@@ -8,7 +8,7 @@
 #' @param ... Variable names (unquoted) or tidyselect expressions
 #' @param weights Name of the weights variable (unquoted), or a numeric vector of weights
 #' @param probs Numeric vector of probabilities (default: c(0, 0.25, 0.5, 0.75, 1))
-#' @param na.rm Logical; if TRUE, missing values are removed
+#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
 #'
 #' @return A w_quantile object (list) containing results and metadata, or numeric values in summarise context
 #' 
@@ -35,28 +35,16 @@
 #' @export
 w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE) {
   
-  # Handle the case where data is a vector (e.g., in summarise context)
+  # Handle summarise() context
   if (is.numeric(data) && !is.data.frame(data)) {
-    # This is the summarise() context - data is actually the variable values
     x <- data
     weights_arg <- substitute(weights)
-    
-    # Use helper function to evaluate weights
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
     
-    # Create consistent quantile labels
-    quantile_labels <- paste0(probs * 100, "%")
-    quantile_labels[quantile_labels == "0%"] <- "Min"
-    quantile_labels[quantile_labels == "100%"] <- "Max"
-    
-    # Calculate weighted or unweighted quantiles
     if (!.are_weights(weights_vec) || !.validate_weights(weights_vec, verbose = FALSE)) {
       # Unweighted calculation
-      if (na.rm) {
-        x <- x[!is.na(x)]
-      }
-      result <- quantile(x, probs = probs, na.rm = na.rm)
-      names(result) <- quantile_labels
+      if (na.rm) x <- x[!is.na(x)]
+      return(quantile(x, probs = probs, na.rm = na.rm))
     } else {
       # Weighted calculation
       if (na.rm) {
@@ -67,66 +55,24 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
       
       if (length(x) == 0) {
         result <- rep(NA_real_, length(probs))
-        names(result) <- quantile_labels
+        names(result) <- paste0(probs * 100, "%")
+        return(result)
       } else {
-        # Weighted quantile calculation
-        order_idx <- order(x)
-        x_sorted <- x[order_idx]
-        w_sorted <- weights_vec[order_idx]
-        
-        cumsum_w <- cumsum(w_sorted)
-        total_w <- sum(w_sorted)
-        
-        result <- numeric(length(probs))
-        names(result) <- quantile_labels
-        
-        for (i in seq_along(probs)) {
-          p <- probs[i]
-          target_pos <- p * total_w
-          
-          if (p == 0) {
-            result[i] <- x_sorted[1]
-          } else if (p == 1) {
-            result[i] <- x_sorted[length(x_sorted)]
-          } else {
-            # Find the index where cumulative weight >= target position
-            idx <- which(cumsum_w >= target_pos)[1]
-            
-            if (is.na(idx)) {
-              result[i] <- x_sorted[length(x_sorted)]
-            } else if (idx == 1 || cumsum_w[idx] == target_pos) {
-              result[i] <- x_sorted[idx]
-            } else {
-              # Linear interpolation
-              w_below <- cumsum_w[idx - 1]
-              w_above <- cumsum_w[idx]
-              x_below <- x_sorted[idx - 1]
-              x_above <- x_sorted[idx]
-              
-              # Interpolation factor
-              alpha <- (target_pos - w_below) / (w_above - w_below)
-              result[i] <- x_below + alpha * (x_above - x_below)
-            }
-          }
-        }
+        # Use Hmisc for weighted quantiles
+        return(Hmisc::wtd.quantile(x, weights = weights_vec, probs = probs, na.rm = FALSE))
       }
     }
-    
-    return(result)
   }
   
-  # Original data frame handling code continues here...
+  # Data frame handling
   if (!is.data.frame(data)) {
     stop("data must be a data frame")
   }
   
-  # Get variable names using tidyselect
-  vars <- tidyselect::eval_select(rlang::expr(c(...)), data)
-  if (length(vars) == 0) {
-    stop("No variables selected")
-  }
+  # Get variables and weights
+  vars <- .process_variables(data, ...)
+  var_names <- names(vars)
   
-  # Get weights
   weights_quo <- rlang::enquo(weights)
   if (rlang::quo_is_null(weights_quo)) {
     weights_vec <- NULL
@@ -140,7 +86,6 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
     }
   }
   
-  # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   
   # Create quantile labels
@@ -155,20 +100,18 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
     results <- data %>%
       dplyr::group_modify(~ {
         group_data <- .x
-        results_list <- list()
+        result_cols <- list()
         
-        for (i in seq_along(vars)) {
-          var_name <- names(vars)[i]
+        for (var_name in var_names) {
           x <- group_data[[var_name]]
           
           if (is.null(weights_vec)) {
             # Unweighted calculation
-            if (na.rm) {
-              x <- x[!is.na(x)]
-            }
+            if (na.rm) x <- x[!is.na(x)]
             quantiles <- quantile(x, probs = probs, na.rm = na.rm)
             names(quantiles) <- quantile_labels
-            n_eff <- length(x[!is.na(x)])
+            n_val <- length(x[!is.na(x)])
+            eff_n <- n_val
           } else {
             # Weighted calculation
             w <- group_data[[weights_name]]
@@ -181,89 +124,43 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
             if (length(x) == 0) {
               quantiles <- rep(NA_real_, length(probs))
               names(quantiles) <- quantile_labels
-              n_eff <- 0
+              n_val <- 0
+              eff_n <- 0
             } else {
-              # Weighted quantile calculation
-              order_idx <- order(x)
-              x_sorted <- x[order_idx]
-              w_sorted <- w[order_idx]
-              
-              cumsum_w <- cumsum(w_sorted)
-              total_w <- sum(w_sorted)
-              
-              quantiles <- numeric(length(probs))
+              quantiles <- Hmisc::wtd.quantile(x, weights = w, probs = probs, na.rm = FALSE)
               names(quantiles) <- quantile_labels
-              
-              for (j in seq_along(probs)) {
-                p <- probs[j]
-                target_pos <- p * total_w
-                
-                if (p == 0) {
-                  quantiles[j] <- x_sorted[1]
-                } else if (p == 1) {
-                  quantiles[j] <- x_sorted[length(x_sorted)]
-                } else {
-                  # Find the index where cumulative weight >= target position
-                  idx <- which(cumsum_w >= target_pos)[1]
-                  
-                  if (is.na(idx)) {
-                    quantiles[j] <- x_sorted[length(x_sorted)]
-                  } else if (idx == 1 || cumsum_w[idx] == target_pos) {
-                    quantiles[j] <- x_sorted[idx]
-                  } else {
-                    # Linear interpolation
-                    w_below <- cumsum_w[idx - 1]
-                    w_above <- cumsum_w[idx]
-                    x_below <- x_sorted[idx - 1]
-                    x_above <- x_sorted[idx]
-                    
-                    # Interpolation factor
-                    alpha <- (target_pos - w_below) / (w_above - w_below)
-                    quantiles[j] <- x_below + alpha * (x_above - x_below)
-                  }
-                }
-              }
-              
-              n_eff <- sum(w)^2 / sum(w^2)
+              n_val <- length(x)
+              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
             }
           }
           
           # Add quantiles to results
           for (j in seq_along(quantiles)) {
             col_name <- paste0(var_name, "_", names(quantiles)[j])
-            results_list[[col_name]] <- quantiles[j]
+            result_cols[[col_name]] <- quantiles[j]
           }
-          results_list[[paste0(var_name, "_n_eff")]] <- n_eff
+          result_cols[[paste0(var_name, "_n")]] <- n_val
+          result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
         }
         
-        tibble::tibble(!!!results_list)
-      })
-    
-    # Extract group information for metadata
-    group_info <- results %>%
-      dplyr::select(dplyr::all_of(group_vars)) %>%
-      dplyr::distinct()
-    
-    # Create results data frame
-    results_df <- results %>%
+        tibble::tibble(!!!result_cols)
+      }) %>%
       dplyr::ungroup()
     
   } else {
     # Handle ungrouped data
-    results_list <- list()
+    result_cols <- list()
     
-    for (i in seq_along(vars)) {
-      var_name <- names(vars)[i]
+    for (var_name in var_names) {
       x <- data[[var_name]]
       
       if (is.null(weights_vec)) {
         # Unweighted calculation
-        if (na.rm) {
-          x <- x[!is.na(x)]
-        }
+        if (na.rm) x <- x[!is.na(x)]
         quantiles <- quantile(x, probs = probs, na.rm = na.rm)
         names(quantiles) <- quantile_labels
-        n_eff <- length(x[!is.na(x)])
+        n_val <- length(x[!is.na(x)])
+        eff_n <- n_val
       } else {
         # Weighted calculation
         if (na.rm) {
@@ -277,73 +174,42 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
         if (length(x) == 0) {
           quantiles <- rep(NA_real_, length(probs))
           names(quantiles) <- quantile_labels
-          n_eff <- 0
+          n_val <- 0
+          eff_n <- 0
         } else {
-          # Weighted quantile calculation
-          order_idx <- order(x)
-          x_sorted <- x[order_idx]
-          w_sorted <- w[order_idx]
-          
-          cumsum_w <- cumsum(w_sorted)
-          total_w <- sum(w_sorted)
-          
-          quantiles <- numeric(length(probs))
+          quantiles <- Hmisc::wtd.quantile(x, weights = w, probs = probs, na.rm = FALSE)
           names(quantiles) <- quantile_labels
-          
-          for (j in seq_along(probs)) {
-            p <- probs[j]
-            target_pos <- p * total_w
-            
-            if (p == 0) {
-              quantiles[j] <- x_sorted[1]
-            } else if (p == 1) {
-              quantiles[j] <- x_sorted[length(x_sorted)]
-            } else {
-              # Find the index where cumulative weight >= target position
-              idx <- which(cumsum_w >= target_pos)[1]
-              
-              if (is.na(idx)) {
-                quantiles[j] <- x_sorted[length(x_sorted)]
-              } else if (idx == 1 || cumsum_w[idx] == target_pos) {
-                quantiles[j] <- x_sorted[idx]
-              } else {
-                # Linear interpolation
-                w_below <- cumsum_w[idx - 1]
-                w_above <- cumsum_w[idx]
-                x_below <- x_sorted[idx - 1]
-                x_above <- x_sorted[idx]
-                
-                # Interpolation factor
-                alpha <- (target_pos - w_below) / (w_above - w_below)
-                quantiles[j] <- x_below + alpha * (x_above - x_below)
-              }
-            }
-          }
-          
-          n_eff <- sum(w)^2 / sum(w^2)
+          n_val <- length(x)
+          eff_n <- sum(w)^2 / sum(w^2)
         }
       }
       
       # Add quantiles to results
       for (j in seq_along(quantiles)) {
         col_name <- paste0(var_name, "_", names(quantiles)[j])
-        results_list[[col_name]] <- quantiles[j]
+        result_cols[[col_name]] <- quantiles[j]
       }
-      results_list[[paste0(var_name, "_n_eff")]] <- n_eff
+      result_cols[[paste0(var_name, "_n")]] <- n_val
+      result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
     }
     
-    results_df <- tibble::tibble(!!!results_list)
-    group_info <- NULL
+    results <- tibble::tibble(!!!result_cols)
   }
   
-  # Create S3 object
+  # Create test-compatible results structure 
+  # For w_quantile, we maintain the quantile column structure
+  # but add standard test-compatible fields
+  
+  # Create S3 object with test-compatible structure
   result <- list(
-    results = results_df,
-    variables = names(vars),
-    weights = weights_name,
+    results = results,
+    variables = var_names,
+    weight_var = weights_name,        # Test-compatible field name
+    weights = weights_name,           # Alternative field name
     probs = probs,
-    grouped = is_grouped,
-    group_vars = if (is_grouped) dplyr::group_vars(data) else NULL
+    is_grouped = is_grouped,          # Test-compatible field
+    grouped = is_grouped,             # Alternative field
+    groups = if (is_grouped) dplyr::group_vars(data) else NULL
   )
   
   class(result) <- "w_quantile"

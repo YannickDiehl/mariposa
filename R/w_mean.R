@@ -1,4 +1,3 @@
-
 #' Weighted Mean
 #'
 #' Calculate weighted mean for numeric variables, with support for 
@@ -76,16 +75,14 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
     return(result)
   }
   
-  # Original data frame handling code continues here...
+  # Data frame handling code
   if (!is.data.frame(data)) {
     stop("data must be a data frame")
   }
   
   # Get variable names using tidyselect
-  vars <- tidyselect::eval_select(rlang::expr(c(...)), data)
-  if (length(vars) == 0) {
-    stop("No variables selected")
-  }
+  vars <- .process_variables(data, ...)
+  var_names <- names(vars)
   
   # Get weights
   weights_quo <- rlang::enquo(weights)
@@ -111,10 +108,10 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
     results <- data %>%
       dplyr::group_modify(~ {
         group_data <- .x
-        results_list <- list()
         
-        for (i in seq_along(vars)) {
-          var_name <- names(vars)[i]
+        # Calculate for each variable
+        result_cols <- list()
+        for (var_name in var_names) {
           x <- group_data[[var_name]]
           
           if (is.null(weights_vec)) {
@@ -123,7 +120,8 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
               x <- x[!is.na(x)]
             }
             mean_val <- mean(x, na.rm = na.rm)
-            n_eff <- length(x[!is.na(x)])
+            n_val <- length(x[!is.na(x)])
+            eff_n <- n_val
           } else {
             # Weighted calculation
             w <- group_data[[weights_name]]
@@ -135,35 +133,29 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
             
             if (length(x) == 0) {
               mean_val <- NA_real_
-              n_eff <- 0
+              n_val <- 0
+              eff_n <- 0
             } else {
               mean_val <- sum(x * w) / sum(w)
-              n_eff <- sum(w)^2 / sum(w^2)
+              n_val <- length(x)
+              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
             }
           }
           
-          results_list[[var_name]] <- mean_val
-          results_list[[paste0(var_name, "_n_eff")]] <- n_eff
+          result_cols[[var_name]] <- mean_val
+          result_cols[[paste0(var_name, "_n")]] <- n_val
+          result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
         }
         
-        tibble::tibble(!!!results_list)
-      })
-    
-    # Extract group information for metadata
-    group_info <- results %>%
-      dplyr::select(dplyr::all_of(group_vars)) %>%
-      dplyr::distinct()
-    
-    # Create results data frame
-    results_df <- results %>%
+        tibble::tibble(!!!result_cols)
+      }) %>%
       dplyr::ungroup()
     
   } else {
     # Handle ungrouped data
-    results_list <- list()
+    result_cols <- list()
     
-    for (i in seq_along(vars)) {
-      var_name <- names(vars)[i]
+    for (var_name in var_names) {
       x <- data[[var_name]]
       
       if (is.null(weights_vec)) {
@@ -172,7 +164,8 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
           x <- x[!is.na(x)]
         }
         mean_val <- mean(x, na.rm = na.rm)
-        n_eff <- length(x[!is.na(x)])
+        n_val <- length(x[!is.na(x)])
+        eff_n <- n_val
       } else {
         # Weighted calculation
         if (na.rm) {
@@ -185,80 +178,107 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
         
         if (length(x) == 0) {
           mean_val <- NA_real_
-          n_eff <- 0
+          n_val <- 0
+          eff_n <- 0
         } else {
           mean_val <- sum(x * w) / sum(w)
-          n_eff <- sum(w)^2 / sum(w^2)
+          n_val <- length(x)
+          eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
         }
       }
       
-      results_list[[var_name]] <- mean_val
-      results_list[[paste0(var_name, "_n_eff")]] <- n_eff
+      result_cols[[var_name]] <- mean_val
+      result_cols[[paste0(var_name, "_n")]] <- n_val
+      result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
     }
     
-    results_df <- tibble::tibble(!!!results_list)
-    group_info <- NULL
+    results <- tibble::tibble(!!!result_cols)
   }
   
-  # Create hybrid results structure for test compatibility
-  hybrid_results <- results_df
-  
-  # Add test-compatible column names based on whether analysis is weighted
-  stat_prefix <- if (!is.null(weights_name)) "weighted_" else ""
-  
-  # For multiple variables, create long format with Variable column
-  if (length(vars) > 1 && !is_grouped) {
-    # Long format for multiple variables
-    long_results <- list()
-    for (i in seq_along(vars)) {
-      var <- names(vars)[i]
-      if (var %in% names(results_df)) {
-        row_data <- data.frame(
-          Variable = var,
-          stringsAsFactors = FALSE
-        )
+  # Create standardized results structure for test compatibility
+  if (length(var_names) > 1) {
+    # Multiple variables: Create long format with Variable column
+    results_long <- list()
+    for (i in seq_along(var_names)) {
+      var_name <- var_names[i]
+      
+      # Handle grouped vs ungrouped data
+      if (is_grouped) {
+        # For grouped data, extract unique combinations
+        group_combinations <- results %>% 
+          dplyr::select(dplyr::all_of(group_vars)) %>% 
+          dplyr::distinct()
         
-        # Add the statistic value
-        row_data[[paste0(stat_prefix, "mean")]] <- results_df[[var]]
+        for (j in 1:nrow(group_combinations)) {
+          group_filter <- group_combinations[j, , drop = FALSE]
+          
+          # Filter results for this group
+          group_results <- results
+          for (grp in names(group_filter)) {
+            group_results <- group_results[group_results[[grp]] == group_filter[[grp]], ]
+          }
+          
+          if (nrow(group_results) > 0) {
+            row_data <- group_filter
+            row_data$Variable <- var_name
+            
+            # Add weighted/unweighted columns
+            if (!is.null(weights_name)) {
+              row_data$weighted_mean <- group_results[[var_name]][1]
+              row_data$effective_n <- group_results[[paste0(var_name, "_eff_n")]][1]
+            } else {
+              row_data$mean <- group_results[[var_name]][1]
+              row_data$n <- group_results[[paste0(var_name, "_n")]][1]
+            }
+            
+            results_long[[length(results_long) + 1]] <- row_data
+          }
+        }
+      } else {
+        # Ungrouped data
+        row_data <- tibble::tibble(Variable = var_name)
         
-        # Add effective n
-        n_eff_col <- paste0(var, "_n_eff")
-        if (n_eff_col %in% names(results_df)) {
-          row_data[[paste0(stat_prefix, "n")]] <- results_df[[n_eff_col]]
-          row_data[["effective_n"]] <- results_df[[n_eff_col]]  # Test-specific name
+        if (!is.null(weights_name)) {
+          row_data$weighted_mean <- results[[var_name]][1]
+          row_data$effective_n <- results[[paste0(var_name, "_eff_n")]][1]
+        } else {
+          row_data$mean <- results[[var_name]][1]
+          row_data$n <- results[[paste0(var_name, "_n")]][1]
         }
         
-        long_results[[i]] <- row_data
+        results_long[[i]] <- row_data
       }
     }
-    hybrid_results <- do.call(rbind, long_results)
+    
+    final_results <- dplyr::bind_rows(results_long)
   } else {
-    # Single variable or grouped: add test-compatible columns
-    for (var in names(vars)) {
-      if (var %in% names(results_df)) {
-        # Add test-compatible columns while preserving variable-based access
-        hybrid_results[[paste0(stat_prefix, "mean")]] <- results_df[[var]]
-        
-        # Add effective n columns
-        n_eff_col <- paste0(var, "_n_eff")
-        if (n_eff_col %in% names(results_df)) {
-          hybrid_results[[paste0(stat_prefix, "n")]] <- results_df[[n_eff_col]]
-          hybrid_results[["effective_n"]] <- results_df[[n_eff_col]]  # Test-specific name
-        }
-      }
+    # Single variable: Simplified structure
+    var_name <- var_names[1]
+    
+    if (!is.null(weights_name)) {
+      final_results <- results %>%
+        dplyr::mutate(
+          weighted_mean = !!rlang::sym(var_name),
+          effective_n = !!rlang::sym(paste0(var_name, "_eff_n"))
+        )
+    } else {
+      final_results <- results %>%
+        dplyr::mutate(
+          mean = !!rlang::sym(var_name),
+          n = !!rlang::sym(paste0(var_name, "_n"))
+        )
     }
   }
-
-  # Create S3 object with hybrid compatibility
+  
+  # Create S3 object with test-compatible structure
   result <- list(
-    results = hybrid_results,
-    variables = names(vars),
-    weights = weights_name,          # Current field name
-    weight_var = weights_name,       # Test-compatible field name
-    grouped = is_grouped,            # Current field
-    is_grouped = is_grouped,         # Test-compatible field
-    group_vars = if (is_grouped) dplyr::group_vars(data) else NULL,  # Current field
-    groups = if (is_grouped) dplyr::group_vars(data) else NULL        # Test-compatible field
+    results = final_results,
+    variables = var_names,
+    weight_var = weights_name,        # Test-compatible field name
+    weights = weights_name,           # Alternative field name
+    is_grouped = is_grouped,          # Test-compatible field
+    grouped = is_grouped,             # Alternative field
+    groups = if (is_grouped) dplyr::group_vars(data) else NULL
   )
   
   class(result) <- "w_mean"
@@ -280,131 +300,70 @@ print.w_mean <- function(x, digits = 3, ...) {
   cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
   
   # Check if this is grouped data
-  is_grouped_data <- !is.null(x$grouped) && x$grouped
+  is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
   
   if (is_grouped_data) {
     # Handle grouped results
-    groups <- unique(x$results[x$group_vars])
-    
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
+    for (group_val in unique(x$results[[x$groups[1]]])) {
+      group_results <- x$results[x$results[[x$groups[1]]] == group_val, ]
       
-      # Format group info
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", as.character(val))
-        } else {
-          paste(g, "=", val)
-        }
-      })
-      group_info <- paste(group_info, collapse = ", ")
+      cat(sprintf("\nGroup: %s = %s\n", x$groups[1], group_val))
       
-      # Filter results for current group
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      # Print formatted results
+      print_df <- group_results
+      if (!is.null(x$weights)) {
+        # Show weighted columns
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "weighted_mean", "effective_n")))
+        print_df$weighted_mean <- round(print_df$weighted_mean, digits)
+        print_df$effective_n <- round(print_df$effective_n, 1)
+      } else {
+        # Show unweighted columns  
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "mean", "n")))
+        print_df$mean <- round(print_df$mean, digits)
       }
       
-      if (nrow(group_results) == 0) next
-      
-      cat(sprintf("\nGroup: %s\n", group_info))
-      
-      # Process each variable in this group as separate blocks
-      for (var in x$variables) {
-        cat(sprintf("\n┌─ %s ─┐\n", var))
-        cat("\n")  # Add blank line after variable name
-        
-        # Create results table for this variable
-        var_mean <- round(group_results[[var]], digits)
-        n_eff_col <- paste0(var, "_n_eff")
-        var_n <- if (n_eff_col %in% names(group_results)) round(group_results[[n_eff_col]], 1) else NA
-        
-        results_df <- data.frame(
-          Variable = var,
-          Mean = var_mean,
-          N = var_n,
-          stringsAsFactors = FALSE
-        )
-        
-        if (!is.null(x$weights)) {
-          results_df$Effective_N <- var_n
-          results_df$Weights <- x$weights
-        }
-        
-        # Calculate border width
-        col_widths <- sapply(names(results_df), function(col) {
-          max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
-        })
-        total_width <- sum(col_widths) + length(col_widths) - 1
-        border_width <- paste(rep("-", total_width), collapse = "")
-        
-        cat(sprintf("%s:\n", test_type))
-        cat(border_width, "\n")
-        print(results_df, row.names = FALSE)
-        cat(border_width, "\n")
-      }
+      print(print_df, row.names = FALSE)
     }
   } else {
     # Handle ungrouped results
-    for (var in x$variables) {
-      cat(sprintf("\n┌─ %s ─┐\n", var))
-      cat("\n")  # Add blank line after variable name
-      
-      # Create results table for this variable - handle hybrid structure
-      if ("Variable" %in% names(x$results)) {
-        # Long format: access via filtered rows
-        var_data <- x$results[x$results$Variable == var, ]
-        if (nrow(var_data) > 0) {
-          var_mean <- round(var_data$weighted_mean[1], digits)
-          var_n <- if ("weighted_n" %in% names(var_data)) round(var_data$weighted_n[1], 1) else 
-                   if ("effective_n" %in% names(var_data)) round(var_data$effective_n[1], 1) else NA
-        } else {
-          var_mean <- NA
-          var_n <- NA
-        }
+    print_df <- x$results
+    
+    if (!is.null(x$weights)) {
+      # Show weighted columns
+      if ("Variable" %in% names(print_df)) {
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "weighted_mean", "effective_n")))
       } else {
-        # Wide format: direct column access
-        var_mean <- round(x$results[[var]], digits)
-        n_eff_col <- paste0(var, "_n_eff")
-        var_n <- if (n_eff_col %in% names(x$results)) round(x$results[[n_eff_col]], 1) else NA
+        # Single variable case
+        print_df <- tibble::tibble(
+          Variable = x$variables[1],
+          weighted_mean = round(print_df$weighted_mean[1], digits),
+          effective_n = round(print_df$effective_n[1], 1)
+        )
       }
-      
-      results_df <- data.frame(
-        Variable = var,
-        Mean = var_mean,
-        N = var_n,
-        stringsAsFactors = FALSE
-      )
-      
-      if (!is.null(x$weights)) {
-        results_df$Effective_N <- var_n
-        results_df$Weights <- x$weights
+      print_df$weighted_mean <- round(print_df$weighted_mean, digits)
+      print_df$effective_n <- round(print_df$effective_n, 1)
+    } else {
+      # Show unweighted columns
+      if ("Variable" %in% names(print_df)) {
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "mean", "n")))
+      } else {
+        # Single variable case
+        print_df <- tibble::tibble(
+          Variable = x$variables[1],
+          mean = round(print_df$mean[1], digits),
+          n = round(print_df$n[1], 0)
+        )
       }
-      
-      # Calculate border width
-      col_widths <- sapply(names(results_df), function(col) {
-        max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
-      })
-      total_width <- sum(col_widths) + length(col_widths) - 1
-      border_width <- paste(rep("-", total_width), collapse = "")
-      
-      cat(sprintf("%s:\n", test_type))
-      cat(border_width, "\n")
-      print(results_df, row.names = FALSE)
-      cat(border_width, "\n")
-      
-      # Add test-compatible text patterns
-      if (!is.null(x$weights)) {
-        cat("Column weighted_mean:", var_mean, "\n")
-        cat("Column effective_n:", var_n, "\n")
-      }
-      
-      if (which(x$variables == var) < length(x$variables)) {
-        cat("\n")  # Add spacing between variables
-      }
+      print_df$mean <- round(print_df$mean, digits)
     }
+    
+    print(print_df, row.names = FALSE)
   }
   
+  cat("\n")
   invisible(x)
 }
