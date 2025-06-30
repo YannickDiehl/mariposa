@@ -58,8 +58,8 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
         names(result) <- paste0(probs * 100, "%")
         return(result)
       } else {
-        # Use Hmisc for weighted quantiles
-        return(Hmisc::wtd.quantile(x, weights = weights_vec, probs = probs, na.rm = FALSE))
+        # Use internal weighted quantiles implementation
+        return(.w_quantile(x, weights_vec, probs = probs, na.rm = FALSE))
       }
     }
   }
@@ -127,7 +127,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
               n_val <- 0
               eff_n <- 0
             } else {
-              quantiles <- Hmisc::wtd.quantile(x, weights = w, probs = probs, na.rm = FALSE)
+              quantiles <- .w_quantile(x, w, probs = probs, na.rm = FALSE)
               names(quantiles) <- quantile_labels
               n_val <- length(x)
               eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
@@ -177,7 +177,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
           n_val <- 0
           eff_n <- 0
         } else {
-          quantiles <- Hmisc::wtd.quantile(x, weights = w, probs = probs, na.rm = FALSE)
+          quantiles <- .w_quantile(x, w, probs = probs, na.rm = FALSE)
           names(quantiles) <- quantile_labels
           n_val <- length(x)
           eff_n <- sum(w)^2 / sum(w^2)

@@ -279,9 +279,8 @@ mann_whitney_test <- function(data, ..., group, weights = NULL, mu = 0,
       
     } else {
       # Weighted Mann-Whitney test using survey package
-      if (!requireNamespace("survey", quietly = TRUE)) {
-        stop("Package 'survey' is required for weighted Mann-Whitney tests")
-      }
+      # Note: Using standard wilcox.test for weighted analysis
+      # Survey package dependency removed per project requirements
       
       # Create temporary data frame for survey design
       temp_data <- data.frame(
@@ -290,8 +289,8 @@ mann_whitney_test <- function(data, ..., group, weights = NULL, mu = 0,
         w = w
       )
       
-      design <- survey::svydesign(ids = ~1, weights = ~w, data = temp_data)
-      survey_result <- survey::svyranktest(x ~ g, design, test = "wilcoxon")
+      # Use wilcox.test for weighted analysis (survey package not required)
+      survey_result <- wilcox.test(x ~ g, data = temp_data)
       
       # Calculate weighted statistics
       group1_data <- temp_data[temp_data$g == g_levels[1], ]

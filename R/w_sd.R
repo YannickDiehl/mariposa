@@ -288,52 +288,79 @@ print.w_sd <- function(x, digits = 3, ...) {
       
       cat(sprintf("\nGroup: %s = %s\n", x$groups[1], group_val))
       
-      print_df <- group_results
-      if (!is.null(x$weights)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "weighted_sd", "effective_n")))
-        print_df$weighted_sd <- round(print_df$weighted_sd, digits)
-        print_df$effective_n <- round(print_df$effective_n, 1)
-      } else {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "sd", "n")))
-        print_df$sd <- round(print_df$sd, digits)
+      # Process each variable with Unicode boxes
+      for (var_name in unique(group_results$Variable)) {
+        var_data <- group_results[group_results$Variable == var_name, ]
+        
+        cat(sprintf("\n┌─ %s ─┐\n", var_name))
+        
+        # Create formatted output
+        if (!is.null(x$weights)) {
+          output_df <- data.frame(
+            Variable = var_name,
+            weighted_sd = round(var_data$weighted_sd[1], digits),
+            Effective_N = round(var_data$effective_n[1], 1)
+          )
+        } else {
+          output_df <- data.frame(
+            Variable = var_name,
+            sd = round(var_data$sd[1], digits),
+            N = round(var_data$n[1], 0)
+          )
+        }
+        
+        print(output_df, row.names = FALSE)
       }
-      
-      print(print_df, row.names = FALSE)
     }
   } else {
     # Handle ungrouped results
-    print_df <- x$results
-    
-    if (!is.null(x$weights)) {
-      if ("Variable" %in% names(print_df)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "weighted_sd", "effective_n")))
-      } else {
-        print_df <- tibble::tibble(
-          Variable = x$variables[1],
-          weighted_sd = round(print_df$weighted_sd[1], digits),
-          effective_n = round(print_df$effective_n[1], 1)
-        )
-      }
-      print_df$weighted_sd <- round(print_df$weighted_sd, digits)
-      print_df$effective_n <- round(print_df$effective_n, 1)
+    variables <- if ("Variable" %in% names(x$results)) {
+      unique(x$results$Variable)
     } else {
-      if ("Variable" %in% names(print_df)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "sd", "n")))
-      } else {
-        print_df <- tibble::tibble(
-          Variable = x$variables[1],
-          sd = round(print_df$sd[1], digits),
-          n = round(print_df$n[1], 0)
-        )
-      }
-      print_df$sd <- round(print_df$sd, digits)
+      x$variables
     }
     
-    print(print_df, row.names = FALSE)
+    for (var_name in variables) {
+      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      
+      if (!is.null(x$weights)) {
+        # Show weighted columns with proper capitalization
+        if ("Variable" %in% names(x$results)) {
+          var_data <- x$results[x$results$Variable == var_name, ]
+          output_df <- data.frame(
+            Variable = var_name,
+            weighted_sd = round(var_data$weighted_sd[1], digits),
+            Effective_N = round(var_data$effective_n[1], 1)
+          )
+        } else {
+          # Single variable case
+          output_df <- data.frame(
+            Variable = var_name,
+            weighted_sd = round(x$results$weighted_sd[1], digits),
+            Effective_N = round(x$results$effective_n[1], 1)
+          )
+        }
+      } else {
+        # Show unweighted columns
+        if ("Variable" %in% names(x$results)) {
+          var_data <- x$results[x$results$Variable == var_name, ]
+          output_df <- data.frame(
+            Variable = var_name,
+            sd = round(var_data$sd[1], digits),
+            N = round(var_data$n[1], 0)
+          )
+        } else {
+          # Single variable case
+          output_df <- data.frame(
+            Variable = var_name,
+            sd = round(x$results$sd[1], digits),
+            N = round(x$results$n[1], 0)
+          )
+        }
+      }
+      
+      print(output_df, row.names = FALSE)
+    }
   }
   
   cat("\n")

@@ -309,59 +309,77 @@ print.w_mean <- function(x, digits = 3, ...) {
       
       cat(sprintf("\nGroup: %s = %s\n", x$groups[1], group_val))
       
-      # Print formatted results
-      print_df <- group_results
-      if (!is.null(x$weights)) {
-        # Show weighted columns
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "weighted_mean", "effective_n")))
-        print_df$weighted_mean <- round(print_df$weighted_mean, digits)
-        print_df$effective_n <- round(print_df$effective_n, 1)
-      } else {
-        # Show unweighted columns  
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "mean", "n")))
-        print_df$mean <- round(print_df$mean, digits)
+      # Process each variable with Unicode boxes
+      for (var_name in x$variables) {
+        cat(sprintf("\n┌─ %s ─┐\n", var_name))
+        
+        # Create formatted output
+        if (!is.null(x$weights)) {
+          output_df <- data.frame(
+            Variable = var_name,
+            weighted_mean = round(group_results$weighted_mean[1], digits),
+            Effective_N = round(group_results$effective_n[1], 1)
+          )
+        } else {
+          output_df <- data.frame(
+            Variable = var_name,
+            mean = round(group_results[[var_name]][1], digits),
+            N = round(group_results[[paste0(var_name, "_n")]][1], 0)
+          )
+        }
+        
+        print(output_df, row.names = FALSE)
       }
-      
-      print(print_df, row.names = FALSE)
     }
   } else {
     # Handle ungrouped results
-    print_df <- x$results
-    
-    if (!is.null(x$weights)) {
-      # Show weighted columns
-      if ("Variable" %in% names(print_df)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "weighted_mean", "effective_n")))
-      } else {
-        # Single variable case
-        print_df <- tibble::tibble(
-          Variable = x$variables[1],
-          weighted_mean = round(print_df$weighted_mean[1], digits),
-          effective_n = round(print_df$effective_n[1], 1)
-        )
-      }
-      print_df$weighted_mean <- round(print_df$weighted_mean, digits)
-      print_df$effective_n <- round(print_df$effective_n, 1)
+    variables <- if ("Variable" %in% names(x$results)) {
+      unique(x$results$Variable)
     } else {
-      # Show unweighted columns
-      if ("Variable" %in% names(print_df)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "mean", "n")))
-      } else {
-        # Single variable case
-        print_df <- tibble::tibble(
-          Variable = x$variables[1],
-          mean = round(print_df$mean[1], digits),
-          n = round(print_df$n[1], 0)
-        )
-      }
-      print_df$mean <- round(print_df$mean, digits)
+      x$variables
     }
     
-    print(print_df, row.names = FALSE)
+    for (var_name in variables) {
+      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      
+      if (!is.null(x$weights)) {
+        # Show weighted columns with proper capitalization
+        if ("Variable" %in% names(x$results)) {
+          var_data <- x$results[x$results$Variable == var_name, ]
+          output_df <- data.frame(
+            Variable = var_name,
+            weighted_mean = round(var_data$weighted_mean[1], digits),
+            Effective_N = round(var_data$effective_n[1], 1)
+          )
+        } else {
+          # Single variable case
+          output_df <- data.frame(
+            Variable = var_name,
+            weighted_mean = round(x$results$weighted_mean[1], digits),
+            Effective_N = round(x$results$effective_n[1], 1)
+          )
+        }
+      } else {
+        # Show unweighted columns
+        if ("Variable" %in% names(x$results)) {
+          var_data <- x$results[x$results$Variable == var_name, ]
+          output_df <- data.frame(
+            Variable = var_name,
+            mean = round(var_data$mean[1], digits),
+            N = round(var_data$n[1], 0)
+          )
+        } else {
+          # Single variable case
+          output_df <- data.frame(
+            Variable = var_name,
+            mean = round(x$results$mean[1], digits),
+            N = round(x$results$n[1], 0)
+          )
+        }
+      }
+      
+      print(output_df, row.names = FALSE)
+    }
   }
   
   cat("\n")

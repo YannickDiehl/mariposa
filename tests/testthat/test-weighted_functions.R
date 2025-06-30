@@ -216,7 +216,7 @@ test_that("weighted functions print output is correctly formatted", {
   expect_true(any(grepl("Weighted Mean", output)))
   expect_true(any(grepl("┌─ life_satisfaction ─┐", output)))
   expect_true(any(grepl("weighted_mean", output)))
-  expect_true(any(grepl("effective_n", output)))
+  expect_true(any(grepl("Effective_N", output)))
 })
 
 test_that("weighted functions show effective sample size", {

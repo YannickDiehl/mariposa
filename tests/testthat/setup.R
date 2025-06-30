@@ -2,7 +2,7 @@
 # This file runs before all tests to ensure package is properly loaded
 
 # Load the package for testing
-devtools::load_all()
+library(SurveyStat)
 
 # Ensure our datasets are available
 tryCatch({

@@ -334,7 +334,7 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
 #' Print method for frequency_results objects
 #'
 #' @description
-#' Prints formatted frequency statistics with ASCII tables.
+#' Prints formatted frequency statistics with Unicode box headers and ASCII tables.
 #'
 #' @param x An object of class "frequency_results"
 #' @param digits Number of decimal places to display (default: 3)
@@ -342,25 +342,97 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
 #'
 #' @export
 print.frequency_results <- function(x, digits = 3, ...) {
-  # Helper functions for formatting
-  format_num <- function(x, width = 6) sprintf(paste0("%-", width, ".2f"), ifelse(is.na(x), NA, x))
-  format_int <- function(x, width = 6) sprintf(paste0("%-", width, "d"), ifelse(is.na(x), NA, as.integer(x)))
-  format_str <- function(x, width) sprintf(paste0("%-", width, "s"), substr(as.character(x), 1, width))
   
-  print_line <- function(widths) {
-    cat("+", paste(sapply(widths, function(w) paste(rep("-", w), collapse = "")), collapse = "+"), "+\n", sep = "")
+  # Helper function to format stats line
+  format_stats_line <- function(stats, var_results, weights_present) {
+    stats_parts <- c()
+    
+    # Always show N and valid N
+    stats_parts <- c(stats_parts, sprintf("N=%d", stats$total_n))
+    stats_parts <- c(stats_parts, sprintf("valid=%d", stats$valid_n))
+    
+    # Add Effective_N if weighted
+    if (weights_present && "n_eff" %in% names(var_results) && !is.na(var_results$n_eff[1])) {
+      stats_parts <- c(stats_parts, sprintf("Effective_N=%.1f", var_results$n_eff[1]))
+    }
+    
+    # Add mean and SD only for numeric variables (not NA)
+    if (!is.na(stats$mean) && !is.na(stats$sd)) {
+      stats_parts <- c(stats_parts, sprintf("mean=%.2f", stats$mean))
+      stats_parts <- c(stats_parts, sprintf("sd=%.2f", stats$sd))
+    }
+    
+    return(paste(stats_parts, collapse = ", "))
   }
   
-  print_row <- function(values, widths) {
-    cat("|", paste(mapply(format_str, values, widths), collapse = "|"), "|\n", sep = "")
+  # Helper function to print Unicode ASCII tables
+  print_unicode_table <- function(data, headers, col_widths) {
+    n_cols <- length(headers)
+    
+    # Top border
+    cat("┌")
+    for (i in seq_len(n_cols)) {
+      cat(paste(rep("─", col_widths[i]), collapse = ""))
+      if (i < n_cols) cat("┬") else cat("┐")
+    }
+    cat("\n")
+    
+    # Headers
+    cat("│")
+    for (i in seq_len(n_cols)) {
+      header_text <- sprintf(paste0("%-", col_widths[i], "s"), substr(headers[i], 1, col_widths[i]))
+      cat(header_text)
+      if (i < n_cols) cat("│") else cat("│")
+    }
+    cat("\n")
+    
+    # Header separator
+    cat("├")
+    for (i in seq_len(n_cols)) {
+      cat(paste(rep("─", col_widths[i]), collapse = ""))
+      if (i < n_cols) cat("┼") else cat("┤")
+    }
+    cat("\n")
+    
+    # Data rows
+    for (row_idx in seq_len(nrow(data))) {
+      cat("│")
+      for (i in seq_len(n_cols)) {
+        value <- data[row_idx, i]
+        if (is.numeric(value) && !is.na(value)) {
+          if (abs(value - round(value)) < 1e-10) {
+            # Integer values
+            formatted_value <- sprintf(paste0("%-", col_widths[i], "d"), as.integer(value))
+          } else {
+            # Decimal values
+            formatted_value <- sprintf(paste0("%-", col_widths[i], ".2f"), value)
+          }
+        } else {
+          # Character or NA values
+          formatted_value <- sprintf(paste0("%-", col_widths[i], "s"), 
+                                   if (is.na(value)) "NA" else substr(as.character(value), 1, col_widths[i]))
+        }
+        cat(formatted_value)
+        if (i < n_cols) cat("│") else cat("│")
+      }
+      cat("\n")
+    }
+    
+    # Bottom border
+    cat("└")
+    for (i in seq_len(n_cols)) {
+      cat(paste(rep("─", col_widths[i]), collapse = ""))
+      if (i < n_cols) cat("┴") else cat("┘")
+    }
+    cat("\n")
   }
-  
-  col_widths <- c(Value = 6, Label = 20, N = 8, Raw = 8, Valid = 8, Cum = 8)
   
   # Print results for each variable
   for (var in x$variables) {
     var_label <- x$labels[var]
-    cat(sprintf("\n%s (%s)\n", var, var_label))
+    
+    # Unicode box header
+    cat(sprintf("\n┌─ %s ─┐\n", var))
     
     if (x$is_grouped) {
       unique_groups <- unique(x$results[x$groups])
@@ -388,78 +460,95 @@ print.frequency_results <- function(x, digits = 3, ...) {
         }
         stats <- group_stats[group_stats$Variable == var, ]
         
-        # Print group header and table
+        # Print group header
         cat(sprintf("\nGroup: %s\n", group_info))
-        cat(sprintf("# total N=%d valid N=%d mean=%.2f sd=%.2f skewness=%.2f\n\n",
-                    stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
         
-        print_table(group_results, col_widths, print_line, print_row, format_int, format_num, x$options)
+        # Print variable label and stats line
+        stats_line <- format_stats_line(stats, group_results, !is.null(x$weights))
+        cat(sprintf("\n%s (%s)\n\n", var_label, stats_line))
+        
+        # Prepare and print frequency table
+        print_frequency_table(group_results, x$options, print_unicode_table)
       }
     } else {
       # Ungrouped results
       var_results <- x$results[x$results$Variable == var, ]
       stats <- x$stats[x$stats$Variable == var, ]
       
-      cat(sprintf("# total N=%d valid N=%d mean=%.2f sd=%.2f skewness=%.2f\n\n",
-                  stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
+      # Print variable label and stats line
+      stats_line <- format_stats_line(stats, var_results, !is.null(x$weights))
+      cat(sprintf("\n%s (%s)\n\n", var_label, stats_line))
       
-      print_table(var_results, col_widths, print_line, print_row, format_int, format_num, x$options)
+      # Prepare and print frequency table
+      print_frequency_table(var_results, x$options, print_unicode_table)
     }
   }
 }
 
 # Helper function to print frequency table
-print_table <- function(results, col_widths, print_line, print_row, format_int, format_num, options) {
+print_frequency_table <- function(results, options, print_unicode_table) {
   # Determine which columns to show
   headers <- c("Value")
-  width_names <- c("Value")
   
   if (options$show.labels) {
     headers <- c(headers, "Label")
-    width_names <- c(width_names, "Label")
   }
   
   headers <- c(headers, "N")
-  width_names <- c(width_names, "N")
   
   if (options$show.prc) {
     headers <- c(headers, "Raw %")
-    width_names <- c(width_names, "Raw")
   }
   
   if (options$show.valid) {
     headers <- c(headers, "Valid %")
-    width_names <- c(width_names, "Valid")
   }
   
   if (options$show.sum) {
     headers <- c(headers, "Cum. %")
-    width_names <- c(width_names, "Cum")
   }
   
-  # Adjust column widths based on actually shown columns
-  active_widths <- col_widths[width_names]
+  # Set column widths based on shown columns
+  base_widths <- c(Value = 7, Label = 21, N = 9, "Raw %" = 8, "Valid %" = 9, "Cum. %" = 8)
+  active_widths <- base_widths[headers]
   
-  print_line(active_widths)
-  print_row(headers, active_widths)
-  print_line(active_widths)
+  # Prepare data for the table
+  freq_data <- data.frame(stringsAsFactors = FALSE)
   
   for (i in seq_len(nrow(results))) {
     row <- results[i, ]
-    # Only use actual labels, don't fall back to value if label is empty
-    display_label <- if (is.na(row$label) || row$label == "") "" else as.character(row$label)
     
-    values <- c(as.character(row$value))
-    if (options$show.labels) values <- c(values, display_label)
-    values <- c(values, format_int(row$freq))
-    if (options$show.prc) values <- c(values, format_num(row$prc))
-    if (options$show.valid) values <- c(values, ifelse(is.na(row$valid_prc), "NA", format_num(row$valid_prc)))
-    if (options$show.sum) values <- c(values, ifelse(is.na(row$cum_prc), "NA", format_num(row$cum_prc)))
+    # Build row data based on shown columns
+    row_data <- list(Value = as.character(row$value))
     
-    print_row(values, active_widths)
+    if (options$show.labels) {
+      display_label <- if (is.na(row$label) || row$label == "") "" else as.character(row$label)
+      row_data$Label <- display_label
+    }
+    
+    row_data$N <- row$freq
+    
+    if (options$show.prc) {
+      row_data$"Raw %" <- row$prc
+    }
+    
+    if (options$show.valid) {
+      row_data$"Valid %" <- if (is.na(row$valid_prc)) NA else row$valid_prc
+    }
+    
+    if (options$show.sum) {
+      row_data$"Cum. %" <- if (is.na(row$cum_prc)) NA else row$cum_prc
+    }
+    
+    # Convert to data frame row
+    if (i == 1) {
+      freq_data <- data.frame(row_data, stringsAsFactors = FALSE)
+    } else {
+      freq_data <- rbind(freq_data, data.frame(row_data, stringsAsFactors = FALSE))
+    }
   }
   
-  print_line(active_widths)
-  cat("\n")
+  # Print the table
+  print_unicode_table(freq_data, headers, active_widths)
 }
 
