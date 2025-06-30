@@ -21,11 +21,26 @@ src/*.dll
 
 # IDE files
 .vscode/
+.claude/
 *.Rproj
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Development files
+*.backup
+*_backup.R
+test_results.txt
+
+# Temporary files
+SPSS_MILESTONE_COMMIT.sh
+generate_sav_files.R
+
+# Environment-specific
+renv/
+renv.lock
+.Rprofile
 
 # Testing
 tests/testthat/Rplots.pdf
