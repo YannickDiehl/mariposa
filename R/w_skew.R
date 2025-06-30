@@ -90,15 +90,15 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
     return(result)
   }
   
-  # Original data frame handling code
+  # Data frame handling
   if (!is.data.frame(data)) {
     stop("data must be a data frame")
   }
   
-  # Get variable names using tidyselect
+  # Get variables and weights
   vars <- .process_variables(data, ...)
+  var_names <- names(vars)
   
-  # Get weights
   weights_quo <- rlang::enquo(weights)
   if (rlang::quo_is_null(weights_quo)) {
     weights_vec <- NULL
@@ -112,7 +112,6 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
     }
   }
   
-  # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   
   if (is_grouped) {
@@ -122,212 +121,204 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
     results <- data %>%
       dplyr::group_modify(~ {
         group_data <- .x
-        results_list <- list()
+        result_cols <- list()
         
-        for (i in seq_along(vars)) {
-          var_name <- names(vars)[i]
+        for (var_name in var_names) {
           x <- group_data[[var_name]]
           
           if (is.null(weights_vec)) {
             # Unweighted calculation
-            if (na.rm) {
-              x_clean <- x[!is.na(x)]
-            } else {
-              x_clean <- x
-            }
+            if (na.rm) x <- x[!is.na(x)]
             
-            if (length(x_clean) < 3) {
-              skew_val <- NA_real_
-              n_val <- length(x_clean)
-              n_eff <- n_val
+            if (length(x) < 3) {
+              stat_val <- NA_real_
+              n_val <- length(x)
+              eff_n <- n_val
             } else {
-              n <- length(x_clean)
-              mean_x <- mean(x_clean)
-              # Type-1 skewness
-              m2 <- sum((x_clean - mean_x)^2) / n
-              m3 <- sum((x_clean - mean_x)^3) / n
+              n <- length(x)
+              mean_x <- mean(x)
+              m2 <- sum((x - mean_x)^2) / n
+              m3 <- sum((x - mean_x)^3) / n
               type1_skew <- m3 / (m2^(3/2))
-              # Type-2 skewness (sample-corrected)
-              skew_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
+              stat_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
               n_val <- n
-              n_eff <- n
+              eff_n <- n
             }
           } else {
             # Weighted calculation
             w <- group_data[[weights_name]]
             if (na.rm) {
               valid <- !is.na(x) & !is.na(w)
-              x_clean <- x[valid]
-              w_clean <- w[valid]
-            } else {
-              x_clean <- x
-              w_clean <- w
+              x <- x[valid]
+              w <- w[valid]
             }
             
-            if (length(x_clean) < 3) {
-              skew_val <- NA_real_
+            if (length(x) < 3) {
+              stat_val <- NA_real_
               n_val <- 0
-              n_eff <- 0
+              eff_n <- 0
             } else {
-              n <- length(x_clean)
-              # Weighted skewness calculation
-              w_sum <- sum(w_clean)
-              w_mean <- sum(x_clean * w_clean) / w_sum
-              
-              # Weighted second and third central moments (Type-1)
-              m2 <- sum(w_clean * (x_clean - w_mean)^2) / w_sum
-              m3 <- sum(w_clean * (x_clean - w_mean)^3) / w_sum
+              n <- length(x)
+              w_sum <- sum(w)
+              w_mean <- sum(x * w) / w_sum
+              m2 <- sum(w * (x - w_mean)^2) / w_sum
+              m3 <- sum(w * (x - w_mean)^3) / w_sum
               type1_skew <- m3 / (m2^(3/2))
-              
-              # Type-2 correction (adapted for weighted data)
-              skew_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
-              n_val <- w_sum
-              n_eff <- .effective_n(w_clean)
+              stat_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
+              n_val <- length(x)
+              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
             }
           }
           
-          results_list[[paste0(var_name, "_value")]] <- skew_val
-          results_list[[paste0(var_name, "_n")]] <- n_val
-          results_list[[paste0(var_name, "_n_eff")]] <- n_eff
+          result_cols[[var_name]] <- stat_val
+          result_cols[[paste0(var_name, "_n")]] <- n_val
+          result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
         }
         
-        tibble::tibble(!!!results_list)
-      })
+        tibble::tibble(!!!result_cols)
+      }) %>%
+      dplyr::ungroup()
     
   } else {
     # Handle ungrouped data
-    results_list <- list()
+    result_cols <- list()
     
-    for (i in seq_along(vars)) {
-      var_name <- names(vars)[i]
+    for (var_name in var_names) {
       x <- data[[var_name]]
       
       if (is.null(weights_vec)) {
         # Unweighted calculation
-        if (na.rm) {
-          x_clean <- x[!is.na(x)]
-        } else {
-          x_clean <- x
-        }
+        if (na.rm) x <- x[!is.na(x)]
         
-        if (length(x_clean) < 3) {
-          skew_val <- NA_real_
-          n_val <- length(x_clean)
-          n_eff <- n_val
+        if (length(x) < 3) {
+          stat_val <- NA_real_
+          n_val <- length(x)
+          eff_n <- n_val
         } else {
-          n <- length(x_clean)
-          mean_x <- mean(x_clean)
-          # Type-1 skewness
-          m2 <- sum((x_clean - mean_x)^2) / n
-          m3 <- sum((x_clean - mean_x)^3) / n
+          n <- length(x)
+          mean_x <- mean(x)
+          m2 <- sum((x - mean_x)^2) / n
+          m3 <- sum((x - mean_x)^3) / n
           type1_skew <- m3 / (m2^(3/2))
-          # Type-2 skewness (sample-corrected)
-          skew_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
+          stat_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
           n_val <- n
-          n_eff <- n
+          eff_n <- n
         }
       } else {
         # Weighted calculation
         if (na.rm) {
           valid <- !is.na(x) & !is.na(weights_vec)
-          x_clean <- x[valid]
-          w_clean <- weights_vec[valid]
+          x <- x[valid]
+          w <- weights_vec[valid]
         } else {
-          x_clean <- x
-          w_clean <- weights_vec
+          w <- weights_vec
         }
         
-        if (length(x_clean) < 3) {
-          skew_val <- NA_real_
+        if (length(x) < 3) {
+          stat_val <- NA_real_
           n_val <- 0
-          n_eff <- 0
+          eff_n <- 0
         } else {
-          n <- length(x_clean)
-          # Weighted skewness calculation
-          w_sum <- sum(w_clean)
-          w_mean <- sum(x_clean * w_clean) / w_sum
-          
-          # Weighted second and third central moments (Type-1)
-          m2 <- sum(w_clean * (x_clean - w_mean)^2) / w_sum
-          m3 <- sum(w_clean * (x_clean - w_mean)^3) / w_sum
+          n <- length(x)
+          w_sum <- sum(w)
+          w_mean <- sum(x * w) / w_sum
+          m2 <- sum(w * (x - w_mean)^2) / w_sum
+          m3 <- sum(w * (x - w_mean)^3) / w_sum
           type1_skew <- m3 / (m2^(3/2))
-          
-          # Type-2 correction (adapted for weighted data)
-          skew_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
-          n_val <- w_sum
-          n_eff <- .effective_n(w_clean)
+          stat_val <- type1_skew * sqrt(n * (n - 1)) / (n - 2)
+          n_val <- length(x)
+          eff_n <- sum(w)^2 / sum(w^2)
         }
       }
       
-      results_list[[paste0(var_name, "_value")]] <- skew_val
-      results_list[[paste0(var_name, "_n")]] <- n_val
-      results_list[[paste0(var_name, "_n_eff")]] <- n_eff
+      result_cols[[var_name]] <- stat_val
+      result_cols[[paste0(var_name, "_n")]] <- n_val
+      result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
     }
     
-    results_df <- tibble::tibble(!!!results_list)
+    results <- tibble::tibble(!!!result_cols)
   }
   
-  # Create hybrid results structure for test compatibility
-  hybrid_results <- if (is_grouped) results else results_df
-  
-  # Add test-compatible column names based on whether analysis is weighted
-  stat_prefix <- if (!is.null(weights_name)) "weighted_" else ""
-  
-  # For multiple variables, create long format with Variable column
-  if (length(vars) > 1 && !is_grouped) {
-    # Long format for multiple variables
-    long_results <- list()
-    for (i in seq_along(vars)) {
-      var <- names(vars)[i]
-      value_col <- paste0(var, "_value")
-      if (value_col %in% names(results_df)) {
-        row_data <- data.frame(
-          Variable = var,
-          stringsAsFactors = FALSE
-        )
+  # Create test-compatible results structure
+  if (length(var_names) > 1) {
+    # Multiple variables: Long format
+    results_long <- list()
+    for (i in seq_along(var_names)) {
+      var_name <- var_names[i]
+      
+      if (is_grouped) {
+        # Grouped multi-variable (complex case)
+        group_combinations <- results %>% 
+          dplyr::select(dplyr::all_of(group_vars)) %>% 
+          dplyr::distinct()
         
-        # Add the statistic value
-        row_data[[paste0(stat_prefix, "skew")]] <- results_df[[value_col]]
+        for (j in 1:nrow(group_combinations)) {
+          group_filter <- group_combinations[j, , drop = FALSE]
+          group_results <- results
+          for (grp in names(group_filter)) {
+            group_results <- group_results[group_results[[grp]] == group_filter[[grp]], ]
+          }
+          
+          if (nrow(group_results) > 0) {
+            row_data <- group_filter
+            row_data$Variable <- var_name
+            
+            if (!is.null(weights_name)) {
+              row_data$weighted_skew <- group_results[[var_name]][1]
+              row_data$effective_n <- group_results[[paste0(var_name, "_eff_n")]][1]
+            } else {
+              row_data$skew <- group_results[[var_name]][1]
+              row_data$n <- group_results[[paste0(var_name, "_n")]][1]
+            }
+            
+            results_long[[length(results_long) + 1]] <- row_data
+          }
+        }
+      } else {
+        # Ungrouped multi-variable
+        row_data <- tibble::tibble(Variable = var_name)
         
-        # Add effective n
-        n_eff_col <- paste0(var, "_n_eff")
-        if (n_eff_col %in% names(results_df)) {
-          row_data[[paste0(stat_prefix, "n")]] <- results_df[[n_eff_col]]
-          row_data[["effective_n"]] <- results_df[[n_eff_col]]  # Test-specific name
+        if (!is.null(weights_name)) {
+          row_data$weighted_skew <- results[[var_name]][1]
+          row_data$effective_n <- results[[paste0(var_name, "_eff_n")]][1]
+        } else {
+          row_data$skew <- results[[var_name]][1]
+          row_data$n <- results[[paste0(var_name, "_n")]][1]
         }
         
-        long_results[[i]] <- row_data
+        results_long[[i]] <- row_data
       }
     }
-    hybrid_results <- do.call(rbind, long_results)
+    
+    final_results <- dplyr::bind_rows(results_long)
   } else {
-    # Single variable or grouped: add test-compatible columns
-    for (var in names(vars)) {
-      value_col <- paste0(var, "_value")
-      if (value_col %in% names(results_df)) {
-        # Add test-compatible columns while preserving variable-based access
-        hybrid_results[[paste0(stat_prefix, "skew")]] <- results_df[[value_col]]
-        
-        # Add effective n columns
-        n_eff_col <- paste0(var, "_n_eff")
-        if (n_eff_col %in% names(results_df)) {
-          hybrid_results[[paste0(stat_prefix, "n")]] <- results_df[[n_eff_col]]
-          hybrid_results[["effective_n"]] <- results_df[[n_eff_col]]  # Test-specific name
-        }
-      }
+    # Single variable: Direct mapping
+    var_name <- var_names[1]
+    
+    if (!is.null(weights_name)) {
+      final_results <- results %>%
+        dplyr::mutate(
+          weighted_skew = !!rlang::sym(var_name),
+          effective_n = !!rlang::sym(paste0(var_name, "_eff_n"))
+        )
+    } else {
+      final_results <- results %>%
+        dplyr::mutate(
+          skew = !!rlang::sym(var_name),
+          n = !!rlang::sym(paste0(var_name, "_n"))
+        )
     }
   }
-
-  # Create S3 object with hybrid compatibility
+  
+  # Create S3 object with test-compatible structure
   result <- list(
-    results = hybrid_results,
-    variables = names(vars),
-    weights = weights_name,          # Current field name
-    weight_var = weights_name,       # Test-compatible field name
-    grouped = is_grouped,            # Current field
-    is_grouped = is_grouped,         # Test-compatible field
-    group_vars = if (is_grouped) dplyr::group_vars(data) else NULL,  # Current field
-    groups = if (is_grouped) dplyr::group_vars(data) else NULL        # Test-compatible field
+    results = final_results,
+    variables = var_names,
+    weight_var = weights_name,        # Test-compatible field name
+    weights = weights_name,           # Alternative field name
+    is_grouped = is_grouped,          # Test-compatible field
+    grouped = is_grouped,             # Alternative field
+    groups = if (is_grouped) dplyr::group_vars(data) else NULL
   )
   
   class(result) <- "w_skew"
@@ -335,143 +326,76 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_skew objects
-#'
-#' @description
-#' Prints a formatted summary of weighted skewness calculations, including skewness values,
-#' sample sizes, and weights (if applicable). For grouped data, results are
-#' displayed by group.
-#'
-#' @param x An object of class "w_skew"
-#' @param digits Number of decimal places to display (default: 3)
-#' @param ... Additional arguments passed to print
-#'
-#' @return Invisibly returns the input object
-#' @keywords internal
 #' @export
+#' @method print w_skew
 print.w_skew <- function(x, digits = 3, ...) {
-  # Determine if this is weighted or unweighted
-  is_weighted <- !is.null(x$weights)
-  
-  if (is_weighted) {
-    .print_header("Weighted Skewness")
+  test_type <- if (!is.null(x$weights)) {
+    "Weighted Skewness Statistics"
   } else {
-    .print_header("Skewness")
+    "Skewness Statistics"
   }
   
-  if (x$grouped) {
-    # Get unique groups
-    groups <- unique(x$results[x$group_vars])
-    
-    # Print results for each group
-    for (i in seq_len(nrow(groups))) {
-      # Get current group values
-      group_values <- groups[i, , drop = FALSE]
+  cat(sprintf("\n%s\n", test_type))
+  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  
+  is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
+  
+  if (is_grouped_data) {
+    # Handle grouped results
+    for (group_val in unique(x$results[[x$groups[1]]])) {
+      group_results <- x$results[x$results[[x$groups[1]]] == group_val, ]
       
-      # Format group info with factor levels if available
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", levels(val)[val])
-        } else {
-          paste(g, "=", val)
-        }
-      })
-      group_info <- paste(group_info, collapse = ", ")
+      cat(sprintf("\nGroup: %s = %s\n", x$groups[1], group_val))
       
-      # Filter results for current group
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      print_df <- group_results
+      if (!is.null(x$weights)) {
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "weighted_skew", "effective_n")))
+        print_df$weighted_skew <- round(print_df$weighted_skew, digits)
+        print_df$effective_n <- round(print_df$effective_n, 1)
+      } else {
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "skew", "n")))
+        print_df$skew <- round(print_df$skew, digits)
       }
       
-      # Skip empty groups
-      if (nrow(group_results) == 0) next
-      
-      # Create results table for this group - one row per variable
-      results_rows <- list()
-      
-      for (var in x$variables) {
-        value_col <- paste0(var, "_value")
-        if (value_col %in% names(group_results)) {
-          var_row <- data.frame(
-            Variable = var,
-            Skewness = round(group_results[[value_col]], digits),
-            stringsAsFactors = FALSE
-          )
-          
-          # Add N and Effective_N for this variable
-          n_col <- paste0(var, "_n")
-          n_eff_col <- paste0(var, "_n_eff")
-          if (n_col %in% names(group_results)) {
-            var_row$N <- round(group_results[[n_col]], 1)
-          }
-          if (n_eff_col %in% names(group_results)) {
-            # Only add Effective_N for weighted calculations
-            if (is_weighted) {
-              var_row$Effective_N <- round(group_results[[n_eff_col]], 1)
-            }
-          }
-          
-          if (!is.null(x$weights)) {
-            var_row$Weights <- x$weights
-          }
-          
-          results_rows[[var]] <- var_row
-        }
-      }
-      
-      results_df <- do.call(rbind, results_rows)
-      
-      # Print group header and results
-      cat(sprintf("\nGroup: %s\n", group_info))
-      results_df_print <- as.data.frame(results_df)
-      .print_border(results_df_print)
-      print(results_df_print, row.names = FALSE)
-      .print_border(results_df_print)
+      print(print_df, row.names = FALSE)
     }
   } else {
-    # Print ungrouped results
-    # Skip if no results
-    if (nrow(x$results) == 0) {
-      cat("\nNo valid results to display.\n")
-      return(invisible(x))
-    }
-    
-    results_df <- data.frame(
-      Variable = x$variables,
-      stringsAsFactors = FALSE
-    )
-    
-    # Add the statistic values for each variable
-    for (var in x$variables) {
-      value_col <- paste0(var, "_value")
-      if (value_col %in% names(x$results)) {
-        results_df$Skewness[results_df$Variable == var] <- round(x$results[[value_col]], digits)
-        
-        # Add N and Effective_N for this variable
-        n_col <- paste0(var, "_n")
-        n_eff_col <- paste0(var, "_n_eff")
-        if (n_col %in% names(x$results)) {
-          results_df$N[results_df$Variable == var] <- round(x$results[[n_col]], 1)
-        }
-        if (n_eff_col %in% names(x$results)) {
-          # Only add Effective_N for weighted calculations
-          if (is_weighted) {
-            results_df$Effective_N[results_df$Variable == var] <- round(x$results[[n_eff_col]], 1)
-          }
-        }
-      }
-    }
+    # Handle ungrouped results
+    print_df <- x$results
     
     if (!is.null(x$weights)) {
-      results_df$Weights <- x$weights
+      if ("Variable" %in% names(print_df)) {
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "weighted_skew", "effective_n")))
+      } else {
+        print_df <- tibble::tibble(
+          Variable = x$variables[1],
+          weighted_skew = round(print_df$weighted_skew[1], digits),
+          effective_n = round(print_df$effective_n[1], 1)
+        )
+      }
+      print_df$weighted_skew <- round(print_df$weighted_skew, digits)
+      print_df$effective_n <- round(print_df$effective_n, 1)
+    } else {
+      if ("Variable" %in% names(print_df)) {
+        print_df <- print_df %>%
+          dplyr::select(dplyr::any_of(c("Variable", "skew", "n")))
+      } else {
+        print_df <- tibble::tibble(
+          Variable = x$variables[1],
+          skew = round(print_df$skew[1], digits),
+          n = round(print_df$n[1], 0)
+        )
+      }
+      print_df$skew <- round(print_df$skew, digits)
     }
     
-    results_df_print <- as.data.frame(results_df)
-    print(results_df_print, row.names = FALSE)
-    .print_border(results_df_print)
+    print(print_df, row.names = FALSE)
   }
   
+  cat("\n")
   invisible(x)
 } 
 
