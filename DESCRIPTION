@@ -1,0 +1,35 @@
+Package: SurveyStat
+Type: Package
+Title: Statistical Analysis Tools for Survey Data
+Version: 0.1.0
+Authors@R: person("Yannick", "Diehl", 
+                  email = "your.email@example.com", 
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "your-orcid-id"))
+Description: A comprehensive package for statistical analysis of survey data,
+    providing tools for data cleaning, weighting, complex survey design analysis,
+    and visualization. Designed to handle common survey methodologies and
+    statistical procedures used in survey research.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1.0)
+Imports:
+    stats,
+    utils,
+    dplyr,
+    rlang,
+    tidyselect,
+    tibble
+Suggests: 
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    covr,
+    haven (>= 2.4.0)
+VignetteBuilder: knitr
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Config/testthat/edition: 3
+URL: https://yourusername.github.io/SurveyStat/, https://github.com/yourusername/SurveyStat
+BugReports: https://github.com/yourusername/SurveyStat/issues

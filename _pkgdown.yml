@@ -1,0 +1,91 @@
+url: https://yourusername.github.io/SurveyStat/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  theme: arrow-light
+  
+home:
+  title: SurveyStat - Professional Statistical Analysis for Survey Data
+  description: >
+    A comprehensive R package for statistical analysis of survey data,
+    providing SPSS-compatible results, weighted analysis, and professional
+    formatting. Designed for survey researchers, data scientists, and 
+    statistical analysts working with complex survey designs.
+
+navbar:
+  structure:
+    left: [intro, reference, articles, tutorials, news]
+    right: [search, github]
+  components:
+    reference:
+      text: Reference
+      href: reference/index.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/yourusername/SurveyStat
+      aria-label: GitHub
+
+reference:
+- title: "🎯 Descriptive Statistics"
+  desc: "Core descriptive and frequency analysis functions"
+  contents:
+  - describe
+  - frequency
+
+- title: "📈 Hypothesis Testing"
+  desc: "Statistical tests for independent and paired samples"
+  contents:
+  - t_test
+  - mann_whitney_test
+  - chi_squared_test
+  - oneway_anova_test
+  - rm_t_test
+  - rm_anova_test
+
+- title: "🔍 Post-Hoc Analysis"
+  desc: "S3 generics for extended analysis of test results"
+  contents:
+  - tukey_test
+  - emmeans
+  - levene_test
+  - mauchly_test
+  - parameter_estimates
+
+- title: "📊 Weighted Statistics"
+  desc: "Specialized weighted statistical functions for survey data"
+  contents:
+  - w_mean
+  - w_sd
+  - w_var
+  - w_se
+  - w_median
+  - w_iqr
+  - w_range
+  - w_quantile
+  - w_modus
+  - w_skew
+  - w_kurtosis
+
+- title: "📋 Datasets"
+  desc: "Synthetic survey and longitudinal datasets for testing and examples"
+  contents:
+  - survey_data
+  - longitudinal_data
+  - longitudinal_data_wide
+
+- title: "🛠️ Print Methods"
+  desc: "Professional output formatting methods"
+  contents:
+  - starts_with("print.")
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
+  components:
+    developed_by: "Developed with ❤️ for survey researchers"
+    built_with: "Built with [pkgdown](https://pkgdown.r-lib.org/index.html)"
+
+development:
+  mode: auto
