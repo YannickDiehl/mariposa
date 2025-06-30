@@ -1,0 +1,1063 @@
+
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+- Project '~/Documents/SoftwareProjekte/RPakete/SurveyStat' loaded. [renv 1.1.4]
+- The project is out-of-sync -- use `renv::status()` for details.
+> devtools::test()
+ℹ Testing SurveyStat
+✔ | F W  S  OK | Context
+
+⠏ |          0 | describe                                                       
+⠴ |      6   0 | describe                                                       
+✔ |      6   0 | describe
+
+⠏ |          0 | example                                                        
+✔ |          2 | example
+
+⠏ |          0 | levene_test                                                    
+⠏ |         20 | levene_test                                                    
+⠦ |         27 | levene_test                                                    
+⠇ |         39 | levene_test                                                    
+✖ | 2       55 | levene_test
+────────────────────────────────────────────────────────────────────────────────
+Failure ('test-levene_test.R:224:3'): levene_test grouped analysis works correctly
+any(grepl("Group: region = East", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-levene_test.R:225:3'): levene_test grouped analysis works correctly
+any(grepl("Group: region = West", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | print_outputs                                                  
+⠸ |          4 | print_outputs                                                  
+⠋ | 1       30 | print_outputs                                                  
+✖ | 2       49 | print_outputs
+────────────────────────────────────────────────────────────────────────────────
+Failure ('test-print_outputs.R:104:3'): print outputs show dynamic borders correctly
+any(grepl("^-+$", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-print_outputs.R:234:3'): print outputs show interpretation guidelines
+... || ... is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | t_test                                                         
+⠋ |         41 | t_test                                                         
+✖ | 2       68 | t_test
+────────────────────────────────────────────────────────────────────────────────
+Failure ('test-t_test.R:176:3'): t_test confidence intervals change with conf.level
+ci_width_99 > ci_width_95 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-t_test.R:245:3'): t_test handles missing data appropriately
+result$results$n1[1] + result$results$n2[1] == n_complete is not TRUE
+
+`actual`:       
+`expected`: TRUE
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | weighted_functions                                             
+⠦ | 10 10      7 | weighted_functions                                           
+⠏ | 23 23     14 | weighted_functions                                           
+⠧ | 37 30     21 | weighted_functions                                           
+⠸ | 43 38     23 | weighted_functions                                           
+✖ | 44 38     23 | weighted_functions
+────────────────────────────────────────────────────────────────────────────────
+Failure ('test-weighted_functions.R:13:3'): w_mean works correctly with survey_data
+result$weight_var (`actual`) not equal to "sampling_weight" (`expected`).
+
+`actual` is NULL
+`expected` is a character vector ('sampling_weight')
+
+Warning ('test-weighted_functions.R:16:3'): w_mean works correctly with survey_data
+Unknown or uninitialised column: `weighted_mean`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_mean[1])) at test-weighted_functions.R:16:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mean
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_mean)
+
+Failure ('test-weighted_functions.R:16:3'): w_mean works correctly with survey_data
+!is.na(result$results$weighted_mean[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:17:3'): w_mean works correctly with survey_data
+Unknown or uninitialised column: `weighted_mean`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_mean[1] > 0) at test-weighted_functions.R:17:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mean
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_mean)
+
+Failure ('test-weighted_functions.R:17:3'): w_mean works correctly with survey_data
+result$results$weighted_mean[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:21:3'): w_mean works correctly with survey_data
+Unknown or uninitialised column: `weighted_mean`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_mean[1] != unweighted_mean) at test-weighted_functions.R:21:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mean
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_mean)
+
+Failure ('test-weighted_functions.R:21:3'): w_mean works correctly with survey_data
+result$results$weighted_mean[1] != unweighted_mean is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:32:3'): w_sd works correctly with survey_data
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_sd[1])) at test-weighted_functions.R:32:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:32:3'): w_sd works correctly with survey_data
+!is.na(result$results$weighted_sd[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:33:3'): w_sd works correctly with survey_data
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_sd[1] > 0) at test-weighted_functions.R:33:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:33:3'): w_sd works correctly with survey_data
+result$results$weighted_sd[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:37:3'): w_sd works correctly with survey_data
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_sd[1] != unweighted_sd) at test-weighted_functions.R:37:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:37:3'): w_sd works correctly with survey_data
+result$results$weighted_sd[1] != unweighted_sd is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:47:3'): w_var works correctly with survey_data
+Unknown or uninitialised column: `weighted_var`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_var[1])) at test-weighted_functions.R:47:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_var
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_var)
+
+Failure ('test-weighted_functions.R:47:3'): w_var works correctly with survey_data
+!is.na(result$results$weighted_var[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:48:3'): w_var works correctly with survey_data
+Unknown or uninitialised column: `weighted_var`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_var[1] > 0) at test-weighted_functions.R:48:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_var
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_var)
+
+Failure ('test-weighted_functions.R:48:3'): w_var works correctly with survey_data
+result$results$weighted_var[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:52:3'): w_var works correctly with survey_data
+Unknown or uninitialised column: `weighted_var`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_equal(...) at test-weighted_functions.R:52:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_var
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_var)
+
+Warning ('test-weighted_functions.R:52:3'): w_var works correctly with survey_data
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_equal(...) at test-weighted_functions.R:52:3
+ 2. │ └─testthat::quasi_label(enquo(expected), expected.label, arg = "expected")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─sd_result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(sd_result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:52:3'): w_var works correctly with survey_data
+result$results$weighted_var[1] (`actual`) not equal to sd_result$results$weighted_sd[1]^2 (`expected`).
+
+`actual` is NULL
+`expected` is a double vector ()
+
+Warning ('test-weighted_functions.R:64:3'): w_median works correctly with survey_data
+Unknown or uninitialised column: `weighted_median`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_median[1])) at test-weighted_functions.R:64:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_median
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_median)
+
+Failure ('test-weighted_functions.R:64:3'): w_median works correctly with survey_data
+!is.na(result$results$weighted_median[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:67:3'): w_median works correctly with survey_data
+Unknown or uninitialised column: `weighted_median`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(...) at test-weighted_functions.R:67:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_median
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_median)
+
+Failure ('test-weighted_functions.R:67:3'): w_median works correctly with survey_data
+result$results$weighted_median[1] >= min(survey_data$age, na.rm = TRUE) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:68:3'): w_median works correctly with survey_data
+Unknown or uninitialised column: `weighted_median`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(...) at test-weighted_functions.R:68:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_median
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_median)
+
+Failure ('test-weighted_functions.R:68:3'): w_median works correctly with survey_data
+result$results$weighted_median[1] <= max(survey_data$age, na.rm = TRUE) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:95:3'): w_iqr works correctly with survey_data
+Unknown or uninitialised column: `weighted_iqr`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_iqr[1])) at test-weighted_functions.R:95:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_iqr
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_iqr)
+
+Failure ('test-weighted_functions.R:95:3'): w_iqr works correctly with survey_data
+!is.na(result$results$weighted_iqr[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:96:3'): w_iqr works correctly with survey_data
+Unknown or uninitialised column: `weighted_iqr`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_iqr[1] > 0) at test-weighted_functions.R:96:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_iqr
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_iqr)
+
+Failure ('test-weighted_functions.R:96:3'): w_iqr works correctly with survey_data
+result$results$weighted_iqr[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:100:3'): w_iqr works correctly with survey_data
+Unknown or uninitialised column: `weighted_iqr`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_iqr[1] <= income_range) at test-weighted_functions.R:100:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_iqr
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_iqr)
+
+Failure ('test-weighted_functions.R:100:3'): w_iqr works correctly with survey_data
+result$results$weighted_iqr[1] <= income_range is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:110:3'): w_range works correctly with survey_data
+Unknown or uninitialised column: `weighted_range`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_range[1])) at test-weighted_functions.R:110:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_range
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_range)
+
+Failure ('test-weighted_functions.R:110:3'): w_range works correctly with survey_data
+!is.na(result$results$weighted_range[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:111:3'): w_range works correctly with survey_data
+Unknown or uninitialised column: `weighted_range`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_range[1] > 0) at test-weighted_functions.R:111:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_range
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_range)
+
+Failure ('test-weighted_functions.R:111:3'): w_range works correctly with survey_data
+result$results$weighted_range[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:115:3'): w_range works correctly with survey_data
+Unknown or uninitialised column: `weighted_range`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(...) at test-weighted_functions.R:115:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_range
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_range)
+
+Failure ('test-weighted_functions.R:115:3'): w_range works correctly with survey_data
+result$results$weighted_range[1] <= actual_range + 0.001 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:125:3'): w_skew works correctly with survey_data
+Unknown or uninitialised column: `weighted_skew`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_skew[1])) at test-weighted_functions.R:125:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_skew
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_skew)
+
+Failure ('test-weighted_functions.R:125:3'): w_skew works correctly with survey_data
+!is.na(result$results$weighted_skew[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:128:3'): w_skew works correctly with survey_data
+Unknown or uninitialised column: `weighted_skew`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(...) at test-weighted_functions.R:128:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_skew
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_skew)
+
+Error ('test-weighted_functions.R:128:3'): w_skew works correctly with survey_data
+Error in `abs(result$results$weighted_skew[1])`: non-numeric argument to mathematical function
+Backtrace:
+    ▆
+ 1. └─testthat::expect_true(...) at test-weighted_functions.R:128:3
+ 2.   └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Warning ('test-weighted_functions.R:138:3'): w_kurtosis works correctly with survey_data
+Unknown or uninitialised column: `weighted_kurtosis`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_kurtosis[1])) at test-weighted_functions.R:138:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_kurtosis
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_kurtosis)
+
+Failure ('test-weighted_functions.R:138:3'): w_kurtosis works correctly with survey_data
+!is.na(result$results$weighted_kurtosis[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:141:3'): w_kurtosis works correctly with survey_data
+Unknown or uninitialised column: `weighted_kurtosis`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(...) at test-weighted_functions.R:141:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_kurtosis
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_kurtosis)
+
+Error ('test-weighted_functions.R:141:3'): w_kurtosis works correctly with survey_data
+Error in `abs(result$results$weighted_kurtosis[1])`: non-numeric argument to mathematical function
+Backtrace:
+    ▆
+ 1. └─testthat::expect_true(...) at test-weighted_functions.R:141:3
+ 2.   └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Failure ('test-weighted_functions.R:151:3'): w_se works correctly with survey_data
+!is.na(result$results$weighted_se[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:152:3'): w_se works correctly with survey_data
+result$results$weighted_se[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:156:3'): w_se works correctly with survey_data
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_se[1] < sd_result$results$weighted_sd[1]) at test-weighted_functions.R:156:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─sd_result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(sd_result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:156:3'): w_se works correctly with survey_data
+result$results$weighted_se[1] < sd_result$results$weighted_sd[1] is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:166:3'): w_modus works correctly with survey_data
+Unknown or uninitialised column: `weighted_mode`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_mode[1])) at test-weighted_functions.R:166:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mode
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_mode)
+
+Failure ('test-weighted_functions.R:166:3'): w_modus works correctly with survey_data
+!is.na(result$results$weighted_mode[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:169:3'): w_modus works correctly with survey_data
+Unknown or uninitialised column: `weighted_mode`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$weighted_mode[1] %in% survey_data$trust_government) at test-weighted_functions.R:169:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mode[1] %in% ...
+ 5. ├─result$results$weighted_mode
+ 6. └─tibble:::`$.tbl_df`(result$results, weighted_mode)
+
+Failure ('test-weighted_functions.R:169:3'): w_modus works correctly with survey_data
+result$results$weighted_mode[1] %in% survey_data$trust_government is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:182:3'): weighted functions handle multiple variables
+nrow(result$results) (`actual`) not equal to 3 (`expected`).
+
+  `actual`: 1.0
+`expected`: 3.0
+
+Warning ('test-weighted_functions.R:183:3'): weighted functions handle multiple variables
+Unknown or uninitialised column: `Variable`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_equal(...) at test-weighted_functions.R:183:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$Variable
+ 5. └─tibble:::`$.tbl_df`(result$results, Variable)
+
+Failure ('test-weighted_functions.R:183:3'): weighted functions handle multiple variables
+result$results$Variable (`actual`) not equal to c("life_satisfaction", "trust_government", "trust_media") (`expected`).
+
+`actual` is NULL
+`expected` is a character vector ('life_satisfaction', 'trust_government', 'trust_media')
+
+Warning ('test-weighted_functions.R:187:3'): weighted functions handle multiple variables
+Unknown or uninitialised column: `weighted_mean`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(all(!is.na(result$results$weighted_mean))) at test-weighted_functions.R:187:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mean
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_mean)
+
+Failure ('test-weighted_functions.R:199:3'): weighted functions work with grouped data
+result$is_grouped is not TRUE
+
+`actual` is NULL
+`expected` is a logical vector (TRUE)
+
+Failure ('test-weighted_functions.R:200:3'): weighted functions work with grouped data
+result$groups (`actual`) not equal to "region" (`expected`).
+
+`actual` is NULL
+`expected` is a character vector ('region')
+
+Failure ('test-weighted_functions.R:218:3'): weighted functions print output is correctly formatted
+any(grepl("weighted_mean", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-weighted_functions.R:219:3'): weighted functions print output is correctly formatted
+any(grepl("effective_n", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-weighted_functions.R:228:3'): weighted functions show effective sample size
+"effective_n" %in% names(result$results) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Warning ('test-weighted_functions.R:229:3'): weighted functions show effective sample size
+Unknown or uninitialised column: `effective_n`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$effective_n[1])) at test-weighted_functions.R:229:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$effective_n
+ 5. └─tibble:::`$.tbl_df`(result$results, effective_n)
+
+Failure ('test-weighted_functions.R:229:3'): weighted functions show effective sample size
+!is.na(result$results$effective_n[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:230:3'): weighted functions show effective sample size
+Unknown or uninitialised column: `effective_n`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$effective_n[1] > 0) at test-weighted_functions.R:230:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$effective_n
+ 5. └─tibble:::`$.tbl_df`(result$results, effective_n)
+
+Failure ('test-weighted_functions.R:230:3'): weighted functions show effective sample size
+result$results$effective_n[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:231:3'): weighted functions show effective sample size
+Unknown or uninitialised column: `effective_n`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$effective_n[1] <= nrow(survey_data)) at test-weighted_functions.R:231:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$effective_n
+ 5. └─tibble:::`$.tbl_df`(result$results, effective_n)
+
+Failure ('test-weighted_functions.R:231:3'): weighted functions show effective sample size
+result$results$effective_n[1] <= nrow(survey_data) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:245:3'): weighted functions handle edge cases
+Unknown or uninitialised column: `weighted_mean`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_equal(...) at test-weighted_functions.R:245:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result_weighted$results$weighted_mean
+ 5. └─tibble:::`$.tbl_df`(result_weighted$results, weighted_mean)
+
+Failure ('test-weighted_functions.R:245:3'): weighted functions handle edge cases
+result_weighted$results$weighted_mean[1] (`actual`) not equal to `unweighted_mean` (`expected`).
+
+`actual` is NULL
+`expected` is a double vector (3.62825278810409)
+
+Warning ('test-weighted_functions.R:260:3'): weighted functions handle missing data
+Unknown or uninitialised column: `weighted_mean`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(!is.na(result$results$weighted_mean[1])) at test-weighted_functions.R:260:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$weighted_mean
+ 5. └─tibble:::`$.tbl_df`(result$results, weighted_mean)
+
+Failure ('test-weighted_functions.R:260:3'): weighted functions handle missing data
+!is.na(result$results$weighted_mean[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Warning ('test-weighted_functions.R:263:3'): weighted functions handle missing data
+Unknown or uninitialised column: `effective_n`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(result$results$effective_n[1] < nrow(survey_data)) at test-weighted_functions.R:263:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─result$results$effective_n
+ 5. └─tibble:::`$.tbl_df`(result$results, effective_n)
+
+Failure ('test-weighted_functions.R:263:3'): weighted functions handle missing data
+result$results$effective_n[1] < nrow(survey_data) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:272:3'): weighted functions work with tidyselect helpers
+nrow(result$results) (`actual`) not equal to 3 (`expected`).
+
+  `actual`: 1.0
+`expected`: 3.0
+
+Warning ('test-weighted_functions.R:273:3'): weighted functions work with tidyselect helpers
+Unknown or uninitialised column: `Variable`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(all(grepl("^trust", result$results$Variable))) at test-weighted_functions.R:273:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─base::grepl("^trust", result$results$Variable)
+ 5. │ └─base::is.factor(x)
+ 6. ├─result$results$Variable
+ 7. └─tibble:::`$.tbl_df`(result$results, Variable)
+
+Warning ('test-weighted_functions.R:283:3'): weighted functions mathematical relationships hold
+Unknown or uninitialised column: `weighted_var`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_equal(...) at test-weighted_functions.R:283:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─var_result$results$weighted_var
+ 5. └─tibble:::`$.tbl_df`(var_result$results, weighted_var)
+
+Warning ('test-weighted_functions.R:283:3'): weighted functions mathematical relationships hold
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_equal(...) at test-weighted_functions.R:283:3
+ 2. │ └─testthat::quasi_label(enquo(expected), expected.label, arg = "expected")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─sd_result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(sd_result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:283:3'): weighted functions mathematical relationships hold
+var_result$results$weighted_var[1] (`actual`) not equal to sd_result$results$weighted_sd[1]^2 (`expected`).
+
+`actual` is NULL
+`expected` is a double vector ()
+
+Warning ('test-weighted_functions.R:289:3'): weighted functions mathematical relationships hold
+Unknown or uninitialised column: `weighted_sd`.
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_true(se_result$results$weighted_se[1] < sd_result$results$weighted_sd[1]) at test-weighted_functions.R:289:3
+ 2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─sd_result$results$weighted_sd
+ 5. └─tibble:::`$.tbl_df`(sd_result$results, weighted_sd)
+
+Failure ('test-weighted_functions.R:289:3'): weighted functions mathematical relationships hold
+se_result$results$weighted_se[1] < sd_result$results$weighted_sd[1] is not TRUE
+
+`actual`:       
+`expected`: TRUE
+────────────────────────────────────────────────────────────────────────────────
+Maximum number of failures exceeded; quitting at end of file.
+ℹ Increase this number with (e.g.) `testthat::set_max_fails(Inf)` 
+
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 2.0 s
+
+── Skipped tests (6) ───────────────────────────────────────────────────────────
+• describe function has known issue: Can't convert a call to a string. (6):
+  'test-describe.R:14:5', 'test-describe.R:34:5', 'test-describe.R:50:5',
+  'test-describe.R:74:5', 'test-describe.R:91:5', 'test-describe.R:111:5'
+
+── Failed tests ────────────────────────────────────────────────────────────────
+Failure ('test-levene_test.R:224:3'): levene_test grouped analysis works correctly
+any(grepl("Group: region = East", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-levene_test.R:225:3'): levene_test grouped analysis works correctly
+any(grepl("Group: region = West", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-print_outputs.R:104:3'): print outputs show dynamic borders correctly
+any(grepl("^-+$", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-print_outputs.R:234:3'): print outputs show interpretation guidelines
+... || ... is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-t_test.R:176:3'): t_test confidence intervals change with conf.level
+ci_width_99 > ci_width_95 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-t_test.R:245:3'): t_test handles missing data appropriately
+result$results$n1[1] + result$results$n2[1] == n_complete is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:13:3'): w_mean works correctly with survey_data
+result$weight_var (`actual`) not equal to "sampling_weight" (`expected`).
+
+`actual` is NULL
+`expected` is a character vector ('sampling_weight')
+
+Failure ('test-weighted_functions.R:16:3'): w_mean works correctly with survey_data
+!is.na(result$results$weighted_mean[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:17:3'): w_mean works correctly with survey_data
+result$results$weighted_mean[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:21:3'): w_mean works correctly with survey_data
+result$results$weighted_mean[1] != unweighted_mean is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:32:3'): w_sd works correctly with survey_data
+!is.na(result$results$weighted_sd[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:33:3'): w_sd works correctly with survey_data
+result$results$weighted_sd[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:37:3'): w_sd works correctly with survey_data
+result$results$weighted_sd[1] != unweighted_sd is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:47:3'): w_var works correctly with survey_data
+!is.na(result$results$weighted_var[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:48:3'): w_var works correctly with survey_data
+result$results$weighted_var[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:52:3'): w_var works correctly with survey_data
+result$results$weighted_var[1] (`actual`) not equal to sd_result$results$weighted_sd[1]^2 (`expected`).
+
+`actual` is NULL
+`expected` is a double vector ()
+
+Failure ('test-weighted_functions.R:64:3'): w_median works correctly with survey_data
+!is.na(result$results$weighted_median[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:67:3'): w_median works correctly with survey_data
+result$results$weighted_median[1] >= min(survey_data$age, na.rm = TRUE) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:68:3'): w_median works correctly with survey_data
+result$results$weighted_median[1] <= max(survey_data$age, na.rm = TRUE) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:95:3'): w_iqr works correctly with survey_data
+!is.na(result$results$weighted_iqr[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:96:3'): w_iqr works correctly with survey_data
+result$results$weighted_iqr[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:100:3'): w_iqr works correctly with survey_data
+result$results$weighted_iqr[1] <= income_range is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:110:3'): w_range works correctly with survey_data
+!is.na(result$results$weighted_range[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:111:3'): w_range works correctly with survey_data
+result$results$weighted_range[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:115:3'): w_range works correctly with survey_data
+result$results$weighted_range[1] <= actual_range + 0.001 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:125:3'): w_skew works correctly with survey_data
+!is.na(result$results$weighted_skew[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Error ('test-weighted_functions.R:128:3'): w_skew works correctly with survey_data
+Error in `abs(result$results$weighted_skew[1])`: non-numeric argument to mathematical function
+Backtrace:
+    ▆
+ 1. └─testthat::expect_true(...) at test-weighted_functions.R:128:3
+ 2.   └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Failure ('test-weighted_functions.R:138:3'): w_kurtosis works correctly with survey_data
+!is.na(result$results$weighted_kurtosis[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Error ('test-weighted_functions.R:141:3'): w_kurtosis works correctly with survey_data
+Error in `abs(result$results$weighted_kurtosis[1])`: non-numeric argument to mathematical function
+Backtrace:
+    ▆
+ 1. └─testthat::expect_true(...) at test-weighted_functions.R:141:3
+ 2.   └─testthat::quasi_label(enquo(object), label, arg = "object")
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Failure ('test-weighted_functions.R:151:3'): w_se works correctly with survey_data
+!is.na(result$results$weighted_se[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:152:3'): w_se works correctly with survey_data
+result$results$weighted_se[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:156:3'): w_se works correctly with survey_data
+result$results$weighted_se[1] < sd_result$results$weighted_sd[1] is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:166:3'): w_modus works correctly with survey_data
+!is.na(result$results$weighted_mode[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:169:3'): w_modus works correctly with survey_data
+result$results$weighted_mode[1] %in% survey_data$trust_government is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:182:3'): weighted functions handle multiple variables
+nrow(result$results) (`actual`) not equal to 3 (`expected`).
+
+  `actual`: 1.0
+`expected`: 3.0
+
+Failure ('test-weighted_functions.R:183:3'): weighted functions handle multiple variables
+result$results$Variable (`actual`) not equal to c("life_satisfaction", "trust_government", "trust_media") (`expected`).
+
+`actual` is NULL
+`expected` is a character vector ('life_satisfaction', 'trust_government', 'trust_media')
+
+Failure ('test-weighted_functions.R:199:3'): weighted functions work with grouped data
+result$is_grouped is not TRUE
+
+`actual` is NULL
+`expected` is a logical vector (TRUE)
+
+Failure ('test-weighted_functions.R:200:3'): weighted functions work with grouped data
+result$groups (`actual`) not equal to "region" (`expected`).
+
+`actual` is NULL
+`expected` is a character vector ('region')
+
+Failure ('test-weighted_functions.R:218:3'): weighted functions print output is correctly formatted
+any(grepl("weighted_mean", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-weighted_functions.R:219:3'): weighted functions print output is correctly formatted
+any(grepl("effective_n", output)) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-weighted_functions.R:228:3'): weighted functions show effective sample size
+"effective_n" %in% names(result$results) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+Failure ('test-weighted_functions.R:229:3'): weighted functions show effective sample size
+!is.na(result$results$effective_n[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:230:3'): weighted functions show effective sample size
+result$results$effective_n[1] > 0 is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:231:3'): weighted functions show effective sample size
+result$results$effective_n[1] <= nrow(survey_data) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:245:3'): weighted functions handle edge cases
+result_weighted$results$weighted_mean[1] (`actual`) not equal to `unweighted_mean` (`expected`).
+
+`actual` is NULL
+`expected` is a double vector (3.62825278810409)
+
+Failure ('test-weighted_functions.R:260:3'): weighted functions handle missing data
+!is.na(result$results$weighted_mean[1]) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:263:3'): weighted functions handle missing data
+result$results$effective_n[1] < nrow(survey_data) is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+Failure ('test-weighted_functions.R:272:3'): weighted functions work with tidyselect helpers
+nrow(result$results) (`actual`) not equal to 3 (`expected`).
+
+  `actual`: 1.0
+`expected`: 3.0
+
+Failure ('test-weighted_functions.R:283:3'): weighted functions mathematical relationships hold
+var_result$results$weighted_var[1] (`actual`) not equal to sd_result$results$weighted_sd[1]^2 (`expected`).
+
+`actual` is NULL
+`expected` is a double vector ()
+
+Failure ('test-weighted_functions.R:289:3'): weighted functions mathematical relationships hold
+se_result$results$weighted_se[1] < sd_result$results$weighted_sd[1] is not TRUE
+
+`actual`:       
+`expected`: TRUE
+
+[ FAIL 50 | WARN 38 | SKIP 6 | PASS 197 ]
+══ Terminated early ════════════════════════════════════════════════════════════
+> 
