@@ -1,0 +1,78 @@
+
+> knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+
+> library(SurveyStat)
+
+Attaching package: ‘SurveyStat’
+
+The following object is masked from ‘package:stats’:
+
+    frequency
+
+
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+> data(survey_data)
+
+> survey_data %>% describe(age, income, weights = sampling_weight)
+
+Weighted Descriptive Statistics
+------------------------------- 
+ Variable     Mean Median       SD Range  IQR Skewness Effective_N
+      age   50.514     50   17.084    77   25    0.159      2468.8
+   income 3743.099   3500 1423.972  7200 1900    0.724      2468.8
+------------------------------------------------------------------ 
+
+> survey_data %>% w_mean(life_satisfaction, weights = sampling_weight)
+
+Weighted Mean Statistics
+------------------------ 
+# A tibble: 1 × 3
+  Variable          weighted_mean effective_n
+  <chr>                     <dbl>       <dbl>
+1 life_satisfaction          3.62       2391.
+
+
+> survey_data %>% frequency(education, region, weights = sampling_weight)
+
+education (Höchster Bildungsabschluss)
+# total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+
++------+--------------------+--------+--------+--------+--------+
+|Value |Label               |N       |Raw %   |Valid % |Cum. %  |
++------+--------------------+--------+--------+--------+--------+
+|Haupts|Hauptschule         |848     |33.71   |33.71   |33.71   |
+|Realsc|Realschule          |640     |25.47   |25.47   |59.18   |
+|Gymnas|Gymnasium           |641     |25.51   |25.51   |84.69   |
+|Univer|University          |385     |15.31   |15.31   |100.00  |
++------+--------------------+--------+--------+--------+--------+
+
+
+region (Region (Ost/West))
+# total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+
++------+--------------------+--------+--------+--------+--------+
+|Value |Label               |N       |Raw %   |Valid % |Cum. %  |
++------+--------------------+--------+--------+--------+--------+
+|East  |East                |509     |20.23   |20.23   |20.23   |
+|West  |West                |2007    |79.77   |79.77   |100.00  |
++------+--------------------+--------+--------+--------+--------+
+
+
+> survey_data %>% group_by(region) %>% t_test(life_satisfaction, 
++     weights = sampling_weight)
+
+  When sourcing ‘introduction.R’:
+Error: arguments imply differing number of rows: 1, 0
+Execution halted

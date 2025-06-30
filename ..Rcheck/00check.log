@@ -6,9 +6,247 @@
     GNU Fortran (GCC) 14.2.0
 * running under: macOS Sequoia 15.5
 * using session charset: UTF-8
-* using options ‘--no-manual --no-build-vignettes’
-* checking for file ‘./DESCRIPTION’ ... ERROR
-Required fields missing or empty:
-  ‘Author’ ‘Maintainer’
+* using options ‘--no-tests --no-manual --no-build-vignettes’
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘SurveyStat’ version ‘0.1.0’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... INFO
+Packages suggested but not available for checking: 'testthat', 'covr'
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .github/.gitignore
+  .gitignore
+  tests/spss_reference/data/.gitkeep
+  ..Rcheck
+  .claude
+  .git
+  .github
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘SurveyStat’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by ‘R CMD build’.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+Subdirectory ‘inst’ contains no files.
+* checking code files for non-ASCII characters ... WARNING
+Found the following files with non-ASCII characters:
+  R/chi_squared_test.R
+  R/emmeans.R
+  R/levene_test.R
+  R/mann_whitney_test.R
+  R/mauchly_test.R
+  R/oneway_anova_test.R
+  R/parameter_estimates.R
+  R/rm_anova_test.R
+  R/rm_t_test.R
+  R/t_test.R
+  R/tukey_test.R
+Portable packages must use only ASCII characters in their R code and
+NAMESPACE directives, except perhaps in comments.
+Use \uxxxx escapes for other characters.
+Function ‘tools::showNonASCIIfile’ can help in finding non-ASCII
+characters in files.
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... WARNING
+levene_test:
+  function(x, ...)
+levene_test.grouped_df:
+  function(data, variable, group, weights, center, ...)
+See section ‘Generic functions and methods’ in the ‘Writing R
+Extensions’ manual.
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+emmeans.oneway_anova_test_results: no visible binding for global
+  variable ‘n’
+emmeans.oneway_anova_test_results: no visible binding for global
+  variable ‘Response’
+emmeans.oneway_anova_test_results: no visible binding for global
+  variable ‘subject_mean’
+emmeans.oneway_anova_test_results: no visible binding for global
+  variable ‘Time’
+parameter_estimates.oneway_anova_test_results: no visible binding for
+  global variable ‘Time’
+parameter_estimates.oneway_anova_test_results: no visible global
+  function definition for ‘n’
+parameter_estimates.oneway_anova_test_results: no visible binding for
+  global variable ‘Response’
+parameter_estimates.oneway_anova_test_results: no visible binding for
+  global variable ‘n’
+rm_anova_test: no visible binding for global variable ‘.’
+rm_anova_test: no visible binding for global variable ‘Time’
+rm_anova_test: no visible global function definition for ‘:=’
+rm_anova_test: no visible binding for global variable
+  ‘subject_weighted_mean’
+rm_anova_test: no visible global function definition for ‘n’
+rm_anova_test: no visible binding for global variable ‘Response’
+rm_anova_test: no visible binding for global variable ‘n’
+Undefined global functions or variables:
+  . := Response Time n subject_mean subject_weighted_mean
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... INFO
+Package unavailable to check Rd xrefs: ‘survey’
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in Rd file 'dot-process_weights.Rd':
+  ‘weights’
+
+Undocumented arguments in Rd file 'levene_test.Rd'
+  ‘variable’
+
+Undocumented arguments in Rd file 'print.levene_test_results.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.mann_whitney_test_results.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.rm_anova_test_results.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.t_test_result.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_mean.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_sd.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_var.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking files in ‘vignettes’ ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  ‘introduction.Rmd’
+* checking examples ... ERROR
+Running examples in ‘SurveyStat-Ex.R’ failed
+The error most likely occurred in:
+
+> ### Name: survey_data
+> ### Title: German Social Survey Data (Synthetic)
+> ### Aliases: survey_data
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> # Load required packages and data
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> data(survey_data)
+> 
+> # Basic descriptive statistics
+> survey_data %>% describe(age, income, weights = sampling_weight)
+
+Weighted Descriptive Statistics
+------------------------------- 
+ Variable     Mean Median       SD Range  IQR Skewness Effective_N
+      age   50.514     50   17.084    77   25    0.159      2468.8
+   income 3743.099   3500 1423.972  7200 1900    0.724      2468.8
+------------------------------------------------------------------ 
+> 
+> # Frequency analysis
+> survey_data %>% frequency(education, region, weights = sampling_weight)
+
+education (Höchster Bildungsabschluss)
+# total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+
++------+--------------------+--------+--------+--------+--------+
+|Value |Label               |N       |Raw %   |Valid % |Cum. %  |
++------+--------------------+--------+--------+--------+--------+
+|Haupts|Hauptschule         |848     |33.71   |33.71   |33.71   |
+|Realsc|Realschule          |640     |25.47   |25.47   |59.18   |
+|Gymnas|Gymnasium           |641     |25.51   |25.51   |84.69   |
+|Univer|University          |385     |15.31   |15.31   |100.00  |
++------+--------------------+--------+--------+--------+--------+
+
+
+region (Region (Ost/West))
+# total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+
++------+--------------------+--------+--------+--------+--------+
+|Value |Label               |N       |Raw %   |Valid % |Cum. %  |
++------+--------------------+--------+--------+--------+--------+
+|East  |East                |509     |20.23   |20.23   |20.23   |
+|West  |West                |2007    |79.77   |79.77   |100.00  |
++------+--------------------+--------+--------+--------+--------+
+
+> 
+> # Group comparisons
+> survey_data %>% 
++   group_by(region) %>% 
++   t_test(life_satisfaction, weights = sampling_weight)
+Error in data.frame(group_info, Variable = var_name, t_stat = NA, df = NA,  : 
+  arguments imply differing number of rows: 1, 0
+Calls: %>% ... tryCatchList -> tryCatchOne -> <Anonymous> -> data.frame
+Execution halted
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... SKIPPED
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... WARNING
+Directory 'inst/doc' does not exist.
+Package vignette without corresponding single PDF/HTML:
+  ‘introduction.Rmd’
+* checking running R code from vignettes ... ERROR
+Errors in running code in vignettes:
+when running code in ‘introduction.Rmd’
+  ...
+|West  |West                |2007    |79.77   |79.77   |100.00  |
++------+--------------------+--------+--------+--------+--------+
+
+
+> survey_data %>% group_by(region) %>% t_test(life_satisfaction, 
++     weights = sampling_weight)
+
+  When sourcing ‘introduction.R’:
+Error: arguments imply differing number of rows: 1, 0
+Execution halted
+
+  ‘introduction.Rmd’ using ‘UTF-8’... failed
+* checking re-building of vignette outputs ... SKIPPED
 * DONE
-Status: 1 ERROR
+Status: 2 ERRORs, 6 WARNINGs, 3 NOTEs

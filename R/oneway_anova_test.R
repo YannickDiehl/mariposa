@@ -273,7 +273,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       # Unweighted ANOVA
       
       # Descriptive statistics by group
-      group_stats <- map(group_levels, function(level) {
+      group_stats <- purrr::map(group_levels, function(level) {
         group_data <- y[g == level]
         n <- length(group_data)
         mean_val <- mean(group_data)
@@ -328,7 +328,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       # Weighted ANOVA
       
       # Weighted descriptive statistics by group
-      group_stats <- map(group_levels, function(level) {
+      group_stats <- purrr::map(group_levels, function(level) {
         group_indices <- g == level
         group_data <- y[group_indices]
         group_weights <- w[group_indices]

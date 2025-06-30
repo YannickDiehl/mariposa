@@ -41,7 +41,8 @@
 #'   attitudinal patterns. No real survey data was used.
 #'
 #' @examples
-#' # Load the data
+#' # Load required packages and data
+#' library(dplyr)
 #' data(survey_data)
 #' 
 #' # Basic descriptive statistics
@@ -97,18 +98,18 @@
 #'   patterns and treatment effects. No real study data was used.
 #'
 #' @examples
-#' # Load the data
+#' # Load required packages and data
+#' library(dplyr)
 #' data(longitudinal_data)
 #' 
-#' # Repeated measures ANOVA
-#' longitudinal_data %>%
-#'   rm_anova_test(outcome_score, secondary_outcome, 
-#'                 group = group, subject_id = subject_id)
+#' # Simple repeated measures ANOVA (within-subjects only)
+#' data(longitudinal_data_wide)
+#' longitudinal_data_wide %>%
+#'   rm_anova_test(score_T1, score_T2, score_T3, subject_id = subject_id)
 #' 
 #' # Repeated measures t-test
-#' longitudinal_data %>%
-#'   filter(time %in% c("T1", "T4")) %>%
-#'   rm_t_test(outcome_score, group = group, subject_id = subject_id)
+#' longitudinal_data_wide %>%
+#'   rm_t_test(score_T1, score_T4)
 #' 
 #' # Descriptive statistics by group and time
 #' longitudinal_data %>%
@@ -145,11 +146,12 @@
 #' @seealso \code{\link{longitudinal_data}} for the long format version
 #'
 #' @examples
-#' # Load the data
+#' # Load required packages and data
+#' library(dplyr)
 #' data(longitudinal_data_wide)
 #' 
 #' # Paired t-test between time points
 #' longitudinal_data_wide %>%
-#'   rm_t_test(score_T1, score_T4, group = group, subject_id = subject_id)
+#'   rm_t_test(score_T1, score_T4)
 #'
 "longitudinal_data_wide"

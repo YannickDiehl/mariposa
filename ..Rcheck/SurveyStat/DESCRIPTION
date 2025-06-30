@@ -11,25 +11,14 @@ Description: A comprehensive package for statistical analysis of survey data,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1.0)
-Imports:
-    stats,
-    utils,
-    dplyr,
-    rlang,
-    tidyselect,
-    tibble,
-    purrr,
-    tidyr
-Suggests: 
-    testthat (>= 3.0.0),
-    knitr,
-    rmarkdown,
-    covr,
-    haven (>= 2.4.0)
+Imports: stats, utils, dplyr, rlang, tidyselect, tibble, purrr, tidyr
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown, covr, haven (>= 2.4.0)
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
-URL: https://yourusername.github.io/SurveyStat/, https://github.com/yourusername/SurveyStat
+URL: https://yourusername.github.io/SurveyStat/,
+        https://github.com/yourusername/SurveyStat
 BugReports: https://github.com/yourusername/SurveyStat/issues
+Built: R 4.5.1; ; 2025-06-30 08:46:26 UTC; unix

@@ -54,10 +54,14 @@ survey_data %>% frequency(education, region, weights = sampling_weight)
 Perform hypothesis tests with survey data:
 
 ```{r}
-# Group comparison with t-test
+# Group comparison with t-test (male vs female)
 survey_data %>% 
-  group_by(region) %>% 
-  t_test(life_satisfaction, weights = sampling_weight)
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+
+# Or grouped analysis by region
+survey_data %>%
+  group_by(region) %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
 ```
 
 ## Package Features
