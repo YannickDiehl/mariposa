@@ -1,0 +1,35 @@
+# R Project files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# R Package development
+man/*.Rd
+NAMESPACE
+.Rd2pdf*
+Meta/
+doc/
+docs/
+
+# R build artifacts
+*.tar.gz
+*.zip
+src/*.o
+src/*.so
+src/*.dll
+
+# IDE files
+.vscode/
+*.Rproj
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+tests/testthat/Rplots.pdf
+
+# Coverage
+coverage.html
+docs
