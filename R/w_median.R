@@ -55,7 +55,7 @@ w_median <- function(data, ..., weights = NULL, na.rm = TRUE) {
       if (length(x) == 0) {
         return(NA_real_)
       } else {
-        return(Hmisc::wtd.quantile(x, weights = weights_vec, probs = 0.5, na.rm = FALSE))
+        return(.w_median(x, weights_vec, na.rm = FALSE))
       }
     }
   }
@@ -116,7 +116,7 @@ w_median <- function(data, ..., weights = NULL, na.rm = TRUE) {
               n_val <- 0
               eff_n <- 0
             } else {
-              stat_val <- Hmisc::wtd.quantile(x, weights = w, probs = 0.5, na.rm = FALSE)
+              stat_val <- .w_median(x, w, na.rm = FALSE)
               n_val <- length(x)
               eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
             }
@@ -159,7 +159,7 @@ w_median <- function(data, ..., weights = NULL, na.rm = TRUE) {
           n_val <- 0
           eff_n <- 0
         } else {
-          stat_val <- Hmisc::wtd.quantile(x, weights = w, probs = 0.5, na.rm = FALSE)
+          stat_val <- .w_median(x, w, na.rm = FALSE)
           n_val <- length(x)
           eff_n <- sum(w)^2 / sum(w^2)
         }

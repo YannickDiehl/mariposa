@@ -55,9 +55,8 @@ w_iqr <- function(data, ..., weights = NULL, na.rm = TRUE) {
       if (length(x) == 0) {
         return(NA_real_)
       } else {
-        q1 <- Hmisc::wtd.quantile(x, weights = weights_vec, probs = 0.25, na.rm = FALSE)
-        q3 <- Hmisc::wtd.quantile(x, weights = weights_vec, probs = 0.75, na.rm = FALSE)
-        return(q3 - q1)
+        quantiles <- .w_quantile(x, weights_vec, probs = c(0.25, 0.75), na.rm = FALSE)
+        return(quantiles[2] - quantiles[1])
       }
     }
   }
@@ -118,9 +117,8 @@ w_iqr <- function(data, ..., weights = NULL, na.rm = TRUE) {
               n_val <- 0
               eff_n <- 0
             } else {
-              q1 <- Hmisc::wtd.quantile(x, weights = w, probs = 0.25, na.rm = FALSE)
-              q3 <- Hmisc::wtd.quantile(x, weights = w, probs = 0.75, na.rm = FALSE)
-              stat_val <- q3 - q1
+              quantiles <- .w_quantile(x, w, probs = c(0.25, 0.75), na.rm = FALSE)
+              stat_val <- quantiles[2] - quantiles[1]
               n_val <- length(x)
               eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
             }
@@ -163,9 +161,8 @@ w_iqr <- function(data, ..., weights = NULL, na.rm = TRUE) {
           n_val <- 0
           eff_n <- 0
         } else {
-          q1 <- Hmisc::wtd.quantile(x, weights = w, probs = 0.25, na.rm = FALSE)
-          q3 <- Hmisc::wtd.quantile(x, weights = w, probs = 0.75, na.rm = FALSE)
-          stat_val <- q3 - q1
+          quantiles <- .w_quantile(x, w, probs = c(0.25, 0.75), na.rm = FALSE)
+          stat_val <- quantiles[2] - quantiles[1]
           n_val <- length(x)
           eff_n <- sum(w)^2 / sum(w^2)
         }

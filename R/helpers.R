@@ -3,6 +3,9 @@
 # This file contains shared utility functions used across all w_* functions
 # to ensure consistency and reduce code duplication.
 
+#' @importFrom dplyr %>%
+NULL
+
 # Weight Validation Functions
 # ---------------------------
 
