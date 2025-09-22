@@ -915,6 +915,275 @@ extract_spss_chi_squared_values <- function(file_path, test_number) {
   
   return(result)
 }
+
+# ============================================================================
+# ONEWAY ANOVA Parser Functions
+# ============================================================================
+
+#' Parse SPSS ONEWAY ANOVA output
+#'
+#' Extracts statistics from SPSS ONEWAY command output
+#' 
+#' @param file_path Path to SPSS output file
+#' @param test_number Test number to extract
+#' @return Named list of ANOVA statistics
+parse_spss_oneway <- function(file_path, test_number) {
+  lines <- readLines(file_path, warn = FALSE)
+  
+  # Find test section
+  test_pattern <- paste0("TEST ", test_number, ":")
+  test_start <- grep(test_pattern, lines)[1]
+  
+  if (is.na(test_start)) return(NULL)
+  
+  # Find next test or use reasonable end
+  next_test <- grep("TEST \\d+:", lines[(test_start + 1):length(lines)])[1]
+  if (!is.na(next_test)) {
+    test_end <- test_start + next_test - 1
+  } else {
+    test_end <- min(test_start + 300, length(lines))
+  }
+  
+  test_lines <- lines[test_start:test_end]
+  result <- list()
+  
+  # Parse Descriptives table for group statistics
+  desc_start <- grep("^Descriptives", test_lines)[1]
+  if (!is.na(desc_start)) {
+    # Find the data lines (skip header lines)
+    # Look for lines with group names and statistics
+    for (i in (desc_start + 4):(desc_start + 20)) {
+      if (i > length(test_lines)) break
+      line <- test_lines[i]
+      
+      # Check if this is a group line (starts with a word, not "Total")
+      if (grepl("^\\s*[A-Za-z]", line) && !grepl("^\\s*Total", line)) {
+        # Extract numbers from the line
+        numbers <- as.numeric(unlist(regmatches(line, 
+                                               gregexpr("-?\\d*\\.?\\d+", line))))
+        
+        # Extract group name (first word(s) before numbers)
+        group_name <- trimws(sub("\\s+\\d+.*", "", line))
+        
+        if (length(numbers) >= 3) {
+          # Store group statistics
+          # Typical order: N, Mean, SD, SE, CI_lower, CI_upper, Min, Max
+          group_key <- paste0("group_", group_name)
+          result[[group_key]] <- list(
+            name = group_name,
+            n = numbers[1],
+            mean = numbers[2],
+            sd = numbers[3],
+            se = if(length(numbers) >= 4) numbers[4] else NA
+          )
+        }
+      } else if (grepl("^\\s*Total", line)) {
+        # Parse total line
+        numbers <- as.numeric(unlist(regmatches(line, 
+                                               gregexpr("-?\\d*\\.?\\d+", line))))
+        if (length(numbers) >= 3) {
+          result$total <- list(
+            n = numbers[1],
+            mean = numbers[2],
+            sd = numbers[3]
+          )
+        }
+      }
+    }
+  }
+  
+  # Parse ANOVA table
+  anova_start <- grep("^ANOVA", test_lines)[1]
+  if (!is.na(anova_start)) {
+    # Look for Between Groups line
+    between_line <- grep("Between Groups", test_lines[anova_start:length(test_lines)])[1]
+    if (!is.na(between_line)) {
+      between_idx <- anova_start + between_line - 1
+      line <- test_lines[between_idx]
+      
+      # Extract values: SS, df, MS, F, Sig
+      numbers <- as.numeric(unlist(regmatches(line, 
+                                             gregexpr("-?\\d*\\.?\\d+", line))))
+      
+      if (length(numbers) >= 5) {
+        result$between_groups <- list(
+          ss = numbers[1],
+          df = numbers[2],
+          ms = numbers[3],
+          f_statistic = numbers[4],
+          p_value = numbers[5]
+        )
+      }
+    }
+    
+    # Look for Within Groups line
+    within_line <- grep("Within Groups", test_lines[anova_start:length(test_lines)])[1]
+    if (!is.na(within_line)) {
+      within_idx <- anova_start + within_line - 1
+      line <- test_lines[within_idx]
+      
+      numbers <- as.numeric(unlist(regmatches(line, 
+                                             gregexpr("-?\\d*\\.?\\d+", line))))
+      
+      if (length(numbers) >= 3) {
+        result$within_groups <- list(
+          ss = numbers[1],
+          df = numbers[2],
+          ms = numbers[3]
+        )
+      }
+    }
+    
+    # Look for Total line
+    total_line <- grep("^\\s*Total", test_lines[anova_start:length(test_lines)])[1]
+    if (!is.na(total_line)) {
+      total_idx <- anova_start + total_line - 1
+      line <- test_lines[total_idx]
+      
+      numbers <- as.numeric(unlist(regmatches(line, 
+                                             gregexpr("-?\\d*\\.?\\d+", line))))
+      
+      if (length(numbers) >= 2) {
+        result$total_ss <- numbers[1]
+        result$total_df <- numbers[2]
+      }
+    }
+  }
+  
+  # Parse Levene's Test
+  levene_start <- grep("Tests of Homogeneity", test_lines)[1]
+  if (!is.na(levene_start)) {
+    # Look for "Based on Mean" line
+    mean_line <- grep("Based on Mean", test_lines[levene_start:length(test_lines)])[1]
+    if (!is.na(mean_line)) {
+      mean_idx <- levene_start + mean_line - 1
+      line <- test_lines[mean_idx]
+      
+      numbers <- as.numeric(unlist(regmatches(line, 
+                                             gregexpr("-?\\d*\\.?\\d+", line))))
+      
+      if (length(numbers) >= 4) {
+        result$levene <- list(
+          statistic = numbers[1],
+          df1 = numbers[2],
+          df2 = numbers[3],
+          p_value = numbers[4]
+        )
+      }
+    }
+  }
+  
+  # Parse Welch and Brown-Forsythe tests
+  robust_start <- grep("Robust Tests of Equality", test_lines)[1]
+  if (!is.na(robust_start)) {
+    # Welch test
+    welch_line <- grep("Welch", test_lines[robust_start:length(test_lines)])[1]
+    if (!is.na(welch_line)) {
+      welch_idx <- robust_start + welch_line - 1
+      line <- test_lines[welch_idx]
+      
+      numbers <- as.numeric(unlist(regmatches(line, 
+                                             gregexpr("-?\\d*\\.?\\d+", line))))
+      
+      if (length(numbers) >= 4) {
+        result$welch <- list(
+          statistic = numbers[1],
+          df1 = numbers[2],
+          df2 = numbers[3],
+          p_value = numbers[4]
+        )
+      }
+    }
+    
+    # Brown-Forsythe test
+    bf_line <- grep("Brown-Forsythe", test_lines[robust_start:length(test_lines)])[1]
+    if (!is.na(bf_line)) {
+      bf_idx <- robust_start + bf_line - 1
+      line <- test_lines[bf_idx]
+      
+      numbers <- as.numeric(unlist(regmatches(line, 
+                                             gregexpr("-?\\d*\\.?\\d+", line))))
+      
+      if (length(numbers) >= 4) {
+        result$brown_forsythe <- list(
+          statistic = numbers[1],
+          df1 = numbers[2],
+          df2 = numbers[3],
+          p_value = numbers[4]
+        )
+      }
+    }
+  }
+  
+  # Parse Post-Hoc tests (Tukey)
+  posthoc_start <- grep("Multiple Comparisons", test_lines)[1]
+  if (!is.na(posthoc_start)) {
+    result$posthoc <- list()
+    
+    # Look for Tukey HSD results
+    tukey_start <- grep("Tukey HSD", test_lines[posthoc_start:length(test_lines)])[1]
+    if (!is.na(tukey_start)) {
+      # Parse pairwise comparisons
+      # This is complex as it involves multiple rows
+      # For now, we'll just note that post-hoc tests are present
+      result$posthoc$tukey_present <- TRUE
+    }
+  }
+  
+  return(result)
+}
+
+#' Extract ONEWAY ANOVA values for validation
+#'
+#' Wrapper function for SPSS ONEWAY validation tests
+#' 
+#' @param file_path Path to SPSS output file
+#' @param test_number Test number to extract
+#' @return Named list of statistics formatted for validation
+extract_spss_oneway_values <- function(file_path, test_number) {
+  raw_result <- parse_spss_oneway(file_path, test_number)
+  
+  if (is.null(raw_result)) return(NULL)
+  
+  # Format results for easy comparison
+  result <- list(
+    # Main ANOVA statistics
+    f_statistic = raw_result$between_groups$f_statistic,
+    df_between = raw_result$between_groups$df,
+    df_within = raw_result$within_groups$df,
+    p_value = raw_result$between_groups$p_value,
+    
+    # Sum of squares
+    ss_between = raw_result$between_groups$ss,
+    ss_within = raw_result$within_groups$ss,
+    ss_total = raw_result$total_ss,
+    
+    # Mean squares
+    ms_between = raw_result$between_groups$ms,
+    ms_within = raw_result$within_groups$ms,
+    
+    # Levene's test
+    levene_statistic = raw_result$levene$statistic,
+    levene_p = raw_result$levene$p_value,
+    
+    # Robust tests (if present)
+    welch_f = if (!is.null(raw_result$welch)) raw_result$welch$statistic else NA,
+    welch_p = if (!is.null(raw_result$welch)) raw_result$welch$p_value else NA,
+    brown_forsythe_f = if (!is.null(raw_result$brown_forsythe)) raw_result$brown_forsythe$statistic else NA,
+    brown_forsythe_p = if (!is.null(raw_result$brown_forsythe)) raw_result$brown_forsythe$p_value else NA,
+    
+    # Group statistics
+    groups = raw_result[grep("^group_", names(raw_result))],
+    
+    # Total statistics
+    total_n = raw_result$total$n,
+    total_mean = raw_result$total$mean,
+    total_sd = raw_result$total$sd
+  )
+  
+  return(result)
+}
+
 # ============================================================================
 # FREQUENCY PARSING FUNCTIONS
 # ============================================================================
