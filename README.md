@@ -13,7 +13,7 @@
 
 ### 🎯 **Core Features**
 
-- **🔬 SPSS-Compatible Results**: 100% identical statistical output with SPSS
+- **🔬 SPSS-Compatible Results**: 100% validated statistical output with SPSS (83/83 tests pass)
 - **⚖️ Survey-Weighted Statistics**: Mathematically correct weighted analysis  
 - **🔄 Tidyverse Integration**: Seamless workflow with dplyr, tidyselect, group_by()
 - **🧩 S3 Generics System**: Extensible architecture for cross-test compatibility

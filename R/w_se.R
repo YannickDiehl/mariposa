@@ -55,12 +55,19 @@ w_se <- function(data, ..., weights = NULL, na.rm = TRUE) {
       if (length(x) == 0) {
         return(NA_real_)
       } else {
-        # Weighted standard error: se = weighted_sd / sqrt(effective_n)
+        # Weighted standard error using SPSS formula
+        # SPSS uses: SE = SD / sqrt(V1) where V1 = sum of weights
         w_mean <- sum(x * weights_vec) / sum(weights_vec)
-        n_eff <- sum(weights_vec)^2 / sum(weights_vec^2)
-        w_var <- sum(weights_vec * (x - w_mean)^2) / (sum(weights_vec) * (n_eff - 1) / n_eff)
+        V1 <- sum(weights_vec)  # Sum of weights
+        
+        if (V1 <= 1) return(NA_real_)
+        
+        # Calculate variance using SPSS formula
+        numerator <- sum(weights_vec * (x - w_mean)^2)
+        w_var <- numerator / (V1 - 1)  # SPSS variance formula
         w_sd <- sqrt(w_var)
-        return(w_sd / sqrt(n_eff))
+        
+        return(w_sd / sqrt(V1))  # SPSS SE formula: SD / sqrt(V1)
       }
     }
   }
@@ -121,12 +128,21 @@ w_se <- function(data, ..., weights = NULL, na.rm = TRUE) {
               n_val <- 0
               eff_n <- 0
             } else {
+              # SPSS formula for weighted standard error
               w_mean <- sum(x * w) / sum(w)
               n_val <- length(x)
-              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
-              w_var <- sum(w * (x - w_mean)^2) / (sum(w) * (eff_n - 1) / eff_n)
-              w_sd <- sqrt(w_var)
-              stat_val <- w_sd / sqrt(eff_n)
+              V1 <- sum(w)  # Sum of weights
+              eff_n <- sum(w)^2 / sum(w^2)  # Still track effective sample size for reporting
+              
+              if (V1 <= 1) {
+                stat_val <- NA_real_
+              } else {
+                # Calculate variance and SE using SPSS formulas
+                numerator <- sum(w * (x - w_mean)^2)
+                w_var <- numerator / (V1 - 1)  # SPSS variance formula
+                w_sd <- sqrt(w_var)
+                stat_val <- w_sd / sqrt(V1)  # SPSS SE formula: SD / sqrt(V1)
+              }
             }
           }
           
@@ -167,12 +183,21 @@ w_se <- function(data, ..., weights = NULL, na.rm = TRUE) {
           n_val <- 0
           eff_n <- 0
         } else {
+          # SPSS formula for weighted standard error
           w_mean <- sum(x * w) / sum(w)
           n_val <- length(x)
-          eff_n <- sum(w)^2 / sum(w^2)
-          w_var <- sum(w * (x - w_mean)^2) / (sum(w) * (eff_n - 1) / eff_n)
-          w_sd <- sqrt(w_var)
-          stat_val <- w_sd / sqrt(eff_n)
+          V1 <- sum(w)  # Sum of weights
+          eff_n <- sum(w)^2 / sum(w^2)  # Still track effective sample size for reporting
+          
+          if (V1 <= 1) {
+            stat_val <- NA_real_
+          } else {
+            # Calculate variance and SE using SPSS formulas
+            numerator <- sum(w * (x - w_mean)^2)
+            w_var <- numerator / (V1 - 1)  # SPSS variance formula
+            w_sd <- sqrt(w_var)
+            stat_val <- w_sd / sqrt(V1)  # SPSS SE formula: SD / sqrt(V1)
+          }
         }
       }
       

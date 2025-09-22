@@ -54,11 +54,18 @@ w_var <- function(data, ..., weights = NULL, na.rm = TRUE) {
       if (length(x) < 2) {
         return(NA_real_)
       } else {
-        # Weighted variance calculation
+        # Weighted variance using SPSS formula
+        # SPSS uses: variance = sum(w * (x - w_mean)^2) / (V1 - 1)
+        # where V1 = sum of weights
         w_mean <- sum(x * weights_vec) / sum(weights_vec)
-        n_eff <- sum(weights_vec)^2 / sum(weights_vec^2)  # Effective sample size
-        w_var <- sum(weights_vec * (x - w_mean)^2) / (sum(weights_vec) * (n_eff - 1) / n_eff)
-        return(w_var)
+        V1 <- sum(weights_vec)  # Sum of weights
+        
+        if (V1 <= 1) return(NA_real_)  # Need V1 > 1 for denominator
+        
+        numerator <- sum(weights_vec * (x - w_mean)^2)
+        denominator <- V1 - 1  # SPSS formula: V1 - 1
+        
+        return(numerator / denominator)
       }
     }
   }
@@ -119,10 +126,18 @@ w_var <- function(data, ..., weights = NULL, na.rm = TRUE) {
               n_val <- 0
               eff_n <- 0
             } else {
+              # SPSS formula for weighted variance
               w_mean <- sum(x * w) / sum(w)
               n_val <- length(x)
-              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
-              stat_val <- sum(w * (x - w_mean)^2) / (sum(w) * (eff_n - 1) / eff_n)
+              V1 <- sum(w)  # Sum of weights
+              eff_n <- sum(w)^2 / sum(w^2)  # Still track effective sample size for reporting
+              
+              if (V1 <= 1) {
+                stat_val <- NA_real_
+              } else {
+                numerator <- sum(w * (x - w_mean)^2)
+                stat_val <- numerator / (V1 - 1)  # SPSS formula: V1 - 1
+              }
             }
           }
           
@@ -163,10 +178,18 @@ w_var <- function(data, ..., weights = NULL, na.rm = TRUE) {
           n_val <- 0
           eff_n <- 0
         } else {
+          # SPSS formula for weighted variance
           w_mean <- sum(x * w) / sum(w)
           n_val <- length(x)
-          eff_n <- sum(w)^2 / sum(w^2)
-          stat_val <- sum(w * (x - w_mean)^2) / (sum(w) * (eff_n - 1) / eff_n)
+          V1 <- sum(w)  # Sum of weights
+          eff_n <- sum(w)^2 / sum(w^2)  # Still track effective sample size for reporting
+          
+          if (V1 <= 1) {
+            stat_val <- NA_real_
+          } else {
+            numerator <- sum(w * (x - w_mean)^2)
+            stat_val <- numerator / (V1 - 1)  # SPSS formula: V1 - 1
+          }
         }
       }
       
