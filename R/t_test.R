@@ -329,13 +329,23 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         test_result <- t.test(x, mu = mu, alternative = alternative, conf.level = conf.level)
         group_stats <- list(means = mean(x, na.rm = TRUE), n = length(x))
       } else {
-        # Weighted one-sample t-test (simplified)
+        # Weighted one-sample t-test using SPSS formulas
         weighted_mean <- sum(x * w) / sum(w)
-        weighted_var <- sum(w * (x - weighted_mean)^2) / sum(w)
-        n_eff <- sum(w)^2 / sum(w^2)
-        se <- sqrt(weighted_var / n_eff)
+        V1 <- sum(w)  # Sum of weights (SPSS uses this)
+        
+        # Calculate variance using SPSS formula: sum(w*(x-mean)^2) / (V1-1)
+        numerator <- sum(w * (x - weighted_mean)^2)
+        weighted_var <- numerator / (V1 - 1)
+        
+        # Calculate SE using SPSS formula: SD / sqrt(V1)
+        weighted_sd <- sqrt(weighted_var)
+        se <- weighted_sd / sqrt(V1)
+        
+        # Calculate t-statistic
         t_stat <- (weighted_mean - mu) / se
-        df <- n_eff - 1
+        
+        # SPSS uses round(sum_w) - 1 for degrees of freedom
+        df <- round(V1) - 1
         
         if (alternative == "two.sided") {
           p_value <- 2 * pt(-abs(t_stat), df)
@@ -354,18 +364,21 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           conf.int = conf_int,
           estimate = weighted_mean
         )
-        group_stats <- list(means = weighted_mean, n = sum(w))
+        group_stats <- list(means = weighted_mean, n = V1)
       }
       
       return(list(
-        t_stat = test_result$statistic,
-        df = test_result$parameter,
-        p_value = test_result$p.value,
-        mean_diff = test_result$estimate,
-        conf_int = test_result$conf.int,
+        t_stat = as.numeric(test_result$statistic),
+        df = as.numeric(test_result$parameter),
+        p_value = as.numeric(test_result$p.value),
+        mean_diff = as.numeric(test_result$estimate),
+        conf_int = as.numeric(test_result$conf.int),
         cohens_d = list(cohens_d = NA, hedges_g = NA, glass_delta = NA),
         group_levels = NULL,
-        group_stats = group_stats
+        group_stats = group_stats,
+        equal_var_result = NULL,  # Not applicable for one-sample
+        unequal_var_result = NULL,  # Not applicable for one-sample
+        is_weighted = !is.null(weight_name)
       ))
       
     } else {
@@ -583,8 +596,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
               CI_lower = test_result$conf_int[1],
               CI_upper = test_result$conf_int[2],
               # Add sample size columns for test compatibility
-              n1 = if(!is.null(test_result$group_stats)) test_result$group_stats$group1$n else NA,
-              n2 = if(!is.null(test_result$group_stats)) test_result$group_stats$group2$n else NA
+              n1 = if(!is.null(test_result$group_stats)) {
+                if(!is.null(test_result$group_stats$group1)) test_result$group_stats$group1$n else test_result$group_stats$n
+              } else NA,
+              n2 = if(!is.null(test_result$group_stats)) {
+                if(!is.null(test_result$group_stats$group2)) test_result$group_stats$group2$n else NA
+              } else NA
             )
             result_df$group_stats <- list(test_result$group_stats)
             result_df$equal_var_result <- list(test_result$equal_var_result)
@@ -642,8 +659,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           CI_lower = test_result$conf_int[1],
           CI_upper = test_result$conf_int[2],
           # Add sample size columns for test compatibility
-          n1 = if(!is.null(test_result$group_stats)) test_result$group_stats$group1$n else NA,
-          n2 = if(!is.null(test_result$group_stats)) test_result$group_stats$group2$n else NA
+          n1 = if(!is.null(test_result$group_stats)) {
+            if(!is.null(test_result$group_stats$group1)) test_result$group_stats$group1$n else test_result$group_stats$n
+          } else NA,
+          n2 = if(!is.null(test_result$group_stats)) {
+            if(!is.null(test_result$group_stats$group2)) test_result$group_stats$group2$n else NA
+          } else NA
         )
         result_df$group_stats <- list(test_result$group_stats)
         result_df$equal_var_result <- list(test_result$equal_var_result)
@@ -836,7 +857,7 @@ print.t_test_results <- function(x, digits = 3, ...) {
         var <- group_results$Variable[j]
         stats <- group_results$group_stats[[j]]
         
-        cat(sprintf("\n┌─ %s ─┐\n", var))
+        cat(sprintf("\n--- %s ---\n", var))
         cat("\n")  # Add blank line after variable name
          
         # Print statistics based on test type
@@ -926,7 +947,7 @@ print.t_test_results <- function(x, digits = 3, ...) {
       var_name <- valid_results$Variable[i]
       stats <- valid_results$group_stats[[i]]
       
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       cat("\n")  # Add blank line after variable name
       
       # Print statistics based on test type
@@ -1101,7 +1122,7 @@ print.t_test_result <- function(x, digits = 3, ...) {
         var <- group_results$Variable[j]
         stats <- group_results$group_stats[[j]]
         
-        cat(sprintf("\n┌─ %s ─┐\n", var))
+        cat(sprintf("\n--- %s ---\n", var))
         cat("\n")  # Add blank line after variable name
          
         # Print group means
@@ -1190,7 +1211,7 @@ print.t_test_result <- function(x, digits = 3, ...) {
       var_name <- valid_results$Variable[i]
       stats <- valid_results$group_stats[[i]]
       
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       cat("\n")  # Add blank line after variable name
       
       # Print group means if available

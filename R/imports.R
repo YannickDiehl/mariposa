@@ -5,11 +5,12 @@
 # This file contains all necessary @importFrom statements to make the package functional
 
 #' @importFrom rlang enquo quo_is_null as_name expr %||% enquos syms sym quo eval_tidy
-#' @importFrom dplyr group_vars group_modify select all_of distinct ungroup arrange desc group_by summarise group_split bind_rows group_keys mutate filter
+#' @importFrom dplyr group_vars group_modify select all_of distinct ungroup arrange desc group_by summarise group_split bind_rows group_keys mutate filter across rowwise c_across
 #' @importFrom tidyselect eval_select starts_with ends_with contains where all_of any_of
+#' @importFrom tidyr pivot_longer
 #' @importFrom tibble tibble as_tibble
-#' @importFrom stats var sd median quantile IQR na.omit complete.cases
-#' @importFrom utils head tail str
+#' @importFrom stats var sd median quantile IQR na.omit complete.cases TukeyHSD aov as.formula chisq.test confint lm oneway.test pf pt ptukey qt qtukey t.test weighted.mean wilcox.test xtabs
+#' @importFrom utils head tail str capture.output combn
 NULL
 
 # This file ensures all external functions are available throughout the package

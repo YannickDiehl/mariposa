@@ -75,9 +75,10 @@ chi_squared_test <- function(data, ..., weights = NULL, correct = FALSE) {
         var2 <- group_data[[var_names[2]]]
         
         if (!is.null(w_name)) {
-          # Weighted test
+          # Weighted test - round weights to integers for SPSS compatibility
           weights_data <- group_data[[w_name]]
           tbl <- xtabs(weights_data ~ var1 + var2)
+          tbl <- round(tbl)  # Round to match SPSS behavior
         } else {
           # Unweighted test
           tbl <- table(var1, var2)
@@ -122,9 +123,10 @@ chi_squared_test <- function(data, ..., weights = NULL, correct = FALSE) {
     var2 <- data[[var_names[2]]]
     
     if (!is.null(w_name)) {
-      # Weighted test
+      # Weighted test - round weights to integers for SPSS compatibility
       weights_data <- data[[w_name]]
       tbl <- xtabs(weights_data ~ var1 + var2)
+      tbl <- round(tbl)  # Round to match SPSS behavior
     } else {
       # Unweighted test
       tbl <- table(var1, var2)
@@ -215,7 +217,7 @@ print.chi_squared_test_results <- function(x, digits = 3, ...) {
   
   if (!x$is_grouped) {
     # Simple test display
-    cat(sprintf("\nVariables: %s × %s\n", x$variables[1], x$variables[2]))
+    cat(sprintf("\nVariables: %s x %s\n", x$variables[1], x$variables[2]))
     
     if (!is.null(x$weights)) {
       cat(sprintf("Weights variable: %s\n", x$weights))
@@ -271,7 +273,7 @@ print.chi_squared_test_results <- function(x, digits = 3, ...) {
     
   } else {
     # Grouped tests
-    cat("\nVariables tested:", paste(x$variables, collapse = " × "), "\n")
+    cat("\nVariables tested:", paste(x$variables, collapse = " x "), "\n")
     cat("Grouped by:", paste(x$groups, collapse = ", "), "\n")
     
     # Create a unified table with all results
@@ -286,7 +288,7 @@ print.chi_squared_test_results <- function(x, digits = 3, ...) {
       })
       group_info <- paste(group_info, collapse = ", ")
       
-      cat(sprintf("\n┌─ Group: %s ─┐\n", group_info))
+      cat(sprintf("\n--- Group: %s ---\n", group_info))
       cat("\n")  # Blank line
       
       # Print observed frequencies
