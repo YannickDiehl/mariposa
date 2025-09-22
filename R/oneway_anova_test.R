@@ -731,7 +731,7 @@ print.oneway_anova_test_results <- function(x, digits = 3, ...) {
         anova_table <- group_results$anova_table[[j]]
         welch_result <- group_results$welch_result[[j]]
         
-        cat(sprintf("\n┌─ %s ─┐\n", var))
+        cat(sprintf("\n--- %s ---\n", var))
         cat("\n")  # Add blank line after variable name
         
         # Print descriptive statistics
@@ -841,7 +841,7 @@ print.oneway_anova_test_results <- function(x, digits = 3, ...) {
       anova_table <- valid_results$anova_table[[i]]
       welch_result <- valid_results$welch_result[[i]]
       
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       cat("\n")  # Add blank line after variable name
       
       # Print descriptive statistics

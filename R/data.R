@@ -54,7 +54,7 @@
 #' # Group comparisons
 #' survey_data %>% 
 #'   group_by(region) %>% 
-#'   t_test(life_satisfaction, weights = sampling_weight)
+#'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #'
 "survey_data"
 
@@ -92,7 +92,7 @@
 #'
 #' Missing data patterns reflect realistic longitudinal study attrition with
 #' higher dropout in later time points. The treatment effect demonstrates
-#' a clear Group × Time interaction suitable for repeated measures testing.
+#' a clear Group x Time interaction suitable for repeated measures testing.
 #'
 #' @source Generated synthetically with realistic longitudinal correlation 
 #'   patterns and treatment effects. No real study data was used.

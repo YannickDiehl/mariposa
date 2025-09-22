@@ -292,7 +292,7 @@ print.w_sd <- function(x, digits = 3, ...) {
       for (var_name in unique(group_results$Variable)) {
         var_data <- group_results[group_results$Variable == var_name, ]
         
-        cat(sprintf("\n┌─ %s ─┐\n", var_name))
+        cat(sprintf("\n--- %s ---\n", var_name))
         
         # Create formatted output
         if (!is.null(x$weights)) {
@@ -321,7 +321,7 @@ print.w_sd <- function(x, digits = 3, ...) {
     }
     
     for (var_name in variables) {
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       
       if (!is.null(x$weights)) {
         # Show weighted columns with proper capitalization

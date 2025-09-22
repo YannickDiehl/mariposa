@@ -311,7 +311,7 @@ print.w_mean <- function(x, digits = 3, ...) {
       
       # Process each variable with Unicode boxes
       for (var_name in x$variables) {
-        cat(sprintf("\n┌─ %s ─┐\n", var_name))
+        cat(sprintf("\n--- %s ---\n", var_name))
         
         # Create formatted output
         if (!is.null(x$weights)) {
@@ -340,7 +340,7 @@ print.w_mean <- function(x, digits = 3, ...) {
     }
     
     for (var_name in variables) {
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       
       if (!is.null(x$weights)) {
         # Show weighted columns with proper capitalization

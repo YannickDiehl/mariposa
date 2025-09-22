@@ -11,7 +11,7 @@
 #'     \item \code{"all"} (default): All main effects and interactions
 #'     \item \code{"group"}: Between-subjects factor means
 #'     \item \code{"time"}: Within-subjects factor means  
-#'     \item \code{"interaction"}: Group × Time interaction means
+#'     \item \code{"interaction"}: Group x Time interaction means
 #'   }
 #'   Can also be a vector to specify multiple effects, e.g., \code{c("group", "time")}
 #' @param ... Additional arguments passed to methods
@@ -152,7 +152,7 @@ emmeans.oneway_anova_test_results <- function(x, show = "all", ...) {
     dplyr::summarise(time_mean = mean(Response, na.rm = TRUE), .groups = "drop")
   
   # Calculate within-subjects error (Time error)
-  # Sum of squared deviations from the time × subject interaction
+  # Sum of squared deviations from the time x subject interaction
   long_with_means <- long_data %>%
     dplyr::left_join(time_grand_means, by = "Time") %>%
     dplyr::left_join(subject_means, by = c(subject_col, group_col))
@@ -220,7 +220,7 @@ emmeans.oneway_anova_test_results <- function(x, show = "all", ...) {
   }
   
   # Update confidence intervals with correct SEs
-  interaction_means$df <- x$results$df2[x$results$Effect == "Interaction (Group × Time)"]
+  interaction_means$df <- x$results$df2[x$results$Effect == "Interaction (Group x Time)"]
   if (length(interaction_means$df) == 0) interaction_means$df <- 118  # Fallback
   interaction_means$t_val <- qt(0.975, df = interaction_means$df)
   interaction_means$ci_lower <- interaction_means$mean - interaction_means$t_val * interaction_means$se

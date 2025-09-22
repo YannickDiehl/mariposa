@@ -1,129 +1,52 @@
-# 📊 SPSS Data Files for Validation
+# 📁 Test Data Files
 
-**Status**: ✅ **PRODUCTION READY**  
-**Last Updated**: 2024-12-29
+SPSS-compatible test datasets for validation.
 
-## 🎯 **Quick Start**
+## Files
 
-### **Generate .sav Files (1-Minute)**
-```bash
-cd /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/SurveyStat/tests/spss_reference/data
-Rscript EXECUTE_BOTH.R
-```
+### survey_data.sav
+- **Size:** 2,500 observations
+- **Variables:** Demographics, attitudes, survey weights
+- **Use:** Main validation dataset
 
-### **Expected Output**
-```
-✓ Created survey_data.sav
-✓ Created longitudinal_data.sav
-=== SUCCESS! ===
-```
+### longitudinal_data.sav
+- **Size:** 500 subjects × 3 timepoints
+- **Variables:** Subject ID, time, groups, measurements
+- **Use:** Repeated measures tests
 
----
+## Variable Dictionary
 
-## 📁 **File Overview**
+### survey_data.sav
+| Variable | Type | Description |
+|----------|------|-------------|
+| age | Numeric | Age in years (18-89) |
+| gender | Numeric | 1=Male, 2=Female |
+| region | Numeric | 1=North, 2=South, 3=East, 4=West |
+| education | Numeric | 1=Low, 2=Medium, 3=High, 4=Very High |
+| income | Numeric | Annual income (thousands) |
+| life_satisfaction | Numeric | 1-5 scale |
+| sampling_weight | Numeric | Survey weights |
 
-| File | Purpose | Size | Required |
-|------|---------|------|----------|
-| `survey_data.sav` | Primary SPSS dataset (2,500 obs) | ~300KB | ✅ **Critical** |
-| `longitudinal_data.sav` | Repeated measures dataset | ~100KB | ✅ **Critical** |
-| `EXECUTE_BOTH.R` | Generation script | ~2KB | ✅ **Critical** |
-| `VERIFY_SAV_INTEGRITY.R` | Quality assurance tool | ~8KB | 🔧 **Utility** |
-| `survey_data_spss.csv` | Emergency backup | ~200KB | 📦 **Backup** |
+### longitudinal_data.sav
+| Variable | Type | Description |
+|----------|------|-------------|
+| subject_id | Numeric | Unique identifier |
+| time | Numeric | 1, 2, 3 (timepoints) |
+| group | Numeric | 1=Control, 2=Treatment |
+| score | Numeric | Outcome measure |
 
----
+## Quick Regeneration
 
-## 📊 **Dataset Specifications**
-
-### **survey_data.sav**
-- **Observations**: 2,500 survey responses
-- **Variables**: 16 (age, gender, region, education, income, trust scales, etc.)
-- **Format**: Native SPSS with value labels
-- **Purpose**: Primary validation testing
-
-### **longitudinal_data.sav**
-- **Structure**: Repeated measures design
-- **Variables**: subject_id, group, time, score
-- **Purpose**: RM ANOVA and mixed-effects validation
-
----
-
-## 🔧 **Usage Instructions**
-
-### **SPSS Import (Direct)**
-1. Open SPSS
-2. File → Open → Data
-3. Select `survey_data.sav` 
-4. **All value labels pre-configured!** ✅
-
-### **R Integration**
+If files are missing or corrupted:
 ```r
-# Read back for verification
+# From R console
 library(haven)
-survey <- read_sav("survey_data.sav")
-str(survey)
-```
+data(survey_data, package = "SurveyStat")
+data(longitudinal_data, package = "SurveyStat")
 
-### **Quality Check**
-```bash
-# Verify file integrity
-Rscript VERIFY_SAV_INTEGRITY.R
+write_sav(survey_data, "survey_data.sav")
+write_sav(longitudinal_data, "longitudinal_data.sav")
 ```
 
 ---
-
-## 🚨 **Troubleshooting**
-
-### **Files Missing/Corrupted**
-```bash
-# Regenerate (guaranteed to work)
-Rscript EXECUTE_BOTH.R
-```
-
-### **Haven Package Issues**
-```r
-# Manual install if auto-install fails
-install.packages("haven")
-```
-
-### **SPSS Can't Open Files**
-- Check file sizes: Should be >50KB each
-- Run integrity check: `Rscript VERIFY_SAV_INTEGRITY.R`
-- If failed: Regenerate files
-
----
-
-## 🔄 **Regeneration Prerequisites**
-
-- ✅ R installation (≥ 4.1.0)
-- ✅ SurveyStat package installed
-- ✅ Internet connection (for haven)
-- ✅ Write permissions to directory
-
----
-
-## 🎯 **Integration with SPSS Validation**
-
-### **Validation Workflow**
-1. ✅ **Data Layer**: COMPLETED (.sav files ready)
-2. 🔄 **SPSS Analysis**: Load .sav files, run `/syntax/*.sps`
-3. 🔄 **Output Export**: Export results as TXT to `/outputs/*/`
-4. 🔄 **R Validation**: Use `/helpers/spss_parser.R` for comparison
-
-### **Success Criteria**
-- Both .sav files created without errors
-- Files pass integrity verification
-- SPSS imports data correctly
-- Statistical syntax executes properly
-
----
-
-## 📈 **Performance**
-
-- **Generation time**: ~30 seconds
-- **Memory usage**: ~50MB peak
-- **Dependencies**: Only haven package
-- **Reliability**: 100% success rate in testing
-
----
-
-*This directory provides production-ready SPSS validation data for the SurveyStat R package. Files are automatically generated and verified for statistical compatibility.*
+**Note:** These are synthetic datasets created for testing purposes.

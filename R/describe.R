@@ -372,15 +372,16 @@ describe <- function(data, ..., weights = NULL,
   
   if (length(x_clean) <= 1) return(NA_real_)
   
-  # Calculate weighted variance with Bessel's correction
+  # Calculate weighted variance using SPSS formula
+  # SPSS uses: variance = sum(w * (x - w_mean)^2) / (V1 - 1)
+  # where V1 = sum of weights
   w_mean <- .w_mean(x_clean, w_clean, na.rm = na.rm)
-  sum_w <- sum(w_clean, na.rm = na.rm)
-  sum_w2 <- sum(w_clean^2, na.rm = na.rm)
+  V1 <- sum(w_clean, na.rm = na.rm)  # Sum of weights
   
-  if (sum_w == 0 || sum_w2 == sum_w^2) return(NA_real_)
+  if (V1 <= 1) return(NA_real_)  # Need V1 > 1 for denominator
   
   numerator <- sum(w_clean * (x_clean - w_mean)^2, na.rm = na.rm)
-  denominator <- sum_w - (sum_w2 / sum_w)  # Bessel's correction for weights
+  denominator <- V1 - 1  # SPSS formula: V1 - 1
   
   return(numerator / denominator)
 }
@@ -391,7 +392,7 @@ describe <- function(data, ..., weights = NULL,
   return(sqrt(.w_var(x, weights, na.rm)))
 }
 
-#' Weighted standard error using effective sample size
+#' Weighted standard error using SPSS formula
 #' @keywords internal
 .w_se <- function(x, weights = NULL, na.rm = TRUE) {
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
@@ -401,13 +402,14 @@ describe <- function(data, ..., weights = NULL,
     return(sd(x, na.rm = na.rm) / sqrt(n))
   }
   
-  # Calculate effective sample size and weighted standard error
-  sum_w <- sum(cleaned$weights, na.rm = na.rm)
-  sum_w2 <- sum(cleaned$weights^2, na.rm = na.rm)
-  n_eff <- sum_w^2 / sum_w2
+  # Calculate weighted standard error using SPSS formula
+  # SPSS uses: SE = SD / sqrt(V1) where V1 = sum of weights
+  V1 <- sum(cleaned$weights, na.rm = na.rm)
+  
+  if (V1 <= 0) return(NA_real_)
   
   w_sd <- .w_sd(cleaned$x, cleaned$weights, na.rm = na.rm)
-  return(w_sd / sqrt(n_eff))
+  return(w_sd / sqrt(V1))  # SPSS formula: SD / sqrt(V1)
 }
 
 #' Weighted range (uses actual data range)

@@ -820,7 +820,7 @@ print.levene_test_results <- function(x, digits = 3, ...) {
         group_row <- group_results[i, ]
         var_name <- group_row$Variable
         
-        cat(sprintf("\n┌─ %s ─┐\n", var_name))
+        cat(sprintf("\n--- %s ---\n", var_name))
         cat("\n")  # Add blank line after variable name
         
         # Create results table for this variable
@@ -858,7 +858,7 @@ print.levene_test_results <- function(x, digits = 3, ...) {
       var_name <- valid_results$Variable[i]
       
       # Add variable box like in t-test
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       cat("\n")  # Add blank line after variable name
       
       # Create results table for this variable

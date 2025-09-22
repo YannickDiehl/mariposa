@@ -311,7 +311,7 @@ print.parameter_estimates_results <- function(x, digits = 3, ...) {
     var_data <- estimates_display[estimates_display$Variable == var, -1]  # Remove Variable column
     
     # Print variable header in framework design
-    cat(sprintf("\n┌─ %s ─┐\n\n", var))
+    cat(sprintf("\n--- %s ---\n\n", var))
     
     # Print table title
     cat("Parameter Estimates:\n")

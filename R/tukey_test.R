@@ -470,7 +470,7 @@ print.tukey_test_results <- function(x, digits = 3, ...) {
         var_results <- group_results[group_results$Variable == var, ]
         if (nrow(var_results) == 0) next
         
-        cat(sprintf("\n┌─ %s ─┐\n", var))
+        cat(sprintf("\n--- %s ---\n", var))
         cat("\n")  # Add blank line after variable name
         
         cat(sprintf("%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Tukey Results", "Tukey Results")))
@@ -507,7 +507,7 @@ print.tukey_test_results <- function(x, digits = 3, ...) {
       var_results <- x$results[x$results$Variable == var, ]
       if (nrow(var_results) == 0) next
       
-      cat(sprintf("\n┌─ %s ─┐\n", var))
+      cat(sprintf("\n--- %s ---\n", var))
       cat("\n")  # Add blank line after variable name
       
       cat(sprintf("%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Tukey Results", "Tukey Results")))

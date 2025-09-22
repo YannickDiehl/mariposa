@@ -370,33 +370,33 @@ print.frequency_results <- function(x, digits = 3, ...) {
     n_cols <- length(headers)
     
     # Top border
-    cat("┌")
+    cat("---")
     for (i in seq_len(n_cols)) {
-      cat(paste(rep("─", col_widths[i]), collapse = ""))
-      if (i < n_cols) cat("┬") else cat("┐")
+      cat(paste(rep("-", col_widths[i]), collapse = ""))
+      if (i < n_cols) cat("+") else cat("---")
     }
     cat("\n")
     
     # Headers
-    cat("│")
+    cat("|")
     for (i in seq_len(n_cols)) {
       header_text <- sprintf(paste0("%-", col_widths[i], "s"), substr(headers[i], 1, col_widths[i]))
       cat(header_text)
-      if (i < n_cols) cat("│") else cat("│")
+      if (i < n_cols) cat("|") else cat("|")
     }
     cat("\n")
     
     # Header separator
-    cat("├")
+    cat("+")
     for (i in seq_len(n_cols)) {
-      cat(paste(rep("─", col_widths[i]), collapse = ""))
-      if (i < n_cols) cat("┼") else cat("┤")
+      cat(paste(rep("-", col_widths[i]), collapse = ""))
+      if (i < n_cols) cat("+") else cat("+")
     }
     cat("\n")
     
     # Data rows
     for (row_idx in seq_len(nrow(data))) {
-      cat("│")
+      cat("|")
       for (i in seq_len(n_cols)) {
         value <- data[row_idx, i]
         if (is.numeric(value) && !is.na(value)) {
@@ -413,16 +413,16 @@ print.frequency_results <- function(x, digits = 3, ...) {
                                    if (is.na(value)) "NA" else substr(as.character(value), 1, col_widths[i]))
         }
         cat(formatted_value)
-        if (i < n_cols) cat("│") else cat("│")
+        if (i < n_cols) cat("|") else cat("|")
       }
       cat("\n")
     }
     
     # Bottom border
-    cat("└")
+    cat("+")
     for (i in seq_len(n_cols)) {
-      cat(paste(rep("─", col_widths[i]), collapse = ""))
-      if (i < n_cols) cat("┴") else cat("┘")
+      cat(paste(rep("-", col_widths[i]), collapse = ""))
+      if (i < n_cols) cat("+") else cat("+")
     }
     cat("\n")
   }
@@ -432,7 +432,7 @@ print.frequency_results <- function(x, digits = 3, ...) {
     var_label <- x$labels[var]
     
     # Unicode box header
-    cat(sprintf("\n┌─ %s ─┐\n", var))
+    cat(sprintf("\n--- %s ---\n", var))
     
     if (x$is_grouped) {
       unique_groups <- unique(x$results[x$groups])

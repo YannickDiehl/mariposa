@@ -1,0 +1,58 @@
+===============================================================================
+                  CHI_SQUARED_TEST() SPSS VALIDATION REPORT                    
+===============================================================================
+Generated: 2025-09-16 21:27:50 
+
+
+TEST 1 :
+--------
+# A tibble: 7 × 7
+  Statistic         SPSS         R Tolerance Difference Pass  Status 
+  <chr>            <dbl>     <dbl>     <dbl>      <dbl> <lgl> <chr>  
+1 Chi-squared      0.415    0.415      0.001   0.000256 TRUE  ✅ PASS
+2 df               1        1          0.1     0        TRUE  ✅ PASS
+3 p-value          0.519    0.519      0.01    0.000314 TRUE  ✅ PASS
+4 Phi              0.013    0.0129     0.001   0.000112 TRUE  ✅ PASS
+5 Cramer's V       0.013    0.0129     0.001   0.000112 TRUE  ✅ PASS
+6 Contingency C    0.013    0.0129     0.001   0.000113 TRUE  ✅ PASS
+7 N             2500     2500          0.1     0        TRUE  ✅ PASS
+
+TEST 2 :
+--------
+# A tibble: 4 × 7
+  Statistic    SPSS      R Tolerance Difference Pass  Status 
+  <chr>       <dbl>  <dbl>     <dbl>      <dbl> <lgl> <chr>  
+1 Chi-squared 3.47  3.47       0.001  0.0000503 TRUE  ✅ PASS
+2 df          3     3          0.1    0         TRUE  ✅ PASS
+3 p-value     0.325 0.325      0.01   0.000319  TRUE  ✅ PASS
+4 Cramer's V  0.037 0.0373     0.001  0.000256  TRUE  ✅ PASS
+
+TEST 3 :
+--------
+# A tibble: 5 × 7
+  Statistic      SPSS      R Tolerance Difference Pass  Status 
+  <chr>         <dbl>  <dbl>     <dbl>      <dbl> <lgl> <chr>  
+1 Chi-squared   0.965 0.965      0.001  0.0000611 TRUE  ✅ PASS
+2 df            3     3          0.1    0         TRUE  ✅ PASS
+3 p-value       0.81  0.810      0.01   0.000265  TRUE  ✅ PASS
+4 Cramer's V    0.02  0.0196     0.001  0.000354  TRUE  ✅ PASS
+5 Contingency C 0.02  0.0196     0.001  0.000358  TRUE  ✅ PASS
+
+TEST 4 :
+--------
+# A tibble: 5 × 7
+  Statistic    SPSS      R Tolerance Difference Pass  Status 
+  <chr>       <dbl>  <dbl>     <dbl>      <dbl> <lgl> <chr>  
+1 Chi-squared 0.548 0.596      0.01    0.0479   FALSE ❌ FAIL
+2 df          1     1          0.1     0        TRUE  ✅ PASS
+3 p-value     0.459 0.440      0.02    0.0189   TRUE  ✅ PASS
+4 Cramer's V  0.015 0.0154     0.002   0.000390 TRUE  ✅ PASS
+5 Phi         0.015 0.0154     0.002   0.000390 TRUE  ✅ PASS
+
+
+SUMMARY:
+--------
+PASSED: 20 
+FAILED: 1 
+SKIPPED: 0 
+PASS RATE: 95.2% 

@@ -561,7 +561,7 @@ print.mann_whitney_test_results <- function(x, digits = 3, ...) {
         var <- group_results$Variable[j]
         stats <- group_results$group_stats[[j]]
         
-        cat(sprintf("\n┌─ %s ─┐\n", var))
+        cat(sprintf("\n--- %s ---\n", var))
         cat("\n")  # Add blank line after variable name
         
         # Print group rank means
@@ -602,7 +602,7 @@ print.mann_whitney_test_results <- function(x, digits = 3, ...) {
       var_name <- valid_results$Variable[i]
       stats <- valid_results$group_stats[[i]]
         
-      cat(sprintf("\n┌─ %s ─┐\n", var_name))
+      cat(sprintf("\n--- %s ---\n", var_name))
       cat("\n")  # Add blank line after variable name
       
       # Print group rank means if available
