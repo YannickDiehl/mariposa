@@ -1,0 +1,88 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+Correlations
+Correlations
+
+                                         Lebenszufriedenheit          Politische Orientierung          Vertrauen in Medien (1=kein, 
+                                         (1=unzufrieden, 5=zufrieden) (1=links, 5=rechts)              5=vollständig)              
+ Lebenszufriedenheit Pearson Correlation 1                            -.001                            .021                         
+ (1=unzufrieden,     Sig. (2-tailed)                                  .962                             .312                         
+ 5=zufrieden)        N                   2421                         2228                             2291                         
+ Politische          Pearson Correlation -.001                        1                                .002                         
+ Orientierung        Sig. (2-tailed)     .962                                                          .909                         
+ (1=links, 5=rechts) N                   2228                         2299                             2177                         
+ Vertrauen in Medien Pearson Correlation .021                         .002                             1                            
+ (1=kein,            Sig. (2-tailed)     .312                         .909                                                          
+ 5=vollständig)     N                   2291                         2177                             2367                         
+
+=========== WEIGHTED / UNGROUPED ===========
+
+Correlations
+Correlations
+
+                                         Lebenszufriedenheit          Politische Orientierung          Vertrauen in Medien (1=kein, 
+                                         (1=unzufrieden, 5=zufrieden) (1=links, 5=rechts)              5=vollständig)              
+ Lebenszufriedenheit Pearson Correlation 1                            -.004                            .020                         
+ (1=unzufrieden,     Sig. (2-tailed)                                  .836                             .330                         
+ 5=zufrieden)        N                   2437                         2241                             2305                         
+ Politische          Pearson Correlation -.004                        1                                .004                         
+ Orientierung        Sig. (2-tailed)     .836                                                          .835                         
+ (1=links, 5=rechts) N                   2241                         2312                             2190                         
+ Vertrauen in Medien Pearson Correlation .020                         .004                             1                            
+ (1=kein,            Sig. (2-tailed)     .330                         .835                                                          
+ 5=vollständig)     N                   2305                         2190                             2382                         
+
+=========== UNWEIGHTED / GROUPED ===========
+
+Correlations
+Correlations
+
+ Region (Ost/West)                                         Lebenszufriedenheit    Politische Orientierung  Vertrauen in Medien      
+                                                           (1=unzufrieden,        (1=links, 5=rechts)      (1=kein, 5=vollständig) 
+                                                           5=zufrieden)                                                             
+ East              Lebenszufriedenheit Pearson Correlation 1                      .008                     -.062                    
+                   (1=unzufrieden,     Sig. (2-tailed)                            .876                     .197                     
+                   5=zufrieden)        N                   465                    427                      440                      
+                   Politische          Pearson Correlation .008                   1                        .087                     
+                   Orientierung        Sig. (2-tailed)     .876                                            .074                     
+                   (1=links, 5=rechts) N                   427                    443                      420                      
+                   Vertrauen in Medien Pearson Correlation -.062                  .087                     1                        
+                   (1=kein,            Sig. (2-tailed)     .197                   .074                                              
+                   5=vollständig)     N                   440                    420                      460                      
+ West              Lebenszufriedenheit Pearson Correlation 1                      -.003                    .041                     
+                   (1=unzufrieden,     Sig. (2-tailed)                            .894                     .080                     
+                   5=zufrieden)        N                   1956                   1801                     1851                     
+                   Politische          Pearson Correlation -.003                  1                        -.017                    
+                   Orientierung        Sig. (2-tailed)     .894                                            .480                     
+                   (1=links, 5=rechts) N                   1801                   1856                     1757                     
+                   Vertrauen in Medien Pearson Correlation .041                   -.017                    1                        
+                   (1=kein,            Sig. (2-tailed)     .080                   .480                                              
+                   5=vollständig)     N                   1851                   1757                     1907                     
+
+=========== WEIGHTED / GROUPED ===========
+
+Correlations
+Correlations
+
+ Region (Ost/West)                                         Lebenszufriedenheit    Politische Orientierung  Vertrauen in Medien      
+                                                           (1=unzufrieden,        (1=links, 5=rechts)      (1=kein, 5=vollständig) 
+                                                           5=zufrieden)                                                             
+ East              Lebenszufriedenheit Pearson Correlation 1                      .001                     -.058                    
+                   (1=unzufrieden,     Sig. (2-tailed)                            .978                     .210                     
+                   5=zufrieden)        N                   488                    447                      462                      
+                   Politische          Pearson Correlation .001                   1                        .091                     
+                   Orientierung        Sig. (2-tailed)     .978                                            .056                     
+                   (1=links, 5=rechts) N                   447                    464                      440                      
+                   Vertrauen in Medien Pearson Correlation -.058                  .091                     1                        
+                   (1=kein,            Sig. (2-tailed)     .210                   .056                                              
+                   5=vollständig)     N                   462                    440                      483                      
+ West              Lebenszufriedenheit Pearson Correlation 1                      -.006                    .040                     
+                   (1=unzufrieden,     Sig. (2-tailed)                            .804                     .087                     
+                   5=zufrieden)        N                   1949                   1794                     1844                     
+                   Politische          Pearson Correlation -.006                  1                        -.016                    
+                   Orientierung        Sig. (2-tailed)     .804                                            .493                     
+                   (1=links, 5=rechts) N                   1794                   1848                     1749                     
+                   Vertrauen in Medien Pearson Correlation .040                   -.016                    1                        
+                   (1=kein,            Sig. (2-tailed)     .087                   .493                                              
+                   5=vollständig)     N                   1844                   1749                     1899                     
+
