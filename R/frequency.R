@@ -159,6 +159,45 @@ get_value_labels <- function(x, freq_names) {
   }
 }
 
+# Helper function: Adjust rounded frequencies using largest remainder method
+# Ensures sum of rounded frequencies equals the rounded sum
+adjust_rounded_frequencies <- function(raw_freqs, target_sum = NULL) {
+  if (is.null(target_sum)) {
+    target_sum <- round(sum(raw_freqs))
+  }
+  
+  # Start with floor of all values
+  floored <- floor(raw_freqs)
+  remainders <- raw_freqs - floored
+  
+  # How many values need to be rounded up?
+  n_to_round_up <- target_sum - sum(floored)
+  
+  if (n_to_round_up > 0) {
+    # Sort by remainder size (descending) and round up the largest remainders
+    order_idx <- order(remainders, decreasing = TRUE)
+    adjusted <- floored
+    for(i in 1:min(n_to_round_up, length(order_idx))) {
+      adjusted[order_idx[i]] <- adjusted[order_idx[i]] + 1
+    }
+    return(adjusted)
+  } else if (n_to_round_up < 0) {
+    # This shouldn't happen with proper rounding, but handle it
+    # Round down the smallest remainders
+    order_idx <- order(remainders, decreasing = FALSE)
+    adjusted <- floored
+    for(i in 1:min(abs(n_to_round_up), length(order_idx))) {
+      if (adjusted[order_idx[i]] > 0) {
+        adjusted[order_idx[i]] <- adjusted[order_idx[i]] - 1
+      }
+    }
+    return(adjusted)
+  } else {
+    # Sum already matches
+    return(floored)
+  }
+}
+
 # Helper function: Calculate frequency statistics for a single variable
 calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na = TRUE) {
   if (is.null(w)) {
@@ -168,9 +207,21 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
     na_idx <- is.na(names(freq_table))
     valid_total <- sum(freq_table[!na_idx])
     
-    prc <- as.numeric(freq_table) / total * 100
-    valid_prc <- ifelse(na_idx, NA, as.numeric(freq_table[!na_idx]) / valid_total * 100)
-    cum_prc <- ifelse(na_idx, NA, cumsum(valid_prc[!na_idx]))
+    # For unweighted: if show.na is TRUE, total includes missing
+    # Raw % should always include missing in denominator
+    total_all <- if (show.na) total else (total + sum(is.na(x)))
+    
+    prc <- as.numeric(freq_table) / total_all * 100
+    # Valid % calculation - only for non-NA values
+    valid_prc <- rep(NA, length(freq_table))
+    if (any(!na_idx)) {
+      valid_prc[!na_idx] <- as.numeric(freq_table[!na_idx]) / valid_total * 100
+    }
+    # Cumulative % based on valid %
+    cum_prc <- rep(NA, length(freq_table))
+    if (any(!na_idx)) {
+      cum_prc[!na_idx] <- cumsum(valid_prc[!na_idx])
+    }
     
     # Handle factors differently than numeric variables
     if (is.factor(x)) {
@@ -196,29 +247,71 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
   } else {
     # Weighted frequencies
     valid_idx <- !is.na(x) & !is.na(w)
-    if (!any(valid_idx)) {
+    if (!any(valid_idx) && !show.na) {
       return(data.frame(value = numeric(0), label = character(0), freq = numeric(0),
                        prc = numeric(0), valid_prc = numeric(0), cum_freq = numeric(0),
                        cum_prc = numeric(0), n_eff = numeric(0), stringsAsFactors = FALSE))
     }
     
-    x_valid <- x[valid_idx]
-    w_valid <- w[valid_idx]
-    unique_vals <- sort(unique(x_valid))
-    freq_weighted <- sapply(unique_vals, function(val) sum(w_valid[x_valid == val]))
-    total_weighted <- sum(freq_weighted)
+    # Calculate frequencies for valid values
+    if (any(valid_idx)) {
+      x_valid <- x[valid_idx]
+      w_valid <- w[valid_idx]
+      unique_vals <- sort(unique(x_valid))
+      freq_weighted <- sapply(unique_vals, function(val) sum(w_valid[x_valid == val]))
+      n_eff <- (sum(w_valid))^2 / sum(w_valid^2)
+    } else {
+      unique_vals <- numeric(0)
+      freq_weighted <- numeric(0)
+      n_eff <- NA
+    }
     
-    prc <- freq_weighted / total_weighted * 100
-    n_eff <- (sum(w_valid))^2 / sum(w_valid^2)
+    # Add NA values if show.na = TRUE and there are missing values
+    if (show.na && any(is.na(x))) {
+      na_freq <- sum(w[is.na(x) & !is.na(w)])
+      if (na_freq > 0 || any(is.na(x))) {  # Include NA row if there are any NA values
+        unique_vals <- c(unique_vals, NA)
+        freq_weighted <- c(freq_weighted, na_freq)
+      }
+    }
+    
+    # Calculate totals
+    total_valid_weighted <- sum(freq_weighted[!is.na(unique_vals)])
+    total_all_weighted <- sum(w[!is.na(w)])  # Sum of all weights, including those with missing x
+    
+    # Calculate percentages
+    # Raw % uses total including missing, Valid % uses only valid total
+    prc <- freq_weighted / total_all_weighted * 100  # Raw % based on ALL observations
+    
+    # Valid % - only for non-NA values
+    valid_prc <- rep(NA, length(freq_weighted))
+    non_na_idx <- !is.na(unique_vals)
+    if (any(non_na_idx) && total_valid_weighted > 0) {
+      valid_prc[non_na_idx] <- freq_weighted[non_na_idx] / total_valid_weighted * 100
+    }
+    
+    # Cumulative frequencies and percentages (only for non-NA values)
+    cum_freq <- rep(NA, length(freq_weighted))
+    cum_prc <- rep(NA, length(freq_weighted))
+    if (any(non_na_idx)) {
+      cum_freq[non_na_idx] <- cumsum(freq_weighted[non_na_idx])
+      cum_prc[non_na_idx] <- cumsum(valid_prc[non_na_idx])
+    }
+    # Set cumulative values for NA row if it exists
+    if (any(is.na(unique_vals))) {
+      na_pos <- which(is.na(unique_vals))
+      cum_freq[na_pos] <- NA
+      cum_prc[na_pos] <- NA
+    }
     
     result <- data.frame(
       value = unique_vals,
       label = get_value_labels(x, as.character(unique_vals)),
       freq = freq_weighted,
       prc = prc,
-      valid_prc = prc,
-      cum_freq = cumsum(freq_weighted),
-      cum_prc = cumsum(prc),
+      valid_prc = valid_prc,
+      cum_freq = cum_freq,
+      cum_prc = cum_prc,
       n_eff = rep(n_eff, length(unique_vals)),
       stringsAsFactors = FALSE
     )
@@ -274,8 +367,10 @@ calculate_single_stats <- function(x, w = NULL) {
     }
   }
   
-  list(mean = mean_val, sd = sd_val, total_n = length(x), 
-       valid_n = if (is.null(w)) length(x_valid) else length(x_valid), skewness = skewness)
+  list(mean = mean_val, sd = sd_val, 
+       total_n = if (is.null(w)) length(x) else sum(w[!is.na(w)]), 
+       valid_n = if (is.null(w)) length(x_valid) else sum(w_valid), 
+       skewness = skewness)
 }
 
 # Helper function: Process variables for a dataset
@@ -343,7 +438,7 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
 print.frequency_results <- function(x, digits = 3, ...) {
   # Helper functions for formatting
   format_num <- function(x, width = 6) sprintf(paste0("%-", width, ".2f"), ifelse(is.na(x), NA, x))
-  format_int <- function(x, width = 6) sprintf(paste0("%-", width, "d"), ifelse(is.na(x), NA, as.integer(x)))
+  format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
   format_str <- function(x, width) sprintf(paste0("%-", width, "s"), substr(as.character(x), 1, width))
   
   print_line <- function(widths) {
@@ -389,7 +484,7 @@ print.frequency_results <- function(x, digits = 3, ...) {
         
         # Print group header and table
         cat(sprintf("\nGroup: %s\n", group_info))
-        cat(sprintf("# total N=%d valid N=%d mean=%.2f sd=%.2f skewness=%.2f\n\n",
+        cat(sprintf("# total N=%.0f valid N=%.0f mean=%.2f sd=%.2f skewness=%.2f\n\n",
                     stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
         
         print_table(group_results, col_widths, print_line, print_row, format_int, format_num, x$options)
@@ -399,7 +494,7 @@ print.frequency_results <- function(x, digits = 3, ...) {
       var_results <- x$results[x$results$Variable == var, ]
       stats <- x$stats[x$stats$Variable == var, ]
       
-      cat(sprintf("# total N=%d valid N=%d mean=%.2f sd=%.2f skewness=%.2f\n\n",
+      cat(sprintf("# total N=%.0f valid N=%.0f mean=%.2f sd=%.2f skewness=%.2f\n\n",
                   stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
       
       print_table(var_results, col_widths, print_line, print_row, format_int, format_num, x$options)

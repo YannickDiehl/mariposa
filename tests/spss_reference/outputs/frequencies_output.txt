@@ -1,7 +1,7 @@
 ﻿=========== UNWEIGHTED / UNGROUPED ===========
 
 Frequencies
-Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)
+Life satisfaction (1=dissatisfied, 5=satisfied)
 
                 Frequency Percent Valid Percent Cumulative Percent 
  Valid   1      118       4.7     4.9           4.9                
@@ -16,7 +16,7 @@ Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)
 =========== WEIGHTED / UNGROUPED ===========
 
 Frequencies
-Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)
+Life satisfaction (1=dissatisfied, 5=satisfied)
 
                 Frequency Percent Valid Percent Cumulative Percent 
  Valid   1      119       4.7     4.9           4.9                
@@ -31,46 +31,46 @@ Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)
 =========== UNWEIGHTED / GROUPED ===========
 
 Frequencies
-Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)
+Life satisfaction (1=dissatisfied, 5=satisfied)
 
- Region (Ost/West)                Frequency Percent Valid Percent Cumulative Percent 
- East              Valid   1      30        6.2     6.5           6.5                
-                           2      58        12.0    12.5          18.9               
-                           3      106       21.9    22.8          41.7               
-                           4      136       28.0    29.2          71.0               
-                           5      135       27.8    29.0          100.0              
-                           Total  465       95.9    100.0                            
-                   Missing System 20        4.1                                      
-                   Total          485       100.0                                    
- West              Valid   1      88        4.4     4.5           4.5                
-                           2      248       12.3    12.7          17.2               
-                           3      494       24.5    25.3          42.4               
-                           4      595       29.5    30.4          72.9               
-                           5      531       26.4    27.1          100.0              
-                           Total  1956      97.1    100.0                            
-                   Missing System 59        2.9                                      
-                   Total          2015      100.0                                    
+ Region (East/West)                Frequency Percent Valid Percent Cumulative Percent 
+ East               Valid   1      30        6.2     6.5           6.5                
+                            2      58        12.0    12.5          18.9               
+                            3      106       21.9    22.8          41.7               
+                            4      136       28.0    29.2          71.0               
+                            5      135       27.8    29.0          100.0              
+                            Total  465       95.9    100.0                            
+                    Missing System 20        4.1                                      
+                    Total          485       100.0                                    
+ West               Valid   1      88        4.4     4.5           4.5                
+                            2      248       12.3    12.7          17.2               
+                            3      494       24.5    25.3          42.4               
+                            4      595       29.5    30.4          72.9               
+                            5      531       26.4    27.1          100.0              
+                            Total  1956      97.1    100.0                            
+                    Missing System 59        2.9                                      
+                    Total          2015      100.0                                    
 
 =========== WEIGHTED / GROUPED ===========
 
 Frequencies
-Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)
+Life satisfaction (1=dissatisfied, 5=satisfied)
 
- Region (Ost/West)                Frequency Percent Valid Percent Cumulative Percent 
- East              Valid   1      31        6.1     6.4           6.4                
-                           2      60        11.8    12.3          18.7               
-                           3      111       21.8    22.8          41.5               
-                           4      144       28.3    29.5          71.0               
-                           5      141       27.8    29.0          100.0              
-                           Total  488       95.9    100.0                            
-                   Missing System 21        4.1                                      
-                   Total          509       100.0                                    
- West              Valid   1      88        4.4     4.5           4.5                
-                           2      247       12.3    12.7          17.2               
-                           3      496       24.7    25.5          42.7               
-                           4      593       29.6    30.5          73.1               
-                           5      524       26.1    26.9          100.0              
-                           Total  1949      97.1    100.0                            
-                   Missing System 58        2.9                                      
-                   Total          2007      100.0                                    
+ Region (East/West)                Frequency Percent Valid Percent Cumulative Percent 
+ East               Valid   1      31        6.1     6.4           6.4                
+                            2      60        11.8    12.3          18.7               
+                            3      111       21.8    22.8          41.5               
+                            4      144       28.3    29.5          71.0               
+                            5      141       27.8    29.0          100.0              
+                            Total  488       95.9    100.0                            
+                    Missing System 21        4.1                                      
+                    Total          509       100.0                                    
+ West               Valid   1      88        4.4     4.5           4.5                
+                            2      247       12.3    12.7          17.2               
+                            3      496       24.7    25.5          42.7               
+                            4      593       29.6    30.5          73.1               
+                            5      524       26.1    26.9          100.0              
+                            Total  1949      97.1    100.0                            
+                    Missing System 58        2.9                                      
+                    Total          2007      100.0                                    
 

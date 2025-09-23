@@ -1,6 +1,6 @@
-#' German Social Survey Data (Synthetic)
+#' Social Survey Data (Synthetic)
 #'
-#' A synthetic dataset modeled after the German General Social Survey (ALLBUS) 
+#' A synthetic dataset modeled after large-scale social surveys 
 #' with demographics, attitudes, and survey design features. Created for 
 #' testing and demonstration purposes without licensing concerns.
 #'
@@ -9,8 +9,8 @@
 #'   \item{id}{Unique identifier (1-2500)}
 #'   \item{age}{Age in years (18-95)}
 #'   \item{gender}{Gender (Male, Female)}
-#'   \item{region}{German region (East, West)}
-#'   \item{education}{Education level (Hauptschule, Realschule, Gymnasium, University)}
+#'   \item{region}{Region (East, West)}
+#'   \item{education}{Education level (Basic Secondary, Intermediate Secondary, Academic Secondary, University)}
 #'   \item{income}{Monthly household income in EUR (800-15000)}
 #'   \item{employment}{Employment status (Student, Employed, Unemployed, Retired, Other)}
 #'   \item{political_orientation}{Political orientation (1=very left to 5=very right)}
@@ -28,16 +28,16 @@
 #' This dataset contains realistic patterns of correlation between variables:
 #' \itemize{
 #'   \item Education correlates with income and political attitudes
-#'   \item Regional differences reflect East/West German patterns
+#'   \item Regional differences reflect East/West patterns
 #'   \item Age effects on employment and attitudes
 #'   \item Realistic missing data patterns (3-12% depending on sensitivity)
 #'   \item Survey weights for post-stratification adjustment
 #' }
 #'
-#' The data includes proper German variable labels and follows ALLBUS conventions
+#' The data includes proper variable labels and follows social survey conventions
 #' for coding and structure. Generated with set.seed(2024) for reproducibility.
 #'
-#' @source Generated synthetically using realistic German demographic and 
+#' @source Generated synthetically using realistic demographic and 
 #'   attitudinal patterns. No real survey data was used.
 #'
 #' @examples
