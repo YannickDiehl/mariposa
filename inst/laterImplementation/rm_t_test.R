@@ -1,4 +1,3 @@
-
 #' Perform paired t-tests for repeated measures data
 #'
 #' @description

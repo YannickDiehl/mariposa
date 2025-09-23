@@ -248,8 +248,10 @@ describe <- function(data, ..., weights = NULL,
   if (is.null(w)) {
     stats_list$N <- sum(!is.na(x))
   } else {
-    stats_list$N <- sum(w, na.rm = TRUE)
-    stats_list$Effective_N <- .effective_n(w)
+    # Only sum weights where x is not missing (like frequency.R does)
+    stats_list$N <- sum(w[!is.na(x)], na.rm = TRUE)
+    # Effective N should also only consider weights for non-missing x
+    stats_list$Effective_N <- .effective_n(w[!is.na(x)])
   }
   
   stats_list$Missing <- n_missing
@@ -483,46 +485,44 @@ describe <- function(data, ..., weights = NULL,
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
   
   if (!cleaned$valid || is.null(cleaned$weights)) {
-    # Unweighted skewness with bias correction
+    # Unweighted skewness with SPSS formula
     if (any(ina <- is.na(x)))
       x <- x[!ina]
-    
+
     n <- length(x)
-    x <- x - mean(x)  # Center the data
-    
+
     if (n < 3) return(NA_real_)
-    
-    # Calculate skewness with bias correction
-    out <- (sum((x - mean(x))^3) / n) / (sum((x - mean(x))^2) / n)^1.5
-    return(out * sqrt(n * (n - 1)) / (n - 2))
+
+    mean_x <- mean(x)
+    sd_x <- sd(x)  # Uses n-1 divisor
+
+    if (sd_x <= 0) return(NA_real_)
+
+    # SPSS formula for skewness with bias correction
+    skew_spss <- n * sum((x - mean_x)^3) / ((n - 1) * (n - 2) * sd_x^3)
+    return(skew_spss)
   }
   
   # Weighted skewness calculation
   x_clean <- cleaned$x
   w_clean <- cleaned$weights
-  
+
   if (length(x_clean) < 3) return(NA_real_)
-  
-  # Calculate weighted moments
-  w_mean <- .w_mean(x_clean, w_clean, na.rm = na.rm)
-  sum_w <- sum(w_clean, na.rm = na.rm)
-  sum_w2 <- sum(w_clean^2, na.rm = na.rm)
-  n_eff <- sum_w^2 / sum_w2
-  
-  if (n_eff < 3) return(NA_real_)
-  
-  # Calculate weighted variance and third moment
-  x_centered <- x_clean - w_mean
-  w_var <- .w_var(x_clean, w_clean, na.rm = na.rm)
-  third_moment <- sum(w_clean * x_centered^3, na.rm = na.rm) / sum_w
-  
-  if (w_var <= 0) return(NA_real_)
-  
-  # Calculate skewness with bias correction
-  skew_raw <- third_moment / (w_var^1.5)
-  skew_corrected <- skew_raw * sqrt(n_eff * (n_eff - 1)) / (n_eff - 2)
-  
-  return(skew_corrected)
+
+  # Use SPSS-compatible simple weighted formula (as in frequency.R)
+  # SPSS treats weights as frequency weights without bias correction
+  w_norm <- w_clean / sum(w_clean, na.rm = na.rm)
+  w_mean <- sum(x_clean * w_norm, na.rm = na.rm)
+
+  # Calculate weighted standard deviation
+  w_sd <- sqrt(sum(w_norm * (x_clean - w_mean)^2, na.rm = na.rm))
+
+  if (w_sd <= 0) return(NA_real_)
+
+  # Simple weighted skewness without bias correction (SPSS approach)
+  skew_weighted <- sum(w_norm * ((x_clean - w_mean) / w_sd)^3, na.rm = na.rm)
+
+  return(skew_weighted)
 }
 
 #' Weighted kurtosis with bias correction
@@ -537,32 +537,38 @@ describe <- function(data, ..., weights = NULL,
     
     n <- length(x_clean)
     mean_x <- mean(x_clean)
-    var_x <- var(x_clean)
-    
+    var_x <- var(x_clean)  # Uses n-1 divisor
+
     if (var_x <= 0) return(NA_real_)
-    
-    kurt <- sum((x_clean - mean_x)^4) / (n * var_x^2)
-    kurt_corrected <- ((n - 1) * ((n + 1) * kurt - 3 * (n - 1)) / ((n - 2) * (n - 3))) + 3
-    
-    return(if (excess) kurt_corrected - 3 else kurt_corrected)
+
+    # SPSS formula for kurtosis (already excess kurtosis)
+    kurt_spss <- (n * (n + 1) * sum((x_clean - mean_x)^4)) /
+                 ((n - 1) * (n - 2) * (n - 3) * var_x^2) -
+                 (3 * (n - 1)^2) / ((n - 2) * (n - 3))
+
+    return(if (excess) kurt_spss else kurt_spss + 3)
   }
   
   # Weighted kurtosis calculation
   x_clean <- cleaned$x
   w_clean <- cleaned$weights
-  
+
   if (length(x_clean) < 4) return(NA_real_)
-  
-  w_mean <- .w_mean(x_clean, w_clean, na.rm = na.rm)
-  w_var <- .w_var(x_clean, w_clean, na.rm = na.rm)
-  
-  if (w_var <= 0) return(NA_real_)
-  
-  sum_w <- sum(w_clean, na.rm = na.rm)
-  fourth_moment <- sum(w_clean * (x_clean - w_mean)^4, na.rm = na.rm) / sum_w
-  kurtosis <- fourth_moment / (w_var^2)
-  
-  return(if (excess) kurtosis - 3 else kurtosis)
+
+  # Use SPSS-compatible simple weighted formula (as in frequency.R)
+  # SPSS treats weights as frequency weights without bias correction
+  w_norm <- w_clean / sum(w_clean, na.rm = na.rm)
+  w_mean <- sum(x_clean * w_norm, na.rm = na.rm)
+
+  # Calculate weighted standard deviation
+  w_sd <- sqrt(sum(w_norm * (x_clean - w_mean)^2, na.rm = na.rm))
+
+  if (w_sd <= 0) return(NA_real_)
+
+  # Simple weighted kurtosis (standardized 4th moment)
+  kurt_raw <- sum(w_norm * ((x_clean - w_mean) / w_sd)^4, na.rm = na.rm)
+
+  return(if (excess) kurt_raw - 3 else kurt_raw)
 }
 
 #' Weighted mode (most frequent value by weight)
