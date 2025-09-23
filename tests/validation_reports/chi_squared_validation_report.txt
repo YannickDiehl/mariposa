@@ -1,0 +1,43 @@
+CHI-SQUARED TEST SPSS VALIDATION REPORT
+=======================================================================
+Generated: 2025-09-23
+Package: SurveyStat
+Function: chi_squared_test()
+Reference: SPSS CROSSTABS
+
+SUMMARY
+-----------------------------------------------------------------------
+Total Comparisons: 32
+Successful Matches: 32
+Match Rate: 100.0%
+
+DETAILS BY TEST
+-----------------------------------------------------------------------
+
+Test 1a: 4/4 matches (100.0%)
+
+Test 1b: 4/4 matches (100.0%)
+
+Test 1c: 3/3 matches (100.0%)
+
+Test 2a: 3/3 matches (100.0%)
+
+Test 2b: 3/3 matches (100.0%)
+
+Test 2c: 3/3 matches (100.0%)
+
+Test 3a: 6/6 matches (100.0%)
+
+Test 4a: 6/6 matches (100.0%)
+
+=======================================================================
+TOLERANCE SETTINGS
+-----------------------------------------------------------------------
+Chi-squared statistic: ±0.001
+Degrees of freedom: Exact match
+P-values: ±0.001
+Cramer's V: ±0.001
+
+Note: Weighted frequencies are rounded to integers for comparison
+with SPSS display values while maintaining internal precision.
+

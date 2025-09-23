@@ -12,14 +12,145 @@
 * this is package ‘SurveyStat’ version ‘0.1.0’
 * package encoding: UTF-8
 * checking package namespace information ... OK
-* checking package dependencies ... ERROR
-Package suggested but not available: ‘covr’
+* checking package dependencies ... INFO
+Package suggested but not available for checking: ‘covr’
+* checking if this is a source package ... NOTE
+Subdirectory ‘SurveyStat.Rcheck/SurveyStat’ seems to contain an installed version of the package.
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .DS_Store
+  .github/.gitignore
+  .gitignore
+  R/.DS_Store
+  tests/.DS_Store
+  tests/spss_reference/.DS_Store
+  tests/spss_reference/outputs/.DS_Store
+  tests/spss_reference/syntax/.DS_Store
+  tests/testthat/.DS_Store
+  ..Rcheck
+  .Rproj.user
+  .claude
+  .git
+  .github
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... NOTE
+Found the following non-portable file paths:
+  SurveyStat/SurveyStat.Rcheck/00_pkg_src/SurveyStat/tests/spss_reference/outputs/frequencies_output.txt
+  SurveyStat/SurveyStat.Rcheck/00_pkg_src/SurveyStat/tests/spss_reference/outputs/pearson_cor_output.txt
+  SurveyStat/SurveyStat.Rcheck/00_pkg_src/SurveyStat/tests/spss_reference/syntax/pearson_correlation.sps
 
-The suggested packages are required for a complete check.
-Checking can be attempted without them by setting the environment
-variable _R_CHECK_FORCE_SUGGESTS_ to a false value.
+Tarballs are only required to store paths of up to 100 bytes and cannot
+store those of more than 256 bytes, with restrictions including to 100
+bytes for the final component.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘SurveyStat’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by ‘R CMD build’.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directories with names of check directories:
+  ./..Rcheck
+  ./SurveyStat.Rcheck
+Most likely, these were included erroneously.
+Subdirectory ‘inst’ contains no files.
+* checking code files for non-ASCII characters ... WARNING
+Found the following files with non-ASCII characters:
+  R/levene_test.R
+  R/mann_whitney_test.R
+  R/mauchly_test.R
+  R/oneway_anova_test.R
+  R/pearson_cor.R
+  R/t_test.R
+Portable packages must use only ASCII characters in their R code and
+NAMESPACE directives, except perhaps in comments.
+Use \uxxxx escapes for other characters.
+Function ‘tools::showNonASCIIfile’ can help in finding non-ASCII
+characters in files.
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... WARNING
+levene_test:
+  function(x, ...)
+levene_test.grouped_df:
+  function(data, variable, group, weights, center, ...)
+See section ‘Generic functions and methods’ in the ‘Writing R
+Extensions’ manual.
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+pearson_cor : calculate_weighted_cor: no visible global function
+  definition for ‘cor’
+pearson_cor : calculate_weighted_cor: no visible global function
+  definition for ‘qnorm’
+Undefined global functions or variables:
+  cor qnorm
+Consider adding
+  importFrom("stats", "cor", "qnorm")
+to your NAMESPACE file.
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... INFO
+Package unavailable to check Rd xrefs: ‘survey’
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in Rd file 'dot-process_weights.Rd':
+  ‘weights’
 
-See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-manual.
-* DONE
-Status: 1 ERROR
+Undocumented arguments in Rd file 'levene_test.Rd'
+  ‘variable’
+
+Undocumented arguments in Rd file 'print.levene_test_results.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.mann_whitney_test_results.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.t_test_result.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_iqr.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_mean.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_median.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_modus.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_range.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_sd.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_se.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_skew.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Undocumented arguments in Rd file 'print.w_var.Rd'
+  ‘x’ ‘digits’ ‘...’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
