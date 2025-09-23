@@ -8,7 +8,7 @@
 #' designed for survey data analysis where sampling weights are crucial for 
 #' population-representative results.
 #' 
-#' For paired t-tests (repeated measures), use \code{rm_t_test()} instead.
+#' For paired t-tests (repeated measures), support will be added in a future version.
 #' 
 #' The function implements both Student's t-test (equal variances) and Welch's t-test 
 #' (unequal variances) and provides comprehensive effect size calculations including 

@@ -60,9 +60,9 @@
 
 #' Longitudinal Study Data (Synthetic)
 #'
-#' A synthetic repeated measures dataset suitable for testing longitudinal 
-#' analysis functions like rm_anova_test() and rm_t_test(). Contains realistic
-#' treatment effects, missing data patterns, and within-subject correlations.
+#' A synthetic repeated measures dataset suitable for testing longitudinal
+#' analysis functions. Contains realistic treatment effects, missing data
+#' patterns, and within-subject correlations.
 #'
 #' @format A data frame with 480 rows and 10 variables:
 #' \describe{
@@ -102,15 +102,10 @@
 #' library(dplyr)
 #' data(longitudinal_data)
 #' 
-#' # Simple repeated measures ANOVA (within-subjects only)
-#' data(longitudinal_data_wide)
-#' longitudinal_data_wide %>%
-#'   rm_anova_test(score_T1, score_T2, score_T3, subject_id = subject_id)
-#' 
-#' # Repeated measures t-test
-#' longitudinal_data_wide %>%
-#'   rm_t_test(score_T1, score_T4)
-#' 
+#' # Simple example analysis with wide format data
+#' # data(longitudinal_data_wide)
+#' # (Repeated measures functions coming in future version)
+#'
 #' # Descriptive statistics by group and time
 #' longitudinal_data %>%
 #'   group_by(group, time) %>%
@@ -150,8 +145,7 @@
 #' library(dplyr)
 #' data(longitudinal_data_wide)
 #' 
-#' # Paired t-test between time points
-#' longitudinal_data_wide %>%
-#'   rm_t_test(score_T1, score_T4)
+#' # Analysis of change scores
+#' # (Repeated measures functions coming in future version)
 #'
 "longitudinal_data_wide"

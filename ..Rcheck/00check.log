@@ -154,3 +154,76 @@ entries, and all their arguments documented.
 The \usage entries must correspond to syntactically valid R code.
 See chapter ‘Writing R documentation files’ in the ‘Writing R
 Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking files in ‘vignettes’ ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  ‘introduction.Rmd’
+* checking examples ... ERROR
+Running examples in ‘SurveyStat-Ex.R’ failed
+The error most likely occurred in:
+
+> ### Name: longitudinal_data
+> ### Title: Longitudinal Study Data (Synthetic)
+> ### Aliases: longitudinal_data
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> # Load required packages and data
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> data(longitudinal_data)
+> 
+> # Simple repeated measures ANOVA (within-subjects only)
+> data(longitudinal_data_wide)
+> longitudinal_data_wide %>%
++   rm_anova_test(score_T1, score_T2, score_T3, subject_id = subject_id)
+Error in rm_anova_test(., score_T1, score_T2, score_T3, subject_id = subject_id) : 
+  could not find function "rm_anova_test"
+Calls: %>%
+Execution halted
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... ERROR
+  Running ‘template-spss-validation.R’
+Running the tests in ‘tests/template-spss-validation.R’ failed.
+Last 13 lines of output:
+  ── Error: Test 1: Unweighted/Ungrouped analysis matches SPSS ───────────────────
+  Error in `FUNCTION_NAME(., VARIABLE_NAME)`: could not find function "FUNCTION_NAME"
+  Backtrace:
+      ▆
+   1. └─survey_data %>% FUNCTION_NAME(VARIABLE_NAME)
+  
+  Error:
+  ! Test failed
+  Backtrace:
+      ▆
+   1. ├─testthat::test_that(...)
+   2. │ └─withr (local) `<fn>`()
+   3. └─reporter$stop_if_needed()
+   4.   └─rlang::abort("Test failed", call = NULL)
+  Execution halted
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... WARNING
+Directory 'inst/doc' does not exist.
+Package vignette without corresponding single PDF/HTML:
+  ‘introduction.Rmd’
+* checking running R code from vignettes ... OK
+  ‘introduction.Rmd’ using ‘UTF-8’... OK
+* checking re-building of vignette outputs ... SKIPPED
+* DONE
+Status: 2 ERRORs, 6 WARNINGs, 5 NOTEs
