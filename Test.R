@@ -17,5 +17,4 @@ survey_data |>
    select(political_orientation, trust_media, life_satisfaction)
 
 survey_data |> 
-  group_by(region) |> 
-  pearson_cor(life_satisfaction, political_orientation, trust_media, na.rm = "pairwise", weights = sampling_weight)
+  pearson_cor(trust_government, political_orientation, trust_science, na.rm = "pairwise", weights = sampling_weight)

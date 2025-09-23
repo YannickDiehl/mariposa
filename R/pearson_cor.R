@@ -603,9 +603,10 @@ print.pearson_cor_results <- function(x, digits = 3, ...) {
         cat(sprintf("  95%% CI: [%.3f, %.3f]\n", 
                    group_corrs$conf_int_lower[1],
                    group_corrs$conf_int_upper[1]))
-        cat(sprintf("  p-value: %.4f %s\n", 
-                   group_corrs$p_value[1],
-                   group_corrs$sig[1]))
+        cat(sprintf("  p-value: %.4f\n", group_corrs$p_value[1]))
+        # Display significance on separate line for clarity
+        sig_text <- if (group_corrs$sig[1] == "") "ns" else group_corrs$sig[1]
+        cat(sprintf("  Significance: %s\n", sig_text))
         
       } else {
         # Multiple correlations - show matrix first, then detailed results
@@ -636,6 +637,7 @@ print.pearson_cor_results <- function(x, digits = 3, ...) {
         output_df <- data.frame(
           Variable_Pair = paste(group_corrs$var1, "×", group_corrs$var2),
           r = round(group_corrs$correlation, digits),
+          r_squared = round(group_corrs$r_squared, digits),
           p_value = round(group_corrs$p_value, 4),
           CI_95 = sprintf("[%.3f, %.3f]", 
                          group_corrs$conf_int_lower,
@@ -665,9 +667,10 @@ print.pearson_cor_results <- function(x, digits = 3, ...) {
       cat(sprintf("  95%% CI: [%.3f, %.3f]\n", 
                  x$correlations$conf_int_lower[1],
                  x$correlations$conf_int_upper[1]))
-      cat(sprintf("  p-value: %.4f %s\n", 
-                 x$correlations$p_value[1],
-                 x$correlations$sig[1]))
+      cat(sprintf("  p-value: %.4f\n", x$correlations$p_value[1]))
+      # Display significance on separate line for clarity
+      sig_text <- if (x$correlations$sig[1] == "") "ns" else x$correlations$sig[1]
+      cat(sprintf("  Significance: %s\n", sig_text))
       
     } else {
       # Multiple correlations - show matrix then detailed results
@@ -696,6 +699,7 @@ print.pearson_cor_results <- function(x, digits = 3, ...) {
       output_df <- data.frame(
         Variable_Pair = paste(x$correlations$var1, "×", x$correlations$var2),
         r = round(x$correlations$correlation, digits),
+        r_squared = round(x$correlations$r_squared, digits),
         p_value = round(x$correlations$p_value, 4),
         CI_95 = sprintf("[%.3f, %.3f]", 
                        x$correlations$conf_int_lower,
@@ -717,6 +721,7 @@ print.pearson_cor_results <- function(x, digits = 3, ...) {
   cat("  |r| < 0.30:        Weak correlation\n")
   cat("  0.30 ≤ |r| < 0.70: Moderate correlation\n")
   cat("  |r| ≥ 0.70:        Strong correlation\n")
+  cat("\nr² represents the proportion of variance explained\n")
   
   invisible(x)
 }
