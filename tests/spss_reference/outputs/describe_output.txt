@@ -1,0 +1,404 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+=========== Test 1a ===========
+Descriptive Statistics for Age
+Frequencies
+Statistics
+ Age in years 
+
+ N           Valid   2500     
+             Missing 0        
+ Mean                50.5496  
+ Std. Error of Mean  .33952   
+ Median              50.0000  
+ Mode                18.00    
+ Std. Deviation      16.97602 
+ Variance            288.185  
+ Skewness            .172     
+ Kurtosis            -.364    
+ Range               77.00    
+ Minimum             18.00    
+ Maximum             95.00    
+ Percentiles 25      38.0000  
+             50      50.0000  
+             75      62.0000  
+
+=========== Test 1b ===========
+
+=========== Test 1b ===========
+Descriptive Statistics for Income
+Frequencies
+Statistics
+ Monthly household income (EUR) 
+
+ N           Valid   2186        
+             Missing 314         
+ Mean                3753.9341   
+ Std. Error of Mean  30.64510    
+ Median              3500.0000   
+ Mode                3200.00     
+ Std. Deviation      1432.80161  
+ Variance            2052920.442 
+ Skewness            .730        
+ Kurtosis            .376        
+ Range               7200.00     
+ Minimum             800.00      
+ Maximum             8000.00     
+ Percentiles 25      2700.0000   
+             50      3500.0000   
+             75      4600.0000   
+
+=========== Test 1c ===========
+
+=========== Test 1c ===========
+Descriptive Statistics for Life Satisfaction
+Frequencies
+Statistics
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ N           Valid   2421  
+             Missing 79    
+ Mean                3.63  
+ Std. Error of Mean  .023  
+ Median              4.00  
+ Mode                4     
+ Std. Deviation      1.153 
+ Variance            1.330 
+ Skewness            -.501 
+ Kurtosis            -.602 
+ Range               4     
+ Minimum             1     
+ Maximum             5     
+ Percentiles 25      3.00  
+             50      4.00  
+             75      5.00  
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+=========== Test 2a ===========
+Descriptive Statistics for Age (weighted)
+Frequencies
+Statistics
+ Age in years 
+
+ N           Valid   2516     
+             Missing 0        
+ Mean                50.5144  
+ Std. Error of Mean  .34058   
+ Median              50.0000  
+ Mode                18.00    
+ Std. Deviation      17.08382 
+ Variance            291.857  
+ Skewness            .159     
+ Kurtosis            -.396    
+ Range               77.00    
+ Minimum             18.00    
+ Maximum             95.00    
+ Percentiles 25      38.0000  
+             50      50.0000  
+             75      63.0000  
+
+=========== Test 2b ===========
+
+=========== Test 2b ===========
+Descriptive Statistics for Income (weighted)
+Frequencies
+Statistics
+ Monthly household income (EUR) 
+
+ N           Valid   2201        
+             Missing 315         
+ Mean                3743.0994   
+ Std. Error of Mean  30.35257    
+ Median              3500.0000   
+ Mode                3200.00     
+ Std. Deviation      1423.96558  
+ Variance            2027677.966 
+ Skewness            .725        
+ Kurtosis            .388        
+ Range               7200.00     
+ Minimum             800.00      
+ Maximum             8000.00     
+ Percentiles 25      2700.0000   
+             50      3500.0000   
+             75      4600.0000   
+
+=========== Test 2c ===========
+
+=========== Test 2c ===========
+Descriptive Statistics for Life Satisfaction (weighted)
+Frequencies
+Statistics
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ N           Valid   2437  
+             Missing 79    
+ Mean                3.62  
+ Std. Error of Mean  .023  
+ Median              4.00  
+ Mode                4     
+ Std. Deviation      1.152 
+ Variance            1.327 
+ Skewness            -.499 
+ Kurtosis            -.598 
+ Range               4     
+ Minimum             1     
+ Maximum             5     
+ Percentiles 25      3.00  
+             50      4.00  
+             75      5.00  
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+=========== Test 3a ===========
+Descriptive Statistics for Age (grouped by region)
+Frequencies
+Statistics
+ Age in years 
+
+ East N           Valid   485      
+                  Missing 0        
+      Mean                51.8680  
+      Std. Error of Mean  .79101   
+      Median              52.0000  
+      Mode                18.00    
+      Std. Deviation      17.42028 
+      Variance            303.466  
+      Skewness            .148     
+      Kurtosis            -.337    
+      Range               77.00    
+      Minimum             18.00    
+      Maximum             95.00    
+      Percentiles 25      39.0000  
+                  50      52.0000  
+                  75      63.0000  
+ West N           Valid   2015     
+                  Missing 0        
+      Mean                50.2323  
+      Std. Error of Mean  .37551   
+      Median              49.0000  
+      Mode                18.00    
+      Std. Deviation      16.85635 
+      Variance            284.137  
+      Skewness            .175     
+      Kurtosis            -.373    
+      Range               77.00    
+      Minimum             18.00    
+      Maximum             95.00    
+      Percentiles 25      38.0000  
+                  50      49.0000  
+                  75      62.0000  
+
+=========== Test 3b ===========
+
+=========== Test 3b ===========
+Descriptive Statistics for Income (grouped by region)
+Frequencies
+Statistics
+ Monthly household income (EUR) 
+
+ East N           Valid   429         
+                  Missing 56          
+      Mean                3752.4476   
+      Std. Error of Mean  66.95917    
+      Median              3600.0000   
+      Mode                3800.00     
+      Std. Deviation      1386.87938  
+      Variance            1923434.416 
+      Skewness            .729        
+      Kurtosis            .489        
+      Range               7200.00     
+      Minimum             800.00      
+      Maximum             8000.00     
+      Percentiles 25      2800.0000   
+                  50      3600.0000   
+                  75      4500.0000   
+ West N           Valid   1757        
+                  Missing 258         
+      Mean                3754.2971   
+      Std. Error of Mean  34.45361    
+      Median              3500.0000   
+      Mode                3100.00     
+      Std. Deviation      1444.17770  
+      Variance            2085649.235 
+      Skewness            .731        
+      Kurtosis            .353        
+      Range               7200.00     
+      Minimum             800.00      
+      Maximum             8000.00     
+      Percentiles 25      2700.0000   
+                  50      3500.0000   
+                  75      4600.0000   
+
+=========== Test 3c ===========
+
+=========== Test 3c ===========
+Descriptive Statistics for Life Satisfaction (grouped by region)
+Frequencies
+Statistics
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ East N           Valid   465   
+                  Missing 20    
+      Mean                3.62  
+      Std. Error of Mean  .056  
+      Median              4.00  
+      Mode                4     
+      Std. Deviation      1.207 
+      Variance            1.456 
+      Skewness            -.552 
+      Kurtosis            -.631 
+      Range               4     
+      Minimum             1     
+      Maximum             5     
+      Percentiles 25      3.00  
+                  50      4.00  
+                  75      5.00  
+ West N           Valid   1956  
+                  Missing 59    
+      Mean                3.63  
+      Std. Error of Mean  .026  
+      Median              4.00  
+      Mode                4     
+      Std. Deviation      1.140 
+      Variance            1.300 
+      Skewness            -.486 
+      Kurtosis            -.600 
+      Range               4     
+      Minimum             1     
+      Maximum             5     
+      Percentiles 25      3.00  
+                  50      4.00  
+                  75      5.00  
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== WEIGHTED / GROUPED ===========
+Descriptive Statistics for Age (weighted, grouped by region)
+=========== Test 4a ===========
+
+Frequencies
+Statistics
+ Age in years 
+
+ East N           Valid   509      
+                  Missing 0        
+      Mean                52.2778  
+      Std. Error of Mean  .77988   
+      Median              53.0000  
+      Mode                18.00    
+      Std. Deviation      17.59548 
+      Variance            309.601  
+      Skewness            .098     
+      Kurtosis            -.389    
+      Range               77.00    
+      Minimum             18.00    
+      Maximum             95.00    
+      Percentiles 25      40.0000  
+                  50      53.0000  
+                  75      64.0000  
+ West N           Valid   2007     
+                  Missing 0        
+      Mean                50.0672  
+      Std. Error of Mean  .37783   
+      Median              49.0000  
+      Mode                18.00    
+      Std. Deviation      16.92689 
+      Variance            286.520  
+      Skewness            .170     
+      Kurtosis            -.396    
+      Range               77.00    
+      Minimum             18.00    
+      Maximum             95.00    
+      Percentiles 25      38.0000  
+                  50      49.0000  
+                  75      62.0000  
+
+=========== Test 4b ===========
+
+=========== Test 4b ===========
+Descriptive Statistics for Income (weighted, grouped by region)
+Frequencies
+Statistics
+ Monthly household income (EUR) 
+
+ East N           Valid   449         
+                  Missing 60          
+      Mean                3760.6866   
+      Std. Error of Mean  65.48281    
+      Median              3600.0000   
+      Mode                3800.00     
+      Std. Deviation      1388.32120  
+      Variance            1927435.755 
+      Skewness            .721        
+      Kurtosis            .502        
+      Range               7200.00     
+      Minimum             800.00      
+      Maximum             8000.00     
+      Percentiles 25      2800.0000   
+                  50      3600.0000   
+                  75      4500.0000   
+ West N           Valid   1751        
+                  Missing 256         
+      Mean                3738.5858   
+      Std. Error of Mean  34.24889    
+      Median              3500.0000   
+      Mode                3100.00     
+      Std. Deviation      1433.32495  
+      Variance            2054420.399 
+      Skewness            .727        
+      Kurtosis            .364        
+      Range               7200.00     
+      Minimum             800.00      
+      Maximum             8000.00     
+      Percentiles 25      2700.0000   
+                  50      3500.0000   
+                  75      4600.0000   
+
+=========== Test 4c ===========
+
+=========== Test 4c ===========
+Descriptive Statistics for Life Satisfaction (weighted, grouped by region)
+Frequencies
+Statistics
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ East N           Valid   488   
+                  Missing 21    
+      Mean                3.62  
+      Std. Error of Mean  .054  
+      Median              4.00  
+      Mode                4     
+      Std. Deviation      1.203 
+      Variance            1.448 
+      Skewness            -.558 
+      Kurtosis            -.616 
+      Range               4     
+      Minimum             1     
+      Maximum             5     
+      Percentiles 25      3.00  
+                  50      4.00  
+                  75      5.00  
+ West N           Valid   1949  
+                  Missing 58    
+      Mean                3.63  
+      Std. Error of Mean  .026  
+      Median              4.00  
+      Mode                4     
+      Std. Deviation      1.139 
+      Variance            1.298 
+      Skewness            -.481 
+      Kurtosis            -.598 
+      Range               4     
+      Minimum             1     
+      Maximum             5     
+      Percentiles 25      3.00  
+                  50      4.00  
+                  75      5.00  
+

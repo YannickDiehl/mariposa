@@ -11,5 +11,5 @@ survey_data |>
   pearson_cor(age, life_satisfaction)
 
 survey_data |> 
-  chi_squared_test(gender, region)
+  pearson_cor(life_satisfaction, trust_government, trust_media)
 

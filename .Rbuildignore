@@ -26,3 +26,5 @@
 ^SPSS_MILESTONE_COMMIT\.sh$
 ^generate_sav_files\.R$
 ^dev/.*\.sav$
+^inst/laterImplementation$
+^R/laterImplementation$
