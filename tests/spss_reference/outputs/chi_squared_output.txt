@@ -1,0 +1,342 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+ Count 
+
+               Region (East/West) Total 
+               East          West       
+ Gender Male   238           956  1194  
+        Female 247           1059 1306  
+ Total         485           2015 2500  
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ Pearson Chi-Square           .415(a) 1  .519                                                                        
+ Continuity Correction(b)     .353    1  .553                                                                        
+ Likelihood Ratio             .415    1  .519                                                                        
+ Fisher's Exact Test                                                       .544                 .276                 
+ Linear-by-Linear Association .415    1  .519                                                                        
+ N of Valid Cases             2500                                                                                   
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 231.64.
+b Computed only for a 2x2 table
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .013  .519                     
+ Nominal    Cramer's V .013  .519                     
+ N of Valid Cases      2500                           
+
+=========== Test 1b ===========
+
+Crosstabs
+Highest educational attainment * Employment status Crosstabulation
+ Count 
+
+                                    Employment status                         Total 
+                                    Student Employed Unemployed Retired Other       
+ Highest     Basic Secondary        0       571      65         171     34    841   
+ educational Intermediate Secondary 0       412      51         137     29    629   
+ attainment  Academic Secondary     44      366      44         145     32    631   
+             University             34      251      22         72      20    399   
+ Total                              78      1600     182        525     115   2500  
+
+Chi-Square Tests
+
+                              Value      df Asymptotic Significance (2-sided) 
+ Pearson Chi-Square           125.867(a) 12 .000                              
+ Likelihood Ratio             152.030    12 .000                              
+ Linear-by-Linear Association 2.865      1  .091                              
+ N of Valid Cases             2500                                            
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 12.45.
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .224  .000                     
+ Nominal    Cramer's V .130  .000                     
+ N of Valid Cases      2500                           
+
+=========== Test 1c ===========
+
+Crosstabs
+Gender * Highest educational attainment Crosstabulation
+ Count 
+
+               Highest educational attainment                                       Total 
+               Basic Secondary Intermediate Secondary Academic Secondary University       
+ Gender Male   401             289                    320                184        1194  
+        Female 440             340                    311                215        1306  
+ Total         841             629                    631                399        2500  
+
+Chi-Square Tests
+
+                              Value    df Asymptotic Significance (2-sided) 
+ Pearson Chi-Square           3.470(a) 3  .325                              
+ Likelihood Ratio             3.469    3  .325                              
+ Linear-by-Linear Association .052     1  .819                              
+ N of Valid Cases             2500                                          
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 190.56.
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .037  .325                     
+ Nominal    Cramer's V .037  .325                     
+ N of Valid Cases      2500                           
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+ Count 
+
+               Region (East/West) Total 
+               East          West       
+ Gender Male   249           945  1194  
+        Female 260           1062 1322  
+ Total         509           2007 2516  
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ Pearson Chi-Square           .548(a) 1  .459                                                                        
+ Continuity Correction(b)     .477    1  .490                                                                        
+ Likelihood Ratio             .548    1  .459                                                                        
+ Fisher's Exact Test                                                       .487                 .245                 
+ Linear-by-Linear Association .548    1  .459                                                                        
+ N of Valid Cases             2516                                                                                   
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 241.55.
+b Computed only for a 2x2 table
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .015  .459                     
+ Nominal    Cramer's V .015  .459                     
+ N of Valid Cases      2516                           
+
+=========== Test 2b ===========
+
+Crosstabs
+Highest educational attainment * Employment status Crosstabulation
+ Count 
+
+                                    Employment status                         Total 
+                                    Student Employed Unemployed Retired Other       
+ Highest     Basic Secondary        0       573      66         175     34    848   
+ educational Intermediate Secondary 0       420      52         139     29    640   
+ attainment  Academic Secondary     46      370      45         149     33    643   
+             University             34      240      21         72      20    387   
+ Total                              80      1603     184        535     116   2518  
+
+Chi-Square Tests
+
+                              Value      df Asymptotic Significance (2-sided) 
+ Pearson Chi-Square           130.696(a) 12 .000                              
+ Likelihood Ratio             157.216    12 .000                              
+ Linear-by-Linear Association 2.410      1  .121                              
+ N of Valid Cases             2518                                            
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 12.30.
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .228  .000                     
+ Nominal    Cramer's V .132  .000                     
+ N of Valid Cases      2518                           
+
+=========== Test 2c ===========
+
+Crosstabs
+Gender * Highest educational attainment Crosstabulation
+ Count 
+
+               Highest educational attainment                                       Total 
+               Basic Secondary Intermediate Secondary Academic Secondary University       
+ Gender Male   402             291                    326                176        1195  
+        Female 447             350                    316                209        1322  
+ Total         849             641                    642                385        2517  
+
+Chi-Square Tests
+
+                              Value    df Asymptotic Significance (2-sided) 
+ Pearson Chi-Square           4.403(a) 3  .221                              
+ Likelihood Ratio             4.402    3  .221                              
+ Linear-by-Linear Association .105     1  .746                              
+ N of Valid Cases             2517                                          
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 182.79.
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .042  .221                     
+ Nominal    Cramer's V .042  .221                     
+ N of Valid Cases      2517                           
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Crosstabs
+Gender * Highest educational attainment Crosstabulation
+ Count 
+
+ Region                    Highest educational attainment                                       Total 
+ (East/West)               Basic Secondary Intermediate Secondary Academic Secondary University       
+ East        Gender Male   82              60                     59                 37         238   
+                    Female 88              61                     56                 42         247   
+             Total         170             121                    115                79         485   
+ West        Gender Male   319             229                    261                147        956   
+                    Female 352             279                    255                173        1059  
+             Total         671             508                    516                320        2015  
+
+Chi-Square Tests
+
+ Region (East/West)                              Value    df Asymptotic Significance (2-sided) 
+ East               Pearson Chi-Square           .448(a)  3  .930                              
+                    Likelihood Ratio             .448     3  .930                              
+                    Linear-by-Linear Association .001     1  .970                              
+                    N of Valid Cases             485                                           
+ West               Pearson Chi-Square           3.471(b) 3  .325                              
+                    Likelihood Ratio             3.470    3  .325                              
+                    Linear-by-Linear Association .059     1  .808                              
+                    N of Valid Cases             2015                                          
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 38.77.
+b 0 cells (.0%) have expected count less than 5. The minimum expected count is 151.82.
+
+Symmetric Measures
+
+ Region (East/West)                       Value Approximate Significance 
+ East               Nominal by Phi        .030  .930                     
+                    Nominal    Cramer's V .030  .930                     
+                    N of Valid Cases      485                            
+ West               Nominal by Phi        .042  .325                     
+                    Nominal    Cramer's V .042  .325                     
+                    N of Valid Cases      2015                           
+
+=========== Test 3b ===========
+
+Crosstabs
+Gender * Employment status Crosstabulation
+ Count 
+
+ Region                    Employment status                         Total 
+ (East/West)               Student Employed Unemployed Retired Other       
+ East        Gender Male   7       145      16         55      15    238   
+                    Female 4       166      15         56      6     247   
+             Total         11      311      31         111     21    485   
+ West        Gender Male   29      605      68         201     53    956   
+                    Female 38      684      83         213     41    1059  
+             Total         67      1289     151        414     94    2015  
+
+Chi-Square Tests
+
+ Region (East/West)                              Value    df Asymptotic Significance (2-sided) 
+ East               Pearson Chi-Square           5.970(a) 4  .201                              
+                    Likelihood Ratio             6.107    4  .191                              
+                    Linear-by-Linear Association 1.697    1  .193                              
+                    N of Valid Cases             485                                           
+ West               Pearson Chi-Square           4.166(b) 4  .384                              
+                    Likelihood Ratio             4.167    4  .384                              
+                    Linear-by-Linear Association 2.238    1  .135                              
+                    N of Valid Cases             2015                                          
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 5.40.
+b 0 cells (.0%) have expected count less than 5. The minimum expected count is 31.79.
+
+Symmetric Measures
+
+ Region (East/West)                       Value Approximate Significance 
+ East               Nominal by Phi        .111  .201                     
+                    Nominal    Cramer's V .111  .201                     
+                    N of Valid Cases      485                            
+ West               Nominal by Phi        .045  .384                     
+                    Nominal    Cramer's V .045  .384                     
+                    N of Valid Cases      2015                           
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Crosstabs
+Gender * Highest educational attainment Crosstabulation
+ Count 
+
+ Region                    Highest educational attainment                                       Total 
+ (East/West)               Basic Secondary Intermediate Secondary Academic Secondary University       
+ East        Gender Male   83              63                     64                 39         249   
+                    Female 92              66                     59                 43         260   
+             Total         175             129                    123                82         509   
+ West        Gender Male   318             228                    262                137        945   
+                    Female 355             284                    257                166        1062  
+             Total         673             512                    519                303        2007  
+
+Chi-Square Tests
+
+ Region (East/West)                              Value    df Asymptotic Significance (2-sided) 
+ East               Pearson Chi-Square           .694(a)  3  .875                              
+                    Likelihood Ratio             .694     3  .875                              
+                    Linear-by-Linear Association .118     1  .732                              
+                    N of Valid Cases             509                                           
+ West               Pearson Chi-Square           4.176(b) 3  .243                              
+                    Likelihood Ratio             4.176    3  .243                              
+                    Linear-by-Linear Association .047     1  .829                              
+                    N of Valid Cases             2007                                          
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 40.11.
+b 0 cells (.0%) have expected count less than 5. The minimum expected count is 142.67.
+
+Symmetric Measures
+
+ Region (East/West)                       Value Approximate Significance 
+ East               Nominal by Phi        .037  .875                     
+                    Nominal    Cramer's V .037  .875                     
+                    N of Valid Cases      509                            
+ West               Nominal by Phi        .046  .243                     
+                    Nominal    Cramer's V .046  .243                     
+                    N of Valid Cases      2007                           
+
+=========== Test 4b ===========
+
+Crosstabs
+Gender * Employment status Crosstabulation
+ Count 
+
+ Region                    Employment status                         Total 
+ (East/West)               Student Employed Unemployed Retired Other       
+ East        Gender Male   7       149      17         61      15    249   
+                    Female 4       172      16         61      6     259   
+             Total         11      321      33         122     21    508   
+ West        Gender Male   29      599      66         199     53    946   
+                    Female 40      683      85         212     41    1061  
+             Total         69      1282     151        411     94    2007  
+
+Chi-Square Tests
+
+ Region (East/West)                              Value    df Asymptotic Significance (2-sided) 
+ East               Pearson Chi-Square           6.159(a) 4  .188                              
+                    Likelihood Ratio             6.296    4  .178                              
+                    Linear-by-Linear Association 1.948    1  .163                              
+                    N of Valid Cases             508                                           
+ West               Pearson Chi-Square           5.018(b) 4  .285                              
+                    Likelihood Ratio             5.020    4  .285                              
+                    Linear-by-Linear Association 2.443    1  .118                              
+                    N of Valid Cases             2007                                          
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 5.39.
+b 0 cells (.0%) have expected count less than 5. The minimum expected count is 32.52.
+
+Symmetric Measures
+
+ Region (East/West)                       Value Approximate Significance 
+ East               Nominal by Phi        .110  .188                     
+                    Nominal    Cramer's V .110  .188                     
+                    N of Valid Cases      508                            
+ West               Nominal by Phi        .050  .285                     
+                    Nominal    Cramer's V .050  .285                     
+                    N of Valid Cases      2007                           
+
