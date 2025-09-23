@@ -8,6 +8,8 @@ OMS
   /IF SUBTYPES=['###']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/SurveyStat/tests/spss_reference/outputs/pearson_cor_output.txt'.
 
+COMPUTE original_order = $CASENUM.
+
 TITLE '=========== UNWEIGHTED / UNGROUPED =========== '.
 
 ####
@@ -27,12 +29,7 @@ SPLIT FILE BY region.
 
 ###
 
-SPLIT FILE OFF.
-
 TITLE '=========== WEIGHTED / GROUPED =========== '.
-
-SORT CASES BY region.
-SPLIT FILE BY region.
 
 WEIGHT BY sampling_weight.
 
@@ -41,6 +38,7 @@ WEIGHT BY sampling_weight.
 WEIGHT OFF.
 
 SPLIT FILE BY region.
+SORT CASES BY original_order.
 
 OMSEND.
 

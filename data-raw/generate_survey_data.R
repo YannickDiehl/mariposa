@@ -26,7 +26,7 @@ survey_data <- tibble(
   
   # Education levels (German system)
   education = sample(
-    c("Hauptschule", "Realschule", "Gymnasium", "University"), 
+    c("Basic Secondary", "Intermediate Secondary", "Academic Secondary", "University"), 
     n, replace = TRUE, 
     prob = c(0.35, 0.25, 0.25, 0.15)
   ),
@@ -34,9 +34,9 @@ survey_data <- tibble(
   # Monthly household income (EUR)
   income = pmax(800, pmin(8000, round(
     case_when(
-      education == "Hauptschule" ~ rnorm(n, 2800, 800),
-      education == "Realschule" ~ rnorm(n, 3500, 1000),
-      education == "Gymnasium" ~ rnorm(n, 4200, 1200),
+      education == "Basic Secondary" ~ rnorm(n, 2800, 800),
+      education == "Intermediate Secondary" ~ rnorm(n, 3500, 1000),
+      education == "Academic Secondary" ~ rnorm(n, 4200, 1200),
       education == "University" ~ rnorm(n, 5500, 1800),
       TRUE ~ rnorm(n, 3500, 1500)
     ), -2))),
@@ -44,7 +44,7 @@ survey_data <- tibble(
   # Employment status
   employment = case_when(
     age >= 65 ~ "Retired",
-    age <= 25 & education %in% c("Gymnasium", "University") ~ "Student",
+    age <= 25 & education %in% c("Academic Secondary", "University") ~ "Student",
     runif(n) < 0.85 ~ "Employed",
     runif(n) < 0.60 ~ "Unemployed",
     TRUE ~ "Other"
@@ -118,7 +118,7 @@ survey_data <- tibble(
     gender = factor(gender, levels = c("Male", "Female")),
     region = factor(region, levels = c("East", "West")),
     education = factor(education, 
-                      levels = c("Hauptschule", "Realschule", "Gymnasium", "University"),
+                      levels = c("Basic Secondary", "Intermediate Secondary", "Academic Secondary", "University"),
                       ordered = TRUE),
     employment = factor(employment,
                        levels = c("Student", "Employed", "Unemployed", "Retired", "Other")),
@@ -127,22 +127,22 @@ survey_data <- tibble(
                            levels = c("Face-to-face", "Telephone", "Online"))
   )
 
-# Add variable labels (following German survey tradition)
-attr(survey_data$age, "label") <- "Alter in Jahren"
-attr(survey_data$gender, "label") <- "Geschlecht"
-attr(survey_data$region, "label") <- "Region (Ost/West)"
-attr(survey_data$education, "label") <- "Höchster Bildungsabschluss"
-attr(survey_data$income, "label") <- "Monatliches Haushaltseinkommen (EUR)"
-attr(survey_data$employment, "label") <- "Erwerbsstatus"
-attr(survey_data$political_orientation, "label") <- "Politische Orientierung (1=links, 5=rechts)"
-attr(survey_data$environmental_concern, "label") <- "Umweltsorge (1=gering, 5=hoch)"
-attr(survey_data$life_satisfaction, "label") <- "Lebenszufriedenheit (1=unzufrieden, 5=zufrieden)"
-attr(survey_data$trust_government, "label") <- "Vertrauen in Regierung (1=kein, 5=vollständig)"
-attr(survey_data$trust_media, "label") <- "Vertrauen in Medien (1=kein, 5=vollständig)"
-attr(survey_data$trust_science, "label") <- "Vertrauen in Wissenschaft (1=kein, 5=vollständig)"
-attr(survey_data$sampling_weight, "label") <- "Gewichtungsfaktor"
-attr(survey_data$stratum, "label") <- "Schichtungsvariable"
-attr(survey_data$interview_mode, "label") <- "Befragungsmodus"
+# Add variable labels (following survey research tradition)
+attr(survey_data$age, "label") <- "Age in years"
+attr(survey_data$gender, "label") <- "Gender"
+attr(survey_data$region, "label") <- "Region (East/West)"
+attr(survey_data$education, "label") <- "Highest educational attainment"
+attr(survey_data$income, "label") <- "Monthly household income (EUR)"
+attr(survey_data$employment, "label") <- "Employment status"
+attr(survey_data$political_orientation, "label") <- "Political orientation (1=left, 5=right)"
+attr(survey_data$environmental_concern, "label") <- "Environmental concern (1=low, 5=high)"
+attr(survey_data$life_satisfaction, "label") <- "Life satisfaction (1=dissatisfied, 5=satisfied)"
+attr(survey_data$trust_government, "label") <- "Trust in government (1=none, 5=complete)"
+attr(survey_data$trust_media, "label") <- "Trust in media (1=none, 5=complete)"
+attr(survey_data$trust_science, "label") <- "Trust in science (1=none, 5=complete)"
+attr(survey_data$sampling_weight, "label") <- "Weighting factor"
+attr(survey_data$stratum, "label") <- "Stratification variable"
+attr(survey_data$interview_mode, "label") <- "Interview mode"
 
 # Save dataset
 usethis::use_data(survey_data, overwrite = TRUE)

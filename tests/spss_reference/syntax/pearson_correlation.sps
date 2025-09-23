@@ -8,6 +8,8 @@ OMS
   /IF SUBTYPES=['Correlations']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/SurveyStat/tests/spss_reference/outputs/pearson_cor_output.txt'.
 
+COMPUTE original_order = $CASENUM.
+
 TITLE '=========== UNWEIGHTED / UNGROUPED =========== '.
 
 CORRELATIONS
@@ -19,26 +21,21 @@ TITLE '=========== WEIGHTED / UNGROUPED =========== '.
 WEIGHT BY sampling_weight.
 
 CORRELATIONS
-  /VARIABLES=life_satisfaction political_orientation trust_media
+  /VARIABLES=life_satisfaction political_orientation trust_media 
   /PRINT=TWOTAIL NOSIG .
 
 WEIGHT OFF.
 
 TITLE '=========== UNWEIGHTED / GROUPED =========== '.
 
-*SORT CASES BY region.
+SORT CASES BY region.
 SPLIT FILE BY region.
 
 CORRELATIONS
   /VARIABLES=life_satisfaction political_orientation trust_media
   /PRINT=TWOTAIL NOSIG .
 
-SPLIT FILE OFF.
-
 TITLE '=========== WEIGHTED / GROUPED =========== '.
-
-*SORT CASES BY region.
-SPLIT FILE BY region.
 
 WEIGHT BY sampling_weight.
 
@@ -48,7 +45,8 @@ CORRELATIONS
 
 WEIGHT OFF.
 
-SPLIT FILE BY region.
+SPLIT FILE OFF.
+SORT CASES BY original_order.
 
 OMSEND.
 
