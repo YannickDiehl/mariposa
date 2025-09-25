@@ -1,0 +1,992 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+Tukey HSD: Life Satisfaction by Education (unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                        Academic Secondary     -.649(*)        .060  .000 -.80        -.50        
+                        University             -.843(*)        .069  .000 -1.02       -.67        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                        Academic Secondary     -.153           .063  .075 -.32        .01         
+                        University             -.346(*)        .072  .000 -.53        -.16        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .50         .80         
+                        Intermediate Secondary .153            .063  .075 -.01        .32         
+                        University             -.193(*)        .072  .037 -.38        -.01        
+ University             Basic Secondary        .843(*)         .069  .000 .67         1.02        
+                        Intermediate Secondary .346(*)         .072  .000 .16         .53         
+                        Academic Secondary     .193(*)         .072  .037 .01         .38         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 1b ===========
+
+Tukey HSD: Income by Education (unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Monthly household income (EUR) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.     Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error         Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -833.47063(*)   63.16256 .000 -995.8624   -671.0789   
+                        Academic Secondary     -1465.03997(*)  63.16256 .000 -1627.4317  -1302.6482  
+                        University             -2578.13548(*)  72.33288 .000 -2764.1042  -2392.1668  
+ Intermediate Secondary Basic Secondary        833.47063(*)    63.16256 .000 671.0789    995.8624    
+                        Academic Secondary     -631.56934(*)   67.60909 .000 -805.3931   -457.7455   
+                        University             -1744.66485(*)  76.24648 .000 -1940.6955  -1548.6342  
+ Academic Secondary     Basic Secondary        1465.03997(*)   63.16256 .000 1302.6482   1627.4317   
+                        Intermediate Secondary 631.56934(*)    67.60909 .000 457.7455    805.3931    
+                        University             -1113.09551(*)  76.24648 .000 -1309.1261  -917.0649   
+ University             Basic Secondary        2578.13548(*)   72.33288 .000 2392.1668   2764.1042   
+                        Intermediate Secondary 1744.66485(*)   76.24648 .000 1548.6342   1940.6955   
+                        Academic Secondary     1113.09551(*)   76.24648 .000 917.0649    1309.1261   
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 1c ===========
+
+Tukey HSD: Age by Education (unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Age in years 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.    Sig.  95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error         Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -1.07584        .89465  .625  -3.3758     1.2241      
+                        Academic Secondary     -1.11010        .89384  .600  -3.4079     1.1878      
+                        University             .73808          1.03168 .891  -1.9141     3.3903      
+ Intermediate Secondary Basic Secondary        1.07584         .89465  .625  -1.2241     3.3758      
+                        Academic Secondary     -.03426         .95623  1.000 -2.4925     2.4240      
+                        University             1.81392         1.08618 .340  -.9784      4.6062      
+ Academic Secondary     Basic Secondary        1.11010         .89384  .600  -1.1878     3.4079      
+                        Intermediate Secondary .03426          .95623  1.000 -2.4240     2.4925      
+                        University             1.84818         1.08551 .322  -.9424      4.6388      
+ University             Basic Secondary        -.73808         1.03168 .891  -3.3903     1.9141      
+                        Intermediate Secondary -1.81392        1.08618 .340  -4.6062     .9784       
+                        Academic Secondary     -1.84818        1.08551 .322  -4.6388     .9424       
+
+=========== Test 1d ===========
+
+Tukey HSD: Trust Variables by Education (unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+ Tukey HSD 
+
+ Dependent   (I) Highest            (J) Highest            Mean Difference Std.  Sig.  95% Confidence Interval 
+ Variable    educational attainment educational attainment (I-J)           Error       Lower Bound Upper Bound 
+ Trust in    Basic Secondary        Intermediate Secondary .066            .063  .722  -.10        .23         
+ government                         Academic Secondary     .037            .063  .935  -.13        .20         
+ (1=none,                           University             .004            .073  1.000 -.18        .19         
+ 5=complete) Intermediate Secondary Basic Secondary        -.066           .063  .722  -.23        .10         
+                                    Academic Secondary     -.029           .068  .973  -.20        .14         
+                                    University             -.063           .077  .847  -.26        .13         
+             Academic Secondary     Basic Secondary        -.037           .063  .935  -.20        .13         
+                                    Intermediate Secondary .029            .068  .973  -.14        .20         
+                                    University             -.034           .077  .972  -.23        .16         
+             University             Basic Secondary        -.004           .073  1.000 -.19        .18         
+                                    Intermediate Secondary .063            .077  .847  -.13        .26         
+                                    Academic Secondary     .034            .077  .972  -.16        .23         
+ Trust in    Basic Secondary        Intermediate Secondary -.057           .063  .802  -.22        .11         
+ media                              Academic Secondary     -.021           .063  .987  -.18        .14         
+ (1=none,                           University             .066            .073  .799  -.12        .25         
+ 5=complete) Intermediate Secondary Basic Secondary        .057            .063  .802  -.11        .22         
+                                    Academic Secondary     .036            .067  .951  -.14        .21         
+                                    University             .123            .077  .373  -.07        .32         
+             Academic Secondary     Basic Secondary        .021            .063  .987  -.14        .18         
+                                    Intermediate Secondary -.036           .067  .951  -.21        .14         
+                                    University             .087            .076  .663  -.11        .28         
+             University             Basic Secondary        -.066           .073  .799  -.25        .12         
+                                    Intermediate Secondary -.123           .077  .373  -.32        .07         
+                                    Academic Secondary     -.087           .076  .663  -.28        .11         
+ Trust in    Basic Secondary        Intermediate Secondary .028            .055  .956  -.11        .17         
+ science                            Academic Secondary     -.049           .055  .817  -.19        .09         
+ (1=none,                           University             .011            .064  .998  -.15        .17         
+ 5=complete) Intermediate Secondary Basic Secondary        -.028           .055  .956  -.17        .11         
+                                    Academic Secondary     -.077           .059  .563  -.23        .08         
+                                    University             -.018           .067  .993  -.19        .15         
+             Academic Secondary     Basic Secondary        .049            .055  .817  -.09        .19         
+                                    Intermediate Secondary .077            .059  .563  -.08        .23         
+                                    University             .059            .067  .815  -.11        .23         
+             University             Basic Secondary        -.011           .064  .998  -.17        .15         
+                                    Intermediate Secondary .018            .067  .993  -.15        .19         
+                                    Academic Secondary     -.059           .067  .815  -.23        .11         
+
+=========== Test 1e ===========
+
+Tukey HSD: Life Satisfaction by Employment (unweighted, 5 groups)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Employment (J) Employment Mean Difference Std.  Sig. 95% Confidence Interval 
+ status         status         (I-J)           Error      Lower Bound Upper Bound 
+ Student        Employed       .321            .136  .128 -.05        .69         
+                Unemployed     .284            .159  .380 -.15        .72         
+                Retired        .389(*)         .142  .050 .00         .78         
+                Other          .232            .172  .659 -.24        .70         
+ Employed       Student        -.321           .136  .128 -.69        .05         
+                Unemployed     -.037           .091  .994 -.29        .21         
+                Retired        .068            .059  .774 -.09        .23         
+                Other          -.088           .113  .935 -.40        .22         
+ Unemployed     Student        -.284           .159  .380 -.72        .15         
+                Employed       .037            .091  .994 -.21        .29         
+                Retired        .105            .100  .832 -.17        .38         
+                Other          -.051           .139  .996 -.43        .33         
+ Retired        Student        -.389(*)        .142  .050 -.78        .00         
+                Employed       -.068           .059  .774 -.23        .09         
+                Unemployed     -.105           .100  .832 -.38        .17         
+                Other          -.157           .120  .690 -.48        .17         
+ Other          Student        -.232           .172  .659 -.70        .24         
+                Employed       .088            .113  .935 -.22        .40         
+                Unemployed     .051            .139  .996 -.33        .43         
+                Retired        .157            .120  .690 -.17        .48         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 1f ===========
+
+Tukey HSD: Income by Employment (unweighted, 5 groups)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Monthly household income (EUR) 
+ Tukey HSD 
+
+ (I) Employment (J) Employment Mean Difference Std.      Sig. 95% Confidence Interval 
+ status         status         (I-J)           Error          Lower Bound Upper Bound 
+ Student        Employed       907.63143(*)    180.90363 .000 413.7538    1401.5090   
+                Unemployed     987.65360(*)    209.86916 .000 414.6984    1560.6088   
+                Retired        886.02319(*)    188.62321 .000 371.0707    1400.9757   
+                Other          833.29779(*)    226.68174 .002 214.4433    1452.1523   
+ Employed       Student        -907.63143(*)   180.90363 .000 -1401.5090  -413.7538   
+                Unemployed     80.02217        119.34373 .963 -245.7933   405.8376    
+                Retired        -21.60824       76.00378  .999 -229.1031   185.8866    
+                Other          -74.33364       146.90974 .987 -475.4059   326.7386    
+ Unemployed     Student        -987.65360(*)   209.86916 .000 -1560.6088  -414.6984   
+                Employed       -80.02217       119.34373 .963 -405.8376   245.7933    
+                Retired        -101.63041      130.74983 .937 -458.5852   255.3243    
+                Other          -154.35581      181.38747 .914 -649.5543   340.8427    
+ Retired        Student        -886.02319(*)   188.62321 .000 -1400.9757  -371.0707   
+                Employed       21.60824        76.00378  .999 -185.8866   229.1031    
+                Unemployed     101.63041       130.74983 .937 -255.3243   458.5852    
+                Other          -52.72540       156.31719 .997 -479.4806   374.0298    
+ Other          Student        -833.29779(*)   226.68174 .002 -1452.1523  -214.4433   
+                Employed       74.33364        146.90974 .987 -326.7386   475.4059    
+                Unemployed     154.35581       181.38747 .914 -340.8427   649.5543    
+                Retired        52.72540        156.31719 .997 -374.0298   479.4806    
+* The mean difference is significant at the 0.05 level.
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+Tukey HSD: Life Satisfaction by Education (weighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.490(*)        .059  .000 -.64        -.34        
+                        Academic Secondary     -.643(*)        .059  .000 -.79        -.49        
+                        University             -.832(*)        .069  .000 -1.01       -.65        
+ Intermediate Secondary Basic Secondary        .490(*)         .059  .000 .34         .64         
+                        Academic Secondary     -.153           .063  .071 -.31        .01         
+                        University             -.342(*)        .072  .000 -.53        -.16        
+ Academic Secondary     Basic Secondary        .643(*)         .059  .000 .49         .79         
+                        Intermediate Secondary .153            .063  .071 -.01        .31         
+                        University             -.189(*)        .073  .046 -.38        .00         
+ University             Basic Secondary        .832(*)         .069  .000 .65         1.01        
+                        Intermediate Secondary .342(*)         .072  .000 .16         .53         
+                        Academic Secondary     .189(*)         .073  .046 .00         .38         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 2b ===========
+
+Tukey HSD: Income by Education (weighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Monthly household income (EUR) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.     Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error         Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -830.95713(*)   62.53396 .000 -991.7319   -670.1823   
+                        Academic Secondary     -1466.06486(*)  62.53873 .000 -1626.8519  -1305.2778  
+                        University             -2572.07638(*)  72.84819 .000 -2759.3690  -2384.7837  
+ Intermediate Secondary Basic Secondary        830.95713(*)    62.53396 .000 670.1823    991.7319    
+                        Academic Secondary     -635.10773(*)   66.79203 .000 -806.8300   -463.3854   
+                        University             -1741.11924(*)  76.53065 .000 -1937.8795  -1544.3590  
+ Academic Secondary     Basic Secondary        1466.06486(*)   62.53873 .000 1305.2778   1626.8519   
+                        Intermediate Secondary 635.10773(*)    66.79203 .000 463.3854    806.8300    
+                        University             -1106.01151(*)  76.53455 .000 -1302.7818  -909.2412   
+ University             Basic Secondary        2572.07638(*)   72.84819 .000 2384.7837   2759.3690   
+                        Intermediate Secondary 1741.11924(*)   76.53065 .000 1544.3590   1937.8795   
+                        Academic Secondary     1106.01151(*)   76.53455 .000 909.2412    1302.7818   
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 2c ===========
+
+Tukey HSD: Age by Education (weighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Age in years 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.    Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error        Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.84360         .89412  .781 -3.1422     1.4550      
+                        Academic Secondary     -1.06554        .89371  .632 -3.3631     1.2320      
+                        University             .64261          1.04965 .928 -2.0558     3.3410      
+ Intermediate Secondary Basic Secondary        .84360          .89412  .781 -1.4550     3.1422      
+                        Academic Secondary     -.22195         .95392  .996 -2.6742     2.2304      
+                        University             1.48621         1.10137 .531 -1.3451     4.3176      
+ Academic Secondary     Basic Secondary        1.06554         .89371  .632 -1.2320     3.3631      
+                        Intermediate Secondary .22195          .95392  .996 -2.2304     2.6742      
+                        University             1.70815         1.10104 .407 -1.1224     4.5387      
+ University             Basic Secondary        -.64261         1.04965 .928 -3.3410     2.0558      
+                        Intermediate Secondary -1.48621        1.10137 .531 -4.3176     1.3451      
+                        Academic Secondary     -1.70815        1.10104 .407 -4.5387     1.1224      
+
+=========== Test 2d ===========
+
+Tukey HSD: Trust Variables by Education (weighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+ Tukey HSD 
+
+ Dependent   (I) Highest            (J) Highest            Mean Difference Std.  Sig.  95% Confidence Interval 
+ Variable    educational attainment educational attainment (I-J)           Error       Lower Bound Upper Bound 
+ Trust in    Basic Secondary        Intermediate Secondary .063            .063  .744  -.10        .22         
+ government                         Academic Secondary     .041            .063  .916  -.12        .20         
+ (1=none,                           University             .006            .074  1.000 -.18        .20         
+ 5=complete) Intermediate Secondary Basic Secondary        -.063           .063  .744  -.22        .10         
+                                    Academic Secondary     -.023           .067  .986  -.19        .15         
+                                    University             -.057           .077  .882  -.26        .14         
+             Academic Secondary     Basic Secondary        -.041           .063  .916  -.20        .12         
+                                    Intermediate Secondary .023            .067  .986  -.15        .19         
+                                    University             -.034           .077  .971  -.23        .16         
+             University             Basic Secondary        -.006           .074  1.000 -.20        .18         
+                                    Intermediate Secondary .057            .077  .882  -.14        .26         
+                                    Academic Secondary     .034            .077  .971  -.16        .23         
+ Trust in    Basic Secondary        Intermediate Secondary -.060           .063  .777  -.22        .10         
+ media                              Academic Secondary     -.017           .063  .993  -.18        .14         
+ (1=none,                           University             .057            .074  .868  -.13        .25         
+ 5=complete) Intermediate Secondary Basic Secondary        .060            .063  .777  -.10        .22         
+                                    Academic Secondary     .043            .067  .920  -.13        .21         
+                                    University             .117            .077  .434  -.08        .32         
+             Academic Secondary     Basic Secondary        .017            .063  .993  -.14        .18         
+                                    Intermediate Secondary -.043           .067  .920  -.21        .13         
+                                    University             .074            .077  .775  -.12        .27         
+             University             Basic Secondary        -.057           .074  .868  -.25        .13         
+                                    Intermediate Secondary -.117           .077  .434  -.32        .08         
+                                    Academic Secondary     -.074           .077  .775  -.27        .12         
+ Trust in    Basic Secondary        Intermediate Secondary .028            .055  .958  -.11        .17         
+ science                            Academic Secondary     -.043           .055  .863  -.18        .10         
+ (1=none,                           University             .022            .064  .986  -.14        .19         
+ 5=complete) Intermediate Secondary Basic Secondary        -.028           .055  .958  -.17        .11         
+                                    Academic Secondary     -.071           .059  .624  -.22        .08         
+                                    University             -.006           .067  1.000 -.18        .17         
+             Academic Secondary     Basic Secondary        .043            .055  .863  -.10        .18         
+                                    Intermediate Secondary .071            .059  .624  -.08        .22         
+                                    University             .065            .068  .772  -.11        .24         
+             University             Basic Secondary        -.022           .064  .986  -.19        .14         
+                                    Intermediate Secondary .006            .067  1.000 -.17        .18         
+                                    Academic Secondary     -.065           .068  .772  -.24        .11         
+
+=========== Test 2e ===========
+
+Tukey HSD: Life Satisfaction by Employment (weighted, 5 groups)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Employment (J) Employment Mean Difference Std.  Sig. 95% Confidence Interval 
+ status         status         (I-J)           Error      Lower Bound Upper Bound 
+ Student        Employed       .306            .135  .154 -.06        .67         
+                Unemployed     .263            .157  .451 -.17        .69         
+                Retired        .377            .141  .058 -.01        .76         
+                Other          .209            .171  .738 -.26        .67         
+ Employed       Student        -.306           .135  .154 -.67        .06         
+                Unemployed     -.043           .091  .989 -.29        .20         
+                Retired        .071            .058  .745 -.09        .23         
+                Other          -.098           .112  .908 -.40        .21         
+ Unemployed     Student        -.263           .157  .451 -.69        .17         
+                Employed       .043            .091  .989 -.20        .29         
+                Retired        .114            .100  .782 -.16        .39         
+                Other          -.054           .138  .995 -.43        .32         
+ Retired        Student        -.377           .141  .058 -.76        .01         
+                Employed       -.071           .058  .745 -.23        .09         
+                Unemployed     -.114           .100  .782 -.39        .16         
+                Other          -.168           .120  .624 -.50        .16         
+ Other          Student        -.209           .171  .738 -.67        .26         
+                Employed       .098            .112  .908 -.21        .40         
+                Unemployed     .054            .138  .995 -.32        .43         
+                Retired        .168            .120  .624 -.16        .50         
+
+=========== Test 2f ===========
+
+Tukey HSD: Income by Employment (weighted, 5 groups)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Monthly household income (EUR) 
+ Tukey HSD 
+
+ (I) Employment (J) Employment Mean Difference Std.      Sig. 95% Confidence Interval 
+ status         status         (I-J)           Error          Lower Bound Upper Bound 
+ Student        Employed       939.19226(*)    177.84237 .000 453.6747    1424.7098   
+                Unemployed     1014.11142(*)   206.53369 .000 450.2653    1577.9576   
+                Retired        906.12176(*)    185.41085 .000 399.9419    1412.3016   
+                Other          864.50898(*)    223.50773 .001 254.3229    1474.6950   
+ Employed       Student        -939.19226(*)   177.84237 .000 -1424.7098  -453.6747   
+                Unemployed     74.91917        117.92950 .969 -247.0336   396.8719    
+                Retired        -33.07050       75.02255  .992 -237.8854   171.7444    
+                Other          -74.68328       145.62592 .986 -472.2485   322.8819    
+ Unemployed     Student        -1014.11142(*)  206.53369 .000 -1577.9576  -450.2653   
+                Employed       -74.91917       117.92950 .969 -396.8719   247.0336    
+                Retired        -107.98967      129.06061 .919 -460.3309   244.3515    
+                Other          -149.60244      179.54154 .920 -639.7588   340.5539    
+ Retired        Student        -906.12176(*)   185.41085 .000 -1412.3016  -399.9419   
+                Employed       33.07050        75.02255  .992 -171.7444   237.8854    
+                Unemployed     107.98967       129.06061 .919 -244.3515   460.3309    
+                Other          -41.61278       154.77785 .999 -464.1632   380.9376    
+ Other          Student        -864.50898(*)   223.50773 .001 -1474.6950  -254.3229   
+                Employed       74.68328        145.62592 .986 -322.8819   472.2485    
+                Unemployed     149.60244       179.54154 .920 -340.5539   639.7588    
+                Retired        41.61278        154.77785 .999 -380.9376   464.1632    
+* The mean difference is significant at the 0.05 level.
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Tukey HSD: Life Satisfaction by Education (grouped by region, unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ Region      (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ (East/West) educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ East        Basic Secondary        Intermediate Secondary -.334           .143  .092 -.70        .03         
+                                    Academic Secondary     -.532(*)        .146  .002 -.91        -.15        
+                                    University             -.642(*)        .166  .001 -1.07       -.22        
+             Intermediate Secondary Basic Secondary        .334            .143  .092 -.03        .70         
+                                    Academic Secondary     -.198           .157  .587 -.60        .21         
+                                    University             -.308           .175  .292 -.76        .14         
+             Academic Secondary     Basic Secondary        .532(*)         .146  .002 .15         .91         
+                                    Intermediate Secondary .198            .157  .587 -.21        .60         
+                                    University             -.110           .177  .925 -.57        .35         
+             University             Basic Secondary        .642(*)         .166  .001 .22         1.07        
+                                    Intermediate Secondary .308            .175  .292 -.14        .76         
+                                    Academic Secondary     .110            .177  .925 -.35        .57         
+ West        Basic Secondary        Intermediate Secondary -.536(*)        .065  .000 -.70        -.37        
+                                    Academic Secondary     -.678(*)        .065  .000 -.85        -.51        
+                                    University             -.892(*)        .075  .000 -1.08       -.70        
+             Intermediate Secondary Basic Secondary        .536(*)         .065  .000 .37         .70         
+                                    Academic Secondary     -.142           .069  .170 -.32        .04         
+                                    University             -.355(*)        .079  .000 -.56        -.15        
+             Academic Secondary     Basic Secondary        .678(*)         .065  .000 .51         .85         
+                                    Intermediate Secondary .142            .069  .170 -.04        .32         
+                                    University             -.213(*)        .079  .034 -.42        -.01        
+             University             Basic Secondary        .892(*)         .075  .000 .70         1.08        
+                                    Intermediate Secondary .355(*)         .079  .000 .15         .56         
+                                    Academic Secondary     .213(*)         .079  .034 .01         .42         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 3b ===========
+
+Tukey HSD: Income by Education (grouped by region, unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Monthly household income (EUR) 
+ Tukey HSD 
+
+ Region      (I) Highest            (J) Highest            Mean Difference Std.      Sig. 95% Confidence Interval 
+ (East/West) educational attainment educational attainment (I-J)           Error          Lower Bound Upper Bound 
+ East        Basic Secondary        Intermediate Secondary -711.94320(*)   141.45344 .000 -1076.7833  -347.1031   
+                                    Academic Secondary     -1302.59740(*)  145.23536 .000 -1677.1919  -928.0029   
+                                    University             -2328.31169(*)  162.01683 .000 -2746.1894  -1910.4340  
+             Intermediate Secondary Basic Secondary        711.94320(*)    141.45344 .000 347.1031    1076.7833   
+                                    Academic Secondary     -590.65421(*)   157.15113 .001 -995.9822   -185.3263   
+                                    University             -1616.36849(*)  172.77910 .000 -2062.0045  -1170.7325  
+             Academic Secondary     Basic Secondary        1302.59740(*)   145.23536 .000 928.0029    1677.1919   
+                                    Intermediate Secondary 590.65421(*)    157.15113 .001 185.3263    995.9822    
+                                    University             -1025.71429(*)  175.88876 .000 -1479.3708  -572.0578   
+             University             Basic Secondary        2328.31169(*)   162.01683 .000 1910.4340   2746.1894   
+                                    Intermediate Secondary 1616.36849(*)   172.77910 .000 1170.7325   2062.0045   
+                                    Academic Secondary     1025.71429(*)   175.88876 .000 572.0578    1479.3708   
+ West        Basic Secondary        Intermediate Secondary -866.06016(*)   70.60782  .000 -1047.6280  -684.4923   
+                                    Academic Secondary     -1506.95812(*)  70.20527  .000 -1687.4908  -1326.4255  
+                                    University             -2642.18619(*)  80.85058  .000 -2850.0932  -2434.2791  
+             Intermediate Secondary Basic Secondary        866.06016(*)    70.60782  .000 684.4923    1047.6280   
+                                    Academic Secondary     -640.89796(*)   74.91141  .000 -833.5325   -448.2635   
+                                    University             -1776.12603(*)  84.96915  .000 -1994.6240  -1557.6281  
+             Academic Secondary     Basic Secondary        1506.95812(*)   70.20527  .000 1326.4255   1687.4908   
+                                    Intermediate Secondary 640.89796(*)    74.91141  .000 448.2635    833.5325    
+                                    University             -1135.22807(*)  84.63494  .000 -1352.8666  -917.5896   
+             University             Basic Secondary        2642.18619(*)   80.85058  .000 2434.2791   2850.0932   
+                                    Intermediate Secondary 1776.12603(*)   84.96915  .000 1557.6281   1994.6240   
+                                    Academic Secondary     1135.22807(*)   84.63494  .000 917.5896    1352.8666   
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 3c ===========
+
+Tukey HSD: Age by Education (grouped by region, unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Age in years 
+ Tukey HSD 
+
+ Region      (I) Highest            (J) Highest            Mean Difference Std.    Sig.  95% Confidence Interval 
+ (East/West) educational attainment educational attainment (I-J)           Error         Lower Bound Upper Bound 
+ East        Basic Secondary        Intermediate Secondary .04385          2.07229 1.000 -5.2986     5.3863      
+                                    Academic Secondary     -3.22097        2.10364 .420  -8.6442     2.2023      
+                                    University             -.99643         2.37237 .975  -7.1125     5.1196      
+             Intermediate Secondary Basic Secondary        -.04385         2.07229 1.000 -5.3863     5.2986      
+                                    Academic Secondary     -3.26482        2.26901 .476  -9.1144     2.5848      
+                                    University             -1.04028        2.52017 .976  -7.5374     5.4568      
+             Academic Secondary     Basic Secondary        3.22097         2.10364 .420  -2.2023     8.6442      
+                                    Intermediate Secondary 3.26482         2.26901 .476  -2.5848     9.1144      
+                                    University             2.22455         2.54601 .818  -4.3392     8.7882      
+             University             Basic Secondary        .99643          2.37237 .975  -5.1196     7.1125      
+                                    Intermediate Secondary 1.04028         2.52017 .976  -5.4568     7.5374      
+                                    Academic Secondary     -2.22455        2.54601 .818  -8.7882     4.3392      
+ West        Basic Secondary        Intermediate Secondary -1.35522        .99090  .520  -3.9030     1.1926      
+                                    Academic Secondary     -.66515         .98652  .907  -3.2017     1.8714      
+                                    University             1.16087         1.14463 .741  -1.7822     4.1039      
+             Intermediate Secondary Basic Secondary        1.35522         .99090  .520  -1.1926     3.9030      
+                                    Academic Secondary     .69008          1.05307 .914  -2.0176     3.3977      
+                                    University             2.51609         1.20247 .156  -.5757      5.6079      
+             Academic Secondary     Basic Secondary        .66515          .98652  .907  -1.8714     3.2017      
+                                    Intermediate Secondary -.69008         1.05307 .914  -3.3977     2.0176      
+                                    University             1.82602         1.19886 .424  -1.2565     4.9085      
+             University             Basic Secondary        -1.16087        1.14463 .741  -4.1039     1.7822      
+                                    Intermediate Secondary -2.51609        1.20247 .156  -5.6079     .5757       
+                                    Academic Secondary     -1.82602        1.19886 .424  -4.9085     1.2565      
+
+=========== Test 3d ===========
+
+Tukey HSD: Life Satisfaction by Employment (grouped by region, unweighted)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ Region      (I) Employment (J) Employment Mean Difference Std.  Sig.  95% Confidence Interval 
+ (East/West) status         status         (I-J)           Error       Lower Bound Upper Bound 
+ East        Student        Employed       .075            .388  1.000 -.99        1.14        
+                            Unemployed     .067            .441  1.000 -1.14       1.27        
+                            Retired        .186            .400  .990  -.91        1.28        
+                            Other          -.300           .464  .967  -1.57       .97         
+             Employed       Student        -.075           .388  1.000 -1.14       .99         
+                            Unemployed     -.008           .231  1.000 -.64        .63         
+                            Retired        .111            .137  .927  -.26        .49         
+                            Other          -.375           .273  .645  -1.12       .37         
+             Unemployed     Student        -.067           .441  1.000 -1.27       1.14        
+                            Employed       .008            .231  1.000 -.63        .64         
+                            Retired        .119            .250  .989  -.57        .80         
+                            Other          -.367           .344  .824  -1.31       .57         
+             Retired        Student        -.186           .400  .990  -1.28       .91         
+                            Employed       -.111           .137  .927  -.49        .26         
+                            Unemployed     -.119           .250  .989  -.80        .57         
+                            Other          -.486           .289  .446  -1.28       .31         
+             Other          Student        .300            .464  .967  -.97        1.57        
+                            Employed       .375            .273  .645  -.37        1.12        
+                            Unemployed     .367            .344  .824  -.57        1.31        
+                            Retired        .486            .289  .446  -.31        1.28        
+ West        Student        Employed       .359            .145  .097  -.04        .75         
+                            Unemployed     .316            .170  .338  -.15        .78         
+                            Retired        .416(*)         .152  .050  .00         .83         
+                            Other          .336            .185  .364  -.17        .84         
+             Employed       Student        -.359           .145  .097  -.75        .04         
+                            Unemployed     -.043           .099  .993  -.31        .23         
+                            Retired        .057            .065  .906  -.12        .23         
+                            Other          -.022           .124  1.000 -.36        .32         
+             Unemployed     Student        -.316           .170  .338  -.78        .15         
+                            Employed       .043            .099  .993  -.23        .31         
+                            Retired        .100            .109  .892  -.20        .40         
+                            Other          .021            .152  1.000 -.39        .43         
+             Retired        Student        -.416(*)        .152  .050  -.83        .00         
+                            Employed       -.057           .065  .906  -.23        .12         
+                            Unemployed     -.100           .109  .892  -.40        .20         
+                            Other          -.079           .132  .975  -.44        .28         
+             Other          Student        -.336           .185  .364  -.84        .17         
+                            Employed       .022            .124  1.000 -.32        .36         
+                            Unemployed     -.021           .152  1.000 -.43        .39         
+                            Retired        .079            .132  .975  -.28        .44         
+* The mean difference is significant at the 0.05 level.
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Tukey HSD: Life Satisfaction by Education (weighted, grouped by region)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ Region      (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ (East/West) educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ East        Basic Secondary        Intermediate Secondary -.327           .140  .090 -.69        .03         
+                                    Academic Secondary     -.505(*)        .143  .002 -.87        -.14        
+                                    University             -.639(*)        .163  .001 -1.06       -.22        
+             Intermediate Secondary Basic Secondary        .327            .140  .090 -.03        .69         
+                                    Academic Secondary     -.178           .151  .643 -.57        .21         
+                                    University             -.311           .170  .262 -.75        .13         
+             Academic Secondary     Basic Secondary        .505(*)         .143  .002 .14         .87         
+                                    Intermediate Secondary .178            .151  .643 -.21        .57         
+                                    University             -.133           .173  .867 -.58        .31         
+             University             Basic Secondary        .639(*)         .163  .001 .22         1.06        
+                                    Intermediate Secondary .311            .170  .262 -.13        .75         
+                                    Academic Secondary     .133            .173  .867 -.31        .58         
+ West        Basic Secondary        Intermediate Secondary -.531(*)        .065  .000 -.70        -.36        
+                                    Academic Secondary     -.677(*)        .065  .000 -.84        -.51        
+                                    University             -.882(*)        .077  .000 -1.08       -.69        
+             Intermediate Secondary Basic Secondary        .531(*)         .065  .000 .36         .70         
+                                    Academic Secondary     -.146           .069  .146 -.32        .03         
+                                    University             -.351(*)        .080  .000 -.56        -.15        
+             Academic Secondary     Basic Secondary        .677(*)         .065  .000 .51         .84         
+                                    Intermediate Secondary .146            .069  .146 -.03        .32         
+                                    University             -.205           .080  .051 -.41        .00         
+             University             Basic Secondary        .882(*)         .077  .000 .69         1.08        
+                                    Intermediate Secondary .351(*)         .080  .000 .15         .56         
+                                    Academic Secondary     .205            .080  .051 .00         .41         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 4b ===========
+
+Tukey HSD: Income by Education (weighted, grouped by region)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Monthly household income (EUR) 
+ Tukey HSD 
+
+ Region      (I) Highest            (J) Highest            Mean Difference Std.      Sig. 95% Confidence Interval 
+ (East/West) educational attainment educational attainment (I-J)           Error          Lower Bound Upper Bound 
+ East        Basic Secondary        Intermediate Secondary -726.59776(*)   139.03880 .000 -1085.1461  -368.0494   
+                                    Academic Secondary     -1290.74934(*)  142.33512 .000 -1657.7981  -923.7006   
+                                    University             -2330.17593(*)  160.43097 .000 -2743.8896  -1916.4622  
+             Intermediate Secondary Basic Secondary        726.59776(*)    139.03880 .000 368.0494    1085.1461   
+                                    Academic Secondary     -564.15158(*)   153.06541 .001 -958.8712   -169.4319   
+                                    University             -1603.57817(*)  170.02303 .000 -2042.0275  -1165.1288  
+             Academic Secondary     Basic Secondary        1290.74934(*)   142.33512 .000 923.7006    1657.7981   
+                                    Intermediate Secondary 564.15158(*)    153.06541 .001 169.4319    958.8712    
+                                    University             -1039.42659(*)  172.72906 .000 -1484.8542  -593.9990   
+             University             Basic Secondary        2330.17593(*)   160.43097 .000 1916.4622   2743.8896   
+                                    Intermediate Secondary 1603.57817(*)   170.02303 .000 1165.1288   2042.0275   
+                                    Academic Secondary     1039.42659(*)   172.72906 .000 593.9990    1484.8542   
+ West        Basic Secondary        Intermediate Secondary -859.87622(*)   70.01596  .000 -1039.9227  -679.8298   
+                                    Academic Secondary     -1512.29521(*)  69.64200  .000 -1691.3800  -1333.2104  
+                                    University             -2637.35703(*)  81.76438  .000 -2847.6146  -2427.0994  
+             Intermediate Secondary Basic Secondary        859.87622(*)    70.01596  .000 679.8298    1039.9227   
+                                    Academic Secondary     -652.41899(*)   74.22507  .000 -843.2892   -461.5488   
+                                    University             -1777.48081(*)  85.70161  .000 -1997.8630  -1557.0986  
+             Academic Secondary     Basic Secondary        1512.29521(*)   69.64200  .000 1333.2104   1691.3800   
+                                    Intermediate Secondary 652.41899(*)    74.22507  .000 461.5488    843.2892    
+                                    University             -1125.06183(*)  85.39637  .000 -1344.6591  -905.4646   
+             University             Basic Secondary        2637.35703(*)   81.76438  .000 2427.0994   2847.6146   
+                                    Intermediate Secondary 1777.48081(*)   85.70161  .000 1557.0986   1997.8630   
+                                    Academic Secondary     1125.06183(*)   85.39637  .000 905.4646    1344.6591   
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 4c ===========
+
+Tukey HSD: Age by Education (weighted, grouped by region)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Age in years 
+ Tukey HSD 
+
+ Region      (I) Highest            (J) Highest            Mean Difference Std.    Sig.  95% Confidence Interval 
+ (East/West) educational attainment educational attainment (I-J)           Error         Lower Bound Upper Bound 
+ East        Basic Secondary        Intermediate Secondary .16042          2.04093 1.000 -5.1003     5.4211      
+                                    Academic Secondary     -3.57840        2.06856 .309  -8.9103     1.7535      
+                                    University             -1.56890        2.35120 .909  -7.6294     4.4916      
+             Intermediate Secondary Basic Secondary        -.16042         2.04093 1.000 -5.4211     5.1003      
+                                    Academic Secondary     -3.73882        2.21620 .332  -9.4513     1.9737      
+                                    University             -1.72932        2.48208 .898  -8.1272     4.6685      
+             Academic Secondary     Basic Secondary        3.57840         2.06856 .309  -1.7535     8.9103      
+                                    Intermediate Secondary 3.73882         2.21620 .332  -1.9737     9.4513      
+                                    University             2.00950         2.50485 .853  -4.4470     8.4660      
+             University             Basic Secondary        1.56890         2.35120 .909  -4.4916     7.6294      
+                                    Intermediate Secondary 1.72932         2.48208 .898  -4.6685     8.1272      
+                                    Academic Secondary     -2.00950        2.50485 .853  -8.4660     4.4470      
+ West        Basic Secondary        Intermediate Secondary -1.10520        .99236  .681  -3.6567     1.4463      
+                                    Academic Secondary     -.49437         .98864  .959  -3.0363     2.0476      
+                                    University             1.25441         1.17076 .707  -1.7558     4.2646      
+             Intermediate Secondary Basic Secondary        1.10520         .99236  .681  -1.4463     3.6567      
+                                    Academic Secondary     .61083          1.05415 .938  -2.0996     3.3212      
+                                    University             2.35961         1.22658 .218  -.7942      5.5134      
+             Academic Secondary     Basic Secondary        .49437          .98864  .959  -2.0476     3.0363      
+                                    Intermediate Secondary -.61083         1.05415 .938  -3.3212     2.0996      
+                                    University             1.74877         1.22357 .481  -1.3973     4.8948      
+             University             Basic Secondary        -1.25441        1.17076 .707  -4.2646     1.7558      
+                                    Intermediate Secondary -2.35961        1.22658 .218  -5.5134     .7942       
+                                    Academic Secondary     -1.74877        1.22357 .481  -4.8948     1.3973      
+
+=========== Test 4d ===========
+
+Tukey HSD: Life Satisfaction by Employment (weighted, grouped by region)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ Region      (I) Employment (J) Employment Mean Difference Std.  Sig.  95% Confidence Interval 
+ (East/West) status         status         (I-J)           Error       Lower Bound Upper Bound 
+ East        Student        Employed       .010            .379  1.000 -1.03       1.05        
+                            Unemployed     -.010           .429  1.000 -1.19       1.17        
+                            Retired        .144            .389  .996  -.92        1.21        
+                            Other          -.398           .455  .906  -1.64       .85         
+             Employed       Student        -.010           .379  1.000 -1.05       1.03        
+                            Unemployed     -.020           .224  1.000 -.63        .59         
+                            Retired        .134            .131  .844  -.23        .49         
+                            Other          -.408           .270  .556  -1.15       .33         
+             Unemployed     Student        .010            .429  1.000 -1.17       1.19        
+                            Employed       .020            .224  1.000 -.59        .63         
+                            Retired        .154            .241  .968  -.51        .81         
+                            Other          -.388           .337  .779  -1.31       .54         
+             Retired        Student        -.144           .389  .996  -1.21       .92         
+                            Employed       -.134           .131  .844  -.49        .23         
+                            Unemployed     -.154           .241  .968  -.81        .51         
+                            Other          -.542           .284  .314  -1.32       .24         
+             Other          Student        .398            .455  .906  -.85        1.64        
+                            Employed       .408            .270  .556  -.33        1.15        
+                            Unemployed     .388            .337  .779  -.54        1.31        
+                            Retired        .542            .284  .314  -.24        1.32        
+ West        Student        Employed       .354            .144  .099  -.04        .75         
+                            Unemployed     .305            .168  .366  -.15        .77         
+                            Retired        .407            .151  .055  -.01        .82         
+                            Other          .329            .184  .380  -.17        .83         
+             Employed       Student        -.354           .144  .099  -.75        .04         
+                            Unemployed     -.049           .099  .988  -.32        .22         
+                            Retired        .053            .065  .928  -.13        .23         
+                            Other          -.025           .124  1.000 -.36        .31         
+             Unemployed     Student        -.305           .168  .366  -.77        .15         
+                            Employed       .049            .099  .988  -.22        .32         
+                            Retired        .102            .109  .885  -.20        .40         
+                            Other          .024            .152  1.000 -.39        .44         
+             Retired        Student        -.407           .151  .055  -.82        .01         
+                            Employed       -.053           .065  .928  -.23        .13         
+                            Unemployed     -.102           .109  .885  -.40        .20         
+                            Other          -.078           .132  .976  -.44        .28         
+             Other          Student        -.329           .184  .380  -.83        .17         
+                            Employed       .025            .124  1.000 -.31        .36         
+                            Unemployed     -.024           .152  1.000 -.44        .39         
+                            Retired        .078            .132  .976  -.28        .44         
+
+=========== ADDITIONAL TEST CASES ===========
+
+=========== Test 5a ===========
+
+Tukey HSD with alpha = 0.01 (99% family-wise confidence)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 99% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.68        -.31        
+                        Academic Secondary     -.649(*)        .060  .000 -.83        -.46        
+                        University             -.843(*)        .069  .000 -1.06       -.63        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .31         .68         
+                        Academic Secondary     -.153           .063  .075 -.35        .04         
+                        University             -.346(*)        .072  .000 -.57        -.12        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .46         .83         
+                        Intermediate Secondary .153            .063  .075 -.04        .35         
+                        University             -.193           .072  .037 -.42        .03         
+ University             Basic Secondary        .843(*)         .069  .000 .63         1.06        
+                        Intermediate Secondary .346(*)         .072  .000 .12         .57         
+                        Academic Secondary     .193            .072  .037 -.03        .42         
+* The mean difference is significant at the 0.01 level.
+
+=========== Test 5b ===========
+
+Tukey HSD with alpha = 0.10 (90% family-wise confidence)
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 90% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.63        -.36        
+                        Academic Secondary     -.649(*)        .060  .000 -.79        -.51        
+                        University             -.843(*)        .069  .000 -1.00       -.69        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .36         .63         
+                        Academic Secondary     -.153(*)        .063  .075 -.30        -.01        
+                        University             -.346(*)        .072  .000 -.51        -.18        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .51         .79         
+                        Intermediate Secondary .153(*)         .063  .075 .01         .30         
+                        University             -.193(*)        .072  .037 -.36        -.03        
+ University             Basic Secondary        .843(*)         .069  .000 .69         1.00        
+                        Intermediate Secondary .346(*)         .072  .000 .18         .51         
+                        Academic Secondary     .193(*)         .072  .037 .03         .36         
+* The mean difference is significant at the 0.10 level.
+
+=========== Test 6a ===========
+
+Tukey HSD with 90% Confidence Intervals
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                        Academic Secondary     -.649(*)        .060  .000 -.80        -.50        
+                        University             -.843(*)        .069  .000 -1.02       -.67        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                        Academic Secondary     -.153           .063  .075 -.32        .01         
+                        University             -.346(*)        .072  .000 -.53        -.16        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .50         .80         
+                        Intermediate Secondary .153            .063  .075 -.01        .32         
+                        University             -.193(*)        .072  .037 -.38        -.01        
+ University             Basic Secondary        .843(*)         .069  .000 .67         1.02        
+                        Intermediate Secondary .346(*)         .072  .000 .16         .53         
+                        Academic Secondary     .193(*)         .072  .037 .01         .38         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 6b ===========
+
+Tukey HSD with 99% Confidence Intervals
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                        Academic Secondary     -.649(*)        .060  .000 -.80        -.50        
+                        University             -.843(*)        .069  .000 -1.02       -.67        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                        Academic Secondary     -.153           .063  .075 -.32        .01         
+                        University             -.346(*)        .072  .000 -.53        -.16        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .50         .80         
+                        Intermediate Secondary .153            .063  .075 -.01        .32         
+                        University             -.193(*)        .072  .037 -.38        -.01        
+ University             Basic Secondary        .843(*)         .069  .000 .67         1.02        
+                        Intermediate Secondary .346(*)         .072  .000 .16         .53         
+                        Academic Secondary     .193(*)         .072  .037 .01         .38         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 7 ===========
+
+Tukey HSD: Multiple Variables by Education
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+ Tukey HSD 
+
+ Dependent        (I) Highest            (J) Highest            Mean Difference Std.     Sig.  95% Confidence Interval 
+ Variable         educational attainment educational attainment (I-J)           Error          Lower Bound Upper Bound 
+ Life             Basic Secondary        Intermediate Secondary -.497(*)        .059     .000  -.65        -.34        
+ satisfaction                            Academic Secondary     -.649(*)        .060     .000  -.80        -.50        
+ (1=dissatisfied,                        University             -.843(*)        .069     .000  -1.02       -.67        
+ 5=satisfied)     Intermediate Secondary Basic Secondary        .497(*)         .059     .000  .34         .65         
+                                         Academic Secondary     -.153           .063     .075  -.32        .01         
+                                         University             -.346(*)        .072     .000  -.53        -.16        
+                  Academic Secondary     Basic Secondary        .649(*)         .060     .000  .50         .80         
+                                         Intermediate Secondary .153            .063     .075  -.01        .32         
+                                         University             -.193(*)        .072     .037  -.38        -.01        
+                  University             Basic Secondary        .843(*)         .069     .000  .67         1.02        
+                                         Intermediate Secondary .346(*)         .072     .000  .16         .53         
+                                         Academic Secondary     .193(*)         .072     .037  .01         .38         
+ Monthly          Basic Secondary        Intermediate Secondary -833.47063(*)   63.16256 .000  -995.8624   -671.0789   
+ household income                        Academic Secondary     -1465.03997(*)  63.16256 .000  -1627.4317  -1302.6482  
+ (EUR)                                   University             -2578.13548(*)  72.33288 .000  -2764.1042  -2392.1668  
+                  Intermediate Secondary Basic Secondary        833.47063(*)    63.16256 .000  671.0789    995.8624    
+                                         Academic Secondary     -631.56934(*)   67.60909 .000  -805.3931   -457.7455   
+                                         University             -1744.66485(*)  76.24648 .000  -1940.6955  -1548.6342  
+                  Academic Secondary     Basic Secondary        1465.03997(*)   63.16256 .000  1302.6482   1627.4317   
+                                         Intermediate Secondary 631.56934(*)    67.60909 .000  457.7455    805.3931    
+                                         University             -1113.09551(*)  76.24648 .000  -1309.1261  -917.0649   
+                  University             Basic Secondary        2578.13548(*)   72.33288 .000  2392.1668   2764.1042   
+                                         Intermediate Secondary 1744.66485(*)   76.24648 .000  1548.6342   1940.6955   
+                                         Academic Secondary     1113.09551(*)   76.24648 .000  917.0649    1309.1261   
+ Age in years     Basic Secondary        Intermediate Secondary -1.07584        .89465   .625  -3.3758     1.2241      
+                                         Academic Secondary     -1.11010        .89384   .600  -3.4079     1.1878      
+                                         University             .73808          1.03168  .891  -1.9141     3.3903      
+                  Intermediate Secondary Basic Secondary        1.07584         .89465   .625  -1.2241     3.3758      
+                                         Academic Secondary     -.03426         .95623   1.000 -2.4925     2.4240      
+                                         University             1.81392         1.08618  .340  -.9784      4.6062      
+                  Academic Secondary     Basic Secondary        1.11010         .89384   .600  -1.1878     3.4079      
+                                         Intermediate Secondary .03426          .95623   1.000 -2.4240     2.4925      
+                                         University             1.84818         1.08551  .322  -.9424      4.6388      
+                  University             Basic Secondary        -.73808         1.03168  .891  -3.3903     1.9141      
+                                         Intermediate Secondary -1.81392        1.08618  .340  -4.6062     .9784       
+                                         Academic Secondary     -1.84818        1.08551  .322  -4.6388     .9424       
+ Political        Basic Secondary        Intermediate Secondary -.030           .060     .960  -.18        .12         
+ orientation                             Academic Secondary     -.017           .060     .991  -.17        .14         
+ (1=left,                                University             .073            .069     .716  -.10        .25         
+ 5=right)         Intermediate Secondary Basic Secondary        .030            .060     .960  -.12        .18         
+                                         Academic Secondary     .012            .064     .998  -.15        .18         
+                                         University             .102            .072     .491  -.08        .29         
+                  Academic Secondary     Basic Secondary        .017            .060     .991  -.14        .17         
+                                         Intermediate Secondary -.012           .064     .998  -.18        .15         
+                                         University             .090            .072     .596  -.10        .28         
+                  University             Basic Secondary        -.073           .069     .716  -.25        .10         
+                                         Intermediate Secondary -.102           .072     .491  -.29        .08         
+                                         Academic Secondary     -.090           .072     .596  -.28        .10         
+ Environmental    Basic Secondary        Intermediate Secondary .051            .064     .856  -.11        .22         
+ concern (1=low,                         Academic Secondary     .073            .064     .670  -.09        .24         
+ 5=high)                                 University             -.033           .074     .972  -.22        .16         
+                  Intermediate Secondary Basic Secondary        -.051           .064     .856  -.22        .11         
+                                         Academic Secondary     .021            .069     .989  -.15        .20         
+                                         University             -.084           .078     .707  -.28        .12         
+                  Academic Secondary     Basic Secondary        -.073           .064     .670  -.24        .09         
+                                         Intermediate Secondary -.021           .069     .989  -.20        .15         
+                                         University             -.105           .078     .533  -.31        .10         
+                  University             Basic Secondary        .033            .074     .972  -.16        .22         
+                                         Intermediate Secondary .084            .078     .707  -.12        .28         
+                                         Academic Secondary     .105            .078     .533  -.10        .31         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 8a ===========
+
+Multiple Post-Hoc Tests Comparison
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+            (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+            educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Tukey HSD  Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                                   Academic Secondary     -.649(*)        .060  .000 -.80        -.50        
+                                   University             -.843(*)        .069  .000 -1.02       -.67        
+            Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                                   Academic Secondary     -.153           .063  .075 -.32        .01         
+                                   University             -.346(*)        .072  .000 -.53        -.16        
+            Academic Secondary     Basic Secondary        .649(*)         .060  .000 .50         .80         
+                                   Intermediate Secondary .153            .063  .075 -.01        .32         
+                                   University             -.193(*)        .072  .037 -.38        -.01        
+            University             Basic Secondary        .843(*)         .069  .000 .67         1.02        
+                                   Intermediate Secondary .346(*)         .072  .000 .16         .53         
+                                   Academic Secondary     .193(*)         .072  .037 .01         .38         
+ Bonferroni Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                                   Academic Secondary     -.649(*)        .060  .000 -.81        -.49        
+                                   University             -.843(*)        .069  .000 -1.02       -.66        
+            Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                                   Academic Secondary     -.153           .063  .096 -.32        .01         
+                                   University             -.346(*)        .072  .000 -.54        -.16        
+            Academic Secondary     Basic Secondary        .649(*)         .060  .000 .49         .81         
+                                   Intermediate Secondary .153            .063  .096 -.01        .32         
+                                   University             -.193(*)        .072  .045 -.38        .00         
+            University             Basic Secondary        .843(*)         .069  .000 .66         1.02        
+                                   Intermediate Secondary .346(*)         .072  .000 .16         .54         
+                                   Academic Secondary     .193(*)         .072  .045 .00         .38         
+ Scheffe    Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.66        -.33        
+                                   Academic Secondary     -.649(*)        .060  .000 -.82        -.48        
+                                   University             -.843(*)        .069  .000 -1.03       -.65        
+            Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .33         .66         
+                                   Academic Secondary     -.153           .063  .121 -.33        .02         
+                                   University             -.346(*)        .072  .000 -.55        -.14        
+            Academic Secondary     Basic Secondary        .649(*)         .060  .000 .48         .82         
+                                   Intermediate Secondary .153            .063  .121 -.02        .33         
+                                   University             -.193           .072  .067 -.39        .01         
+            University             Basic Secondary        .843(*)         .069  .000 .65         1.03        
+                                   Intermediate Secondary .346(*)         .072  .000 .14         .55         
+                                   Academic Secondary     .193            .072  .067 -.01        .39         
+ LSD        Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.61        -.38        
+                                   Academic Secondary     -.649(*)        .060  .000 -.77        -.53        
+                                   University             -.843(*)        .069  .000 -.98        -.71        
+            Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .38         .61         
+                                   Academic Secondary     -.153(*)        .063  .016 -.28        -.03        
+                                   University             -.346(*)        .072  .000 -.49        -.20        
+            Academic Secondary     Basic Secondary        .649(*)         .060  .000 .53         .77         
+                                   Intermediate Secondary .153(*)         .063  .016 .03         .28         
+                                   University             -.193(*)        .072  .007 -.33        -.05        
+            University             Basic Secondary        .843(*)         .069  .000 .71         .98         
+                                   Intermediate Secondary .346(*)         .072  .000 .20         .49         
+                                   Academic Secondary     .193(*)         .072  .007 .05         .33         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 9a ===========
+
+Tukey HSD with Homogeneous Subsets
+
+Oneway
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                        Academic Secondary     -.649(*)        .060  .000 -.80        -.50        
+                        University             -.843(*)        .069  .000 -1.02       -.67        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                        Academic Secondary     -.153           .063  .075 -.32        .01         
+                        University             -.346(*)        .072  .000 -.53        -.16        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .50         .80         
+                        Intermediate Secondary .153            .063  .075 -.01        .32         
+                        University             -.193(*)        .072  .037 -.38        -.01        
+ University             Basic Secondary        .843(*)         .069  .000 .67         1.02        
+                        Intermediate Secondary .346(*)         .072  .000 .16         .53         
+                        Academic Secondary     .193(*)         .072  .037 .01         .38         
+* The mean difference is significant at the 0.05 level.
+

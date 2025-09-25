@@ -1,0 +1,202 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+One-Sample T-Test: Life Satisfaction (mu = 3.0)
+
+=========== Test 1b ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender
+
+T-Test
+Homogeneity of Variance Test
+
+                                                                         Levene's Test for Equality of Variances 
+                                                                         F                                  Sig. 
+ Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.277                              .258 
+
+=========== Test 1c ===========
+
+Independent Samples T-Test: Income by Gender
+
+T-Test
+Homogeneity of Variance Test
+
+                                                        Levene's Test for Equality of Variances 
+                                                        F                                  Sig. 
+ Monthly household income (EUR) Equal variances assumed .057                               .811 
+
+=========== Test 1d ===========
+
+Independent Samples T-Test: Age by Gender
+
+T-Test
+Homogeneity of Variance Test
+
+                                      Levene's Test for Equality of Variances 
+                                      F                                  Sig. 
+ Age in years Equal variances assumed .534                               .465 
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+One-Sample T-Test: Life Satisfaction (weighted, mu = 3.0)
+
+=========== Test 2b ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender (weighted)
+
+T-Test
+Homogeneity of Variance Test
+
+                                                                         Levene's Test for Equality of Variances 
+                                                                         F                                  Sig. 
+ Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.461                              .227 
+
+=========== Test 2c ===========
+
+Independent Samples T-Test: Income by Gender (weighted)
+
+T-Test
+Homogeneity of Variance Test
+
+                                                        Levene's Test for Equality of Variances 
+                                                        F                                  Sig. 
+ Monthly household income (EUR) Equal variances assumed .001                               .975 
+
+=========== Test 2d ===========
+
+Independent Samples T-Test: Age by Gender (weighted)
+
+T-Test
+Homogeneity of Variance Test
+
+                                      Levene's Test for Equality of Variances 
+                                      F                                  Sig. 
+ Age in years Equal variances assumed .123                               .725 
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender (grouped by region)
+
+T-Test
+Homogeneity of Variance Test
+
+ Region                                                                              Levene's Test for Equality of Variances 
+ (East/West)                                                                         F                                  Sig. 
+ East        Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed .002                               .961 
+ West        Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.575                              .210 
+
+=========== Test 3b ===========
+
+Independent Samples T-Test: Income by Gender (grouped by region)
+
+T-Test
+Homogeneity of Variance Test
+
+ Region                                                             Levene's Test for Equality of Variances 
+ (East/West)                                                        F                                  Sig. 
+ East        Monthly household income (EUR) Equal variances assumed 4.830                              .029 
+ West        Monthly household income (EUR) Equal variances assumed 1.781                              .182 
+
+=========== Test 3c ===========
+
+Independent Samples T-Test: Age by Gender (grouped by region)
+
+T-Test
+Homogeneity of Variance Test
+
+ Region                                           Levene's Test for Equality of Variances 
+ (East/West)                                      F                                  Sig. 
+ East        Age in years Equal variances assumed 1.342                              .247 
+ West        Age in years Equal variances assumed .110                               .740 
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender (weighted, grouped by region)
+
+T-Test
+Homogeneity of Variance Test
+
+ Region                                                                              Levene's Test for Equality of Variances 
+ (East/West)                                                                         F                                  Sig. 
+ East        Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed .004                               .951 
+ West        Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.604                              .205 
+
+=========== Test 4b ===========
+
+Independent Samples T-Test: Income by Gender (weighted, grouped by region)
+
+T-Test
+Homogeneity of Variance Test
+
+ Region                                                             Levene's Test for Equality of Variances 
+ (East/West)                                                        F                                  Sig. 
+ East        Monthly household income (EUR) Equal variances assumed 6.136                              .014 
+ West        Monthly household income (EUR) Equal variances assumed 1.718                              .190 
+
+=========== Test 4c ===========
+
+Independent Samples T-Test: Age by Gender (weighted, grouped by region)
+
+T-Test
+Homogeneity of Variance Test
+
+ Region                                           Levene's Test for Equality of Variances 
+ (East/West)                                      F                                  Sig. 
+ East        Age in years Equal variances assumed 1.028                              .311 
+ West        Age in years Equal variances assumed .000                               .989 
+
+=========== ADDITIONAL TEST CASES ===========
+
+=========== Test 5a ===========
+
+One-Sample T-Test: Income (mu = 5000)
+
+=========== Test 5b ===========
+
+One-Sample T-Test: Age (mu = 45)
+
+=========== Test 6 ===========
+
+Multiple Variables T-Test by Gender
+
+T-Test
+Homogeneity of Variance Test
+
+                                                                         Levene's Test for Equality of Variances 
+                                                                         F                                  Sig. 
+ Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.277                              .258 
+ Monthly household income (EUR)                  Equal variances assumed .057                               .811 
+ Age in years                                    Equal variances assumed .534                               .465 
+ Trust in government (1=none, 5=complete)        Equal variances assumed 3.217                              .073 
+ Trust in media (1=none, 5=complete)             Equal variances assumed .005                               .944 
+ Trust in science (1=none, 5=complete)           Equal variances assumed 3.241                              .072 
+
+=========== Test 7a ===========
+
+T-Test with 90% CI
+
+T-Test
+Homogeneity of Variance Test
+
+                                                                         Levene's Test for Equality of Variances 
+                                                                         F                                  Sig. 
+ Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.277                              .258 
+
+=========== Test 7b ===========
+
+T-Test with 99% CI
+
+T-Test
+Homogeneity of Variance Test
+
+                                                                         Levene's Test for Equality of Variances 
+                                                                         F                                  Sig. 
+ Life satisfaction (1=dissatisfied, 5=satisfied) Equal variances assumed 1.277                              .258 
+

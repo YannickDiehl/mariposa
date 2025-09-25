@@ -2,17 +2,36 @@
 #' Perform independent sample t-tests with support for weights and grouped data
 #'
 #' @description
-#' \code{t_test()} performs one-sample and two-sample t-tests on one or more 
-#' variables in a data frame. The function supports both weighted and unweighted analyses, 
-#' grouped data operations, and multiple variables simultaneously. It is particularly 
-#' designed for survey data analysis where sampling weights are crucial for 
+#' \code{t_test()} performs one-sample and two-sample t-tests on one or more
+#' variables in a data frame. The function supports both weighted and unweighted analyses,
+#' grouped data operations, and multiple variables simultaneously. It is particularly
+#' designed for survey data analysis where sampling weights are crucial for
 #' population-representative results.
-#' 
+#'
 #' For paired t-tests (repeated measures), support will be added in a future version.
-#' 
-#' The function implements both Student's t-test (equal variances) and Welch's t-test 
-#' (unequal variances) and provides comprehensive effect size calculations including 
-#' Cohen's d, Hedges' g (bias-corrected), and Glass' Delta. Results are SPSS-compatible.
+#'
+#' The function implements both Student's t-test (equal variances) and Welch's t-test
+#' (unequal variances) and provides comprehensive effect size calculations including
+#' Cohen's d, Hedges' g (bias-corrected), and Glass' Delta.
+#'
+#' @section SPSS Compatibility:
+#' This function is designed to be SPSS-compatible, producing results that closely match
+#' SPSS output. Key compatibility features:
+#' \itemize{
+#'   \item Uses frequency weights approach (rounded effective sample sizes)
+#'   \item Reports both equal and unequal variance assumptions
+#'   \item Matching formulas for weighted variance and standard errors
+#'   \item Effect sizes calculated using SPSS conventions
+#' }
+#'
+#' Minor differences from SPSS (typically < 1%) may occur due to:
+#' \itemize{
+#'   \item Internal precision handling differences
+#'   \item Different rounding strategies for intermediate calculations
+#'   \item Data preprocessing variations
+#' }
+#'
+#' These differences are within acceptable tolerances for practical statistical analysis.
 #'
 #' @param data A data frame or tibble containing the variables to analyze.
 #' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Variables for which to perform 
@@ -329,24 +348,27 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         test_result <- t.test(x, mu = mu, alternative = alternative, conf.level = conf.level)
         group_stats <- list(means = mean(x, na.rm = TRUE), n = length(x))
       } else {
-        # Weighted one-sample t-test using SPSS formulas
+        # Weighted one-sample t-test using SPSS frequency weights approach
         weighted_mean <- sum(x * w) / sum(w)
-        V1 <- sum(w)  # Sum of weights (SPSS uses this)
-        
-        # Calculate variance using SPSS formula: sum(w*(x-mean)^2) / (V1-1)
+
+        # SPSS uses rounded sum of weights as effective sample size
+        n_eff <- round(sum(w))
+
+        # Calculate variance using SPSS frequency weights formula
+        # Uses n_eff - 1 in denominator (frequency weights approach)
         numerator <- sum(w * (x - weighted_mean)^2)
-        weighted_var <- numerator / (V1 - 1)
-        
-        # Calculate SE using SPSS formula: SD / sqrt(V1)
+        weighted_var <- numerator / (n_eff - 1)
+
+        # Calculate SE using SPSS formula with effective sample size
         weighted_sd <- sqrt(weighted_var)
-        se <- weighted_sd / sqrt(V1)
-        
+        se <- weighted_sd / sqrt(n_eff)
+
         # Calculate t-statistic
         t_stat <- (weighted_mean - mu) / se
-        
-        # SPSS uses round(sum_w) - 1 for degrees of freedom
-        df <- round(V1) - 1
-        
+
+        # Degrees of freedom based on effective sample size
+        df <- n_eff - 1
+
         if (alternative == "two.sided") {
           p_value <- 2 * pt(-abs(t_stat), df)
         } else if (alternative == "less") {
@@ -354,9 +376,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         } else {
           p_value <- pt(t_stat, df, lower.tail = FALSE)
         }
-        
+
         conf_int <- weighted_mean + c(-1, 1) * qt((1 + conf.level)/2, df) * se
-        
+
         test_result <- list(
           statistic = t_stat,
           parameter = df,
@@ -364,7 +386,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           conf.int = conf_int,
           estimate = weighted_mean
         )
-        group_stats <- list(means = weighted_mean, n = V1)
+        # Return effective sample size for consistency with SPSS
+        group_stats <- list(means = weighted_mean, n = n_eff)
       }
       
       return(list(
@@ -427,95 +450,89 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         )
         
       } else {
-        # Weighted two-sample t-test (following sjstats method exactly)
+        # Weighted two-sample t-test using SPSS frequency weights approach
         mu_x <- sum(x1 * w1) / sum(w1)  # weighted mean group 1
         mu_y <- sum(x2 * w2) / sum(w2)  # weighted mean group 2
-        
-        # Calculate weighted variances using sjstats method
-        var_x <- sum(w1 * (x1 - mu_x)^2) / sum(w1)
-        var_y <- sum(w2 * (x2 - mu_y)^2) / sum(w2)
-        
-        # SPSS-compatible degrees of freedom calculation
-        # Use effective sample sizes (sum of weights) for standard errors
-        n1_eff <- sum(w1)
-        n2_eff <- sum(w2)
-        
-        # Calculate standard errors using effective sample sizes (SPSS method)
-        se_x <- sqrt(var_x / n1_eff)
-        se_y <- sqrt(var_y / n2_eff)
-        
-        # Combined standard error
-        se <- sqrt(se_x^2 + se_y^2)
-        
-        # SPSS uses weighted sample size - 2 as degrees of freedom for equal variances
-        df <- round(n1_eff + n2_eff) - 2
-        
-        # Calculate mean difference and t-statistic
+
+        # Use rounded effective sample sizes (SPSS frequency weights)
+        n1_eff <- round(sum(w1))
+        n2_eff <- round(sum(w2))
+
+        # Calculate weighted variances using SPSS frequency weights formula
+        # Uses n_eff - 1 in denominator
+        var_x <- sum(w1 * (x1 - mu_x)^2) / (n1_eff - 1)
+        var_y <- sum(w2 * (x2 - mu_y)^2) / (n2_eff - 1)
+
+        # Standard deviations
+        sd_x <- sqrt(var_x)
+        sd_y <- sqrt(var_y)
+
+        # Mean difference
         mean_diff <- mu_x - mu_y
-        t_stat <- (mean_diff - mu) / se
-        
-        # Calculate p-value
-        if (alternative == "two.sided") {
-          p_value <- 2 * pt(-abs(t_stat), df)
-        } else if (alternative == "less") {
-          p_value <- pt(t_stat, df)
-        } else {
-          p_value <- pt(t_stat, df, lower.tail = FALSE)
-        }
-        
-        # Calculate confidence interval
-        if (alternative == "two.sided") {
-          conf_int <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df) * se
-        } else if (alternative == "less") {
-          conf_int <- c(-Inf, mean_diff + qt(conf.level, df) * se)
-        } else {
-          conf_int <- c(mean_diff - qt(conf.level, df) * se, Inf)
-        }
-        
-        # Calculate Cohen's d
-        cohens_d <- calculate_cohens_d(x1, x2, w1, w2)
-        
-        # For weighted tests, create both "equal" and "unequal" variance results
-        # Equal variances: use weighted sample size - 2 (SPSS method)
-        df_equal <- round(n1_eff + n2_eff) - 2
-        
-        # Unequal variances: use Welch-Satterthwaite with effective sample sizes
+
+        # === EQUAL VARIANCE (Student's t-test) ===
+        # Calculate pooled standard deviation
+        pooled_var <- ((n1_eff - 1) * var_x + (n2_eff - 1) * var_y) / (n1_eff + n2_eff - 2)
+        pooled_sd <- sqrt(pooled_var)
+
+        # Standard error for equal variance
+        se_equal <- pooled_sd * sqrt(1/n1_eff + 1/n2_eff)
+
+        # t-statistic and df for equal variance
+        t_stat_equal <- (mean_diff - mu) / se_equal
+        df_equal <- n1_eff + n2_eff - 2
+
+        # === UNEQUAL VARIANCE (Welch's t-test) ===
+        # Standard errors for each group
+        se_x <- sd_x / sqrt(n1_eff)
+        se_y <- sd_y / sqrt(n2_eff)
+
+        # Combined standard error for unequal variance
+        se_unequal <- sqrt(se_x^2 + se_y^2)
+
+        # t-statistic for unequal variance
+        t_stat_unequal <- (mean_diff - mu) / se_unequal
+
+        # Welch-Satterthwaite degrees of freedom
         df_unequal <- (se_x^2 + se_y^2)^2 / (se_x^4 / (n1_eff - 1) + se_y^4 / (n2_eff - 1))
-        
+
         # Calculate p-values for both methods
         if (alternative == "two.sided") {
-          p_value_equal <- 2 * pt(-abs(t_stat), df_equal)
-          p_value_unequal <- 2 * pt(-abs(t_stat), df_unequal)
+          p_value_equal <- 2 * pt(-abs(t_stat_equal), df_equal)
+          p_value_unequal <- 2 * pt(-abs(t_stat_unequal), df_unequal)
         } else if (alternative == "less") {
-          p_value_equal <- pt(t_stat, df_equal)
-          p_value_unequal <- pt(t_stat, df_unequal)
+          p_value_equal <- pt(t_stat_equal, df_equal)
+          p_value_unequal <- pt(t_stat_unequal, df_unequal)
         } else {
-          p_value_equal <- pt(t_stat, df_equal, lower.tail = FALSE)
-          p_value_unequal <- pt(t_stat, df_unequal, lower.tail = FALSE)
+          p_value_equal <- pt(t_stat_equal, df_equal, lower.tail = FALSE)
+          p_value_unequal <- pt(t_stat_unequal, df_unequal, lower.tail = FALSE)
         }
-        
+
         # Calculate confidence intervals for both methods
         if (alternative == "two.sided") {
-          conf_int_equal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_equal) * se
-          conf_int_unequal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_unequal) * se
+          conf_int_equal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_equal) * se_equal
+          conf_int_unequal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_unequal) * se_unequal
         } else if (alternative == "less") {
-          conf_int_equal <- c(-Inf, mean_diff + qt(conf.level, df_equal) * se)
-          conf_int_unequal <- c(-Inf, mean_diff + qt(conf.level, df_unequal) * se)
+          conf_int_equal <- c(-Inf, mean_diff + qt(conf.level, df_equal) * se_equal)
+          conf_int_unequal <- c(-Inf, mean_diff + qt(conf.level, df_unequal) * se_unequal)
         } else {
-          conf_int_equal <- c(mean_diff - qt(conf.level, df_equal) * se, Inf)
-          conf_int_unequal <- c(mean_diff - qt(conf.level, df_unequal) * se, Inf)
+          conf_int_equal <- c(mean_diff - qt(conf.level, df_equal) * se_equal, Inf)
+          conf_int_unequal <- c(mean_diff - qt(conf.level, df_unequal) * se_unequal, Inf)
         }
-        
+
+        # Calculate Cohen's d using weighted data
+        cohens_d <- calculate_cohens_d(x1, x2, w1, w2)
+
         test_equal_weighted <- list(
-          statistic = t_stat,
+          statistic = t_stat_equal,
           parameter = df_equal,
           p.value = p_value_equal,
           conf.int = conf_int_equal,
           estimate = c(mu_x, mu_y)
         )
-        
+
         test_unequal_weighted <- list(
-          statistic = t_stat,
+          statistic = t_stat_unequal,
           parameter = df_unequal,
           p.value = p_value_unequal,
           conf.int = conf_int_unequal,
@@ -526,21 +543,11 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         test_result$equal_var_result <- test_equal_weighted
         test_result$unequal_var_result <- test_unequal_weighted
         
-        # IMPORTANT: sjstats has a bug where it swaps group labels/values in weighted tests
-        # To maintain compatibility, we need to replicate this bug
-        if (!is.null(weight_name)) {
-          # For weighted tests: swap the display (labels with values) to match sjstats bug
-          group_stats <- list(
-            group1 = list(name = as.character(g_levels[1]), mean = mu_y, n = sum(w2)),  # Show group1 name with group2 values
-            group2 = list(name = as.character(g_levels[2]), mean = mu_x, n = sum(w1))   # Show group2 name with group1 values
-          )
-        } else {
-          # For unweighted tests: show correctly
-          group_stats <- list(
-            group1 = list(name = as.character(g_levels[1]), mean = mu_x, n = sum(w1)),
-            group2 = list(name = as.character(g_levels[2]), mean = mu_y, n = sum(w2))
-          )
-        }
+        # Group statistics with effective sample sizes
+        group_stats <- list(
+          group1 = list(name = as.character(g_levels[1]), mean = mu_x, n = n1_eff),
+          group2 = list(name = as.character(g_levels[2]), mean = mu_y, n = n2_eff)
+        )
       }
       
       return(list(
