@@ -1,0 +1,353 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+One-Sample T-Test: Life Satisfaction (mu = 3.0)
+
+T-Test
+One-Sample Statistics
+
+                                                 N    Mean Std. Deviation Std. Error Mean 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 2421 3.63 1.153          .023            
+
+One-Sample Test
+
+                                           Test Value = 3.0                                                                         
+                                           t      df   Significance            Mean       95% Confidence Interval of the Difference 
+                                                       One-Sided p Two-Sided p Difference Lower                               Upper 
+ Life satisfaction (1=dissatisfied,        26.809 2420 .000        .000        .628       .58                                 .67   
+ 5=satisfied)                                                                                                                       
+
+=========== Test 1b ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender
+
+T-Test
+Independent Samples Test
+
+                                                t-test for Equality of Means                                                        
+                                                t      df       Significance            Mean       Std. Error 95% Confidence        
+                                                                                        Difference Difference Interval of the       
+                                                                                                              Difference            
+                                                                One-Sided p Two-Sided p                       Lower           Upper 
+ Life satisfaction  Equal variances assumed     -1.019 2419     .154        .308        -.048      .047       -.140           .044  
+ (1=dissatisfied,                                                                                                                   
+ 5=satisfied)       Equal variances not assumed -1.018 2384.147 .154        .309        -.048      .047       -.140           .044  
+
+=========== Test 1c ===========
+
+Independent Samples T-Test: Income by Gender
+
+T-Test
+Independent Samples Test
+
+                                               t-test for Equality of Means                                                         
+                                               t    df       Significance            Mean       Std. Error 95% Confidence Interval  
+                                                                                     Difference Difference of the Difference        
+                                                             One-Sided p Two-Sided p                       Lower          Upper     
+ Monthly household Equal variances assumed     .690 2184     .245        .490        42.31961   61.35430   -77.99928      162.63850 
+ income (EUR)      Equal variances not assumed .690 2169.337 .245        .490        42.31961   61.34398   -77.97949      162.61872 
+
+=========== Test 1d ===========
+
+Independent Samples T-Test: Age by Gender
+
+T-Test
+Independent Samples Test
+
+                                    t-test for Equality of Means                                                                    
+                                    t     df       Significance            Mean       Std. Error 95% Confidence Interval of the     
+                                                                           Difference Difference Difference                         
+                                                   One-Sided p Two-Sided p                       Lower                      Upper   
+ Age in Equal variances assumed     -.229 2498     .409        .819        -.15587    .67985     -1.48900                   1.17726 
+ years  Equal variances not assumed -.229 2468.094 .409        .819        -.15587    .68047     -1.49023                   1.17849 
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+One-Sample T-Test: Life Satisfaction (weighted, mu = 3.0)
+
+T-Test
+One-Sample Statistics
+
+                                                 N    Mean Std. Deviation Std. Error Mean 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 2437 3.62 1.152          .023            
+
+One-Sample Test
+
+                                           Test Value = 3.0                                                                         
+                                           t      df   Significance            Mean       95% Confidence Interval of the Difference 
+                                                       One-Sided p Two-Sided p Difference Lower                               Upper 
+ Life satisfaction (1=dissatisfied,        26.771 2436 .000        .000        .625       .58                                 .67   
+ 5=satisfied)                                                                                                                       
+
+=========== Test 2b ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender (weighted)
+
+T-Test
+Independent Samples Test
+
+                                                t-test for Equality of Means                                                        
+                                                t      df       Significance            Mean       Std. Error 95% Confidence        
+                                                                                        Difference Difference Interval of the       
+                                                                                                              Difference            
+                                                                One-Sided p Two-Sided p                       Lower           Upper 
+ Life satisfaction  Equal variances assumed     -1.070 2435     .142        .285        -.050      .047       -.142           .042  
+ (1=dissatisfied,                                                                                                                   
+ 5=satisfied)       Equal variances not assumed -1.069 2391.291 .143        .285        -.050      .047       -.142           .042  
+
+=========== Test 2c ===========
+
+Independent Samples T-Test: Income by Gender (weighted)
+
+T-Test
+Independent Samples Test
+
+                                               t-test for Equality of Means                                                         
+                                               t    df       Significance            Mean       Std. Error 95% Confidence Interval  
+                                                                                     Difference Difference of the Difference        
+                                                             One-Sided p Two-Sided p                       Lower          Upper     
+ Monthly household Equal variances assumed     .751 2199     .226        .453        45.61972   60.78060   -73.57366      164.81311 
+ income (EUR)      Equal variances not assumed .751 2178.724 .227        .453        45.61972   60.78235   -73.57770      164.81715 
+
+=========== Test 2d ===========
+
+Independent Samples T-Test: Age by Gender (weighted)
+
+T-Test
+Independent Samples Test
+
+                                    t-test for Equality of Means                                                                    
+                                    t    df       Significance            Mean       Std. Error 95% Confidence Interval of the      
+                                                                          Difference Difference Difference                          
+                                                  One-Sided p Two-Sided p                       Lower                       Upper   
+ Age in Equal variances assumed     .138 2514     .445        .890        .09444     .68216     -1.24322                    1.43210 
+ years  Equal variances not assumed .138 2483.483 .445        .890        .09444     .68251     -1.24391                    1.43279 
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender (grouped by region)
+
+T-Test
+Independent Samples Test
+
+ Region                                          t-test for Equality of Means                                                       
+ (East/West)                                     t      df       Significance            Mean       Std. Error 95% Confidence       
+                                                                                         Difference Difference Interval of the      
+                                                                                                               Difference           
+                                                                 One-Sided p Two-Sided p                       Lower          Upper 
+ East        Life           Equal variances      .598   463      .275        .550        .067       .112       -.153          .287  
+             satisfaction   assumed                                                                                                 
+             (1=dissatisfie                                                                                                         
+             d,             Equal variances not  .598   462.235  .275        .550        .067       .112       -.153          .287  
+             5=satisfied)   assumed                                                                                                 
+ West        Life           Equal variances      -1.453 1954     .073        .146        -.075      .052       -.176          .026  
+             satisfaction   assumed                                                                                                 
+             (1=dissatisfie                                                                                                         
+             d,             Equal variances not  -1.451 1916.526 .073        .147        -.075      .052       -.176          .026  
+             5=satisfied)   assumed                                                                                                 
+
+=========== Test 3b ===========
+
+Independent Samples T-Test: Income by Gender (grouped by region)
+
+T-Test
+Independent Samples Test
+
+ Region                                        t-test for Equality of Means                                                         
+ (East/West)                                   t     df       Significance            Mean       Std. Error 95% Confidence Interval 
+                                                                                      Difference Difference of the Difference       
+                                                              One-Sided p Two-Sided p                       Lower         Upper     
+ East        Monthly household Equal variances 1.426 427      .077        .155        190.84737  133.83880  -72.21751     453.91224 
+             income (EUR)      assumed                                                                                              
+                               Equal variances 1.420 412.750  .078        .156        190.84737  134.38503  -73.31706     455.01180 
+                               not assumed                                                                                          
+ West        Monthly household Equal variances .087  1755     .465        .930        6.03322    68.99648   -129.29072    141.35717 
+             income (EUR)      assumed                                                                                              
+                               Equal variances .088  1748.855 .465        .930        6.03322    68.90101   -129.10379    141.17024 
+                               not assumed                                                                                          
+
+=========== Test 3c ===========
+
+Independent Samples T-Test: Age by Gender (grouped by region)
+
+T-Test
+Independent Samples Test
+
+ Region                                         t-test for Equality of Means                                                        
+ (East/West)                                    t     df       Significance            Mean       Std. Error 95% Confidence         
+                                                                                       Difference Difference Interval of the        
+                                                                                                             Difference             
+                                                               One-Sided p Two-Sided p                       Lower          Upper   
+ East        Age in Equal variances assumed     -.942 483      .173        .347        -1.48995   1.58249    -4.59935       1.61946 
+             years  Equal variances not assumed -.940 477.409  .174        .348        -1.48995   1.58458    -4.60356       1.62367 
+ West        Age in Equal variances assumed     .193  2013     .423        .847        .14522     .75219     -1.32994       1.62037 
+             years  Equal variances not assumed .193  1988.415 .424        .847        .14522     .75253     -1.33061       1.62104 
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Independent Samples T-Test: Life Satisfaction by Gender (weighted, grouped by region)
+
+T-Test
+Independent Samples Test
+
+ Region                                          t-test for Equality of Means                                                       
+ (East/West)                                     t      df       Significance            Mean       Std. Error 95% Confidence       
+                                                                                         Difference Difference Interval of the      
+                                                                                                               Difference           
+                                                                 One-Sided p Two-Sided p                       Lower          Upper 
+ East        Life           Equal variances      .641   486      .261        .522        .070       .109       -.144          .284  
+             satisfaction   assumed                                                                                                 
+             (1=dissatisfie                                                                                                         
+             d,             Equal variances not  .641   484.658  .261        .522        .070       .109       -.144          .284  
+             5=satisfied)   assumed                                                                                                 
+ West        Life           Equal variances      -1.550 1947     .061        .121        -.080      .052       -.182          .021  
+             satisfaction   assumed                                                                                                 
+             (1=dissatisfie                                                                                                         
+             d,             Equal variances not  -1.548 1901.144 .061        .122        -.080      .052       -.182          .021  
+             5=satisfied)   assumed                                                                                                 
+
+=========== Test 4b ===========
+
+Independent Samples T-Test: Income by Gender (weighted, grouped by region)
+
+T-Test
+Independent Samples Test
+
+ Region                                        t-test for Equality of Means                                                         
+ (East/West)                                   t     df       Significance            Mean       Std. Error 95% Confidence Interval 
+                                                                                      Difference Difference of the Difference       
+                                                              One-Sided p Two-Sided p                       Lower         Upper     
+ East        Monthly household Equal variances 1.681 447      .047        .093        219.82616  130.76218  -37.15804     476.81037 
+             income (EUR)      assumed                                                                                              
+                               Equal variances 1.674 431.197  .047        .095        219.82616  131.30194  -38.24528     477.89761 
+                               not assumed                                                                                          
+ West        Monthly household Equal variances .009  1749     .496        .993        .64379     68.61062   -133.92366    135.21124 
+             income (EUR)      assumed                                                                                              
+                               Equal variances .009  1740.190 .496        .993        .64379     68.49794   -133.70315    134.99072 
+                               not assumed                                                                                          
+
+=========== Test 4c ===========
+
+Independent Samples T-Test: Age by Gender (weighted, grouped by region)
+
+T-Test
+Independent Samples Test
+
+ Region                                         t-test for Equality of Means                                                        
+ (East/West)                                    t     df       Significance            Mean       Std. Error 95% Confidence         
+                                                                                       Difference Difference Interval of the        
+                                                                                                             Difference             
+                                                               One-Sided p Two-Sided p                       Lower          Upper   
+ East        Age in Equal variances assumed     -.669 507      .252        .503        -1.04503   1.56092    -4.11170       2.02163 
+             years  Equal variances not assumed -.669 502.251  .252        .504        -1.04503   1.56272    -4.11530       2.02524 
+ West        Age in Equal variances assumed     .462  2005     .322        .644        .34999     .75709     -1.13478       1.83475 
+             years  Equal variances not assumed .462  1978.869 .322        .644        .34999     .75702     -1.13466       1.83463 
+
+=========== ADDITIONAL TEST CASES ===========
+
+=========== Test 5a ===========
+
+One-Sample T-Test: Income (mu = 5000)
+
+T-Test
+One-Sample Statistics
+
+                                N    Mean      Std. Deviation Std. Error Mean 
+ Monthly household income (EUR) 2186 3753.9341 1432.80161     30.64510        
+
+One-Sample Test
+
+                                Test Value = 5000                                                                          
+                                t       df   Significance            Mean        95% Confidence Interval of the Difference 
+                                             One-Sided p Two-Sided p Difference  Lower                          Upper      
+ Monthly household income (EUR) -40.661 2185 .000        .000        -1246.06587 -1306.1624                     -1185.9693 
+
+=========== Test 5b ===========
+
+One-Sample T-Test: Age (mu = 45)
+
+T-Test
+One-Sample Statistics
+
+              N    Mean    Std. Deviation Std. Error Mean 
+ Age in years 2500 50.5496 16.97602       .33952          
+
+One-Sample Test
+
+              Test Value = 45                                                                          
+              t      df   Significance            Mean       95% Confidence Interval of the Difference 
+                          One-Sided p Two-Sided p Difference Lower                              Upper  
+ Age in years 16.345 2499 .000        .000        5.54960    4.8838                             6.2154 
+
+=========== Test 6 ===========
+
+Multiple Variables T-Test by Gender
+
+T-Test
+Independent Samples Test
+
+                                            t-test for Equality of Means                                                            
+                                            t      df       Significance            Mean       Std. Error 95% Confidence Interval   
+                                                                                    Difference Difference of the Difference         
+                                                            One-Sided p Two-Sided p                       Lower           Upper     
+ Life           Equal variances assumed     -1.019 2419     .154        .308        -.048      .047       -.140           .044      
+ satisfaction                                                                                                                       
+ (1=dissatisfie                                                                                                                     
+ d,                                                                                                                                 
+ 5=satisfied)   Equal variances not assumed -1.018 2384.147 .154        .309        -.048      .047       -.140           .044      
+ Monthly        Equal variances assumed     .690   2184     .245        .490        42.31961   61.35430   -77.99928       162.63850 
+ household                                                                                                                          
+ income (EUR)   Equal variances not assumed .690   2169.337 .245        .490        42.31961   61.34398   -77.97949       162.61872 
+ Age in years   Equal variances assumed     -.229  2498     .409        .819        -.15587    .67985     -1.48900        1.17726   
+                Equal variances not assumed -.229  2468.094 .409        .819        -.15587    .68047     -1.49023        1.17849   
+ Trust in       Equal variances assumed     -.673  2352     .250        .501        -.032      .048       -.126           .062      
+ government                                                                                                                         
+ (1=none,                                                                                                                           
+ 5=complete)    Equal variances not assumed -.672  2313.961 .251        .501        -.032      .048       -.127           .062      
+ Trust in media Equal variances assumed     -2.172 2365     .015        .030        -.104      .048       -.198           -.010     
+ (1=none,                                                                                                                           
+ 5=complete)    Equal variances not assumed -2.172 2342.242 .015        .030        -.104      .048       -.198           -.010     
+ Trust in       Equal variances assumed     -1.490 2396     .068        .136        -.063      .042       -.145           .020      
+ science                                                                                                                            
+ (1=none,                                                                                                                           
+ 5=complete)    Equal variances not assumed -1.487 2350.552 .069        .137        -.063      .042       -.145           .020      
+
+=========== Test 7a ===========
+
+T-Test with 90% CI
+
+T-Test
+Independent Samples Test
+
+                                                t-test for Equality of Means                                                        
+                                                t      df       Significance            Mean       Std. Error 90% Confidence        
+                                                                                        Difference Difference Interval of the       
+                                                                                                              Difference            
+                                                                One-Sided p Two-Sided p                       Lower           Upper 
+ Life satisfaction  Equal variances assumed     -1.019 2419     .154        .308        -.048      .047       -.125           .029  
+ (1=dissatisfied,                                                                                                                   
+ 5=satisfied)       Equal variances not assumed -1.018 2384.147 .154        .309        -.048      .047       -.125           .029  
+
+=========== Test 7b ===========
+
+T-Test with 99% CI
+
+T-Test
+Independent Samples Test
+
+                                                t-test for Equality of Means                                                        
+                                                t      df       Significance            Mean       Std. Error 99% Confidence        
+                                                                                        Difference Difference Interval of the       
+                                                                                                              Difference            
+                                                                One-Sided p Two-Sided p                       Lower           Upper 
+ Life satisfaction  Equal variances assumed     -1.019 2419     .154        .308        -.048      .047       -.169           .073  
+ (1=dissatisfied,                                                                                                                   
+ 5=satisfied)       Equal variances not assumed -1.018 2384.147 .154        .309        -.048      .047       -.169           .073  
+

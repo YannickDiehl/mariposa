@@ -47,6 +47,7 @@ reference:
   desc: "S3 generics for extended analysis of test results"
   contents:
   - tukey_test
+  - scheffe_test
   - emmeans
   - levene_test
   - mauchly_test
