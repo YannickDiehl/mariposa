@@ -1,0 +1,929 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+One-Way ANOVA: Life Satisfaction by Education
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                        N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                                  Deviation Error Lower Bound          Upper Bound                 
+ Basic Secondary        809  3.20 1.243     .044  3.12                 3.29        1       5       
+ Intermediate Secondary 618  3.70 1.112     .045  3.61                 3.79        1       5       
+ Academic Secondary     607  3.85 .998      .041  3.77                 3.93        1       5       
+ University             387  4.05 .957      .049  3.95                 4.14        1       5       
+ Total                  2421 3.63 1.153     .023  3.58                 3.67        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F      Sig. 
+ Between Groups 247.347        3    82.449      67.096 .000 
+ Within Groups  2970.080       2417 1.229                   
+ Total          3217.428       2420                         
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Statistic(a) df1 df2      Sig. 
+ Welch          64.489       3   1229.456 .000 
+ Brown-Forsythe 71.350       3   2338.259 .000 
+a Asymptotically F distributed.
+
+=========== Test 1b ===========
+
+One-Way ANOVA: Income by Education
+
+Oneway
+Descriptives
+ Monthly household income (EUR) 
+
+                        N    Mean      Std.       Std.     95% Confidence Interval for Mean Minimum Maximum 
+                                       Deviation  Error    Lower Bound          Upper Bound                 
+ Basic Secondary        735  2759.0476 786.56752  29.01298 2702.0893            2816.0059   800.00  5300.00 
+ Intermediate Secondary 548  3592.5182 995.63887  42.53158 3508.9730            3676.0635   800.00  6300.00 
+ Academic Secondary     548  4224.0876 1178.63526 50.34880 4125.1869            4322.9883   800.00  7800.00 
+ University             355  5337.1831 1660.95846 88.15452 5163.8107            5510.5555   800.00  8000.00 
+ Total                  2186 3753.9341 1432.80161 30.64510 3693.8376            3814.0307   800.00  8000.00 
+
+ANOVA
+ Monthly household income (EUR) 
+
+                Sum of Squares df   Mean Square   F       Sig. 
+ Between Groups 1752783281.470 3    584261093.824 466.494 .000 
+ Within Groups  2732847885.046 2182 1252450.910                
+ Total          4485631166.515 2185                            
+
+Robust Tests of Equality of Means
+ Monthly household income (EUR) 
+
+                Statistic(a) df1 df2      Sig. 
+ Welch          418.250      3   978.181  .000 
+ Brown-Forsythe 389.062      3   1108.912 .000 
+a Asymptotically F distributed.
+
+=========== Test 1c ===========
+
+One-Way ANOVA: Age by Education
+
+Oneway
+Descriptives
+ Age in years 
+
+                        N    Mean    Std.      Std.   95% Confidence Interval for Mean Minimum Maximum 
+                                     Deviation Error  Lower Bound          Upper Bound                 
+ Basic Secondary        841  50.1165 16.86658  .58161 48.9750              51.2581     18.00   95.00   
+ Intermediate Secondary 629  51.1924 17.23894  .68736 49.8426              52.5422     18.00   95.00   
+ Academic Secondary     631  51.2266 17.04358  .67849 49.8942              52.5590     18.00   95.00   
+ University             399  49.3784 16.64904  .83349 47.7398              51.0170     18.00   95.00   
+ Total                  2500 50.5496 16.97602  .33952 49.8838              51.2154     18.00   95.00   
+
+ANOVA
+ Age in years 
+
+                Sum of Squares df   Mean Square F     Sig. 
+ Between Groups 1254.099       3    418.033     1.451 .226 
+ Within Groups  718920.751     2496 288.029                
+ Total          720174.850     2499                        
+
+Robust Tests of Equality of Means
+ Age in years 
+
+                Statistic(a) df1 df2      Sig. 
+ Welch          1.464        3   1228.520 .223 
+ Brown-Forsythe 1.456        3   2231.803 .225 
+a Asymptotically F distributed.
+
+=========== Test 1d ===========
+
+One-Way ANOVA: Trust Variables by Education
+
+Oneway
+Descriptives
+
+                                    N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                                              Deviation Error Lower Bound          Upper Bound                 
+ Trust in    Basic Secondary        791  2.65 1.149     .041  2.57                 2.73        1       5       
+ government  Intermediate Secondary 592  2.58 1.175     .048  2.49                 2.68        1       5       
+ (1=none,    Academic Secondary     595  2.61 1.183     .049  2.51                 2.71        1       5       
+ 5=complete) University             376  2.64 1.146     .059  2.53                 2.76        1       5       
+             Total                  2354 2.62 1.163     .024  2.57                 2.67        1       5       
+ Trust in    Basic Secondary        797  2.44 1.163     .041  2.36                 2.52        1       5       
+ media       Intermediate Secondary 594  2.50 1.188     .049  2.40                 2.60        1       5       
+ (1=none,    Academic Secondary     599  2.46 1.149     .047  2.37                 2.56        1       5       
+ 5=complete) University             377  2.38 1.149     .059  2.26                 2.49        1       5       
+             Total                  2367 2.45 1.163     .024  2.41                 2.50        1       5       
+ Trust in    Basic Secondary        807  3.64 1.051     .037  3.57                 3.71        1       5       
+ science     Intermediate Secondary 610  3.61 1.005     .041  3.53                 3.69        1       5       
+ (1=none,    Academic Secondary     597  3.69 1.040     .043  3.60                 3.77        1       5       
+ 5=complete) University             384  3.63 .996      .051  3.53                 3.73        1       5       
+             Total                  2398 3.64 1.028     .021  3.60                 3.68        1       5       
+
+ANOVA
+
+                                    Sum of Squares df   Mean Square F    Sig. 
+ Trust in government Between Groups 1.753          3    .584        .431 .731 
+ (1=none,            Within Groups  3182.484       2350 1.354                 
+ 5=complete)         Total          3184.237       2353                       
+ Trust in media      Between Groups 3.662          3    1.221       .902 .439 
+ (1=none,            Within Groups  3198.645       2363 1.354                 
+ 5=complete)         Total          3202.308       2366                       
+ Trust in science    Between Groups 1.918          3    .639        .605 .612 
+ (1=none,            Within Groups  2529.658       2394 1.057                 
+ 5=complete)         Total          2531.576       2397                       
+
+Robust Tests of Equality of Means
+
+                                     Statistic(a) df1 df2      Sig. 
+ Trust in government  Welch          .431         3   1155.612 .731 
+ (1=none, 5=complete) Brown-Forsythe .432         3   2094.438 .730 
+ Trust in media       Welch          .901         3   1161.543 .440 
+ (1=none, 5=complete) Brown-Forsythe .904         3   2103.412 .438 
+ Trust in science     Welch          .605         3   1185.828 .612 
+ (1=none, 5=complete) Brown-Forsythe .613         3   2171.092 .607 
+a Asymptotically F distributed.
+
+=========== Test 1e ===========
+
+One-Way ANOVA: Life Satisfaction by Employment
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+            N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                      Deviation Error Lower Bound          Upper Bound                 
+ Student    75   3.95 .943      .109  3.73                 4.16        1       5       
+ Employed   1545 3.63 1.173     .030  3.57                 3.68        1       5       
+ Unemployed 178  3.66 1.099     .082  3.50                 3.83        1       5       
+ Retired    511  3.56 1.146     .051  3.46                 3.66        1       5       
+ Other      112  3.71 1.094     .103  3.51                 3.92        1       5       
+ Total      2421 3.63 1.153     .023  3.58                 3.67        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F     Sig. 
+ Between Groups 11.197         4    2.799       2.109 .077 
+ Within Groups  3206.230       2416 1.327                  
+ Total          3217.428       2420                        
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Statistic(a) df1 df2     Sig. 
+ Welch          2.809        4   301.749 .026 
+ Brown-Forsythe 2.405        4   696.897 .048 
+a Asymptotically F distributed.
+
+=========== Test 1f ===========
+
+One-Way ANOVA: Income by Employment
+
+Oneway
+Descriptives
+ Monthly household income (EUR) 
+
+            N    Mean      Std.       Std.      95% Confidence Interval for Mean Minimum Maximum 
+                           Deviation  Error     Lower Bound          Upper Bound                 
+ Student    65   4632.3077 1397.77811 173.37304 4285.9552            4978.6602   1600.00 8000.00 
+ Employed   1390 3724.6763 1446.05011 38.78608  3648.5906            3800.7619   800.00  8000.00 
+ Unemployed 159  3644.6541 1220.58545 96.79872  3453.4677            3835.8405   800.00  7800.00 
+ Retired    471  3746.2845 1435.81173 66.15871  3616.2810            3876.2880   800.00  8000.00 
+ Other      101  3799.0099 1408.22548 140.12367 3521.0085            4077.0113   1000.00 8000.00 
+ Total      2186 3753.9341 1432.80161 30.64510  3693.8376            3814.0307   800.00  8000.00 
+
+ANOVA
+ Monthly household income (EUR) 
+
+                Sum of Squares df   Mean Square  F     Sig. 
+ Between Groups 53471553.510   4    13367888.377 6.578 .000 
+ Within Groups  4432159613.005 2181 2032168.553             
+ Total          4485631166.515 2185                         
+
+Robust Tests of Equality of Means
+ Monthly household income (EUR) 
+
+                Statistic(a) df1 df2     Sig. 
+ Welch          6.855        4   263.672 .000 
+ Brown-Forsythe 7.085        4   517.902 .000 
+a Asymptotically F distributed.
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+One-Way ANOVA: Life Satisfaction by Education (weighted)
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                        N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                                  Deviation Error Lower Bound          Upper Bound                 
+ Basic Secondary        816  3.21 1.243     .044  3.12                 3.29        1       5       
+ Intermediate Secondary 630  3.70 1.110     .044  3.61                 3.78        1       5       
+ Academic Secondary     618  3.85 .997      .040  3.77                 3.93        1       5       
+ University             373  4.04 .962      .050  3.94                 4.14        1       5       
+ Total                  2437 3.62 1.152     .023  3.58                 3.67        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F      Sig. 
+ Between Groups 241.130        3    80.377      65.333 .000 
+ Within Groups  2992.019       2432 1.230                   
+ Total          3233.149       2435                         
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Statistic(a) df1 df2      Sig. 
+ Welch          62.636       3   1216.114 .000 
+ Brown-Forsythe 69.524       3   2326.240 .000 
+a Asymptotically F distributed.
+
+=========== Test 2b ===========
+
+One-Way ANOVA: Income by Education (weighted)
+
+Oneway
+Descriptives
+ Monthly household income (EUR) 
+
+                        N    Mean      Std.       Std.     95% Confidence Interval for Mean Minimum Maximum 
+                                       Deviation  Error    Lower Bound          Upper Bound                 
+ Basic Secondary        741  2759.2606 787.77480  28.93759 2702.4511            2816.0701   800.00  5300.00 
+ Intermediate Secondary 558  3590.2177 994.46762  42.08720 3507.5488            3672.8867   800.00  6300.00 
+ Academic Secondary     558  4225.3255 1180.12280 49.95106 4127.2101            4323.4409   800.00  7800.00 
+ University             343  5331.3370 1664.10362 89.80740 5154.6932            5507.9807   800.00  8000.00 
+ Total                  2201 3743.0994 1423.96558 30.35257 3683.5767            3802.6221   800.00  8000.00 
+
+ANOVA
+ Monthly household income (EUR) 
+
+                Sum of Squares df   Mean Square   F       Sig. 
+ Between Groups 1726289512.505 3    575429837.502 462.115 .000 
+ Within Groups  2734479255.792 2196 1245209.133                
+ Total          4460768768.296 2199                            
+
+Robust Tests of Equality of Means
+ Monthly household income (EUR) 
+
+                Statistic(a) df1 df2      Sig. 
+ Welch          413.705      3   969.609  .000 
+ Brown-Forsythe 381.378      3   1072.584 .000 
+a Asymptotically F distributed.
+
+=========== Test 2c ===========
+
+One-Way ANOVA: Age by Education (weighted)
+
+Oneway
+Descriptives
+ Age in years 
+
+                        N    Mean    Std.      Std.   95% Confidence Interval for Mean Minimum Maximum 
+                                     Deviation Error  Lower Bound          Upper Bound                 
+ Basic Secondary        848  50.1260 16.94224  .58176 48.9842              51.2679     18.00   95.00   
+ Intermediate Secondary 641  50.9696 17.33275  .68466 49.6252              52.3141     18.00   95.00   
+ Academic Secondary     642  51.1916 17.17437  .67786 49.8605              52.5227     18.00   95.00   
+ University             385  49.4834 16.81672  .85687 47.7987              51.1682     18.00   95.00   
+ Total                  2516 50.5144 17.08382  .34058 49.8466              51.1822     18.00   95.00   
+
+ANOVA
+ Age in years 
+
+                Sum of Squares df   Mean Square F     Sig. 
+ Between Groups 964.501        3    321.500     1.102 .347 
+ Within Groups  733082.646     2512 291.832                
+ Total          734047.147     2515                        
+
+Robust Tests of Equality of Means
+ Age in years 
+
+                Statistic(a) df1 df2      Sig. 
+ Welch          1.109        3   1215.388 .344 
+ Brown-Forsythe 1.104        3   2206.481 .346 
+a Asymptotically F distributed.
+
+=========== Test 2d ===========
+
+One-Way ANOVA: Trust Variables by Education (weighted)
+
+Oneway
+Descriptives
+
+                                    N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                                              Deviation Error Lower Bound          Upper Bound                 
+ Trust in    Basic Secondary        799  2.65 1.146     .041  2.57                 2.73        1       5       
+ government  Intermediate Secondary 603  2.58 1.178     .048  2.49                 2.68        1       5       
+ (1=none,    Academic Secondary     606  2.61 1.188     .048  2.51                 2.70        1       5       
+ 5=complete) University             363  2.64 1.139     .060  2.52                 2.76        1       5       
+             Total                  2371 2.62 1.164     .024  2.57                 2.67        1       5       
+ Trust in    Basic Secondary        803  2.44 1.166     .041  2.36                 2.53        1       5       
+ media       Intermediate Secondary 606  2.50 1.184     .048  2.41                 2.60        1       5       
+ (1=none,    Academic Secondary     609  2.46 1.155     .047  2.37                 2.55        1       5       
+ 5=complete) University             364  2.39 1.156     .061  2.27                 2.51        1       5       
+             Total                  2382 2.46 1.166     .024  2.41                 2.50        1       5       
+ Trust in    Basic Secondary        813  3.64 1.048     .037  3.57                 3.71        1       5       
+ science     Intermediate Secondary 622  3.61 1.010     .040  3.53                 3.69        1       5       
+ (1=none,    Academic Secondary     608  3.68 1.037     .042  3.60                 3.77        1       5       
+ 5=complete) University             370  3.62 .994      .052  3.52                 3.72        1       5       
+             Total                  2414 3.64 1.027     .021  3.60                 3.68        1       5       
+
+ANOVA
+
+                                    Sum of Squares df   Mean Square F    Sig. 
+ Trust in government Between Groups 1.649          3    .550        .406 .749 
+ (1=none,            Within Groups  3206.580       2366 1.355                 
+ 5=complete)         Total          3208.229       2369                       
+ Trust in media      Between Groups 3.233          3    1.078       .792 .498 
+ (1=none,            Within Groups  3235.507       2377 1.361                 
+ 5=complete)         Total          3238.740       2380                       
+ Trust in science    Between Groups 1.777          3    .592        .561 .641 
+ (1=none,            Within Groups  2543.405       2409 1.056                 
+ 5=complete)         Total          2545.183       2412                       
+
+Robust Tests of Equality of Means
+
+                                     Statistic(a) df1 df2      Sig. 
+ Trust in government  Welch          .406         3   1145.159 .749 
+ (1=none, 5=complete) Brown-Forsythe .407         3   2084.419 .748 
+ Trust in media       Welch          .788         3   1149.996 .501 
+ (1=none, 5=complete) Brown-Forsythe .794         3   2080.548 .497 
+ Trust in science     Welch          .563         3   1174.013 .639 
+ (1=none, 5=complete) Brown-Forsythe .569         3   2155.067 .636 
+a Asymptotically F distributed.
+
+=========== Test 2e ===========
+
+One-Way ANOVA: Life Satisfaction by Employment (weighted)
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+            N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                      Deviation Error Lower Bound          Upper Bound                 
+ Student    77   3.93 .949      .108  3.71                 4.14        1       5       
+ Employed   1548 3.62 1.171     .030  3.56                 3.68        1       5       
+ Unemployed 180  3.67 1.095     .082  3.50                 3.83        1       5       
+ Retired    519  3.55 1.149     .050  3.45                 3.65        1       5       
+ Other      112  3.72 1.093     .103  3.52                 3.92        1       5       
+ Total      2437 3.62 1.152     .023  3.58                 3.67        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F     Sig. 
+ Between Groups 11.176         4    2.794       2.108 .077 
+ Within Groups  3221.973       2431 1.325                  
+ Total          3233.149       2435                        
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Statistic(a) df1 df2     Sig. 
+ Welch          2.737        4   305.915 .029 
+ Brown-Forsythe 2.398        4   703.846 .049 
+a Asymptotically F distributed.
+
+=========== Test 2f ===========
+
+One-Way ANOVA: Income by Employment (weighted)
+
+Oneway
+Descriptives
+ Monthly household income (EUR) 
+
+            N    Mean      Std.       Std.      95% Confidence Interval for Mean Minimum Maximum 
+                           Deviation  Error     Lower Bound          Upper Bound                 
+ Student    66   4648.7778 1388.26184 170.31453 4308.6796            4988.8759   1600.00 8000.00 
+ Employed   1393 3709.5855 1434.35369 38.42651  3634.2054            3784.9656   800.00  8000.00 
+ Unemployed 161  3634.6663 1196.23529 94.31317  3448.4060            3820.9267   800.00  7800.00 
+ Retired    479  3742.6560 1433.91694 65.52860  3613.8962            3871.4158   800.00  8000.00 
+ Other      101  3784.2688 1413.51332 140.32491 3505.8840            4062.6535   1000.00 8000.00 
+ Total      2201 3743.0994 1423.96558 30.35257  3683.5767            3802.6221   800.00  8000.00 
+
+ANOVA
+ Monthly household income (EUR) 
+
+                Sum of Squares df   Mean Square  F     Sig. 
+ Between Groups 58127400.293   4    14531850.073 7.245 .000 
+ Within Groups  4402641368.002 2195 2005759.165             
+ Total          4460768768.296 2199                         
+
+Robust Tests of Equality of Means
+ Monthly household income (EUR) 
+
+                Statistic(a) df1 df2     Sig. 
+ Welch          7.555        4   267.828 .000 
+ Brown-Forsythe 7.787        4   523.910 .000 
+a Asymptotically F distributed.
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+One-Way ANOVA: Life Satisfaction by Education (grouped by region)
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region                             N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                                  Deviation Error Lower Bound          Upper Bound                 
+ East        Basic Secondary        161  3.30 1.337     .105  3.10                 3.51        1       5       
+             Intermediate Secondary 119  3.64 1.140     .105  3.43                 3.85        1       5       
+             Academic Secondary     110  3.84 1.088     .104  3.63                 4.04        1       5       
+             University             75   3.95 1.025     .118  3.71                 4.18        1       5       
+             Total                  465  3.62 1.207     .056  3.51                 3.73        1       5       
+ West        Basic Secondary        648  3.18 1.219     .048  3.08                 3.27        1       5       
+             Intermediate Secondary 499  3.72 1.106     .050  3.62                 3.81        1       5       
+             Academic Secondary     497  3.86 .978      .044  3.77                 3.94        1       5       
+             University             312  4.07 .939      .053  3.97                 4.18        1       5       
+             Total                  1956 3.63 1.140     .026  3.58                 3.68        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Sum of Squares df   Mean Square F      Sig. 
+ East               Between Groups 29.235         3    9.745       6.950  .000 
+                    Within Groups  646.390        461  1.402                   
+                    Total          675.626        464                          
+ West               Between Groups 221.625        3    73.875      62.153 .000 
+                    Within Groups  2320.132       1952 1.189                   
+                    Total          2541.756       1955                         
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Statistic(a) df1 df2      Sig. 
+ East               Welch          6.682        3   233.415  .000 
+                    Brown-Forsythe 7.454        3   446.214  .000 
+ West               Welch          59.852       3   992.905  .000 
+                    Brown-Forsythe 65.938       3   1885.351 .000 
+a Asymptotically F distributed.
+
+=========== Test 3b ===========
+
+One-Way ANOVA: Income by Education (grouped by region)
+
+Oneway
+Descriptives
+ Monthly household income (EUR) 
+
+ Region                             N    Mean      Std.       Std.      95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                                       Deviation  Error     Lower Bound          Upper Bound                 
+ East        Basic Secondary        154  2897.4026 782.56726  63.06107  2772.8198            3021.9854   1400.00 5000.00 
+             Intermediate Secondary 107  3609.3458 981.29032  94.86492  3421.2669            3797.4247   800.00  6300.00 
+             Academic Secondary     98   4200.0000 1264.66653 127.75061 3946.4504            4453.5496   900.00  7800.00 
+             University             70   5225.7143 1641.72812 196.22404 4834.2580            5617.1705   800.00  8000.00 
+             Total                  429  3752.4476 1386.87938 66.95917  3620.8378            3884.0573   800.00  8000.00 
+ West        Basic Secondary        581  2722.3752 784.20740  32.53441  2658.4756            2786.2748   800.00  5300.00 
+             Intermediate Secondary 441  3588.4354 1000.14888 47.62614  3494.8324            3682.0384   1100.00 6300.00 
+             Academic Secondary     450  4229.3333 1160.47836 54.70547  4121.8228            4336.8439   800.00  7600.00 
+             University             285  5364.5614 1667.36706 98.76630  5170.1545            5558.9683   1000.00 8000.00 
+             Total                  1757 3754.2971 1444.17770 34.45361  3686.7227            3821.8715   800.00  8000.00 
+
+ANOVA
+ Monthly household income (EUR) 
+
+ Region (East/West)                Sum of Squares df   Mean Square   F       Sig. 
+ East               Between Groups 286346600.540  3    95448866.847  75.558  .000 
+                    Within Groups  536883329.531  425  1263254.893                
+                    Total          823229930.070  428                             
+ West               Between Groups 1471355044.129 3    490451681.376 392.398 .000 
+                    Within Groups  2191045012.787 1753 1249883.065                
+                    Total          3662400056.916 1756                            
+
+Robust Tests of Equality of Means
+ Monthly household income (EUR) 
+
+ Region (East/West)                Statistic(a) df1 df2     Sig. 
+ East               Welch          64.226       3   183.963 .000 
+                    Brown-Forsythe 62.184       3   222.358 .000 
+ West               Welch          356.580      3   790.232 .000 
+                    Brown-Forsythe 327.565      3   880.864 .000 
+a Asymptotically F distributed.
+
+=========== Test 3c ===========
+
+One-Way ANOVA: Age by Education (grouped by region)
+
+Oneway
+Descriptives
+ Age in years 
+
+ Region                             N    Mean    Std.      Std.    95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                                     Deviation Error   Lower Bound          Upper Bound                 
+ East        Basic Secondary        170  50.9529 16.76281  1.28565 48.4149              53.4909     18.00   95.00   
+             Intermediate Secondary 121  50.9091 18.19295  1.65390 47.6345              54.1837     18.00   95.00   
+             Academic Secondary     115  54.1739 17.59349  1.64060 50.9239              57.4239     18.00   95.00   
+             University             79   51.9494 17.36479  1.95369 48.0599              55.8389     18.00   95.00   
+             Total                  485  51.8680 17.42028  .79101  50.3138              53.4223     18.00   95.00   
+ West        Basic Secondary        671  49.9046 16.89864  .65236  48.6237              51.1855     18.00   95.00   
+             Intermediate Secondary 508  51.2598 17.02184  .75522  49.7761              52.7436     18.00   95.00   
+             Academic Secondary     516  50.5698 16.86592  .74248  49.1111              52.0284     18.00   95.00   
+             University             320  48.7438 16.43368  .91867  46.9363              50.5512     18.00   95.00   
+             Total                  2015 50.2323 16.85635  .37551  49.4958              50.9687     18.00   95.00   
+
+ANOVA
+ Age in years 
+
+ Region (East/West)                Sum of Squares df   Mean Square F     Sig. 
+ East               Between Groups 865.612        3    288.537     .951  .416 
+                    Within Groups  146011.943     481  303.559                
+                    Total          146877.555     484                         
+ West               Between Groups 1376.231       3    458.744     1.616 .184 
+                    Within Groups  570875.072     2011 283.876                
+                    Total          572251.303     2014                        
+
+Robust Tests of Equality of Means
+ Age in years 
+
+ Region (East/West)                Statistic(a) df1 df2      Sig. 
+ East               Welch          .935         3   233.459  .425 
+                    Brown-Forsythe .941         3   419.083  .421 
+ West               Welch          1.642        3   992.155  .178 
+                    Brown-Forsythe 1.627        3   1809.455 .181 
+a Asymptotically F distributed.
+
+=========== Test 3d ===========
+
+One-Way ANOVA: Life Satisfaction by Employment (grouped by region)
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region                 N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                      Deviation Error Lower Bound          Upper Bound                 
+ East        Student    10   3.70 1.418     .448  2.69                 4.71        1       5       
+             Employed   299  3.63 1.198     .069  3.49                 3.76        1       5       
+             Unemployed 30   3.63 1.351     .247  3.13                 4.14        1       5       
+             Retired    105  3.51 1.186     .116  3.28                 3.74        1       5       
+             Other      21   4.00 1.140     .249  3.48                 4.52        2       5       
+             Total      465  3.62 1.207     .056  3.51                 3.73        1       5       
+ West        Student    65   3.98 .857      .106  3.77                 4.20        1       5       
+             Employed   1246 3.63 1.167     .033  3.56                 3.69        1       5       
+             Unemployed 148  3.67 1.046     .086  3.50                 3.84        1       5       
+             Retired    406  3.57 1.137     .056  3.46                 3.68        1       5       
+             Other      91   3.65 1.079     .113  3.42                 3.87        1       5       
+             Total      1956 3.63 1.140     .026  3.58                 3.68        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Sum of Squares df   Mean Square F     Sig. 
+ East               Between Groups 4.284          4    1.071       .734  .569 
+                    Within Groups  671.342        460  1.459                  
+                    Total          675.626        464                         
+ West               Between Groups 9.961          4    2.490       1.919 .105 
+                    Within Groups  2531.795       1951 1.298                  
+                    Total          2541.756       1955                        
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Statistic(a) df1 df2     Sig. 
+ East               Welch          .766         4   42.132  .554 
+                    Brown-Forsythe .657         4   68.517  .624 
+ West               Welch          3.075        4   256.259 .017 
+                    Brown-Forsythe 2.290        4   604.458 .058 
+a Asymptotically F distributed.
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+One-Way ANOVA: Life Satisfaction by Education (weighted, grouped by region)
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region                             N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                                  Deviation Error Lower Bound          Upper Bound                 
+ East        Basic Secondary        165  3.31 1.334     .104  3.11                 3.52        1       5       
+             Intermediate Secondary 127  3.64 1.134     .101  3.44                 3.84        1       5       
+             Academic Secondary     118  3.82 1.100     .101  3.62                 4.02        1       5       
+             University             78   3.95 1.024     .116  3.72                 4.18        1       5       
+             Total                  488  3.62 1.203     .054  3.52                 3.73        1       5       
+ West        Basic Secondary        650  3.18 1.219     .048  3.09                 3.27        1       5       
+             Intermediate Secondary 503  3.71 1.104     .049  3.62                 3.81        1       5       
+             Academic Secondary     500  3.86 .973      .043  3.77                 3.94        1       5       
+             University             295  4.06 .946      .055  3.95                 4.17        1       5       
+             Total                  1949 3.63 1.139     .026  3.57                 3.68        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Sum of Squares df   Mean Square F      Sig. 
+ East               Between Groups 28.855         3    9.618       6.868  .000 
+                    Within Groups  676.447        483  1.401                   
+                    Total          705.302        486                          
+ West               Between Groups 216.014        3    72.005      60.548 .000 
+                    Within Groups  2311.831       1944 1.189                   
+                    Total          2527.845       1947                         
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Statistic(a) df1 df2      Sig. 
+ East               Welch          6.621        3   245.073  .000 
+                    Brown-Forsythe 7.347        3   468.359  .000 
+ West               Welch          58.124       3   967.680  .000 
+                    Brown-Forsythe 64.354       3   1850.574 .000 
+a Asymptotically F distributed.
+
+=========== Test 4b ===========
+
+One-Way ANOVA: Income by Education (weighted, grouped by region)
+
+Oneway
+Descriptives
+ Monthly household income (EUR) 
+
+ Region                             N    Mean      Std.       Std.      95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                                       Deviation  Error     Lower Bound          Upper Bound                 
+ East        Basic Secondary        158  2899.6797 789.33868  62.73662  2775.7648            3023.5945   1400.00 5000.00 
+             Intermediate Secondary 114  3626.2774 970.29703  90.99553  3445.9937            3806.5611   800.00  6300.00 
+             Academic Secondary     105  4190.4290 1269.96243 123.91044 3944.7111            4436.1469   900.00  7800.00 
+             University             72   5229.8556 1661.94283 195.25394 4840.5727            5619.1385   800.00  8000.00 
+             Total                  449  3760.6866 1388.32120 65.48281  3631.9953            3889.3778   800.00  8000.00 
+ West        Basic Secondary        583  2721.1199 783.68799  32.46252  2657.3619            2784.8779   800.00  5300.00 
+             Intermediate Secondary 445  3580.9961 1001.41978 47.49240  3487.6581            3674.3342   1100.00 6300.00 
+             Academic Secondary     453  4233.4151 1159.64176 54.47719  4126.3552            4340.4750   800.00  7600.00 
+             University             271  5358.4769 1666.70330 101.26360 5159.1099            5557.8439   1000.00 8000.00 
+             Total                  1751 3738.5858 1433.32495 34.24889  3671.4127            3805.7588   800.00  8000.00 
+
+ANOVA
+ Monthly household income (EUR) 
+
+ Region (East/West)                Sum of Squares df   Mean Square   F       Sig. 
+ East               Between Groups 295185395.664  3    98395131.888  76.917  .000 
+                    Within Groups  569260669.071  445  1279237.459                
+                    Total          864446064.734  448                             
+ West               Between Groups 1436187402.137 3    478729134.046 387.201 .000 
+                    Within Groups  2159960586.534 1747 1236382.706                
+                    Total          3596147988.671 1750                            
+
+Robust Tests of Equality of Means
+ Monthly household income (EUR) 
+
+ Region (East/West)                Statistic(a) df1 df2     Sig. 
+ East               Welch          65.650       3   194.051 .000 
+                    Brown-Forsythe 63.348       3   227.995 .000 
+ West               Welch          351.163      3   771.507 .000 
+                    Brown-Forsythe 318.929      3   838.672 .000 
+a Asymptotically F distributed.
+
+=========== Test 4c ===========
+
+One-Way ANOVA: Age by Education (weighted, grouped by region)
+
+Oneway
+Descriptives
+ Age in years 
+
+ Region                             N    Mean    Std.      Std.    95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                                     Deviation Error   Lower Bound          Upper Bound                 
+ East        Basic Secondary        175  51.2003 16.88029  1.27606 48.6817              53.7189     18.00   95.00   
+             Intermediate Secondary 129  51.0399 18.37052  1.61840 47.8376              54.2422     18.00   95.00   
+             Academic Secondary     123  54.7787 17.60817  1.58752 51.6360              57.9213     18.00   95.00   
+             University             82   52.7692 17.73869  1.95687 48.8758              56.6626     18.00   95.00   
+             Total                  509  52.2778 17.59548  .77988  50.7456              53.8100     18.00   95.00   
+ West        Basic Secondary        673  49.8468 16.95967  .65369  48.5632              51.1303     18.00   95.00   
+             Intermediate Secondary 512  50.9520 17.08045  .75482  49.4690              52.4349     18.00   95.00   
+             Academic Secondary     519  50.3411 16.97622  .74525  48.8771              51.8052     18.00   95.00   
+             University             303  48.5924 16.47548  .94649  46.7298              50.4549     18.00   95.00   
+             Total                  2007 50.0672 16.92689  .37783  49.3262              50.8081     18.00   95.00   
+
+ANOVA
+ Age in years 
+
+ Region (East/West)                Sum of Squares df   Mean Square F     Sig. 
+ East               Between Groups 1189.911       3    396.637     1.283 .279 
+                    Within Groups  156097.339     505  309.104                
+                    Total          157287.250     508                         
+ West               Between Groups 1131.554       3    377.185     1.317 .267 
+                    Within Groups  573644.048     2003 286.392                
+                    Total          574775.602     2006                        
+
+Robust Tests of Equality of Means
+ Age in years 
+
+ Region (East/West)                Statistic(a) df1 df2      Sig. 
+ East               Welch          1.274        3   245.463  .284 
+                    Brown-Forsythe 1.269        3   438.044  .285 
+ West               Welch          1.348        3   967.532  .257 
+                    Brown-Forsythe 1.327        3   1769.573 .264 
+a Asymptotically F distributed.
+
+=========== Test 4d ===========
+
+One-Way ANOVA: Life Satisfaction by Employment (weighted, grouped by region)
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region                 N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+ (East/West)                      Deviation Error Lower Bound          Upper Bound                 
+ East        Student    10   3.65 1.431     .442  2.65                 4.64        1       5       
+             Employed   308  3.64 1.189     .068  3.50                 3.77        1       5       
+             Unemployed 32   3.66 1.342     .238  3.17                 4.14        1       5       
+             Retired    116  3.50 1.196     .111  3.28                 3.72        1       5       
+             Other      21   4.04 1.120     .243  3.54                 4.55        2       5       
+             Total      488  3.62 1.203     .054  3.52                 3.73        1       5       
+ West        Student    66   3.97 .856      .105  3.76                 4.18        1       5       
+             Employed   1240 3.62 1.167     .033  3.55                 3.68        1       5       
+             Unemployed 148  3.67 1.039     .085  3.50                 3.84        1       5       
+             Retired    404  3.57 1.136     .057  3.46                 3.68        1       5       
+             Other      91   3.64 1.079     .113  3.42                 3.87        1       5       
+             Total      1949 3.63 1.139     .026  3.57                 3.68        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Sum of Squares df   Mean Square F     Sig. 
+ East               Between Groups 5.568          4    1.392       .959  .430 
+                    Within Groups  699.734        482  1.452                  
+                    Total          705.302        486                         
+ West               Between Groups 9.778          4    2.444       1.886 .110 
+                    Within Groups  2518.068       1943 1.296                  
+                    Total          2527.845       1947                        
+
+Robust Tests of Equality of Means
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Region (East/West)                Statistic(a) df1 df2     Sig. 
+ East               Welch          1.017        4   44.066  .409 
+                    Brown-Forsythe .857         4   70.624  .494 
+ West               Welch          3.028        4   258.609 .018 
+                    Brown-Forsythe 2.256        4   607.142 .062 
+a Asymptotically F distributed.
+
+=========== ADDITIONAL TEST CASES ===========
+
+=========== Test 5a ===========
+
+One-Way ANOVA with Tukey Post-Hoc
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                        N    Mean Std.      Std.  95% Confidence Interval for Mean Minimum Maximum 
+                                  Deviation Error Lower Bound          Upper Bound                 
+ Basic Secondary        809  3.20 1.243     .044  3.12                 3.29        1       5       
+ Intermediate Secondary 618  3.70 1.112     .045  3.61                 3.79        1       5       
+ Academic Secondary     607  3.85 .998      .041  3.77                 3.93        1       5       
+ University             387  4.05 .957      .049  3.95                 4.14        1       5       
+ Total                  2421 3.63 1.153     .023  3.58                 3.67        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F      Sig. 
+ Between Groups 247.347        3    82.449      67.096 .000 
+ Within Groups  2970.080       2417 1.229                   
+ Total          3217.428       2420                         
+
+Post Hoc Tests
+Multiple Comparisons
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Tukey HSD 
+
+ (I) Highest            (J) Highest            Mean Difference Std.  Sig. 95% Confidence Interval 
+ educational attainment educational attainment (I-J)           Error      Lower Bound Upper Bound 
+ Basic Secondary        Intermediate Secondary -.497(*)        .059  .000 -.65        -.34        
+                        Academic Secondary     -.649(*)        .060  .000 -.80        -.50        
+                        University             -.843(*)        .069  .000 -1.02       -.67        
+ Intermediate Secondary Basic Secondary        .497(*)         .059  .000 .34         .65         
+                        Academic Secondary     -.153           .063  .075 -.32        .01         
+                        University             -.346(*)        .072  .000 -.53        -.16        
+ Academic Secondary     Basic Secondary        .649(*)         .060  .000 .50         .80         
+                        Intermediate Secondary .153            .063  .075 -.01        .32         
+                        University             -.193(*)        .072  .037 -.38        -.01        
+ University             Basic Secondary        .843(*)         .069  .000 .67         1.02        
+                        Intermediate Secondary .346(*)         .072  .000 .16         .53         
+                        Academic Secondary     .193(*)         .072  .037 .01         .38         
+* The mean difference is significant at the 0.05 level.
+
+=========== Test 6a ===========
+
+One-Way ANOVA with 90% CI
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                        N    Mean Std.      Std.  90% Confidence Interval for Mean Minimum Maximum 
+                                  Deviation Error Lower Bound          Upper Bound                 
+ Basic Secondary        809  3.20 1.243     .044  3.13                 3.28        1       5       
+ Intermediate Secondary 618  3.70 1.112     .045  3.63                 3.77        1       5       
+ Academic Secondary     607  3.85 .998      .041  3.79                 3.92        1       5       
+ University             387  4.05 .957      .049  3.97                 4.13        1       5       
+ Total                  2421 3.63 1.153     .023  3.59                 3.67        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F      Sig. 
+ Between Groups 247.347        3    82.449      67.096 .000 
+ Within Groups  2970.080       2417 1.229                   
+ Total          3217.428       2420                         
+
+=========== Test 6b ===========
+
+One-Way ANOVA with 99% CI
+
+Oneway
+Descriptives
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                        N    Mean Std.      Std.  99% Confidence Interval for Mean Minimum Maximum 
+                                  Deviation Error Lower Bound          Upper Bound                 
+ Basic Secondary        809  3.20 1.243     .044  3.09                 3.32        1       5       
+ Intermediate Secondary 618  3.70 1.112     .045  3.59                 3.82        1       5       
+ Academic Secondary     607  3.85 .998      .041  3.75                 3.96        1       5       
+ University             387  4.05 .957      .049  3.92                 4.17        1       5       
+ Total                  2421 3.63 1.153     .023  3.57                 3.69        1       5       
+
+ANOVA
+ Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+                Sum of Squares df   Mean Square F      Sig. 
+ Between Groups 247.347        3    82.449      67.096 .000 
+ Within Groups  2970.080       2417 1.229                   
+ Total          3217.428       2420                         
+
+=========== Test 7 ===========
+
+Multiple Variables ANOVA by Education
+
+Oneway
+Descriptives
+
+                                         N    Mean      Std.       Std.     95% Confidence Interval for Mean Minimum Maximum 
+                                                        Deviation  Error    Lower Bound          Upper Bound                 
+ Life             Basic Secondary        809  3.20      1.243      .044     3.12                 3.29        1       5       
+ satisfaction     Intermediate Secondary 618  3.70      1.112      .045     3.61                 3.79        1       5       
+ (1=dissatisfied, Academic Secondary     607  3.85      .998       .041     3.77                 3.93        1       5       
+ 5=satisfied)     University             387  4.05      .957       .049     3.95                 4.14        1       5       
+                  Total                  2421 3.63      1.153      .023     3.58                 3.67        1       5       
+ Monthly          Basic Secondary        735  2759.0476 786.56752  29.01298 2702.0893            2816.0059   800.00  5300.00 
+ household income Intermediate Secondary 548  3592.5182 995.63887  42.53158 3508.9730            3676.0635   800.00  6300.00 
+ (EUR)            Academic Secondary     548  4224.0876 1178.63526 50.34880 4125.1869            4322.9883   800.00  7800.00 
+                  University             355  5337.1831 1660.95846 88.15452 5163.8107            5510.5555   800.00  8000.00 
+                  Total                  2186 3753.9341 1432.80161 30.64510 3693.8376            3814.0307   800.00  8000.00 
+ Age in years     Basic Secondary        841  50.1165   16.86658   .58161   48.9750              51.2581     18.00   95.00   
+                  Intermediate Secondary 629  51.1924   17.23894   .68736   49.8426              52.5422     18.00   95.00   
+                  Academic Secondary     631  51.2266   17.04358   .67849   49.8942              52.5590     18.00   95.00   
+                  University             399  49.3784   16.64904   .83349   47.7398              51.0170     18.00   95.00   
+                  Total                  2500 50.5496   16.97602   .33952   49.8838              51.2154     18.00   95.00   
+ Political        Basic Secondary        768  2.72      1.074      .039     2.65                 2.80        1       5       
+ orientation      Intermediate Secondary 582  2.75      1.078      .045     2.66                 2.84        1       5       
+ (1=left,         Academic Secondary     582  2.74      1.096      .045     2.65                 2.83        1       5       
+ 5=right)         University             367  2.65      1.108      .058     2.53                 2.76        1       5       
+                  Total                  2299 2.72      1.086      .023     2.68                 2.77        1       5       
+ Environmental    Basic Secondary        808  3.60      1.188      .042     3.52                 3.68        1       5       
+ concern (1=low,  Intermediate Secondary 606  3.55      1.218      .049     3.45                 3.65        1       5       
+ 5=high)          Academic Secondary     606  3.53      1.158      .047     3.43                 3.62        1       5       
+                  University             380  3.63      1.223      .063     3.51                 3.75        1       5       
+                  Total                  2400 3.57      1.194      .024     3.53                 3.62        1       5       
+
+ANOVA
+
+                                  Sum of Squares df   Mean Square   F       Sig. 
+ Life satisfaction Between Groups 247.347        3    82.449        67.096  .000 
+ (1=dissatisfied,  Within Groups  2970.080       2417 1.229                      
+ 5=satisfied)      Total          3217.428       2420                            
+ Monthly household Between Groups 1752783281.470 3    584261093.824 466.494 .000 
+ income (EUR)      Within Groups  2732847885.046 2182 1252450.910                
+                   Total          4485631166.515 2185                            
+ Age in years      Between Groups 1254.099       3    418.033       1.451   .226 
+                   Within Groups  718920.751     2496 288.029                    
+                   Total          720174.850     2499                            
+ Political         Between Groups 2.632          3    .877          .744    .526 
+ orientation       Within Groups  2707.203       2295 1.180                      
+ (1=left, 5=right) Total          2709.836       2298                            
+ Environmental     Between Groups 3.550          3    1.183         .830    .477 
+ concern (1=low,   Within Groups  3413.690       2396 1.425                      
+ 5=high)           Total          3417.240       2399                            
+
+Robust Tests of Equality of Means
+
+                                                       Statistic(a) df1 df2      Sig. 
+ Life satisfaction (1=dissatisfied, 5=satisfied) Welch 64.489       3   1229.456 .000 
+ Monthly household income (EUR)                  Welch 418.250      3   978.181  .000 
+ Age in years                                    Welch 1.464        3   1228.520 .223 
+ Political orientation (1=left, 5=right)         Welch .722         3   1124.261 .539 
+ Environmental concern (1=low, 5=high)           Welch .832         3   1168.306 .476 
+a Asymptotically F distributed.
+
