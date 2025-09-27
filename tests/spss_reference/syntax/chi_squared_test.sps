@@ -24,7 +24,7 @@ SUBTITLE 'Gender by Region'.
 CROSSTABS
   /TABLES=gender BY region
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 TITLE '=========== Test 1b ==========='.
@@ -34,7 +34,7 @@ SUBTITLE 'Education by Employment'.
 CROSSTABS
   /TABLES=education BY employment
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 TITLE '=========== Test 1c ==========='.
@@ -44,7 +44,7 @@ SUBTITLE 'Gender by Education'.
 CROSSTABS
   /TABLES=gender BY education
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 * ================================================
@@ -62,7 +62,7 @@ SUBTITLE 'Gender by Region (weighted)'.
 CROSSTABS
   /TABLES=gender BY region
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 TITLE '=========== Test 2b ==========='.
@@ -72,7 +72,7 @@ SUBTITLE 'Education by Employment (weighted)'.
 CROSSTABS
   /TABLES=education BY employment
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 TITLE '=========== Test 2c ==========='.
@@ -82,7 +82,7 @@ SUBTITLE 'Gender by Education (weighted)'.
 CROSSTABS
   /TABLES=gender BY education
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 WEIGHT OFF.
@@ -103,7 +103,7 @@ SUBTITLE 'Gender by Education (grouped by region)'.
 CROSSTABS
   /TABLES=gender BY education
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 TITLE '=========== Test 3b ==========='.
@@ -113,7 +113,7 @@ SUBTITLE 'Gender by Employment (grouped by region)'.
 CROSSTABS
   /TABLES=gender BY employment
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 * ================================================
@@ -132,7 +132,7 @@ TITLE '=========== Test 4a ==========='.
 CROSSTABS
   /TABLES=gender BY education
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 TITLE '=========== Test 4b ==========='.
@@ -142,7 +142,7 @@ SUBTITLE 'Gender by Employment (weighted, grouped by region)'.
 CROSSTABS
   /TABLES=gender BY employment
   /FORMAT= AVALUE TABLES
-  /STATISTICS=CHISQ PHI 
+  /STATISTICS=CHISQ PHI GAMMA
   /CELLS= COUNT.
 
 WEIGHT OFF.

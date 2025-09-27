@@ -272,6 +272,10 @@ w_range <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_range objects
+#'
+#' @param x A w_range object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_range
 print.w_range <- function(x, digits = 3, ...) {

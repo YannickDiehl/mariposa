@@ -1,0 +1,576 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+Kendall Tau: Life satisfaction, Political orientation, Trust media
+
+Nonparametric Correlations
+Correlations
+
+                                                     Life satisfaction      Political orientation      Trust in media (1=none,      
+                                                     (1=dissatisfied,       (1=left, 5=right)          5=complete)                  
+                                                     5=satisfied)                                                                   
+ Kendall's Life satisfaction Correlation Coefficient 1.000                  -.004                      .023                         
+ tau_b     (1=dissatisfied,  Sig. (2-tailed)         .                      .832                       .176                         
+           5=satisfied)      N                       2421                   2228                       2291                         
+           Political         Correlation Coefficient -.004                  1.000                      .003                         
+           orientation       Sig. (2-tailed)         .832                   .                          .883                         
+           (1=left, 5=right) N                       2228                   2299                       2177                         
+           Trust in media    Correlation Coefficient .023                   .003                       1.000                        
+           (1=none,          Sig. (2-tailed)         .176                   .883                       .                            
+           5=complete)       N                       2291                   2177                       2367                         
+
+=========== Test 1b ===========
+
+Kendall Tau: Income, Age, Life satisfaction
+
+Nonparametric Correlations
+Correlations
+
+                                                     Monthly household income (EUR) Age in years Life satisfaction (1=dissatisfied, 
+                                                                                                 5=satisfied)                       
+ Kendall's Monthly household Correlation Coefficient 1.000                          .002         .353(**)                           
+ tau_b     income (EUR)      Sig. (2-tailed)         .                              .867         .000                               
+                             N                       2186                           2186         2115                               
+           Age in years      Correlation Coefficient .002                           1.000        -.018                              
+                             Sig. (2-tailed)         .867                           .            .232                               
+                             N                       2186                           2500         2421                               
+           Life satisfaction Correlation Coefficient .353(**)                       -.018        1.000                              
+           (1=dissatisfied,  Sig. (2-tailed)         .000                           .232         .                                  
+           5=satisfied)      N                       2115                           2421         2421                               
+** Correlation is significant at the 0.01 level (2-tailed).
+
+=========== Test 1c ===========
+
+Kendall Tau: Trust government, Trust media, Trust science
+
+Nonparametric Correlations
+Correlations
+
+                                                       Trust in government    Trust in media (1=none,     Trust in science (1=none, 
+                                                       (1=none, 5=complete)   5=complete)                 5=complete)               
+ Kendall's Trust in government Correlation Coefficient 1.000                  .006                        .022                      
+ tau_b     (1=none,            Sig. (2-tailed)         .                      .722                        .205                      
+           5=complete)         N                       2354                   2227                        2255                      
+           Trust in media      Correlation Coefficient .006                   1.000                       .013                      
+           (1=none,            Sig. (2-tailed)         .722                   .                           .455                      
+           5=complete)         N                       2227                   2367                        2272                      
+           Trust in science    Correlation Coefficient .022                   .013                        1.000                     
+           (1=none,            Sig. (2-tailed)         .205                   .455                        .                         
+           5=complete)         N                       2255                   2272                        2398                      
+
+=========== Test 1d ===========
+
+Kendall Tau: Political orientation with trust variables
+
+Nonparametric Correlations
+Correlations
+
+                                                    Political          Trust in           Trust in media       Trust in science     
+                                                    orientation        government         (1=none, 5=complete) (1=none, 5=complete) 
+                                                    (1=left, 5=right)  (1=none,                                                     
+                                                                       5=complete)                                                  
+ Kendall's Political           Correlation          1.000              -.045(*)           .003                 .027                 
+ tau_b     orientation         Coefficient                                                                                          
+           (1=left, 5=right)   Sig. (2-tailed)      .                  .011               .883                 .129                 
+                               N                    2299               2168               2177                 2202                 
+           Trust in government Correlation          -.045(*)           1.000              .006                 .022                 
+           (1=none,            Coefficient                                                                                          
+           5=complete)         Sig. (2-tailed)      .011               .                  .722                 .205                 
+                               N                    2168               2354               2227                 2255                 
+           Trust in media      Correlation          .003               .006               1.000                .013                 
+           (1=none,            Coefficient                                                                                          
+           5=complete)         Sig. (2-tailed)      .883               .722               .                    .455                 
+                               N                    2177               2227               2367                 2272                 
+           Trust in science    Correlation          .027               .022               .013                 1.000                
+           (1=none,            Coefficient                                                                                          
+           5=complete)         Sig. (2-tailed)      .129               .205               .455                 .                    
+                               N                    2202               2255               2272                 2398                 
+* Correlation is significant at the 0.05 level (2-tailed).
+
+=========== Test 1e ===========
+
+Kendall Tau: Income and Age
+
+Nonparametric Correlations
+Correlations
+
+                                                Monthly household income (EUR) Age in years 
+ Kendall's Monthly      Correlation Coefficient 1.000                          .002         
+ tau_b     household    Sig. (2-tailed)         .                              .867         
+           income (EUR) N                       2186                           2186         
+           Age in years Correlation Coefficient .002                           1.000        
+                        Sig. (2-tailed)         .867                           .            
+                        N                       2186                           2500         
+
+=========== Test 1f ===========
+
+Kendall Tau: Comprehensive variable set
+
+Nonparametric Correlations
+Correlations
+
+                                               Life satisfaction Monthly household Age in years Political         Environmental     
+                                               (1=dissatisfied,  income (EUR)                   orientation       concern (1=low,   
+                                               5=satisfied)                                     (1=left, 5=right) 5=high)           
+ Kendall's Life satisfaction Correlation       1.000             .353(**)          -.018        -.004             .002              
+ tau_b     (1=dissatisfied,  Coefficient                                                                                            
+           5=satisfied)      Sig. (2-tailed)   .                 .000              .232         .832              .903              
+                             N                 2421              2115              2421         2228              2324              
+           Monthly household Correlation       .353(**)          1.000             .002         -.022             .003              
+           income (EUR)      Coefficient                                                                                            
+                             Sig. (2-tailed)   .000              .                 .867         .189              .868              
+                             N                 2115              2186              2186         2008              2097              
+           Age in years      Correlation       -.018             .002              1.000        -.027             .015              
+                             Coefficient                                                                                            
+                             Sig. (2-tailed)   .232              .867              .            .079              .321              
+                             N                 2421              2186              2500         2299              2400              
+           Political         Correlation       -.004             -.022             -.027        1.000             -.486(**)         
+           orientation       Coefficient                                                                                            
+           (1=left, 5=right) Sig. (2-tailed)   .832              .189              .079         .                 .000              
+                             N                 2228              2008              2299         2299              2207              
+           Environmental     Correlation       .002              .003              .015         -.486(**)         1.000             
+           concern (1=low,   Coefficient                                                                                            
+           5=high)           Sig. (2-tailed)   .903              .868              .321         .000              .                 
+                             N                 2324              2097              2400         2207              2400              
+** Correlation is significant at the 0.01 level (2-tailed).
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+Kendall Tau: Life satisfaction, Political orientation, Trust media (weighted)
+
+Nonparametric Correlations
+Correlations
+
+                                                     Life satisfaction      Political orientation      Trust in media (1=none,      
+                                                     (1=dissatisfied,       (1=left, 5=right)          5=complete)                  
+                                                     5=satisfied)                                                                   
+ Kendall's Life satisfaction Correlation Coefficient 1.000                  -.004                      .023                         
+ tau_b     (1=dissatisfied,  Sig. (2-tailed)         .                      .832                       .176                         
+           5=satisfied)      N                       2421                   2228                       2291                         
+           Political         Correlation Coefficient -.004                  1.000                      .003                         
+           orientation       Sig. (2-tailed)         .832                   .                          .883                         
+           (1=left, 5=right) N                       2228                   2299                       2177                         
+           Trust in media    Correlation Coefficient .023                   .003                       1.000                        
+           (1=none,          Sig. (2-tailed)         .176                   .883                       .                            
+           5=complete)       N                       2291                   2177                       2367                         
+
+=========== Test 2b ===========
+
+Kendall Tau: Income, Age, Life satisfaction (weighted)
+
+Nonparametric Correlations
+Correlations
+
+                                                     Monthly household income (EUR) Age in years Life satisfaction (1=dissatisfied, 
+                                                                                                 5=satisfied)                       
+ Kendall's Monthly household Correlation Coefficient 1.000                          .002         .353(**)                           
+ tau_b     income (EUR)      Sig. (2-tailed)         .                              .867         .000                               
+                             N                       2186                           2186         2115                               
+           Age in years      Correlation Coefficient .002                           1.000        -.018                              
+                             Sig. (2-tailed)         .867                           .            .232                               
+                             N                       2186                           2500         2421                               
+           Life satisfaction Correlation Coefficient .353(**)                       -.018        1.000                              
+           (1=dissatisfied,  Sig. (2-tailed)         .000                           .232         .                                  
+           5=satisfied)      N                       2115                           2421         2421                               
+** Correlation is significant at the 0.01 level (2-tailed).
+
+=========== Test 2c ===========
+
+Kendall Tau: Trust government, Trust media, Trust science (weighted)
+
+Nonparametric Correlations
+Correlations
+
+                                                       Trust in government    Trust in media (1=none,     Trust in science (1=none, 
+                                                       (1=none, 5=complete)   5=complete)                 5=complete)               
+ Kendall's Trust in government Correlation Coefficient 1.000                  .006                        .022                      
+ tau_b     (1=none,            Sig. (2-tailed)         .                      .722                        .205                      
+           5=complete)         N                       2354                   2227                        2255                      
+           Trust in media      Correlation Coefficient .006                   1.000                       .013                      
+           (1=none,            Sig. (2-tailed)         .722                   .                           .455                      
+           5=complete)         N                       2227                   2367                        2272                      
+           Trust in science    Correlation Coefficient .022                   .013                        1.000                     
+           (1=none,            Sig. (2-tailed)         .205                   .455                        .                         
+           5=complete)         N                       2255                   2272                        2398                      
+
+=========== Test 2d ===========
+
+Kendall Tau: Political orientation with trust variables (weighted)
+
+Nonparametric Correlations
+Correlations
+
+                                                    Political          Trust in           Trust in media       Trust in science     
+                                                    orientation        government         (1=none, 5=complete) (1=none, 5=complete) 
+                                                    (1=left, 5=right)  (1=none,                                                     
+                                                                       5=complete)                                                  
+ Kendall's Political           Correlation          1.000              -.045(*)           .003                 .027                 
+ tau_b     orientation         Coefficient                                                                                          
+           (1=left, 5=right)   Sig. (2-tailed)      .                  .011               .883                 .129                 
+                               N                    2299               2168               2177                 2202                 
+           Trust in government Correlation          -.045(*)           1.000              .006                 .022                 
+           (1=none,            Coefficient                                                                                          
+           5=complete)         Sig. (2-tailed)      .011               .                  .722                 .205                 
+                               N                    2168               2354               2227                 2255                 
+           Trust in media      Correlation          .003               .006               1.000                .013                 
+           (1=none,            Coefficient                                                                                          
+           5=complete)         Sig. (2-tailed)      .883               .722               .                    .455                 
+                               N                    2177               2227               2367                 2272                 
+           Trust in science    Correlation          .027               .022               .013                 1.000                
+           (1=none,            Coefficient                                                                                          
+           5=complete)         Sig. (2-tailed)      .129               .205               .455                 .                    
+                               N                    2202               2255               2272                 2398                 
+* Correlation is significant at the 0.05 level (2-tailed).
+
+=========== Test 2e ===========
+
+Kendall Tau: Income and Age (weighted)
+
+Nonparametric Correlations
+Correlations
+
+                                                Monthly household income (EUR) Age in years 
+ Kendall's Monthly      Correlation Coefficient 1.000                          .002         
+ tau_b     household    Sig. (2-tailed)         .                              .867         
+           income (EUR) N                       2186                           2186         
+           Age in years Correlation Coefficient .002                           1.000        
+                        Sig. (2-tailed)         .867                           .            
+                        N                       2186                           2500         
+
+=========== Test 2f ===========
+
+Kendall Tau: Comprehensive variable set (weighted)
+
+Nonparametric Correlations
+Correlations
+
+                                               Life satisfaction Monthly household Age in years Political         Environmental     
+                                               (1=dissatisfied,  income (EUR)                   orientation       concern (1=low,   
+                                               5=satisfied)                                     (1=left, 5=right) 5=high)           
+ Kendall's Life satisfaction Correlation       1.000             .353(**)          -.018        -.004             .002              
+ tau_b     (1=dissatisfied,  Coefficient                                                                                            
+           5=satisfied)      Sig. (2-tailed)   .                 .000              .232         .832              .903              
+                             N                 2421              2115              2421         2228              2324              
+           Monthly household Correlation       .353(**)          1.000             .002         -.022             .003              
+           income (EUR)      Coefficient                                                                                            
+                             Sig. (2-tailed)   .000              .                 .867         .189              .868              
+                             N                 2115              2186              2186         2008              2097              
+           Age in years      Correlation       -.018             .002              1.000        -.027             .015              
+                             Coefficient                                                                                            
+                             Sig. (2-tailed)   .232              .867              .            .079              .321              
+                             N                 2421              2186              2500         2299              2400              
+           Political         Correlation       -.004             -.022             -.027        1.000             -.486(**)         
+           orientation       Coefficient                                                                                            
+           (1=left, 5=right) Sig. (2-tailed)   .832              .189              .079         .                 .000              
+                             N                 2228              2008              2299         2299              2207              
+           Environmental     Correlation       .002              .003              .015         -.486(**)         1.000             
+           concern (1=low,   Coefficient                                                                                            
+           5=high)           Sig. (2-tailed)   .903              .868              .321         .000              .                 
+                             N                 2324              2097              2400         2207              2400              
+** Correlation is significant at the 0.01 level (2-tailed).
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Kendall Tau: Life satisfaction, Political orientation, Trust media (grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                        Life satisfaction    Political            Trust in media       
+                                                                     (1=dissatisfied,     orientation (1=left, (1=none, 5=complete) 
+                                                                     5=satisfied)         5=right)                                  
+ Kendall's East               Life satisfaction Correlation          1.000                .007                 -.049                
+ tau_b                        (1=dissatisfied,  Coefficient                                                                         
+                              5=satisfied)      Sig. (2-tailed)      .                    .851                 .216                 
+                                                N                    465                  427                  440                  
+                              Political         Correlation          .007                 1.000                .058                 
+                              orientation       Coefficient                                                                         
+                              (1=left, 5=right) Sig. (2-tailed)      .851                 .                    .153                 
+                                                N                    427                  443                  420                  
+                              Trust in media    Correlation          -.049                .058                 1.000                
+                              (1=none,          Coefficient                                                                         
+                              5=complete)       Sig. (2-tailed)      .216                 .153                 .                    
+                                                N                    440                  420                  460                  
+           West               Life satisfaction Correlation          1.000                -.007                .040(*)              
+                              (1=dissatisfied,  Coefficient                                                                         
+                              5=satisfied)      Sig. (2-tailed)      .                    .733                 .037                 
+                                                N                    1956                 1801                 1851                 
+                              Political         Correlation          -.007                1.000                -.010                
+                              orientation       Coefficient                                                                         
+                              (1=left, 5=right) Sig. (2-tailed)      .733                 .                    .608                 
+                                                N                    1801                 1856                 1757                 
+                              Trust in media    Correlation          .040(*)              -.010                1.000                
+                              (1=none,          Coefficient                                                                         
+                              5=complete)       Sig. (2-tailed)      .037                 .608                 .                    
+                                                N                    1851                 1757                 1907                 
+* Correlation is significant at the 0.05 level (2-tailed).
+
+=========== Test 3b ===========
+
+Kendall Tau: Income, Age, Life satisfaction (grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                           Monthly household       Age in years Life satisfaction      
+                                                                        income (EUR)                         (1=dissatisfied,       
+                                                                                                             5=satisfied)           
+ Kendall's East               Monthly household Correlation Coefficient 1.000                   .040         .338(**)               
+ tau_b                        income (EUR)      Sig. (2-tailed)         .                       .227         .000                   
+                                                N                       429                     429          410                    
+                              Age in years      Correlation Coefficient .040                    1.000        -.030                  
+                                                Sig. (2-tailed)         .227                    .            .380                   
+                                                N                       429                     485          465                    
+                              Life satisfaction Correlation Coefficient .338(**)                -.030        1.000                  
+                              (1=dissatisfied,  Sig. (2-tailed)         .000                    .380         .                      
+                              5=satisfied)      N                       410                     465          465                    
+           West               Monthly household Correlation Coefficient 1.000                   -.006        .357(**)               
+                              income (EUR)      Sig. (2-tailed)         .                       .726         .000                   
+                                                N                       1757                    1757         1705                   
+                              Age in years      Correlation Coefficient -.006                   1.000        -.015                  
+                                                Sig. (2-tailed)         .726                    .            .377                   
+                                                N                       1757                    2015         1956                   
+                              Life satisfaction Correlation Coefficient .357(**)                -.015        1.000                  
+                              (1=dissatisfied,  Sig. (2-tailed)         .000                    .377         .                      
+                              5=satisfied)      N                       1705                    1956         1956                   
+** Correlation is significant at the 0.01 level (2-tailed).
+
+=========== Test 3c ===========
+
+Kendall Tau: Trust variables (grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                          Trust in           Trust in media       Trust in science     
+                                                                       government         (1=none, 5=complete) (1=none, 5=complete) 
+                                                                       (1=none,                                                     
+                                                                       5=complete)                                                  
+ Kendall's East               Trust in government Correlation          1.000              -.022                .003                 
+ tau_b                        (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .                  .570                 .937                 
+                                                  N                    460                435                  444                  
+                              Trust in media      Correlation          -.022              1.000                .042                 
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .570               .                    .284                 
+                                                  N                    435                460                  447                  
+                              Trust in science    Correlation          .003               .042                 1.000                
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .937               .284                 .                    
+                                                  N                    444                447                  469                  
+           West               Trust in government Correlation          1.000              .013                 .027                 
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .                  .505                 .168                 
+                                                  N                    1894               1792                 1811                 
+                              Trust in media      Correlation          .013               1.000                .006                 
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .505               .                    .749                 
+                                                  N                    1792               1907                 1825                 
+                              Trust in science    Correlation          .027               .006                 1.000                
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .168               .749                 .                    
+                                                  N                    1811               1825                 1929                 
+
+=========== Test 3d ===========
+
+Kendall Tau: Income and Age (grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                      Monthly household income (EUR) Age in years 
+ Kendall's East               Monthly      Correlation Coefficient 1.000                          .040         
+ tau_b                        household    Sig. (2-tailed)         .                              .227         
+                              income (EUR) N                       429                            429          
+                              Age in years Correlation Coefficient .040                           1.000        
+                                           Sig. (2-tailed)         .227                           .            
+                                           N                       429                            485          
+           West               Monthly      Correlation Coefficient 1.000                          -.006        
+                              household    Sig. (2-tailed)         .                              .726         
+                              income (EUR) N                       1757                           1757         
+                              Age in years Correlation Coefficient -.006                          1.000        
+                                           Sig. (2-tailed)         .726                           .            
+                                           N                       1757                           2015         
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Kendall Tau: Life satisfaction, Political orientation, Trust media (weighted, grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                        Life satisfaction    Political            Trust in media       
+                                                                     (1=dissatisfied,     orientation (1=left, (1=none, 5=complete) 
+                                                                     5=satisfied)         5=right)                                  
+ Kendall's East               Life satisfaction Correlation          1.000                .007                 -.049                
+ tau_b                        (1=dissatisfied,  Coefficient                                                                         
+                              5=satisfied)      Sig. (2-tailed)      .                    .851                 .216                 
+                                                N                    465                  427                  440                  
+                              Political         Correlation          .007                 1.000                .058                 
+                              orientation       Coefficient                                                                         
+                              (1=left, 5=right) Sig. (2-tailed)      .851                 .                    .153                 
+                                                N                    427                  443                  420                  
+                              Trust in media    Correlation          -.049                .058                 1.000                
+                              (1=none,          Coefficient                                                                         
+                              5=complete)       Sig. (2-tailed)      .216                 .153                 .                    
+                                                N                    440                  420                  460                  
+           West               Life satisfaction Correlation          1.000                -.007                .040(*)              
+                              (1=dissatisfied,  Coefficient                                                                         
+                              5=satisfied)      Sig. (2-tailed)      .                    .733                 .037                 
+                                                N                    1956                 1801                 1851                 
+                              Political         Correlation          -.007                1.000                -.010                
+                              orientation       Coefficient                                                                         
+                              (1=left, 5=right) Sig. (2-tailed)      .733                 .                    .608                 
+                                                N                    1801                 1856                 1757                 
+                              Trust in media    Correlation          .040(*)              -.010                1.000                
+                              (1=none,          Coefficient                                                                         
+                              5=complete)       Sig. (2-tailed)      .037                 .608                 .                    
+                                                N                    1851                 1757                 1907                 
+* Correlation is significant at the 0.05 level (2-tailed).
+
+=========== Test 4b ===========
+
+Kendall Tau: Income, Age, Life satisfaction (weighted, grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                           Monthly household       Age in years Life satisfaction      
+                                                                        income (EUR)                         (1=dissatisfied,       
+                                                                                                             5=satisfied)           
+ Kendall's East               Monthly household Correlation Coefficient 1.000                   .040         .338(**)               
+ tau_b                        income (EUR)      Sig. (2-tailed)         .                       .227         .000                   
+                                                N                       429                     429          410                    
+                              Age in years      Correlation Coefficient .040                    1.000        -.030                  
+                                                Sig. (2-tailed)         .227                    .            .380                   
+                                                N                       429                     485          465                    
+                              Life satisfaction Correlation Coefficient .338(**)                -.030        1.000                  
+                              (1=dissatisfied,  Sig. (2-tailed)         .000                    .380         .                      
+                              5=satisfied)      N                       410                     465          465                    
+           West               Monthly household Correlation Coefficient 1.000                   -.006        .357(**)               
+                              income (EUR)      Sig. (2-tailed)         .                       .726         .000                   
+                                                N                       1757                    1757         1705                   
+                              Age in years      Correlation Coefficient -.006                   1.000        -.015                  
+                                                Sig. (2-tailed)         .726                    .            .377                   
+                                                N                       1757                    2015         1956                   
+                              Life satisfaction Correlation Coefficient .357(**)                -.015        1.000                  
+                              (1=dissatisfied,  Sig. (2-tailed)         .000                    .377         .                      
+                              5=satisfied)      N                       1705                    1956         1956                   
+** Correlation is significant at the 0.01 level (2-tailed).
+
+=========== Test 4c ===========
+
+Kendall Tau: Trust variables (weighted, grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                          Trust in           Trust in media       Trust in science     
+                                                                       government         (1=none, 5=complete) (1=none, 5=complete) 
+                                                                       (1=none,                                                     
+                                                                       5=complete)                                                  
+ Kendall's East               Trust in government Correlation          1.000              -.022                .003                 
+ tau_b                        (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .                  .570                 .937                 
+                                                  N                    460                435                  444                  
+                              Trust in media      Correlation          -.022              1.000                .042                 
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .570               .                    .284                 
+                                                  N                    435                460                  447                  
+                              Trust in science    Correlation          .003               .042                 1.000                
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .937               .284                 .                    
+                                                  N                    444                447                  469                  
+           West               Trust in government Correlation          1.000              .013                 .027                 
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .                  .505                 .168                 
+                                                  N                    1894               1792                 1811                 
+                              Trust in media      Correlation          .013               1.000                .006                 
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .505               .                    .749                 
+                                                  N                    1792               1907                 1825                 
+                              Trust in science    Correlation          .027               .006                 1.000                
+                              (1=none,            Coefficient                                                                       
+                              5=complete)         Sig. (2-tailed)      .168               .749                 .                    
+                                                  N                    1811               1825                 1929                 
+
+=========== Test 4d ===========
+
+Kendall Tau: Income and Age (weighted, grouped by region)
+
+Nonparametric Correlations
+Correlations
+
+           Region (East/West)                                      Monthly household income (EUR) Age in years 
+ Kendall's East               Monthly      Correlation Coefficient 1.000                          .040         
+ tau_b                        household    Sig. (2-tailed)         .                              .227         
+                              income (EUR) N                       429                            429          
+                              Age in years Correlation Coefficient .040                           1.000        
+                                           Sig. (2-tailed)         .227                           .            
+                                           N                       429                            485          
+           West               Monthly      Correlation Coefficient 1.000                          -.006        
+                              household    Sig. (2-tailed)         .                              .726         
+                              income (EUR) N                       1757                           1757         
+                              Age in years Correlation Coefficient -.006                          1.000        
+                                           Sig. (2-tailed)         .726                           .            
+                                           N                       1757                           2015         
+
+=========== EDGE CASES ===========
+
+=========== Test 5a ===========
+
+Edge Case: Single pair correlation
+
+Nonparametric Correlations
+Correlations
+
+                                                     Life satisfaction (1=dissatisfied,     Political orientation (1=left, 5=right) 
+                                                     5=satisfied)                                                                   
+ Kendall's Life satisfaction Correlation Coefficient 1.000                                  -.004                                   
+ tau_b     (1=dissatisfied,  Sig. (2-tailed)         .                                      .832                                    
+           5=satisfied)      N                       2421                                   2228                                    
+           Political         Correlation Coefficient -.004                                  1.000                                   
+           orientation       Sig. (2-tailed)         .832                                   .                                       
+           (1=left, 5=right) N                       2228                                   2299                                    
+
+=========== Test 5b ===========
+
+Edge Case: Listwise deletion
+
+Nonparametric Correlations
+Correlations(a)
+
+                                                             Life satisfaction      Political orientation Trust in media (1=none,   
+                                                             (1=dissatisfied,       (1=left, 5=right)     5=complete)               
+                                                             5=satisfied)                                                           
+ Kendall's Life satisfaction         Correlation Coefficient 1.000                  .000                  .024                      
+ tau_b     (1=dissatisfied,                                                                                                         
+           5=satisfied)              Sig. (2-tailed)         .                      .989                  .173                      
+           Political orientation     Correlation Coefficient .000                   1.000                 .006                      
+           (1=left, 5=right)         Sig. (2-tailed)         .989                   .                     .745                      
+           Trust in media (1=none,   Correlation Coefficient .024                   .006                  1.000                     
+           5=complete)               Sig. (2-tailed)         .173                   .745                  .                         
+a Listwise N = 2109
+
+=========== Test 5c ===========
+
+Edge Case: One-tailed test
+
+Nonparametric Correlations
+Correlations
+
+                                                Monthly household income (EUR) Age in years 
+ Kendall's Monthly      Correlation Coefficient 1.000                          .002         
+ tau_b     household    Sig. (1-tailed)         .                              .433         
+           income (EUR) N                       2186                           2186         
+           Age in years Correlation Coefficient .002                           1.000        
+                        Sig. (1-tailed)         .433                           .            
+                        N                       2186                           2500         
+

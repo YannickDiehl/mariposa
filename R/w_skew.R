@@ -326,6 +326,10 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_skew objects
+#'
+#' @param x A w_skew object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_skew
 print.w_skew <- function(x, digits = 3, ...) {

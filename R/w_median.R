@@ -260,6 +260,10 @@ w_median <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_median objects
+#'
+#' @param x A w_median object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_median
 print.w_median <- function(x, digits = 3, ...) {
