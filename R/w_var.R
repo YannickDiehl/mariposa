@@ -288,6 +288,10 @@ w_var <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_var objects
+#'
+#' @param x A w_var object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_var
 print.w_var <- function(x, digits = 3, ...) {

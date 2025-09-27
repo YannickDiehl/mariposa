@@ -9,7 +9,7 @@
 #' @importFrom tidyselect eval_select starts_with ends_with contains where all_of any_of
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble tibble as_tibble
-#' @importFrom stats var sd median quantile IQR na.omit complete.cases TukeyHSD aov as.formula chisq.test confint cor lm oneway.test pf pt ptukey qf qnorm qt qtukey t.test weighted.mean wilcox.test xtabs
+#' @importFrom stats var sd median quantile IQR na.omit complete.cases TukeyHSD aov as.formula chisq.test confint cor lm oneway.test pf pnorm pt ptukey qf qnorm qt qtukey t.test weighted.mean wilcox.test xtabs
 #' @importFrom utils head tail str capture.output combn
 NULL
 

@@ -296,6 +296,10 @@ w_se <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_se objects
+#'
+#' @param x A w_se object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_se
 print.w_se <- function(x, digits = 3, ...) {

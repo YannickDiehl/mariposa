@@ -125,8 +125,8 @@
 #' - Both equal and unequal variance assumptions displayed
 #' 
 #' ## Interpretation Guidelines
-#' - **p-values**: p < 0.05 indicates statistical significance at α = 0.05
-#' - **Effect sizes**: |effect| ≈ 0.2 (small), |effect| ≈ 0.5 (medium), |effect| ≈ 0.8 (large)
+#' - **p-values**: p < 0.05 indicates statistical significance at alpha = 0.05
+#' - **Effect sizes**: |effect| ~ 0.2 (small), |effect| ~ 0.5 (medium), |effect| ~ 0.8 (large)
 #' - **Cohen's d**: Classic effect size using pooled standard deviation
 #' - **Hedges' g**: Bias-corrected version, preferred for publication
 #' - **Glass' Delta**: Uses control group SD only, useful when variances differ substantially
@@ -1044,12 +1044,16 @@ print.t_test_results <- function(x, digits = 3, ...) {
   cat("- Cohen's d: pooled standard deviation (classic)\n")
   cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
   cat("- Glass' Delta: control group standard deviation only\n")
-  cat("- Small effect: |effect| ≈ 0.2\n")
-  cat("- Medium effect: |effect| ≈ 0.5\n")
-  cat("- Large effect: |effect| ≈ 0.8\n")
+  cat("- Small effect: |effect| ~ 0.2\n")
+  cat("- Medium effect: |effect| ~ 0.5\n")
+  cat("- Large effect: |effect| ~ 0.8\n")
 }
 
-#' Print method for t_test_result 
+#' Print method for t_test_result
+#'
+#' @param x A t_test_result object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print t_test_result
 print.t_test_result <- function(x, digits = 3, ...) {
@@ -1310,9 +1314,9 @@ print.t_test_result <- function(x, digits = 3, ...) {
   cat("- Cohen's d: pooled standard deviation (classic)\n")
   cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
   cat("- Glass' Delta: control group standard deviation only\n")
-  cat("- Small effect: |effect| ≈ 0.2\n")
-  cat("- Medium effect: |effect| ≈ 0.5\n")
-  cat("- Large effect: |effect| ≈ 0.8\n")
+  cat("- Small effect: |effect| ~ 0.2\n")
+  cat("- Medium effect: |effect| ~ 0.5\n")
+  cat("- Large effect: |effect| ~ 0.8\n")
 }
 
 

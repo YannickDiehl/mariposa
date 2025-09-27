@@ -14,21 +14,14 @@
 * checking package namespace information ... OK
 * checking package dependencies ... INFO
 Package suggested but not available for checking: ‘covr’
-* checking if this is a source package ... NOTE
-Subdirectory ‘SurveyStat.Rcheck/SurveyStat’ seems to contain an installed version of the package.
+* checking if this is a source package ... OK
 * checking if there is a namespace ... OK
 * checking for executable files ... OK
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
-  .DS_Store
   .github/.gitignore
   .gitignore
-  R/.DS_Store
-  tests/.DS_Store
-  tests/spss_reference/.DS_Store
-  tests/spss_reference/outputs/.DS_Store
-  tests/spss_reference/syntax/.DS_Store
-  tests/testthat/.DS_Store
+  vignettes/.build.timestamp
   ..Rcheck
   .Rproj.user
   .claude
@@ -36,16 +29,7 @@ Found the following hidden files and directories:
   .github
 These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
-* checking for portable file names ... NOTE
-Found the following non-portable file paths:
-  SurveyStat/SurveyStat.Rcheck/00_pkg_src/SurveyStat/tests/spss_reference/outputs/frequencies_output.txt
-  SurveyStat/SurveyStat.Rcheck/00_pkg_src/SurveyStat/tests/spss_reference/outputs/pearson_cor_output.txt
-  SurveyStat/SurveyStat.Rcheck/00_pkg_src/SurveyStat/tests/spss_reference/syntax/pearson_correlation.sps
-
-Tarballs are only required to store paths of up to 100 bytes and cannot
-store those of more than 256 bytes, with restrictions including to 100
-bytes for the final component.
-See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘SurveyStat’ can be installed ... OK
 * checking installed package size ... OK
@@ -56,19 +40,15 @@ Checking should be performed on sources prepared by ‘R CMD build’.
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
-Found the following directories with names of check directories:
+Found the following directory with the name of a check directory:
   ./..Rcheck
-  ./SurveyStat.Rcheck
 Most likely, these were included erroneously.
-Subdirectory ‘inst’ contains no files.
 * checking code files for non-ASCII characters ... WARNING
 Found the following files with non-ASCII characters:
-  R/levene_test.R
+  R/chi_squared_test.R
+  R/kendall_tau.R
   R/mann_whitney_test.R
-  R/mauchly_test.R
-  R/oneway_anova_test.R
   R/pearson_cor.R
-  R/t_test.R
 Portable packages must use only ASCII characters in their R code and
 NAMESPACE directives, except perhaps in comments.
 Use \uxxxx escapes for other characters.
@@ -81,25 +61,10 @@ characters in files.
 * checking whether the namespace can be loaded with stated dependencies ... OK
 * checking whether the namespace can be unloaded cleanly ... OK
 * checking dependencies in R code ... OK
-* checking S3 generic/method consistency ... WARNING
-levene_test:
-  function(x, ...)
-levene_test.grouped_df:
-  function(data, variable, group, weights, center, ...)
-See section ‘Generic functions and methods’ in the ‘Writing R
-Extensions’ manual.
+* checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-pearson_cor : calculate_weighted_cor: no visible global function
-  definition for ‘cor’
-pearson_cor : calculate_weighted_cor: no visible global function
-  definition for ‘qnorm’
-Undefined global functions or variables:
-  cor qnorm
-Consider adding
-  importFrom("stats", "cor", "qnorm")
-to your NAMESPACE file.
+* checking R code for possible problems ... OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd cross-references ... INFO
@@ -113,42 +78,6 @@ Documented arguments not in \usage in Rd file 'dot-process_weights.Rd':
 Undocumented arguments in Rd file 'levene_test.Rd'
   ‘variable’
 
-Undocumented arguments in Rd file 'print.levene_test_results.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.mann_whitney_test_results.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.t_test_result.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_iqr.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_mean.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_median.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_modus.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_range.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_sd.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_se.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_skew.Rd'
-  ‘x’ ‘digits’ ‘...’
-
-Undocumented arguments in Rd file 'print.w_var.Rd'
-  ‘x’ ‘digits’ ‘...’
-
 Functions with \usage entries need to have the appropriate \alias
 entries, and all their arguments documented.
 The \usage entries must correspond to syntactically valid R code.
@@ -160,70 +89,16 @@ Extensions’ manual.
 * checking data for non-ASCII characters ... OK
 * checking LazyData ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking files in ‘vignettes’ ... WARNING
-Files in the 'vignettes' directory but no files in 'inst/doc':
-  ‘introduction.Rmd’
-* checking examples ... ERROR
-Running examples in ‘SurveyStat-Ex.R’ failed
-The error most likely occurred in:
-
-> ### Name: longitudinal_data
-> ### Title: Longitudinal Study Data (Synthetic)
-> ### Aliases: longitudinal_data
-> ### Keywords: datasets
-> 
-> ### ** Examples
-> 
-> # Load required packages and data
-> library(dplyr)
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-> data(longitudinal_data)
-> 
-> # Simple repeated measures ANOVA (within-subjects only)
-> data(longitudinal_data_wide)
-> longitudinal_data_wide %>%
-+   rm_anova_test(score_T1, score_T2, score_T3, subject_id = subject_id)
-Error in rm_anova_test(., score_T1, score_T2, score_T3, subject_id = subject_id) : 
-  could not find function "rm_anova_test"
-Calls: %>%
-Execution halted
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... OK
 * checking for unstated dependencies in ‘tests’ ... OK
-* checking tests ... ERROR
-  Running ‘template-spss-validation.R’
-Running the tests in ‘tests/template-spss-validation.R’ failed.
-Last 13 lines of output:
-  ── Error: Test 1: Unweighted/Ungrouped analysis matches SPSS ───────────────────
-  Error in `FUNCTION_NAME(., VARIABLE_NAME)`: could not find function "FUNCTION_NAME"
-  Backtrace:
-      ▆
-   1. └─survey_data %>% FUNCTION_NAME(VARIABLE_NAME)
-  
-  Error:
-  ! Test failed
-  Backtrace:
-      ▆
-   1. ├─testthat::test_that(...)
-   2. │ └─withr (local) `<fn>`()
-   3. └─reporter$stop_if_needed()
-   4.   └─rlang::abort("Test failed", call = NULL)
-  Execution halted
+* checking tests ... OK
+  Running ‘testthat.R’
 * checking for unstated dependencies in vignettes ... OK
-* checking package vignettes ... WARNING
-Directory 'inst/doc' does not exist.
-Package vignette without corresponding single PDF/HTML:
-  ‘introduction.Rmd’
+* checking package vignettes ... OK
 * checking running R code from vignettes ... OK
   ‘introduction.Rmd’ using ‘UTF-8’... OK
 * checking re-building of vignette outputs ... SKIPPED
 * DONE
-Status: 2 ERRORs, 6 WARNINGs, 5 NOTEs
+Status: 3 WARNINGs, 2 NOTEs

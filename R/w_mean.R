@@ -286,6 +286,10 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_mean objects
+#'
+#' @param x A w_mean object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_mean
 print.w_mean <- function(x, digits = 3, ...) {

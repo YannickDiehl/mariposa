@@ -263,6 +263,10 @@ w_iqr <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_iqr objects
+#'
+#' @param x A w_iqr object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_iqr
 print.w_iqr <- function(x, digits = 3, ...) {

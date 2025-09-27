@@ -9,7 +9,7 @@
 #' and multiple variables simultaneously.
 #' 
 #' The function provides SPSS-compatible results including effect size calculations 
-#' (r = |Z|/√(n1 + n2)) and is particularly designed for survey data analysis where 
+#' (r = |Z|/sqrt(n1 + n2)) and is particularly designed for survey data analysis where 
 #' sampling weights are crucial for population-representative results.
 #'
 #' @param data A data frame or tibble containing the variables to analyze.
@@ -47,7 +47,7 @@
 #'   \item{W}{Wilcoxon rank-sum statistic (rank sum of group with smaller U-value, SPSS-compatible)}
 #'   \item{Z}{Standardized test statistic with tie correction}
 #'   \item{p_value}{Two-tailed p-value}
-#'   \item{effect_size_r}{Effect size r = |Z|/√(n1 + n2)}
+#'   \item{effect_size_r}{Effect size r = |Z|/sqrt(n1 + n2)}
 #'   \item{rank_mean_diff}{Difference in rank means (group1 - group2)}
 #'   \item{group_stats}{List column with group-specific statistics}
 #' }
@@ -76,7 +76,7 @@
 #' For weighted tests, the function uses the survey package methodology:
 #' - Weighted ranking using midpoint method for tied values
 #' - Survey design-adjusted test statistics
-#' - Chi²-to-Z conversion for effect size calculation
+#' - Chi-squared-to-Z conversion for effect size calculation
 #' 
 #' The standardized test statistic is:
 #' \deqn{Z = \frac{U - \mu_U}{\sigma_U}}
@@ -91,8 +91,8 @@
 #' standardized measure of effect magnitude.
 #' 
 #' ## Interpretation Guidelines
-#' - **p-values**: p < 0.05 indicates statistical significance at α = 0.05
-#' - **Effect size r**: |r| ≈ 0.1 (small), |r| ≈ 0.3 (medium), |r| ≈ 0.5 (large effect)
+#' - **p-values**: p < 0.05 indicates statistical significance at alpha = 0.05
+#' - **Effect size r**: |r| ~ 0.1 (small), |r| ~ 0.3 (medium), |r| ~ 0.5 (large effect)
 #' - **Rank differences**: Positive values indicate group 1 has higher average ranks
 #' - **U-statistic**: Smaller values indicate greater separation between groups
 #' - **W-statistic**: Represents the rank sum of the group contributing to the minimum U
@@ -477,7 +477,11 @@ mann_whitney_test <- function(data, ..., group, weights = NULL, mu = 0,
 }
 
 #' Print method for Mann-Whitney test results
-#' @export  
+#'
+#' @param x A mann_whitney_test_results object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
+#' @export
 #' @method print mann_whitney_test_results
 print.mann_whitney_test_results <- function(x, digits = 3, ...) {
   

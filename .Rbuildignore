@@ -20,7 +20,11 @@
 ^dev/planning$
 ^TODO\.md$
 ^\.DS_Store$
+^.*\.DS_Store$
 ^.*\.backup$
+^.*\.Rcheck$
+^SurveyStat\.Rcheck$
+^\.\./
 ^.*_backup\.R$
 ^test_results\.txt$
 ^SPSS_MILESTONE_COMMIT\.sh$
@@ -28,3 +32,7 @@
 ^dev/.*\.sav$
 ^inst/laterImplementation$
 ^R/laterImplementation$
+^Test\.R$
+^test_.*\.R$
+^SurveyStat_.*\.tar\.gz$
+^CLAUDE\.md$
