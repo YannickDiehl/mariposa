@@ -31,7 +31,7 @@ survey_data |>
 
 
 survey_data |>
-  chi_squared_test(education, employment, weights = sampling_weight)
+  chi_squared_test(gender, region, weights = sampling_weight)
 
 survey_data |>
   group_by(region) |> 

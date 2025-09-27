@@ -56,6 +56,36 @@ record_chi_squared_comparison <- function(test_name, metric, expected, actual, t
 }
 
 # ============================================================================
+# ADAPTIVE TOLERANCE FUNCTION
+# ============================================================================
+# Provides appropriate tolerance levels based on the type and magnitude of values
+# being compared, ensuring strict validation where it matters most
+
+adaptive_tolerance <- function(expected, type = "p_value") {
+  if (type == "p_value") {
+    # For p-values: strict for small/significant values, relaxed for large
+    if (is.na(expected)) return(0.001)
+    if (expected < 0.001) return(0.0001)  # Very strict for highly significant
+    if (expected < 0.05)  return(0.001)   # Strict for significant
+    if (expected < 0.1)   return(0.005)   # Moderate for borderline
+    return(0.01)                           # Relaxed for non-significant
+  }
+  if (type == "statistic") {
+    return(0.001)  # Always strict for test statistics
+  }
+  if (type == "effect_size") {
+    return(0.002)  # Moderate for effect sizes
+  }
+  if (type == "gamma_p") {
+    # Higher tolerance for Gamma p-values due to ASE calculation differences
+    # SPSS uses proprietary ASE formula while we use Goodman-Kruskal approximation
+    return(0.05)
+  }
+  # Default
+  return(0.001)
+}
+
+# ============================================================================
 # SPSS REFERENCE VALUES (from chi_squared_output.txt)
 # ============================================================================
 
@@ -299,11 +329,7 @@ spss_chi_squared_values <- list(
 # HELPER FUNCTION TO COMPARE CHI-SQUARED RESULTS
 # ============================================================================
 
-compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
-                                         tolerance_stat = 0.002,
-                                         tolerance_p = 0.002,
-                                         tolerance_effect = 0.002,
-                                         tolerance_p_effect = 0.2) {
+compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name) {
 
   # Extract R results from the results dataframe
   if (inherits(r_result, "chi_squared_test_results")) {
@@ -338,46 +364,50 @@ compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
   all_match <- TRUE
   
   # Chi-square statistic
-  match <- record_chi_squared_comparison(test_name, "Chi-square", 
+  tolerance_stat <- adaptive_tolerance(spss_ref$chi_square, "statistic")
+  match <- record_chi_squared_comparison(test_name, "Chi-square",
                                         spss_ref$chi_square, chi_sq, tolerance_stat)
   expect_equal(chi_sq, spss_ref$chi_square, tolerance = tolerance_stat,
                info = paste(test_name, "- Chi-square statistic"))
   all_match <- all_match && match
-  
-  # Degrees of freedom
-  match <- record_chi_squared_comparison(test_name, "df", 
+
+  # Degrees of freedom (exact match required)
+  match <- record_chi_squared_comparison(test_name, "df",
                                         spss_ref$df, df, 0)
   expect_equal(df, spss_ref$df, tolerance = 0,
                info = paste(test_name, "- Degrees of freedom"))
   all_match <- all_match && match
-  
-  # P-value
-  match <- record_chi_squared_comparison(test_name, "p-value", 
+
+  # P-value - use adaptive tolerance and check rounding
+  tolerance_p <- adaptive_tolerance(spss_ref$p_value, "p_value")
+  match <- record_chi_squared_comparison(test_name, "p-value",
                                         spss_ref$p_value, p_val, tolerance_p)
-  # Round to 3 decimals for comparison (SPSS precision)
+  # For SPSS compatibility, compare rounded values (SPSS displays 3 decimals)
   expect_equal(round(p_val, 3), round(spss_ref$p_value, 3),
                info = paste(test_name, "- P-value"))
   all_match <- all_match && match
-  
-  # Sample size
-  match <- record_chi_squared_comparison(test_name, "N", 
+
+  # Sample size (exact match required)
+  match <- record_chi_squared_comparison(test_name, "N",
                                         spss_ref$n_valid, n, 0)
   expect_equal(n, spss_ref$n_valid, tolerance = 0,
                info = paste(test_name, "- Sample size"))
   all_match <- all_match && match
-  
+
   # Cramér's V
   if (!is.null(spss_ref$cramers_v)) {
-    match <- record_chi_squared_comparison(test_name, "Cramer's V", 
+    tolerance_effect <- adaptive_tolerance(spss_ref$cramers_v, "effect_size")
+    match <- record_chi_squared_comparison(test_name, "Cramer's V",
                                           spss_ref$cramers_v, cramers_v, tolerance_effect)
     # Round both values to same precision as SPSS displays (3 decimals)
-    expect_equal(round(cramers_v, 3), round(spss_ref$cramers_v, 3), 
+    expect_equal(round(cramers_v, 3), round(spss_ref$cramers_v, 3),
                  info = paste(test_name, "- Cramér's V"))
     all_match <- all_match && match
   }
-  
+
   # Phi coefficient (for 2x2 tables)
   if (!is.null(spss_ref$phi)) {
+    tolerance_effect <- adaptive_tolerance(spss_ref$phi, "effect_size")
     match <- record_chi_squared_comparison(test_name, "Phi",
                                           spss_ref$phi, phi, tolerance_effect)
     # Round both values to same precision as SPSS displays (3 decimals)
@@ -388,6 +418,7 @@ compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
 
   # Goodman and Kruskal's Gamma
   if (!is.null(spss_ref$gamma)) {
+    tolerance_effect <- adaptive_tolerance(spss_ref$gamma, "effect_size")
     match <- record_chi_squared_comparison(test_name, "Gamma",
                                           spss_ref$gamma, gamma, tolerance_effect)
     # Round both values to same precision as SPSS displays (3 decimals)
@@ -398,31 +429,38 @@ compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
 
   # ========== P-VALUES FOR EFFECT SIZES ==========
 
-  # Phi p-value (for 2x2 tables)
+  # Phi p-value (for 2x2 tables) - same as chi-square p-value
   if (!is.null(spss_ref$phi_p_value)) {
+    tolerance_p_phi <- adaptive_tolerance(spss_ref$phi_p_value, "p_value")
     match <- record_chi_squared_comparison(test_name, "Phi p-value",
-                                          spss_ref$phi_p_value, phi_p, tolerance_p_effect)
-    # Use more lenient tolerance for p-values due to ASE approximation differences
-    expect_equal(phi_p, spss_ref$phi_p_value, tolerance = tolerance_p_effect,
+                                          spss_ref$phi_p_value, phi_p, tolerance_p_phi)
+    expect_equal(phi_p, spss_ref$phi_p_value, tolerance = tolerance_p_phi,
                  info = paste(test_name, "- Phi p-value"))
     all_match <- all_match && match
   }
 
-  # Cramér's V p-value
+  # Cramér's V p-value - same as chi-square p-value
   if (!is.null(spss_ref$cramers_v_p_value)) {
+    tolerance_p_cv <- adaptive_tolerance(spss_ref$cramers_v_p_value, "p_value")
     match <- record_chi_squared_comparison(test_name, "Cramer's V p-value",
-                                          spss_ref$cramers_v_p_value, cramers_v_p, tolerance_p_effect)
-    expect_equal(cramers_v_p, spss_ref$cramers_v_p_value, tolerance = tolerance_p_effect,
+                                          spss_ref$cramers_v_p_value, cramers_v_p, tolerance_p_cv)
+    expect_equal(cramers_v_p, spss_ref$cramers_v_p_value, tolerance = tolerance_p_cv,
                  info = paste(test_name, "- Cramér's V p-value"))
     all_match <- all_match && match
   }
 
   # Gamma p-value
+  # NOTE: Gamma p-values may differ significantly from SPSS due to different
+  # ASE (Asymptotic Standard Error) calculation methods. SPSS uses a proprietary
+  # formula while our implementation uses the Goodman-Kruskal approximation with
+  # empirical adjustment factors. This is a known limitation that affects the
+  # significance testing of the Gamma statistic but not the statistic itself.
   if (!is.null(spss_ref$gamma_p_value)) {
+    tolerance_p_gamma <- adaptive_tolerance(spss_ref$gamma_p_value, "gamma_p")
     match <- record_chi_squared_comparison(test_name, "Gamma p-value",
-                                          spss_ref$gamma_p_value, gamma_p, tolerance_p_effect)
-    expect_equal(gamma_p, spss_ref$gamma_p_value, tolerance = tolerance_p_effect,
-                 info = paste(test_name, "- Gamma p-value"))
+                                          spss_ref$gamma_p_value, gamma_p, tolerance_p_gamma)
+    expect_equal(gamma_p, spss_ref$gamma_p_value, tolerance = tolerance_p_gamma,
+                 info = paste(test_name, "- Gamma p-value (Note: ASE calculation differs from SPSS)"))
     all_match <- all_match && match
   }
 
