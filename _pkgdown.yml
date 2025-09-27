@@ -43,6 +43,13 @@ reference:
   - rm_t_test
   - rm_anova_test
 
+- title: "🔗 Correlation Analysis"
+  desc: "Correlation coefficients for continuous and ordinal variables"
+  contents:
+  - pearson_cor
+  - kendall_tau
+  - spearman_rho
+
 - title: "🔍 Post-Hoc Analysis"
   desc: "S3 generics for extended analysis of test results"
   contents:
