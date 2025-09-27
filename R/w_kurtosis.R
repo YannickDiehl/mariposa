@@ -337,7 +337,6 @@ w_kurtosis <- function(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE) {
 #'
 #' @return Invisibly returns the input object
 #' @keywords internal
-#' Print method for w_kurtosis objects
 #' @export
 #' @method print w_kurtosis
 print.w_kurtosis <- function(x, digits = 3, ...) {

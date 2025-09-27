@@ -38,7 +38,7 @@
 #' 
 #' ## Interpretation
 #' - **p > 0.05**: Variances are homogeneous (assumption met)
-#' - **p ≤ 0.05**: Variances are heterogeneous (assumption violated)
+#' - **p <= 0.05**: Variances are heterogeneous (assumption violated)
 #' 
 #' ## Usage with Other Tests
 #' The function can be used standalone or piped after other statistical tests:
@@ -380,7 +380,8 @@ levene_test.mann_whitney_test_results <- function(x, ...) {
 
 #' @rdname levene_test
 #' @export
-levene_test.grouped_df <- function(data, variable, group = NULL, weights = NULL, center = "mean", ...) {
+levene_test.grouped_df <- function(x, variable, group = NULL, weights = NULL, center = "mean", ...) {
+  data <- x
   
   # Get grouping variables
   group_vars <- dplyr::group_vars(data)
@@ -716,6 +717,10 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
 }
 
 #' Print method for Levene test results
+#'
+#' @param x A levene_test_results object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print levene_test_results
 print.levene_test_results <- function(x, digits = 3, ...) {
@@ -895,14 +900,14 @@ print.levene_test_results <- function(x, digits = 3, ...) {
   
   cat("\nInterpretation:\n")
   cat("- p > 0.05: Variances are homogeneous (equal variances assumed)\n")
-  cat("- p ≤ 0.05: Variances are heterogeneous (equal variances NOT assumed)\n")
+  cat("- p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)\n")
   
   # Always show recommendation for grouped data
   if (is_grouped_data) {
     cat("\nRecommendation based on Levene test:\n")
     unequal_groups <- sum(x$results$p_value <= 0.05, na.rm = TRUE)
     if (unequal_groups > 0) {
-      cat(sprintf("- %d group(s) show unequal variances (p ≤ 0.05)\n", unequal_groups))
+      cat(sprintf("- %d group(s) show unequal variances (p <= 0.05)\n", unequal_groups))
       cat("- Consider using Welch's t-test for groups with unequal variances\n")
     } else {
       cat("- All groups show equal variances (p > 0.05)\n")

@@ -21,7 +21,7 @@
 #' survey_data %>% w_modus(gender, weights = sampling_weight)
 #' 
 #' # Multiple variables (works best with categorical/discrete data)
-#' survey_data %>% w_modus(gender, region, education, weights = sampling_weight)
+#' survey_data %>% w_modus(gender, region, weights = sampling_weight)
 #' 
 #' # Grouped data
 #' survey_data %>% group_by(region) %>% w_modus(gender, weights = sampling_weight)
@@ -277,10 +277,20 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
             row_data$Variable <- var_name
             
             if (!is.null(weights_name)) {
-              row_data$weighted_mode <- group_results[[var_name]][1]
+              # Convert to character to avoid factor type conflicts
+              mode_val <- group_results[[var_name]][1]
+              if (is.factor(mode_val) || is.ordered(mode_val)) {
+                mode_val <- as.character(mode_val)
+              }
+              row_data$weighted_mode <- mode_val
               row_data$effective_n <- group_results[[paste0(var_name, "_eff_n")]][1]
             } else {
-              row_data$mode <- group_results[[var_name]][1]
+              # Convert to character to avoid factor type conflicts
+              mode_val <- group_results[[var_name]][1]
+              if (is.factor(mode_val) || is.ordered(mode_val)) {
+                mode_val <- as.character(mode_val)
+              }
+              row_data$mode <- mode_val
               row_data$n <- group_results[[paste0(var_name, "_n")]][1]
             }
             
@@ -292,10 +302,20 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
         row_data <- tibble::tibble(Variable = var_name)
         
         if (!is.null(weights_name)) {
-          row_data$weighted_mode <- results[[var_name]][1]
+          # Convert to character to avoid factor type conflicts
+          mode_val <- results[[var_name]][1]
+          if (is.factor(mode_val) || is.ordered(mode_val)) {
+            mode_val <- as.character(mode_val)
+          }
+          row_data$weighted_mode <- mode_val
           row_data$effective_n <- results[[paste0(var_name, "_eff_n")]][1]
         } else {
-          row_data$mode <- results[[var_name]][1]
+          # Convert to character to avoid factor type conflicts
+          mode_val <- results[[var_name]][1]
+          if (is.factor(mode_val) || is.ordered(mode_val)) {
+            mode_val <- as.character(mode_val)
+          }
+          row_data$mode <- mode_val
           row_data$n <- results[[paste0(var_name, "_n")]][1]
         }
         
@@ -339,6 +359,10 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Print method for w_modus objects
+#'
+#' @param x A w_modus object
+#' @param digits Number of decimal places to display
+#' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_modus
 print.w_modus <- function(x, digits = 3, ...) {

@@ -54,13 +54,13 @@
 #' 3. Transform back to r scale: \eqn{r = \frac{e^{2z} - 1}{e^{2z} + 1}}
 #' 
 #' ### Significance Testing
-#' Tests the null hypothesis H₀: ρ = 0 using:
+#' Tests the null hypothesis H0: rho = 0 using:
 #' \deqn{t = r\sqrt{\frac{n-2}{1-r^2}}}
 #' with df = n - 2 degrees of freedom.
 #' 
 #' ## Interpretation Guidelines
-#' - **Correlation strength**: |r| < 0.3 (weak), 0.3 ≤ |r| < 0.7 (moderate), |r| ≥ 0.7 (strong)
-#' - **Coefficient of determination (r²)**: Proportion of variance explained
+#' - **Correlation strength**: |r| < 0.3 (weak), 0.3 <= |r| < 0.7 (moderate), |r| >= 0.7 (strong)
+#' - **Coefficient of determination (r-squared)**: Proportion of variance explained
 #' - **p-values**: Test whether the correlation is significantly different from zero
 #' - **Confidence intervals**: Range of plausible values for the true correlation
 #' 
@@ -593,12 +593,12 @@ print.pearson_cor_results <- function(x, digits = 3, ...) {
       # For each pair of variables, show results like t_test does
       if (length(x$variables) == 2) {
         # Single correlation - use variable block format
-        var_pair <- paste(x$variables[1], "×", x$variables[2])
+        var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
         cat(sprintf("\n--- %s ---\n\n", var_pair))
         
         # Show correlation statistics
         cat(sprintf("  Correlation: r = %.3f\n", group_corrs$correlation[1]))
-        cat(sprintf("  Effect size: r² = %.3f\n", group_corrs$r_squared[1]))
+        cat(sprintf("  Effect size: r-squared = %.3f\n", group_corrs$r_squared[1]))
         cat(sprintf("  Sample size: n = %d\n", group_corrs$n[1]))
         cat(sprintf("  95%% CI: [%.3f, %.3f]\n", 
                    group_corrs$conf_int_lower[1],

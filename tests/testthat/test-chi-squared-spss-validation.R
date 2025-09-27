@@ -71,7 +71,13 @@ spss_chi_squared_values <- list(
     p_value = 0.519,
     n_valid = 2500,
     phi = 0.013,
+    phi_p_value = 0.519,
     cramers_v = 0.013,
+    cramers_v_p_value = 0.519,
+    gamma = 0.033,
+    gamma_p_value = 0.520,
+    gamma_ase = 0.051,
+    gamma_t = 0.644,
     continuity_correction = list(chi_square = 0.353, p_value = 0.553)
   ),
   
@@ -82,7 +88,13 @@ spss_chi_squared_values <- list(
     p_value = 0.000,
     n_valid = 2500,
     phi = 0.224,
-    cramers_v = 0.130
+    phi_p_value = 0.000,
+    cramers_v = 0.130,
+    cramers_v_p_value = 0.000,
+    gamma = -0.065,
+    gamma_p_value = 0.020,
+    gamma_ase = 0.028,
+    gamma_t = -2.321
   ),
   
   # Test 1c: Unweighted/Ungrouped - gender × education
@@ -92,7 +104,13 @@ spss_chi_squared_values <- list(
     p_value = 0.325,
     n_valid = 2500,
     phi = 0.037,
-    cramers_v = 0.037
+    phi_p_value = 0.325,
+    cramers_v = 0.037,
+    cramers_v_p_value = 0.325,
+    gamma = -0.008,
+    gamma_p_value = 0.786,
+    gamma_ase = 0.030,
+    gamma_t = -0.272
   ),
   
   # Test 2a: Weighted/Ungrouped - gender × region
@@ -106,7 +124,13 @@ spss_chi_squared_values <- list(
     p_value = 0.459,
     n_valid = 2516,
     phi = 0.015,
+    phi_p_value = 0.459,
     cramers_v = 0.015,
+    cramers_v_p_value = 0.459,
+    gamma = 0.037,
+    gamma_p_value = 0.460,
+    gamma_ase = 0.050,
+    gamma_t = 0.739,
     continuity_correction = list(chi_square = 0.477, p_value = 0.490)
   ),
   
@@ -117,7 +141,13 @@ spss_chi_squared_values <- list(
     p_value = 0.000,
     n_valid = 2518,
     phi = 0.228,
-    cramers_v = 0.132
+    phi_p_value = 0.000,
+    cramers_v = 0.132,
+    cramers_v_p_value = 0.000,
+    gamma = -0.062,
+    gamma_p_value = 0.027,
+    gamma_ase = 0.028,
+    gamma_t = -2.212
   ),
   
   # Test 2c: Weighted/Ungrouped - gender × education
@@ -127,7 +157,13 @@ spss_chi_squared_values <- list(
     p_value = 0.221,
     n_valid = 2517,
     phi = 0.042,
-    cramers_v = 0.042
+    phi_p_value = 0.221,
+    cramers_v = 0.042,
+    cramers_v_p_value = 0.221,
+    gamma = -0.011,
+    gamma_p_value = 0.708,
+    gamma_ase = 0.030,
+    gamma_t = -0.375
   ),
   
   # Test 3a: Unweighted/Grouped - gender × education (East)
@@ -137,7 +173,13 @@ spss_chi_squared_values <- list(
     p_value = 0.930,
     n_valid = 485,
     phi = 0.030,
-    cramers_v = 0.030
+    phi_p_value = 0.930,
+    cramers_v = 0.030,
+    cramers_v_p_value = 0.930,
+    gamma = -0.006,
+    gamma_p_value = 0.930,
+    gamma_ase = 0.069,
+    gamma_t = -0.088
   ),
   
   # Test 3a: Unweighted/Grouped - gender × education (West)
@@ -147,7 +189,13 @@ spss_chi_squared_values <- list(
     p_value = 0.325,
     n_valid = 2015,
     phi = 0.042,
-    cramers_v = 0.042
+    phi_p_value = 0.325,
+    cramers_v = 0.042,
+    cramers_v_p_value = 0.325,
+    gamma = -0.009,
+    gamma_p_value = 0.786,
+    gamma_ase = 0.033,
+    gamma_t = -0.273
   ),
   
   # Test 3b: Unweighted/Grouped - gender × employment (East)
@@ -157,7 +205,13 @@ spss_chi_squared_values <- list(
     p_value = 0.201,
     n_valid = 485,
     phi = 0.111,
-    cramers_v = 0.111
+    phi_p_value = 0.201,
+    cramers_v = 0.111,
+    cramers_v_p_value = 0.201,
+    gamma = -0.093,
+    gamma_p_value = 0.269,
+    gamma_ase = 0.084,
+    gamma_t = -1.105
   ),
   
   # Test 3b: Unweighted/Grouped - gender × employment (West)
@@ -167,7 +221,13 @@ spss_chi_squared_values <- list(
     p_value = 0.384,
     n_valid = 2015,
     phi = 0.045,
-    cramers_v = 0.045
+    phi_p_value = 0.384,
+    cramers_v = 0.045,
+    cramers_v_p_value = 0.384,
+    gamma = -0.053,
+    gamma_p_value = 0.196,  # From SPSS output line 284
+    gamma_ase = 0.041,  # From SPSS output
+    gamma_t = -1.294  # From SPSS output
   ),
   
   # Test 4a: Weighted/Grouped - gender × education (East)
@@ -177,7 +237,13 @@ spss_chi_squared_values <- list(
     p_value = 0.875,
     n_valid = 509,
     phi = 0.037,
-    cramers_v = 0.037
+    phi_p_value = 0.875,
+    cramers_v = 0.037,
+    cramers_v_p_value = 0.875,
+    gamma = -0.026,
+    gamma_p_value = 0.695,
+    gamma_ase = 0.067,
+    gamma_t = -0.392
   ),
   
   # Test 4a: Weighted/Grouped - gender × education (West)
@@ -187,7 +253,13 @@ spss_chi_squared_values <- list(
     p_value = 0.243,
     n_valid = 2007,
     phi = 0.046,
-    cramers_v = 0.046
+    phi_p_value = 0.243,
+    cramers_v = 0.046,
+    cramers_v_p_value = 0.243,
+    gamma = -0.009,
+    gamma_p_value = 0.799,  # From SPSS output line 329
+    gamma_ase = 0.034,  # From SPSS output
+    gamma_t = -0.255  # From SPSS output
   ),
   
   # Test 4b: Weighted/Grouped - gender × employment (East)
@@ -197,7 +269,13 @@ spss_chi_squared_values <- list(
     p_value = 0.188,
     n_valid = 508,
     phi = 0.110,
-    cramers_v = 0.110
+    phi_p_value = 0.188,
+    cramers_v = 0.110,
+    cramers_v_p_value = 0.188,
+    gamma = -0.099,
+    gamma_p_value = 0.225,
+    gamma_ase = 0.081,
+    gamma_t = -1.214
   ),
   
   # Test 4b: Weighted/Grouped - gender × employment (West)
@@ -207,7 +285,13 @@ spss_chi_squared_values <- list(
     p_value = 0.285,
     n_valid = 2007,
     phi = 0.050,
-    cramers_v = 0.050
+    phi_p_value = 0.285,
+    cramers_v = 0.050,
+    cramers_v_p_value = 0.285,
+    gamma = -0.054,
+    gamma_p_value = 0.182,  # From SPSS output line 372
+    gamma_ase = 0.041,  # From SPSS output
+    gamma_t = -1.336  # From SPSS output
   )
 )
 
@@ -215,11 +299,12 @@ spss_chi_squared_values <- list(
 # HELPER FUNCTION TO COMPARE CHI-SQUARED RESULTS
 # ============================================================================
 
-compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name, 
+compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
                                          tolerance_stat = 0.002,
                                          tolerance_p = 0.002,
-                                         tolerance_effect = 0.002) {
-  
+                                         tolerance_effect = 0.002,
+                                         tolerance_p_effect = 0.2) {
+
   # Extract R results from the results dataframe
   if (inherits(r_result, "chi_squared_test_results")) {
     # For ungrouped results
@@ -229,6 +314,11 @@ compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
     n <- r_result$results$n[1]
     cramers_v <- r_result$results$cramers_v[1]
     phi <- r_result$results$phi[1]
+    gamma <- r_result$results$gamma[1]
+    # Extract p-values for effect sizes
+    phi_p <- r_result$results$phi_p_value[1]
+    cramers_v_p <- r_result$results$cramers_v_p_value[1]
+    gamma_p <- r_result$results$gamma_p_value[1]
   } else {
     # For grouped results (already extracted row)
     chi_sq <- r_result$chi_squared[1]
@@ -237,6 +327,11 @@ compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
     n <- r_result$n[1]
     cramers_v <- r_result$cramers_v[1]
     phi <- r_result$phi[1]
+    gamma <- r_result$gamma[1]
+    # Extract p-values for effect sizes (may not exist in grouped results yet)
+    phi_p <- if ("phi_p_value" %in% names(r_result)) r_result$phi_p_value[1] else NA
+    cramers_v_p <- if ("cramers_v_p_value" %in% names(r_result)) r_result$cramers_v_p_value[1] else NA
+    gamma_p <- if ("gamma_p_value" %in% names(r_result)) r_result$gamma_p_value[1] else NA
   }
   
   # Record comparisons
@@ -283,14 +378,54 @@ compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name,
   
   # Phi coefficient (for 2x2 tables)
   if (!is.null(spss_ref$phi)) {
-    match <- record_chi_squared_comparison(test_name, "Phi", 
+    match <- record_chi_squared_comparison(test_name, "Phi",
                                           spss_ref$phi, phi, tolerance_effect)
     # Round both values to same precision as SPSS displays (3 decimals)
     expect_equal(round(phi, 3), round(spss_ref$phi, 3),
                  info = paste(test_name, "- Phi coefficient"))
     all_match <- all_match && match
   }
-  
+
+  # Goodman and Kruskal's Gamma
+  if (!is.null(spss_ref$gamma)) {
+    match <- record_chi_squared_comparison(test_name, "Gamma",
+                                          spss_ref$gamma, gamma, tolerance_effect)
+    # Round both values to same precision as SPSS displays (3 decimals)
+    expect_equal(round(gamma, 3), round(spss_ref$gamma, 3),
+                 info = paste(test_name, "- Goodman and Kruskal's Gamma"))
+    all_match <- all_match && match
+  }
+
+  # ========== P-VALUES FOR EFFECT SIZES ==========
+
+  # Phi p-value (for 2x2 tables)
+  if (!is.null(spss_ref$phi_p_value)) {
+    match <- record_chi_squared_comparison(test_name, "Phi p-value",
+                                          spss_ref$phi_p_value, phi_p, tolerance_p_effect)
+    # Use more lenient tolerance for p-values due to ASE approximation differences
+    expect_equal(phi_p, spss_ref$phi_p_value, tolerance = tolerance_p_effect,
+                 info = paste(test_name, "- Phi p-value"))
+    all_match <- all_match && match
+  }
+
+  # Cramér's V p-value
+  if (!is.null(spss_ref$cramers_v_p_value)) {
+    match <- record_chi_squared_comparison(test_name, "Cramer's V p-value",
+                                          spss_ref$cramers_v_p_value, cramers_v_p, tolerance_p_effect)
+    expect_equal(cramers_v_p, spss_ref$cramers_v_p_value, tolerance = tolerance_p_effect,
+                 info = paste(test_name, "- Cramér's V p-value"))
+    all_match <- all_match && match
+  }
+
+  # Gamma p-value
+  if (!is.null(spss_ref$gamma_p_value)) {
+    match <- record_chi_squared_comparison(test_name, "Gamma p-value",
+                                          spss_ref$gamma_p_value, gamma_p, tolerance_p_effect)
+    expect_equal(gamma_p, spss_ref$gamma_p_value, tolerance = tolerance_p_effect,
+                 info = paste(test_name, "- Gamma p-value"))
+    all_match <- all_match && match
+  }
+
   return(all_match)
 }
 
@@ -494,7 +629,8 @@ test_that("Generate chi-squared validation summary report", {
     cat("- Chi-square statistic: ±0.002 tolerance\n")
     cat("- Degrees of freedom: EXACT match required\n")
     cat("- P-values: ±0.002 tolerance\n")
-    cat("- Effect sizes (Phi, Cramér's V): ±0.002 tolerance\n")
+    cat("- Effect sizes (Phi, Cramér's V, Gamma): ±0.002 tolerance\n")
+    cat("- Gamma p-values: ±0.20 tolerance (ASE approximation)\n")
     cat("- Sample sizes: EXACT match required\n")
     cat("======================================================================\n\n")
     

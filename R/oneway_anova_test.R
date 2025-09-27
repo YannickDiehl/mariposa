@@ -101,8 +101,8 @@
 #' - Welch's robust test for equality of means
 #' 
 #' ## Interpretation Guidelines
-#' - **p-values**: p < 0.05 indicates significant group differences at α = 0.05
-#' - **Effect sizes**: η² ≈ 0.01 (small), η² ≈ 0.06 (medium), η² ≈ 0.14 (large)
+#' - **p-values**: p < 0.05 indicates significant group differences at alpha = 0.05
+#' - **Effect sizes**: eta-squared ~ 0.01 (small), eta-squared ~ 0.06 (medium), eta-squared ~ 0.14 (large)
 #' - **Eta-squared**: Proportion of variance explained (tends to overestimate)
 #' - **Epsilon-squared**: Less biased than eta-squared
 #' - **Omega-squared**: Unbiased estimate (preferred for publication)
@@ -949,7 +949,7 @@ print.oneway_anova_test_results <- function(x, digits = 3, ...) {
   cat("- Eta-squared: Proportion of variance explained (biased upward)\n")
   cat("- Epsilon-squared: Less biased than eta-squared\n")
   cat("- Omega-squared: Unbiased estimate (preferred for publication)\n")
-  cat("- Small effect: η² ≈ 0.01, Medium effect: η² ≈ 0.06, Large effect: η² ≈ 0.14\n")
+  cat("- Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14\n")
   
   # Add note about post-hoc tests
   if (x$is_grouped) {
@@ -1320,7 +1320,7 @@ print_repeated_measures_anova <- function(x, digits = 3, ...) {
   
   cat("\nEffect Size Interpretation:\n")
   cat("- Eta-squared: Proportion of variance explained\n")
-  cat("- Small effect: η² ≈ 0.01, Medium effect: η² ≈ 0.06, Large effect: η² ≈ 0.14\n")
+  cat("- Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14\n")
   
   invisible(x)
 }

@@ -61,7 +61,7 @@ TITLE 'Tukey HSD: Trust Variables by Education (unweighted)'.
 ONEWAY trust_government trust_media trust_science BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 1e ==========='.
@@ -73,7 +73,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Employment (unweighted, 5 groups)'.
 ONEWAY life_satisfaction BY employment
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 1f ==========='.
@@ -85,7 +85,7 @@ TITLE 'Tukey HSD: Income by Employment (unweighted, 5 groups)'.
 ONEWAY income BY employment
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 * ================================================
@@ -105,7 +105,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Education (weighted)'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 2b ==========='.
@@ -117,7 +117,7 @@ TITLE 'Tukey HSD: Income by Education (weighted)'.
 ONEWAY income BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 2c ==========='.
@@ -129,7 +129,7 @@ TITLE 'Tukey HSD: Age by Education (weighted)'.
 ONEWAY age BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 2d ==========='.
@@ -141,7 +141,7 @@ TITLE 'Tukey HSD: Trust Variables by Education (weighted)'.
 ONEWAY trust_government trust_media trust_science BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 2e ==========='.
@@ -153,7 +153,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Employment (weighted, 5 groups)'.
 ONEWAY life_satisfaction BY employment
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 2f ==========='.
@@ -165,7 +165,7 @@ TITLE 'Tukey HSD: Income by Employment (weighted, 5 groups)'.
 ONEWAY income BY employment
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 WEIGHT OFF.
@@ -188,7 +188,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Education (grouped by region, unweighted)
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 3b ==========='.
@@ -200,7 +200,7 @@ TITLE 'Tukey HSD: Income by Education (grouped by region, unweighted)'.
 ONEWAY income BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 3c ==========='.
@@ -212,7 +212,7 @@ TITLE 'Tukey HSD: Age by Education (grouped by region, unweighted)'.
 ONEWAY age BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 3d ==========='.
@@ -224,7 +224,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Employment (grouped by region, unweighted
 ONEWAY life_satisfaction BY employment
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 * ================================================
@@ -244,7 +244,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Education (weighted, grouped by region)'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 4b ==========='.
@@ -256,7 +256,7 @@ TITLE 'Tukey HSD: Income by Education (weighted, grouped by region)'.
 ONEWAY income BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 4c ==========='.
@@ -268,7 +268,7 @@ TITLE 'Tukey HSD: Age by Education (weighted, grouped by region)'.
 ONEWAY age BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 TITLE '=========== Test 4d ==========='.
@@ -280,7 +280,7 @@ TITLE 'Tukey HSD: Life Satisfaction by Employment (weighted, grouped by region)'
 ONEWAY life_satisfaction BY employment
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 WEIGHT OFF.
@@ -302,7 +302,7 @@ TITLE 'Tukey HSD with alpha = 0.01 (99% family-wise confidence)'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.01)
+  /POSTHOC=SCHEFFE ALPHA(0.01)
   /CRITERIA=CILEVEL(0.99).
 
 TITLE '=========== Test 5b ==========='.
@@ -312,7 +312,7 @@ TITLE 'Tukey HSD with alpha = 0.10 (90% family-wise confidence)'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.10)
+  /POSTHOC=SCHEFFE ALPHA(0.10)
   /CRITERIA=CILEVEL(0.90).
 
 * Test 6: Different confidence intervals (for interval estimation)
@@ -324,7 +324,7 @@ TITLE 'Tukey HSD with 90% Confidence Intervals'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.90).
 
 TITLE '=========== Test 6b ==========='.
@@ -334,7 +334,7 @@ TITLE 'Tukey HSD with 99% Confidence Intervals'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.99).
 
 * Test 7: Multiple variables simultaneously (efficiency check)
@@ -346,7 +346,7 @@ TITLE 'Tukey HSD: Multiple Variables by Education'.
 ONEWAY life_satisfaction income age political_orientation environmental_concern BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 * Test 8: Comparison with other post-hoc tests (for reference)
@@ -358,7 +358,7 @@ TITLE 'Multiple Post-Hoc Tests Comparison'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES HOMOGENEITY
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY BONFERRONI SCHEFFE LSD ALPHA(0.05)
+  /POSTHOC=SCHEFFE BONFERRONI SCHEFFE LSD ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 * Test 9: Homogeneous subsets output
@@ -370,7 +370,7 @@ TITLE 'Tukey HSD with Homogeneous Subsets'.
 ONEWAY life_satisfaction BY education
   /STATISTICS DESCRIPTIVES
   /MISSING ANALYSIS
-  /POSTHOC=TUKEY ALPHA(0.05)
+  /POSTHOC=SCHEFFE ALPHA(0.05)
   /CRITERIA=CILEVEL(0.95).
 
 * Note: SPSS automatically generates homogeneous subsets for Tukey
