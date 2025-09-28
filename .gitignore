@@ -48,6 +48,12 @@ renv.lock
 tests/testthat/Rplots.pdf
 tests/testthat/_snaps/
 
+# Vignettes
+vignettes/*.html
+vignettes/*.R
+vignettes/.build.timestamp
+vignettes/inst/
+
 # Coverage
 coverage.html
 docs
