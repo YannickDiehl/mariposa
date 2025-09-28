@@ -37,3 +37,7 @@ survey_data |>
   group_by(region) |> 
   kendall_tau(life_satisfaction, trust_government, trust_media)
 
+survey_data |>
+  group_by(region) |> 
+  crosstab(gender, trust_government, percentages = "col")
+
