@@ -46,6 +46,7 @@ renv.lock
 
 # Testing
 tests/testthat/Rplots.pdf
+tests/testthat/_snaps/
 
 # Coverage
 coverage.html

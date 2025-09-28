@@ -687,17 +687,6 @@ test_that("Generate describe validation summary report", {
                   status))
     }
 
-    # Save detailed report to file
-    report_path <- file.path("tests", "validation_reports", "describe_validation_report.txt")
-    dir.create(dirname(report_path), showWarnings = FALSE, recursive = TRUE)
-
-    sink(report_path)
-    cat("DESCRIBE FUNCTION VALIDATION REPORT\n")
-    cat("Generated:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
-    cat("===========================================\n\n")
-    print(df_results)
-    sink()
-
     cat("\n======================================================================\n")
 
     # Final result

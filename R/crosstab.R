@@ -266,14 +266,12 @@ print.crosstab_results <- function(x, ...) {
       result <- x$results[[i]]
 
       # Print group header
-      cat("Group: ")
       group_info <- result$group_info
-      for (j in seq_along(group_info)) {
-        if (j > 1) cat(", ")
-        cat(names(group_info)[j], " = ", as.character(group_info[[j]]), sep = "")
-      }
-      cat("\n")
-      cat(paste(rep("-", 50), collapse = ""), "\n")
+      group_str <- paste(sapply(seq_along(group_info), function(j) {
+        paste(names(group_info)[j], "=", as.character(group_info[[j]]))
+      }), collapse = ", ")
+
+      cat(sprintf("\n--- Group: %s ---\n", group_str))
 
       # Print the crosstab for this group
       .print_single_crosstab(result)
@@ -337,10 +335,10 @@ print.crosstab_results <- function(x, ...) {
 
     # Counts
     for (j in 1:n_cols) {
-      cat(sprintf("%*d", col_width, display_table[i, j]))
+      cat(sprintf("%*.0f", col_width, display_table[i, j]))
     }
     # Row total
-    cat(sprintf("%*d", col_width, display_table[i, n_cols + 1]))
+    cat(sprintf("%*.0f", col_width, display_table[i, n_cols + 1]))
     cat("\n")
 
     # Print percentages if requested
@@ -392,9 +390,9 @@ print.crosstab_results <- function(x, ...) {
   # Print totals row
   cat(sprintf("%-*s", row_label_width, "Total"))
   for (j in 1:n_cols) {
-    cat(sprintf("%*d", col_width, x$col_totals[j]))
+    cat(sprintf("%*.0f", col_width, x$col_totals[j]))
   }
-  cat(sprintf("%*d", col_width, x$total))
+  cat(sprintf("%*.0f", col_width, x$total))
   cat("\n")
 
   # Print column percentages for total row
@@ -411,12 +409,12 @@ print.crosstab_results <- function(x, ...) {
   # Footer
   cat("\n")
   if (x$is_weighted) {
-    cat(sprintf("N = %d (Weighted)\n", x$n_valid))
+    cat(sprintf("N = %.0f (Weighted)\n", x$n_valid))
   } else {
-    cat(sprintf("N = %d\n", x$n_valid))
+    cat(sprintf("N = %.0f\n", x$n_valid))
   }
 
   if (x$n_missing > 0) {
-    cat(sprintf("Missing cases: %d\n", x$n_missing))
+    cat(sprintf("Missing cases: %.0f\n", x$n_missing))
   }
 }
