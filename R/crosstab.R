@@ -121,10 +121,10 @@ crosstab.data.frame <- function(data, row, col,
 
   # Create contingency table
   if (is_weighted) {
-    # Round weights for SPSS compatibility
-    weights_rounded <- round(weights_vec)
-    # Create weighted table
-    tab <- xtabs(weights_rounded ~ row_data + col_data)
+    # Use actual decimal weights (not rounded)
+    # SPSS applies decimal weights and rounds results, not weights
+    tab <- xtabs(weights_vec ~ row_data + col_data)
+    # Note: Results can be rounded later for display if needed
   } else {
     # Create unweighted table
     tab <- table(row_data, col_data)
