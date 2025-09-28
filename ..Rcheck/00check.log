@@ -21,6 +21,9 @@ Package suggested but not available for checking: ‘covr’
 Found the following hidden files and directories:
   .github/.gitignore
   .gitignore
+  tests/.DS_Store
+  tests/spss_reference/outputs/.DS_Store
+  tests/testthat/.DS_Store
   vignettes/.build.timestamp
   ..Rcheck
   .Rproj.user
@@ -45,10 +48,11 @@ Found the following directory with the name of a check directory:
 Most likely, these were included erroneously.
 * checking code files for non-ASCII characters ... WARNING
 Found the following files with non-ASCII characters:
-  R/chi_squared_test.R
+  R/crosstab.R
   R/kendall_tau.R
   R/mann_whitney_test.R
   R/pearson_cor.R
+  R/spearman_rho.R
 Portable packages must use only ASCII characters in their R code and
 NAMESPACE directives, except perhaps in comments.
 Use \uxxxx escapes for other characters.
@@ -70,13 +74,31 @@ characters in files.
 * checking Rd cross-references ... INFO
 Package unavailable to check Rd xrefs: ‘survey’
 * checking for missing documentation entries ... OK
-* checking for code/documentation mismatches ... OK
+* checking for code/documentation mismatches ... WARNING
+Codoc mismatches from Rd file 'crosstab.Rd':
+crosstab
+  Code: function(data, row, col, weights = NULL, percentages = c("row",
+                 "none", "col", "total", "all"), na.rm = TRUE, digits =
+                 1)
+  Docs: function(data, row, col, control = NULL, weights = NULL,
+                 percentages = c("row", "none", "col", "total", "all"),
+                 na.rm = TRUE, digits = 1)
+  Argument names in docs not in code:
+    control
+  Mismatches in argument names (first 3):
+    Position: 4 Code: weights Docs: control
+    Position: 5 Code: percentages Docs: weights
+    Position: 6 Code: na.rm Docs: percentages
+
 * checking Rd \usage sections ... WARNING
 Documented arguments not in \usage in Rd file 'dot-process_weights.Rd':
   ‘weights’
 
 Undocumented arguments in Rd file 'levene_test.Rd'
   ‘variable’
+
+Undocumented arguments in Rd file 'print.crosstab_results.Rd'
+  ‘x’ ‘...’
 
 Functions with \usage entries need to have the appropriate \alias
 entries, and all their arguments documented.
@@ -89,16 +111,70 @@ Extensions’ manual.
 * checking data for non-ASCII characters ... OK
 * checking LazyData ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking installed files from ‘inst/doc’ ... OK
-* checking files in ‘vignettes’ ... OK
-* checking examples ... OK
+* checking files in ‘vignettes’ ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  ‘introduction.R’ ‘introduction.Rmd’ ‘introduction.html’
+* checking examples ... ERROR
+Running examples in ‘SurveyStat-Ex.R’ failed
+The error most likely occurred in:
+
+> ### Name: crosstab
+> ### Title: Cross-tabulation Table
+> ### Aliases: crosstab
+> 
+> ### ** Examples
+> 
+> # Load required packages and data
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> data(survey_data)
+> 
+> # Basic 2-way crosstab
+> survey_data %>% crosstab(gender, region)
+
+Crosstabulation: gender × region
+────────────────────────────────────────────────── 
+
+            region 
+gender 
+                  East      West     Total
+────────────────────────────────────────── 
+Male               238       956      1194
+                 19.9%     80.1%    100.0%  (row %)
+
+Female             247      1059      1306
+                 18.9%     81.1%    100.0%  (row %)
+────────────────────────────────────────── 
+Total              485      2015      2500
+
+N = 2500
+> 
+> # 3-way crosstab with control variable
+> survey_data %>% crosstab(life_satisfaction, gender, control = region)
+Error in crosstab(., life_satisfaction, gender, control = region) : 
+  unused argument (control = region)
+Calls: %>%
+Execution halted
 * checking for unstated dependencies in ‘tests’ ... OK
 * checking tests ... OK
   Running ‘testthat.R’
 * checking for unstated dependencies in vignettes ... OK
-* checking package vignettes ... OK
+* checking package vignettes ... WARNING
+Directory 'inst/doc' does not exist.
+Package vignette without corresponding single PDF/HTML:
+  ‘introduction.Rmd’
 * checking running R code from vignettes ... OK
   ‘introduction.Rmd’ using ‘UTF-8’... OK
 * checking re-building of vignette outputs ... SKIPPED
 * DONE
-Status: 3 WARNINGs, 2 NOTEs
+Status: 1 ERROR, 6 WARNINGs, 2 NOTEs

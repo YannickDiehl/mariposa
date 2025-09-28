@@ -1079,30 +1079,6 @@ test_that("Generate crosstab validation summary", {
     cat("- R crosstab function produces accurate weighted grouped results\n")
 
     # ======================================================================
-    # SAVE REPORT TO FILE
-    # ======================================================================
-    report_path <- file.path("tests", "validation_reports", "crosstab_validation_report.txt")
-    dir.create(dirname(report_path), showWarnings = FALSE, recursive = TRUE)
-
-    sink(report_path)
-    cat("CROSSTAB VALIDATION REPORT\n")
-    cat("Generated:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
-    cat(paste(rep("=", 70), collapse = ""), "\n\n", sep = "")
-
-    # Write summary statistics
-    cat(sprintf("Total comparisons: %d\n", total_comparisons))
-    cat(sprintf("Matches: %d (%.1f%%)\n", total_matches, match_rate))
-    cat(sprintf("Mismatches: %d (%.1f%%)\n\n", total_mismatches, 100 - match_rate))
-
-    # Write the full results data frame
-    cat("DETAILED RESULTS:\n")
-    cat(paste(rep("-", 70), collapse = ""), "\n", sep = "")
-    print(df_results, row.names = FALSE)
-    sink()
-
-    cat("\nValidation report saved to: ", report_path, "\n", sep = "")
-
-    # ======================================================================
     # FINAL VERDICT
     # ======================================================================
     cat("\n")
