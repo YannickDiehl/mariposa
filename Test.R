@@ -1,4 +1,3 @@
-# Reload package to get latest changes
 devtools::load_all(".")
 library(dplyr)
 
@@ -31,6 +30,7 @@ survey_data |>
 
 
 survey_data |>
+  group_by(region) |> 
   chi_squared_test(gender, region, weights = sampling_weight)
 
 survey_data |>
@@ -39,5 +39,5 @@ survey_data |>
 
 survey_data |>
   group_by(region) |> 
-  crosstab(gender, trust_government, percentages = "col")
+  crosstab(life_satisfaction, gender, percentages = "col")
 
