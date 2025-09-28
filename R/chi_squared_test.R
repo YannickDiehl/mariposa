@@ -651,8 +651,4 @@ cramers_v_test <- chi_squared_test
 
 #' @rdname chi_squared_test
 #' @export
-phi_test <- chi_squared_test
-
-#' @rdname chi_squared_test
-#' @export
 gamma_test <- chi_squared_test

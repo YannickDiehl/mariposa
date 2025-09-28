@@ -1,5 +1,5 @@
 DESCRIBE FUNCTION VALIDATION REPORT
-Generated: 2025-09-27 19:26:32 
+Generated: 2025-09-28 17:01:19 
 ===========================================
 
                                  Test          Variable             Metric

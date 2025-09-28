@@ -1,0 +1,1019 @@
+﻿=========== SCENARIO 1: UNWEIGHTED / UNGROUPED ===========
+
+Test 1.1: Gender × Region (2×2 table)
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+                                           Region (East/West) Total  
+                                           East        West          
+ Gender Male   Count                       238         956    1194   
+               Expected Count              231.6       962.4  1194.0 
+               % within Gender             19.9%       80.1%  100.0% 
+               % within Region (East/West) 49.1%       47.4%  47.8%  
+               % of Total                  9.5%        38.2%  47.8%  
+               Residual                    6.4         -6.4          
+        Female Count                       247         1059   1306   
+               Expected Count              253.4       1052.6 1306.0 
+               % within Gender             18.9%       81.1%  100.0% 
+               % within Region (East/West) 50.9%       52.6%  52.2%  
+               % of Total                  9.9%        42.4%  52.2%  
+               Residual                    -6.4        6.4           
+ Total         Count                       485         2015   2500   
+               Expected Count              485.0       2015.0 2500.0 
+               % within Gender             19.4%       80.6%  100.0% 
+               % within Region (East/West) 100.0%      100.0% 100.0% 
+               % of Total                  19.4%       80.6%  100.0% 
+
+Test 1.2: Education × Employment Status (4×5 table)
+
+Crosstabs
+Highest educational attainment * Employment status Crosstabulation
+
+                                                                  Employment status                          Total  
+                                                                  Student Employed Unemployed Retired Other         
+ Highest     Basic        Count                                   0       571      65         171     34     841    
+ educational Secondary    Expected Count                          26.2    538.2    61.2       176.6   38.7   841.0  
+ attainment               % within Highest educational attainment .0%     67.9%    7.7%       20.3%   4.0%   100.0% 
+                          % within Employment status              .0%     35.7%    35.7%      32.6%   29.6%  33.6%  
+                          % of Total                              .0%     22.8%    2.6%       6.8%    1.4%   33.6%  
+                          Residual                                -26.2   32.8     3.8        -5.6    -4.7          
+             Intermediate Count                                   0       412      51         137     29     629    
+             Secondary    Expected Count                          19.6    402.6    45.8       132.1   28.9   629.0  
+                          % within Highest educational attainment .0%     65.5%    8.1%       21.8%   4.6%   100.0% 
+                          % within Employment status              .0%     25.8%    28.0%      26.1%   25.2%  25.2%  
+                          % of Total                              .0%     16.5%    2.0%       5.5%    1.2%   25.2%  
+                          Residual                                -19.6   9.4      5.2        4.9     .1            
+             Academic     Count                                   44      366      44         145     32     631    
+             Secondary    Expected Count                          19.7    403.8    45.9       132.5   29.0   631.0  
+                          % within Highest educational attainment 7.0%    58.0%    7.0%       23.0%   5.1%   100.0% 
+                          % within Employment status              56.4%   22.9%    24.2%      27.6%   27.8%  25.2%  
+                          % of Total                              1.8%    14.6%    1.8%       5.8%    1.3%   25.2%  
+                          Residual                                24.3    -37.8    -1.9       12.5    3.0           
+             University   Count                                   34      251      22         72      20     399    
+                          Expected Count                          12.4    255.4    29.0       83.8    18.4   399.0  
+                          % within Highest educational attainment 8.5%    62.9%    5.5%       18.0%   5.0%   100.0% 
+                          % within Employment status              43.6%   15.7%    12.1%      13.7%   17.4%  16.0%  
+                          % of Total                              1.4%    10.0%    .9%        2.9%    .8%    16.0%  
+                          Residual                                21.6    -4.4     -7.0       -11.8   1.6           
+ Total                    Count                                   78      1600     182        525     115    2500   
+                          Expected Count                          78.0    1600.0   182.0      525.0   115.0  2500.0 
+                          % within Highest educational attainment 3.1%    64.0%    7.3%       21.0%   4.6%   100.0% 
+                          % within Employment status              100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+                          % of Total                              3.1%    64.0%    7.3%       21.0%   4.6%   100.0% 
+
+Test 1.3: Life Satisfaction × Gender × Region (3-way)
+
+Crosstabs
+Life satisfaction (1=dissatisfied, 5=satisfied) * Gender * Region (East/West) Crosstabulation
+
+ Region                                         Gender        Total  
+ (East/West)                                    Male   Female        
+ East        Life             1 Count           14     16     30     
+             satisfaction       % within Gender 6.1%   6.8%   6.5%   
+             (1=dissatisfied, 2 Count           29     29     58     
+             5=satisfied)       % within Gender 12.7%  12.2%  12.5%  
+                              3 Count           48     58     106    
+                                % within Gender 21.1%  24.5%  22.8%  
+                              4 Count           68     68     136    
+                                % within Gender 29.8%  28.7%  29.2%  
+                              5 Count           69     66     135    
+                                % within Gender 30.3%  27.8%  29.0%  
+             Total              Count           228    237    465    
+                                % within Gender 100.0% 100.0% 100.0% 
+ West        Life             1 Count           46     42     88     
+             satisfaction       % within Gender 5.0%   4.1%   4.5%   
+             (1=dissatisfied, 2 Count           117    131    248    
+             5=satisfied)       % within Gender 12.7%  12.7%  12.7%  
+                              3 Count           251    243    494    
+                                % within Gender 27.3%  23.5%  25.3%  
+                              4 Count           261    334    595    
+                                % within Gender 28.3%  32.3%  30.4%  
+                              5 Count           246    285    531    
+                                % within Gender 26.7%  27.5%  27.1%  
+             Total              Count           921    1035   1956   
+                                % within Gender 100.0% 100.0% 100.0% 
+ Total       Life             1 Count           60     58     118    
+             satisfaction       % within Gender 5.2%   4.6%   4.9%   
+             (1=dissatisfied, 2 Count           146    160    306    
+             5=satisfied)       % within Gender 12.7%  12.6%  12.6%  
+                              3 Count           299    301    600    
+                                % within Gender 26.0%  23.7%  24.8%  
+                              4 Count           329    402    731    
+                                % within Gender 28.6%  31.6%  30.2%  
+                              5 Count           315    351    666    
+                                % within Gender 27.4%  27.6%  27.5%  
+             Total              Count           1149   1272   2421   
+                                % within Gender 100.0% 100.0% 100.0% 
+
+Test 1.4: Life Satisfaction × Region × Gender (3-way reordered)
+
+Crosstabs
+Life satisfaction (1=dissatisfied, 5=satisfied) * Region (East/West) * Gender Crosstabulation
+
+ Gender                                                Region (East/West) Total  
+                                                       East        West          
+ Male   Life             1 Count                       14          46     60     
+        satisfaction       % within Region (East/West) 6.1%        5.0%   5.2%   
+        (1=dissatisfied, 2 Count                       29          117    146    
+        5=satisfied)       % within Region (East/West) 12.7%       12.7%  12.7%  
+                         3 Count                       48          251    299    
+                           % within Region (East/West) 21.1%       27.3%  26.0%  
+                         4 Count                       68          261    329    
+                           % within Region (East/West) 29.8%       28.3%  28.6%  
+                         5 Count                       69          246    315    
+                           % within Region (East/West) 30.3%       26.7%  27.4%  
+        Total              Count                       228         921    1149   
+                           % within Region (East/West) 100.0%      100.0% 100.0% 
+ Female Life             1 Count                       16          42     58     
+        satisfaction       % within Region (East/West) 6.8%        4.1%   4.6%   
+        (1=dissatisfied, 2 Count                       29          131    160    
+        5=satisfied)       % within Region (East/West) 12.2%       12.7%  12.6%  
+                         3 Count                       58          243    301    
+                           % within Region (East/West) 24.5%       23.5%  23.7%  
+                         4 Count                       68          334    402    
+                           % within Region (East/West) 28.7%       32.3%  31.6%  
+                         5 Count                       66          285    351    
+                           % within Region (East/West) 27.8%       27.5%  27.6%  
+        Total              Count                       237         1035   1272   
+                           % within Region (East/West) 100.0%      100.0% 100.0% 
+ Total  Life             1 Count                       30          88     118    
+        satisfaction       % within Region (East/West) 6.5%        4.5%   4.9%   
+        (1=dissatisfied, 2 Count                       58          248    306    
+        5=satisfied)       % within Region (East/West) 12.5%       12.7%  12.6%  
+                         3 Count                       106         494    600    
+                           % within Region (East/West) 22.8%       25.3%  24.8%  
+                         4 Count                       136         595    731    
+                           % within Region (East/West) 29.2%       30.4%  30.2%  
+                         5 Count                       135         531    666    
+                           % within Region (East/West) 29.0%       27.1%  27.5%  
+        Total              Count                       465         1956   2421   
+                           % within Region (East/West) 100.0%      100.0% 100.0% 
+
+=========== SCENARIO 2: WEIGHTED / UNGROUPED ===========
+
+Test 2.1: Gender × Region (weighted, 2×2)
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+                                           Region (East/West) Total  
+                                           East        West          
+ Gender Male   Count                       249         945    1194   
+               Expected Count              241.6       952.4  1194.0 
+               % within Gender             20.9%       79.1%  100.0% 
+               % within Region (East/West) 48.9%       47.1%  47.5%  
+               % of Total                  9.9%        37.6%  47.5%  
+               Residual                    7.4         -7.4          
+        Female Count                       260         1062   1322   
+               Expected Count              267.4       1054.6 1322.0 
+               % within Gender             19.7%       80.3%  100.0% 
+               % within Region (East/West) 51.1%       52.9%  52.5%  
+               % of Total                  10.3%       42.2%  52.5%  
+               Residual                    -7.4        7.4           
+ Total         Count                       509         2007   2516   
+               Expected Count              509.0       2007.0 2516.0 
+               % within Gender             20.2%       79.8%  100.0% 
+               % within Region (East/West) 100.0%      100.0% 100.0% 
+               % of Total                  20.2%       79.8%  100.0% 
+
+Test 2.2: Education × Employment Status (weighted, 4×5)
+
+Crosstabs
+Highest educational attainment * Employment status Crosstabulation
+
+                                                                  Employment status                          Total  
+                                                                  Student Employed Unemployed Retired Other         
+ Highest     Basic        Count                                   0       573      66         175     34     848    
+ educational Secondary    Expected Count                          26.9    539.9    62.0       180.2   39.1   848.0  
+ attainment               % within Highest educational attainment .0%     67.6%    7.8%       20.6%   4.0%   100.0% 
+                          % within Employment status              .0%     35.7%    35.9%      32.7%   29.3%  33.7%  
+                          % of Total                              .0%     22.8%    2.6%       6.9%    1.4%   33.7%  
+                          Residual                                -26.9   33.1     4.0        -5.2    -5.1          
+             Intermediate Count                                   0       420      52         139     29     640    
+             Secondary    Expected Count                          20.3    407.4    46.8       136.0   29.5   640.0  
+                          % within Highest educational attainment .0%     65.6%    8.1%       21.7%   4.5%   100.0% 
+                          % within Employment status              .0%     26.2%    28.3%      26.0%   25.0%  25.4%  
+                          % of Total                              .0%     16.7%    2.1%       5.5%    1.2%   25.4%  
+                          Residual                                -20.3   12.6     5.2        3.0     -.5           
+             Academic     Count                                   46      370      45         149     33     643    
+             Secondary    Expected Count                          20.4    409.3    47.0       136.6   29.6   643.0  
+                          % within Highest educational attainment 7.2%    57.5%    7.0%       23.2%   5.1%   100.0% 
+                          % within Employment status              57.5%   23.1%    24.5%      27.9%   28.4%  25.5%  
+                          % of Total                              1.8%    14.7%    1.8%       5.9%    1.3%   25.5%  
+                          Residual                                25.6    -39.3    -2.0       12.4    3.4           
+             University   Count                                   34      240      21         72      20     387    
+                          Expected Count                          12.3    246.4    28.3       82.2    17.8   387.0  
+                          % within Highest educational attainment 8.8%    62.0%    5.4%       18.6%   5.2%   100.0% 
+                          % within Employment status              42.5%   15.0%    11.4%      13.5%   17.2%  15.4%  
+                          % of Total                              1.4%    9.5%     .8%        2.9%    .8%    15.4%  
+                          Residual                                21.7    -6.4     -7.3       -10.2   2.2           
+ Total                    Count                                   80      1603     184        535     116    2518   
+                          Expected Count                          80.0    1603.0   184.0      535.0   116.0  2518.0 
+                          % within Highest educational attainment 3.2%    63.7%    7.3%       21.2%   4.6%   100.0% 
+                          % within Employment status              100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+                          % of Total                              3.2%    63.7%    7.3%       21.2%   4.6%   100.0% 
+
+Test 2.3: Life Satisfaction × Gender × Region (weighted, 3-way)
+
+Crosstabs
+Life satisfaction (1=dissatisfied, 5=satisfied) * Gender * Region (East/West) Crosstabulation
+
+ Region                                         Gender        Total  
+ (East/West)                                    Male   Female        
+ East        Life             1 Count           15     16     31     
+             satisfaction       % within Gender 6.3%   6.4%   6.3%   
+             (1=dissatisfied, 2 Count           30     30     60     
+             5=satisfied)       % within Gender 12.5%  12.0%  12.3%  
+                              3 Count           50     62     112    
+                                % within Gender 20.8%  24.9%  22.9%  
+                              4 Count           72     72     144    
+                                % within Gender 30.0%  28.9%  29.4%  
+                              5 Count           73     69     142    
+                                % within Gender 30.4%  27.7%  29.0%  
+             Total              Count           240    249    489    
+                                % within Gender 100.0% 100.0% 100.0% 
+ West        Life             1 Count           46     42     88     
+             satisfaction       % within Gender 5.0%   4.0%   4.5%   
+             (1=dissatisfied, 2 Count           117    130    247    
+             5=satisfied)       % within Gender 12.8%  12.5%  12.7%  
+                              3 Count           250    247    497    
+                                % within Gender 27.4%  23.8%  25.5%  
+                              4 Count           259    335    594    
+                                % within Gender 28.4%  32.3%  30.5%  
+                              5 Count           240    284    524    
+                                % within Gender 26.3%  27.4%  26.9%  
+             Total              Count           912    1038   1950   
+                                % within Gender 100.0% 100.0% 100.0% 
+ Total       Life             1 Count           61     58     119    
+             satisfaction       % within Gender 5.3%   4.5%   4.9%   
+             (1=dissatisfied, 2 Count           147    160    307    
+             5=satisfied)       % within Gender 12.8%  12.4%  12.6%  
+                              3 Count           300    309    609    
+                                % within Gender 26.0%  24.0%  25.0%  
+                              4 Count           331    407    738    
+                                % within Gender 28.7%  31.6%  30.3%  
+                              5 Count           313    353    666    
+                                % within Gender 27.2%  27.4%  27.3%  
+             Total              Count           1152   1287   2439   
+                                % within Gender 100.0% 100.0% 100.0% 
+
+Test 2.4: Life Satisfaction × Region × Gender (weighted, 3-way reordered)
+
+Crosstabs
+Life satisfaction (1=dissatisfied, 5=satisfied) * Region (East/West) * Gender Crosstabulation
+
+ Gender                                                Region (East/West) Total  
+                                                       East        West          
+ Male   Life             1 Count                       15          46     61     
+        satisfaction       % within Region (East/West) 6.3%        5.0%   5.3%   
+        (1=dissatisfied, 2 Count                       30          117    147    
+        5=satisfied)       % within Region (East/West) 12.5%       12.8%  12.8%  
+                         3 Count                       50          250    300    
+                           % within Region (East/West) 20.8%       27.4%  26.0%  
+                         4 Count                       72          259    331    
+                           % within Region (East/West) 30.0%       28.4%  28.7%  
+                         5 Count                       73          240    313    
+                           % within Region (East/West) 30.4%       26.3%  27.2%  
+        Total              Count                       240         912    1152   
+                           % within Region (East/West) 100.0%      100.0% 100.0% 
+ Female Life             1 Count                       16          42     58     
+        satisfaction       % within Region (East/West) 6.4%        4.0%   4.5%   
+        (1=dissatisfied, 2 Count                       30          130    160    
+        5=satisfied)       % within Region (East/West) 12.0%       12.5%  12.4%  
+                         3 Count                       62          247    309    
+                           % within Region (East/West) 24.9%       23.8%  24.0%  
+                         4 Count                       72          335    407    
+                           % within Region (East/West) 28.9%       32.3%  31.6%  
+                         5 Count                       69          284    353    
+                           % within Region (East/West) 27.7%       27.4%  27.4%  
+        Total              Count                       249         1038   1287   
+                           % within Region (East/West) 100.0%      100.0% 100.0% 
+ Total  Life             1 Count                       31          88     119    
+        satisfaction       % within Region (East/West) 6.3%        4.5%   4.9%   
+        (1=dissatisfied, 2 Count                       60          247    307    
+        5=satisfied)       % within Region (East/West) 12.3%       12.7%  12.6%  
+                         3 Count                       112         497    609    
+                           % within Region (East/West) 22.9%       25.5%  25.0%  
+                         4 Count                       144         594    738    
+                           % within Region (East/West) 29.4%       30.5%  30.3%  
+                         5 Count                       142         524    666    
+                           % within Region (East/West) 29.0%       26.9%  27.3%  
+        Total              Count                       489         1950   2439   
+                           % within Region (East/West) 100.0%      100.0% 100.0% 
+
+=========== SCENARIO 3: UNWEIGHTED / GROUPED BY REGION ===========
+
+Test 3.1: Gender × Education by Region (unweighted, grouped)
+
+Crosstabs
+Gender * Highest educational attainment Crosstabulation
+
+ Region                                                 Highest educational attainment                                       Total  
+ (East/West)                                            Basic Secondary Intermediate Secondary Academic Secondary University        
+ East        Gender Male   Count                        82              60                     59                 37         238    
+                           % within Gender              34.5%           25.2%                  24.8%              15.5%      100.0% 
+                           % within Highest educational 48.2%           49.6%                  51.3%              46.8%      49.1%  
+                           attainment                                                                                               
+                           % of Total                   16.9%           12.4%                  12.2%              7.6%       49.1%  
+                    Female Count                        88              61                     56                 42         247    
+                           % within Gender              35.6%           24.7%                  22.7%              17.0%      100.0% 
+                           % within Highest educational 51.8%           50.4%                  48.7%              53.2%      50.9%  
+                           attainment                                                                                               
+                           % of Total                   18.1%           12.6%                  11.5%              8.7%       50.9%  
+             Total         Count                        170             121                    115                79         485    
+                           % within Gender              35.1%           24.9%                  23.7%              16.3%      100.0% 
+                           % within Highest educational 100.0%          100.0%                 100.0%             100.0%     100.0% 
+                           attainment                                                                                               
+                           % of Total                   35.1%           24.9%                  23.7%              16.3%      100.0% 
+ West        Gender Male   Count                        319             229                    261                147        956    
+                           % within Gender              33.4%           24.0%                  27.3%              15.4%      100.0% 
+                           % within Highest educational 47.5%           45.1%                  50.6%              45.9%      47.4%  
+                           attainment                                                                                               
+                           % of Total                   15.8%           11.4%                  13.0%              7.3%       47.4%  
+                    Female Count                        352             279                    255                173        1059   
+                           % within Gender              33.2%           26.3%                  24.1%              16.3%      100.0% 
+                           % within Highest educational 52.5%           54.9%                  49.4%              54.1%      52.6%  
+                           attainment                                                                                               
+                           % of Total                   17.5%           13.8%                  12.7%              8.6%       52.6%  
+             Total         Count                        671             508                    516                320        2015   
+                           % within Gender              33.3%           25.2%                  25.6%              15.9%      100.0% 
+                           % within Highest educational 100.0%          100.0%                 100.0%             100.0%     100.0% 
+                           attainment                                                                                               
+                           % of Total                   33.3%           25.2%                  25.6%              15.9%      100.0% 
+
+Test 3.2: Life Satisfaction × Gender by Region (unweighted, grouped)
+
+Crosstabs
+Life satisfaction (1=dissatisfied, 5=satisfied) * Gender Crosstabulation
+
+ Region                                         Gender        Total  
+ (East/West)                                    Male   Female        
+ East        Life             1 Count           14     16     30     
+             satisfaction       Expected Count  14.7   15.3   30.0   
+             (1=dissatisfied,   % within Gender 6.1%   6.8%   6.5%   
+             5=satisfied)     2 Count           29     29     58     
+                                Expected Count  28.4   29.6   58.0   
+                                % within Gender 12.7%  12.2%  12.5%  
+                              3 Count           48     58     106    
+                                Expected Count  52.0   54.0   106.0  
+                                % within Gender 21.1%  24.5%  22.8%  
+                              4 Count           68     68     136    
+                                Expected Count  66.7   69.3   136.0  
+                                % within Gender 29.8%  28.7%  29.2%  
+                              5 Count           69     66     135    
+                                Expected Count  66.2   68.8   135.0  
+                                % within Gender 30.3%  27.8%  29.0%  
+             Total              Count           228    237    465    
+                                Expected Count  228.0  237.0  465.0  
+                                % within Gender 100.0% 100.0% 100.0% 
+ West        Life             1 Count           46     42     88     
+             satisfaction       Expected Count  41.4   46.6   88.0   
+             (1=dissatisfied,   % within Gender 5.0%   4.1%   4.5%   
+             5=satisfied)     2 Count           117    131    248    
+                                Expected Count  116.8  131.2  248.0  
+                                % within Gender 12.7%  12.7%  12.7%  
+                              3 Count           251    243    494    
+                                Expected Count  232.6  261.4  494.0  
+                                % within Gender 27.3%  23.5%  25.3%  
+                              4 Count           261    334    595    
+                                Expected Count  280.2  314.8  595.0  
+                                % within Gender 28.3%  32.3%  30.4%  
+                              5 Count           246    285    531    
+                                Expected Count  250.0  281.0  531.0  
+                                % within Gender 26.7%  27.5%  27.1%  
+             Total              Count           921    1035   1956   
+                                Expected Count  921.0  1035.0 1956.0 
+                                % within Gender 100.0% 100.0% 100.0% 
+
+Test 3.3: Education × Employment × Gender by Region (unweighted, grouped, 3-way)
+
+Crosstabs
+Highest educational attainment * Employment status * Gender Crosstabulation
+
+ Region      Gender                                                     Employment status                          Total  
+ (East/West)                                                            Student Employed Unemployed Retired Other         
+ East        Male   Highest     Basic        Count                      0       49       6          18      9      82     
+                    educational Secondary    % within Employment status .0%     33.8%    37.5%      32.7%   60.0%  34.5%  
+                    attainment  Intermediate Count                      0       40       7          10      3      60     
+                                Secondary    % within Employment status .0%     27.6%    43.8%      18.2%   20.0%  25.2%  
+                                Academic     Count                      3       32       3          20      1      59     
+                                Secondary    % within Employment status 42.9%   22.1%    18.8%      36.4%   6.7%   24.8%  
+                                University   Count                      4       24       0          7       2      37     
+                                             % within Employment status 57.1%   16.6%    .0%        12.7%   13.3%  15.5%  
+                    Total                    Count                      7       145      16         55      15     238    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Female Highest     Basic        Count                      0       62       5          18      3      88     
+                    educational Secondary    % within Employment status .0%     37.3%    33.3%      32.1%   50.0%  35.6%  
+                    attainment  Intermediate Count                      0       39       5          16      1      61     
+                                Secondary    % within Employment status .0%     23.5%    33.3%      28.6%   16.7%  24.7%  
+                                Academic     Count                      3       37       4          12      0      56     
+                                Secondary    % within Employment status 75.0%   22.3%    26.7%      21.4%   .0%    22.7%  
+                                University   Count                      1       28       1          10      2      42     
+                                             % within Employment status 25.0%   16.9%    6.7%       17.9%   33.3%  17.0%  
+                    Total                    Count                      4       166      15         56      6      247    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Total  Highest     Basic        Count                      0       111      11         36      12     170    
+                    educational Secondary    % within Employment status .0%     35.7%    35.5%      32.4%   57.1%  35.1%  
+                    attainment  Intermediate Count                      0       79       12         26      4      121    
+                                Secondary    % within Employment status .0%     25.4%    38.7%      23.4%   19.0%  24.9%  
+                                Academic     Count                      6       69       7          32      1      115    
+                                Secondary    % within Employment status 54.5%   22.2%    22.6%      28.8%   4.8%   23.7%  
+                                University   Count                      5       52       1          17      4      79     
+                                             % within Employment status 45.5%   16.7%    3.2%       15.3%   19.0%  16.3%  
+                    Total                    Count                      11      311      31         111     21     485    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+ West        Male   Highest     Basic        Count                      0       216      24         62      17     319    
+                    educational Secondary    % within Employment status .0%     35.7%    35.3%      30.8%   32.1%  33.4%  
+                    attainment  Intermediate Count                      0       144      16         58      11     229    
+                                Secondary    % within Employment status .0%     23.8%    23.5%      28.9%   20.8%  24.0%  
+                                Academic     Count                      18      152      18         58      15     261    
+                                Secondary    % within Employment status 62.1%   25.1%    26.5%      28.9%   28.3%  27.3%  
+                                University   Count                      11      93       10         23      10     147    
+                                             % within Employment status 37.9%   15.4%    14.7%      11.4%   18.9%  15.4%  
+                    Total                    Count                      29      605      68         201     53     956    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Female Highest     Basic        Count                      0       244      30         73      5      352    
+                    educational Secondary    % within Employment status .0%     35.7%    36.1%      34.3%   12.2%  33.2%  
+                    attainment  Intermediate Count                      0       189      23         53      14     279    
+                                Secondary    % within Employment status .0%     27.6%    27.7%      24.9%   34.1%  26.3%  
+                                Academic     Count                      20      145      19         55      16     255    
+                                Secondary    % within Employment status 52.6%   21.2%    22.9%      25.8%   39.0%  24.1%  
+                                University   Count                      18      106      11         32      6      173    
+                                             % within Employment status 47.4%   15.5%    13.3%      15.0%   14.6%  16.3%  
+                    Total                    Count                      38      684      83         213     41     1059   
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Total  Highest     Basic        Count                      0       460      54         135     22     671    
+                    educational Secondary    % within Employment status .0%     35.7%    35.8%      32.6%   23.4%  33.3%  
+                    attainment  Intermediate Count                      0       333      39         111     25     508    
+                                Secondary    % within Employment status .0%     25.8%    25.8%      26.8%   26.6%  25.2%  
+                                Academic     Count                      38      297      37         113     31     516    
+                                Secondary    % within Employment status 56.7%   23.0%    24.5%      27.3%   33.0%  25.6%  
+                                University   Count                      29      199      21         55      16     320    
+                                             % within Employment status 43.3%   15.4%    13.9%      13.3%   17.0%  15.9%  
+                    Total                    Count                      67      1289     151        414     94     2015   
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+
+=========== SCENARIO 4: WEIGHTED / GROUPED BY REGION ===========
+
+Test 4.1: Gender × Education by Region (weighted, grouped)
+
+Crosstabs
+Gender * Highest educational attainment Crosstabulation
+
+ Region                                                 Highest educational attainment                                       Total  
+ (East/West)                                            Basic Secondary Intermediate Secondary Academic Secondary University        
+ East        Gender Male   Count                        83              63                     64                 39         249    
+                           % within Gender              33.3%           25.3%                  25.7%              15.7%      100.0% 
+                           % within Highest educational 47.4%           48.8%                  52.0%              47.6%      48.9%  
+                           attainment                                                                                               
+                           % of Total                   16.3%           12.4%                  12.6%              7.7%       48.9%  
+                    Female Count                        92              66                     59                 43         260    
+                           % within Gender              35.4%           25.4%                  22.7%              16.5%      100.0% 
+                           % within Highest educational 52.6%           51.2%                  48.0%              52.4%      51.1%  
+                           attainment                                                                                               
+                           % of Total                   18.1%           13.0%                  11.6%              8.4%       51.1%  
+             Total         Count                        175             129                    123                82         509    
+                           % within Gender              34.4%           25.3%                  24.2%              16.1%      100.0% 
+                           % within Highest educational 100.0%          100.0%                 100.0%             100.0%     100.0% 
+                           attainment                                                                                               
+                           % of Total                   34.4%           25.3%                  24.2%              16.1%      100.0% 
+ West        Gender Male   Count                        318             228                    262                137        945    
+                           % within Gender              33.7%           24.1%                  27.7%              14.5%      100.0% 
+                           % within Highest educational 47.3%           44.5%                  50.5%              45.2%      47.1%  
+                           attainment                                                                                               
+                           % of Total                   15.8%           11.4%                  13.1%              6.8%       47.1%  
+                    Female Count                        355             284                    257                166        1062   
+                           % within Gender              33.4%           26.7%                  24.2%              15.6%      100.0% 
+                           % within Highest educational 52.7%           55.5%                  49.5%              54.8%      52.9%  
+                           attainment                                                                                               
+                           % of Total                   17.7%           14.2%                  12.8%              8.3%       52.9%  
+             Total         Count                        673             512                    519                303        2007   
+                           % within Gender              33.5%           25.5%                  25.9%              15.1%      100.0% 
+                           % within Highest educational 100.0%          100.0%                 100.0%             100.0%     100.0% 
+                           attainment                                                                                               
+                           % of Total                   33.5%           25.5%                  25.9%              15.1%      100.0% 
+
+Test 4.2: Life Satisfaction × Gender by Region (weighted, grouped)
+
+Crosstabs
+Life satisfaction (1=dissatisfied, 5=satisfied) * Gender Crosstabulation
+
+ Region                                         Gender        Total  
+ (East/West)                                    Male   Female        
+ East        Life             1 Count           15     16     31     
+             satisfaction       Expected Count  15.2   15.8   31.0   
+             (1=dissatisfied,   % within Gender 6.3%   6.4%   6.3%   
+             5=satisfied)     2 Count           30     30     60     
+                                Expected Count  29.4   30.6   60.0   
+                                % within Gender 12.5%  12.0%  12.3%  
+                              3 Count           50     62     112    
+                                Expected Count  55.0   57.0   112.0  
+                                % within Gender 20.8%  24.9%  22.9%  
+                              4 Count           72     72     144    
+                                Expected Count  70.7   73.3   144.0  
+                                % within Gender 30.0%  28.9%  29.4%  
+                              5 Count           73     69     142    
+                                Expected Count  69.7   72.3   142.0  
+                                % within Gender 30.4%  27.7%  29.0%  
+             Total              Count           240    249    489    
+                                Expected Count  240.0  249.0  489.0  
+                                % within Gender 100.0% 100.0% 100.0% 
+ West        Life             1 Count           46     42     88     
+             satisfaction       Expected Count  41.2   46.8   88.0   
+             (1=dissatisfied,   % within Gender 5.0%   4.0%   4.5%   
+             5=satisfied)     2 Count           117    130    247    
+                                Expected Count  115.5  131.5  247.0  
+                                % within Gender 12.8%  12.5%  12.7%  
+                              3 Count           250    247    497    
+                                Expected Count  232.4  264.6  497.0  
+                                % within Gender 27.4%  23.8%  25.5%  
+                              4 Count           259    335    594    
+                                Expected Count  277.8  316.2  594.0  
+                                % within Gender 28.4%  32.3%  30.5%  
+                              5 Count           240    284    524    
+                                Expected Count  245.1  278.9  524.0  
+                                % within Gender 26.3%  27.4%  26.9%  
+             Total              Count           912    1038   1950   
+                                Expected Count  912.0  1038.0 1950.0 
+                                % within Gender 100.0% 100.0% 100.0% 
+
+Test 4.3: Education × Employment × Gender by Region (weighted, grouped, 3-way)
+
+Crosstabs
+Highest educational attainment * Employment status * Gender Crosstabulation
+
+ Region      Gender                                                     Employment status                          Total  
+ (East/West)                                                            Student Employed Unemployed Retired Other         
+ East        Male   Highest     Basic        Count                      0       48       6          20      9      83     
+                    educational Secondary    % within Employment status .0%     32.2%    35.3%      32.3%   60.0%  33.2%  
+                    attainment  Intermediate Count                      0       42       7          11      3      63     
+                                Secondary    % within Employment status .0%     28.2%    41.2%      17.7%   20.0%  25.2%  
+                                Academic     Count                      3       34       4          23      1      65     
+                                Secondary    % within Employment status 42.9%   22.8%    23.5%      37.1%   6.7%   26.0%  
+                                University   Count                      4       25       0          8       2      39     
+                                             % within Employment status 57.1%   16.8%    .0%        12.9%   13.3%  15.6%  
+                    Total                    Count                      7       149      17         62      15     250    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Female Highest     Basic        Count                      0       64       5          19      3      91     
+                    educational Secondary    % within Employment status .0%     37.4%    33.3%      31.1%   50.0%  35.4%  
+                    attainment  Intermediate Count                      0       41       5          18      1      65     
+                                Secondary    % within Employment status .0%     24.0%    33.3%      29.5%   16.7%  25.3%  
+                                Academic     Count                      3       38       4          13      0      58     
+                                Secondary    % within Employment status 75.0%   22.2%    26.7%      21.3%   .0%    22.6%  
+                                University   Count                      1       28       1          11      2      43     
+                                             % within Employment status 25.0%   16.4%    6.7%       18.0%   33.3%  16.7%  
+                    Total                    Count                      4       171      15         61      6      257    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Total  Highest     Basic        Count                      0       112      11         39      12     174    
+                    educational Secondary    % within Employment status .0%     35.0%    34.4%      31.7%   57.1%  34.3%  
+                    attainment  Intermediate Count                      0       83       12         29      4      128    
+                                Secondary    % within Employment status .0%     25.9%    37.5%      23.6%   19.0%  25.2%  
+                                Academic     Count                      6       72       8          36      1      123    
+                                Secondary    % within Employment status 54.5%   22.5%    25.0%      29.3%   4.8%   24.3%  
+                                University   Count                      5       53       1          19      4      82     
+                                             % within Employment status 45.5%   16.6%    3.1%       15.4%   19.0%  16.2%  
+                    Total                    Count                      11      320      32         123     21     507    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+ West        Male   Highest     Basic        Count                      0       216      24         62      17     319    
+                    educational Secondary    % within Employment status .0%     36.1%    35.8%      31.0%   32.1%  33.7%  
+                    attainment  Intermediate Count                      0       144      16         57      11     228    
+                                Secondary    % within Employment status .0%     24.1%    23.9%      28.5%   20.8%  24.1%  
+                                Academic     Count                      19      152      18         59      15     263    
+                                Secondary    % within Employment status 65.5%   25.4%    26.9%      29.5%   28.3%  27.8%  
+                                University   Count                      10      86       9          22      10     137    
+                                             % within Employment status 34.5%   14.4%    13.4%      11.0%   18.9%  14.5%  
+                    Total                    Count                      29      598      67         200     53     947    
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Female Highest     Basic        Count                      0       245      31         74      5      355    
+                    educational Secondary    % within Employment status .0%     35.8%    36.5%      34.9%   12.2%  33.5%  
+                    attainment  Intermediate Count                      0       193      24         53      15     285    
+                                Secondary    % within Employment status .0%     28.2%    28.2%      25.0%   36.6%  26.9%  
+                                Academic     Count                      21      146      19         54      16     256    
+                                Secondary    % within Employment status 53.8%   21.3%    22.4%      25.5%   39.0%  24.1%  
+                                University   Count                      18      100      11         31      5      165    
+                                             % within Employment status 46.2%   14.6%    12.9%      14.6%   12.2%  15.6%  
+                    Total                    Count                      39      684      85         212     41     1061   
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+             Total  Highest     Basic        Count                      0       461      55         136     22     674    
+                    educational Secondary    % within Employment status .0%     36.0%    36.2%      33.0%   23.4%  33.6%  
+                    attainment  Intermediate Count                      0       337      40         110     26     513    
+                                Secondary    % within Employment status .0%     26.3%    26.3%      26.7%   27.7%  25.5%  
+                                Academic     Count                      40      298      37         113     31     519    
+                                Secondary    % within Employment status 58.8%   23.2%    24.3%      27.4%   33.0%  25.8%  
+                                University   Count                      28      186      20         53      15     302    
+                                             % within Employment status 41.2%   14.5%    13.2%      12.9%   16.0%  15.0%  
+                    Total                    Count                      68      1282     152        412     94     2008   
+                                             % within Employment status 100.0%  100.0%   100.0%     100.0%  100.0% 100.0% 
+
+=========== SCENARIO 5: SPECIAL CASES ===========
+
+Test 5.1: Variables with Missing Values
+
+Crosstabs
+Monthly household income (EUR) * Life satisfaction (1=dissatisfied, 5=satisfied) Crosstabulation
+
+                                                                            Life satisfaction (1=dissatisfied, 5=satisfied) Total  
+                                                                            1                   2      3      4      5             
+ Monthly   800.00  Count                                                    4                   0      0      0      0      4      
+ household         % within Monthly household income (EUR)                  100.0%              .0%    .0%    .0%    .0%    100.0% 
+ income            % within Life satisfaction (1=dissatisfied, 5=satisfied) 4.0%                .0%    .0%    .0%    .0%    .2%    
+ (EUR)     900.00  Count                                                    2                   0      1      0      0      3      
+                   % within Monthly household income (EUR)                  66.7%               .0%    33.3%  .0%    .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 2.0%                .0%    .2%    .0%    .0%    .1%    
+           1000.00 Count                                                    3                   2      0      0      0      5      
+                   % within Monthly household income (EUR)                  60.0%               40.0%  .0%    .0%    .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 3.0%                .8%    .0%    .0%    .0%    .2%    
+           1100.00 Count                                                    1                   3      1      0      0      5      
+                   % within Monthly household income (EUR)                  20.0%               60.0%  20.0%  .0%    .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 1.0%                1.1%   .2%    .0%    .0%    .2%    
+           1200.00 Count                                                    2                   2      1      1      0      6      
+                   % within Monthly household income (EUR)                  33.3%               33.3%  16.7%  16.7%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 2.0%                .8%    .2%    .2%    .0%    .3%    
+           1300.00 Count                                                    3                   4      1      1      0      9      
+                   % within Monthly household income (EUR)                  33.3%               44.4%  11.1%  11.1%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 3.0%                1.5%   .2%    .2%    .0%    .4%    
+           1400.00 Count                                                    4                   5      2      1      0      12     
+                   % within Monthly household income (EUR)                  33.3%               41.7%  16.7%  8.3%   .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 4.0%                1.9%   .4%    .2%    .0%    .6%    
+           1500.00 Count                                                    2                   1      6      1      0      10     
+                   % within Monthly household income (EUR)                  20.0%               10.0%  60.0%  10.0%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 2.0%                .4%    1.1%   .2%    .0%    .5%    
+           1600.00 Count                                                    8                   4      6      0      0      18     
+                   % within Monthly household income (EUR)                  44.4%               22.2%  33.3%  .0%    .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 8.0%                1.5%   1.1%   .0%    .0%    .9%    
+           1700.00 Count                                                    3                   8      6      2      0      19     
+                   % within Monthly household income (EUR)                  15.8%               42.1%  31.6%  10.5%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 3.0%                3.0%   1.1%   .3%    .0%    .9%    
+           1800.00 Count                                                    5                   6      11     1      0      23     
+                   % within Monthly household income (EUR)                  21.7%               26.1%  47.8%  4.3%   .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 5.0%                2.3%   2.1%   .2%    .0%    1.1%   
+           1900.00 Count                                                    10                  12     12     4      0      38     
+                   % within Monthly household income (EUR)                  26.3%               31.6%  31.6%  10.5%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 10.0%               4.6%   2.3%   .6%    .0%    1.8%   
+           2000.00 Count                                                    11                  11     14     4      0      40     
+                   % within Monthly household income (EUR)                  27.5%               27.5%  35.0%  10.0%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 11.0%               4.2%   2.7%   .6%    .0%    1.9%   
+           2100.00 Count                                                    7                   18     10     1      0      36     
+                   % within Monthly household income (EUR)                  19.4%               50.0%  27.8%  2.8%   .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 7.0%                6.8%   1.9%   .2%    .0%    1.7%   
+           2200.00 Count                                                    8                   9      9      4      0      30     
+                   % within Monthly household income (EUR)                  26.7%               30.0%  30.0%  13.3%  .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 8.0%                3.4%   1.7%   .6%    .0%    1.4%   
+           2300.00 Count                                                    16                  13     21     4      0      54     
+                   % within Monthly household income (EUR)                  29.6%               24.1%  38.9%  7.4%   .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 16.0%               4.9%   4.0%   .6%    .0%    2.6%   
+           2400.00 Count                                                    11                  21     19     5      0      56     
+                   % within Monthly household income (EUR)                  19.6%               37.5%  33.9%  8.9%   .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 11.0%               8.0%   3.6%   .8%    .0%    2.6%   
+           2500.00 Count                                                    0                   8      13     15     18     54     
+                   % within Monthly household income (EUR)                  .0%                 14.8%  24.1%  27.8%  33.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 3.0%   2.5%   2.3%   3.1%   2.6%   
+           2600.00 Count                                                    0                   8      16     20     26     70     
+                   % within Monthly household income (EUR)                  .0%                 11.4%  22.9%  28.6%  37.1%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 3.0%   3.0%   3.1%   4.4%   3.3%   
+           2700.00 Count                                                    0                   8      10     20     17     55     
+                   % within Monthly household income (EUR)                  .0%                 14.5%  18.2%  36.4%  30.9%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 3.0%   1.9%   3.1%   2.9%   2.6%   
+           2800.00 Count                                                    0                   7      23     18     21     69     
+                   % within Monthly household income (EUR)                  .0%                 10.1%  33.3%  26.1%  30.4%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 2.7%   4.4%   2.8%   3.6%   3.3%   
+           2900.00 Count                                                    0                   7      14     20     13     54     
+                   % within Monthly household income (EUR)                  .0%                 13.0%  25.9%  37.0%  24.1%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 2.7%   2.7%   3.1%   2.2%   2.6%   
+           3000.00 Count                                                    0                   11     16     15     18     60     
+                   % within Monthly household income (EUR)                  .0%                 18.3%  26.7%  25.0%  30.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 4.2%   3.0%   2.3%   3.1%   2.8%   
+           3100.00 Count                                                    0                   13     15     24     16     68     
+                   % within Monthly household income (EUR)                  .0%                 19.1%  22.1%  35.3%  23.5%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 4.9%   2.9%   3.7%   2.7%   3.2%   
+           3200.00 Count                                                    0                   12     16     22     19     69     
+                   % within Monthly household income (EUR)                  .0%                 17.4%  23.2%  31.9%  27.5%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 4.6%   3.0%   3.4%   3.2%   3.3%   
+           3300.00 Count                                                    0                   11     16     26     17     70     
+                   % within Monthly household income (EUR)                  .0%                 15.7%  22.9%  37.1%  24.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 4.2%   3.0%   4.0%   2.9%   3.3%   
+           3400.00 Count                                                    0                   14     19     21     11     65     
+                   % within Monthly household income (EUR)                  .0%                 21.5%  29.2%  32.3%  16.9%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 5.3%   3.6%   3.3%   1.9%   3.1%   
+           3500.00 Count                                                    0                   12     18     25     13     68     
+                   % within Monthly household income (EUR)                  .0%                 17.6%  26.5%  36.8%  19.1%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 4.6%   3.4%   3.9%   2.2%   3.2%   
+           3600.00 Count                                                    0                   11     22     12     15     60     
+                   % within Monthly household income (EUR)                  .0%                 18.3%  36.7%  20.0%  25.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 4.2%   4.2%   1.9%   2.6%   2.8%   
+           3700.00 Count                                                    0                   7      12     23     11     53     
+                   % within Monthly household income (EUR)                  .0%                 13.2%  22.6%  43.4%  20.8%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 2.7%   2.3%   3.6%   1.9%   2.5%   
+           3800.00 Count                                                    0                   6      13     22     16     57     
+                   % within Monthly household income (EUR)                  .0%                 10.5%  22.8%  38.6%  28.1%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 2.3%   2.5%   3.4%   2.7%   2.7%   
+           3900.00 Count                                                    0                   9      18     25     16     68     
+                   % within Monthly household income (EUR)                  .0%                 13.2%  26.5%  36.8%  23.5%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 3.4%   3.4%   3.9%   2.7%   3.2%   
+           4000.00 Count                                                    0                   0      8      14     26     48     
+                   % within Monthly household income (EUR)                  .0%                 .0%    16.7%  29.2%  54.2%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.5%   2.2%   4.4%   2.3%   
+           4100.00 Count                                                    0                   0      9      17     25     51     
+                   % within Monthly household income (EUR)                  .0%                 .0%    17.6%  33.3%  49.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.7%   2.6%   4.3%   2.4%   
+           4200.00 Count                                                    0                   0      10     15     16     41     
+                   % within Monthly household income (EUR)                  .0%                 .0%    24.4%  36.6%  39.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.9%   2.3%   2.7%   1.9%   
+           4300.00 Count                                                    0                   0      8      15     18     41     
+                   % within Monthly household income (EUR)                  .0%                 .0%    19.5%  36.6%  43.9%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.5%   2.3%   3.1%   1.9%   
+           4400.00 Count                                                    0                   0      11     11     14     36     
+                   % within Monthly household income (EUR)                  .0%                 .0%    30.6%  30.6%  38.9%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    2.1%   1.7%   2.4%   1.7%   
+           4500.00 Count                                                    0                   0      8      13     23     44     
+                   % within Monthly household income (EUR)                  .0%                 .0%    18.2%  29.5%  52.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.5%   2.0%   3.9%   2.1%   
+           4600.00 Count                                                    0                   0      9      12     14     35     
+                   % within Monthly household income (EUR)                  .0%                 .0%    25.7%  34.3%  40.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.7%   1.9%   2.4%   1.7%   
+           4700.00 Count                                                    0                   0      10     15     16     41     
+                   % within Monthly household income (EUR)                  .0%                 .0%    24.4%  36.6%  39.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.9%   2.3%   2.7%   1.9%   
+           4800.00 Count                                                    0                   0      9      15     16     40     
+                   % within Monthly household income (EUR)                  .0%                 .0%    22.5%  37.5%  40.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.7%   2.3%   2.7%   1.9%   
+           4900.00 Count                                                    0                   0      7      12     15     34     
+                   % within Monthly household income (EUR)                  .0%                 .0%    20.6%  35.3%  44.1%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.3%   1.9%   2.6%   1.6%   
+           5000.00 Count                                                    0                   0      0      13     15     28     
+                   % within Monthly household income (EUR)                  .0%                 .0%    .0%    46.4%  53.6%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .0%    2.0%   2.6%   1.3%   
+           5100.00 Count                                                    0                   0      4      9      14     27     
+                   % within Monthly household income (EUR)                  .0%                 .0%    14.8%  33.3%  51.9%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .8%    1.4%   2.4%   1.3%   
+           5200.00 Count                                                    0                   0      2      10     7      19     
+                   % within Monthly household income (EUR)                  .0%                 .0%    10.5%  52.6%  36.8%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .4%    1.6%   1.2%   .9%    
+           5300.00 Count                                                    0                   0      6      10     17     33     
+                   % within Monthly household income (EUR)                  .0%                 .0%    18.2%  30.3%  51.5%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.1%   1.6%   2.9%   1.6%   
+           5400.00 Count                                                    0                   0      7      9      10     26     
+                   % within Monthly household income (EUR)                  .0%                 .0%    26.9%  34.6%  38.5%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.3%   1.4%   1.7%   1.2%   
+           5500.00 Count                                                    0                   0      8      6      6      20     
+                   % within Monthly household income (EUR)                  .0%                 .0%    40.0%  30.0%  30.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    1.5%   .9%    1.0%   .9%    
+           5600.00 Count                                                    0                   0      3      15     8      26     
+                   % within Monthly household income (EUR)                  .0%                 .0%    11.5%  57.7%  30.8%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    2.3%   1.4%   1.2%   
+           5700.00 Count                                                    0                   0      4      11     7      22     
+                   % within Monthly household income (EUR)                  .0%                 .0%    18.2%  50.0%  31.8%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .8%    1.7%   1.2%   1.0%   
+           5800.00 Count                                                    0                   0      3      6      4      13     
+                   % within Monthly household income (EUR)                  .0%                 .0%    23.1%  46.2%  30.8%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    .9%    .7%    .6%    
+           5900.00 Count                                                    0                   0      4      7      10     21     
+                   % within Monthly household income (EUR)                  .0%                 .0%    19.0%  33.3%  47.6%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .8%    1.1%   1.7%   1.0%   
+           6000.00 Count                                                    0                   0      2      10     3      15     
+                   % within Monthly household income (EUR)                  .0%                 .0%    13.3%  66.7%  20.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .4%    1.6%   .5%    .7%    
+           6100.00 Count                                                    0                   0      0      3      1      4      
+                   % within Monthly household income (EUR)                  .0%                 .0%    .0%    75.0%  25.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .0%    .5%    .2%    .2%    
+           6200.00 Count                                                    0                   0      3      1      1      5      
+                   % within Monthly household income (EUR)                  .0%                 .0%    60.0%  20.0%  20.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    .2%    .2%    .2%    
+           6300.00 Count                                                    0                   0      1      4      5      10     
+                   % within Monthly household income (EUR)                  .0%                 .0%    10.0%  40.0%  50.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .6%    .9%    .5%    
+           6400.00 Count                                                    0                   0      1      4      3      8      
+                   % within Monthly household income (EUR)                  .0%                 .0%    12.5%  50.0%  37.5%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .6%    .5%    .4%    
+           6500.00 Count                                                    0                   0      1      7      4      12     
+                   % within Monthly household income (EUR)                  .0%                 .0%    8.3%   58.3%  33.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    1.1%   .7%    .6%    
+           6600.00 Count                                                    0                   0      3      3      4      10     
+                   % within Monthly household income (EUR)                  .0%                 .0%    30.0%  30.0%  40.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    .5%    .7%    .5%    
+           6700.00 Count                                                    0                   0      3      6      1      10     
+                   % within Monthly household income (EUR)                  .0%                 .0%    30.0%  60.0%  10.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    .9%    .2%    .5%    
+           6800.00 Count                                                    0                   0      1      2      2      5      
+                   % within Monthly household income (EUR)                  .0%                 .0%    20.0%  40.0%  40.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .3%    .3%    .2%    
+           6900.00 Count                                                    0                   0      0      3      3      6      
+                   % within Monthly household income (EUR)                  .0%                 .0%    .0%    50.0%  50.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .0%    .5%    .5%    .3%    
+           7000.00 Count                                                    0                   0      3      0      2      5      
+                   % within Monthly household income (EUR)                  .0%                 .0%    60.0%  .0%    40.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    .0%    .3%    .2%    
+           7100.00 Count                                                    0                   0      4      2      3      9      
+                   % within Monthly household income (EUR)                  .0%                 .0%    44.4%  22.2%  33.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .8%    .3%    .5%    .4%    
+           7200.00 Count                                                    0                   0      0      3      2      5      
+                   % within Monthly household income (EUR)                  .0%                 .0%    .0%    60.0%  40.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .0%    .5%    .3%    .2%    
+           7300.00 Count                                                    0                   0      2      0      1      3      
+                   % within Monthly household income (EUR)                  .0%                 .0%    66.7%  .0%    33.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .4%    .0%    .2%    .1%    
+           7400.00 Count                                                    0                   0      1      3      1      5      
+                   % within Monthly household income (EUR)                  .0%                 .0%    20.0%  60.0%  20.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .5%    .2%    .2%    
+           7500.00 Count                                                    0                   0      2      0      3      5      
+                   % within Monthly household income (EUR)                  .0%                 .0%    40.0%  .0%    60.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .4%    .0%    .5%    .2%    
+           7600.00 Count                                                    0                   0      1      1      6      8      
+                   % within Monthly household income (EUR)                  .0%                 .0%    12.5%  12.5%  75.0%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .2%    1.0%   .4%    
+           7700.00 Count                                                    0                   0      1      0      0      1      
+                   % within Monthly household income (EUR)                  .0%                 .0%    100.0% .0%    .0%    100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .0%    .0%    .0%    
+           7800.00 Count                                                    0                   0      1      3      2      6      
+                   % within Monthly household income (EUR)                  .0%                 .0%    16.7%  50.0%  33.3%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .5%    .3%    .3%    
+           7900.00 Count                                                    0                   0      1      0      2      3      
+                   % within Monthly household income (EUR)                  .0%                 .0%    33.3%  .0%    66.7%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .2%    .0%    .3%    .1%    
+           8000.00 Count                                                    0                   0      3      15     8      26     
+                   % within Monthly household income (EUR)                  .0%                 .0%    11.5%  57.7%  30.8%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) .0%                 .0%    .6%    2.3%   1.4%   1.2%   
+ Total             Count                                                    100                 263    525    642    585    2115   
+                   % within Monthly household income (EUR)                  4.7%                12.4%  24.8%  30.4%  27.7%  100.0% 
+                   % within Life satisfaction (1=dissatisfied, 5=satisfied) 100.0%              100.0% 100.0% 100.0% 100.0% 100.0% 
+
+Test 5.2: Large Dimensions (if available)
+
+Crosstabs
+Political orientation (1=left, 5=right) * Life satisfaction (1=dissatisfied, 5=satisfied) Crosstabulation
+
+                          Life satisfaction (1=dissatisfied, 5=satisfied) Total  
+                          1                       2     3     4     5            
+ Political   1 Count      16                      49    80    103   102   350    
+ orientation   % of Total .7%                     2.2%  3.6%  4.6%  4.6%  15.7%  
+ (1=left,    2 Count      31                      75    126   166   150   548    
+ 5=right)      % of Total 1.4%                    3.4%  5.7%  7.5%  6.7%  24.6%  
+             3 Count      40                      103   201   234   223   801    
+               % of Total 1.8%                    4.6%  9.0%  10.5% 10.0% 36.0%  
+             4 Count      18                      49    109   141   105   422    
+               % of Total .8%                     2.2%  4.9%  6.3%  4.7%  18.9%  
+             5 Count      6                       12    33    22    34    107    
+               % of Total .3%                     .5%   1.5%  1.0%  1.5%  4.8%   
+ Total         Count      111                     288   549   666   614   2228   
+               % of Total 5.0%                    12.9% 24.6% 29.9% 27.6% 100.0% 
+
+=========== SCENARIO 6: PERCENTAGE COMPARISON PATTERNS ===========
+
+Test 6.1: Political Orientation × Region × Gender
+
+Crosstabs
+Political orientation (1=left, 5=right) * Region (East/West) * Gender Crosstabulation
+
+ Gender                                           Region (East/West) Total  
+                                                  East        West          
+ Male   Political   1 Count                       30          140    170    
+        orientation   % within Region (East/West) 13.9%       15.8%  15.4%  
+        (1=left,    2 Count                       58          219    277    
+        5=right)      % within Region (East/West) 26.9%       24.7%  25.2%  
+                    3 Count                       81          313    394    
+                      % within Region (East/West) 37.5%       35.4%  35.8%  
+                    4 Count                       41          171    212    
+                      % within Region (East/West) 19.0%       19.3%  19.3%  
+                    5 Count                       6           42     48     
+                      % within Region (East/West) 2.8%        4.7%   4.4%   
+        Total         Count                       216         885    1101   
+                      % within Region (East/West) 100.0%      100.0% 100.0% 
+ Female Political   1 Count                       42          149    191    
+        orientation   % within Region (East/West) 18.5%       15.3%  15.9%  
+        (1=left,    2 Count                       50          245    295    
+        5=right)      % within Region (East/West) 22.0%       25.2%  24.6%  
+                    3 Count                       80          347    427    
+                      % within Region (East/West) 35.2%       35.7%  35.6%  
+                    4 Count                       36          188    224    
+                      % within Region (East/West) 15.9%       19.4%  18.7%  
+                    5 Count                       19          42     61     
+                      % within Region (East/West) 8.4%        4.3%   5.1%   
+        Total         Count                       227         971    1198   
+                      % within Region (East/West) 100.0%      100.0% 100.0% 
+ Total  Political   1 Count                       72          289    361    
+        orientation   % within Region (East/West) 16.3%       15.6%  15.7%  
+        (1=left,    2 Count                       108         464    572    
+        5=right)      % within Region (East/West) 24.4%       25.0%  24.9%  
+                    3 Count                       161         660    821    
+                      % within Region (East/West) 36.3%       35.6%  35.7%  
+                    4 Count                       77          359    436    
+                      % within Region (East/West) 17.4%       19.3%  19.0%  
+                    5 Count                       25          84     109    
+                      % within Region (East/West) 5.6%        4.5%   4.7%   
+        Total         Count                       443         1856   2299   
+                      % within Region (East/West) 100.0%      100.0% 100.0% 
+
+Test 6.2: Political Orientation × Gender × Region
+
+Crosstabs
+Political orientation (1=left, 5=right) * Gender * Region (East/West) Crosstabulation
+
+ Region                                    Gender        Total  
+ (East/West)                               Male   Female        
+ East        Political   1 Count           30     42     72     
+             orientation   % within Gender 13.9%  18.5%  16.3%  
+             (1=left,    2 Count           58     50     108    
+             5=right)      % within Gender 26.9%  22.0%  24.4%  
+                         3 Count           81     80     161    
+                           % within Gender 37.5%  35.2%  36.3%  
+                         4 Count           41     36     77     
+                           % within Gender 19.0%  15.9%  17.4%  
+                         5 Count           6      19     25     
+                           % within Gender 2.8%   8.4%   5.6%   
+             Total         Count           216    227    443    
+                           % within Gender 100.0% 100.0% 100.0% 
+ West        Political   1 Count           140    149    289    
+             orientation   % within Gender 15.8%  15.3%  15.6%  
+             (1=left,    2 Count           219    245    464    
+             5=right)      % within Gender 24.7%  25.2%  25.0%  
+                         3 Count           313    347    660    
+                           % within Gender 35.4%  35.7%  35.6%  
+                         4 Count           171    188    359    
+                           % within Gender 19.3%  19.4%  19.3%  
+                         5 Count           42     42     84     
+                           % within Gender 4.7%   4.3%   4.5%   
+             Total         Count           885    971    1856   
+                           % within Gender 100.0% 100.0% 100.0% 
+ Total       Political   1 Count           170    191    361    
+             orientation   % within Gender 15.4%  15.9%  15.7%  
+             (1=left,    2 Count           277    295    572    
+             5=right)      % within Gender 25.2%  24.6%  24.9%  
+                         3 Count           394    427    821    
+                           % within Gender 35.8%  35.6%  35.7%  
+                         4 Count           212    224    436    
+                           % within Gender 19.3%  18.7%  19.0%  
+                         5 Count           48     61     109    
+                           % within Gender 4.4%   5.1%   4.7%   
+             Total         Count           1101   1198   2299   
+                           % within Gender 100.0% 100.0% 100.0% 
+
+Test 6.3: Weighted Political Orientation × Region × Gender
+
+Crosstabs
+Political orientation (1=left, 5=right) * Region (East/West) * Gender Crosstabulation
+
+ Gender                                           Region (East/West) Total  
+                                                  East        West          
+ Male   Political   1 Count                       32          138    170    
+        orientation   % within Region (East/West) 14.1%       15.8%  15.5%  
+        (1=left,    2 Count                       60          214    274    
+        5=right)      % within Region (East/West) 26.4%       24.5%  24.9%  
+                    3 Count                       86          310    396    
+                      % within Region (East/West) 37.9%       35.5%  36.0%  
+                    4 Count                       43          168    211    
+                      % within Region (East/West) 18.9%       19.2%  19.2%  
+                    5 Count                       6           43     49     
+                      % within Region (East/West) 2.6%        4.9%   4.5%   
+        Total         Count                       227         873    1100   
+                      % within Region (East/West) 100.0%      100.0% 100.0% 
+ Female Political   1 Count                       44          150    194    
+        orientation   % within Region (East/West) 18.4%       15.4%  16.0%  
+        (1=left,    2 Count                       53          246    299    
+        5=right)      % within Region (East/West) 22.2%       25.2%  24.6%  
+                    3 Count                       83          349    432    
+                      % within Region (East/West) 34.7%       35.8%  35.6%  
+                    4 Count                       38          189    227    
+                      % within Region (East/West) 15.9%       19.4%  18.7%  
+                    5 Count                       21          42     63     
+                      % within Region (East/West) 8.8%        4.3%   5.2%   
+        Total         Count                       239         976    1215   
+                      % within Region (East/West) 100.0%      100.0% 100.0% 
+ Total  Political   1 Count                       76          288    364    
+        orientation   % within Region (East/West) 16.3%       15.6%  15.7%  
+        (1=left,    2 Count                       113         460    573    
+        5=right)      % within Region (East/West) 24.2%       24.9%  24.8%  
+                    3 Count                       169         659    828    
+                      % within Region (East/West) 36.3%       35.6%  35.8%  
+                    4 Count                       81          357    438    
+                      % within Region (East/West) 17.4%       19.3%  18.9%  
+                    5 Count                       27          85     112    
+                      % within Region (East/West) 5.8%        4.6%   4.8%   
+        Total         Count                       466         1849   2315   
+                      % within Region (East/West) 100.0%      100.0% 100.0% 
+
+Test 6.4: Weighted Political Orientation × Gender × Region
+
+Crosstabs
+Political orientation (1=left, 5=right) * Gender * Region (East/West) Crosstabulation
+
+ Region                                    Gender        Total  
+ (East/West)                               Male   Female        
+ East        Political   1 Count           32     44     76     
+             orientation   % within Gender 14.1%  18.4%  16.3%  
+             (1=left,    2 Count           60     53     113    
+             5=right)      % within Gender 26.4%  22.2%  24.2%  
+                         3 Count           86     83     169    
+                           % within Gender 37.9%  34.7%  36.3%  
+                         4 Count           43     38     81     
+                           % within Gender 18.9%  15.9%  17.4%  
+                         5 Count           6      21     27     
+                           % within Gender 2.6%   8.8%   5.8%   
+             Total         Count           227    239    466    
+                           % within Gender 100.0% 100.0% 100.0% 
+ West        Political   1 Count           138    150    288    
+             orientation   % within Gender 15.8%  15.4%  15.6%  
+             (1=left,    2 Count           214    246    460    
+             5=right)      % within Gender 24.5%  25.2%  24.9%  
+                         3 Count           310    349    659    
+     
