@@ -36,3 +36,5 @@
 ^test_.*\.R$
 ^SurveyStat_.*\.tar\.gz$
 ^CLAUDE\.md$
+^laterImplementation$
+^DECISIONS\.md$
