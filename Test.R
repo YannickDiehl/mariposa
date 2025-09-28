@@ -39,5 +39,5 @@ survey_data |>
 
 survey_data |>
   group_by(region) |> 
-  crosstab(life_satisfaction, gender, percentages = "col")
+  crosstab(life_satisfaction, gender, percentages = "all", weights = sampling_weight)
 
