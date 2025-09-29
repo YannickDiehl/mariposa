@@ -1,13 +1,13 @@
 # ============================================================================
 # ONEWAY_ANOVA_TEST FUNCTION - SPSS VALIDATION TEST
 # ============================================================================
-# Purpose: Validate R oneway_anova_test() against SPSS ONEWAY procedure
+# Purpose: Validate R oneway_anova() against SPSS ONEWAY procedure
 # Dataset: survey_data
 # Variable: life_satisfaction by education
 # Created: 2025-01-24
 # SPSS Version: 29.0.0.0
 #
-# This is the primary validation test for the oneway_anova_test() function,
+# This is the primary validation test for the oneway_anova() function,
 # comparing output against SPSS reference values across 4 scenarios:
 # 1. Unweighted/Ungrouped
 # 2. Weighted/Ungrouped
@@ -255,7 +255,7 @@ spss_values <- list(
 
 #' Compare ANOVA results with SPSS
 #'
-#' @param r_result R oneway_anova_test result object
+#' @param r_result R oneway_anova result object
 #' @param spss_ref SPSS reference values
 #' @param test_name Test scenario name for error messages
 #' @param tolerance_f Tolerance for F-statistics (default: 0.001)
@@ -453,7 +453,7 @@ data(survey_data, envir = environment())
 test_that("Test 1: Unweighted/Ungrouped ANOVA matches SPSS", {
   # Run ANOVA: Life Satisfaction by Education
   result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   # Compare with SPSS
   compare_anova_with_spss(
@@ -466,7 +466,7 @@ test_that("Test 1: Unweighted/Ungrouped ANOVA matches SPSS", {
 test_that("Test 2: Weighted/Ungrouped ANOVA matches SPSS", {
   # Run weighted ANOVA
   result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
   # Compare with SPSS using weighted comparison
   compare_weighted_anova_with_spss(
@@ -480,7 +480,7 @@ test_that("Test 3: Unweighted/Grouped ANOVA matches SPSS", {
   # Run grouped ANOVA
   result <- survey_data %>%
     group_by(region) %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   # Test East region
   east_result <- extract_group_results(result, "region", "East")
@@ -503,7 +503,7 @@ test_that("Test 4: Weighted/Grouped ANOVA matches SPSS", {
   # Run weighted grouped ANOVA
   result <- survey_data %>%
     group_by(region) %>%
-    oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
   # Test East region
   east_result <- extract_group_results(result, "region", "East")
@@ -534,7 +534,7 @@ test_that("Edge case: Missing values handled correctly", {
   # Run ANOVA and verify it handles NA appropriately
   expect_no_error({
     result <- test_data %>%
-      oneway_anova_test(life_satisfaction, group = education)
+      oneway_anova(life_satisfaction, group = education)
   })
 
   # Verify N is reduced appropriately
@@ -545,7 +545,7 @@ test_that("Edge case: Missing values handled correctly", {
 test_that("Edge case: Effect sizes are calculated correctly", {
   # Run basic ANOVA
   result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   # Check effect sizes are within valid range [0, 1]
   expect_gte(result$results$eta_squared[1], 0)

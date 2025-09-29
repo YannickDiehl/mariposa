@@ -274,14 +274,9 @@ w_sd <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @export
 #' @method print w_sd
 print.w_sd <- function(x, digits = 3, ...) {
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Standard Deviation Statistics"
-  } else {
-    "Standard Deviation Statistics"
-  }
-  
-  cat(sprintf("\n%s\n", test_type))
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  # Determine test type using standardized helper
+  test_type <- get_standard_title("Standard Deviation", x$weights, "Statistics")
+  print_header(test_type)
   
   is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
   

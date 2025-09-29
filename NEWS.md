@@ -1,3 +1,16 @@
+# SurveyStat 0.1.1
+
+## Breaking changes
+
+* Renamed functions for consistency and clarity:
+  - `oneway_anova_test()` is now `oneway_anova()`
+  - `mann_whitney_test()` is now `mann_whitney()`
+  - `chi_squared_test()` is now `chi_square()`
+* Class names updated accordingly:
+  - `oneway_anova_test_results` is now `oneway_anova_results`
+  - `mann_whitney_test_results` is now `mann_whitney_results`
+  - `chi_squared_test_results` is now `chi_square_results`
+
 # SurveyStat 0.1.0
 
 * Initial CRAN submission
@@ -7,9 +20,9 @@
     - `frequency()`: Frequency tables with percentage calculations
   - Hypothesis testing suite
     - `t_test()`: One-sample and two-sample t-tests
-    - `oneway_anova_test()`: One-way ANOVA with effect sizes
-    - `chi_squared_test()`: Chi-square test with Cramér's V and Phi
-    - `mann_whitney_test()`: Non-parametric alternative to t-test
+    - `oneway_anova()`: One-way ANOVA with effect sizes
+    - `chi_square()`: Chi-square test with Cramér's V and Phi
+    - `mann_whitney()`: Non-parametric alternative to t-test
   - Post-hoc analysis functions
     - `tukey_test()`: Tukey HSD post-hoc test
     - `scheffe_test()`: Scheffé post-hoc test

@@ -1,7 +1,7 @@
 # ============================================================================
 # CHI-SQUARED TEST - SPSS VALIDATION TEST
 # ============================================================================
-# Purpose: Validate R chi_squared_test() function against SPSS CROSSTABS procedure
+# Purpose: Validate R chi_square() function against SPSS CROSSTABS procedure
 # Dataset: survey_data
 # SPSS Version: 29.0.0.0 (assumed from output format)
 # Created: 2025-01-23
@@ -332,7 +332,7 @@ spss_chi_squared_values <- list(
 compare_chi_squared_with_spss <- function(r_result, spss_ref, test_name) {
 
   # Extract R results from the results dataframe
-  if (inherits(r_result, "chi_squared_test_results")) {
+  if (inherits(r_result, "chi_square_results")) {
     # For ungrouped results
     chi_sq <- r_result$results$chi_squared[1]
     df <- r_result$results$df[1]
@@ -480,7 +480,7 @@ data(survey_data)
 
 test_that("Test 1a: Unweighted/Ungrouped - gender × region", {
   result <- survey_data %>% 
-    chi_squared_test(gender, region)
+    chi_square(gender, region)
   
   compare_chi_squared_with_spss(result, spss_chi_squared_values$test1a, 
                                "Test 1a: Unweighted/Ungrouped (gender × region)")
@@ -488,7 +488,7 @@ test_that("Test 1a: Unweighted/Ungrouped - gender × region", {
 
 test_that("Test 1b: Unweighted/Ungrouped - education × employment", {
   result <- survey_data %>% 
-    chi_squared_test(education, employment)
+    chi_square(education, employment)
   
   compare_chi_squared_with_spss(result, spss_chi_squared_values$test1b,
                                "Test 1b: Unweighted/Ungrouped (education × employment)")
@@ -496,7 +496,7 @@ test_that("Test 1b: Unweighted/Ungrouped - education × employment", {
 
 test_that("Test 1c: Unweighted/Ungrouped - gender × education", {
   result <- survey_data %>% 
-    chi_squared_test(gender, education)
+    chi_square(gender, education)
   
   compare_chi_squared_with_spss(result, spss_chi_squared_values$test1c,
                                "Test 1c: Unweighted/Ungrouped (gender × education)")
@@ -508,7 +508,7 @@ test_that("Test 1c: Unweighted/Ungrouped - gender × education", {
 
 test_that("Test 2a: Weighted/Ungrouped - gender × region", {
   result <- survey_data %>% 
-    chi_squared_test(gender, region, weights = sampling_weight)
+    chi_square(gender, region, weights = sampling_weight)
   
   compare_chi_squared_with_spss(result, spss_chi_squared_values$test2a,
                                "Test 2a: Weighted/Ungrouped (gender × region)")
@@ -516,7 +516,7 @@ test_that("Test 2a: Weighted/Ungrouped - gender × region", {
 
 test_that("Test 2b: Weighted/Ungrouped - education × employment", {
   result <- survey_data %>% 
-    chi_squared_test(education, employment, weights = sampling_weight)
+    chi_square(education, employment, weights = sampling_weight)
   
   compare_chi_squared_with_spss(result, spss_chi_squared_values$test2b,
                                "Test 2b: Weighted/Ungrouped (education × employment)")
@@ -524,7 +524,7 @@ test_that("Test 2b: Weighted/Ungrouped - education × employment", {
 
 test_that("Test 2c: Weighted/Ungrouped - gender × education", {
   result <- survey_data %>% 
-    chi_squared_test(gender, education, weights = sampling_weight)
+    chi_square(gender, education, weights = sampling_weight)
   
   compare_chi_squared_with_spss(result, spss_chi_squared_values$test2c,
                                "Test 2c: Weighted/Ungrouped (gender × education)")
@@ -537,7 +537,7 @@ test_that("Test 2c: Weighted/Ungrouped - gender × education", {
 test_that("Test 3a: Unweighted/Grouped - gender × education by region", {
   result <- survey_data %>% 
     group_by(region) %>%
-    chi_squared_test(gender, education)
+    chi_square(gender, education)
   
   # For grouped results, extract from the results dataframe
   results_df <- result$results
@@ -556,7 +556,7 @@ test_that("Test 3a: Unweighted/Grouped - gender × education by region", {
 test_that("Test 3b: Unweighted/Grouped - gender × employment by region", {
   result <- survey_data %>% 
     group_by(region) %>%
-    chi_squared_test(gender, employment)
+    chi_square(gender, employment)
   
   # For grouped results, extract from the results dataframe
   results_df <- result$results
@@ -579,7 +579,7 @@ test_that("Test 3b: Unweighted/Grouped - gender × employment by region", {
 test_that("Test 4a: Weighted/Grouped - gender × education by region", {
   result <- survey_data %>% 
     group_by(region) %>%
-    chi_squared_test(gender, education, weights = sampling_weight)
+    chi_square(gender, education, weights = sampling_weight)
   
   # For grouped results, extract from the results dataframe
   results_df <- result$results
@@ -598,7 +598,7 @@ test_that("Test 4a: Weighted/Grouped - gender × education by region", {
 test_that("Test 4b: Weighted/Grouped - gender × employment by region", {
   result <- survey_data %>% 
     group_by(region) %>%
-    chi_squared_test(gender, employment, weights = sampling_weight)
+    chi_square(gender, employment, weights = sampling_weight)
   
   # For grouped results, extract from the results dataframe
   results_df <- result$results
@@ -620,7 +620,7 @@ test_that("Test 4b: Weighted/Grouped - gender × employment by region", {
 
 test_that("Test 5: Continuity correction - unweighted", {
   result_corrected <- survey_data %>% 
-    chi_squared_test(gender, region, correct = TRUE)
+    chi_square(gender, region, correct = TRUE)
   
   # Compare with SPSS continuity correction values
   spss_corrected <- spss_chi_squared_values$test1a$continuity_correction

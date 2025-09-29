@@ -17,7 +17,7 @@
 # SPSS crosstabs show: Count, Expected Count, % within row, % within col,
 # % of Total, and Residuals. Our crosstab() function currently calculates
 # counts and percentages but not expected counts/residuals (those are in
-# chi_squared_test() function).
+# chi_square() function).
 # ============================================================================
 
 library(testthat)
@@ -1073,7 +1073,7 @@ test_that("Generate crosstab validation summary", {
 
     cat("\nNOTES:\n")
     cat("- Expected counts and residuals are not in crosstab() function\n")
-    cat("- These statistics are available in chi_squared_test() function\n")
+    cat("- These statistics are available in chi_square() function\n")
     cat("- Weighted counts are rounded in R to match SPSS display format\n")
     cat("- SPSS reference values have been verified against actual SPSS output file\n")
     cat("- R crosstab function produces accurate weighted grouped results\n")

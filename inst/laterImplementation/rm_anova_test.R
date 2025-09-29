@@ -673,7 +673,7 @@ rm_anova_test <- function(data, ..., group = NULL, subject_id, weights = NULL,
     )
     
     # Set class to ensure S3 compatibility
-    class(result) <- "oneway_anova_test_results"
+    class(result) <- "oneway_anova_results"
     
     return(result)
   }

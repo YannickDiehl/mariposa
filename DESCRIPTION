@@ -1,7 +1,7 @@
 Package: SurveyStat
 Type: Package
 Title: Statistical Analysis Tools for Survey Data
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@example.com",

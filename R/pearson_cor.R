@@ -1,75 +1,83 @@
-#' Pearson Correlation Analysis
+#' Measure How Strongly Variables Are Related
 #'
 #' @description
-#' Calculates Pearson correlation coefficients between numeric variables with support 
-#' for weighted correlations, grouped data, and multiple variable pairs. Provides 
-#' confidence intervals, significance testing, and SPSS-compatible output formatting.
+#' \code{pearson_cor()} shows you how strongly numeric variables are related to each
+#' other. For example, is age related to income? Does satisfaction increase with
+#' experience? This helps you understand patterns in your data.
 #'
-#' The function computes product-moment correlation coefficients and tests the null 
-#' hypothesis that the true correlation is zero. For weighted correlations, it uses 
-#' survey-weighted covariance and variance calculations with appropriate bias corrections.
+#' The correlation tells you:
+#' - **Direction**: Positive (both increase together) or negative (one increases as other decreases)
+#' - **Strength**: How closely the variables move together (from 0 = no relationship to 1 = perfect relationship)
+#' - **Significance**: Whether the relationship is real or could be due to chance
 #'
-#' @param data A data frame or tibble containing the variables to analyze
-#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Variables for correlation analysis.
-#'   Supports all tidyselect helpers. If more than two variables are selected, 
-#'   a correlation matrix is computed.
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights 
-#'   for weighted correlations. Should be a numeric variable with positive values.
-#' @param conf.level Confidence level for the confidence interval. Must be between 
-#'   0 and 1. Default is \code{0.95} (95% confidence interval)
-#' @param na.rm Character string specifying missing data handling:
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to correlate. List two for a single
+#'   correlation or more for a correlation matrix.
+#' @param weights Optional survey weights for population-representative results
+#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#' @param na.rm How to handle missing values:
 #'   \itemize{
-#'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
-#'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
+#'     \item \code{"pairwise"} (default): Use all available data for each pair
+#'     \item \code{"listwise"}: Only use complete cases across all variables
 #'   }
 #'
-#' @return An object of class \code{"pearson_cor_results"} containing:
-#' \describe{
-#'   \item{correlations}{Data frame with correlation coefficients, p-values, and confidence intervals}
-#'   \item{n_obs}{Matrix of sample sizes for each correlation}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{conf.level}{Confidence level used}
-#'   \item{is_grouped}{Logical indicating if data was grouped}
-#'   \item{groups}{Grouping variables (if any)}
-#' }
+#' @return Correlation results showing relationships between variables, including:
+#' - Correlation coefficient (r): Strength and direction of relationship
+#' - P-value: Whether the relationship is statistically significant
+#' - Confidence interval: Range of plausible correlation values
+#' - Sample size: Number of observations used
 #'
 #' @details
-#' ## Statistical Methods
-#' 
-#' ### Unweighted Pearson Correlation
-#' The Pearson correlation coefficient is calculated as:
-#' \deqn{r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}}
-#' 
-#' ### Weighted Pearson Correlation
-#' For weighted correlations:
-#' \deqn{r_w = \frac{\sum_{i=1}^{n}w_i(x_i - \bar{x}_w)(y_i - \bar{y}_w)}{\sqrt{\sum_{i=1}^{n}w_i(x_i - \bar{x}_w)^2 \sum_{i=1}^{n}w_i(y_i - \bar{y}_w)^2}}}
-#' 
-#' where \eqn{\bar{x}_w} and \eqn{\bar{y}_w} are weighted means.
-#' 
-#' ### Confidence Intervals
-#' Confidence intervals are computed using Fisher's z-transformation:
-#' 1. Transform r to z: \eqn{z = \frac{1}{2}\ln\left(\frac{1+r}{1-r}\right)}
-#' 2. Calculate CI for z: \eqn{z \pm z_{\alpha/2} \times SE_z} where \eqn{SE_z = \frac{1}{\sqrt{n-3}}}
-#' 3. Transform back to r scale: \eqn{r = \frac{e^{2z} - 1}{e^{2z} + 1}}
-#' 
-#' ### Significance Testing
-#' Tests the null hypothesis H0: rho = 0 using:
-#' \deqn{t = r\sqrt{\frac{n-2}{1-r^2}}}
-#' with df = n - 2 degrees of freedom.
-#' 
-#' ## Interpretation Guidelines
-#' - **Correlation strength**: |r| < 0.3 (weak), 0.3 <= |r| < 0.7 (moderate), |r| >= 0.7 (strong)
-#' - **Coefficient of determination (r-squared)**: Proportion of variance explained
-#' - **p-values**: Test whether the correlation is significantly different from zero
-#' - **Confidence intervals**: Range of plausible values for the true correlation
-#' 
-#' ## SPSS Compatibility
-#' Results match SPSS CORRELATIONS procedure output for:
-#' - Correlation coefficients
-#' - Significance levels (two-tailed)
-#' - Sample sizes
-#' - Weighted correlations (when weights are provided)
+#' ## Understanding Correlation Values
+#'
+#' **Correlation coefficient (r)** ranges from -1 to +1:
+#' - **+1**: Perfect positive relationship (as one goes up, the other always goes up)
+#' - **0**: No linear relationship
+#' - **-1**: Perfect negative relationship (as one goes up, the other always goes down)
+#'
+#' **Interpreting strength** (absolute value of r):
+#' - 0.00 - 0.10: Negligible relationship
+#' - 0.10 - 0.30: Weak relationship
+#' - 0.30 - 0.50: Moderate relationship
+#' - 0.50 - 0.70: Strong relationship
+#' - 0.70 - 0.90: Very strong relationship
+#' - 0.90 - 1.00: Extremely strong relationship
+#'
+#' **P-value interpretation**:
+#' - p < 0.001: Very strong evidence of a relationship
+#' - p < 0.01: Strong evidence of a relationship
+#' - p < 0.05: Moderate evidence of a relationship
+#' - p ≥ 0.05: No significant relationship found
+#'
+#' ## When to Use Pearson Correlation
+#'
+#' Use this when:
+#' - Both variables are numeric and continuous
+#' - You expect a linear relationship
+#' - Data is roughly normally distributed
+#' - You want to measure strength of linear association
+#'
+#' Don't use when:
+#' - Data has extreme outliers (consider Spearman instead)
+#' - Relationship is curved/non-linear
+#' - Variables are categorical (use chi-squared test)
+#' - You need to establish causation (correlation ≠ causation!)
+#'
+#' ## Reading the Results
+#'
+#' A correlation of 0.65 with p < 0.001 means:
+#' - Strong positive relationship (r = 0.65)
+#' - As one variable increases, the other tends to increase
+#' - Very unlikely to be due to chance (p < 0.001)
+#' - About 42% of variation is shared (r² = 0.65² = 0.42)
+#'
+#' ## Tips for Success
+#'
+#' - Always plot your data first to check for non-linear patterns
+#' - Consider both statistical significance (p-value) and practical importance (r value)
+#' - Remember: correlation does not imply causation
+#' - Check for outliers that might inflate or deflate correlations
+#' - Use Spearman correlation for ordinal data or non-normal distributions
 #'
 #' @examples
 #' # Load required packages and data
@@ -552,25 +560,22 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
 #'
 #' @export
 print.pearson_cor_results <- function(x, digits = 3, ...) {
+
+  # Determine test type using standardized helper
+  test_type <- get_standard_title("Pearson Correlation", x$weights, "")
+  print_header(test_type)
   
-  # Determine test type header (Template Standard)
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Pearson Correlation"
-  } else {
-    "Pearson Correlation"
-  }
-  
-  # Print header with dynamic border matching title length
-  cat(sprintf("\n%s\n", test_type))
-  border_line <- paste(rep("-", nchar(test_type)), collapse = "")
-  cat(border_line, "\n")
-  
+  # Print test information using standardized helpers
+  cat("\n")
+  test_info <- list(
+    "Weights variable" = x$weights,
+    "Missing data handling" = paste(x$na.rm, "deletion")
+  )
+  print_info_section(test_info)
+
   # Print test parameters
-  if (!is.null(x$weights)) {
-    cat(sprintf("Weights variable: %s\n", x$weights))
-  }
-  cat(sprintf("Missing data handling: %s deletion\n", x$na.rm))
-  cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
+  test_params <- list(conf.level = x$conf.level)
+  print_test_parameters(test_params)
   cat("\n")
   
   if (x$is_grouped) {

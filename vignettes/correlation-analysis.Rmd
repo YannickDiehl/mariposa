@@ -1,0 +1,369 @@
+---
+title: "Understanding Relationships: Correlation Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Understanding Relationships: Correlation Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SurveyStat)
+library(dplyr)
+data(survey_data)
+```
+
+## What Does Correlation Do?
+
+Correlation measures how two things change together. If one goes up, does the other tend to go up (positive correlation), go down (negative correlation), or stay the same (no correlation)?
+
+Think of it like this:
+- **Positive correlation**: As age increases, income tends to increase
+- **Negative correlation**: As price increases, demand tends to decrease
+- **No correlation**: Shoe size and intelligence are unrelated
+
+The main correlation functions:
+- `pearson_cor()` - Standard correlation for linear relationships
+- `spearman_rho()` - Correlation based on ranks (more robust)
+- `kendall_tau()` - Another rank correlation (more conservative)
+
+## When Should I Use Each Type?
+
+### Use Pearson when:
+- You expect a **linear relationship**
+- Both variables are **continuous**
+- Data is roughly **normally distributed**
+- You want the most common correlation measure
+
+### Use Spearman when:
+- Relationship might be **monotonic but not linear**
+- You have **ordinal data** (ranked categories)
+- Data has **outliers** that might affect results
+- You're not sure about the relationship shape
+
+### Use Kendall when:
+- You have **small sample sizes** (< 30)
+- You have many **tied ranks**
+- You want a more **conservative** measure
+- Data is **ordinal** with few categories
+
+## Getting Started: Pearson Correlation
+
+Let's explore if age and income are related:
+
+```{r}
+# Test correlation between age and income
+survey_data %>%
+  pearson_cor(age, income, weights = sampling_weight)
+```
+
+### Understanding the Output:
+
+- **r value**: Ranges from -1 to +1
+  - Close to +1: Strong positive relationship
+  - Close to 0: No linear relationship
+  - Close to -1: Strong negative relationship
+- **p-value**: Is this correlation statistically significant?
+- **CI**: Confidence interval (range of plausible values)
+- **n**: Number of complete pairs analyzed
+
+### Interpreting Correlation Strength:
+- **Weak**: |r| < 0.3
+- **Moderate**: 0.3 ≤ |r| < 0.5
+- **Strong**: |r| ≥ 0.5
+
+## Creating Correlation Matrices
+
+Explore relationships among multiple variables:
+
+```{r}
+# Correlation matrix for multiple variables
+survey_data %>%
+  pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
+```
+
+### Reading the Matrix:
+- Diagonal is always 1 (perfect correlation with itself)
+- Upper and lower triangles are mirror images
+- Look for patterns of high correlations
+
+## Robust Correlations: Spearman's Rho
+
+When data isn't perfectly normal or has outliers:
+
+```{r}
+# Spearman correlation (rank-based)
+survey_data %>%
+  spearman_rho(age, income, life_satisfaction, weights = sampling_weight)
+```
+
+### Why Use Spearman?
+
+Spearman works with ranks, not actual values, making it:
+- **Robust to outliers** (extreme values become highest/lowest ranks)
+- **Suitable for ordinal data** (like satisfaction ratings)
+- **Detects any monotonic relationship** (not just linear)
+
+Compare Pearson vs. Spearman:
+
+```{r}
+# Pearson correlation
+pearson_result <- survey_data %>%
+  pearson_cor(political_orientation, environmental_concern)
+
+# Spearman correlation
+spearman_result <- survey_data %>%
+  spearman_rho(political_orientation, environmental_concern)
+
+cat("Pearson r =", pearson_result$correlations$r[1], "\n")
+cat("Spearman rho =", spearman_result$correlations$rho[1], "\n")
+```
+
+If they differ substantially, your relationship might not be linear!
+
+## Conservative Approach: Kendall's Tau
+
+For ordinal data or small samples:
+
+```{r}
+# Kendall's tau correlation
+survey_data %>%
+  kendall_tau(trust_government, trust_media, weights = sampling_weight)
+```
+
+### Kendall vs. Spearman:
+- Kendall is typically **smaller in magnitude**
+- Kendall has **better statistical properties**
+- Kendall is **more interpretable** (probability of concordance)
+- Spearman is **more commonly reported**
+
+## Common Scenarios
+
+### Scenario 1: Survey Validation
+
+Check if similar questions correlate as expected:
+
+```{r}
+# Do trust questions correlate?
+survey_data %>%
+  pearson_cor(trust_government, trust_media, trust_science,
+              weights = sampling_weight)
+```
+
+High correlations suggest questions measure similar concepts.
+
+### Scenario 2: Exploring Predictors
+
+What variables relate to life satisfaction?
+
+```{r}
+# Correlations with life satisfaction
+survey_data %>%
+  pearson_cor(life_satisfaction, age, income,
+              weights = sampling_weight)
+```
+
+This helps identify potential predictors for further analysis.
+
+### Scenario 3: Method Comparison
+
+Different correlation methods for ordinal data:
+
+```{r}
+# Compare methods for ordinal data
+cat("Pearson correlation:\n")
+survey_data %>%
+  pearson_cor(life_satisfaction, political_orientation) %>%
+  print()
+
+cat("\nSpearman correlation:\n")
+survey_data %>%
+  spearman_rho(life_satisfaction, political_orientation) %>%
+  print()
+
+cat("\nKendall correlation:\n")
+survey_data %>%
+  kendall_tau(life_satisfaction, political_orientation) %>%
+  print()
+```
+
+## Grouped Correlations
+
+Calculate correlations within subgroups:
+
+```{r}
+# Correlations by region
+survey_data %>%
+  group_by(region) %>%
+  pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
+```
+
+This reveals if relationships differ across groups.
+
+## Visualizing Correlations
+
+While SurveyStat focuses on analysis, visualization helps understanding:
+
+```{r eval=FALSE}
+# Create a simple scatterplot (requires ggplot2)
+library(ggplot2)
+ggplot(survey_data, aes(x = age, y = income)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "Age vs Income Relationship")
+```
+
+## Understanding Correlation vs. Causation
+
+⚠️ **Critical Warning**: Correlation ≠ Causation!
+
+Just because two things correlate doesn't mean one causes the other:
+
+```{r}
+# Example: spurious correlation
+survey_data %>%
+  pearson_cor(age, political_orientation)
+```
+
+Even if significant, this doesn't mean age causes political views (or vice versa). Other factors might explain both.
+
+### Common Correlation Pitfalls:
+
+1. **Third Variable Problem**: Something else causes both
+2. **Reverse Causation**: Effect might cause the "cause"
+3. **Coincidence**: Random patterns in data
+4. **Selection Bias**: Sample doesn't represent population
+
+## Handling Missing Data
+
+Correlations use pairwise deletion by default:
+
+```{r}
+# Check sample sizes for each correlation
+result <- survey_data %>%
+  pearson_cor(age, income, life_satisfaction, political_orientation)
+
+# Look at the n_obs matrix
+print(result$n_obs)
+```
+
+Different pairs might use different sample sizes!
+
+For complete case analysis:
+
+```{r}
+# Listwise deletion (complete cases only)
+survey_data %>%
+  pearson_cor(age, income, na.rm = "listwise")
+```
+
+## Correlation with Categorical Variables
+
+For relationships involving categories, use appropriate tests:
+
+- **Two categorical**: Use `chi_square()` instead
+- **One categorical (binary), one continuous**: Use `t_test()` instead
+- **One categorical (multiple), one continuous**: Use `oneway_anova()` instead
+
+## Tips for Success
+
+### 1. Check Your Data First
+```{r}
+# Always explore before correlating
+survey_data %>%
+  describe(age, income, life_satisfaction)
+```
+
+Look for:
+- Outliers that might affect Pearson
+- Skewness suggesting non-linear relationships
+- Adequate sample size
+
+### 2. Use Multiple Methods for Robustness
+If Pearson and Spearman give very different results, investigate why:
+- Plot the relationship
+- Check for outliers
+- Consider transformations
+
+### 3. Report Complete Information
+Always report:
+- Correlation coefficient (r, rho, or tau)
+- Sample size (n)
+- p-value
+- Confidence interval
+- Which method you used and why
+
+### 4. Consider Practical Significance
+- r = 0.1 might be significant with n = 10,000 but practically meaningless
+- r = 0.5 might not be significant with n = 20 but practically important
+
+### 5. Watch for Restriction of Range
+If your sample has limited variability, correlations will be artificially low:
+```{r}
+# Check variability
+survey_data %>%
+  describe(age) # If SD is very small, correlations might be suppressed
+```
+
+## Quick Decision Guide
+
+```
+Is your data categorical?
+  Yes → Use chi_square() or t_test()
+  No → Continue
+
+Is the relationship linear?
+  Yes → Use pearson_cor()
+  No/Unsure → Continue
+
+Do you have outliers?
+  Yes → Use spearman_rho()
+  No → Continue
+
+Is your sample small (n < 30)?
+  Yes → Use kendall_tau()
+  No → Use spearman_rho()
+```
+
+## Common Mistakes to Avoid
+
+❌ **Don't** assume correlation means causation
+❌ **Don't** ignore outliers with Pearson correlation
+❌ **Don't** use correlation for categorical variables
+❌ **Don't** correlate variables with restricted range
+❌ **Don't** forget to check the scatterplot
+
+✅ **Do** check assumptions before choosing a method
+✅ **Do** report confidence intervals
+✅ **Do** use multiple methods for important findings
+✅ **Do** consider practical significance
+✅ **Do** visualize relationships when possible
+
+## Quick Reference
+
+| Method | Best For | Range | Interpretation |
+|--------|----------|-------|----------------|
+| Pearson | Linear relationships | -1 to +1 | Strength of linear relationship |
+| Spearman | Monotonic relationships | -1 to +1 | Strength of rank relationship |
+| Kendall | Ordinal/small samples | -1 to +1 | Probability of concordance |
+
+| Strength | Pearson | Spearman | Kendall |
+|----------|---------|----------|---------|
+| Weak | < 0.3 | < 0.3 | < 0.2 |
+| Moderate | 0.3-0.5 | 0.3-0.6 | 0.2-0.4 |
+| Strong | > 0.5 | > 0.6 | > 0.4 |
+
+## What's Next?
+
+- Test group differences with hypothesis testing
+- Explore post-hoc analyses after significant results
+- Learn about survey weights and their impact
+
+Remember: Correlation is a starting point for understanding relationships, not the final answer!

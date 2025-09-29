@@ -439,7 +439,7 @@ test_that("Scheffe test matches SPSS for unweighted/ungrouped analysis", {
 
   # Test 1a: Life Satisfaction by Education (unweighted)
   result_life <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education) %>%
+    oneway_anova(life_satisfaction, group = education) %>%
     scheffe_test()
 
   compare_scheffe_with_spss(result_life, spss_values$unweighted_ungrouped_life,
@@ -447,7 +447,7 @@ test_that("Scheffe test matches SPSS for unweighted/ungrouped analysis", {
 
   # Test 1b: Income by Education (unweighted)
   result_income <- survey_data %>%
-    oneway_anova_test(income, group = education) %>%
+    oneway_anova(income, group = education) %>%
     scheffe_test()
 
   compare_scheffe_with_spss(result_income, spss_values$unweighted_ungrouped_income,
@@ -462,7 +462,7 @@ test_that("Scheffe test matches SPSS for weighted/ungrouped analysis", {
 
   # Test 2a: Life Satisfaction by Education (weighted)
   result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight) %>%
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight) %>%
     scheffe_test()
 
   compare_scheffe_with_spss(result, spss_values$weighted_ungrouped_life,
@@ -476,7 +476,7 @@ test_that("Scheffe test matches SPSS for grouped analysis (by region)", {
   # Test 3a: Life Satisfaction by Education grouped by region (unweighted)
   result <- survey_data %>%
     group_by(region) %>%
-    oneway_anova_test(life_satisfaction, group = education) %>%
+    oneway_anova(life_satisfaction, group = education) %>%
     scheffe_test()
 
   # Extract East region results
@@ -501,7 +501,7 @@ test_that("Scheffe test matches SPSS for weighted/grouped analysis", {
   # Test 4a: Life Satisfaction by Education grouped by region (weighted)
   result <- survey_data %>%
     group_by(region) %>%
-    oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight) %>%
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight) %>%
     scheffe_test()
 
   # Extract East region results
@@ -529,7 +529,7 @@ test_that("Scheffe test handles multiple variables correctly", {
 
   # Test multiple variables simultaneously
   result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, income, age, group = education) %>%
+    oneway_anova(life_satisfaction, income, age, group = education) %>%
     scheffe_test()
 
   # Check that results contain all three variables
@@ -547,7 +547,7 @@ test_that("Scheffe test confidence intervals are wider than Tukey", {
 
   # Run both Tukey and Scheffe tests
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   tukey_result <- anova_result %>% tukey_test()
   scheffe_result <- anova_result %>% scheffe_test()
@@ -564,7 +564,7 @@ test_that("Scheffe test handles different confidence levels", {
 
   # Test with 99% confidence level
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   result_95 <- anova_result %>% scheffe_test(conf.level = 0.95)
   result_99 <- anova_result %>% scheffe_test(conf.level = 0.99)
