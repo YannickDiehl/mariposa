@@ -29,7 +29,6 @@ survey_data %>%
 ### The Migration Challenge
 
 Moving from SPSS to R typically means:
-
 - 🔴 Results that don't match 
 - 🔴 Rewriting all validation procedures
 - 🔴 Learning complex survey packages with different outputs
