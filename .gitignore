@@ -5,12 +5,12 @@
 .Ruserdata
 
 # R Package development
-man/*.Rd
-NAMESPACE
+# man/*.Rd  # NEVER ignore - these are essential documentation files!
+# NAMESPACE # NEVER ignore - this exports your functions!
 .Rd2pdf*
-Meta/
-doc/
-docs/
+# Meta/     # Keep for vignette index
+# doc/      # Keep for built vignettes
+docs/       # Only ignore pkgdown site
 
 # R build artifacts
 *.tar.gz
@@ -57,5 +57,5 @@ vignettes/inst/
 # Coverage
 coverage.html
 docs
-/doc/
-/Meta/
+# /doc/     # Keep for built vignettes
+# /Meta/    # Keep for vignette index
