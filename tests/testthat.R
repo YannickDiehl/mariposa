@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(SurveyStat)
+library(mariposa)
 
-test_check("SurveyStat")
+test_check("mariposa")

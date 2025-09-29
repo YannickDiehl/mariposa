@@ -648,12 +648,12 @@ print.chi_square_results <- function(x, digits = 3, ...) {
 
 #' @rdname chi_square
 #' @export
-phi_test <- chi_square
+phi <- chi_square
 
 #' @rdname chi_square
 #' @export
-cramers_v_test <- chi_square
+cramers_v <- chi_square
 
 #' @rdname chi_square
 #' @export
-gamma_test <- chi_square
+gamma <- chi_square

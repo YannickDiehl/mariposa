@@ -1,16 +1,19 @@
-url: https://yourusername.github.io/SurveyStat/
+url: https://YannickDiehl.github.io/mariposa/
 
 template:
   bootstrap: 5
   bootswatch: flatly
   theme: arrow-light
-  
+  includes:
+    in_header: |
+      <link rel="stylesheet" href="extra.css">
+
 home:
-  title: SurveyStat - Professional Statistical Analysis for Survey Data
+  title: mariposa - Marburg Initiative for Political and Social Analysis
   description: >
     A comprehensive R package for statistical analysis of survey data,
     providing SPSS-compatible results, weighted analysis, and professional
-    formatting. Designed for survey researchers, data scientists, and 
+    formatting. Designed for survey researchers, data scientists, and
     statistical analysts working with complex survey designs.
 
 navbar:
@@ -25,7 +28,7 @@ navbar:
       text: Vignettes
       menu:
       - text: "Getting Started"
-      - text: "Introduction to SurveyStat"
+      - text: "Introduction to mariposa"
         href: articles/introduction.html
       - text: "-------"
       - text: "Core Functions"
@@ -41,7 +44,7 @@ navbar:
         href: articles/survey-weights.html
     github:
       icon: fab fa-github fa-lg
-      href: https://github.com/yourusername/SurveyStat
+      href: https://github.com/YannickDiehl/mariposa
       aria-label: GitHub
 
 reference:
@@ -53,14 +56,12 @@ reference:
   - crosstab
 
 - title: "📈 Hypothesis Testing"
-  desc: "Statistical tests for independent and paired samples"
+  desc: "Statistical tests for comparing groups and testing hypotheses"
   contents:
   - t_test
   - mann_whitney
   - chi_square
   - oneway_anova
-  - rm_t_test
-  - rm_anova_test
 
 - title: "🔗 Correlation Analysis"
   desc: "Correlation coefficients for continuous and ordinal variables"
@@ -74,10 +75,7 @@ reference:
   contents:
   - tukey_test
   - scheffe_test
-  - emmeans
   - levene_test
-  - mauchly_test
-  - parameter_estimates
 
 - title: "📊 Weighted Statistics"
   desc: "Specialized weighted statistical functions for survey data"
