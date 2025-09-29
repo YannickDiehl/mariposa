@@ -57,3 +57,5 @@ vignettes/inst/
 # Coverage
 coverage.html
 docs
+/doc/
+/Meta/
