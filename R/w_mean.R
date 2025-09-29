@@ -1,21 +1,46 @@
-#' Weighted Mean
+#' Calculate Population-Representative Averages
 #'
-#' Calculate weighted mean for numeric variables, with support for 
-#' grouped data and multiple variables simultaneously. Provides professional
-#' output formatting with smart headers and dynamic borders.
+#' @description
+#' \code{w_mean()} calculates averages that accurately represent your population
+#' by using survey weights. This ensures that groups who were over- or under-sampled
+#' contribute appropriately to the final average.
 #'
-#' @param data A data frame, or a numeric vector when used in summarise() context
-#' @param ... Variable names (unquoted) or tidyselect expressions (e.g., starts_with(), where())
-#' @param weights Name of the weights variable (unquoted), or a numeric vector of weights
-#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to average. You can list multiple
+#'   variables or use helpers like \code{starts_with("income")}
+#' @param weights Survey weights to make the average representative of your population.
+#'   Without weights, you get the simple sample average.
+#' @param na.rm Remove missing values before calculating? (Default: TRUE)
 #'
-#' @return A w_mean object (list) containing results and metadata, or numeric values in summarise context
-#' 
+#' @return Population-weighted average(s) with sample size information
+#'
 #' @details
-#' The function automatically detects whether calculations are weighted or unweighted and
-#' adjusts the output format accordingly:
-#' - Unweighted: Shows "Mean Statistics" header with Variable, Mean, N columns
-#' - Weighted: Shows "Weighted Mean Statistics" header with Variable, Mean, N, Effective_N, Weights columns
+#' ## Why Use Weighted Means?
+#'
+#' Survey samples rarely match the population perfectly. Weights correct for:
+#' - Oversampling of certain groups (weights < 1)
+#' - Undersampling of other groups (weights > 1)
+#' - Non-response patterns
+#' - Complex survey designs
+#'
+#' ## Understanding the Output
+#'
+#' - **Weighted Mean**: The population-representative average
+#' - **Effective N**: How many independent observations your weighted data represents
+#' - **N**: Actual number of observations used
+#'
+#' ## Weighted vs Unweighted
+#'
+#' - **Unweighted mean**: Average of your sample as-is
+#' - **Weighted mean**: Estimated average for your entire population
+#' - These can differ substantially when your sample isn't representative
+#'
+#' ## Tips for Success
+#'
+#' - Always use weights for population estimates
+#' - Compare weighted and unweighted means to see sampling effects
+#' - Check effective sample size - very low values suggest high weight variation
+#' - Ensure your weights sum to a meaningful total (often population size)
 #'
 #' @examples
 #' # Load required packages and data
@@ -293,15 +318,9 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @export
 #' @method print w_mean
 print.w_mean <- function(x, digits = 3, ...) {
-  # Determine test type based on weights
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Mean Statistics"
-  } else {
-    "Mean Statistics"
-  }
-  
-  cat(sprintf("\n%s\n", test_type))
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  # Determine test type using standardized helper
+  test_type <- get_standard_title("Mean", x$weights, "Statistics")
+  print_header(test_type)
   
   # Check if this is grouped data
   is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped

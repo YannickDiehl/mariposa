@@ -1,81 +1,78 @@
-#' Perform Scheffe's post-hoc tests for ANOVA results
+#' Compare All Groups More Conservatively After ANOVA
 #'
 #' @description
-#' \code{scheffe_test()} performs Scheffe's post-hoc tests following ANOVA analyses.
-#' This function is designed to work with results from \code{\link{oneway_anova_test}}
-#' and provides pairwise comparisons between all group combinations when the ANOVA
-#' indicates significant differences. Scheffe's method is more conservative than
-#' Tukey's HSD and controls the family-wise error rate for all possible contrasts.
+#' \code{scheffe_test()} tells you which groups differ after ANOVA, using the most
+#' conservative approach. It's like Tukey's test but even more careful about
+#' avoiding false positives.
 #'
-#' The function supports both weighted and unweighted analyses, grouped data
-#' operations, and multiple variables simultaneously. Results are SPSS-compatible.
+#' Think of it as:
+#' - The most cautious post-hoc test available
+#' - A way to compare groups when sample sizes are very unequal
+#' - Insurance against finding differences that aren't real
 #'
-#' @param x An object of class \code{"oneway_anova_test_results"} returned by
-#'   \code{\link{oneway_anova_test}}.
-#' @param conf.level Confidence level for the confidence intervals. Must be
-#'   between 0 and 1. Default is \code{0.95} (95% confidence interval).
-#' @param ... Additional arguments. Currently unused but maintained for
-#'   consistency with S3 generic methods.
+#' @param x ANOVA results from \code{oneway_anova()}
+#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#' @param ... Additional arguments (currently unused)
 #'
-#' @return An object of class \code{"scheffe_test_results"} containing:
-#' \describe{
-#'   \item{results}{A data frame with pairwise comparisons, confidence intervals,
-#'     and adjusted p-values for each variable}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{group}{Name of the grouping variable}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{groups}{Grouping variables from original data (if grouped)}
-#'   \item{is_grouped}{Logical indicating if data was grouped}
-#'   \item{conf.level}{Confidence level used}
-#' }
-#'
-#' The results data frame contains the following columns:
-#' \describe{
-#'   \item{Variable}{Name of the analyzed dependent variable}
-#'   \item{Comparison}{Pairwise comparison (Group1 - Group2)}
-#'   \item{Estimate}{Mean difference between groups}
-#'   \item{SE}{Standard error of the difference}
-#'   \item{F_value}{F-statistic}
-#'   \item{p_adjusted}{Scheffe-adjusted p-value}
-#'   \item{conf_low}{Lower bound of confidence interval}
-#'   \item{conf_high}{Upper bound of confidence interval}
-#' }
+#' @return Pairwise comparison results showing:
+#' - Which group pairs are significantly different
+#' - Size of the difference between each pair
+#' - Adjusted p-values (extra conservative)
+#' - Confidence intervals for each difference
 #'
 #' @details
-#' ## Statistical Methods
+#' ## Understanding the Results
 #'
-#' ### Scheffe's Test
-#' Scheffe's method is the most conservative post-hoc test and controls the
-#' family-wise error rate for all possible contrasts (not just pairwise).
-#' For each pair of groups i and j:
+#' **Adjusted P-values**: Extra conservative to prevent false positives
+#' - p < 0.05: Groups are significantly different (you can be very confident)
+#' - p ≥ 0.05: No significant difference between these groups
+#' - Scheffe adjustments are stricter than other methods
 #'
-#' \deqn{F = \frac{(\bar{X}_i - \bar{X}_j)^2}{(k-1) \cdot MS_{within} \cdot (\frac{1}{n_i} + \frac{1}{n_j})}}
+#' **Confidence Intervals**: Wider than Tukey's
+#' - Do not include 0: Groups differ significantly
+#' - Include 0: No significant difference
+#' - Wider intervals reflect extra caution
 #'
-#' The critical value comes from the F-distribution with k-1 and N-k degrees of freedom,
-#' multiplied by (k-1):
+#' ## When to Use Scheffe Test
 #'
-#' \deqn{S = \sqrt{(k-1) \cdot F_{\alpha, k-1, N-k}}}
+#' Use Scheffe test when:
+#' - Your ANOVA shows significant differences (p < 0.05)
+#' - Group sizes are very unequal
+#' - You want to be extra cautious about false positives
+#' - You might test complex comparisons (not just pairs)
+#' - Sample sizes are small
 #'
-#' ### Confidence Intervals
-#' For the difference \eqn{\mu_i - \mu_j}:
-#' \deqn{(\bar{X}_i - \bar{X}_j) \pm S \cdot \sqrt{MS_{within} \cdot (\frac{1}{n_i} + \frac{1}{n_j})}}
+#' ## Scheffe vs. Tukey
 #'
-#' ### Weighted Analyses
-#' For weighted data, effective sample sizes and weighted means are used:
-#' - Effective sample size: \eqn{n_{eff} = \frac{(\sum w_i)^2}{\sum w_i^2}}
-#' - Weighted variance estimates account for unequal weights
+#' **Scheffe Test:**
+#' - Most conservative (hardest to find differences)
+#' - Best for unequal group sizes
+#' - Protects against all possible comparisons
+#' - Wider confidence intervals
 #'
-#' ## SPSS Compatibility
-#' Results match SPSS ONEWAY procedure with POSTHOC subcommand using Scheffe.
+#' **Tukey Test:**
+#' - Less conservative (easier to find differences)
+#' - Best for equal group sizes
+#' - Protects only pairwise comparisons
+#' - Narrower confidence intervals
 #'
-#' ## Usage Recommendations
-#' - Only interpret post-hoc results when ANOVA F-test is significant
-#' - Scheffe is the most conservative post-hoc test (widest confidence intervals)
-#' - Best used when comparing complex contrasts beyond simple pairwise comparisons
-#' - For simple pairwise comparisons only, Tukey HSD may be preferred
+#' ## Reading the Output
+#'
+#' Example: "Group A - Group B: Diff = 3.2, p = 0.082"
+#' - Group A's average is 3.2 units higher than Group B's
+#' - This difference is NOT significant with Scheffe (p > 0.05)
+#' - It might be significant with less conservative tests
+#'
+#' ## Tips for Success
+#'
+#' - Scheffe may not find differences even when ANOVA does
+#' - This is normal - it's being extra careful
+#' - Consider Tukey if group sizes are similar
+#' - Report which post-hoc test you used and why
+#' - Focus on confidence intervals, not just p-values
 #'
 #' @seealso
-#' \code{\link{oneway_anova_test}} for performing ANOVA tests.
+#' \code{\link{oneway_anova}} for performing ANOVA tests.
 #'
 #' \code{\link{tukey_test}} for Tukey HSD post-hoc tests.
 #'
@@ -94,27 +91,27 @@
 #'
 #' # Perform ANOVA followed by Scheffe post-hoc test
 #' anova_result <- survey_data %>%
-#'   oneway_anova_test(life_satisfaction, group = education)
+#'   oneway_anova(life_satisfaction, group = education)
 #'
 #' # Scheffe post-hoc comparisons
 #' anova_result %>% scheffe_test()
 #'
 #' # Multiple variables
 #' anova_result_multi <- survey_data %>%
-#'   oneway_anova_test(life_satisfaction, income, group = education)
+#'   oneway_anova(life_satisfaction, income, group = education)
 #'
 #' anova_result_multi %>% scheffe_test()
 #'
 #' # Weighted analysis
 #' anova_weighted <- survey_data %>%
-#'   oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+#'   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 #'
 #' anova_weighted %>% scheffe_test()
 #'
 #' # Grouped analysis
 #' anova_grouped <- survey_data %>%
 #'   group_by(region) %>%
-#'   oneway_anova_test(life_satisfaction, group = education)
+#'   oneway_anova(life_satisfaction, group = education)
 #'
 #' anova_grouped %>% scheffe_test()
 #'
@@ -127,7 +124,7 @@ scheffe_test <- function(x, conf.level = 0.95, ...) {
 }
 
 #' @export
-scheffe_test.oneway_anova_test_results <- function(x, conf.level = 0.95, ...) {
+scheffe_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
 
   # Input validation
   if (conf.level <= 0 || conf.level >= 1) {
@@ -379,15 +376,10 @@ scheffe_test.oneway_anova_test_results <- function(x, conf.level = 0.95, ...) {
 #'
 #' @export
 print.scheffe_test_results <- function(x, digits = 3, ...) {
-  # Determine test type based on weights
-  test_type <- if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    "Weighted Scheffe Post-Hoc Test Results"
-  } else {
-    "Scheffe Post-Hoc Test Results"
-  }
-
-  cat(test_type, "\n")
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  # Determine test type using standardized helper
+  weights_name <- x$weight_var %||% x$weights
+  test_type <- get_standard_title("Scheffe Post-Hoc Test", weights_name, "Results")
+  print_header(test_type, newline_before = FALSE)
 
   # Print basic info
   if (!x$is_grouped) {

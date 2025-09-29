@@ -1,40 +1,57 @@
-#' Calculate frequency distributions with support for weights and grouped data
+#' Count How Many People Chose Each Option
 #'
 #' @description
-#' \code{frequency()} calculates frequency distributions for one or more categorical 
-#' or discrete variables in a data frame. The function supports both weighted and 
-#' unweighted analyses, grouped data operations, and multiple variables simultaneously. 
-#' It is specifically designed for survey data analysis where sampling weights are 
-#' essential for population-representative frequency estimates.
+#' \code{frequency()} helps you understand categorical data by showing how many people
+#' chose each option. It's perfect for survey questions with fixed choices like
+#' education level, yes/no questions, or rating scales.
 #'
-#' @param data A data frame or tibble containing the variables to analyze.
-#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Variables for which to calculate 
-#'   frequencies. Supports all tidyselect helpers such as \code{starts_with()}, 
-#'   \code{ends_with()}, \code{contains()}, \code{matches()}, \code{num_range()}, etc.
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights 
-#'   for weighted frequency calculations. Should be a numeric variable with positive 
-#'   values. Weights are used to adjust for sampling design and non-response patterns.
-#' @param sort.frq Character string specifying how to sort frequencies. Options are 
-#'   \code{"none"} (default, preserve original order), \code{"asc"} (ascending by value), 
-#'   or \code{"desc"} (descending by value).
-#' @param show.na Logical indicating whether to include missing values (NA) in the 
-#'   output. Default is \code{TRUE}.
-#' @param show.prc Logical indicating whether to display raw percentages. Default is \code{TRUE}.
-#' @param show.valid Logical indicating whether to display valid percentages (excluding NA). 
-#'   Default is \code{TRUE}.
-#' @param show.sum Logical indicating whether to display cumulative frequencies and 
-#'   percentages. Default is \code{TRUE}.
-#' @param show.labels Controls whether to display value labels in the output.
-#'   Can be \code{"auto"} (default, automatically detect), \code{TRUE} (force display), 
-#'   or \code{FALSE} (hide labels). When \code{"auto"}, labels are shown only if 
-#'   variables have meaningful value labels.
+#' Think of it as creating a summary table that shows:
+#' - How many people chose each option
+#' - What percentage that represents
+#' - Running totals to see cumulative patterns
 #'
-#' @return An object of class \code{"frequency_results"} containing frequency statistics,
-#'   descriptive statistics, variable information, and display options.
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The categorical variables you want to analyze. You can list multiple
+#'   variables separated by commas, or use helpers like \code{starts_with("trust")}
+#' @param weights Optional survey weights to make results representative of your
+#'   population. Without weights, you get sample frequencies. With weights, you
+#'   get population estimates.
+#' @param sort.frq How to order the results:
+#'   \itemize{
+#'     \item \code{"none"} (default): Keep original order
+#'     \item \code{"asc"}: Sort from lowest to highest frequency
+#'     \item \code{"desc"}: Sort from highest to lowest frequency
+#'   }
+#' @param show.na Include missing values in the table? (Default: TRUE)
+#' @param show.prc Show raw percentages including missing values? (Default: TRUE)
+#' @param show.valid Show percentages excluding missing values? (Default: TRUE)
+#' @param show.sum Show cumulative totals? (Default: TRUE)
+#' @param show.labels Show category labels if available? (Default: "auto" - shows
+#'   labels when they exist)
+#'
+#' @return A frequency table showing counts and percentages for each category
 #'
 #' @details
-#' For weighted frequencies, the effective sample size is calculated as:
-#' \deqn{n_{eff} = \frac{(\sum w_i)^2}{\sum w_i^2}}
+#' ## Understanding the Output
+#'
+#' The frequency table shows:
+#' - **Freq**: Number of responses in each category
+#' - **%**: Percentage including missing values (use for "response rate")
+#' - **Valid %**: Percentage excluding missing values (use for "among those who answered")
+#' - **Cum %**: Running total percentage (helps identify cutoff points)
+#'
+#' ## When to Use This
+#'
+#' Use \code{frequency()} when you have:
+#' - Categorical variables (gender, region, education level)
+#' - Yes/No questions
+#' - Rating scales (satisfied/neutral/dissatisfied)
+#' - Any question with a fixed set of options
+#'
+#' ## Weights Make a Difference
+#'
+#' Without weights, you're describing your sample. With weights, you're estimating
+#' population values. Always use weights for population inference.
 #'
 #' @examples
 #' # Load required packages and data
@@ -451,20 +468,22 @@ print.frequency_results <- function(x, digits = 3, ...) {
   
   col_widths <- c(Value = 6, Label = 20, N = 8, Raw = 8, Valid = 8, Cum = 8)
   
+  # Determine test type
+  weights_name <- x$weight_var %||% x$weights
+  title <- get_standard_title("Frequency Analysis", weights_name, "Results")
+  print_header(title)
+
   # Print results for each variable
   for (var in x$variables) {
     var_label <- x$labels[var]
-    cat(sprintf("\n%s (%s)\n", var, var_label))
+    cat(sprintf("\n%s\n", format_variable_name(var, var_label)))
     
     if (x$is_grouped) {
       unique_groups <- unique(x$results[x$groups])
       
       for (i in seq_len(nrow(unique_groups))) {
         group_values <- unique_groups[i, , drop = FALSE]
-        group_info <- paste(sapply(names(group_values), function(g) {
-          val <- group_values[[g]]
-          paste(g, "=", if (is.factor(val)) levels(val)[val] else val)
-        }), collapse = ", ")
+        # Group info not needed here since print_group_header handles it
         
         # Filter results for current group and variable
         group_results <- x$results
@@ -482,8 +501,8 @@ print.frequency_results <- function(x, digits = 3, ...) {
         }
         stats <- group_stats[group_stats$Variable == var, ]
         
-        # Print group header and table
-        cat(sprintf("\nGroup: %s\n", group_info))
+        # Print group header using standardized helper
+        print_group_header(group_values)
         cat(sprintf("# total N=%.0f valid N=%.0f mean=%.2f sd=%.2f skewness=%.2f\n\n",
                     stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
         

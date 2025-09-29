@@ -28,11 +28,6 @@
 #'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
-#' @param sig_levels Character string specifying significance indicator style:
-#'   \itemize{
-#'     \item \code{"spss"} (default): SPSS-compatible two levels (** for p < 0.01, * for p < 0.05)
-#'     \item \code{"standard"}: Three levels (*** for p < 0.001, ** for p < 0.01, * for p < 0.05)
-#'   }
 #'
 #' @return An object of class \code{"spearman_rho_results"} containing:
 #' \describe{
@@ -47,46 +42,46 @@
 #' }
 #'
 #' @details
-#' ## Statistical Methods
+#' ## What Spearman's Rho Measures
 #'
-#' ### Unweighted Spearman's Rho
-#' Spearman's rho is calculated as the Pearson correlation of ranked data:
-#' \deqn{\rho = \frac{\sum_{i=1}^{n}(R_i - \bar{R})(S_i - \bar{S})}{\sqrt{\sum_{i=1}^{n}(R_i - \bar{R})^2 \sum_{i=1}^{n}(S_i - \bar{S})^2}}}
+#' Spearman's rho measures the strength and direction of a monotonic relationship between
+#' two variables. Unlike Pearson correlation, it doesn't require a linear relationship -
+#' it just needs one variable to consistently increase (or decrease) as the other increases.
 #'
-#' where \eqn{R_i} and \eqn{S_i} are the ranks of observations.
+#' Think of it as ranking your data first, then checking if the ranks tend to go together.
 #'
-#' For data without ties, this simplifies to:
-#' \deqn{\rho = 1 - \frac{6\sum d_i^2}{n(n^2-1)}}
+#' ## Interpreting Results
 #'
-#' where \eqn{d_i} is the difference between ranks.
+#' The rho value ranges from -1 to +1:
+#' - **Strong positive** (0.7 to 1.0): High ranks in one variable go with high ranks in the other
+#' - **Moderate positive** (0.3 to 0.7): Moderate tendency for ranks to increase together
+#' - **Weak positive** (0 to 0.3): Slight tendency for ranks to increase together
+#' - **No correlation** (near 0): No relationship between the variables
+#' - **Negative values**: As one variable's rank increases, the other's tends to decrease
 #'
-#' ### Weighted Spearman's Rho
-#' For weighted correlations:
-#' 1. Calculate weighted ranks using survey weights
-#' 2. Apply Pearson correlation formula to the weighted ranks
+#' ## When to Use Spearman's Rho
 #'
-#' ### Significance Testing
-#' For large samples (n > 30), tests H0: rho = 0 using:
-#' \deqn{t = \rho\sqrt{\frac{n-2}{1-\rho^2}}}
+#' Choose Spearman's rho when:
+#' - Your relationship is monotonic but not necessarily linear
+#' - Your data has outliers (they have less impact on ranks)
+#' - Your variables are ordinal (ordered categories)
+#' - You're not sure if your data meets Pearson correlation assumptions
+#' - You want to detect any monotonic trend, not just linear ones
 #'
-#' with df = n - 2 degrees of freedom.
+#' ## Spearman vs. Kendall
 #'
-#' ### Tie Handling
-#' Tied values receive the average of the ranks they would have received.
-#' This is the standard approach used by SPSS NONPAR CORR.
+#' - **Spearman's rho** is usually larger in magnitude than Kendall's tau
+#' - **Spearman's rho** is better for detecting linear relationships in ranks
+#' - **Kendall's tau** is more robust and has better statistical properties
+#' - **Spearman's rho** is more commonly reported in research
 #'
-#' ## Interpretation Guidelines
-#' - **Correlation strength**: |rho| < 0.3 (weak), 0.3 <= |rho| < 0.7 (moderate), |rho| >= 0.7 (strong)
-#' - **Advantages**: Robust to outliers, suitable for ordinal data, detects monotonic relationships
-#' - **Range**: -1 (perfect negative rank correlation) to +1 (perfect positive rank correlation)
-#' - **Comparison**: Often similar to Kendall's tau but typically larger in magnitude
+#' ## Understanding the Output
 #'
-#' ## SPSS Compatibility
-#' This function produces results identical to SPSS NONPAR CORR procedure:
-#' - Rho coefficients match exactly (uses same ranking algorithm)
-#' - P-values match to 3 decimal places
-#' - Sample sizes are identical
-#' - Note: SPSS documentation suggests weights may not be applied to Spearman's rho
+#' The function provides:
+#' - **rho**: The rank correlation coefficient
+#' - **p-value**: Probability of seeing this correlation by chance
+#' - **n**: Number of observation pairs used
+#' - **significance stars**: Visual indicator (*** very strong, ** strong, * moderate evidence)
 #'
 #' @examples
 #' # Load required packages and data
@@ -136,7 +131,7 @@
 #'
 #' @export
 spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
-                        na.rm = "pairwise", sig_levels = "spss") {
+                        na.rm = "pairwise") {
 
   # Input validation
   if (!is.data.frame(data)) {
@@ -151,9 +146,6 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     stop("alternative must be 'two.sided', 'less', or 'greater'")
   }
 
-  if (!sig_levels %in% c("spss", "standard")) {
-    stop("sig_levels must be either 'spss' or 'standard'")
-  }
 
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
@@ -307,21 +299,12 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
         # Calculate correlation
         result <- calculate_spearman_rho(x, y, w, alternative)
 
-        # Add significance symbols
-        if (sig_levels == "spss") {
-          # SPSS style: ** for p < 0.01, * for p < 0.05
-          sig <- if (is.na(result$p_value)) ""
-                else if (result$p_value < 0.01) "**"
-                else if (result$p_value < 0.05) "*"
-                else ""
-        } else {
-          # Standard style: *** for p < 0.001, ** for p < 0.01, * for p < 0.05
-          sig <- if (is.na(result$p_value)) ""
-                else if (result$p_value < 0.001) "***"
-                else if (result$p_value < 0.01) "**"
-                else if (result$p_value < 0.05) "*"
-                else ""
-        }
+        # Add significance symbols (standard three-level style)
+        sig <- if (is.na(result$p_value)) ""
+              else if (result$p_value < 0.001) "***"
+              else if (result$p_value < 0.01) "**"
+              else if (result$p_value < 0.05) "*"
+              else ""
 
         # Store results
         all_results[[paste(var1, var2, sep = "_")]] <- data.frame(
@@ -438,7 +421,6 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     alternative = alternative,
     is_grouped = is_grouped,
     groups = group_vars,
-    sig_levels = sig_levels,
     n_obs = if (!is_grouped) matrices[[1]]$n_obs else NULL
   )
 
@@ -455,11 +437,9 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
 print.spearman_rho_results <- function(x, digits = 3, ...) {
   # Header
   cat("\n")
-  if (!is.null(x$weights)) {
-    cat("Weighted Spearman's Rank Correlation Analysis\n")
-  } else {
-    cat("Spearman's Rank Correlation Analysis\n")
-  }
+  # Print header using standardized title
+  title <- get_standard_title("Spearman's Rank Correlation Analysis", x$weights, "")
+  cat(title, "\n")
   cat("══════════════════════════════════════════════════════════════════════\n")
 
   # Display analysis info

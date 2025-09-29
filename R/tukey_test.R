@@ -1,78 +1,80 @@
 
-#' Perform Tukey HSD post-hoc tests for ANOVA results
+#' Find Which Specific Groups Differ After ANOVA
 #'
 #' @description
-#' \code{tukey_test()} performs Tukey Honest Significant Difference (HSD) 
-#' post-hoc tests following ANOVA analyses. This function is designed to work 
-#' with results from \code{\link{oneway_anova_test}} and provides pairwise comparisons 
-#' between all group combinations when the ANOVA indicates significant differences.
-#' 
-#' The function supports both weighted and unweighted analyses, grouped data 
-#' operations, and multiple variables simultaneously. Results are SPSS-compatible.
+#' \code{tukey_test()} tells you exactly which groups are different from each other
+#' after ANOVA finds overall differences. It's like a follow-up investigation that
+#' pinpoints where the differences lie.
 #'
-#' @param x An object of class \code{"oneway_anova_test_results"} returned by
-#'   \code{\link{oneway_anova_test}}.
-#' @param conf.level Confidence level for the confidence intervals. Must be 
-#'   between 0 and 1. Default is \code{0.95} (95% confidence interval).
-#' @param ... Additional arguments. Currently unused but maintained for 
-#'   consistency with S3 generic methods.
+#' Think of it as:
+#' - ANOVA says "there are differences somewhere"
+#' - Tukey test says "specifically, Group A differs from Group C"
+#' - A way to make all possible comparisons while controlling error rates
 #'
-#' @return An object of class \code{"tukey_test_results"} containing:
-#' \describe{
-#'   \item{results}{A data frame with pairwise comparisons, confidence intervals, 
-#'     and adjusted p-values for each variable}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{group}{Name of the grouping variable}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{groups}{Grouping variables from original data (if grouped)}
-#'   \item{is_grouped}{Logical indicating if data was grouped}
-#'   \item{conf.level}{Confidence level used}
-#' }
-#' 
-#' The results data frame contains the following columns:
-#' \describe{
-#'   \item{Variable}{Name of the analyzed dependent variable}
-#'   \item{Comparison}{Pairwise comparison (Group1 - Group2)}
-#'   \item{Estimate}{Mean difference between groups}
-#'   \item{SE}{Standard error of the difference}
-#'   \item{t_value}{t-statistic}
-#'   \item{p_adjusted}{Tukey-adjusted p-value}
-#'   \item{conf_low}{Lower bound of confidence interval}
-#'   \item{conf_high}{Upper bound of confidence interval}
-#' }
+#' @param x ANOVA results from \code{oneway_anova()}
+#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#' @param ... Additional arguments (currently unused)
+#'
+#' @return Pairwise comparison results showing:
+#' - Which group pairs are significantly different
+#' - Size of the difference between each pair
+#' - Adjusted p-values (controlling for multiple comparisons)
+#' - Confidence intervals for each difference
 #'
 #' @details
-#' ## Statistical Methods
-#' 
-#' ### Tukey HSD Test
-#' The Tukey Honestly Significant Difference test controls the family-wise 
-#' error rate when making multiple pairwise comparisons. For each pair of 
-#' groups i and j:
-#' 
-#' \deqn{q = \frac{|\bar{X}_i - \bar{X}_j|}{\sqrt{MS_{within} \cdot (\frac{1}{n_i} + \frac{1}{n_j})/2}}}
-#' 
-#' The critical value comes from the studentized range distribution Q with 
-#' k groups and df_within degrees of freedom.
-#' 
-#' ### Confidence Intervals
-#' For the difference \eqn{\mu_i - \mu_j}:
-#' \deqn{(\bar{X}_i - \bar{X}_j) \pm q_{\alpha/2} \sqrt{MS_{within} \cdot (\frac{1}{n_i} + \frac{1}{n_j})/2}}
-#' 
-#' ### Weighted Analyses
-#' For weighted data, effective sample sizes and weighted means are used:
-#' - Effective sample size: \eqn{n_{eff} = \frac{(\sum w_i)^2}{\sum w_i^2}}
-#' - Weighted variance estimates account for unequal weights
-#' 
-#' ## SPSS Compatibility
-#' Results match SPSS ONEWAY procedure with POSTHOC subcommand using Tukey HSD.
-#' 
-#' ## Usage Recommendations
-#' - Only interpret post-hoc results when ANOVA F-test is significant
-#' - Tukey HSD is more conservative than other post-hoc tests
-#' - For unequal variances, consider Games-Howell post-hoc test instead
+#' ## Understanding the Results
+#'
+#' **Adjusted P-values**: Control for multiple comparisons
+#' - p < 0.05: Groups are significantly different
+#' - p ≥ 0.05: No significant difference between these groups
+#' - When you make many comparisons, chance alone could produce false positives
+#' - Tukey adjustment protects against this by being more conservative
+#'
+#' **Mean Differences**:
+#' - Positive: First group has higher average than second
+#' - Negative: Second group has higher average than first
+#' - Zero in confidence interval: No significant difference
+#'
+#' ## When to Use Tukey Test
+#'
+#' Use Tukey test when:
+#' - Your ANOVA shows significant differences (p < 0.05)
+#' - You want to know which specific groups differ
+#' - You need to compare all possible pairs
+#' - Group sizes are roughly equal
+#' - Variances are roughly equal across groups
+#'
+#' ## Tukey vs. Scheffe
+#'
+#' **Tukey Test:**
+#' - Less conservative (easier to find differences)
+#' - Best for equal group sizes
+#' - Protects only pairwise comparisons
+#' - Narrower confidence intervals
+#'
+#' **Scheffe Test:**
+#' - Most conservative (hardest to find differences)
+#' - Best for unequal group sizes
+#' - Protects against all possible comparisons
+#' - Wider confidence intervals
+#'
+#' ## Reading the Output
+#'
+#' Example: "Group A - Group B: Diff = 3.2, p = 0.012"
+#' - Group A's average is 3.2 units higher than Group B's
+#' - This difference is statistically significant (p < 0.05)
+#' - You can be confident these groups truly differ
+#'
+#' ## Tips for Success
+#'
+#' - Only run post-hoc tests if ANOVA is significant
+#' - Focus on comparisons that make theoretical sense
+#' - Consider practical significance, not just statistical
+#' - Report both the difference and its confidence interval
+#' - Remember: non-significant doesn't mean "exactly equal"
 #'
 #' @seealso 
-#' \code{\link{oneway_anova_test}} for performing ANOVA tests.
+#' \code{\link{oneway_anova}} for performing ANOVA tests.
 #' 
 #' \code{\link[stats]{TukeyHSD}} for the base R Tukey HSD function.
 #' 
@@ -86,44 +88,34 @@
 #' unequal numbers of replications. Biometrics, 12(3), 307-310.
 #'
 #' @examples
-#' # Load required packages
+#' # Load required packages and data
 #' library(dplyr)
-#' 
-#' # Create sample data
-#' set.seed(123)
-#' survey_data <- data.frame(
-#'   id = 1:300,
-#'   treatment = factor(rep(c("Control", "Treatment1", "Treatment2"), each = 100)),
-#'   outcome1 = c(rnorm(100, 5.0, 1.2), rnorm(100, 5.8, 1.4), rnorm(100, 6.2, 1.1)),
-#'   outcome2 = c(rnorm(100, 3.2, 1.0), rnorm(100, 3.9, 1.3), rnorm(100, 4.1, 0.9)),
-#'   weight = runif(300, 0.5, 2.0),
-#'   gender = factor(sample(c("Male", "Female"), 300, replace = TRUE))
-#' )
-#' 
+#' data(survey_data)
+#'
 #' # Perform ANOVA followed by Tukey post-hoc test
 #' anova_result <- survey_data %>%
-#'   oneway_anova_test(outcome1, group = treatment)
-#' 
+#'   oneway_anova(life_satisfaction, group = education)
+#'
 #' # Tukey post-hoc comparisons
 #' anova_result %>% tukey_test()
-#' 
-#' # Multiple variables
-#' anova_result_multi <- survey_data %>%
-#'   oneway_anova_test(outcome1, outcome2, group = treatment)
-#' 
-#' anova_result_multi %>% tukey_test()
-#' 
-#' # Weighted analysis
+#'
+#' # With weights
 #' anova_weighted <- survey_data %>%
-#'   oneway_anova_test(outcome1, group = treatment, weights = weight)
-#' 
+#'   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+#'
 #' anova_weighted %>% tukey_test()
-#' 
+#'
+#' # Multiple variables
+#' anova_multi <- survey_data %>%
+#'   oneway_anova(trust_government, trust_companies, group = education)
+#'
+#' anova_multi %>% tukey_test()
+#'
 #' # Grouped analysis
 #' anova_grouped <- survey_data %>%
-#'   group_by(gender) %>%
-#'   oneway_anova_test(outcome1, group = treatment)
-#' 
+#'   group_by(region) %>%
+#'   oneway_anova(life_satisfaction, group = education)
+#'
 #' anova_grouped %>% tukey_test()
 #'
 #' @export
@@ -132,7 +124,7 @@ tukey_test <- function(x, conf.level = 0.95, ...) {
 }
 
 #' @export
-tukey_test.oneway_anova_test_results <- function(x, conf.level = 0.95, ...) {
+tukey_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
   
   # Input validation
   if (conf.level <= 0 || conf.level >= 1) {
@@ -389,15 +381,10 @@ tukey_test.oneway_anova_test_results <- function(x, conf.level = 0.95, ...) {
 #'
 #' @export
 print.tukey_test_results <- function(x, digits = 3, ...) {
-  # Determine test type based on weights
-  test_type <- if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    "Weighted Tukey HSD Post-Hoc Test Results"
-  } else {
-    "Tukey HSD Post-Hoc Test Results"
-  }
-  
-  cat(test_type, "\n")
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  # Determine test type using standardized helper
+  weights_name <- x$weight_var %||% x$weights
+  test_type <- get_standard_title("Tukey HSD Post-Hoc Test", weights_name, "Results")
+  print_header(test_type, newline_before = FALSE)
   
   # Print basic info
   if (!x$is_grouped) {

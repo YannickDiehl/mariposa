@@ -21,6 +21,24 @@ navbar:
     reference:
       text: Reference
       href: reference/index.html
+    articles:
+      text: Vignettes
+      menu:
+      - text: "Getting Started"
+      - text: "Introduction to SurveyStat"
+        href: articles/introduction.html
+      - text: "-------"
+      - text: "Core Functions"
+      - text: "Descriptive Statistics and Frequencies"
+        href: articles/descriptive-statistics.html
+      - text: "Comparing Groups and Testing Hypotheses"
+        href: articles/hypothesis-testing.html
+      - text: "Understanding Relationships: Correlation Analysis"
+        href: articles/correlation-analysis.html
+      - text: "-------"
+      - text: "Advanced Topics"
+      - text: "Working with Survey Weights"
+        href: articles/survey-weights.html
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/yourusername/SurveyStat
@@ -38,9 +56,9 @@ reference:
   desc: "Statistical tests for independent and paired samples"
   contents:
   - t_test
-  - mann_whitney_test
-  - chi_squared_test
-  - oneway_anova_test
+  - mann_whitney
+  - chi_square
+  - oneway_anova
   - rm_t_test
   - rm_anova_test
 
@@ -87,6 +105,24 @@ reference:
   desc: "Professional output formatting methods"
   contents:
   - starts_with("print.")
+
+articles:
+- title: "Getting Started"
+  navbar: ~
+  contents:
+  - introduction
+
+- title: "Core Analysis Functions"
+  navbar: ~
+  contents:
+  - descriptive-statistics
+  - hypothesis-testing
+  - correlation-analysis
+
+- title: "Advanced Topics"
+  navbar: ~
+  contents:
+  - survey-weights
 
 footer:
   structure:

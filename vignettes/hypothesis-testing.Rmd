@@ -1,0 +1,375 @@
+---
+title: "Comparing Groups and Testing Hypotheses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comparing Groups and Testing Hypotheses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SurveyStat)
+library(dplyr)
+data(survey_data)
+```
+
+## What Does This Do?
+
+Hypothesis testing helps you determine if differences between groups are real or just due to chance. It's like being a detective - you're looking for evidence that groups truly differ, not just random variation.
+
+The main tests covered here:
+- `t_test()` - Compare two groups (like male vs. female)
+- `oneway_anova()` - Compare three or more groups
+- `mann_whitney()` - Compare two groups when data isn't normal
+- `chi_square()` - Test if two categorical variables are related
+
+## When Should I Use These Tests?
+
+### Choose t_test() when:
+- You have exactly **two groups** to compare
+- Your outcome is **numeric** (like satisfaction scores)
+- Example: "Do men and women have different life satisfaction?"
+
+### Choose oneway_anova() when:
+- You have **three or more groups** to compare
+- Your outcome is **numeric**
+- Example: "Does income vary by education level (high school/college/graduate)?"
+
+### Choose mann_whitney() when:
+- You have **two groups** to compare
+- Your data is **skewed** or has **outliers**
+- You have **ordinal data** (ranked categories)
+- Example: "Do age distributions differ between regions?" (when age is skewed)
+
+### Choose chi_square() when:
+- Both variables are **categorical**
+- You want to test if they're **related**
+- Example: "Is education level related to region?"
+
+## Getting Started: t-Test
+
+### What Does the t-Test Do?
+
+The t-test determines if two groups have different average values. It separates real differences from random variation in your data.
+
+For example:
+- Do men and women have different satisfaction scores?
+- Does Region A spend more than Region B?
+- Is this year's performance better than last year's?
+
+### When Should I Use the t-Test?
+
+**Use t-test when:**
+- You have exactly **two groups** to compare
+- Your outcome is **numeric** (continuous)
+- Groups are **independent** (different people in each)
+- Data is roughly **normally distributed** (or n ≥ 30 per group)
+
+**Don't use when:**
+- You have more than two groups (use ANOVA)
+- Data is severely skewed with small samples (use Mann-Whitney)
+- Groups are paired/matched (paired t-test coming soon)
+- Variables are categorical (use chi-square)
+
+### Basic Two-Sample Test
+
+Let's test if life satisfaction differs between men and women:
+
+```{r}
+# Compare life satisfaction by gender
+survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+```
+
+### Understanding the Output
+
+**P-value**: Is the difference statistically significant?
+- p < 0.001: Very strong evidence of a difference
+- p < 0.01: Strong evidence
+- p < 0.05: Moderate evidence
+- p ≥ 0.05: No significant difference
+
+**Effect Sizes**: How big is the difference?
+- Cohen's d < 0.2: Negligible
+- Cohen's d = 0.2-0.5: Small
+- Cohen's d = 0.5-0.8: Medium
+- Cohen's d > 0.8: Large
+
+**Confidence Interval**: The likely range of the true difference
+- If it includes 0, groups may not differ
+- Narrower intervals = more precise estimates
+
+### Multiple Variables at Once
+
+Test several outcomes simultaneously:
+
+```{r}
+# Test all trust variables between genders
+survey_data %>%
+  t_test(trust_government, trust_companies, trust_media,
+         group = gender, weights = sampling_weight)
+```
+
+### One-Sample Test
+
+Compare your data to a benchmark:
+
+```{r}
+# Is satisfaction above the midpoint (5)?
+survey_data %>%
+  t_test(life_satisfaction, mu = 5, weights = sampling_weight)
+```
+
+### Variance Assumptions
+
+The function shows both Welch's and Student's results:
+
+```{r}
+# Compare both approaches
+survey_data %>%
+  t_test(income, group = gender, weights = sampling_weight)
+```
+
+- **Welch's test** (default): Safer, doesn't assume equal variances
+- **Student's test**: Traditional, assumes equal variances
+
+Use Welch's unless you're certain variances are equal.
+
+## ANOVA: Comparing Multiple Groups
+
+When you have more than two groups, use ANOVA:
+
+```{r}
+# Compare life satisfaction across education levels
+result <- survey_data %>%
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+
+print(result)
+```
+
+### Following Up with Post-Hoc Tests
+
+ANOVA tells you *if* groups differ, but not *which* groups differ. Use Tukey's test to find out:
+
+```{r}
+# See which specific education levels differ
+result %>% tukey_test()
+```
+
+This shows all pairwise comparisons:
+- **diff**: The difference in means between groups
+- **p adj**: Adjusted p-value (accounts for multiple comparisons)
+- Look for stars to see which pairs significantly differ
+
+## Non-Parametric Tests: When Data Isn't Normal
+
+If your data is heavily skewed or has outliers, use mann_whitney:
+
+```{r}
+# Compare age distributions between genders (non-parametric)
+survey_data %>%
+  mann_whitney(age, group = gender, weights = sampling_weight)
+```
+
+### Why Use Non-Parametric Tests?
+
+They're more robust when:
+- Data is heavily skewed
+- You have outliers
+- Sample sizes are small
+- Data is ordinal (ordered categories)
+
+The output is similar to t-test but uses ranks instead of means.
+
+## Chi-Square Test: Categorical Variables
+
+Test if two categorical variables are related:
+
+```{r}
+# Is education level related to region?
+survey_data %>%
+  chi_square(education, region, weights = sampling_weight)
+```
+
+### Understanding Chi-Square Output:
+
+- **Chi-square statistic**: How different from expected (bigger = more different)
+- **p-value**: Probability the variables are independent
+- **Cramér's V**: Effect size for categorical data
+  - 0.1 = Small effect
+  - 0.3 = Medium effect
+  - 0.5 = Large effect
+
+### The Contingency Table:
+Shows observed vs. expected frequencies:
+- **Observed**: What you actually found
+- **Expected**: What you'd expect if variables were independent
+- Large differences suggest a relationship
+
+## Common t-Test Scenarios
+
+### Scenario 1: Survey Method Comparison
+
+Testing if different data collection methods yield different results:
+
+```{r}
+# Compare online vs phone survey responses
+survey_data %>%
+  t_test(life_satisfaction, group = region, weights = sampling_weight)
+```
+
+Look for both statistical significance (p-value) and practical importance (effect size).
+
+### Scenario 2: Regional Analysis
+
+Compare key metrics across regions:
+
+```{r}
+# Test regional differences in multiple outcomes
+survey_data %>%
+  t_test(income, life_satisfaction, trust_government,
+         group = region, weights = sampling_weight)
+```
+
+### Scenario 3: Subgroup Analysis
+
+Run tests within specific populations:
+
+```{r}
+# Gender differences by region
+survey_data %>%
+  group_by(region) %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+```
+
+## Tips to Avoid Common Mistakes
+
+- **Check sample sizes first**: Need 30+ per group for reliable results
+- **Look beyond p-values**: Small effects can be significant with large samples
+- **Use weights consistently**: Unweighted = sample description, weighted = population inference
+- **Verify assumptions**: Use Mann-Whitney if data is heavily skewed
+- **Report complete results**: Include effect sizes and confidence intervals
+
+## Checking Test Assumptions
+
+### For t-tests and ANOVA:
+
+Check if variances are equal across groups:
+
+```{r}
+# Test equality of variances
+result <- survey_data %>%
+  oneway_anova(life_satisfaction, group = education)
+
+result %>% levene_test()
+```
+
+If Levene's test is significant (p < 0.05), variances are unequal. The functions automatically adjust for this.
+
+### For All Tests:
+
+Check sample sizes:
+
+```{r}
+# Ensure adequate sample sizes
+survey_data %>%
+  group_by(education) %>%
+  summarise(n = n(), .groups = "drop")
+```
+
+Warning: Groups with n < 30 may give unreliable results.
+
+## Decision Tree: Which Test to Use?
+
+1. **What type is your outcome variable?**
+   - Numeric → Continue to #2
+   - Categorical → Use `chi_square()`
+
+2. **How many groups are you comparing?**
+   - Two groups → Continue to #3
+   - Three+ groups → Use `oneway_anova()`
+
+3. **Is your data normally distributed?**
+   - Yes → Use `t_test()`
+   - No/Unsure → Use `mann_whitney()`
+
+## Tips for Success
+
+### 1. Check Your Data First
+Always run `describe()` before testing:
+```{r eval=FALSE}
+survey_data %>%
+  group_by(gender) %>%
+  describe(life_satisfaction)
+```
+
+### 2. Consider Effect Size, Not Just p-values
+A result can be statistically significant but practically meaningless:
+- p = 0.001 with Cohen's d = 0.1 → Statistically significant but tiny effect
+- p = 0.06 with Cohen's d = 0.8 → Not significant but large effect
+
+### 3. Use Weights When Available
+Weighted tests give population-level conclusions:
+```{r eval=FALSE}
+# Population inference (use weights)
+survey_data %>%
+  t_test(outcome, group = group_var, weights = sampling_weight)
+
+# Sample description (no weights)
+survey_data %>%
+  t_test(outcome, group = group_var)
+```
+
+### 4. Multiple Comparisons Warning
+Running many tests increases false positive risk. If testing many hypotheses:
+- Focus on pre-specified hypotheses
+- Use adjusted p-values (like in Tukey's test)
+- Consider stricter significance levels
+
+### 5. Report Complete Results
+Always report:
+- Test used and why
+- Sample sizes per group
+- Test statistic and p-value
+- Effect size
+- Confidence intervals (when available)
+
+## Common Pitfalls to Avoid
+
+❌ **Don't** use t-test for 3+ groups (use ANOVA)
+❌ **Don't** ignore effect sizes
+❌ **Don't** forget to check assumptions
+❌ **Don't** use parametric tests with very small samples (n < 10 per group)
+❌ **Don't** interpret non-significant results as "no difference"
+
+✅ **Do** check your data first
+✅ **Do** report effect sizes
+✅ **Do** use appropriate post-hoc tests
+✅ **Do** consider practical significance
+✅ **Do** use weights for population inference
+
+## Quick Reference
+
+| Situation | Test to Use | Function |
+|-----------|------------|----------|
+| 2 groups, numeric outcome | t-test | `t_test()` |
+| 3+ groups, numeric outcome | ANOVA | `oneway_anova()` |
+| 2 groups, non-normal data | Mann-Whitney | `mann_whitney()` |
+| 2 categorical variables | Chi-square | `chi_square()` |
+| Which groups differ (after ANOVA) | Tukey HSD | `tukey_test()` |
+| Check equal variances | Levene's test | `levene_test()` |
+
+## What's Next?
+
+- Learn about relationships between variables in the Correlation vignette
+- Explore advanced post-hoc analyses
+- Understand survey weights in depth
+
+Remember: Statistical significance ≠ practical importance. Always consider both!

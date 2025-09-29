@@ -1,136 +1,97 @@
 
-#' Perform independent sample t-tests with support for weights and grouped data
+#' Test If Two Groups Differ
 #'
 #' @description
-#' \code{t_test()} performs one-sample and two-sample t-tests on one or more
-#' variables in a data frame. The function supports both weighted and unweighted analyses,
-#' grouped data operations, and multiple variables simultaneously. It is particularly
-#' designed for survey data analysis where sampling weights are crucial for
-#' population-representative results.
+#' \code{t_test()} helps you determine if two groups have different average values.
+#' For example, do men and women have different satisfaction scores? Does Region A
+#' spend more than Region B? Is this year better than last year?
 #'
-#' For paired t-tests (repeated measures), support will be added in a future version.
+#' The test tells you:
+#' - **Whether the difference is statistically significant**
+#' - **How big the difference is** (effect sizes)
+#' - **The likely range of the true difference** (confidence interval)
 #'
-#' The function implements both Student's t-test (equal variances) and Welch's t-test
-#' (unequal variances) and provides comprehensive effect size calculations including
-#' Cohen's d, Hedges' g (bias-corrected), and Glass' Delta.
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables to test. List multiple variables or use
+#'   tidyselect helpers like \code{starts_with("trust")}.
+#' @param group The variable that defines your two groups (e.g., gender, region).
+#'   Must have exactly two categories. Leave empty for one-sample tests.
+#' @param weights Optional survey weights for population-representative results
+#' @param var.equal Should we assume equal variances? (Default: FALSE)
+#'   \itemize{
+#'     \item \code{FALSE}: Safer, works even if groups vary differently (Welch's test)
+#'     \item \code{TRUE}: Traditional approach, assumes equal spread (Student's test)
+#'   }
+#' @param mu Comparison value (Default: 0). For two-sample tests, usually 0.
+#'   For one-sample tests, your benchmark value.
+#' @param alternative Direction of the test:
+#'   \itemize{
+#'     \item \code{"two.sided"} (default): Any difference
+#'     \item \code{"greater"}: First group is higher
+#'     \item \code{"less"}: First group is lower
+#'   }
+#' @param conf.level Confidence level (Default: 0.95 = 95%)
 #'
-#' @section SPSS Compatibility:
-#' This function is designed to be SPSS-compatible, producing results that closely match
-#' SPSS output. Key compatibility features:
-#' \itemize{
-#'   \item Uses frequency weights approach (rounded effective sample sizes)
-#'   \item Reports both equal and unequal variance assumptions
-#'   \item Matching formulas for weighted variance and standard errors
-#'   \item Effect sizes calculated using SPSS conventions
-#' }
-#'
-#' Minor differences from SPSS (typically < 1%) may occur due to:
-#' \itemize{
-#'   \item Internal precision handling differences
-#'   \item Different rounding strategies for intermediate calculations
-#'   \item Data preprocessing variations
-#' }
-#'
-#' These differences are within acceptable tolerances for practical statistical analysis.
-#'
-#' @param data A data frame or tibble containing the variables to analyze.
-#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Variables for which to perform 
-#'   t-tests. Supports all tidyselect helpers such as \code{starts_with()}, 
-#'   \code{ends_with()}, \code{contains()}, \code{matches()}, \code{num_range()}, etc.
-#' @param group <\code{\link[dplyr]{dplyr_data_masking}}> Optional grouping variable 
-#'   for two-sample t-test. Must be a factor or character variable with exactly 
-#'   two levels. If \code{NULL} (default), performs one-sample t-tests.
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights 
-#'   for weighted t-tests. Should be a numeric variable with positive values. 
-#'   Weights are used to adjust for sampling design and non-response patterns.
-#' @param var.equal Logical indicating whether to assume equal variances in 
-#'   two-sample tests. Default is \code{FALSE} (Welch's t-test). When \code{TRUE}, 
-#'   uses Student's t-test. Both results are displayed in SPSS-style output.
-#' @param mu A number specifying the null hypothesis value. For one-sample tests, 
-#'   this is the hypothesized population mean. For two-sample tests, this is the 
-#'   hypothesized difference in means. Default is \code{0}.
-#' @param alternative Character string specifying the alternative hypothesis. 
-#'   Must be one of \code{"two.sided"} (default), \code{"greater"}, or \code{"less"}.
-#' @param conf.level Confidence level for the confidence interval. Must be between 
-#'   0 and 1. Default is \code{0.95} (95% confidence interval).
-#'
-#' @return An object of class \code{"t_test_results"} containing:
-#' \describe{
-#'   \item{results}{A data frame with test statistics, p-values, effect sizes, 
-#'     and confidence intervals for each variable or comparison}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{group}{Name of the grouping variable (if used)}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{var.equal}{Variance assumption used}
-#'   \item{group_levels}{Levels of the grouping variable}
-#'   \item{is_grouped}{Logical indicating if data was grouped via group_by()}
-#'   \item{mu, alternative, conf.level}{Test parameters}
-#' }
-#' 
-#' The results data frame contains the following columns:
-#' \describe{
-#'   \item{Variable}{Name of the analyzed variable}
-#'   \item{t_stat}{t-statistic}
-#'   \item{df}{Degrees of freedom}
-#'   \item{p_value}{p-value}
-#'   \item{mean_diff}{Mean difference (group1 - group2 for two-sample)}
-#'   \item{cohens_d}{Cohen's d effect size}
-#'   \item{hedges_g}{Hedges' g (bias-corrected Cohen's d)}
-#'   \item{glass_delta}{Glass' Delta (for independent samples only)}
-#'   \item{conf_int_lower, conf_int_upper}{Confidence interval bounds}
-#'   \item{group_stats}{List column with group-specific or variable-specific statistics}
-#' }
+#' @return Test results showing whether groups differ, including:
+#' - t-statistic and p-value for statistical significance
+#' - Mean difference and confidence interval
+#' - Effect sizes (Cohen's d, Hedges' g, Glass' Delta)
+#' - Group statistics (mean, SD, sample size)
 #'
 #' @details
-#' ## Statistical Methods
-#' 
-#' ### Independent Sample Tests
-#' For two-sample tests, both equal and unequal variance assumptions are calculated:
-#' 
-#' **Welch's t-test (unequal variances):**
-#' \deqn{t = \frac{\bar{x}_1 - \bar{x}_2 - \mu_0}{\sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}}}
-#' 
-#' **Student's t-test (equal variances):**
-#' \deqn{t = \frac{\bar{x}_1 - \bar{x}_2 - \mu_0}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}}
-#' where \eqn{s_p = \sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}}
-#' 
-
-#' ### Weighted Tests
-#' For weighted tests, following \pkg{sjstats} methodology:
-#' - Weighted means: \eqn{\mu_w = \frac{\sum w_i x_i}{\sum w_i}}
-#' - Weighted variances: \eqn{\sigma_w^2 = \frac{\sum w_i (x_i - \mu_w)^2}{\sum w_i}}
-#' - Standard errors use actual (unweighted) sample sizes for degrees of freedom
-#' 
-#' ### Effect Sizes
-#' 
-#' **Cohen's d (independent samples):**
-#' \deqn{d = \frac{\bar{x}_1 - \bar{x}_2}{s_{pooled}}}
-#' 
-#' **Hedges' g (bias-corrected Cohen's d):**
-#' For independent samples: \eqn{g = d \times J} where \eqn{J = 1 - \frac{3}{4(n_1+n_2-2)-1}}
-#' 
-#' **Glass' Delta (independent samples only):**
-#' \deqn{\Delta = \frac{\bar{x}_1 - \bar{x}_2}{s_1}}
-#' Uses only the standard deviation of the first (control) group.
-#' 
-#' ## Grouped Analyses
-#' When data is grouped using \code{group_by()}, the function performs separate 
-#' analyses for each group combination.
-#' 
-#' ## SPSS Compatibility
-#' Results match SPSS output for:
-#' - t-statistics and p-values
-#' - Confidence intervals
-#' - Effect size calculations
-#' - Both equal and unequal variance assumptions displayed
-#' 
-#' ## Interpretation Guidelines
-#' - **p-values**: p < 0.05 indicates statistical significance at alpha = 0.05
-#' - **Effect sizes**: |effect| ~ 0.2 (small), |effect| ~ 0.5 (medium), |effect| ~ 0.8 (large)
-#' - **Cohen's d**: Classic effect size using pooled standard deviation
-#' - **Hedges' g**: Bias-corrected version, preferred for publication
-#' - **Glass' Delta**: Uses control group SD only, useful when variances differ substantially
-#' - **Confidence intervals**: Range of plausible values for the true difference
+#' ## Understanding the Results
+#'
+#' **P-value**: Is the difference statistically significant?
+#' - p < 0.001: Very strong evidence of a difference
+#' - p < 0.01: Strong evidence of a difference
+#' - p < 0.05: Moderate evidence of a difference
+#' - p ≥ 0.05: No significant difference found
+#'
+#' **Effect Sizes** (How big is the difference?):
+#' - **Cohen's d**: The standard measure
+#'   - |d| < 0.2: Negligible difference
+#'   - |d| = 0.2-0.5: Small difference
+#'   - |d| = 0.5-0.8: Medium difference
+#'   - |d| > 0.8: Large difference
+#' - **Hedges' g**: Corrected for small samples
+#' - **Glass' Delta**: Uses control group SD only
+#'
+#' **Confidence Interval**: Range where the true difference likely falls
+#' - If it includes 0, groups may not differ
+#' - Width indicates precision (narrower = more precise)
+#'
+#' ## When to Use This
+#'
+#' Use t-test when:
+#' - You have exactly two groups to compare
+#' - Your outcome variable is numeric (continuous)
+#' - Groups are independent (different people in each)
+#' - Data is roughly normally distributed (or n ≥ 30 per group)
+#'
+#' Don't use when:
+#' - You have more than two groups (use ANOVA)
+#' - Data is severely skewed with small samples (use Mann-Whitney)
+#' - Groups are paired/matched (use paired t-test - coming soon)
+#' - Variables are categorical (use chi-square)
+#'
+#' ## Reading the Output
+#'
+#' The results show both variance assumptions:
+#' - **Welch's test** (var.equal = FALSE): Safer, doesn't assume equal variances
+#' - **Student's test** (var.equal = TRUE): Traditional, assumes equal variances
+#'
+#' A result with t = 2.45, p = 0.015, d = 0.62 means:
+#' - Groups are 2.45 standard errors apart (t-statistic)
+#' - 1.5% chance this is due to random variation (p-value)
+#' - Medium-sized practical difference (Cohen's d)
+#'
+#' ## Tips for Success
+#'
+#' - Always check sample sizes (aim for 30+ per group)
+#' - Consider both statistical significance AND effect size
+#' - Use weights for population-level conclusions
+#' - Plot your data first to check assumptions
+#' - Report confidence intervals along with p-values
 #'
 #' @seealso 
 #' \code{\link[stats]{t.test}} for the base R t-test function.
@@ -153,58 +114,46 @@
 #' different population variances are involved. Biometrika, 34(1-2), 28-35.
 #'
 #' @examples
-#' # Load required packages
+#' # Load required packages and data
 #' library(dplyr)
-#' 
-#' # Create sample data
-#' set.seed(123)
-#' survey_data <- data.frame(
-#'   id = 1:200,
-#'   group = factor(rep(c("Treatment", "Control"), each = 100)),
-#'   pre_test = rnorm(200, 50, 10),
-#'   post_test = rnorm(200, 55, 12),
-#'   outcome1 = c(rnorm(100, 5.2, 1.5), rnorm(100, 4.8, 1.3)),
-#'   outcome2 = c(rnorm(100, 3.1, 1.2), rnorm(100, 3.5, 1.4)),
-#'   weight = runif(200, 0.5, 2.0),
-#'   gender = factor(sample(c("Male", "Female"), 200, replace = TRUE))
-#' )
-#' 
-#' # Basic two-sample t-test
+#' data(survey_data)
+#'
+#' # Basic two-sample test
 #' survey_data %>%
-#'   t_test(outcome1, group = group)
-#' 
+#'   t_test(life_satisfaction, group = gender)
+#'
+#' # With survey weights
+#' survey_data %>%
+#'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
+#'
 #' # Multiple variables
 #' survey_data %>%
-#'   t_test(outcome1, outcome2, group = group)
-#' 
-#' # Using tidyselect helpers
+#'   t_test(age, income, life_satisfaction, group = region, weights = sampling_weight)
+#'
+#' # One-sample test against a benchmark
 #' survey_data %>%
-#'   t_test(starts_with("outcome"), group = group)
-#' 
-#' # Weighted analysis
+#'   t_test(life_satisfaction, mu = 5, weights = sampling_weight)
+#'
+#' # Grouped analysis
 #' survey_data %>%
-#'   t_test(outcome1, group = group, weights = weight)
-#' 
-#' # Grouped analysis (separate tests for each gender)
-#' survey_data %>%
-#'   group_by(gender) %>%
-#'   t_test(outcome1, group = group)
-#' 
-#' # One-sample t-test (test against mu = 5)
-#' survey_data %>%
-#'   t_test(outcome1, mu = 5)
-#' 
-#' # One-sided test
-#' survey_data %>%
-#'   t_test(outcome1, group = group, alternative = "greater")
-#' 
+#'   group_by(region) %>%
+#'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
+#'
 #' # Equal variance assumption
 #' survey_data %>%
-#'   t_test(outcome1, group = group, var.equal = TRUE)
-#' 
+#'   t_test(life_satisfaction, group = gender, var.equal = TRUE)
+#'
+#' # One-sided test
+#' survey_data %>%
+#'   t_test(income, group = gender, alternative = "greater")
+#'
+#' # Using tidyselect helpers
+#' survey_data %>%
+#'   t_test(starts_with("trust"), group = gender, weights = sampling_weight)
+#'
 #' # Store results for further analysis
 #' result <- survey_data %>%
-#'   t_test(outcome1, group = group, weights = weight)
+#'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #' print(result)
 #'
 #' @export
@@ -784,46 +733,44 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 #'
 #' @export
 print.t_test_results <- function(x, digits = 3, ...) {
-  # Determine test type based on weights (Template Standard)
-  test_type <- if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    "Weighted t-Test Results"
-  } else {
-    "t-Test Results"
-  }
-  
-  cat(sprintf("\n%s\n", test_type))
-  border_line <- paste(rep("-", nchar(test_type)), collapse = "")
-  writeLines(border_line)
+  # Determine test type based on weights
+  weights_name <- x$weight_var %||% x$weights
+  test_type <- get_standard_title("t-Test", weights_name, "Results")
+
+  # Print header with consistent style
+  print_header(test_type)
   
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
-  
-  # Add significance stars (Template Standard)
-  x$results$sig <- cut(x$results$p_value, 
-                      breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                      labels = c("***", "**", "*", ""),
-                      right = FALSE)
-                      
-  # Template Standard: Dual grouped data detection
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) || 
+
+  # Add significance stars using standard helper
+  x$results$sig <- sapply(x$results$p_value, add_significance_stars)
+
+  # Detect grouped data
+  is_grouped_data <- (!is.null(x$grouped) && x$grouped) ||
                      (!is.null(x$is_grouped) && x$is_grouped)
   
-    # Print test info
+  # Print test information
   if (!is.null(x$group)) {
-    # Grouping variable info
     group_levels <- x$group_levels
     if (length(group_levels) >= 2) {
-      cat(sprintf("\nGrouping variable: %s\n", x$group))
-      cat(sprintf("Groups compared: %s vs. %s\n", 
-                  as.character(group_levels[1]), 
-                  as.character(group_levels[2])))
-      if (!is.null(x$weight_var) || !is.null(x$weights)) {
-        weight_name <- if (!is.null(x$weight_var)) x$weight_var else x$weights
-        cat(sprintf("Weights variable: %s\n", weight_name))
-      }
-      cat(sprintf("Null hypothesis (mu): %.3f\n", x$mu))
-      cat(sprintf("Alternative hypothesis: %s\n", x$alternative))
-      cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
+      cat("\n")
+      test_info <- list(
+        "Grouping variable" = x$group,
+        "Groups compared" = sprintf("%s vs. %s",
+                                   as.character(group_levels[1]),
+                                   as.character(group_levels[2])),
+        "Weights variable" = weights_name
+      )
+      print_info_section(test_info)
+
+      # Print test parameters
+      test_params <- list(
+        mu = x$mu,
+        alternative = x$alternative,
+        conf.level = x$conf.level
+      )
+      print_test_parameters(test_params)
       cat("\n")
     }
   }
@@ -1037,7 +984,8 @@ print.t_test_results <- function(x, digits = 3, ...) {
     }
   }
   
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+  # Print significance legend using standard helper
+  print_significance_legend()
   
   # Add interpretation guidelines only once at the end
   cat("\nEffect Size Interpretation:\n")
@@ -1057,25 +1005,19 @@ print.t_test_results <- function(x, digits = 3, ...) {
 #' @export
 #' @method print t_test_result
 print.t_test_result <- function(x, digits = 3, ...) {
-  if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    cat("Weighted t-Test Results\n")
-    cat(paste(rep("-", 23), collapse = ""), "\n")
-  } else {
-    cat("t-Test Results\n")
-    cat(paste(rep("-", 14), collapse = ""), "\n")
-  }
+  # Use consistent title formatting
+  weights_name <- x$weight_var %||% x$weights
+  test_type <- get_standard_title("t-Test", weights_name, "Results")
+  print_header(test_type, newline_before = FALSE)
   
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
-  
-  # Add significance stars (Template Standard)
-  x$results$sig <- cut(x$results$p_value, 
-                      breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                      labels = c("***", "**", "*", ""),
-                      right = FALSE)
-                      
-  # Template Standard: Dual grouped data detection
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) || 
+
+  # Add significance stars using standard helper
+  x$results$sig <- sapply(x$results$p_value, add_significance_stars)
+
+  # Detect grouped data
+  is_grouped_data <- (!is.null(x$grouped) && x$grouped) ||
                      (!is.null(x$is_grouped) && x$is_grouped)
   
   # Print info about grouping variable if present

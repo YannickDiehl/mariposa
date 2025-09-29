@@ -26,7 +26,7 @@
 | Category | Functions | Description |
 |----------|-----------|-------------|
 | 🎯 **Descriptive** | `describe()`, `frequency()` | Core descriptive and frequency analysis |
-| 📈 **Hypothesis Testing** | `t_test()`, `oneway_anova_test()`, `mann_whitney_test()`, `chi_squared_test()` | Independent and paired sample tests |
+| 📈 **Hypothesis Testing** | `t_test()`, `oneway_anova()`, `mann_whitney()`, `chi_square()` | Independent and paired sample tests |
 | 🔍 **Post-Hoc Analysis** | `tukey_test()`, `emmeans()`, `levene_test()`, `mauchly_test()` | S3 generics for extended analysis |
 | 📊 **Weighted Statistics** | 11 `w_*` functions | Survey-ready weighted statistical functions |
 | 🧪 **Advanced Testing** | `rm_t_test()`, `rm_anova_test()` | Repeated measures and longitudinal analysis |
@@ -77,11 +77,11 @@ survey_data %>%
 
 # One-way ANOVA with effect sizes
 survey_data %>% 
-  oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
 # Non-parametric Mann-Whitney test  
 survey_data %>%
-  mann_whitney_test(age, group = gender, weights = sampling_weight)
+  mann_whitney(age, group = gender, weights = sampling_weight)
 ```
 
 ### 🔍 **Post-Hoc Analysis Pipeline**
@@ -89,7 +89,7 @@ survey_data %>%
 ```r
 # Complete analysis pipeline with S3 generics
 result <- survey_data %>%
-  oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
 # Seamless post-hoc analysis
 result %>% tukey_test()    # Multiple comparisons
@@ -122,7 +122,7 @@ survey_data %>%
 # Complex survey design analysis
 survey_data %>%
   group_by(region) %>%
-  oneway_anova_test(income, group = education, weights = sampling_weight) %>%
+  oneway_anova(income, group = education, weights = sampling_weight) %>%
   tukey_test()
 ```
 

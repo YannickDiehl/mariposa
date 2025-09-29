@@ -1,23 +1,63 @@
-#' Cross-tabulation Table
+#' Compare Two Categories: See How They Relate
 #'
 #' @description
-#' Creates cross-tabulation frequency tables with optional percentages for
-#' categorical variables. Supports survey weights and grouped data operations.
+#' \code{crosstab()} shows you how two categorical variables relate to each other.
+#' It creates a table that reveals patterns - like whether education level differs
+#' by region, or if gender influences product preferences.
 #'
-#' @param data A data frame containing the variables
-#' @param row The row variable (unquoted name)
-#' @param col The column variable (unquoted name)
-#' @param weights Optional weights variable (unquoted name)
-#' @param percentages Character vector specifying which percentages to calculate.
-#'   Options are "none", "row", "col", "total", or "all" (default: "row")
-#' @param na.rm Logical; if TRUE, remove missing values (default: TRUE)
-#' @param digits Number of decimal places for percentages (default: 1)
+#' Think of it as a two-way frequency table that shows:
+#' - How many people fall into each combination of categories
+#' - What percentage each cell represents
+#' - Whether there are patterns or associations
 #'
-#' @return An object of class "crosstab_results" containing:
-#' - Frequency table with counts
-#' - Row/column/total percentages (if requested)
-#' - Marginal totals
-#' - Metadata about the analysis
+#' @param data Your survey data (a data frame or tibble)
+#' @param row The variable for table rows (e.g., education, age_group)
+#' @param col The variable for table columns (e.g., region, gender)
+#' @param weights Optional survey weights for population-representative results
+#' @param percentages Which percentages to show:
+#'   \itemize{
+#'     \item \code{"row"} (default): Percentages across each row (adds to 100% horizontally)
+#'     \item \code{"col"}: Percentages down each column (adds to 100% vertically)
+#'     \item \code{"total"}: Percentage of the entire table
+#'     \item \code{"all"}: Show all three types
+#'     \item \code{"none"}: Just counts, no percentages
+#'   }
+#' @param na.rm Remove missing values? (Default: TRUE)
+#' @param digits Decimal places for percentages (Default: 1)
+#'
+#' @return A cross-tabulation table showing the relationship between two variables
+#'
+#' @details
+#' ## Understanding the Output
+#'
+#' The crosstab table shows:
+#' - **Cell counts**: Number of people in each combination
+#' - **Row %**: Distribution within each row (e.g., "Among those with high school education, X% live in the East")
+#' - **Column %**: Distribution within each column (e.g., "Among those in the East, X% have high school education")
+#' - **Total %**: Percentage of the entire sample (e.g., "X% of all respondents have high school education AND live in the East")
+#'
+#' ## When to Use This
+#'
+#' Use crosstab when you want to:
+#' - See if two categorical variables are related
+#' - Compare distributions across groups
+#' - Find patterns in survey responses
+#' - Create demographic breakdowns
+#'
+#' ## Choosing Percentages
+#'
+#' - **Row %**: Use when your row variable is the grouping factor
+#'   (e.g., "How does region vary BY education level?")
+#' - **Column %**: Use when your column variable is the grouping factor
+#'   (e.g., "How does education vary BY region?")
+#' - **Total %**: Use to understand the overall sample composition
+#'
+#' ## Tips for Success
+#'
+#' - Start with row or column percentages, not both at once
+#' - Use chi-squared test to check if the relationship is statistically significant
+#' - Watch for small cell counts (< 5) which may be unreliable
+#' - Consider combining sparse categories if many cells are empty
 #'
 #' @examples
 #' # Load required packages and data
@@ -258,9 +298,10 @@ crosstab.grouped_df <- function(data, row, col,
 print.crosstab_results <- function(x, ...) {
 
   if (x$is_grouped) {
-    # Print grouped results
-    cat("\nGrouped Crosstabulation\n")
-    cat("=======================\n\n")
+    # Print grouped results using standardized header
+    title <- get_standard_title("Grouped Crosstabulation", x$weights, "")
+    print_header(title)
+    cat("\n")
 
     for (i in seq_along(x$results)) {
       result <- x$results[[i]]
