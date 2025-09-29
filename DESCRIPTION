@@ -20,7 +20,6 @@ Imports:
     rlang,
     tidyselect,
     tibble,
-    purrr,
     tidyr
 Suggests: 
     testthat (>= 3.0.0),
