@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Working with Survey Weights</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Working with Survey Weights</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(mariposa)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">data</span>(survey_data)</span></code></pre></div>
+<div id="why-survey-weights-matter" class="section level2">
+<h2>Why Survey Weights Matter</h2>
+<p>Survey weights adjust your analysis to make results representative of
+the target population. Without weights, your results only describe your
+sample, which might be biased.</p>
+<p>Common reasons for weights: - <strong>Oversampling</strong>:
+Deliberately surveying more people from small groups -
+<strong>Non-response</strong>: Some groups less likely to participate -
+<strong>Post-stratification</strong>: Adjusting sample to match known
+population totals</p>
+</div>
+<div id="impact-of-weights" class="section level2">
+<h2>Impact of Weights</h2>
+<p>Let’s see the difference weights can make:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Without weights (biased)</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>unweighted_stats <span class="ot">&lt;-</span> survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="at">mean_age =</span> <span class="fu">mean</span>(age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="at">mean_satisfaction =</span> <span class="fu">mean</span>(life_satisfaction, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  )</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">print</span>(unweighted_stats)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 2</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;   mean_age mean_satisfaction</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;      &lt;dbl&gt;             &lt;dbl&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; 1     50.5              3.63</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co"># With weights (representative)</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>age_weighted <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data, age, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>satisfaction_weighted <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data, life_satisfaction, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>weighted_stats <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="at">mean_age =</span> age_weighted<span class="sc">$</span>results<span class="sc">$</span>weighted_mean,</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="at">mean_satisfaction =</span> satisfaction_weighted<span class="sc">$</span>results<span class="sc">$</span>weighted_mean</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="fu">print</span>(weighted_stats)</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt;   mean_age mean_satisfaction</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; 1  50.5144          3.624863</span></span></code></pre></div>
+<p>The weighted results represent what you’d find if you surveyed the
+entire population.</p>
+</div>
+<div id="weighted-statistics-functions" class="section level2">
+<h2>Weighted Statistics Functions</h2>
+<p>mariposa provides specialized functions for weighted
+calculations:</p>
+<div id="central-tendency" class="section level3">
+<h3>Central Tendency</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Weighted mean</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>mean_result <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">print</span>(mean_result)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; Weighted Mean Statistics</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; ------------------------ </span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; --- income ---</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;  Variable weighted_mean Effective_N</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt;    income      3743.099      2158.9</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># Weighted median</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>median_result <span class="ot">&lt;-</span> <span class="fu">w_median</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">print</span>(median_result)</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; Weighted Median Statistics</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; -------------------------- </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt;   Variable weighted_median effective_n</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; 1 income              3500       2159.</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co"># Weighted mode</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>mode_result <span class="ot">&lt;-</span> <span class="fu">w_modus</span>(survey_data, education, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="fu">print</span>(mode_result)</span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; Weighted Mode Statistics</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; ------------------------ </span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt;   Variable  weighted_mode   effective_n</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;ord&gt;                 &lt;dbl&gt;</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; 1 education Basic Secondary       2469.</span></span></code></pre></div>
+</div>
+<div id="dispersion" class="section level3">
+<h3>Dispersion</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Weighted standard deviation</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>sd_result <span class="ot">&lt;-</span> <span class="fu">w_sd</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">print</span>(sd_result)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; Weighted Standard Deviation Statistics</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; -------------------------------------- </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; --- income ---</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  Variable weighted_sd Effective_N</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;    income    1423.972      2158.9</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co"># Weighted variance</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>var_result <span class="ot">&lt;-</span> <span class="fu">w_var</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="fu">print</span>(var_result)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; Weighted Variance Statistics</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; ---------------------------- </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;   Variable weighted_var effective_n</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; 1 income       2027678.       2159.</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co"># Weighted IQR</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>iqr_result <span class="ot">&lt;-</span> <span class="fu">w_iqr</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="fu">print</span>(iqr_result)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; Weighted IQR Statistics</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; ----------------------- </span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt;   Variable weighted_iqr effective_n</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt; 1 income           1900       2159.</span></span></code></pre></div>
+</div>
+<div id="distribution-shape" class="section level3">
+<h3>Distribution Shape</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Weighted skewness</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>skew_result <span class="ot">&lt;-</span> <span class="fu">w_skew</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">print</span>(skew_result)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; Weighted Skewness Statistics</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; ---------------------------- </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;   Variable weighted_skew effective_n</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 1 income           0.725       2159.</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co"># Weighted kurtosis</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>kurt_result <span class="ot">&lt;-</span> <span class="fu">w_kurtosis</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">print</span>(kurt_result)</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; Weighted Excess Kurtosis Statistics</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; ----------------------------------- </span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;   Variable weighted_kurtosis effective_n</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; 1 income               0.384       2159.</span></span></code></pre></div>
+</div>
+<div id="other-weighted-functions" class="section level3">
+<h3>Other Weighted Functions</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Weighted quantiles (25th, 50th, 75th percentiles)</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>quantile_result <span class="ot">&lt;-</span> <span class="fu">w_quantile</span>(survey_data, income,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                              <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                              <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">print</span>(quantile_result)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; Weighted Quantile Statistics</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; ---------------------------- </span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt;  Variable Quantile    Value         Weights</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt;    income      25% 2700.000 sampling_weight</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;    income      50% 3500.000 sampling_weight</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt;    income      75% 4600.000 sampling_weight</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;    income        n 2186.000 sampling_weight</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;    income    eff_n 2158.917 sampling_weight</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co"># Weighted standard error</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>se_result <span class="ot">&lt;-</span> <span class="fu">w_se</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="fu">print</span>(se_result)</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; Weighted Standard Error Statistics</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; ---------------------------------- </span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt;   Variable weighted_se effective_n</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; 1 income          30.4       2159.</span></span></code></pre></div>
+</div>
+</div>
+<div id="effective-sample-size" class="section level2">
+<h2>Effective Sample Size</h2>
+<p>When using weights, the “effective” sample size is often smaller than
+the actual sample size:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Compare actual vs effective N</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>actual_n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(survey_data)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>age_weighted <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data, age, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>effective_n <span class="ot">&lt;-</span> age_weighted<span class="sc">$</span>results<span class="sc">$</span>effective_n</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Actual sample size:&quot;</span>, actual_n, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; Actual sample size: 2500</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Effective sample size:&quot;</span>, <span class="fu">round</span>(effective_n), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; Effective sample size: 2469</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Design effect:&quot;</span>, <span class="fu">round</span>(actual_n <span class="sc">/</span> effective_n, <span class="dv">2</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; Design effect: 1.01</span></span></code></pre></div>
+<p>A design effect &gt; 1 means weights reduce statistical power.</p>
+</div>
+<div id="weights-in-statistical-tests" class="section level2">
+<h2>Weights in Statistical Tests</h2>
+<div id="weighted-t-test" class="section level3">
+<h3>Weighted t-test</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Compare incomes between genders (weighted)</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="fu">t_test</span>(income, <span class="at">group =</span> gender, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; Weighted t-Test Results</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; ----------------------- </span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; Grouping variable: gender</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; Groups compared: Male vs. Female</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; Weights variable: sampling_weight</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; Null hypothesis (mu): 0.000</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; --- income ---</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;   Male: mean = 3766.999, n = 1048.0</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;   Female: mean = 3721.379, n = 1153.0</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; Weighted t-test Results:</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff           conf_int sig</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt;    Equal variances  0.751 2199.000   0.453     45.62 [-73.570, 164.809]    </span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt;  Unequal variances  0.751 2178.884   0.453     45.62 [-73.574, 164.813]    </span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; Effect Sizes:</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt; ------------ </span></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt;  Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt;    income    0.007    0.007       0.007  negligible</span></span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt; Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05</span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt; Effect Size Interpretation:</span></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt; - Cohen&#39;s d: pooled standard deviation (classic)</span></span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt; - Hedges&#39; g: bias-corrected Cohen&#39;s d (preferred)</span></span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="co">#&gt; - Glass&#39; Delta: control group standard deviation only</span></span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a><span class="co">#&gt; - Small effect: |effect| ~ 0.2</span></span>
+<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a><span class="co">#&gt; - Medium effect: |effect| ~ 0.5</span></span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a><span class="co">#&gt; - Large effect: |effect| ~ 0.8</span></span></code></pre></div>
+</div>
+<div id="weighted-anova" class="section level3">
+<h3>Weighted ANOVA</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Compare life satisfaction across education levels</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">oneway_anova</span>(life_satisfaction, <span class="at">group =</span> education,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>               <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Weighted One-Way ANOVA Results </span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; ------------------------------ </span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; Dependent Variable: life_satisfaction</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; Grouping Variable: education</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt; Weights Variable: sampling_weight</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; Null hypothesis: All group means are equal</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; Alternative hypothesis: At least one group mean differs</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt; --- life_satisfaction ---</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt; Weighted Descriptive Statistics by Group:</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="co">#&gt;   Basic Secondary: mean = 3.208, sd = 1.243, n = 815.7</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="co">#&gt;   Intermediate Secondary: mean = 3.698, sd = 1.109, n = 629.6</span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a><span class="co">#&gt;   Academic Secondary: mean = 3.851, sd = 0.996, n = 618.2</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="co">#&gt;   University: mean = 4.040, sd = 0.961, n = 373.2</span></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="co">#&gt; Weighted ANOVA Results:</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="co">#&gt;          Source Sum_Squares   df Mean_Square      F p_value sig</span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001 ***</span></span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="co">#&gt;   Within Groups    2992.019 2433        1.23                   </span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="co">#&gt;           Total    3233.149 2436                               </span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="co">#&gt; Assumption Tests:</span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a><span class="co">#&gt; ---------------- </span></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a><span class="co">#&gt;  Assumption Statistic df1  df2 p_value sig</span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a><span class="co">#&gt;       Welch    62.636   3 1216   &lt;.001 ***</span></span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a><span class="co">#&gt; Effect Sizes:</span></span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a><span class="co">#&gt; ------------ </span></span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a><span class="co">#&gt;           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a><span class="co">#&gt;  life_satisfaction       0.075           0.073         0.073      medium</span></span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a><span class="co">#&gt; Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05</span></span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a><span class="co">#&gt; Effect Size Interpretation:</span></span>
+<span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a><span class="co">#&gt; - Eta-squared: Proportion of variance explained (biased upward)</span></span>
+<span id="cb9-47"><a href="#cb9-47" tabindex="-1"></a><span class="co">#&gt; - Epsilon-squared: Less biased than eta-squared</span></span>
+<span id="cb9-48"><a href="#cb9-48" tabindex="-1"></a><span class="co">#&gt; - Omega-squared: Unbiased estimate (preferred for publication)</span></span>
+<span id="cb9-49"><a href="#cb9-49" tabindex="-1"></a><span class="co">#&gt; - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14</span></span>
+<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-51"><a href="#cb9-51" tabindex="-1"></a><span class="co">#&gt; Post-hoc tests: Use tukey_test() for pairwise comparisons</span></span></code></pre></div>
+</div>
+<div id="weighted-chi-square" class="section level3">
+<h3>Weighted Chi-square</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Test relationship between education and employment</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="fu">chi_square</span>(education, employment, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; Weighted Chi-Squared Test of Independence </span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------ </span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; Variables: education x employment</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; Weights variable: sampling_weight</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; Observed Frequencies:</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt;                         var2</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; var1                     Student Employed Unemployed Retired Other</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt;   Basic Secondary              0      573         66     175    34</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt;   Intermediate Secondary       0      420         52     139    29</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="co">#&gt;   Academic Secondary          46      370         45     149    33</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a><span class="co">#&gt;   University                  34      240         21      72    20</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="co">#&gt; Expected Frequencies:</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="co">#&gt;                         var2</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="co">#&gt; var1                     Student Employed Unemployed Retired  Other</span></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="co">#&gt;   Basic Secondary         26.942  539.851     61.967 180.175 39.066</span></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="co">#&gt;   Intermediate Secondary  20.334  407.434     46.767 135.981 29.484</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="co">#&gt;   Academic Secondary      20.429  409.344     46.986 136.618 29.622</span></span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="co">#&gt;   University              12.295  246.371     28.280  82.226 17.828</span></span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a><span class="co">#&gt; Chi-Squared Test Results:</span></span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="co">#&gt;  Chi_squared df p_value sig</span></span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a><span class="co">#&gt;      130.696 12   &lt;.001 ***</span></span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a><span class="co">#&gt; Effect Sizes:</span></span>
+<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
+<span id="cb10-35"><a href="#cb10-35" tabindex="-1"></a><span class="co">#&gt;     Measure  Value p_value sig Interpretation</span></span>
+<span id="cb10-36"><a href="#cb10-36" tabindex="-1"></a><span class="co">#&gt;  Cramer&#39;s V  0.132   &lt;.001 ***          Small</span></span>
+<span id="cb10-37"><a href="#cb10-37" tabindex="-1"></a><span class="co">#&gt;       Gamma -0.062   0.002  **           Weak</span></span>
+<span id="cb10-38"><a href="#cb10-38" tabindex="-1"></a><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
+<span id="cb10-39"><a href="#cb10-39" tabindex="-1"></a><span class="co">#&gt; Table size: 4×5 | N = 2518</span></span>
+<span id="cb10-40"><a href="#cb10-40" tabindex="-1"></a><span class="co">#&gt; Note: Phi coefficient only shown for 2x2 tables</span></span>
+<span id="cb10-41"><a href="#cb10-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-42"><a href="#cb10-42" tabindex="-1"></a><span class="co">#&gt; Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05</span></span></code></pre></div>
+</div>
+<div id="weighted-correlations" class="section level3">
+<h3>Weighted Correlations</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Correlation between age and income</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">pearson_cor</span>(age, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; Weighted Pearson Correlation </span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; ----------------------------- </span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; Weights variable: sampling_weight</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; --- age × income ---</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt;   Correlation: r = -0.005</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt;   Effect size: r² = 0.000</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt;   Sample size: n = 2201</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt;   p-value: 0.8276</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt;   Significance: ns</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt; Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a><span class="co">#&gt;   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span></span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a><span class="co">#&gt;   |r| ≥ 0.70:        Strong correlation</span></span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a><span class="co">#&gt; r² represents the proportion of variance explained</span></span></code></pre></div>
+</div>
+</div>
+<div id="grouped-analysis-with-weights" class="section level2">
+<h2>Grouped Analysis with Weights</h2>
+<p>All functions work seamlessly with dplyr’s group_by:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Regional comparisons with weights</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">group_by</span>(region) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="fu">describe</span>(age, income, life_satisfaction,</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>           <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; ------------------------------- </span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; Group: region = East</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; --------------------------------------------------------------------------- </span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt;                age   52.278     53   17.595    77   24    0.098       477.0</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; --------------------------------------------------------------------------- </span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; Group: region = West</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; --------------------------------------------------------------------------- </span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt;                age   50.067     49   16.927    77   24    0.170      1993.1</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; ---------------------------------------------------------------------------</span></span></code></pre></div>
+</div>
+<div id="common-weight-issues" class="section level2">
+<h2>Common Weight Issues</h2>
+<div id="extreme-weights" class="section level3">
+<h3>1. Extreme Weights</h3>
+<p>Check for outliers that might unduly influence results:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Examine weight distribution</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>weight_stats <span class="ot">&lt;-</span> survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>    <span class="at">min_weight =</span> <span class="fu">min</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>    <span class="at">max_weight =</span> <span class="fu">max</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>    <span class="at">mean_weight =</span> <span class="fu">mean</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>    <span class="at">sd_weight =</span> <span class="fu">sd</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>  )</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="fu">print</span>(weight_stats)</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 4</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;   min_weight max_weight mean_weight sd_weight</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;        &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; 1      0.702       1.40        1.01     0.113</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co"># Weights should typically range from 0.5 to 3.0</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co"># Extreme weights (&gt;5 or &lt;0.2) may indicate problems</span></span></code></pre></div>
+</div>
+<div id="missing-weights" class="section level3">
+<h3>2. Missing Weights</h3>
+<p>Check how many cases have missing weights:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>missing_weights <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(survey_data<span class="sc">$</span>sampling_weight))</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>total_cases <span class="ot">&lt;-</span> <span class="fu">nrow</span>(survey_data)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Cases with missing weights:&quot;</span>, missing_weights, <span class="st">&quot;/&quot;</span>, total_cases,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>    <span class="st">&quot;(&quot;</span>, <span class="fu">round</span>(missing_weights<span class="sc">/</span>total_cases <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">&quot;%)</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; Cases with missing weights: 0 / 2500 ( 0 %)</span></span></code></pre></div>
+</div>
+<div id="weight-trimming" class="section level3">
+<h3>3. Weight Trimming</h3>
+<p>If weights are extreme, consider trimming:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Create trimmed weights (cap at 5)</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>survey_data_trimmed <span class="ot">&lt;-</span> survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>    <span class="at">weight_trimmed =</span> <span class="fu">case_when</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>      sampling_weight <span class="sc">&gt;</span> <span class="dv">5</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>      sampling_weight <span class="sc">&lt;</span> <span class="fl">0.2</span> <span class="sc">~</span> <span class="fl">0.2</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> sampling_weight</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>    )</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>  )</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co"># Compare results</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>original <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>trimmed <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data_trimmed, income, <span class="at">weights =</span> weight_trimmed)</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Original weighted mean:&quot;</span>, original<span class="sc">$</span>results<span class="sc">$</span>weighted_mean, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; Original weighted mean: 3743.099</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Trimmed weighted mean:&quot;</span>, trimmed<span class="sc">$</span>results<span class="sc">$</span>weighted_mean, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co">#&gt; Trimmed weighted mean: 3743.099</span></span></code></pre></div>
+</div>
+</div>
+<div id="best-practices" class="section level2">
+<h2>Best Practices</h2>
+<div id="always-document-weight-source" class="section level3">
+<h3>1. Always Document Weight Source</h3>
+<p>Clearly explain: - How weights were calculated - What they adjust for
+- Any limitations</p>
+</div>
+<div id="report-both-weighted-and-unweighted" class="section level3">
+<h3>2. Report Both Weighted and Unweighted</h3>
+<p>Show both for transparency:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Create comparison table</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">Statistic =</span> <span class="fu">c</span>(<span class="st">&quot;Mean Age&quot;</span>, <span class="st">&quot;Mean Income&quot;</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="at">Unweighted =</span> <span class="fu">c</span>(</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>    <span class="fu">mean</span>(survey_data<span class="sc">$</span>age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>    <span class="fu">mean</span>(survey_data<span class="sc">$</span>income, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  ),</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>  <span class="at">Weighted =</span> <span class="fu">c</span>(</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>    <span class="fu">w_mean</span>(survey_data, age, <span class="at">weights =</span> sampling_weight)<span class="sc">$</span>results<span class="sc">$</span>weighted_mean,</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>    <span class="fu">w_mean</span>(survey_data, income, <span class="at">weights =</span> sampling_weight)<span class="sc">$</span>results<span class="sc">$</span>weighted_mean</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>  )</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>)</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="fu">print</span>(comparison)</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt;     Statistic Unweighted  Weighted</span></span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co">#&gt; 1    Mean Age    50.5496   50.5144</span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="co">#&gt; 2 Mean Income  3753.9341 3743.0994</span></span></code></pre></div>
+</div>
+<div id="check-weight-impact" class="section level3">
+<h3>3. Check Weight Impact</h3>
+<p>Large differences between weighted and unweighted results indicate: -
+Sample is not representative - Weights are doing important work -
+Results would be biased without weights</p>
+</div>
+<div id="consider-variance-estimation" class="section level3">
+<h3>4. Consider Variance Estimation</h3>
+<p>Weights affect standard errors. The effective sample size shows this
+impact.</p>
+</div>
+</div>
+<div id="complete-example" class="section level2">
+<h2>Complete Example</h2>
+<p>Here’s a full weighted analysis workflow:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># 1. Check weight properties</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;=== Weight Distribution ===</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="co">#&gt; === Weight Distribution ===</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>weight_summary <span class="ot">&lt;-</span> survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">mean</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>    <span class="at">sd =</span> <span class="fu">sd</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>    <span class="at">min =</span> <span class="fu">min</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>    <span class="at">max =</span> <span class="fu">max</span>(sampling_weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>  )</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="fu">print</span>(weight_summary)</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 5</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;       n  mean    sd   min   max</span></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt; 1  2500  1.01 0.113 0.702  1.40</span></span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co"># 2. Compare weighted vs unweighted means</span></span>
+<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">=== Impact of Weights ===</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb17-20"><a href="#cb17-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-21"><a href="#cb17-21" tabindex="-1"></a><span class="co">#&gt; === Impact of Weights ===</span></span>
+<span id="cb17-22"><a href="#cb17-22" tabindex="-1"></a>vars_to_check <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>, <span class="st">&quot;life_satisfaction&quot;</span>)</span>
+<span id="cb17-23"><a href="#cb17-23" tabindex="-1"></a><span class="cf">for</span> (var <span class="cf">in</span> vars_to_check) {</span>
+<span id="cb17-24"><a href="#cb17-24" tabindex="-1"></a>  unweighted <span class="ot">&lt;-</span> <span class="fu">mean</span>(survey_data[[var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb17-25"><a href="#cb17-25" tabindex="-1"></a>  weighted_result <span class="ot">&lt;-</span> <span class="fu">w_mean</span>(survey_data, <span class="sc">!!</span><span class="fu">sym</span>(var), <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb17-26"><a href="#cb17-26" tabindex="-1"></a>  weighted <span class="ot">&lt;-</span> weighted_result<span class="sc">$</span>results<span class="sc">$</span>weighted_mean</span>
+<span id="cb17-27"><a href="#cb17-27" tabindex="-1"></a>  diff_pct <span class="ot">&lt;-</span> (weighted <span class="sc">-</span> unweighted) <span class="sc">/</span> unweighted <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb17-28"><a href="#cb17-28" tabindex="-1"></a></span>
+<span id="cb17-29"><a href="#cb17-29" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s: Unweighted=%.2f, Weighted=%.2f (%.1f%% diff)</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb17-30"><a href="#cb17-30" tabindex="-1"></a>              var, unweighted, weighted, diff_pct))</span>
+<span id="cb17-31"><a href="#cb17-31" tabindex="-1"></a>}</span>
+<span id="cb17-32"><a href="#cb17-32" tabindex="-1"></a><span class="co">#&gt; age: Unweighted=50.55, Weighted=50.51 (-0.1% diff)</span></span>
+<span id="cb17-33"><a href="#cb17-33" tabindex="-1"></a><span class="co">#&gt; income: Unweighted=3753.93, Weighted=3743.10 (-0.3% diff)</span></span>
+<span id="cb17-34"><a href="#cb17-34" tabindex="-1"></a><span class="co">#&gt; life_satisfaction: Unweighted=3.63, Weighted=3.62 (-0.1% diff)</span></span>
+<span id="cb17-35"><a href="#cb17-35" tabindex="-1"></a></span>
+<span id="cb17-36"><a href="#cb17-36" tabindex="-1"></a><span class="co"># 3. Weighted analysis by group</span></span>
+<span id="cb17-37"><a href="#cb17-37" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">=== Weighted Group Comparisons ===</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb17-38"><a href="#cb17-38" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-39"><a href="#cb17-39" tabindex="-1"></a><span class="co">#&gt; === Weighted Group Comparisons ===</span></span>
+<span id="cb17-40"><a href="#cb17-40" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb17-41"><a href="#cb17-41" tabindex="-1"></a>  <span class="fu">group_by</span>(region) <span class="sc">%&gt;%</span></span>
+<span id="cb17-42"><a href="#cb17-42" tabindex="-1"></a>  <span class="fu">describe</span>(income, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb17-43"><a href="#cb17-43" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-44"><a href="#cb17-44" tabindex="-1"></a><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
+<span id="cb17-45"><a href="#cb17-45" tabindex="-1"></a><span class="co">#&gt; ------------------------------- </span></span>
+<span id="cb17-46"><a href="#cb17-46" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-47"><a href="#cb17-47" tabindex="-1"></a><span class="co">#&gt; Group: region = East</span></span>
+<span id="cb17-48"><a href="#cb17-48" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span id="cb17-49"><a href="#cb17-49" tabindex="-1"></a><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span id="cb17-50"><a href="#cb17-50" tabindex="-1"></a><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span id="cb17-51"><a href="#cb17-51" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span id="cb17-52"><a href="#cb17-52" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-53"><a href="#cb17-53" tabindex="-1"></a><span class="co">#&gt; Group: region = West</span></span>
+<span id="cb17-54"><a href="#cb17-54" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span id="cb17-55"><a href="#cb17-55" tabindex="-1"></a><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span id="cb17-56"><a href="#cb17-56" tabindex="-1"></a><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span id="cb17-57"><a href="#cb17-57" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------------</span></span>
+<span id="cb17-58"><a href="#cb17-58" tabindex="-1"></a></span>
+<span id="cb17-59"><a href="#cb17-59" tabindex="-1"></a><span class="co"># 4. Weighted hypothesis test</span></span>
+<span id="cb17-60"><a href="#cb17-60" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">=== Weighted Statistical Test ===</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb17-61"><a href="#cb17-61" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-62"><a href="#cb17-62" tabindex="-1"></a><span class="co">#&gt; === Weighted Statistical Test ===</span></span>
+<span id="cb17-63"><a href="#cb17-63" tabindex="-1"></a>survey_data <span class="sc">%&gt;%</span></span>
+<span id="cb17-64"><a href="#cb17-64" tabindex="-1"></a>  <span class="fu">t_test</span>(income, <span class="at">group =</span> gender, <span class="at">weights =</span> sampling_weight)</span>
+<span id="cb17-65"><a href="#cb17-65" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-66"><a href="#cb17-66" tabindex="-1"></a><span class="co">#&gt; Weighted t-Test Results</span></span>
+<span id="cb17-67"><a href="#cb17-67" tabindex="-1"></a><span class="co">#&gt; ----------------------- </span></span>
+<span id="cb17-68"><a href="#cb17-68" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-69"><a href="#cb17-69" tabindex="-1"></a><span class="co">#&gt; Grouping variable: gender</span></span>
+<span id="cb17-70"><a href="#cb17-70" tabindex="-1"></a><span class="co">#&gt; Groups compared: Male vs. Female</span></span>
+<span id="cb17-71"><a href="#cb17-71" tabindex="-1"></a><span class="co">#&gt; Weights variable: sampling_weight</span></span>
+<span id="cb17-72"><a href="#cb17-72" tabindex="-1"></a><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span id="cb17-73"><a href="#cb17-73" tabindex="-1"></a><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
+<span id="cb17-74"><a href="#cb17-74" tabindex="-1"></a><span class="co">#&gt; Null hypothesis (mu): 0.000</span></span>
+<span id="cb17-75"><a href="#cb17-75" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-76"><a href="#cb17-76" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-77"><a href="#cb17-77" tabindex="-1"></a><span class="co">#&gt; --- income ---</span></span>
+<span id="cb17-78"><a href="#cb17-78" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-79"><a href="#cb17-79" tabindex="-1"></a><span class="co">#&gt;   Male: mean = 3766.999, n = 1048.0</span></span>
+<span id="cb17-80"><a href="#cb17-80" tabindex="-1"></a><span class="co">#&gt;   Female: mean = 3721.379, n = 1153.0</span></span>
+<span id="cb17-81"><a href="#cb17-81" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-82"><a href="#cb17-82" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-83"><a href="#cb17-83" tabindex="-1"></a><span class="co">#&gt; Weighted t-test Results:</span></span>
+<span id="cb17-84"><a href="#cb17-84" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span id="cb17-85"><a href="#cb17-85" tabindex="-1"></a><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff           conf_int sig</span></span>
+<span id="cb17-86"><a href="#cb17-86" tabindex="-1"></a><span class="co">#&gt;    Equal variances  0.751 2199.000   0.453     45.62 [-73.570, 164.809]    </span></span>
+<span id="cb17-87"><a href="#cb17-87" tabindex="-1"></a><span class="co">#&gt;  Unequal variances  0.751 2178.884   0.453     45.62 [-73.574, 164.813]    </span></span>
+<span id="cb17-88"><a href="#cb17-88" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span id="cb17-89"><a href="#cb17-89" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-90"><a href="#cb17-90" tabindex="-1"></a><span class="co">#&gt; Effect Sizes:</span></span>
+<span id="cb17-91"><a href="#cb17-91" tabindex="-1"></a><span class="co">#&gt; ------------ </span></span>
+<span id="cb17-92"><a href="#cb17-92" tabindex="-1"></a><span class="co">#&gt;  Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
+<span id="cb17-93"><a href="#cb17-93" tabindex="-1"></a><span class="co">#&gt;    income    0.007    0.007       0.007  negligible</span></span>
+<span id="cb17-94"><a href="#cb17-94" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-95"><a href="#cb17-95" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-96"><a href="#cb17-96" tabindex="-1"></a><span class="co">#&gt; Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05</span></span>
+<span id="cb17-97"><a href="#cb17-97" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-98"><a href="#cb17-98" tabindex="-1"></a><span class="co">#&gt; Effect Size Interpretation:</span></span>
+<span id="cb17-99"><a href="#cb17-99" tabindex="-1"></a><span class="co">#&gt; - Cohen&#39;s d: pooled standard deviation (classic)</span></span>
+<span id="cb17-100"><a href="#cb17-100" tabindex="-1"></a><span class="co">#&gt; - Hedges&#39; g: bias-corrected Cohen&#39;s d (preferred)</span></span>
+<span id="cb17-101"><a href="#cb17-101" tabindex="-1"></a><span class="co">#&gt; - Glass&#39; Delta: control group standard deviation only</span></span>
+<span id="cb17-102"><a href="#cb17-102" tabindex="-1"></a><span class="co">#&gt; - Small effect: |effect| ~ 0.2</span></span>
+<span id="cb17-103"><a href="#cb17-103" tabindex="-1"></a><span class="co">#&gt; - Medium effect: |effect| ~ 0.5</span></span>
+<span id="cb17-104"><a href="#cb17-104" tabindex="-1"></a><span class="co">#&gt; - Large effect: |effect| ~ 0.8</span></span></code></pre></div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Key takeaways about survey weights:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Always use weights</strong> when they’re provided - they
+ensure representativeness</li>
+<li><strong>Check weight properties</strong> - extreme values may need
+attention</li>
+<li><strong>Report effective N</strong> - weights reduce statistical
+power</li>
+<li><strong>Document everything</strong> - explain what weights adjust
+for</li>
+<li><strong>Compare weighted/unweighted</strong> - large differences
+indicate importance</li>
+</ol>
+<p>mariposa makes weighted analysis as easy as unweighted - just add the
+<code>weights</code> parameter!</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
