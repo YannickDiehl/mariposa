@@ -1,208 +1,201 @@
-# SurveyStat <img src="man/figures/logo.png" align="right" height="139" />
+# *mariposa*: marburg initiative for political and social analysis <img src="man/figures/logo.png" align="right" height="180" />
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/yourusername/SurveyStat/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/SurveyStat/actions/workflows/R-CMD-check.yaml)
-[![test-coverage](https://github.com/yourusername/SurveyStat/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/yourusername/SurveyStat/actions/workflows/test-coverage.yaml)
-[![Codecov test coverage](https://codecov.io/gh/yourusername/SurveyStat/branch/main/graph/badge.svg)](https://app.codecov.io/gh/yourusername/SurveyStat?branch=main)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![R-CMD-check](https://github.com/YannickDiehl/mariposa/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/YannickDiehl/mariposa/actions/workflows/R-CMD-check.yaml)
+[![test-coverage](https://github.com/YannickDiehl/mariposa/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/YannickDiehl/mariposa/actions/workflows/test-coverage.yaml)
+[![Codecov test coverage](https://codecov.io/gh/YannickDiehl/mariposa/branch/main/graph/badge.svg)](https://app.codecov.io/gh/YannickDiehl/mariposa?branch=main)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-## Overview
+## 🎯 SPSS → R Migration Made Simple
 
-**SurveyStat** is a comprehensive R package for professional statistical analysis of survey data. Designed as a production-ready framework for survey researchers, data scientists, and statistical analysts working with complex survey designs.
+**Finally, R analysis that matches SPSS exactly.**
 
-### 🎯 **Core Features**
+mariposa delivers 100% SPSS-compatible results for survey researchers migrating to R. No more explaining why your R numbers don't match SPSS. No more parallel analyses. Just identical results, every time.
 
-- **🔬 SPSS-Compatible Results**: 100% validated statistical output with SPSS (83/83 tests pass)
-- **⚖️ Survey-Weighted Statistics**: Mathematically correct weighted analysis  
-- **🔄 Tidyverse Integration**: Seamless workflow with dplyr, tidyselect, group_by()
-- **🧩 S3 Generics System**: Extensible architecture for cross-test compatibility
-- **🎨 Professional Output**: Unicode boxes, dynamic borders, publication-ready formatting
+```r
+# Your SPSS workflow, now in R
+survey_data %>%
+  t_test(satisfaction, group = gender, weights = weight)
 
-### 📊 **Statistical Framework**
+# ✓ Same test statistics
+# ✓ Same p-values
+# ✓ Same confidence intervals
+# ✓ Same weighted calculations
+```
 
-**46+ Functions across 6 core categories:**
+## Why mariposa?
 
-| Category | Functions | Description |
-|----------|-----------|-------------|
-| 🎯 **Descriptive** | `describe()`, `frequency()` | Core descriptive and frequency analysis |
-| 📈 **Hypothesis Testing** | `t_test()`, `oneway_anova()`, `mann_whitney()`, `chi_square()` | Independent and paired sample tests |
-| 🔍 **Post-Hoc Analysis** | `tukey_test()`, `emmeans()`, `levene_test()`, `mauchly_test()` | S3 generics for extended analysis |
-| 📊 **Weighted Statistics** | 11 `w_*` functions | Survey-ready weighted statistical functions |
-| 🧪 **Advanced Testing** | `rm_t_test()`, `rm_anova_test()` | Repeated measures and longitudinal analysis |
-| 🎨 **Professional Output** | Dynamic print methods | Unicode formatting, adaptive borders |
+### The Migration Challenge
+
+Moving from SPSS to R typically means:
+
+🔴 Results that don't match 
+🔴 Rewriting all validation procedures
+🔴 Learning complex survey packages with different outputs
+🔴 Losing confidence in your analyses
+
+### The mariposa Solution
+
+✅ **100% SPSS-validated** - Statistical tests match
+✅ **Familiar workflow** - Functions work like you expect
+✅ **Survey-ready** - Built-in weight handling for every function
+✅ **Production-quality output** - Publication-ready tables with proper formatting
+✅ **Tidyverse native** - Modern R workflow with dplyr integration
 
 ## Installation
 
-Install the development version from GitHub:
+```r
+# Install from GitHub
+devtools::install_github("YannickDiehl/mariposa")
 
-``` r
-# install.packages("devtools")
-devtools::install_github("yourusername/SurveyStat")
+# Load the package
+library(mariposa)
+library(dplyr)  # For modern workflow
 ```
 
 ## Quick Start
 
-Load the package and example survey data:
+### Your First Analysis
 
 ```r
-library(SurveyStat)
-library(dplyr)
-
-# Load built-in survey dataset
+# Load example survey data (2,500 respondents)
 data(survey_data)
-glimpse(survey_data)
-```
 
-## Examples
-
-### 🎯 **Descriptive Statistics**
-
-```r
-# Basic descriptive analysis with weights
-survey_data %>% 
-  describe(age, income, life_satisfaction, weights = sampling_weight)
-
-# Frequency analysis for categorical variables
-survey_data %>% 
-  frequency(gender, region, education, weights = sampling_weight)
-```
-
-### 📈 **Hypothesis Testing**
-
-```r
-# Independent samples t-test with weights
-survey_data %>% 
-  t_test(life_satisfaction, group = gender, weights = sampling_weight)
-
-# One-way ANOVA with effect sizes
-survey_data %>% 
-  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
-
-# Non-parametric Mann-Whitney test  
+# Descriptive statistics with survey weights
 survey_data %>%
-  mann_whitney(age, group = gender, weights = sampling_weight)
-```
+  describe(age, income, satisfaction, weights = sampling_weight)
 
-### 🔍 **Post-Hoc Analysis Pipeline**
-
-```r
-# Complete analysis pipeline with S3 generics
-result <- survey_data %>%
-  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
-
-# Seamless post-hoc analysis
-result %>% tukey_test()    # Multiple comparisons
-result %>% levene_test()   # Homogeneity of variance  
-result %>% emmeans()       # Estimated marginal means
-```
-
-### 📊 **Weighted Statistics**
-
-```r
-# Individual weighted statistics
-survey_data %>% w_mean(age, income, weights = sampling_weight)
-survey_data %>% w_sd(age, income, weights = sampling_weight) 
-survey_data %>% w_median(age, income, weights = sampling_weight)
-
-# Grouped weighted analysis
-survey_data %>% 
-  group_by(region) %>% 
-  w_mean(age, life_satisfaction, weights = sampling_weight)
-```
-
-### 🔄 **Grouped Analysis**
-
-```r
-# Automatic grouped operations with any function
+# Frequency table for categorical data
 survey_data %>%
-  group_by(region, education) %>%
-  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+  frequency(education, weights = sampling_weight)
 
-# Complex survey design analysis
+# Compare groups with t-test
 survey_data %>%
-  group_by(region) %>%
-  oneway_anova(income, group = education, weights = sampling_weight) %>%
-  tukey_test()
+  t_test(satisfaction, group = gender, weights = sampling_weight)
 ```
 
-## Professional Output
-
-SurveyStat produces publication-ready output with professional formatting:
+### Professional Output
 
 ```
 Weighted t-Test Results
------------------------
-
-┌─ life_satisfaction ─┐
+─────────────────────────
 
 Group: gender (Male vs. Female)
-  Male: mean = 6.89, sd = 1.85, n = 1204.4
-  Female: mean = 7.12, sd = 1.79, n = 1264.4
+  Male:   mean = 6.89, sd = 1.85, n = 1,204.4
+  Female: mean = 7.12, sd = 1.79, n = 1,264.4
 
-Weighted t-Test Results:
-----------------------------------------------
-Test         t      df    p_value  d_cohen  sig
-t-test   -2.456  2466.8     0.014    0.125    *
-----------------------------------------------
+Test Statistics:
+────────────────────────────────────────────
+Test      t      df      p_value  d_cohen  sig
+────────────────────────────────────────────
+t-test  -2.456  2466.8    0.014    0.125    *
+────────────────────────────────────────────
 
-Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+Significance codes: *** p<0.001, ** p<0.01, * p<0.05
 ```
 
-## Survey Design Support
+## Core Features
 
-**Built for real-world survey data:**
+### 📊 Statistical Functions (46+)
 
-- ✅ **Sampling Weights**: Mathematically correct weighted statistics
-- ✅ **Complex Survey Designs**: Stratification, clustering, post-stratification  
-- ✅ **Missing Data Handling**: Robust NA treatment across all functions
-- ✅ **Large Datasets**: Optimized for surveys with 10,000+ respondents
-- ✅ **SPSS Migration**: Drop-in replacement with identical results
+| Category | Functions | Purpose |
+|----------|-----------|---------|
+| **Descriptive** | `describe()`, `frequency()`, `crosstab()` | Summaries and distributions |
+| **T-Tests** | `t_test()` | Mean comparisons |
+| **ANOVA** | `oneway_anova()` | Multiple group analysis |
+| **Non-parametric** | `mann_whitney()` | Distribution-free tests |
+| **Correlation** | `pearson_cor()`, `spearman_rho()`, `kendall_tau()` | Relationships |
+| **Post-hoc** | `tukey_test()`, `scheffe_test()`, `levene_test()` | Follow-up analyses |
+| **Chi-square** | `chi_square()`, `phi()`, `cramers_v()`, `gamma()` | Categorical associations |
 
-## Comparison with Other Packages
+### ⚖️ Survey Weights Built-In
 
-| Feature | SurveyStat | Base R | survey | sjstats |
-|---------|------------|--------|--------|---------|
-| **SPSS-Compatible Results** | ✅ | ❌ | ⚠️ | ⚠️ |
-| **Weighted Statistics** | ✅ | ❌ | ✅ | ✅ |
-| **Tidyverse Integration** | ✅ | ❌ | ❌ | ✅ |
-| **S3 Generics Pipeline** | ✅ | ❌ | ❌ | ❌ |
-| **Professional Output** | ✅ | ❌ | ❌ | ⚠️ |
-| **Grouped Operations** | ✅ | ⚠️ | ❌ | ⚠️ |
+Every function handles survey weights correctly:
+
+```r
+# Weighted mean, median, SD
+survey_data %>%
+  w_mean(age, income, weights = sampling_weight)
+
+# Grouped weighted analysis
+survey_data %>%
+  group_by(region) %>%
+  describe(satisfaction, weights = sampling_weight)
+```
+
+### 🔄 Modern R Workflow
+
+Full tidyverse integration:
+
+```r
+# Complex analysis pipeline
+survey_data %>%
+  filter(age >= 18) %>%
+  group_by(region, education) %>%
+  t_test(satisfaction, group = gender, weights = sampling_weight) %>%
+  filter(p_value < 0.05)
+```
+
+### 🧩 S3 Methods for Extended Analysis
+
+Seamless post-hoc testing:
+
+```r
+# Run ANOVA
+anova_result <- survey_data %>%
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+
+# Automatic post-hoc tests
+anova_result %>% tukey_test()    # Pairwise comparisons
+anova_result %>% levene_test()   # Variance homogeneity
+```
+
+## SPSS Compatibility
+
+### Validated Against SPSS v29
+
+Every function tested across four scenarios:
+
+✓ Unweighted, ungrouped
+✓ Weighted, ungrouped
+✓ Unweighted, grouped
+✓ Weighted, grouped
+
+### Migration Example
+
+**SPSS Syntax:**
+```spss
+WEIGHT BY sampling_weight.
+T-TEST GROUPS=gender(1 2)
+  /VARIABLES=satisfaction.
+```
+
+**mariposa Equivalent:**
+```r
+survey_data %>%
+  t_test(satisfaction, group = gender, weights = sampling_weight)
+```
+
+**Result: Identical output, guaranteed.**
 
 ## Documentation
 
-- 📖 **[Function Reference](https://yourusername.github.io/SurveyStat/reference/)**: Complete documentation with examples
-- 🎓 **[Getting Started Guide](https://yourusername.github.io/SurveyStat/articles/introduction.html)**: Step-by-step tutorials
-- 📊 **[Advanced Analysis](https://yourusername.github.io/SurveyStat/articles/advanced-analysis.html)**: Complex survey designs
-- 🔧 **[SPSS Migration](https://yourusername.github.io/SurveyStat/articles/spss-migration.html)**: Side-by-side comparisons
+- 📖 [Complete Reference](https://yanndiehl.github.io/mariposa/reference/) - All functions with examples
+- 🎓 [Tutorials](https://yanndiehl.github.io/mariposa/articles/) - Step-by-step guides
+- 🔄 [SPSS Migration Guide](https://yanndiehl.github.io/mariposa/articles/spss-migration.html) - Side-by-side comparisons
+- 📊 [Survey Weights Guide](https://yanndiehl.github.io/mariposa/articles/survey-weights.html) - Weight handling explained
 
-## Getting Help
+## Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/SurveyStat/issues) with minimal reproducible examples
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/yourusername/SurveyStat/discussions) for new functionality
-- 📧 **Contact**: Professional support available for enterprise users
+- 🐛 **Issues**: [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues)
+- 💡 **Discussions**: [GitHub Discussions](https://github.com/YannickDiehl/mariposa/discussions)
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
-
-- Code style and standards
-- Testing requirements  
-- Documentation guidelines
-- Development workflow
-
-## Citation
-
-```r
-citation("SurveyStat")
-```
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT © Yannick Diehl
 
 ---
 
-**SurveyStat** - Professional Statistical Analysis for Survey Data  
-*Developed with ❤️ for survey researchers*
+**mariposa** - When your R results must match SPSS exactly.

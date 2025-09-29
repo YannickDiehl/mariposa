@@ -23,7 +23,7 @@
 ^.*\.DS_Store$
 ^.*\.backup$
 ^.*\.Rcheck$
-^SurveyStat\.Rcheck$
+^mariposa\.Rcheck$
 ^\.\./
 ^.*_backup\.R$
 ^test_results\.txt$
@@ -34,7 +34,8 @@
 ^R/laterImplementation$
 ^Test\.R$
 ^test_.*\.R$
-^SurveyStat_.*\.tar\.gz$
+^mariposa_.*\.tar\.gz$
+^R/create_hex_logo\.R$
 ^CLAUDE\.md$
 ^laterImplementation$
 ^DECISIONS\.md$

@@ -2,7 +2,7 @@
 # PRINT METHOD STYLE GUIDE AND HELPER FUNCTIONS
 # =============================================================================
 # This file contains standardized helper functions and the style guide for
-# all print methods in the SurveyStat package.
+# all print methods in the mariposa package.
 #
 # STYLE GUIDE:
 # 1. Headers: Title with dash separator matching title length

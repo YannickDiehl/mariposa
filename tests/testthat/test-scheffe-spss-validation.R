@@ -15,7 +15,7 @@
 
 library(testthat)
 library(dplyr)
-library(SurveyStat)
+library(mariposa)
 
 # Load test data
 data(survey_data)

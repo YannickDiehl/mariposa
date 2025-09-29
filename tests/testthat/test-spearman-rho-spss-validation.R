@@ -26,7 +26,7 @@
 
 library(testthat)
 library(dplyr)
-library(SurveyStat)
+library(mariposa)
 
 # ============================================================================
 # GLOBAL TRACKING FOR VALIDATION REPORT
