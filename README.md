@@ -30,18 +30,18 @@ survey_data %>%
 
 Moving from SPSS to R typically means:
 
-🔴 Results that don't match 
-🔴 Rewriting all validation procedures
-🔴 Learning complex survey packages with different outputs
-🔴 Losing confidence in your analyses
+- 🔴 Results that don't match 
+- 🔴 Rewriting all validation procedures
+- 🔴 Learning complex survey packages with different outputs
+- 🔴 Losing confidence in your analyses
 
 ### The mariposa Solution
 
-✅ **100% SPSS-validated** - Statistical tests match
-✅ **Familiar workflow** - Functions work like you expect
-✅ **Survey-ready** - Built-in weight handling for every function
-✅ **Production-quality output** - Publication-ready tables with proper formatting
-✅ **Tidyverse native** - Modern R workflow with dplyr integration
+- ✅ **100% SPSS-validated** - Statistical tests match
+- ✅ **Familiar workflow** - Functions work like you expect
+- ✅ **Survey-ready** - Built-in weight handling for every function
+- ✅ **Production-quality output** - Publication-ready tables with proper formatting
+- ✅ **Tidyverse native** - Modern R workflow with dplyr integration
 
 ## Installation
 
@@ -78,21 +78,36 @@ survey_data %>%
 ### Professional Output
 
 ```
-Weighted t-Test Results
-─────────────────────────
+t-Test Results
+-------------- 
 
-Group: gender (Male vs. Female)
-  Male:   mean = 6.89, sd = 1.85, n = 1,204.4
-  Female: mean = 7.12, sd = 1.79, n = 1,264.4
+Grouping variable: gender
+Groups compared: Male vs. Female
+Confidence level: 95.0%
+Alternative hypothesis: two.sided
+Null hypothesis (mu): 0.000
 
-Test Statistics:
-────────────────────────────────────────────
-Test      t      df      p_value  d_cohen  sig
-────────────────────────────────────────────
-t-test  -2.456  2466.8    0.014    0.125    *
-────────────────────────────────────────────
 
-Significance codes: *** p<0.001, ** p<0.01, * p<0.05
+--- life_satisfaction ---
+
+  Male: mean = 3.603, n = 1149.0
+  Female: mean = 3.651, n = 1272.0
+
+
+t-test Results:
+-------------------------------------------------------------------------------- 
+        Assumption t_stat       df p_value mean_diff        conf_int sig
+   Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    
+ Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    
+-------------------------------------------------------------------------------- 
+
+Effect Sizes:
+------------ 
+          Variable Cohens_d Hedges_g Glass_Delta Effect_Size
+ life_satisfaction   -0.041   -0.041      -0.041  negligible
+
+
+Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 ## Core Features
@@ -157,10 +172,10 @@ anova_result %>% levene_test()   # Variance homogeneity
 
 Every function tested across four scenarios:
 
-✓ Unweighted, ungrouped
-✓ Weighted, ungrouped
-✓ Unweighted, grouped
-✓ Weighted, grouped
+- ✓ Unweighted, ungrouped
+- ✓ Weighted, ungrouped
+- ✓ Unweighted, grouped
+- ✓ Weighted, grouped
 
 ### Migration Example
 
