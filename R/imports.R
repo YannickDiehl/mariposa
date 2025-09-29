@@ -5,7 +5,8 @@
 # This file contains all necessary @importFrom statements to make the package functional
 
 #' @importFrom rlang enquo quo_is_null as_name expr %||% enquos syms sym quo eval_tidy
-#' @importFrom dplyr group_vars group_modify select all_of distinct ungroup arrange desc group_by summarise group_split bind_rows group_keys mutate filter across rowwise c_across
+#' @importFrom dplyr %>% group_vars group_modify select all_of distinct ungroup arrange desc group_by summarise group_split bind_rows group_keys mutate across rowwise c_across
+#' @importFrom purrr map2
 #' @importFrom tidyselect eval_select starts_with ends_with contains where all_of any_of
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble tibble as_tibble
