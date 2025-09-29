@@ -1,0 +1,409 @@
+---
+title: "Understanding Relationships: Correlation Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Understanding Relationships: Correlation Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mariposa)
+library(dplyr)
+data(survey_data)
+```
+
+## What is Correlation?
+
+Correlation measures how two variables are related. When one goes up, does the other tend to go up (positive correlation) or down (negative correlation)?
+
+mariposa provides three correlation methods:
+- **Pearson**: For linear relationships between continuous variables
+- **Spearman**: For monotonic relationships (doesn't have to be linear)
+- **Kendall**: For ordinal data or when you have many ties
+
+## Pearson Correlation
+
+### Basic Usage
+
+Measure linear correlation between age and income:
+
+```{r}
+survey_data %>%
+  pearson_cor(age, income)
+```
+
+Interpretation:
+- **r = 1**: Perfect positive correlation
+- **r = 0**: No linear relationship
+- **r = -1**: Perfect negative correlation
+
+### With Survey Weights
+
+Get population-representative correlations:
+
+```{r}
+survey_data %>%
+  pearson_cor(age, income, weights = sampling_weight)
+```
+
+### Multiple Variables
+
+Create a correlation matrix:
+
+```{r}
+# Correlate all trust variables
+survey_data %>%
+  pearson_cor(trust_government, trust_media, trust_science,
+              weights = sampling_weight)
+```
+
+### Grouped Analysis
+
+Calculate correlations within groups:
+
+```{r}
+survey_data %>%
+  group_by(region) %>%
+  pearson_cor(age, income, weights = sampling_weight)
+```
+
+### With Confidence Intervals
+
+Get confidence intervals for correlations:
+
+```{r}
+survey_data %>%
+  pearson_cor(age, income,
+              conf.level = 0.95,
+              weights = sampling_weight)
+```
+
+## Spearman Correlation
+
+### When to Use
+
+Use Spearman when:
+- Relationship is monotonic but not linear
+- Data contains outliers
+- Variables are ordinal
+
+### Basic Usage
+
+```{r}
+# Correlation between ordinal variables
+survey_data %>%
+  spearman_rho(political_orientation, environmental_concern)
+```
+
+### With Weights
+
+```{r}
+survey_data %>%
+  spearman_rho(political_orientation, environmental_concern,
+               weights = sampling_weight)
+```
+
+### Multiple Variables
+
+```{r}
+# Create rank correlation matrix
+survey_data %>%
+  spearman_rho(political_orientation, environmental_concern,
+               life_satisfaction, trust_government,
+               weights = sampling_weight)
+```
+
+## Kendall's Tau
+
+### When to Use
+
+Use Kendall when:
+- Data is ordinal
+- Sample size is small
+- Many tied values exist
+
+### Basic Usage
+
+```{r}
+survey_data %>%
+  kendall_tau(political_orientation, life_satisfaction)
+```
+
+### With Weights
+
+```{r}
+survey_data %>%
+  kendall_tau(political_orientation, life_satisfaction,
+              weights = sampling_weight)
+```
+
+## Interpreting Correlations
+
+### Strength Guidelines
+
+| Correlation | Interpretation |
+|------------|---------------|
+| 0.0 - 0.3  | Weak |
+| 0.3 - 0.7  | Moderate |
+| 0.7 - 1.0  | Strong |
+
+Remember: These are rough guidelines. Context matters!
+
+### Statistical Significance
+
+Check the p-value:
+- **p < 0.05**: Correlation is statistically significant
+- **p ≥ 0.05**: Could be due to chance
+
+```{r}
+# Example with interpretation
+result <- survey_data %>%
+  pearson_cor(age, income, weights = sampling_weight)
+
+# Check structure and extract values properly
+if (!is.null(result) && !is.null(result$correlations) && nrow(result$correlations) > 0) {
+  p_value <- result$correlations$p_value[1]
+  estimate <- result$correlations$correlation[1]
+
+  if (!is.na(p_value) && p_value < 0.05) {
+    cat("Age and income are significantly correlated (r =",
+        round(estimate, 3), ", p =", round(p_value, 4), ")\n")
+  } else {
+    cat("No significant correlation between age and income\n")
+  }
+}
+```
+
+### Correlation ≠ Causation
+
+Important reminders:
+- Correlation doesn't imply causation
+- Third variables might explain the relationship
+- Direction of causality is unknown
+
+## Visualizing Correlations
+
+### Correlation Matrix
+
+When examining multiple variables:
+
+```{r}
+# Calculate correlations among multiple variables
+cor_matrix <- survey_data %>%
+  pearson_cor(age, income, life_satisfaction,
+              trust_government, trust_media, trust_science,
+              weights = sampling_weight)
+
+print(cor_matrix)
+```
+
+### Grouped Correlations
+
+Compare correlations across groups:
+
+```{r}
+# How does age-income correlation vary by region?
+regional_cors <- survey_data %>%
+  group_by(region) %>%
+  pearson_cor(age, income, weights = sampling_weight)
+
+print(regional_cors)
+```
+
+## Choosing the Right Method
+
+### Decision Tree
+
+1. **Are both variables continuous?**
+   - Yes → Consider Pearson
+   - No → Go to step 2
+
+2. **Are variables ordinal or ranked?**
+   - Yes → Use Spearman or Kendall
+   - No → Correlation may not be appropriate
+
+3. **Is the relationship linear?**
+   - Yes → Use Pearson
+   - No, but monotonic → Use Spearman
+   - Many ties → Use Kendall
+
+### Comparison Example
+
+Let's compare all three methods:
+
+```{r}
+# Pearson correlation
+pearson_result <- survey_data %>%
+  pearson_cor(life_satisfaction, income, weights = sampling_weight)
+
+# Spearman correlation
+spearman_result <- survey_data %>%
+  spearman_rho(life_satisfaction, income, weights = sampling_weight)
+
+# Kendall correlation
+kendall_result <- survey_data %>%
+  kendall_tau(life_satisfaction, income, weights = sampling_weight)
+
+# Compare results
+comparison <- data.frame(
+  Method = c("Pearson", "Spearman", "Kendall"),
+  Correlation = c(pearson_result$correlations$correlation[1],
+                  spearman_result$correlations$correlation[1],
+                  kendall_result$correlations$correlation[1]),
+  P_Value = c(pearson_result$correlations$p_value[1],
+              spearman_result$correlations$p_value[1],
+              kendall_result$correlations$p_value[1])
+)
+
+print(comparison)
+```
+
+## Common Patterns in Survey Data
+
+### Age and Attitudes
+
+```{r}
+# How age relates to various attitudes
+age_correlations <- survey_data %>%
+  pearson_cor(age, political_orientation, environmental_concern,
+              life_satisfaction, trust_government,
+              weights = sampling_weight)
+
+print(age_correlations)
+```
+
+### Income Effects
+
+```{r}
+# Income's relationship with satisfaction and trust
+income_correlations <- survey_data %>%
+  pearson_cor(income, life_satisfaction, trust_government,
+              trust_media, trust_science,
+              weights = sampling_weight)
+
+print(income_correlations)
+```
+
+## Advanced Topics
+
+### Partial Correlation
+
+When you want to control for a third variable:
+
+```{r}
+# Note: mariposa focuses on bivariate correlations
+# For partial correlations, combine with regression approaches
+
+# Example: Age-income correlation might be confounded by education
+# First, check bivariate correlations
+survey_data %>%
+  group_by(education) %>%
+  pearson_cor(age, income, weights = sampling_weight)
+```
+
+### Non-Linear Relationships
+
+If correlation is weak but you suspect a relationship:
+
+```{r}
+# Check for non-linear patterns
+# Low correlation doesn't mean no relationship
+
+# Example: Life satisfaction might have U-shaped relationship with age
+young <- survey_data %>% filter(age < 30)
+middle <- survey_data %>% filter(age >= 30 & age < 60)
+older <- survey_data %>% filter(age >= 60)
+
+cat("Correlation in young adults:\n")
+young %>% pearson_cor(age, life_satisfaction, weights = sampling_weight)
+
+cat("\nCorrelation in middle-aged:\n")
+middle %>% pearson_cor(age, life_satisfaction, weights = sampling_weight)
+
+cat("\nCorrelation in older adults:\n")
+older %>% pearson_cor(age, life_satisfaction, weights = sampling_weight)
+```
+
+## Complete Example
+
+Here's a comprehensive correlation analysis workflow:
+
+```{r}
+# 1. Explore all correlations
+cat("=== Correlation Matrix ===\n")
+cor_matrix <- survey_data %>%
+  pearson_cor(age, income, life_satisfaction,
+              political_orientation, environmental_concern,
+              weights = sampling_weight)
+print(cor_matrix)
+
+# 2. Focus on significant correlations
+cat("\n=== Significant Correlations (p < 0.05) ===\n")
+significant_cors <- cor_matrix$correlations %>%
+  filter(p_value < 0.05) %>%
+  arrange(desc(abs(correlation)))
+print(significant_cors)
+
+# 3. Compare methods for key relationship
+cat("\n=== Method Comparison: Income vs Life Satisfaction ===\n")
+pearson <- survey_data %>%
+  pearson_cor(income, life_satisfaction, weights = sampling_weight)
+spearman <- survey_data %>%
+  spearman_rho(income, life_satisfaction, weights = sampling_weight)
+
+if (!is.null(pearson$correlations) && nrow(pearson$correlations) > 0) {
+  corr_val <- pearson$correlations$correlation[1]
+  p_val <- pearson$correlations$p_value[1]
+  if (!is.null(corr_val) && !is.na(corr_val) && !is.null(p_val) && !is.na(p_val)) {
+    cat("Pearson r =", round(corr_val, 3),
+        "(p =", round(p_val, 4), ")\n")
+  }
+}
+if (!is.null(spearman$correlations) && nrow(spearman$correlations) > 0) {
+  corr_val <- spearman$correlations$correlation[1]
+  p_val <- spearman$correlations$p_value[1]
+  if (!is.null(corr_val) && !is.na(corr_val) && !is.null(p_val) && !is.na(p_val)) {
+    cat("Spearman rho =", round(corr_val, 3),
+        "(p =", round(p_val, 4), ")\n")
+  }
+}
+
+# 4. Group differences
+cat("\n=== Regional Differences in Age-Income Correlation ===\n")
+survey_data %>%
+  group_by(region) %>%
+  pearson_cor(age, income, weights = sampling_weight)
+```
+
+## Reporting Results
+
+### Professional Format
+
+"There was a moderate positive correlation between age and income (r = 0.34, 95% CI [0.29, 0.39], p < .001), indicating that older respondents tended to report higher incomes."
+
+### What to Include
+- Correlation coefficient (r, ρ, or τ)
+- Confidence interval
+- p-value
+- Sample size or effective N
+- Whether weights were used
+
+## Summary
+
+Key points about correlations:
+
+1. **Choose the right method**: Pearson for linear, Spearman for monotonic, Kendall for ordinal
+2. **Use weights**: Ensure representativeness with survey weights
+3. **Check significance**: But remember effect size matters too
+4. **Avoid over-interpretation**: Correlation ≠ causation
+5. **Consider context**: Domain knowledge helps interpret strength
+
+mariposa makes correlation analysis straightforward while ensuring proper handling of survey weights!

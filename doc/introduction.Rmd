@@ -1,0 +1,298 @@
+---
+title: "Introduction to mariposa"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to mariposa}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mariposa)
+library(dplyr)
+```
+
+## What is mariposa?
+
+mariposa (Marburg Initiative for Political and Social Analysis) makes it easy to analyze survey data in R. Whether you're working with customer satisfaction surveys, social research, or market research data, this package helps you get insights quickly and accurately.
+
+The package handles the complexities of survey analysis for you - things like sampling weights, grouped comparisons, and missing data are all taken care of automatically.
+
+## Getting Started
+
+Let's start with a simple example. We'll use the included survey data which contains responses from 2,500 people about their life satisfaction, demographics, and opinions.
+
+```{r}
+# Load the example survey data
+data(survey_data)
+
+# Take a quick look at what we have
+glimpse(survey_data)
+```
+
+## Understanding Your Data
+
+### Getting Summary Statistics
+
+Want to know the average age or income in your survey? The `describe()` function gives you a complete summary:
+
+```{r}
+# Get a summary of age and income
+# The weights ensure results represent the population correctly
+survey_data %>%
+  describe(age, income, weights = sampling_weight)
+```
+
+This shows you:
+- **n**: How many valid responses
+- **mean**: The average value
+- **sd**: Standard deviation (how spread out values are)
+- **median**: The middle value
+- **range**: Minimum and maximum values
+
+### Looking at Categories
+
+For categorical data like education or employment status, use `frequency()`:
+
+```{r}
+survey_data %>%
+  frequency(education, weights = sampling_weight)
+```
+
+This tells you:
+- How many people are in each category
+- What percentage they represent
+- Cumulative percentages
+
+## Comparing Groups
+
+### Are There Differences?
+
+Want to know if men and women differ in life satisfaction? Use a t-test:
+
+```{r}
+survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+```
+
+If the p-value is less than 0.05, there's a statistically significant difference.
+
+### Multiple Group Comparisons
+
+When you have more than two groups, use ANOVA:
+
+```{r}
+survey_data %>%
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+```
+
+## Finding Relationships
+
+### Correlation Analysis
+
+Are age and income related? Check their correlation:
+
+```{r}
+survey_data %>%
+  pearson_cor(age, income, weights = sampling_weight)
+```
+
+- Positive correlation: As one goes up, the other tends to go up
+- Negative correlation: As one goes up, the other tends to go down
+- Near zero: No linear relationship
+
+### Cross-tabulation
+
+See how two categorical variables relate:
+
+```{r}
+survey_data %>%
+  crosstab(education, employment, weights = sampling_weight)
+```
+
+## Working with Groups
+
+### Regional Analysis
+
+Compare statistics across regions easily:
+
+```{r}
+survey_data %>%
+  group_by(region) %>%
+  describe(income, life_satisfaction, weights = sampling_weight)
+```
+
+### Multiple Tests at Once
+
+Test several variables simultaneously:
+
+```{r}
+survey_data %>%
+  t_test(trust_government, trust_media, trust_science,
+         group = gender, weights = sampling_weight)
+```
+
+## Why Weights Matter
+
+Survey weights make your results representative of the population. Here's the difference they make:
+
+```{r}
+# Without weights - just your sample
+unweighted <- mean(survey_data$age, na.rm = TRUE)
+
+# With weights - represents the population
+weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
+weighted <- weighted_result$results$weighted_mean
+
+cat("Sample average age:", round(unweighted, 1), "\n")
+cat("Population average age:", round(weighted, 1), "\n")
+cat("Difference:", round(weighted - unweighted, 1), "years\n")
+```
+
+## Common Analysis Workflow
+
+Here's a typical analysis pattern:
+
+```{r}
+# 1. Start with descriptive statistics
+cat("=== Basic Summary ===\n")
+survey_data %>%
+  describe(life_satisfaction, weights = sampling_weight)
+
+# 2. Check distribution across groups
+cat("\n=== By Education Level ===\n")
+survey_data %>%
+  group_by(education) %>%
+  describe(life_satisfaction, weights = sampling_weight)
+
+# 3. Test for significant differences
+cat("\n=== Statistical Test ===\n")
+result <- survey_data %>%
+  oneway_anova(life_satisfaction, group = education,
+               weights = sampling_weight)
+print(result)
+
+# 4. If significant, see which groups differ
+# Check if result has p_value column (data frame structure)
+if (!is.null(result) && "p_value" %in% names(result) && result$p_value[1] < 0.05) {
+  cat("\n=== Post-hoc Comparisons ===\n")
+  tukey_test(result)
+}
+```
+
+## Tips for Success
+
+### 1. Always Start with Descriptives
+Before running tests, understand your data:
+```{r}
+survey_data %>%
+  describe(income, show = "all", weights = sampling_weight)
+```
+
+### 2. Check Your Assumptions
+Many tests assume normal distribution. Check skewness:
+- Skewness near 0: Roughly normal
+- Skewness > 1 or < -1: Quite skewed
+
+### 3. Use Appropriate Tests
+- **Continuous data** (age, income): t-test, ANOVA, Pearson correlation
+- **Ordinal data** (ratings): Mann-Whitney, Spearman correlation
+- **Categorical data** (yes/no): Chi-square test
+
+### 4. Report Effect Sizes
+Statistical significance doesn't always mean practical importance. Check effect sizes!
+
+## Getting Help
+
+### Function Documentation
+
+Every function has detailed help:
+```r
+?describe
+?t_test
+?pearson_cor
+```
+
+### Vignettes
+
+For detailed guides:
+- `vignette("descriptive-statistics")` - Deep dive into summaries and frequencies
+- `vignette("hypothesis-testing")` - All about comparing groups
+- `vignette("correlation-analysis")` - Understanding relationships
+- `vignette("survey-weights")` - Working with weighted data
+
+### Workflow Example
+
+Here's how to analyze a survey question from start to finish:
+
+```{r}
+# Question: Does income relate to life satisfaction?
+
+# 1. Look at both variables
+cat("=== Income Summary ===\n")
+survey_data %>%
+  describe(income, weights = sampling_weight)
+
+cat("\n=== Life Satisfaction Summary ===\n")
+survey_data %>%
+  describe(life_satisfaction, weights = sampling_weight)
+
+# 2. Check correlation
+cat("\n=== Correlation ===\n")
+cor_result <- survey_data %>%
+  pearson_cor(income, life_satisfaction, weights = sampling_weight)
+print(cor_result)
+
+# 3. Interpret
+if (!is.null(cor_result) && "p_value" %in% names(cor_result) && cor_result$p_value[1] < 0.05) {
+  if (cor_result$correlation[1] > 0) {
+    cat("\nHigher income is associated with greater life satisfaction.\n")
+  } else {
+    cat("\nHigher income is associated with lower life satisfaction.\n")
+  }
+  cat("Correlation strength:", round(cor_result$correlation[1], 2),
+      "(", ifelse(abs(cor_result$correlation[1]) < 0.3, "weak",
+                  ifelse(abs(cor_result$correlation[1]) < 0.7, "moderate", "strong")),
+      ")\n")
+} else {
+  cat("\nNo significant relationship found between income and life satisfaction.\n")
+}
+```
+
+## Next Steps
+
+Now that you understand the basics:
+
+1. **Explore your own data** - Start with `describe()` and `frequency()`
+2. **Test your hypotheses** - Use t-tests, ANOVA, or chi-square
+3. **Dig deeper** - Check out the other vignettes for advanced techniques
+4. **Stay accurate** - Always use weights when provided
+
+Remember: Good analysis tells a story. Start broad, then focus on what's interesting!
+
+## Quick Reference
+
+| Task | Function | Example |
+|------|----------|---------|
+| Summarize numeric | `describe()` | `describe(age, income)` |
+| Count categories | `frequency()` | `frequency(education)` |
+| Compare 2 groups | `t_test()` | `t_test(income, group = gender)` |
+| Compare 3+ groups | `oneway_anova()` | `oneway_anova(income, group = education)` |
+| Test association | `chi_square()` | `chi_square(education, employment)` |
+| Measure correlation | `pearson_cor()` | `pearson_cor(age, income)` |
+| Cross-tabulate | `crosstab()` | `crosstab(education, region)` |
+
+All functions support:
+- ✓ Survey weights via `weights = `
+- ✓ Grouped analysis via `group_by()`
+- ✓ Multiple variables at once
+- ✓ Missing data handling
+
+Welcome to mariposa - happy analyzing!

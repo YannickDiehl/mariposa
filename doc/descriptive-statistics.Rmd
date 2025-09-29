@@ -1,0 +1,254 @@
+---
+title: "Descriptive Statistics and Frequencies"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Descriptive Statistics and Frequencies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mariposa)
+library(dplyr)
+data(survey_data)
+```
+
+## What Does This Do?
+
+Descriptive statistics help you understand your data before doing any complex analysis. Think of it as getting to know your survey responses - what's typical, what's unusual, and how spread out the answers are.
+
+The main functions covered here:
+- `describe()` - Get a complete summary of numeric variables
+- `frequency()` - See how many people chose each option
+- `crosstab()` - Compare responses across two categorical variables
+
+## Getting Summary Statistics
+
+### Basic Usage
+
+The simplest way to get descriptive statistics:
+
+```{r}
+survey_data %>% describe(age)
+```
+
+This gives you the mean, median, standard deviation, and other key statistics for age.
+
+### Multiple Variables at Once
+
+Analyze several variables together:
+
+```{r}
+survey_data %>%
+  describe(age, income, life_satisfaction)
+```
+
+### With Survey Weights
+
+To get population-representative statistics:
+
+```{r}
+survey_data %>%
+  describe(age, income, life_satisfaction,
+           weights = sampling_weight)
+```
+
+The weighted results better represent your target population.
+
+### Grouped Analysis
+
+Compare statistics across groups:
+
+```{r}
+survey_data %>%
+  group_by(region) %>%
+  describe(age, income, weights = sampling_weight)
+```
+
+### Customizing Output
+
+Choose which statistics to display:
+
+```{r}
+# Just the essentials
+survey_data %>%
+  describe(age, income, show = c("mean", "sd", "range"))
+
+# Everything available
+survey_data %>%
+  describe(age, show = "all")
+```
+
+## Frequency Tables
+
+### Basic Frequency
+
+For categorical variables, use `frequency()`:
+
+```{r}
+survey_data %>%
+  frequency(education)
+```
+
+### With Percentages
+
+The output shows:
+- **Frequency**: How many people gave each answer
+- **Percent**: Percentage including missing values
+- **Valid Percent**: Percentage excluding missing values
+- **Cumulative Percent**: Running total of valid percentages
+
+### Weighted Frequencies
+
+Include survey weights for representative results:
+
+```{r}
+survey_data %>%
+  frequency(education, weights = sampling_weight)
+```
+
+### Multiple Variables
+
+Analyze several categorical variables:
+
+```{r}
+survey_data %>%
+  frequency(education, employment, region,
+            weights = sampling_weight)
+```
+
+### Grouped Frequencies
+
+See how distributions vary by group:
+
+```{r}
+survey_data %>%
+  group_by(gender) %>%
+  frequency(education, weights = sampling_weight)
+```
+
+## Cross-tabulation
+
+### Basic Crosstab
+
+Examine relationships between two categorical variables:
+
+```{r}
+survey_data %>%
+  crosstab(education, employment)
+```
+
+### Understanding the Output
+
+Crosstabs show:
+- Count in each cell
+- Row percentages (sum to 100% across rows)
+- Column percentages (sum to 100% down columns)
+- Cell percentages (percentage of total)
+
+### Weighted Crosstabs
+
+Include survey weights:
+
+```{r}
+survey_data %>%
+  crosstab(education, employment, weights = sampling_weight)
+```
+
+### Grouped Crosstabs
+
+Create separate crosstabs for each group:
+
+```{r}
+survey_data %>%
+  group_by(region) %>%
+  crosstab(education, employment, weights = sampling_weight)
+```
+
+## Practical Tips
+
+### 1. Always Check Your Data First
+
+Start with basic descriptives to spot issues:
+
+```{r}
+# Check for outliers and missing data
+survey_data %>%
+  describe(age, income, show = "all")
+```
+
+Look for:
+- Data entry errors (impossible values)
+- Missing data patterns
+- Distribution issues (extreme skewness)
+
+### 2. Use Weights When Available
+Unweighted results can be misleading. Here's a comparison:
+
+```{r}
+# Compare weighted vs unweighted
+unweighted_mean <- survey_data %>%
+  summarise(mean_age = mean(age, na.rm = TRUE)) %>%
+  pull()
+
+weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
+
+cat("Unweighted mean age:", unweighted_mean, "\n")
+cat("Weighted mean age:", weighted_result$results$weighted_mean, "\n")
+```
+
+### 3. Report the Right Percentage
+- Use **Valid %** when missing values are truly missing (skip patterns)
+- Use **Raw %** when "no response" is meaningful
+
+### 4. Consider Your Audience
+- For technical audiences: Include SD, skewness, kurtosis
+- For general audiences: Focus on mean, median, percentages
+
+## Complete Example
+
+Here's a typical descriptive analysis workflow:
+
+```{r}
+# 1. Overall summary
+cat("=== Overall Summary ===\n")
+survey_data %>%
+  describe(age, income, life_satisfaction,
+           weights = sampling_weight,
+           show = "short")
+
+# 2. Check distributions
+cat("\n=== Key Frequencies ===\n")
+survey_data %>%
+  frequency(education, employment,
+            weights = sampling_weight)
+
+# 3. Examine relationships
+cat("\n=== Education by Employment ===\n")
+survey_data %>%
+  crosstab(education, employment,
+           weights = sampling_weight)
+
+# 4. Group comparisons
+cat("\n=== Regional Differences ===\n")
+survey_data %>%
+  group_by(region) %>%
+  describe(income, life_satisfaction,
+           weights = sampling_weight)
+```
+
+## Next Steps
+
+Now that you understand your data's basic patterns:
+- Test hypotheses with `t_test()` or `chi_square()`
+- Explore relationships with `pearson_cor()` or `spearman_rho()`
+- Build models based on these insights
+
+Remember: Good analysis starts with understanding your data!
