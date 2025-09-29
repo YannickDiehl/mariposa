@@ -1,39 +1,62 @@
 
-#' Comprehensive Descriptive Statistics
+#' Get to Know Your Numeric Data
 #'
-#' Calculate comprehensive descriptive statistics for numeric variables with optional 
-#' weighting support. Handles grouped data and multiple variables simultaneously.
-#' All calculations are performed using mathematically correct weighted formulas
-#' with appropriate bias corrections.
+#' @description
+#' \code{describe()} gives you a complete summary of numeric variables - like age,
+#' income, or satisfaction scores. It's your first step in any analysis, helping you
+#' understand what's typical, what's unusual, and how spread out your data is.
 #'
-#' @param data A data frame
-#' @param ... Variable names (unquoted) or tidyselect expressions
-#' @param weights Name of the weights variable (unquoted). If NULL, unweighted analysis is performed
-#' @param show Character vector indicating which statistics to include:
+#' Think of it as a health check for your data that reveals:
+#' - What's the average value?
+#' - What's the middle value?
+#' - How spread out are the responses?
+#' - Are there unusual patterns or outliers?
+#'
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to summarize. List them separated by
+#'   commas, or use helpers like \code{starts_with("trust")}
+#' @param weights Optional survey weights to get population-representative statistics.
+#'   Without weights, you describe your sample. With weights, you describe the population.
+#' @param show Which statistics to display:
 #'   \itemize{
-#'     \item "all" - All available statistics
-#'     \item "short" (default) - Core statistics: mean, median, sd, range, iqr, skewness
-#'     \item Custom vector - Specific statistics: "mean", "median", "sd", "se", "var", 
-#'           "range", "iqr", "skew", "kurtosis", "mode", "quantiles"
+#'     \item \code{"short"} (default): Essential stats (mean, median, SD, range, IQR, skewness)
+#'     \item \code{"all"}: Everything including variance, kurtosis, mode, quantiles
+#'     \item Custom list: Choose specific stats like \code{c("mean", "sd", "range")}
 #'   }
-#' @param probs Numeric vector of probabilities for quantiles (default: c(0.25, 0.5, 0.75))
-#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
-#' @param excess Logical; if TRUE returns excess kurtosis (kurtosis - 3), 
-#'               if FALSE returns raw kurtosis (default: TRUE)
+#' @param probs For quantiles, which percentiles to show (default: 25th, 50th, 75th)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param excess For kurtosis, show excess kurtosis? (Default: TRUE, easier to interpret)
 #'
-#' @return A describe object containing comprehensive descriptive statistics
-#' 
+#' @return A summary table with descriptive statistics for each variable
+#'
 #' @details
-#' The function automatically detects whether weights are provided and applies appropriate
-#' statistical methods:
-#' \itemize{
-#'   \item \strong{Unweighted}: Standard R statistical functions with bias corrections
-#'   \item \strong{Weighted}: Mathematically correct weighted formulas with effective sample size calculations
-#' }
-#' 
-#' For weighted analyses, the function calculates effective sample size and applies
-#' appropriate bias corrections. Missing weights trigger warnings and fallback to
-#' unweighted calculations.
+#' ## Understanding the Output
+#'
+#' Key statistics and what they tell you:
+#' - **n**: How many valid responses (watch for too many missing)
+#' - **Mean**: The average value
+#' - **Median**: The middle value (half above, half below)
+#' - **SD**: Standard deviation - how spread out values are
+#' - **Range**: The minimum and maximum values
+#' - **IQR**: Interquartile range - the middle 50% of values
+#' - **Skewness**: Whether data leans left (negative) or right (positive)
+#' - **Kurtosis**: Whether you have unusual outliers
+#'
+#' ## When to Use This
+#'
+#' Always start here! Use \code{describe()} to:
+#' - Check data quality (impossible values?)
+#' - Understand distributions before testing
+#' - Spot outliers that might affect analyses
+#' - Compare groups side by side
+#'
+#' ## Interpreting Patterns
+#'
+#' - **Mean ≈ Median**: Data is roughly symmetric
+#' - **Mean > Median**: Right-skewed (tail extends right)
+#' - **Mean < Median**: Left-skewed (tail extends left)
+#' - **Large SD**: Responses vary widely
+#' - **Small SD**: Responses are similar
 #'
 #' @examples
 #' # Load required packages and data
@@ -617,31 +640,25 @@ describe <- function(data, ..., weights = NULL,
 #' @param ... Additional arguments (currently unused)
 #' @export
 print.describe <- function(x, ...) {
-  
+
   # Determine if weighted analysis
   is_weighted <- !is.null(x$weights)
-  
-  # Print header
-  header_text <- if (is_weighted) "Weighted Descriptive" else "Descriptive"
-  .print_header(header_text)
-  
+
+  # Print header using standardized helper
+  title <- get_standard_title("Descriptive", x$weights, "Statistics")
+  print_header(title)
+
   # Print results based on grouping
   if (x$grouped) {
     .print_grouped_results(x, is_weighted)
   } else {
     .print_ungrouped_results(x, is_weighted)
   }
-  
+
   invisible(x)
 }
 
-#' Print header with title and separator line
-#' @keywords internal
-.print_header <- function(title) {
-  cat("\n")
-  cat(title, "Statistics\n")
-  cat(paste(rep("-", nchar(title) + 11), collapse = ""), "\n")
-}
+# Note: .print_header function removed - using standardized print_header from print_helpers.R
 
 #' Print results for ungrouped data
 #' @keywords internal
@@ -650,7 +667,7 @@ print.describe <- function(x, ...) {
   print(output_df, row.names = FALSE)
   
   # Print footer border
-  cat(.get_border(output_df), "\n")
+  print_separator(get_table_width(output_df))
 }
 
 #' Print results for grouped data
@@ -673,15 +690,14 @@ print.describe <- function(x, ...) {
     }
     group_data <- results_df[filter_condition, , drop = FALSE]
     
-    # Print group header
-    group_text <- paste(paste(group_vars, "=", group_filter[1, group_vars], collapse = ", "))
-    cat("\nGroup:", group_text, "\n")
+    # Print group header using standardized helper
+    print_group_header(group_filter)
     
     # Create and print output
     temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted)
-    cat(.get_border(temp_output), "\n")
+    print_separator(get_table_width(temp_output))
     print(temp_output, row.names = FALSE)
-    cat(.get_border(temp_output), "\n")
+    print_separator(get_table_width(temp_output))
   }
 }
 
@@ -756,13 +772,5 @@ print.describe <- function(x, ...) {
   return(output_df)
 }
 
-#' Get table border for formatting
-#' @keywords internal
-.get_border <- function(df) {
-  col_widths <- sapply(names(df), function(col) {
-    max(nchar(as.character(df[[col]])), nchar(col), na.rm = TRUE)
-  })
-  total_width <- sum(col_widths) + length(col_widths) - 1
-    return(paste(rep("-", total_width), collapse = ""))
-}
+# Note: .get_border function removed - using standardized get_table_width from print_helpers.R
  

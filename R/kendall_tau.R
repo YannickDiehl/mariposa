@@ -26,11 +26,6 @@
 #'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
-#' @param sig_levels Character string specifying significance indicator style:
-#'   \itemize{
-#'     \item \code{"spss"} (default): SPSS-compatible two levels (** for p < 0.01, * for p < 0.05)
-#'     \item \code{"standard"}: Three levels (*** for p < 0.001, ** for p < 0.01, * for p < 0.05)
-#'   }
 #'
 #' @return An object of class \code{"kendall_tau_results"} containing:
 #' \describe{
@@ -44,44 +39,39 @@
 #' }
 #'
 #' @details
-#' ## Statistical Methods
+#' ## What Kendall's Tau Measures
 #'
-#' ### Unweighted Kendall's Tau-b (SPSS-Compatible Algorithm)
-#' Kendall's tau-b is calculated using the exact SPSS NONPAR CORR algorithm:
-#' \deqn{\tau_b = \frac{P - Q}{\sqrt{(n_0 - T_x - T_{xy})(n_0 - T_y - T_{xy})}}}
+#' Kendall's tau measures how often pairs of observations are in the same order
+#' (concordant) versus different order (discordant). It's particularly useful for:
+#' - Ordinal data (like rating scales: strongly disagree to strongly agree)
+#' - Data with outliers (more robust than Pearson correlation)
+#' - Small sample sizes
+#' - Non-linear but monotonic relationships
 #'
-#' where:
-#' - \eqn{P} = number of concordant pairs
-#' - \eqn{Q} = number of discordant pairs
-#' - \eqn{n_0 = n(n-1)/2} = total number of pairs
-#' - \eqn{T_x} = number of pairs tied only on X
-#' - \eqn{T_y} = number of pairs tied only on Y
-#' - \eqn{T_{xy}} = number of pairs tied on both X and Y
+#' ## Interpreting Results
 #'
-#' ### Weighted Kendall's Tau
-#' For weighted correlations, each pair is weighted by the geometric mean of the weights:
-#' \deqn{\tau_w = \frac{\sum w_{ij}(concordant) - \sum w_{ij}(discordant)}{\sqrt{(\sum w_{ij} - T_{wx})(\sum w_{ij} - T_{wy})}}}
+#' The tau value ranges from -1 to +1:
+#' - **Strong positive** (0.5 to 1.0): High values of one variable tend to go with high values of the other
+#' - **Moderate positive** (0.3 to 0.5): Some tendency for values to increase together
+#' - **Weak positive** (0 to 0.3): Slight tendency for values to increase together
+#' - **No correlation** (near 0): No relationship between the variables
+#' - **Negative values**: As one variable increases, the other tends to decrease
 #'
-#' ### Significance Testing (SPSS Method)
-#' Tests the null hypothesis H0: tau = 0 using the Kendall & Gibbons (1990) variance formula:
-#' \deqn{z = \frac{\tau}{SE_\tau}}
+#' ## When to Use Kendall's Tau
 #'
-#' The standard error incorporates comprehensive tie corrections for accurate p-value calculation,
-#' matching SPSS NONPAR CORR output exactly.
+#' Choose Kendall's tau when:
+#' - Your data is ordinal (ranked categories)
+#' - You have a small sample size (< 30 observations)
+#' - Your data has outliers that might affect Pearson correlation
+#' - You want a more conservative measure than Spearman's rho
 #'
-#' ## Interpretation Guidelines
-#' - **Correlation strength**: |tau| < 0.3 (weak), 0.3 <= |tau| < 0.5 (moderate), |tau| >= 0.5 (strong)
-#' - **Advantages**: Robust to outliers, suitable for ordinal data, handles ties well
-#' - **Range**: -1 (perfect negative rank correlation) to +1 (perfect positive rank correlation)
-#' - **Comparison with Pearson**: Typically |tau| < |r| due to different scaling
+#' ## Understanding the Output
 #'
-#' ## SPSS Compatibility
-#' This function produces results identical to SPSS NONPAR CORR procedure with KENDALL option:
-#' - Tau-b coefficients match exactly (uses same tie-handling algorithm)
-#' - P-values match to 3 decimal places (uses Kendall & Gibbons variance formula)
-#' - Sample sizes are identical
-#' - Note: SPSS may not apply weights to Kendall's tau; our weighted implementation
-#'   uses mathematically correct weighted ranks for survey data analysis
+#' The function provides:
+#' - **tau**: The correlation coefficient
+#' - **p-value**: Probability of seeing this correlation by chance (smaller = stronger evidence)
+#' - **n**: Number of observations used
+#' - **significance stars**: Quick visual indicator of statistical significance
 #'
 #' @examples
 #' # Load required packages and data
@@ -136,7 +126,7 @@
 #' Agresti, A. (2010). Analysis of Ordinal Categorical Data (2nd ed.). John Wiley & Sons.
 #'
 #' @export
-kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na.rm = "pairwise", sig_levels = "spss") {
+kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na.rm = "pairwise") {
 
   # Input validation
   if (!is.data.frame(data)) {
@@ -151,9 +141,6 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     stop("alternative must be 'two.sided', 'less', or 'greater'")
   }
 
-  if (!sig_levels %in% c("spss", "standard")) {
-    stop("sig_levels must be either 'spss' or 'standard'")
-  }
 
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
@@ -547,20 +534,11 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     matrices_list <- list(cor_results)
   }
 
-  # Add significance indicators based on chosen style
-  if (sig_levels == "spss") {
-    # SPSS-compatible: two levels only (matches SPSS NONPAR CORR output)
-    correlations_df$sig <- cut(correlations_df$p_value,
-                               breaks = c(-Inf, 0.01, 0.05, Inf),
-                               labels = c("**", "*", ""),
-                               right = TRUE)  # Use closed intervals like SPSS
-  } else {
-    # Standard three-level significance indicators
-    correlations_df$sig <- cut(correlations_df$p_value,
-                               breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                               labels = c("***", "**", "*", ""),
-                               right = TRUE)
-  }
+  # Add significance indicators (standard three-level style)
+  correlations_df$sig <- cut(correlations_df$p_value,
+                             breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
+                             labels = c("***", "**", "*", ""),
+                             right = TRUE)
 
   # Create result object
   result <- list(
@@ -571,7 +549,6 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     weights = w_name,
     alternative = alternative,
     na.rm = na.rm,
-    sig_levels = sig_levels,
     is_grouped = is_grouped,
     groups = group_vars,
     group_keys = if(is_grouped) group_keys else NULL
@@ -663,24 +640,18 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
 #' @export
 print.kendall_tau_results <- function(x, digits = 3, ...) {
 
-  # Determine test type header
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Kendall's Tau-b Correlation"
-  } else {
-    "Kendall's Tau-b Correlation"
-  }
+  # Print header using standardized helper
+  test_type <- get_standard_title("Kendall's Tau-b Correlation", x$weights, "")
+  print_header(test_type)
 
-  # Print header with dynamic border matching title length
-  cat(sprintf("\n%s\n", test_type))
-  border_line <- paste(rep("=", nchar(test_type)), collapse = "")
-  cat(border_line, "\n")
-
-  # Print test parameters
-  if (!is.null(x$weights)) {
-    cat(sprintf("Weights variable: %s\n", x$weights))
-  }
-  cat(sprintf("Missing data handling: %s deletion\n", x$na.rm))
-  cat(sprintf("Alternative hypothesis: %s\n", x$alternative))
+  # Print test information using standardized helpers
+  cat("\n")
+  test_info <- list(
+    "Weights variable" = x$weights,
+    "Missing data handling" = paste(x$na.rm, "deletion"),
+    "Alternative hypothesis" = x$alternative
+  )
+  print_info_section(test_info)
   cat("\n")
 
   if (x$is_grouped) {
@@ -688,12 +659,8 @@ print.kendall_tau_results <- function(x, digits = 3, ...) {
     group_combinations <- unique(x$correlations[x$groups])
 
     for (i in seq_len(nrow(group_combinations))) {
-      # Format group header
-      group_info <- sapply(names(group_combinations), function(g) {
-        paste(g, "=", group_combinations[i, g])
-      })
-      cat(sprintf("\nGroup: %s\n", paste(group_info, collapse = ", ")))
-      cat(paste(rep("-", nchar(paste(group_info, collapse = ", ")) + 7), collapse = ""), "\n")
+      # Print group header using standardized helper
+      print_group_header(group_combinations[i, , drop = FALSE])
 
       # Filter correlations for this group
       group_corrs <- x$correlations
@@ -819,13 +786,8 @@ print.kendall_tau_results <- function(x, digits = 3, ...) {
     }
   }
 
-  # Print significance codes at the end based on style used
-  if (!is.null(x$sig_levels) && x$sig_levels == "spss") {
-    cat("\n* Correlation is significant at the 0.05 level (2-tailed).\n")
-    cat("** Correlation is significant at the 0.01 level (2-tailed).\n")
-  } else {
-    cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
-  }
+  # Print significance codes
+  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
 
   # Note about interpretation
   if (length(x$variables) == 2) {

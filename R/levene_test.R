@@ -1,57 +1,69 @@
 
-#' Levene's Test for Homogeneity of Variance
+#' Test If Groups Vary Similarly
 #'
 #' @description
-#' \code{levene_test()} performs Levene's test for homogeneity of variance across groups.
-#' This function can be used as a standalone test or piped after other statistical tests
-#' to check the assumption of equal variances. The function supports both weighted and 
-#' unweighted analyses and works with various statistical test result objects.
+#' \code{levene_test()} checks if different groups have similar amounts of variation.
+#' This is an important assumption for many statistical tests - groups should spread
+#' out in similar ways.
 #'
-#' @param x Either a data frame or a statistical test result object (e.g., from \code{t_test()})
-#' @param ... Additional arguments passed to methods
-#' @param data A data frame (when x is not a test result object)
-#' @param group <\code{\link[dplyr]{dplyr_data_masking}}> Grouping variable for the test
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights
-#' @param center Character string specifying the center to use. Options are \code{"mean"} 
-#'   (default, classical Levene test, SPSS-compatible) or \code{"median"} (more robust)
+#' The test tells you:
+#' - Whether variance is consistent across groups
+#' - If you can trust standard ANOVA and t-test results
+#' - When to use alternative tests that don't assume equal variance
 #'
-#' @return An object of class \code{"levene_test_results"} containing:
-#' \describe{
-#'   \item{results}{A data frame with Levene test statistics and p-values for each variable}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{group}{Name of the grouping variable}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{center}{Type of center used (median or mean)}
-#'   \item{original_test}{Original test result object (if applicable)}
-#' }
+#' @param x Either your data or test results from \code{t_test()} or \code{oneway_anova()}
+#' @param ... Variables to test (when using data frame)
+#' @param data Your survey data (when x is not a test result)
+#' @param group The grouping variable for comparison
+#' @param weights Optional survey weights for population-representative results
+#' @param center How to measure center: \code{"mean"} (default) or \code{"median"} (more robust)
+#'
+#' @return Test results showing:
+#' - Whether groups have equal variances (p-value)
+#' - F-statistic measuring variance differences
+#' - Which variables meet the assumption
 #'
 #' @details
-#' ## Statistical Method
-#' 
-#' Levene's test examines the null hypothesis that the population variances are equal.
-#' The test statistic is calculated as:
-#' 
-#' \deqn{W = \frac{(N-k) \sum_{i=1}^{k} n_i (\bar{Z}_{i.} - \bar{Z}_{..})^2}{(k-1) \sum_{i=1}^{k} \sum_{j=1}^{n_i} (Z_{ij} - \bar{Z}_{i.})^2}}
-#' 
-#' where \eqn{Z_{ij} = |Y_{ij} - \tilde{Y}_{i.}|} and \eqn{\tilde{Y}_{i.}} is the median 
-#' (or mean) of the i-th group.
-#' 
-#' ## Interpretation
-#' - **p > 0.05**: Variances are homogeneous (assumption met)
-#' - **p <= 0.05**: Variances are heterogeneous (assumption violated)
-#' 
-#' ## Usage with Other Tests
-#' The function can be used standalone or piped after other statistical tests:
-#' 
-#' ```r
-#' # Standalone usage
-#' levene_test(data, variable, group = grouping_var)
-#' 
-#' # Piped after t-test
-#' t_test(data, variable, group = grouping_var) %>% levene_test()
-#' 
-
-#' ```
+#' ## Understanding the Results
+#'
+#' **P-value interpretation**:
+#' - p > 0.05: Good! Groups have similar variance (assumption met)
+#' - p ≤ 0.05: Problem - groups vary differently (assumption violated)
+#'
+#' Think of it like checking if all groups are equally "spread out":
+#' - Similar spread = can use standard tests
+#' - Different spread = need special methods
+#'
+#' ## When to Use This
+#'
+#' Check variance equality when:
+#' - Before running t-tests or ANOVA
+#' - Comparing groups with different sizes
+#' - Your statistical test assumes equal variances
+#' - You see very different standard deviations
+#'
+#' ## What If Variances Are Unequal?
+#'
+#' If Levene's test is significant (p ≤ 0.05):
+#' - For t-tests: Use Welch's t-test (var.equal = FALSE)
+#' - For ANOVA: Use Welch's ANOVA
+#' - Consider transforming your data
+#' - Use non-parametric alternatives
+#' - Report that equal variance assumption was violated
+#'
+#' ## Usage Flexibility
+#'
+#' You can use this function two ways:
+#' - **Standalone**: Check any variables for equal variance
+#' - **After tests**: Pipe after t_test() or oneway_anova() to verify assumptions
+#'
+#' ## Tips for Success
+#'
+#' - Always check this assumption for group comparisons
+#' - Visual inspection (boxplots) can supplement the test
+#' - Large samples make the test very sensitive
+#' - Use median-based test for skewed data (center = "median")
+#' - Don't panic if violated - alternatives exist!
 #'
 #' @examples
 #' # Load required packages and data
@@ -69,7 +81,7 @@
 #' 
 #' # Piped after ANOVA (common workflow)
 #' result <- survey_data %>%
-#'   oneway_anova_test(life_satisfaction, group = education)
+#'   oneway_anova(life_satisfaction, group = education)
 #' result %>% levene_test()
 #' 
 #' # Piped after t-test
@@ -171,7 +183,7 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
 
 #' @rdname levene_test
 #' @export
-levene_test.oneway_anova_test_results <- function(x, center = c("mean", "median"), ...) {
+levene_test.oneway_anova_results <- function(x, center = c("mean", "median"), ...) {
   
   center <- match.arg(center)
   
@@ -181,7 +193,7 @@ levene_test.oneway_anova_test_results <- function(x, center = c("mean", "median"
   }
   
   if (is.null(x$data)) {
-    stop("Original data not available in oneway_anova_test results. Please use: levene_test(data, variables, group = group)")
+    stop("Original data not available in oneway_anova results. Please use: levene_test(data, variables, group = group)")
   }
   
   # Check if this is a grouped analysis
@@ -372,7 +384,7 @@ levene_test.t_test_results <- function(x, center = c("mean", "median"), ...) {
 
 #' @rdname levene_test
 #' @export
-levene_test.mann_whitney_test_results <- function(x, ...) {
+levene_test.mann_whitney_results <- function(x, ...) {
   stop("Levene's test is not appropriate for Mann-Whitney U test results.\n",
        "Mann-Whitney U test is non-parametric and does not assume equal variances.\n",
        "Use Levene's test only with parametric tests like t-test.")
@@ -724,16 +736,11 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
 #' @export
 #' @method print levene_test_results
 print.levene_test_results <- function(x, digits = 3, ...) {
-  
-  # Determine test type based on weights
-  test_type <- if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    "Weighted Levene's Test for Homogeneity of Variance"
-  } else {
-    "Levene's Test for Homogeneity of Variance"
-  }
-  
-  cat(sprintf("\n%s\n", test_type))
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+
+  # Determine test type using standardized helper
+  weights_name <- x$weight_var %||% x$weights
+  test_type <- get_standard_title("Levene's Test for Homogeneity of Variance", weights_name, "")
+  print_header(test_type)
   
   # Print test information (always show for both grouped and ungrouped)
   cat("\n")

@@ -14,7 +14,7 @@
 # - Test 4a-d: Weighted/Grouped by region
 # - Test 5-7: Additional tests with different alpha levels and multiple variables
 #
-# The function is an S3 generic that takes oneway_anova_test results as input.
+# The function is an S3 generic that takes oneway_anova results as input.
 # ============================================================================
 
 library(testthat)
@@ -575,7 +575,7 @@ data(survey_data, envir = environment())
 test_that("Test 1a: Unweighted/Ungrouped - Life Satisfaction by Education", {
   # Run ANOVA first
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -591,7 +591,7 @@ test_that("Test 1a: Unweighted/Ungrouped - Life Satisfaction by Education", {
 test_that("Test 1b: Unweighted/Ungrouped - Income by Education", {
   # Run ANOVA first
   anova_result <- survey_data %>%
-    oneway_anova_test(income, group = education)
+    oneway_anova(income, group = education)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -609,7 +609,7 @@ test_that("Test 1b: Unweighted/Ungrouped - Income by Education", {
 test_that("Test 1c: Unweighted/Ungrouped - Age by Education", {
   # Run ANOVA first
   anova_result <- survey_data %>%
-    oneway_anova_test(age, group = education)
+    oneway_anova(age, group = education)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -628,7 +628,7 @@ test_that("Test 1c: Unweighted/Ungrouped - Age by Education", {
 test_that("Test 1e: Unweighted/Ungrouped - Life Satisfaction by Employment (5 groups)", {
   # Run ANOVA first
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = employment)
+    oneway_anova(life_satisfaction, group = employment)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -644,7 +644,7 @@ test_that("Test 1e: Unweighted/Ungrouped - Life Satisfaction by Employment (5 gr
 test_that("Test 2a: Weighted/Ungrouped - Life Satisfaction by Education", {
   # Run weighted ANOVA first
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -660,7 +660,7 @@ test_that("Test 2a: Weighted/Ungrouped - Life Satisfaction by Education", {
 test_that("Test 2b: Weighted/Ungrouped - Income by Education", {
   # Run weighted ANOVA first
   anova_result <- survey_data %>%
-    oneway_anova_test(income, group = education, weights = sampling_weight)
+    oneway_anova(income, group = education, weights = sampling_weight)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -682,7 +682,7 @@ test_that("Test 3a: Unweighted/Grouped - Life Satisfaction by Education (by Regi
   # Run grouped ANOVA
   anova_result <- survey_data %>%
     group_by(region) %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -708,7 +708,7 @@ test_that("Test 4a: Weighted/Grouped - Life Satisfaction by Education (by Region
   # Run grouped weighted ANOVA
   anova_result <- survey_data %>%
     group_by(region) %>%
-    oneway_anova_test(life_satisfaction, group = education, weights = sampling_weight)
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -742,7 +742,7 @@ test_that("Edge case: Tukey test with missing values", {
   # Run ANOVA and Tukey
   expect_no_error({
     anova_result <- test_data %>%
-      oneway_anova_test(life_satisfaction, group = education)
+      oneway_anova(life_satisfaction, group = education)
     tukey_result <- anova_result %>% tukey_test()
   })
 
@@ -754,7 +754,7 @@ test_that("Edge case: Tukey test with missing values", {
 test_that("Edge case: Different confidence levels", {
   # Run ANOVA
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, group = education)
+    oneway_anova(life_satisfaction, group = education)
 
   # Test with 99% confidence level
   tukey_99 <- anova_result %>% tukey_test(conf.level = 0.99)
@@ -779,7 +779,7 @@ test_that("Edge case: Different confidence levels", {
 test_that("Edge case: Multiple variables simultaneously", {
   # Run ANOVA with multiple variables
   anova_result <- survey_data %>%
-    oneway_anova_test(life_satisfaction, income, age, group = education)
+    oneway_anova(life_satisfaction, income, age, group = education)
 
   # Run Tukey post-hoc test
   tukey_result <- anova_result %>% tukey_test()
@@ -986,7 +986,7 @@ test_that("Generate Tukey HSD validation summary", {
 
 # Implementation Notes:
 # --------------------
-# 1. Tukey HSD is an S3 generic that operates on oneway_anova_test results
+# 1. Tukey HSD is an S3 generic that operates on oneway_anova results
 # 2. Must run ANOVA first, then pipe to tukey_test()
 # 3. Weighted analyses use custom implementation with effective sample sizes
 # 4. Comparisons are all pairwise between groups

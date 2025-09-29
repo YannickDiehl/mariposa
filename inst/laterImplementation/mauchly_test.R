@@ -32,7 +32,7 @@
 #' \dontrun{
 #' # Load data and perform repeated measures ANOVA
 #' result <- data %>% 
-#'   oneway_anova_test(var1, var2, group = group, repeated = TRUE, subject_id = id)
+#'   oneway_anova(var1, var2, group = group, repeated = TRUE, subject_id = id)
 #' 
 #' # Test sphericity assumption
 #' mauchly_test(result)
@@ -45,11 +45,11 @@ mauchly_test <- function(x, ...) {
 
 #' @rdname mauchly_test
 #' @export
-mauchly_test.oneway_anova_test_results <- function(x, ...) {
+mauchly_test.oneway_anova_results <- function(x, ...) {
   
   # Check if this is repeated measures ANOVA
   if (is.null(x$repeated) || !x$repeated) {
-    stop("Mauchly's test is only applicable to repeated measures ANOVA. Use repeated = TRUE in oneway_anova_test()")
+    stop("Mauchly's test is only applicable to repeated measures ANOVA. Use repeated = TRUE in oneway_anova()")
   }
   
   # Check if we have sufficient time points for sphericity test

@@ -1,101 +1,87 @@
 
-#' Perform Mann-Whitney U tests with support for weights and grouped data
+#' Compare Two Groups Without Assuming Normal Data
 #'
 #' @description
-#' \code{mann_whitney_test()} performs Mann-Whitney U tests (Wilcoxon rank-sum tests) 
-#' on one or more variables in a data frame. This is a non-parametric alternative 
-#' to the t-test when data is not normally distributed or measured on ordinal scales.
-#' The function supports both weighted and unweighted analyses, grouped data operations, 
-#' and multiple variables simultaneously.
-#' 
-#' The function provides SPSS-compatible results including effect size calculations 
-#' (r = |Z|/sqrt(n1 + n2)) and is particularly designed for survey data analysis where 
-#' sampling weights are crucial for population-representative results.
+#' \code{mann_whitney()} compares two groups when your data isn't normally
+#' distributed or when you have ordinal data (like ratings or rankings). It's the
+#' go-to alternative when t-tests aren't appropriate.
 #'
-#' @param data A data frame or tibble containing the variables to analyze.
-#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Variables for which to perform 
-#'   Mann-Whitney tests. Supports all tidyselect helpers such as \code{starts_with()}, 
-#'   \code{ends_with()}, \code{contains()}, \code{matches()}, \code{num_range()}, etc.
-#' @param group <\code{\link[dplyr]{dplyr_data_masking}}> Grouping variable 
-#'   for two-sample Mann-Whitney test. Must be a factor or character variable with exactly 
-#'   two levels. Required for Mann-Whitney tests.
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights 
-#'   for weighted Mann-Whitney tests. Should be a numeric variable with positive values. 
-#'   Weights are used to adjust for sampling design and non-response patterns.
-#' @param mu A number specifying the hypothesized location shift. Default is \code{0}.
-#' @param alternative Character string specifying the alternative hypothesis. 
-#'   Must be one of \code{"two.sided"} (default), \code{"greater"}, or \code{"less"}.
-#' @param conf.level Confidence level for the effect size. Must be between 
-#'   0 and 1. Default is \code{0.95} (95% confidence level).
+#' Think of it as:
+#' - A robust way to compare groups that works with any data shape
+#' - Perfect for Likert scales, ratings, or skewed distributions
+#' - A test that compares the typical values between groups
 #'
-#' @return An object of class \code{"mann_whitney_test_results"} containing:
-#' \describe{
-#'   \item{results}{A data frame with test statistics, p-values, effect sizes, 
-#'     and rank means for each variable}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{group}{Name of the grouping variable}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{group_levels}{Levels of the grouping variable}
-#'   \item{is_grouped}{Logical indicating if data was grouped}
-#'   \item{mu, alternative, conf.level}{Test parameters}
-#' }
-#' 
-#' The results data frame contains the following columns:
-#' \describe{
-#'   \item{Variable}{Name of the analyzed variable}
-#'   \item{U}{Mann-Whitney U statistic (minimum of U1 and U2)}
-#'   \item{W}{Wilcoxon rank-sum statistic (rank sum of group with smaller U-value, SPSS-compatible)}
-#'   \item{Z}{Standardized test statistic with tie correction}
-#'   \item{p_value}{Two-tailed p-value}
-#'   \item{effect_size_r}{Effect size r = |Z|/sqrt(n1 + n2)}
-#'   \item{rank_mean_diff}{Difference in rank means (group1 - group2)}
-#'   \item{group_stats}{List column with group-specific statistics}
-#' }
+#' The test tells you:
+#' - Whether one group tends to have higher values than the other
+#' - How strong the difference is (effect size)
+#' - Which group has higher average ranks
+#'
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The variables you want to compare between groups. You can list
+#'   multiple variables or use helpers like \code{starts_with("satisfaction")}
+#' @param group The categorical variable that defines your two groups (e.g., gender,
+#'   treatment/control). Must have exactly two groups.
+#' @param weights Optional survey weights for population-representative results
+#' @param mu The hypothesized difference (Default: 0, meaning no difference)
+#' @param alternative Direction of the test:
+#'   \itemize{
+#'     \item \code{"two.sided"} (default): Test if groups are different
+#'     \item \code{"greater"}: Test if group 1 > group 2
+#'     \item \code{"less"}: Test if group 1 < group 2
+#'   }
+#' @param conf.level Confidence level for effect size (Default: 0.95 = 95%)
+#'
+#' @return Test results showing whether groups differ, including:
+#' - U and W statistics (test statistics)
+#' - Z-score and p-value (are groups different?)
+#' - Effect size r (how big is the difference?)
+#' - Rank means for each group (which group is higher?)
 #'
 #' @details
-#' ## Statistical Methods
-#' 
-#' ### Unweighted Tests
-#' For unweighted Mann-Whitney tests, the function implements the standard algorithm with 
-#' SPSS-compatible calculations:
-#' 
-#' 1. **Rank Calculation**: All values are ranked together using R's \code{rank()} function
-#' 2. **U Statistics**: 
-#'    - \eqn{U_1 = R_1 - \frac{n_1(n_1 + 1)}{2}}
-#'    - \eqn{U_2 = R_2 - \frac{n_2(n_2 + 1)}{2}}
-#'    - \eqn{U = \min(U_1, U_2)} (reported U-statistic)
-#' 3. **W Statistic**: Following SPSS convention, W represents the rank sum of the group 
-#'    with the smaller U-value. This ensures mathematical consistency and matches SPSS output exactly.
-#' 4. **Z Statistic**: Calculated with tie correction matching SPSS methodology:
-#'    \deqn{Z = \frac{U - \mu_U}{\sigma_U}}
-#'    where \eqn{\mu_U = \frac{n_1 n_2}{2}} and 
-#'    \eqn{\sigma_U = \sqrt{\frac{n_1 n_2 [(n_1 + n_2 + 1) - T]}{12}}}
-#'    with tie correction \eqn{T = \sum(t_i^3 - t_i)/[(n_1 + n_2)(n_1 + n_2 - 1)]}
-#' 
-#' ### Weighted Tests
-#' For weighted tests, the function uses the survey package methodology:
-#' - Weighted ranking using midpoint method for tied values
-#' - Survey design-adjusted test statistics
-#' - Chi-squared-to-Z conversion for effect size calculation
-#' 
-#' The standardized test statistic is:
-#' \deqn{Z = \frac{U - \mu_U}{\sigma_U}}
-#' where \eqn{\mu_U = \frac{n_1 n_2}{2}} and \eqn{\sigma_U = \sqrt{\frac{n_1 n_2 (n_1 + n_2 + 1)}{12}}}
-#' 
-#' 
-#' ### Effect Size (r)
-#' The effect size r is calculated as:
-#' \deqn{r = \frac{|Z|}{\sqrt{n_1 + n_2}}}
-#' 
-#' This measure is equivalent to the point-biserial correlation and provides a 
-#' standardized measure of effect magnitude.
-#' 
-#' ## Interpretation Guidelines
-#' - **p-values**: p < 0.05 indicates statistical significance at alpha = 0.05
-#' - **Effect size r**: |r| ~ 0.1 (small), |r| ~ 0.3 (medium), |r| ~ 0.5 (large effect)
-#' - **Rank differences**: Positive values indicate group 1 has higher average ranks
-#' - **U-statistic**: Smaller values indicate greater separation between groups
-#' - **W-statistic**: Represents the rank sum of the group contributing to the minimum U
+#' ## Understanding the Results
+#'
+#' **P-value**: If p < 0.05, the groups are significantly different
+#' - p < 0.001: Very strong evidence of difference
+#' - p < 0.01: Strong evidence of difference
+#' - p < 0.05: Moderate evidence of difference
+#' - p ≥ 0.05: No significant difference found
+#'
+#' **Effect Size r** (How big is the difference?):
+#' - |r| < 0.1: Negligible difference
+#' - |r| ~ 0.1: Small difference
+#' - |r| ~ 0.3: Medium difference
+#' - |r| ~ 0.5: Large difference
+#' - |r| > 0.5: Very large difference
+#'
+#' **Rank Mean Difference**:
+#' - Positive: Group 1 tends to have higher values
+#' - Negative: Group 2 tends to have higher values
+#' - Zero: Groups have similar distributions
+#'
+#' ## When to Use This Test
+#'
+#' Use Mann-Whitney test when:
+#' - Your data is not normally distributed (skewed, outliers)
+#' - You have ordinal data (rankings, Likert scales)
+#' - Sample sizes are small (< 30 per group)
+#' - You want a robust alternative to the t-test
+#' - You're comparing satisfaction ratings, income, or other skewed variables
+#'
+#' ## Advantages Over t-test
+#'
+#' - Works with any data distribution
+#' - Not affected by outliers
+#' - Valid for ordinal data
+#' - No assumptions about variance
+#' - More robust for real-world data
+#'
+#' ## Tips for Success
+#'
+#' - Each group should have at least 5 observations
+#' - The test compares distributions, not just means
+#' - Look at both p-values and effect sizes
+#' - Consider plotting the data to see the pattern
+#' - Use this for Likert scales and rating data
 
 #'
 #' @seealso 
@@ -120,36 +106,36 @@
 #' 
 #' # Basic Mann-Whitney test (non-parametric comparison)
 #' survey_data %>%
-#'   mann_whitney_test(age, group = gender)
+#'   mann_whitney(age, group = gender)
 #' 
 #' # Multiple variables
 #' survey_data %>%
-#'   mann_whitney_test(age, income, life_satisfaction, group = region)
+#'   mann_whitney(age, income, life_satisfaction, group = region)
 #' 
 #' # Using tidyselect helpers
 #' survey_data %>%
-#'   mann_whitney_test(starts_with("trust_"), group = gender)
+#'   mann_whitney(starts_with("trust_"), group = gender)
 #' 
 #' # Weighted analysis
 #' survey_data %>%
-#'   mann_whitney_test(income, group = region, weights = sampling_weight)
+#'   mann_whitney(income, group = region, weights = sampling_weight)
 #' 
 #' # Grouped analysis (separate tests for each education level)
 #' survey_data %>%
 #'   group_by(education) %>%
-#'   mann_whitney_test(life_satisfaction, group = gender)
+#'   mann_whitney(life_satisfaction, group = gender)
 #' 
 #' # One-sided test
 #' survey_data %>%
-#'   mann_whitney_test(life_satisfaction, group = region, alternative = "greater")
+#'   mann_whitney(life_satisfaction, group = region, alternative = "greater")
 #' 
 #' # Store results for further analysis
 #' result <- survey_data %>%
-#'   mann_whitney_test(income, group = gender, weights = sampling_weight)
+#'   mann_whitney(income, group = gender, weights = sampling_weight)
 #' print(result)
 #'
 #' @export
-mann_whitney_test <- function(data, ..., group, weights = NULL, mu = 0, 
+mann_whitney <- function(data, ..., group, weights = NULL, mu = 0, 
                              alternative = c("two.sided", "less", "greater"),
                              conf.level = 0.95) {
   
@@ -462,7 +448,7 @@ mann_whitney_test <- function(data, ..., group, weights = NULL, mu = 0,
     data = data  # Store original data for levene_test
   )
   
-  class(result) <- "mann_whitney_test_results"
+  class(result) <- "mann_whitney_results"
   return(result)
 }
 
@@ -478,31 +464,23 @@ mann_whitney_test <- function(data, ..., group, weights = NULL, mu = 0,
 
 #' Print method for Mann-Whitney test results
 #'
-#' @param x A mann_whitney_test_results object
+#' @param x A mann_whitney_results object
 #' @param digits Number of decimal places to display
 #' @param ... Additional arguments (not used)
 #' @export
-#' @method print mann_whitney_test_results
-print.mann_whitney_test_results <- function(x, digits = 3, ...) {
-  
-  # Determine test type based on weights (Template Standard)
-  test_type <- if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    "Weighted Mann-Whitney U Test Results"
-  } else {
-    "Mann-Whitney U Test Results"
-  }
-  
-  cat(sprintf("\n%s\n", test_type))
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+#' @method print mann_whitney_results
+print.mann_whitney_results <- function(x, digits = 3, ...) {
+
+  # Determine test type using standardized helper
+  weights_name <- x$weight_var %||% x$weights
+  test_type <- get_standard_title("Mann-Whitney U Test", weights_name, "Results")
+  print_header(test_type)
   
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
   
-  # Add significance stars (Template Standard)
-  x$results$sig <- cut(x$results$p_value, 
-                      breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                      labels = c("***", "**", "*", ""),
-                      right = FALSE)
+  # Add significance stars using standard helper
+  x$results$sig <- sapply(x$results$p_value, add_significance_stars)
                       
   # Template Standard: Dual grouped data detection
   is_grouped_data <- (!is.null(x$grouped) && x$grouped) || 

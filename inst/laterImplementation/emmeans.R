@@ -41,7 +41,7 @@
 #' \dontrun{
 #' # Load data and perform repeated measures ANOVA
 #' result <- data %>% 
-#'   oneway_anova_test(var1, var2, group = group, repeated = TRUE, subject_id = id)
+#'   oneway_anova(var1, var2, group = group, repeated = TRUE, subject_id = id)
 #' 
 #' # Calculate all estimated marginal means
 #' emmeans(result)
@@ -60,11 +60,11 @@ emmeans <- function(x, show = "all", ...) {
 
 #' @rdname emmeans
 #' @export
-emmeans.oneway_anova_test_results <- function(x, show = "all", ...) {
+emmeans.oneway_anova_results <- function(x, show = "all", ...) {
   
   # Check if this is repeated measures ANOVA
   if (is.null(x$repeated) || !x$repeated) {
-    stop("emmeans() is currently only implemented for repeated measures ANOVA. Use repeated = TRUE in oneway_anova_test()")
+    stop("emmeans() is currently only implemented for repeated measures ANOVA. Use repeated = TRUE in oneway_anova()")
   }
   
   # Get descriptive statistics

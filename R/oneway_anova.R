@@ -1,103 +1,82 @@
 
-#' Perform one-way ANOVA tests with support for weights and grouped data
+#' Compare Multiple Groups: Are Their Averages Different?
 #'
 #' @description
-#' \code{oneway_anova_test()} performs one-way analysis of variance (ANOVA) 
-#' on one or more dependent variables in a data frame. 
-#' The function supports both weighted and unweighted analyses, grouped data operations, 
-#' and multiple variables simultaneously. 
-#' It is particularly designed for survey data analysis where sampling weights are 
-#' crucial for population-representative results.
-#' 
-#' The function implements standard ANOVA (equal variances) and Welch's ANOVA 
-#' (unequal variances) with comprehensive effect size calculations including 
-#' Eta-squared, Epsilon-squared, and Omega-squared. Results are SPSS-compatible.
+#' \code{oneway_anova()} helps you determine if average values differ across
+#' three or more groups. For example, does average income vary by education level?
+#' Or is customer satisfaction different across regions?
 #'
-#' @param data A data frame or tibble containing the variables to analyze.
-#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Dependent variables for which to perform 
-#'   ANOVA tests. Supports all tidyselect helpers such as \code{starts_with()}, 
-#'   \code{ends_with()}, \code{contains()}, \code{matches()}, \code{num_range()}, etc.
-#' @param group <\code{\link[dplyr]{dplyr_data_masking}}> Grouping variable 
-#'   for one-way ANOVA. Can be a factor, character, or numeric variable 
-#'   with at least two unique values. Automatically converted to factor if needed. 
-#'   Required parameter.
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights 
-#'   for weighted ANOVA. Should be a numeric variable with positive values. 
-#'   Weights are used to adjust for sampling design and non-response patterns.
-#' @param var.equal Logical indicating whether to assume equal variances. 
-#'   Default is \code{TRUE} (standard ANOVA). When \code{FALSE}, performs 
-#'   Welch's ANOVA for unequal variances. Both results are displayed.
-#' @param conf.level Confidence level for the confidence intervals in descriptive 
-#'   statistics. Must be between 0 and 1. Default is \code{0.95} (95% confidence interval).
+#' Think of it as:
+#' - An extension of t-test for more than two groups
+#' - A way to test if group membership affects outcomes
+#' - A tool to identify meaningful group differences
 #'
-#' @return An object of class \code{"oneway_anova_test_results"} containing:
-#' \describe{
-#'   \item{results}{A data frame with F-statistics, p-values, effect sizes, 
-#'     and ANOVA tables for each dependent variable}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{group}{Name of the grouping variable}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{var.equal}{Variance assumption used}
-#'   \item{group_levels}{Levels of the grouping variable}
-#'   \item{is_grouped}{Logical indicating if data was grouped via group_by()}
-#'   \item{conf.level}{Confidence level used}
-#' }
-#' 
-#' The results data frame contains the following columns:
-#' \describe{
-#'   \item{Variable}{Name of the analyzed dependent variable}
-#'   \item{F_stat}{F-statistic}
-#'   \item{df1, df2}{Degrees of freedom (between groups, within groups)}
-#'   \item{p_value}{p-value}
-#'   \item{eta_squared}{Eta-squared effect size}
-#'   \item{epsilon_squared}{Epsilon-squared effect size (less biased)}
-#'   \item{omega_squared}{Omega-squared effect size (unbiased)}
-#'   \item{group_stats}{List column with group-specific descriptive statistics}
-#'   \item{anova_table}{List column with complete ANOVA table}
-#'   \item{welch_result}{List column with Welch ANOVA results}
-#' }
+#' The test tells you:
+#' - Whether at least one group is different from the others
+#' - How much variation is explained by group membership
+#' - Which variance assumption fits your data best
+#'
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to analyze. You can list multiple
+#'   variables or use helpers like \code{starts_with("income")}
+#' @param group The categorical variable that defines your groups (e.g., education,
+#'   region, age_group). Must have at least 3 groups for ANOVA.
+#' @param weights Optional survey weights for population-representative results
+#' @param var.equal Should we assume all groups have similar variance? (Default: TRUE)
+#'   - TRUE: Standard ANOVA (assumes equal variances)
+#'   - FALSE: Welch's ANOVA (allows unequal variances)
+#' @param conf.level Confidence level for group statistics (Default: 0.95 = 95%)
+#'
+#' @return ANOVA results showing whether groups differ, including:
+#' - F-statistic and p-value (are groups different?)
+#' - Effect sizes (how much do groups matter?)
+#' - Group statistics (means and standard deviations)
+#' - Both standard and Welch ANOVA results
 #'
 #' @details
-#' ## Statistical Methods
-#' 
-#' ### Standard One-Way ANOVA
-#' Tests the null hypothesis that all group means are equal:
-#' \deqn{H_0: \mu_1 = \mu_2 = ... = \mu_k}
-#' \deqn{H_1: \text{At least one } \mu_i \neq \mu_j}
-#' 
-#' F-statistic calculation:
-#' \deqn{F = \frac{MS_{between}}{MS_{within}} = \frac{SS_{between}/(k-1)}{SS_{within}/(N-k)}}
-#' 
-#' ### Welch's ANOVA (Unequal Variances)
-#' When variances are unequal across groups, Welch's ANOVA provides more robust results:
-#' \deqn{F_W = \frac{\sum_{i=1}^k w_i(\bar{X}_i - \bar{X}_w)^2/(k-1)}{1 + \frac{2(k-2)}{k^2-1}\sum_{i=1}^k \frac{(1-w_i/W)^2}{n_i-1}}}
-#' 
-#' ### Weighted ANOVA
-#' For weighted analyses, following survey methodology:
-#' - Weighted means: \eqn{\mu_w = \frac{\sum w_i x_i}{\sum w_i}}
-#' - Weighted variances: \eqn{\sigma_w^2 = \frac{\sum w_i (x_i - \mu_w)^2}{\sum w_i}}
-#' - F-statistics adjusted for effective sample sizes
-#' 
-#' ### Effect Sizes
-#' 
-#' **Eta-squared:**
-#' \deqn{\eta^2 = \frac{SS_{between}}{SS_{total}}}
-#' 
-#' **Epsilon-squared (less biased):**
-#' \deqn{\epsilon^2 = \frac{SS_{between} - (k-1) \cdot MS_{within}}{SS_{total}}}
-#' 
-#' **Omega-squared (unbiased):**
-#' \deqn{\omega^2 = \frac{SS_{between} - (k-1) \cdot MS_{within}}{SS_{total} + MS_{within}}}
-#' 
-#' ## Grouped Analyses
-#' When data is grouped using \code{group_by()}, the function performs separate 
-#' ANOVA analyses for each group combination.
-#' 
-#' ## SPSS Compatibility
-#' Results match SPSS output for:
-#' - F-statistics and p-values
-#' - Sum of squares decomposition
-#' - Effect size calculations
+#' ## Understanding the Results
+#'
+#' **P-value**: If p < 0.05, at least one group average is different
+#' - p < 0.001: Very strong evidence of group differences
+#' - p < 0.01: Strong evidence of group differences
+#' - p < 0.05: Moderate evidence of group differences
+#' - p ≥ 0.05: No significant group differences found
+#'
+#' **Effect Sizes** (How much do groups matter?):
+#' - **Eta-squared**: Proportion of variance explained by groups
+#'   - < 0.01: Negligible effect
+#'   - 0.01-0.06: Small effect
+#'   - 0.06-0.14: Medium effect
+#'   - 0.14 or higher: Large effect
+#' - **Omega-squared**: More conservative estimate (usually preferred)
+#'
+#' ## When to Use This
+#'
+#' Use ANOVA when:
+#' - You have one numeric outcome (income, satisfaction score, etc.)
+#' - You have one categorical grouping variable with 3+ groups
+#' - You want to know if group averages differ
+#' - Your data is roughly normally distributed within groups
+#'
+#' ## Choosing Variance Assumptions
+#'
+#' - **Standard ANOVA** (var.equal = TRUE): Use when group variances are similar
+#' - **Welch's ANOVA** (var.equal = FALSE): Use when group variances differ or you're unsure
+#' - The function shows both results for comparison
+#'
+#' ## What Comes Next?
+#'
+#' If ANOVA is significant:
+#' 1. Look at group means to see the pattern
+#' 2. Use \code{tukey_test()} to find which specific groups differ
+#' 3. Consider effect sizes to judge practical importance
+#'
+#' ## Tips for Success
+#'
+#' - Check that each group has sufficient observations (ideally 20+)
+#' - Look at both p-values and effect sizes
+#' - Use Welch's ANOVA if group sizes are very unequal
+#' - Follow up with post-hoc tests to identify specific differences
 #' - Welch's robust test for equality of means
 #' 
 #' ## Interpretation Guidelines
@@ -133,32 +112,32 @@
 #' 
 #' # Basic one-way ANOVA (comparing across education levels)
 #' survey_data %>%
-#'   oneway_anova_test(life_satisfaction, group = education)
+#'   oneway_anova(life_satisfaction, group = education)
 #' 
 #' # Multiple dependent variables
 #' survey_data %>%
-#'   oneway_anova_test(life_satisfaction, trust_government, group = education)
+#'   oneway_anova(life_satisfaction, trust_government, group = education)
 #' 
 #' # Using tidyselect helpers
 #' survey_data %>%
-#'   oneway_anova_test(starts_with("trust_"), group = education)
+#'   oneway_anova(starts_with("trust_"), group = education)
 #' 
 #' # Weighted analysis
 #' survey_data %>%
-#'   oneway_anova_test(income, group = education, weights = sampling_weight)
+#'   oneway_anova(income, group = education, weights = sampling_weight)
 #' 
 #' # Grouped analysis (separate ANOVA for each region)
 #' survey_data %>%
 #'   group_by(region) %>%
-#'   oneway_anova_test(life_satisfaction, group = education)
+#'   oneway_anova(life_satisfaction, group = education)
 #' 
 #' # Unequal variances (Welch's ANOVA)
 #' survey_data %>%
-#'   oneway_anova_test(income, group = education, var.equal = FALSE)
+#'   oneway_anova(income, group = education, var.equal = FALSE)
 #' 
 #' # Store results for post-hoc analysis
 #' result <- survey_data %>%
-#'   oneway_anova_test(life_satisfaction, group = education)
+#'   oneway_anova(life_satisfaction, group = education)
 #' 
 #' # Follow up with post-hoc tests
 #' result %>% tukey_test()
@@ -167,7 +146,7 @@
 #' # Note: For repeated measures ANOVA, use rm_anova_test() function instead
 #'
 #' @export
-oneway_anova_test <- function(data, ..., group, weights = NULL, var.equal = TRUE, 
+oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE, 
                       conf.level = 0.95) {
   
   # Input validation
@@ -593,18 +572,18 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       group_levels = g_levels,
       data = data  # Store original data for post-hoc tests
     ),
-    class = "oneway_anova_test_results"
+    class = "oneway_anova_results"
   )
 }
 
 #' Print ANOVA test results
 #'
 #' @description
-#' Print method for objects of class \code{"oneway_anova_test_results"}. Provides a 
+#' Print method for objects of class \code{"oneway_anova_results"}. Provides a 
 #' formatted display of ANOVA results including descriptive statistics, ANOVA 
 #' tables, assumption tests, and effect sizes.
 #'
-#' @param x An object of class \code{"oneway_anova_test_results"} returned by \code{\link{oneway_anova_test}}.
+#' @param x An object of class \code{"oneway_anova_results"} returned by \code{\link{oneway_anova}}.
 #' @param digits Integer specifying the number of decimal places to display 
 #'   for numeric values. Default is \code{3}.
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
@@ -628,7 +607,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @export
-print.oneway_anova_test_results <- function(x, digits = 3, ...) {
+print.oneway_anova_results <- function(x, digits = 3, ...) {
   
   # Check if this is repeated measures ANOVA
   if (!is.null(x$repeated) && x$repeated) {
@@ -701,28 +680,18 @@ print.oneway_anova_test_results <- function(x, digits = 3, ...) {
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
       
-      # Format group info
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", levels(val)[val])
-        } else {
-          paste(g, "=", val)
-        }
-      })
-      group_info <- paste(group_info, collapse = ", ")
-      
       # Filter results for current group
       group_results <- x$results
       for (g in names(group_values)) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
-      
+
       if (nrow(group_results) == 0) next
       group_results <- group_results[!is.na(group_results$Variable), ]
       if (nrow(group_results) == 0) next
-      
-      cat(sprintf("\nGroup: %s\n", group_info))
+
+      # Print group header using standardized helper
+      print_group_header(group_values)
       
       # Print each variable as separate block
       for (j in seq_len(nrow(group_results))) {

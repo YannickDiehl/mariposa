@@ -1,48 +1,63 @@
 
-#' Chi-Squared Test for Independence
+#' Test If Two Categories Are Related
 #'
 #' @description
-#' Performs chi-squared test for independence between categorical variables
-#' with support for weights and grouped data. The function calculates appropriate
-#' effect sizes based on table dimensions:
-#' - Cramer's V: Always displayed (appropriate for any table size)
-#' - Phi coefficient: Only displayed for 2x2 tables (where it's interpretable)
-#' - Goodman and Kruskal's Gamma: Measure of association for ordinal variables
+#' \code{chi_square()} helps you discover if two categorical variables are
+#' related or independent. For example, is education level related to voting
+#' preference? Or are they independent of each other?
 #'
-#' @param data A data frame containing the variables
-#' @param ... Variables to test (unquoted names)
-#' @param weights Optional weights variable (unquoted)
-#' @param correct Logical; apply continuity correction (default: FALSE)
+#' The test tells you:
+#' - Whether the relationship is statistically significant
+#' - How strong the relationship is (effect sizes)
+#' - What patterns exist in your data
 #'
-#' @return An object of class "chi_squared_test_results" containing:
-#' - Test statistics (chi-squared, df, p-value)
-#' - Observed and expected frequencies
-#' - Effect sizes (Cramer's V, Phi for 2x2 tables, Contingency C)
-#' - Table dimensions for appropriate effect size selection
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... Two categorical variables to test (e.g., gender, region)
+#' @param weights Optional survey weights for population-representative results
+#' @param correct Apply continuity correction for small samples? (Default: FALSE)
+#'
+#' @return Test results showing whether the variables are related, including:
+#' - Chi-squared statistic and p-value
+#' - Observed vs expected frequencies
+#' - Effect sizes to measure relationship strength
 #'
 #' @details
-#' ## Effect Size Measures
+#' ## Understanding the Results
 #'
-#' The function intelligently selects which effect sizes to display based on
-#' table dimensions:
+#' **P-value**: If p < 0.05, the variables are likely related (not independent)
+#' - p < 0.001: Very strong evidence of relationship
+#' - p < 0.01: Strong evidence of relationship
+#' - p < 0.05: Moderate evidence of relationship
+#' - p ≥ 0.05: No significant relationship found
 #'
-#' **Cramer's V**: Always calculated and displayed. It's the most versatile
-#' effect size for chi-square tests, ranging from 0 to 1 regardless of table size.
-#' Interpretation: < 0.1 = negligible, 0.1-0.3 = small, 0.3-0.5 = medium, > 0.5 = large.
+#' **Effect Sizes** (How strong is the relationship?):
+#' - **Cramer's V**: Works for any table size (0 = no relationship, 1 = perfect relationship)
+#'   - < 0.1: Negligible relationship
+#'   - 0.1-0.3: Small relationship
+#'   - 0.3-0.5: Medium relationship
+#'   - 0.5 or higher: Large relationship
+#' - **Phi**: Only for 2x2 tables (similar interpretation as Cramer's V)
+#' - **Gamma**: For ordinal data (-1 to +1, shows direction of relationship)
 #'
-#' **Phi coefficient (phi)**: Only displayed for 2x2 tables where it ranges from 0 to 1
-#' and can be interpreted as a correlation coefficient. For larger tables, Phi can
-#' exceed 1 and loses its interpretability, so it's not shown.
+#' ## When to Use This
 #'
-#' **Goodman and Kruskal's Gamma (gamma)**: A measure of association between ordinal
-#' variables that ranges from -1 to +1. Gamma measures the strength and direction
-#' of monotonic association by comparing concordant and discordant pairs.
-#' Interpretation: |gamma| < 0.1 = weak, 0.1-0.3 = moderate, > 0.3 = strong association.
+#' Use chi-squared test when:
+#' - Both variables are categorical (gender, region, education level, etc.)
+#' - You want to know if they're related or independent
+#' - You have at least 5 observations in most cells
 #'
-#' ## Weighted Analysis
+#' ## Reading the Frequency Tables
 #'
-#' When weights are provided, the function rounds them to integers for
-#' SPSS compatibility before calculating the chi-square statistic.
+#' - **Observed**: What you actually found in your data
+#' - **Expected**: What you'd expect if variables were independent
+#' - Large differences suggest a relationship exists
+#'
+#' ## Tips for Success
+#'
+#' - Check that most cells have at least 5 observations
+#' - Use weights for population estimates
+#' - Look at both significance (p-value) and strength (effect sizes)
+#' - Consider using crosstab() for detailed percentage breakdowns
 #'
 #' @examples
 #' # Load required packages and data
@@ -50,21 +65,21 @@
 #' data(survey_data)
 #' 
 #' # Basic chi-squared test for independence
-#' survey_data %>% chi_squared_test(gender, region)
+#' survey_data %>% chi_square(gender, region)
 #' 
 #' # With weights
-#' survey_data %>% chi_squared_test(gender, education, weights = sampling_weight)
+#' survey_data %>% chi_square(gender, education, weights = sampling_weight)
 #' 
 #' # Grouped analysis
 #' survey_data %>% 
 #'   group_by(region) %>% 
-#'   chi_squared_test(gender, employment)
+#'   chi_square(gender, employment)
 #' 
 #' # With continuity correction
-#' survey_data %>% chi_squared_test(gender, region, correct = TRUE)
+#' survey_data %>% chi_square(gender, region, correct = TRUE)
 #' 
 #' @export
-chi_squared_test <- function(data, ..., weights = NULL, correct = FALSE) {
+chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   
   # Get variable names
   dots <- enquos(...)
@@ -339,7 +354,7 @@ chi_squared_test <- function(data, ..., weights = NULL, correct = FALSE) {
     data = data
   )
   
-  class(result) <- "chi_squared_test_results"
+  class(result) <- "chi_square_results"
   return(result)
 }
 
@@ -383,30 +398,20 @@ chi_squared_test <- function(data, ..., weights = NULL, correct = FALSE) {
   return(sprintf(" %5.3f", p))
 }
 
-#' Print method for chi_squared_test_results
+#' Print method for chi_square_results
 #'
 #' @param x Chi-squared test results object
 #' @param digits Number of decimal places (default: 3)
 #' @param ... Additional arguments passed to print
 #' @export
-print.chi_squared_test_results <- function(x, digits = 3, ...) {
+print.chi_square_results <- function(x, digits = 3, ...) {
+
+  # Determine test type using standardized helper
+  test_type <- get_standard_title("Chi-Squared Test of Independence", x$weights, "")
+  print_header(test_type)
   
-  # Determine test type
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Chi-Squared Test of Independence"
-  } else {
-    "Chi-Squared Test of Independence"
-  }
-  
-  cat("\n", test_type, "\n", sep = "")
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
-  
-  # Add significance stars
-  p_values <- x$results$p_value
-  sig <- cut(p_values, 
-            breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-            labels = c("***", "**", "*", ""),
-            right = FALSE)
+  # Add significance stars using standard helper
+  sig <- sapply(x$results$p_value, add_significance_stars)
   
   if (!x$is_grouped) {
     # Simple test display
@@ -641,14 +646,14 @@ print.chi_squared_test_results <- function(x, digits = 3, ...) {
   invisible(x)
 }
 
-#' @rdname chi_squared_test
+#' @rdname chi_square
 #' @export
-phi_test <- chi_squared_test
+phi_test <- chi_square
 
-#' @rdname chi_squared_test
+#' @rdname chi_square
 #' @export
-cramers_v_test <- chi_squared_test
+cramers_v_test <- chi_square
 
-#' @rdname chi_squared_test
+#' @rdname chi_square
 #' @export
-gamma_test <- chi_squared_test
+gamma_test <- chi_square
