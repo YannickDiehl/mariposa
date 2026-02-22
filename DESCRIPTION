@@ -6,10 +6,12 @@ Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
            role = c("aut", "cre"))
-Description: A comprehensive package for statistical analysis of survey data,
-    providing tools for data cleaning, weighting, complex survey design analysis,
-    and visualization. Designed to handle common survey methodologies and
-    statistical procedures used in survey research.
+Description: Professional statistical analysis of survey data with full support
+    for survey weights, grouped operations, and tidyverse integration. Provides
+    46+ functions for descriptive statistics, hypothesis testing, correlation
+    analysis, and post-hoc comparisons. All results are validated against SPSS
+    v29 for reproducibility. Designed for survey researchers, social scientists,
+    and students working with complex survey designs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1.0)

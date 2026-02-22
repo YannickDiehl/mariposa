@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-A comprehensive package for statistical analysis of survey data, providing tools for data cleaning, weighting, complex survey design analysis, and visualization. Designed to handle common survey methodologies and statistical procedures used in survey research.
+Professional statistical analysis of survey data with full support for survey weights, grouped operations, and tidyverse integration. Provides 46+ functions for descriptive statistics, hypothesis testing, correlation analysis, and post-hoc comparisons. All results are validated against SPSS v29 for reproducibility. Designed for survey researchers, social scientists, and students working with complex survey designs.
 }
 \seealso{
 Useful links:

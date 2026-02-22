@@ -41,8 +41,8 @@ If files are missing or corrupted:
 ```r
 # From R console
 library(haven)
-data(survey_data, package = "SurveyStat")
-data(longitudinal_data, package = "SurveyStat")
+data(survey_data, package = "mariposa")
+data(longitudinal_data, package = "mariposa")
 
 write_sav(survey_data, "survey_data.sav")
 write_sav(longitudinal_data, "longitudinal_data.sav")

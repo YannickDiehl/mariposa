@@ -9,34 +9,34 @@ template:
       <link rel="stylesheet" href="extra.css">
 
 home:
-  title: mariposa - Marburg Initiative for Political and Social Analysis
+  title: mariposa - Professional Survey Analysis in R
   description: >
-    A comprehensive R package for statistical analysis of survey data,
-    providing SPSS-compatible results, weighted analysis, and professional
-    formatting. Designed for survey researchers, data scientists, and
-    statistical analysts working with complex survey designs.
+    A comprehensive R package for statistical analysis of survey data.
+    Full support for survey weights, tidyverse integration, and
+    professional output formatting. Validated against SPSS for
+    reproducible, publication-ready results.
 
 navbar:
   structure:
-    left: [intro, reference, articles, tutorials, news]
+    left: [intro, reference, articles, news]
     right: [search, github]
   components:
     reference:
       text: Reference
       href: reference/index.html
     articles:
-      text: Vignettes
+      text: Guides
       menu:
       - text: "Getting Started"
       - text: "Introduction to mariposa"
         href: articles/introduction.html
       - text: "-------"
-      - text: "Core Functions"
-      - text: "Descriptive Statistics and Frequencies"
+      - text: "Core Analysis"
+      - text: "Descriptive Statistics"
         href: articles/descriptive-statistics.html
-      - text: "Comparing Groups and Testing Hypotheses"
+      - text: "Hypothesis Testing"
         href: articles/hypothesis-testing.html
-      - text: "Understanding Relationships: Correlation Analysis"
+      - text: "Correlation Analysis"
         href: articles/correlation-analysis.html
       - text: "-------"
       - text: "Advanced Topics"
@@ -48,43 +48,43 @@ navbar:
       aria-label: GitHub
 
 reference:
-- title: "🎯 Descriptive Statistics"
-  desc: "Core descriptive and frequency analysis functions"
+- title: "Descriptive Statistics"
+  desc: "Summarize and explore your survey data"
   contents:
   - describe
   - frequency
   - crosstab
 
-- title: "📈 Hypothesis Testing"
-  desc: "Statistical tests for comparing groups and testing hypotheses"
+- title: "Hypothesis Testing"
+  desc: "Compare groups and test for significant differences"
   contents:
   - t_test
+  - oneway_anova
   - mann_whitney
   - chi_square
-  - oneway_anova
 
-- title: "🔗 Correlation Analysis"
-  desc: "Correlation coefficients for continuous and ordinal variables"
+- title: "Correlation Analysis"
+  desc: "Measure relationships between variables"
   contents:
   - pearson_cor
-  - kendall_tau
   - spearman_rho
+  - kendall_tau
 
-- title: "🔍 Post-Hoc Analysis"
-  desc: "S3 generics for extended analysis of test results"
+- title: "Post-Hoc Analysis"
+  desc: "Follow-up tests for detailed group comparisons"
   contents:
   - tukey_test
   - scheffe_test
   - levene_test
 
-- title: "📊 Weighted Statistics"
-  desc: "Specialized weighted statistical functions for survey data"
+- title: "Weighted Statistics"
+  desc: "Individual weighted statistics for survey data"
   contents:
   - w_mean
+  - w_median
   - w_sd
   - w_var
   - w_se
-  - w_median
   - w_iqr
   - w_range
   - w_quantile
@@ -92,15 +92,15 @@ reference:
   - w_skew
   - w_kurtosis
 
-- title: "📋 Datasets"
-  desc: "Synthetic survey and longitudinal datasets for testing and examples"
+- title: "Datasets"
+  desc: "Example datasets for learning and testing"
   contents:
   - survey_data
   - longitudinal_data
   - longitudinal_data_wide
 
-- title: "🛠️ Print Methods"
-  desc: "Professional output formatting methods"
+- title: "Print Methods"
+  desc: "Formatted output for all result types"
   contents:
   - starts_with("print.")
 
@@ -110,7 +110,7 @@ articles:
   contents:
   - introduction
 
-- title: "Core Analysis Functions"
+- title: "Core Analysis"
   navbar: ~
   contents:
   - descriptive-statistics
@@ -127,8 +127,8 @@ footer:
     left: developed_by
     right: built_with
   components:
-    developed_by: "Developed with ❤️ for survey researchers"
-    built_with: "Built with [pkgdown](https://pkgdown.r-lib.org/index.html)"
+    developed_by: "Developed by [Yannick Diehl](https://github.com/YannickDiehl)"
+    built_with: "Built with [pkgdown](https://pkgdown.r-lib.org/)"
 
 development:
   mode: auto

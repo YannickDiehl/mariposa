@@ -11,7 +11,7 @@ library(testthat)
 library(dplyr)
 
 # Load test data
-data(survey_data, package = "SurveyStat")
+data(survey_data, package = "mariposa")
 
 # ============================================================================
 # SPSS REFERENCE VALUES

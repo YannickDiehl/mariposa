@@ -15,7 +15,7 @@ kendall_tau(
 \arguments{
 \item{data}{A data frame or tibble containing the variables to analyze}
 
-\item{...}{\if{html}{\out{<\code{\link[dplyr]{dplyr_tidy_select}}>}} Variables for correlation analysis.
+\item{...}{<\code{\link[dplyr]{dplyr_tidy_select}}> Variables for correlation analysis.
 Supports all tidyselect helpers. If more than two variables are selected,
 a correlation matrix is computed.}
 
