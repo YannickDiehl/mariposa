@@ -31,15 +31,29 @@ data(survey_data)
 survey_data \%>\% w_median(age, weights = sampling_weight)
 
 # Multiple variables
-survey_data \%>\% w_median(age, income, life_satisfaction, weights = sampling_weight)
+survey_data \%>\% w_median(age, income, weights = sampling_weight)
 
 # Grouped data
 survey_data \%>\% group_by(region) \%>\% w_median(age, weights = sampling_weight)
 
 # In summarise context
-survey_data \%>\% summarise(median_age = w_median(age, weights = sampling_weight))
+survey_data \%>\% summarise(med_age = w_median(age, weights = sampling_weight))
 
 # Unweighted (for comparison)
 survey_data \%>\% w_median(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

@@ -23,7 +23,7 @@
 #'   specifying case weights for the analysis. When provided, weighted statistics are 
 #'   calculated for means and standard deviations.
 #'
-#' @return An object of class \code{"rm_t_test_results"} containing:
+#' @return An object of class \code{"rm_t_test"} containing:
 #' \describe{
 #'   \item{results}{A data frame with test statistics, p-values, effect sizes, 
 #'     and confidence intervals}
@@ -81,7 +81,7 @@
 #' @seealso 
 #' \code{\link[stats]{t.test}} for the base R t-test function.
 #' 
-#' \code{\link{print.rm_t_test_results}} for printing results.
+#' \code{\link{print.rm_t_test}} for printing results.
 #' 
 #' \code{\link[dplyr]{group_by}} for grouped analyses.
 #' 
@@ -384,7 +384,7 @@ rm_t_test <- function(data, ..., mu = 0, alternative = c("two.sided", "less", "g
       alternative = alternative,
       conf.level = conf.level
     ),
-    class = "rm_t_test_results"
+    class = "rm_t_test"
   )
 }
 
@@ -407,18 +407,18 @@ rm_t_test <- function(data, ..., mu = 0, alternative = c("two.sided", "less", "g
 #' Print paired t-test results
 #'
 #' @description
-#' Print method for objects of class \code{"rm_t_test_results"}.
+#' Print method for objects of class \code{"rm_t_test"}.
 #' Displays test statistics, p-values, confidence intervals, and effect sizes
 #' in a formatted, easy-to-read layout similar to SPSS output.
 #'
-#' @param x An object of class \code{"rm_t_test_results"} from \code{rm_t_test()}.
+#' @param x An object of class \code{"rm_t_test"} from \code{rm_t_test()}.
 #' @param digits Number of decimal places to display for numeric values. Default is 3.
 #' @param ... Additional arguments passed to print methods.
 #'
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @export
-print.rm_t_test_results <- function(x, digits = 3, ...) {
+print.rm_t_test <- function(x, digits = 3, ...) {
   # Determine if weighted analysis was used
   is_weighted <- !is.null(x$weights)
   

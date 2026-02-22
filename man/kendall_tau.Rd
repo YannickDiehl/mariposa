@@ -36,7 +36,7 @@ for weighted correlations. Should be a numeric variable with positive values.}
 }}
 }
 \value{
-An object of class \code{"kendall_tau_results"} containing:
+An object of class \code{"kendall_tau"} containing:
 \describe{
 \item{correlations}{Data frame with tau coefficients, p-values, and z-scores}
 \item{n_obs}{Matrix of sample sizes for each correlation}
@@ -155,4 +155,9 @@ Agresti, A. (2010). Analysis of Ordinal Categorical Data (2nd ed.). John Wiley &
 \code{\link[stats]{cor}} with method="kendall" for base R implementation
 \code{\link[stats]{cor.test}} with method="kendall" for significance testing
 \code{\link{pearson_cor}} for Pearson correlation analysis
+
+Other correlation: 
+\code{\link{pearson_cor}()},
+\code{\link{spearman_rho}()}
 }
+\concept{correlation}

@@ -27,7 +27,7 @@
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
 #'
-#' @return An object of class \code{"kendall_tau_results"} containing:
+#' @return An object of class \code{"kendall_tau"} containing:
 #' \describe{
 #'   \item{correlations}{Data frame with tau coefficients, p-values, and z-scores}
 #'   \item{n_obs}{Matrix of sample sizes for each correlation}
@@ -125,20 +125,21 @@
 #'
 #' Agresti, A. (2010). Analysis of Ordinal Categorical Data (2nd ed.). John Wiley & Sons.
 #'
+#' @family correlation
 #' @export
 kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na.rm = "pairwise") {
 
   # Input validation
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
 
   if (!na.rm %in% c("pairwise", "listwise")) {
-    stop("na.rm must be either 'pairwise' or 'listwise'")
+    cli_abort("{.arg na.rm} must be either {.val pairwise} or {.val listwise}.")
   }
 
   if (!alternative %in% c("two.sided", "less", "greater")) {
-    stop("alternative must be 'two.sided', 'less', or 'greater'")
+    cli_abort("{.arg alternative} must be {.val two.sided}, {.val less}, or {.val greater}.")
   }
 
 
@@ -155,13 +156,13 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
   var_names <- names(vars)
 
   if (length(var_names) < 2) {
-    stop("At least two variables must be specified for correlation analysis")
+    cli_abort("At least two variables must be specified for correlation analysis.")
   }
 
   # Validate that all selected variables are numeric
   for (var_name in var_names) {
     if (!is.numeric(data[[var_name]])) {
-      stop("Variable '", var_name, "' is not numeric")
+      cli_abort("Variable {.var {var_name}} is not numeric.")
     }
   }
 
@@ -554,7 +555,7 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     group_keys = if(is_grouped) group_keys else NULL
   )
 
-  class(result) <- "kendall_tau_results"
+  class(result) <- "kendall_tau"
   return(result)
 }
 
@@ -631,14 +632,14 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
   }
 }
 
-#' Print method for kendall_tau_results
+#' Print method for kendall_tau
 #'
-#' @param x A kendall_tau_results object
+#' @param x A kendall_tau object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #'
 #' @export
-print.kendall_tau_results <- function(x, digits = 3, ...) {
+print.kendall_tau <- function(x, digits = 3, ...) {
 
   # Print header using standardized helper
   test_type <- get_standard_title("Kendall's Tau-b Correlation", x$weights, "")

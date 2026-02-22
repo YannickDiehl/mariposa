@@ -747,7 +747,7 @@ test_that("Edge case: Tukey test with missing values", {
   })
 
   # Check that results are produced despite missing values
-  expect_s3_class(tukey_result, "tukey_test_results")
+  expect_s3_class(tukey_result, "tukey_test")
   expect_true(nrow(tukey_result$results) > 0)
 })
 
@@ -790,7 +790,7 @@ test_that("Edge case: Multiple variables simultaneously", {
   expect_true("age" %in% tukey_result$results$Variable)
 
   # Check that results are properly structured
-  expect_s3_class(tukey_result, "tukey_test_results")
+  expect_s3_class(tukey_result, "tukey_test")
   expect_equal(length(tukey_result$variables), 3)
 })
 

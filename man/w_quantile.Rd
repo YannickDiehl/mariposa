@@ -51,3 +51,17 @@ survey_data \%>\% group_by(region) \%>\% w_quantile(age, weights = sampling_weig
 survey_data \%>\% w_quantile(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

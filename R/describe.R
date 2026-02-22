@@ -79,6 +79,7 @@
 #'   group_by(region) %>% 
 #'   describe(age, weights = sampling_weight)
 #'
+#' @family descriptive
 #' @export
 describe <- function(data, ..., weights = NULL, 
                      show = "short", 
@@ -91,7 +92,7 @@ describe <- function(data, ..., weights = NULL,
   # ============================================================================
   
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   # Process show parameter - expand shortcuts to full statistic names
@@ -103,7 +104,14 @@ describe <- function(data, ..., weights = NULL,
   
   # Get variable names using tidyselect
   vars <- .process_variables(data, ...)
-  
+
+  # Validate that all selected variables are numeric (describe-specific)
+  for (var_name in names(vars)) {
+    if (!is.numeric(data[[var_name]])) {
+      cli_abort("Variable {.var {var_name}} is not numeric. {.fn describe} only works with numeric variables.")
+    }
+  }
+
   # Process weights parameter
   weights_info <- .process_weights(data, rlang::enquo(weights))
   
@@ -136,50 +144,6 @@ describe <- function(data, ..., weights = NULL,
   
   class(result) <- "describe"
   return(result)
-}
-
-# ============================================================================
-# HELPER FUNCTIONS FOR INPUT PROCESSING
-# ============================================================================
-
-#' Process variable selection using tidyselect
-#' @keywords internal
-.process_variables <- function(data, ...) {
-  vars <- rlang::enquos(...)
-  if (length(vars) == 0) {
-    stop("At least one variable must be specified")
-  }
-  
-  selected_vars <- tidyselect::eval_select(rlang::expr(c(...)), data)
-  
-  if (length(selected_vars) == 0) {
-    stop("No variables selected")
-  }
-  
-  # Validate that all selected variables are numeric
-  for (var_name in names(selected_vars)) {
-    if (!is.numeric(data[[var_name]])) {
-      stop("Variable '", var_name, "' is not numeric")
-    }
-  }
-  
-  return(selected_vars)
-}
-
-#' Process weights parameter and validate
-#' @keywords internal
-.process_weights <- function(data, weights_quo) {
-  if (rlang::quo_is_null(weights_quo)) {
-    return(list(vector = NULL, name = NULL))
-  }
-  
-  weights_name <- rlang::as_name(weights_quo)
-  if (weights_name %in% names(data)) {
-    return(list(vector = data[[weights_name]], name = weights_name))
-  } else {
-    warning(sprintf("Weights variable '%s' not found in data. Using unweighted calculation.", weights_name))
-    return(list(vector = NULL, name = NULL))
-  }
 }
 
 # ============================================================================
@@ -295,17 +259,17 @@ describe <- function(data, ..., weights = NULL,
   
   # Basic validation checks
   if (length(weights) != length(x)) {
-    warning("Length of weights does not match length of data. Using unweighted calculation.")
+    cli_warn("Length of weights does not match length of data. Using unweighted calculation.")
     return(list(x = x, weights = NULL, valid = FALSE))
   }
   
   if (any(weights < 0, na.rm = TRUE)) {
-    warning("Negative weights found. Using unweighted calculation.")
+    cli_warn("Negative weights found. Using unweighted calculation.")
     return(list(x = x, weights = NULL, valid = FALSE))
   }
   
   if (all(is.na(weights))) {
-    warning("All weights are missing. Using unweighted calculation.")
+    cli_warn("All weights are missing. Using unweighted calculation.")
     return(list(x = x, weights = NULL, valid = FALSE))
   }
   
@@ -322,14 +286,7 @@ describe <- function(data, ..., weights = NULL,
   return(list(x = x_clean, weights = weights_clean, valid = TRUE))
 }
 
-#' Calculate effective sample size for weighted data
-#' @keywords internal
-.effective_n <- function(weights) {
-  if (is.null(weights)) return(length(weights))
-  sum_w <- sum(weights, na.rm = TRUE)
-  sum_w2 <- sum(weights^2, na.rm = TRUE)
-  return(sum_w^2 / sum_w2)
-}
+# .effective_n() is defined in helpers.R — no local redefinition needed
 
 #' Weighted mean
 #' @keywords internal

@@ -10,6 +10,7 @@
 #' @param na.rm Logical; if TRUE, missing values are removed
 #'
 #' @return A w_modus object (list) containing results and metadata, or values in summarise context
+#' @family weighted_statistics
 #' @export
 #'
 #' @examples
@@ -95,7 +96,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
   
   # Data frame handling
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   # Get variables and weights
@@ -111,7 +112,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
     if (weights_name %in% names(data)) {
       weights_vec <- data[[weights_name]]
     } else {
-      stop("Weights variable '", weights_name, "' not found in data")
+      cli_abort("Weights variable {.var {weights_name}} not found in data.")
     }
   }
   

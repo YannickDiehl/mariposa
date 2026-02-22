@@ -454,8 +454,8 @@ test_that("Scheffe test matches SPSS for unweighted/ungrouped analysis", {
                            "Unweighted/Ungrouped - Income")
 
   # Basic assertions to ensure tests run
-  expect_s3_class(result_life, "scheffe_test_results")
-  expect_s3_class(result_income, "scheffe_test_results")
+  expect_s3_class(result_life, "scheffe_test")
+  expect_s3_class(result_income, "scheffe_test")
 })
 
 test_that("Scheffe test matches SPSS for weighted/ungrouped analysis", {
@@ -468,7 +468,7 @@ test_that("Scheffe test matches SPSS for weighted/ungrouped analysis", {
   compare_scheffe_with_spss(result, spss_values$weighted_ungrouped_life,
                            "Weighted/Ungrouped - Life Satisfaction")
 
-  expect_s3_class(result, "scheffe_test_results")
+  expect_s3_class(result, "scheffe_test")
 })
 
 test_that("Scheffe test matches SPSS for grouped analysis (by region)", {
@@ -493,7 +493,7 @@ test_that("Scheffe test matches SPSS for grouped analysis (by region)", {
   compare_scheffe_with_spss(west_result_obj, spss_values$unweighted_grouped_west_life,
                            "Unweighted/Grouped - West")
 
-  expect_s3_class(result, "scheffe_test_results")
+  expect_s3_class(result, "scheffe_test")
 })
 
 test_that("Scheffe test matches SPSS for weighted/grouped analysis", {
@@ -518,7 +518,7 @@ test_that("Scheffe test matches SPSS for weighted/grouped analysis", {
   compare_scheffe_with_spss(west_result_obj, spss_values$weighted_grouped_west_life,
                            "Weighted/Grouped - West")
 
-  expect_s3_class(result, "scheffe_test_results")
+  expect_s3_class(result, "scheffe_test")
 })
 
 # ============================================================================

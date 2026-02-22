@@ -45,21 +45,9 @@ Survey samples rarely match the population perfectly. Weights correct for:
 }
 }
 
-\subsection{Weighted vs Unweighted}{
-\itemize{
-\item \strong{Unweighted mean}: Average of your sample as-is
-\item \strong{Weighted mean}: Estimated average for your entire population
-\item These can differ substantially when your sample isn't representative
-}
-}
+\subsection{Formula}{
 
-\subsection{Tips for Success}{
-\itemize{
-\item Always use weights for population estimates
-\item Compare weighted and unweighted means to see sampling effects
-\item Check effective sample size - very low values suggest high weight variation
-\item Ensure your weights sum to a meaningful total (often population size)
-}
+Weighted mean: \eqn{\bar{x}_w = \sum(w_i \cdot x_i) / \sum(w_i)}
 }
 }
 \examples{
@@ -83,3 +71,17 @@ survey_data \%>\% summarise(mean_age = w_mean(age, weights = sampling_weight))
 survey_data \%>\% w_mean(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

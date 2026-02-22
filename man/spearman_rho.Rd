@@ -38,7 +38,7 @@ weighted ranks for mathematically correct survey analysis.}
 }}
 }
 \value{
-An object of class \code{"spearman_rho_results"} containing:
+An object of class \code{"spearman_rho"} containing:
 \describe{
 \item{correlations}{Data frame with rho coefficients, p-values, and t-statistics}
 \item{n_obs}{Matrix of sample sizes for each correlation}
@@ -159,4 +159,9 @@ Lehmann, E.L. (1975). Nonparametrics: Statistical Methods Based on Ranks. Holden
 \code{\link[stats]{cor.test}} with method="spearman" for significance testing
 \code{\link{kendall_tau}} for Kendall's rank correlation
 \code{\link{pearson_cor}} for Pearson correlation analysis
+
+Other correlation: 
+\code{\link{kendall_tau}()},
+\code{\link{pearson_cor}()}
 }
+\concept{correlation}

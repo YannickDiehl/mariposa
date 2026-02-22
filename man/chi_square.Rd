@@ -4,7 +4,7 @@
 \alias{chi_square}
 \alias{phi}
 \alias{cramers_v}
-\alias{gamma}
+\alias{goodman_gamma}
 \title{Test If Two Categories Are Related}
 \usage{
 chi_square(data, ..., weights = NULL, correct = FALSE)
@@ -13,7 +13,7 @@ phi(data, ..., weights = NULL, correct = FALSE)
 
 cramers_v(data, ..., weights = NULL, correct = FALSE)
 
-gamma(data, ..., weights = NULL, correct = FALSE)
+goodman_gamma(data, ..., weights = NULL, correct = FALSE)
 }
 \arguments{
 \item{data}{Your survey data (a data frame or tibble)}
@@ -116,3 +116,10 @@ survey_data \%>\%
 survey_data \%>\% chi_square(gender, region, correct = TRUE)
 
 }
+\seealso{
+Other hypothesis_tests: 
+\code{\link{mann_whitney}()},
+\code{\link{oneway_anova}()},
+\code{\link{t_test}()}
+}
+\concept{hypothesis_tests}

@@ -76,11 +76,12 @@
 #' survey_data %>% frequency(employment, weights = sampling_weight, 
 #'                          show.na = TRUE, show.sum = TRUE)
 #'
+#' @family descriptive
 #' @export
 frequency <- function(data, ..., weights = NULL, sort.frq = "none",
                      show.na = TRUE, show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto") {
   
-  if (!is.data.frame(data)) stop("data must be a data frame")
+  if (!is.data.frame(data)) cli_abort("{.arg data} must be a data frame.")
   
   # Check grouping and get variable names
   is_grouped <- inherits(data, "grouped_df")
@@ -159,7 +160,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
     is_grouped = is_grouped,
     options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels),
     labels = sapply(var_names, function(var) attr(data[[var]], "label") %||% var)
-  ), class = "frequency_results")
+  ), class = "frequency")
 }
 
 # Helper function: Get value labels
@@ -442,17 +443,17 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
   )
 }
 
-#' Print method for frequency_results objects
+#' Print method for frequency objects
 #'
 #' @description
 #' Prints formatted frequency statistics with ASCII tables.
 #'
-#' @param x An object of class "frequency_results"
+#' @param x An object of class "frequency"
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #'
 #' @export
-print.frequency_results <- function(x, digits = 3, ...) {
+print.frequency <- function(x, digits = 3, ...) {
   # Helper functions for formatting
   format_num <- function(x, width = 6) sprintf(paste0("%-", width, ".2f"), ifelse(is.na(x), NA, x))
   format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
