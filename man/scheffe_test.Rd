@@ -150,4 +150,9 @@ Scheffe, H. (1959). The Analysis of Variance. New York: Wiley.
 \code{\link{tukey_test}} for Tukey HSD post-hoc tests.
 
 \code{\link{levene_test}} for testing homogeneity of variances.
+
+Other posthoc: 
+\code{\link{levene_test}()},
+\code{\link{tukey_test}()}
 }
+\concept{posthoc}

@@ -29,7 +29,7 @@
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
 #'
-#' @return An object of class \code{"spearman_rho_results"} containing:
+#' @return An object of class \code{"spearman_rho"} containing:
 #' \describe{
 #'   \item{correlations}{Data frame with rho coefficients, p-values, and t-statistics}
 #'   \item{n_obs}{Matrix of sample sizes for each correlation}
@@ -129,21 +129,22 @@
 #'
 #' Lehmann, E.L. (1975). Nonparametrics: Statistical Methods Based on Ranks. Holden-Day.
 #'
+#' @family correlation
 #' @export
 spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
                         na.rm = "pairwise") {
 
   # Input validation
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
 
   if (!na.rm %in% c("pairwise", "listwise")) {
-    stop("na.rm must be either 'pairwise' or 'listwise'")
+    cli_abort("{.arg na.rm} must be either {.val pairwise} or {.val listwise}.")
   }
 
   if (!alternative %in% c("two.sided", "less", "greater")) {
-    stop("alternative must be 'two.sided', 'less', or 'greater'")
+    cli_abort("{.arg alternative} must be {.val two.sided}, {.val less}, or {.val greater}.")
   }
 
 
@@ -160,13 +161,13 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
   var_names <- names(vars)
 
   if (length(var_names) < 2) {
-    stop("At least two variables must be specified for correlation analysis")
+    cli_abort("At least two variables must be specified for correlation analysis.")
   }
 
   # Validate that all selected variables are numeric
   for (var_name in var_names) {
     if (!is.numeric(data[[var_name]])) {
-      stop("Variable '", var_name, "' is not numeric")
+      cli_abort("Variable {.var {var_name}} is not numeric.")
     }
   }
 
@@ -424,17 +425,17 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     n_obs = if (!is_grouped) matrices[[1]]$n_obs else NULL
   )
 
-  class(result) <- "spearman_rho_results"
+  class(result) <- "spearman_rho"
   return(result)
 }
 
-#' Print method for spearman_rho_results
+#' Print method for spearman_rho
 #'
-#' @param x An object of class "spearman_rho_results"
+#' @param x An object of class "spearman_rho"
 #' @param digits Number of decimal places to display
 #' @param ... Additional arguments (not used)
 #' @export
-print.spearman_rho_results <- function(x, digits = 3, ...) {
+print.spearman_rho <- function(x, digits = 3, ...) {
   # Header
   cat("\n")
   # Print header using standardized title

@@ -149,4 +149,9 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.
 \code{\link[stats]{TukeyHSD}} for the base R Tukey HSD function.
 
 \code{\link{levene_test}} for testing homogeneity of variances.
+
+Other posthoc: 
+\code{\link{levene_test}()},
+\code{\link{scheffe_test}()}
 }
+\concept{posthoc}

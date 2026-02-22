@@ -19,19 +19,19 @@ w_iqr(data, ..., weights = NULL, na.rm = TRUE)
 A w_iqr object (list) containing results and metadata, or numeric values in summarise context
 }
 \description{
-Calculate weighted interquartile range (Q3 - Q1) for numeric variables, with support for
-grouped data and multiple variables simultaneously.
+Calculate weighted interquartile range (Q3 - Q1) for numeric variables,
+with support for grouped data and multiple variables simultaneously.
 }
 \examples{
 # Load required packages and data
 library(dplyr)
 data(survey_data)
 
-# Basic weighted interquartile range
+# Basic weighted IQR
 survey_data \%>\% w_iqr(age, weights = sampling_weight)
 
 # Multiple variables
-survey_data \%>\% w_iqr(age, income, life_satisfaction, weights = sampling_weight)
+survey_data \%>\% w_iqr(age, income, weights = sampling_weight)
 
 # Grouped data
 survey_data \%>\% group_by(region) \%>\% w_iqr(age, weights = sampling_weight)
@@ -43,3 +43,17 @@ survey_data \%>\% summarise(iqr_age = w_iqr(age, weights = sampling_weight))
 survey_data \%>\% w_iqr(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

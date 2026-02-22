@@ -96,7 +96,7 @@
 #' @seealso 
 #' \code{\link[stats]{t.test}} for the base R t-test function.
 #' 
-#' \code{\link{print.t_test_results}} for printing results.
+#' \code{\link{print.t_test}} for printing results.
 #' 
 #' \code{\link[dplyr]{group_by}} for grouped analyses.
 #' 
@@ -156,6 +156,7 @@
 #'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #' print(result)
 #'
+#' @family hypothesis_tests
 #' @export
 t_test <- function(data, ..., group = NULL, weights = NULL, 
                   var.equal = FALSE, mu = 0, alternative = c("two.sided", "less", "greater"),
@@ -163,11 +164,17 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   
   # Input validation
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   alternative <- match.arg(alternative)
-  
+
+  # Validate conf.level
+  if (!is.numeric(conf.level) || length(conf.level) != 1 ||
+      conf.level <= 0 || conf.level >= 1) {
+    cli_abort("{.arg conf.level} must be a single number between 0 and 1 (exclusive).")
+  }
+
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) group_vars(data) else NULL
@@ -180,7 +187,14 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   # Evaluate selections
   vars <- eval_select(expr(c(!!!dots)), data = data)
   var_names <- names(vars)
-  
+
+  # Validate that selected variables are numeric
+  for (vn in var_names) {
+    if (!is.numeric(data[[vn]])) {
+      cli_abort("Variable {.var {vn}} is not numeric. {.fn t_test} requires numeric variables.")
+    }
+  }
+
   if (!quo_is_null(group_quo)) {
     g_var <- eval_select(expr(!!group_quo), data = data)
     g_name <- names(g_var)
@@ -225,7 +239,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       hedges_g <- cohens_d * hedges_j
       
     } else {
-      # Weighted Cohen's d - following sjstats method exactly
+      # Weighted Cohen's d using proper weighted means and pooled SD
       # Remove NA values
       valid1 <- !is.na(x1) & !is.na(w1)
       valid2 <- !is.na(x2) & !is.na(w2)
@@ -233,35 +247,31 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       x2 <- x2[valid2]
       w1 <- w1[valid1]
       w2 <- w2[valid2]
-      
-      # Create data frame
-      dat <- data.frame(
-        y = c(x1, x2),
-        g = factor(c(rep("Group1", length(x1)), rep("Group2", length(x2)))),
-        w = c(w1, w2)
-      )
-      
-      # Key step: multiply values by weights
-      dat$y <- dat$y * dat$w
-      
-      # Use simple Cohen's d calculation on weighted values
-      group1_values <- dat$y[dat$g == "Group1"]
-      group2_values <- dat$y[dat$g == "Group2"]
-      
-      d <- mean(group1_values) - mean(group2_values)
-      s1 <- sd(group1_values)
-      s2 <- sd(group2_values)
-      n1 <- length(group1_values)
-      n2 <- length(group2_values)
-      
-      s <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
-      cohens_d <- d / s
-      
-      # Glass' Delta (uses only control group SD - first group)
-      glass_delta <- d / s1
-      
-      # Hedges' bias correction (methodologically superior)
-      hedges_j <- 1 - (3 / (4 * (n1 + n2 - 2) - 1))
+
+      # Weighted means
+      w_mean1 <- sum(w1 * x1) / sum(w1)
+      w_mean2 <- sum(w2 * x2) / sum(w2)
+      d <- w_mean1 - w_mean2
+
+      # Weighted sum of squares per group
+      ss1 <- sum(w1 * (x1 - w_mean1)^2)
+      ss2 <- sum(w2 * (x2 - w_mean2)^2)
+      V1_1 <- sum(w1)
+      V1_2 <- sum(w2)
+      V1_total <- V1_1 + V1_2
+
+      # Weighted pooled SD (SPSS frequency weights formula)
+      s_pooled <- sqrt((ss1 + ss2) / (V1_total - 2))
+      cohens_d <- d / s_pooled
+
+      # Glass' Delta (uses only control group weighted SD)
+      s1_weighted <- sqrt(ss1 / (V1_1 - 1))
+      glass_delta <- d / s1_weighted
+
+      # Hedges' bias correction using effective N
+      eff_n1 <- sum(w1)^2 / sum(w1^2)
+      eff_n2 <- sum(w2)^2 / sum(w2^2)
+      hedges_j <- 1 - (3 / (4 * (eff_n1 + eff_n2 - 2) - 1))
       hedges_g <- cohens_d * hedges_j
     }
     
@@ -366,8 +376,10 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       }
       
       if (length(g_levels) != 2) {
-        stop(sprintf("Grouping variable '%s' must have exactly 2 levels, found %d", 
-                    group_name, length(g_levels)))
+        cli_abort(c(
+          "Grouping variable {.var {group_name}} must have exactly 2 levels.",
+          "x" = "Found {length(g_levels)} level{?s}."
+        ))
       }
       
       # Split data by groups
@@ -657,9 +669,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           unique(g_var)
         }
       } else NULL,
-      data = data  # Store original data for levene_test
+      data = data[, unique(c(var_names, g_name, w_name, group_vars)), drop = FALSE]
     ),
-    class = "t_test_results"
+    class = "t_test"
   )
 }
 
@@ -701,56 +713,15 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   }
 }
 
-#' Print t-test results
-#'
-#' @description
-#' Print method for objects of class \code{"t_test_results"}. Provides a 
-#' formatted display of t-test results including group statistics, test 
-#' statistics, p-values, effect sizes, and confidence intervals.
-#'
-#' @param x An object of class \code{"t_test_results"} returned by \code{\link{t_test}}.
-#' @param digits Integer specifying the number of decimal places to display 
-#'   for numeric values. Default is \code{3}.
-#' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
-#'
-#' @details
-#' The print method displays:
-#' \itemize{
-#'   \item Group-specific descriptive statistics (means and sample sizes)
-#'   \item Test statistics (t-statistic, degrees of freedom, p-value)
-#'   \item Effect size (Cohen's d) with interpretation
-#'   \item Confidence intervals for mean differences
-#'   \item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-#' }
-#' 
-#' For grouped analyses (when data is grouped with \code{\link[dplyr]{group_by}}), 
-#' results are displayed separately for each group combination.
-#' 
-#' For weighted analyses, a note is included about the sjstats compatibility 
-#' behavior regarding group label display.
-#'
-#' @return Invisibly returns the input object \code{x}.
-#'
-#' @export
-print.t_test_results <- function(x, digits = 3, ...) {
-  # Determine test type based on weights
+# Internal implementation shared by both print methods
+.print_t_test_impl <- function(x, digits = 3) {
   weights_name <- x$weight_var %||% x$weights
-  test_type <- get_standard_title("t-Test", weights_name, "Results")
-
-  # Print header with consistent style
-  print_header(test_type)
-  
-  # Ensure p-values are numeric
-  x$results$p_value <- as.numeric(x$results$p_value)
-
-  # Add significance stars using standard helper
-  x$results$sig <- sapply(x$results$p_value, add_significance_stars)
-
-  # Detect grouped data
+  is_weighted <- !is.null(weights_name)
   is_grouped_data <- (!is.null(x$grouped) && x$grouped) ||
                      (!is.null(x$is_grouped) && x$is_grouped)
-  
-  # Print test information
+  results_label <- if (is_weighted) "Weighted t-test Results" else "t-test Results"
+
+  # Print test info
   if (!is.null(x$group)) {
     group_levels <- x$group_levels
     if (length(group_levels) >= 2) {
@@ -763,8 +734,6 @@ print.t_test_results <- function(x, digits = 3, ...) {
         "Weights variable" = weights_name
       )
       print_info_section(test_info)
-
-      # Print test parameters
       test_params <- list(
         mu = x$mu,
         alternative = x$alternative,
@@ -774,220 +743,111 @@ print.t_test_results <- function(x, digits = 3, ...) {
       cat("\n")
     }
   }
-  
+
+  # Internal helper: print a single variable row from a results data frame
+  .print_var_row <- function(row_results, idx, show_group_means) {
+    var_name <- row_results$Variable[idx]
+    stats <- row_results$group_stats[[idx]]
+
+    cat(sprintf("\n--- %s ---\n\n", var_name))
+
+    # Group means
+    if (show_group_means && !is.null(stats) && !is.null(stats$group1)) {
+      cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
+                  stats$group1$name, digits, stats$group1$mean, stats$group1$n))
+      cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
+                  stats$group2$name, digits, stats$group2$mean, stats$group2$n))
+    }
+
+    # Results table
+    has_both <- !is.null(row_results$equal_var_result[[idx]])
+
+    if (has_both) {
+      equal_result <- row_results$equal_var_result[[idx]]
+      unequal_result <- row_results$unequal_var_result[[idx]]
+      spss_df <- data.frame(
+        Assumption = c("Equal variances", "Unequal variances"),
+        t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
+        df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
+        p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
+        mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
+                     round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
+        conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
+                    sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
+      )
+      spss_df$sig <- cut(spss_df$p_value,
+                        breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
+                        labels = c("***", "**", "*", ""),
+                        right = FALSE)
+      cat(sprintf("\n%s:\n", results_label))
+      border <- paste(rep("-", 80), collapse = "")
+      cat(border, "\n")
+      print(spss_df, row.names = FALSE)
+      cat(border, "\n")
+    } else {
+      results_df <- data.frame(
+        Assumption = "t-test",
+        t_stat = round(row_results$t_stat[idx], digits),
+        df = round(row_results$df[idx], digits),
+        p_value = round(row_results$p_value[idx], digits),
+        mean_diff = round(row_results$mean_diff[idx], digits),
+        conf_int = sprintf("[%.3f, %.3f]",
+                          row_results$conf_int_lower[idx],
+                          row_results$conf_int_upper[idx]),
+        sig = row_results$sig[idx]
+      )
+      cat(sprintf("\n%s:\n", results_label))
+      border <- paste(rep("-", 70), collapse = "")
+      cat(border, "\n")
+      print(results_df, row.names = FALSE)
+      cat(border, "\n")
+    }
+
+    # Effect sizes
+    cohens_d_val <- row_results$cohens_d[idx]
+    hedges_g_val <- if ("hedges_g" %in% names(row_results)) row_results$hedges_g[idx] else cohens_d_val
+    glass_delta_val <- if ("glass_delta" %in% names(row_results)) row_results$glass_delta[idx] else cohens_d_val
+
+    if (!is.na(cohens_d_val)) {
+      effect_df <- .create_effect_size_df(var_name, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
+      cat("\nEffect Sizes:\n")
+      cat(paste(rep("-", 12), collapse = ""), "\n")
+      print(effect_df, row.names = FALSE)
+    }
+    cat("\n")
+  }
+
   if (is_grouped_data) {
-    # Get unique groups
     groups <- unique(x$results[x$groups])
-    
-    # Print results for each group
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      
-      # Format group info
       group_info <- sapply(names(group_values), function(g) {
         val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", levels(val)[val])
-        } else {
-          paste(g, "=", val)
-        }
+        if (is.factor(val)) paste(g, "=", levels(val)[val]) else paste(g, "=", val)
       })
-      group_info <- paste(group_info, collapse = ", ")
-      
-      # Filter results for current group
+      cat(sprintf("\nGroup: %s\n", paste(group_info, collapse = ", ")))
+
       group_results <- x$results
       for (g in names(group_values)) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
-      
       if (nrow(group_results) == 0) next
       group_results <- group_results[!is.na(group_results$Variable), ]
       if (nrow(group_results) == 0) next
-      
-      cat(sprintf("\nGroup: %s\n", group_info))
-      
-      # Print each variable as separate block
+
       for (j in seq_len(nrow(group_results))) {
-        var <- group_results$Variable[j]
-        stats <- group_results$group_stats[[j]]
-        
-        cat(sprintf("\n--- %s ---\n", var))
-        cat("\n")  # Add blank line after variable name
-         
-        # Print statistics based on test type
-        if (!is.null(stats) && !is.null(stats$group1)) {
-          # Group comparison: show group means
-          cat(sprintf("  %s: mean = %.3f, n = %.1f\n", 
-                      stats$group1$name, stats$group1$mean, stats$group1$n))
-          cat(sprintf("  %s: mean = %.3f, n = %.1f\n", 
-                      stats$group2$name, stats$group2$mean, stats$group2$n))
-        }
-        
-        # Create and print t-test table for this variable
-        # Check if we have both variance assumptions
-        has_both_assumptions <- !is.null(group_results$equal_var_result[[j]])
-        
-        if (has_both_assumptions) {
-          # SPSS-style display with both equal and unequal variance assumptions
-          equal_result <- group_results$equal_var_result[[j]]
-          unequal_result <- group_results$unequal_var_result[[j]]
-          
-          # Create SPSS-style table
-          spss_df <- data.frame(
-            Assumption = c("Equal variances", "Unequal variances"),
-            t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
-            df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
-            p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
-            mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
-                         round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
-            conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
-                        sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
-          )
-          
-          # Add significance stars
-          spss_df$sig <- cut(spss_df$p_value, 
-                            breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                            labels = c("***", "**", "*", ""),
-                            right = FALSE)
-          
-          # Print SPSS-style table
-          cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-          border_width <- paste(rep("-", 80), collapse = "")
-          cat(border_width, "\n")
-          print(spss_df, row.names = FALSE)
-          cat(border_width, "\n")
-          
-        } else {
-          # Standard display
-          results_df <- data.frame(
-            Assumption = "t-test",
-            t_stat = round(group_results$t_stat[j], digits),
-            df = round(group_results$df[j], digits),
-            p_value = round(group_results$p_value[j], digits),
-            mean_diff = round(group_results$mean_diff[j], digits),
-            conf_int = sprintf("[%.3f, %.3f]", 
-                              group_results$conf_int_lower[j],
-                              group_results$conf_int_upper[j]),
-            sig = group_results$sig[j]
-          )
-          
-          cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-          border_width <- paste(rep("-", 70), collapse = "")
-          cat(border_width, "\n")
-          print(results_df, row.names = FALSE)
-          cat(border_width, "\n")
-        }
-        
-        # Add Effect Sizes for this variable
-        cohens_d_val <- group_results$cohens_d[j]
-        hedges_g_val <- if("hedges_g" %in% names(group_results)) group_results$hedges_g[j] else cohens_d_val
-        glass_delta_val <- if("glass_delta" %in% names(group_results)) group_results$glass_delta[j] else cohens_d_val
-        
-        if (!is.na(cohens_d_val)) {
-          effect_df <- .create_effect_size_df(var, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
-          
-          cat("\nEffect Sizes:\n")
-          cat(paste(rep("-", 12), collapse = ""), "\n")
-          print(effect_df, row.names = FALSE)
-        }
-        cat("\n")
+        .print_var_row(group_results, j, show_group_means = TRUE)
       }
     }
   } else {
-    # Print results for ungrouped data - each variable as separate block
     valid_results <- x$results[!is.na(x$results$Variable), ]
-    
     for (i in seq_len(nrow(valid_results))) {
-      var_name <- valid_results$Variable[i]
-      stats <- valid_results$group_stats[[i]]
-      
-      cat(sprintf("\n--- %s ---\n", var_name))
-      cat("\n")  # Add blank line after variable name
-      
-      # Print statistics based on test type
-      if (!is.null(x$group) && !is.null(stats) && !is.null(stats$group1)) {
-        # Group comparison: show group means
-        cat(sprintf("  %s: mean = %.*f, n = %.1f\n", 
-                    stats$group1$name, digits, stats$group1$mean, stats$group1$n))
-        cat(sprintf("  %s: mean = %.*f, n = %.1f\n", 
-                    stats$group2$name, digits, stats$group2$mean, stats$group2$n))
-        cat("\n")
-      }
-      
-      # Check if we have both variance assumptions
-      has_both_assumptions <- !is.null(valid_results$equal_var_result[[i]])
-      
-      if (has_both_assumptions) {
-        # SPSS-style display with both equal and unequal variance assumptions
-        equal_result <- valid_results$equal_var_result[[i]]
-        unequal_result <- valid_results$unequal_var_result[[i]]
-        
-        # Create SPSS-style table
-        spss_df <- data.frame(
-          Assumption = c("Equal variances", "Unequal variances"),
-          t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
-          df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
-          p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
-          mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
-                       round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
-          conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
-                      sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
-        )
-        
-        # Add significance stars
-        spss_df$sig <- cut(spss_df$p_value, 
-                          breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                          labels = c("***", "**", "*", ""),
-                          right = FALSE)
-        
-        # Print SPSS-style table
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-        border_width <- paste(rep("-", 80), collapse = "")
-        cat(border_width, "\n")
-        print(spss_df, row.names = FALSE)
-        cat(border_width, "\n")
-        
-      } else {
-        # Standard display
-        results_df <- data.frame(
-          Assumption = "t-test",
-          t_stat = round(valid_results$t_stat[i], digits),
-          df = round(valid_results$df[i], digits),
-          p_value = round(valid_results$p_value[i], digits),
-          mean_diff = round(valid_results$mean_diff[i], digits),
-          conf_int = sprintf("[%.3f, %.3f]", 
-                            valid_results$conf_int_lower[i],
-                            valid_results$conf_int_upper[i]),
-          sig = valid_results$sig[i]
-        )
-        
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-        border_width <- paste(rep("-", 70), collapse = "")
-        writeLines(border_width)
-        print(results_df, row.names = FALSE)
-        writeLines(border_width)
-      }
-      
-      # Add Effect Sizes for this variable
-      cohens_d_val <- valid_results$cohens_d[i]
-      hedges_g_val <- if("hedges_g" %in% names(valid_results)) valid_results$hedges_g[i] else cohens_d_val
-      glass_delta_val <- if("glass_delta" %in% names(valid_results)) valid_results$glass_delta[i] else cohens_d_val
-      
-      if (!is.na(cohens_d_val)) {
-        effect_df <- .create_effect_size_df(var_name, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
-        
-        cat("\nEffect Sizes:\n")
-        cat(paste(rep("-", 12), collapse = ""), "\n")
-        print(effect_df, row.names = FALSE)
-        cat("\n")
-      }
+      .print_var_row(valid_results, i, show_group_means = !is.null(x$group))
     }
   }
-  
-  # Print significance legend using standard helper
+
+  # Footer
   print_significance_legend()
-  
-  # Add interpretation guidelines only once at the end
   cat("\nEffect Size Interpretation:\n")
   cat("- Cohen's d: pooled standard deviation (classic)\n")
   cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
@@ -997,268 +857,43 @@ print.t_test_results <- function(x, digits = 3, ...) {
   cat("- Large effect: |effect| ~ 0.8\n")
 }
 
-#' Print method for t_test_result
+#' Print t-test results
 #'
-#' @param x A t_test_result object
-#' @param digits Number of decimal places to display
-#' @param ... Additional arguments (not used)
+#' @description
+#' Print method for objects of class \code{"t_test"}. Provides a
+#' formatted display of t-test results including group statistics, test
+#' statistics, p-values, effect sizes, and confidence intervals.
+#'
+#' @param x An object of class \code{"t_test"} returned by \code{\link{t_test}}.
+#' @param digits Integer specifying the number of decimal places to display
+#'   for numeric values. Default is \code{3}.
+#' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
+#'
+#' @details
+#' The print method displays:
+#' \itemize{
+#'   \item Group-specific descriptive statistics (means and sample sizes)
+#'   \item Test statistics (t-statistic, degrees of freedom, p-value)
+#'   \item Effect size (Cohen's d) with interpretation
+#'   \item Confidence intervals for mean differences
+#'   \item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
+#' }
+#'
+#' For grouped analyses (when data is grouped with \code{\link[dplyr]{group_by}}),
+#' results are displayed separately for each group combination.
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
 #' @export
-#' @method print t_test_result
-print.t_test_result <- function(x, digits = 3, ...) {
-  # Use consistent title formatting
+#' @method print t_test
+print.t_test <- function(x, digits = 3, ...) {
   weights_name <- x$weight_var %||% x$weights
   test_type <- get_standard_title("t-Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
-  
-  # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
-
-  # Add significance stars using standard helper
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
-
-  # Detect grouped data
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) ||
-                     (!is.null(x$is_grouped) && x$is_grouped)
-  
-  # Print info about grouping variable if present
-  if (!is.null(x$group)) {
-    group_levels <- x$group_levels
-    if (length(group_levels) >= 2) {
-      cat(sprintf("\nGrouping variable: %s\n", x$group))
-      cat(sprintf("Groups compared: %s vs. %s\n", 
-                  as.character(group_levels[1]), 
-                  as.character(group_levels[2])))
-      if (!is.null(x$weight_var) || !is.null(x$weights)) {
-        weight_name <- if (!is.null(x$weight_var)) x$weight_var else x$weights
-        cat(sprintf("Weights variable: %s\n", weight_name))
-      }
-      cat(sprintf("Null hypothesis (mu): %.3f\n", x$mu))
-      cat(sprintf("Alternative hypothesis: %s\n", x$alternative))
-      cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
-      cat("\n")
-    }
-  }
-  
-  if (is_grouped_data) {
-    # Get unique groups
-    groups <- unique(x$results[x$groups])
-    
-    # Print results for each group
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-      
-      # Format group info
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", levels(val)[val])
-        } else {
-          paste(g, "=", val)
-        }
-      })
-      group_info <- paste(group_info, collapse = ", ")
-      
-      # Filter results for current group
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
-      }
-      
-      if (nrow(group_results) == 0) next
-      group_results <- group_results[!is.na(group_results$Variable), ]
-      if (nrow(group_results) == 0) next
-      
-      cat(sprintf("\nGroup: %s\n", group_info))
-      
-      # Print each variable as separate block
-      for (j in seq_len(nrow(group_results))) {
-        var <- group_results$Variable[j]
-        stats <- group_results$group_stats[[j]]
-        
-        cat(sprintf("\n--- %s ---\n", var))
-        cat("\n")  # Add blank line after variable name
-         
-        # Print group means
-        if (!is.null(stats) && !is.null(stats$group1)) {
-          cat(sprintf("  %s: mean = %.3f, n = %.1f\n", 
-                      stats$group1$name, stats$group1$mean, stats$group1$n))
-          cat(sprintf("  %s: mean = %.3f, n = %.1f\n", 
-                      stats$group2$name, stats$group2$mean, stats$group2$n))
-        }
-        
-        # Create and print t-test table for this variable
-        # Check if we have both variance assumptions
-        has_both_assumptions <- !is.null(group_results$equal_var_result[[j]])
-        
-        if (has_both_assumptions) {
-          # SPSS-style display with both equal and unequal variance assumptions
-          equal_result <- group_results$equal_var_result[[j]]
-          unequal_result <- group_results$unequal_var_result[[j]]
-          
-          # Create SPSS-style table
-          spss_df <- data.frame(
-            Assumption = c("Equal variances", "Unequal variances"),
-            t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
-            df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
-            p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
-            mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
-                         round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
-            conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
-                        sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
-          )
-          
-          # Add significance stars
-          spss_df$sig <- cut(spss_df$p_value, 
-                            breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                            labels = c("***", "**", "*", ""),
-                            right = FALSE)
-          
-          # Print SPSS-style table
-          cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-          border_width <- paste(rep("-", 80), collapse = "")
-          cat(border_width, "\n")
-          print(spss_df, row.names = FALSE)
-          cat(border_width, "\n")
-          
-        } else {
-          # Standard display
-          results_df <- data.frame(
-            Assumption = "t-test",
-            t_stat = round(group_results$t_stat[j], digits),
-            df = round(group_results$df[j], digits),
-            p_value = round(group_results$p_value[j], digits),
-            mean_diff = round(group_results$mean_diff[j], digits),
-            conf_int = sprintf("[%.3f, %.3f]", 
-                              group_results$conf_int_lower[j],
-                              group_results$conf_int_upper[j]),
-            sig = group_results$sig[j]
-          )
-          
-          cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-          border_width <- paste(rep("-", 70), collapse = "")
-          cat(border_width, "\n")
-          print(results_df, row.names = FALSE)
-          cat(border_width, "\n")
-        }
-        
-        # Add Effect Sizes for this variable
-        cohens_d_val <- group_results$cohens_d[j]
-        hedges_g_val <- if("hedges_g" %in% names(group_results)) group_results$hedges_g[j] else cohens_d_val
-        glass_delta_val <- if("glass_delta" %in% names(group_results)) group_results$glass_delta[j] else cohens_d_val
-        
-        if (!is.na(cohens_d_val)) {
-          effect_df <- .create_effect_size_df(var, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
-          
-          cat("\nEffect Sizes:\n")
-          cat(paste(rep("-", 12), collapse = ""), "\n")
-          print(effect_df, row.names = FALSE)
-        }
-        cat("\n")
-      }
-    }
-  } else {
-    # Print results for ungrouped data - each variable as separate block
-    valid_results <- x$results[!is.na(x$results$Variable), ]
-    
-    for (i in seq_len(nrow(valid_results))) {
-      var_name <- valid_results$Variable[i]
-      stats <- valid_results$group_stats[[i]]
-      
-      cat(sprintf("\n--- %s ---\n", var_name))
-      cat("\n")  # Add blank line after variable name
-      
-      # Print group means if available
-      if (!is.null(x$group) && !is.null(stats) && !is.null(stats$group1)) {
-        cat(sprintf("  %s: mean = %.3f, n = %.1f\n", 
-                    stats$group1$name, stats$group1$mean, stats$group1$n))
-        cat(sprintf("  %s: mean = %.3f, n = %.1f\n", 
-                    stats$group2$name, stats$group2$mean, stats$group2$n))
-        cat("\n")
-      }
-      
-      # Check if we have both variance assumptions
-      has_both_assumptions <- !is.null(valid_results$equal_var_result[[i]])
-      
-      if (has_both_assumptions) {
-        # SPSS-style display with both equal and unequal variance assumptions
-        equal_result <- valid_results$equal_var_result[[i]]
-        unequal_result <- valid_results$unequal_var_result[[i]]
-        
-        # Create SPSS-style table
-        spss_df <- data.frame(
-          Assumption = c("Equal variances", "Unequal variances"),
-          t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
-          df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
-          p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
-          mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
-                       round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
-          conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
-                      sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
-        )
-        
-        # Add significance stars
-        spss_df$sig <- cut(spss_df$p_value, 
-                          breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                          labels = c("***", "**", "*", ""),
-                          right = FALSE)
-        
-        # Print SPSS-style table
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-        border_width <- paste(rep("-", 80), collapse = "")
-        cat(border_width, "\n")
-        print(spss_df, row.names = FALSE)
-        cat(border_width, "\n")
-        
-      } else {
-        # Standard display
-        results_df <- data.frame(
-          Assumption = "t-test",
-          t_stat = round(valid_results$t_stat[i], digits),
-          df = round(valid_results$df[i], digits),
-          p_value = round(valid_results$p_value[i], digits),
-          mean_diff = round(valid_results$mean_diff[i], digits),
-          conf_int = sprintf("[%.3f, %.3f]", 
-                            valid_results$conf_int_lower[i],
-                            valid_results$conf_int_upper[i]),
-          sig = valid_results$sig[i]
-        )
-        
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted t-test Results", "t-test Results")))
-        border_width <- paste(rep("-", 70), collapse = "")
-        writeLines(border_width)
-        print(results_df, row.names = FALSE)
-        writeLines(border_width)
-      }
-      
-      # Add Effect Sizes for this variable
-      cohens_d_val <- valid_results$cohens_d[i]
-      hedges_g_val <- if("hedges_g" %in% names(valid_results)) valid_results$hedges_g[i] else cohens_d_val
-      glass_delta_val <- if("glass_delta" %in% names(valid_results)) valid_results$glass_delta[i] else cohens_d_val
-      
-      if (!is.na(cohens_d_val)) {
-        effect_df <- .create_effect_size_df(var_name, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
-        
-        cat("\nEffect Sizes:\n")
-        cat(paste(rep("-", 12), collapse = ""), "\n")
-        print(effect_df, row.names = FALSE)
-        cat("\n")
-      }
-    }
-  }
-  
-  # Add explanation section once at the end
-  cat("\n")
-  cat(paste(rep("=", 50), collapse = ""), "\n")
-  cat("EXPLANATION\n")
-  cat(paste(rep("=", 50), collapse = ""), "\n")
-  cat("Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
-  cat("\nEffect Size Interpretation:\n")
-  cat("- Cohen's d: pooled standard deviation (classic)\n")
-  cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
-  cat("- Glass' Delta: control group standard deviation only\n")
-  cat("- Small effect: |effect| ~ 0.2\n")
-  cat("- Medium effect: |effect| ~ 0.5\n")
-  cat("- Large effect: |effect| ~ 0.8\n")
+  .print_t_test_impl(x, digits)
+  invisible(x)
 }
 
 

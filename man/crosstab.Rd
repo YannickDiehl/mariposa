@@ -115,3 +115,9 @@ survey_data \%>\%
 survey_data \%>\% crosstab(education, employment, percentages = "col")
 
 }
+\seealso{
+Other descriptive: 
+\code{\link{describe}()},
+\code{\link{frequency}()}
+}
+\concept{descriptive}

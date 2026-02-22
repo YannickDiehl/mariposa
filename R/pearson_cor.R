@@ -125,20 +125,21 @@
 #' Fisher, R.A. (1915). Frequency distribution of the values of the correlation coefficient 
 #' in samples from an indefinitely large population. Biometrika, 10(4), 507-521.
 #'
+#' @family correlation
 #' @export
 pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "pairwise") {
   
   # Input validation
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   if (!na.rm %in% c("pairwise", "listwise")) {
-    stop("na.rm must be either 'pairwise' or 'listwise'")
+    cli_abort("{.arg na.rm} must be either {.val pairwise} or {.val listwise}.")
   }
   
   if (conf.level <= 0 || conf.level >= 1) {
-    stop("conf.level must be between 0 and 1")
+    cli_abort("{.arg conf.level} must be between 0 and 1.")
   }
   
   # Check if data is grouped
@@ -154,13 +155,13 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
   var_names <- names(vars)
   
   if (length(var_names) < 2) {
-    stop("At least two variables must be specified for correlation analysis")
+    cli_abort("At least two variables must be specified for correlation analysis.")
   }
   
   # Validate that all selected variables are numeric
   for (var_name in var_names) {
     if (!is.numeric(data[[var_name]])) {
-      stop("Variable '", var_name, "' is not numeric")
+      cli_abort("Variable {.var {var_name}} is not numeric.")
     }
   }
   
@@ -475,7 +476,7 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
     group_keys = if(is_grouped) group_keys else NULL
   )
   
-  class(result) <- "pearson_cor_results"
+  class(result) <- "pearson_cor"
   return(result)
 }
 
@@ -552,14 +553,14 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
   }
 }
 
-#' Print method for pearson_cor_results
+#' Print method for pearson_cor
 #'
-#' @param x A pearson_cor_results object
+#' @param x A pearson_cor object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #'
 #' @export
-print.pearson_cor_results <- function(x, digits = 3, ...) {
+print.pearson_cor <- function(x, digits = 3, ...) {
 
   # Determine test type using standardized helper
   test_type <- get_standard_title("Pearson Correlation", x$weights, "")

@@ -80,6 +80,7 @@
 #' # Column percentages only
 #' survey_data %>% crosstab(education, employment, percentages = "col")
 #'
+#' @family descriptive
 #' @export
 crosstab <- function(data, row, col,
                     weights = NULL,
@@ -110,10 +111,10 @@ crosstab.data.frame <- function(data, row, col,
 
   # Check if variables exist in data
   if (!row_var %in% names(data)) {
-    stop(paste("Row variable '", row_var, "' not found in data", sep = ""))
+    cli_abort("Row variable {.var {row_var}} not found in data.")
   }
   if (!col_var %in% names(data)) {
-    stop(paste("Column variable '", col_var, "' not found in data", sep = ""))
+    cli_abort("Column variable {.var {col_var}} not found in data.")
   }
 
   # Extract variables
@@ -128,16 +129,16 @@ crosstab.data.frame <- function(data, row, col,
   if (is_weighted) {
     weights_var <- rlang::as_name(weights_quo)
     if (!weights_var %in% names(data)) {
-      stop(paste("Weights variable '", weights_var, "' not found in data", sep = ""))
+      cli_abort("Weights variable {.var {weights_var}} not found in data.")
     }
     weights_vec <- data[[weights_var]]
 
     # Validate weights
     if (!is.numeric(weights_vec)) {
-      stop("Weights must be numeric")
+      cli_abort("Weights variable {.var {weights_var}} must be numeric.")
     }
     if (any(weights_vec < 0, na.rm = TRUE)) {
-      warning("Negative weights detected. Results may be invalid.")
+      cli_warn("Negative weights detected. Results may be invalid.")
     }
   }
 
@@ -221,7 +222,7 @@ crosstab.data.frame <- function(data, row, col,
     digits = digits
   )
 
-  class(result) <- "crosstab_results"
+  class(result) <- "crosstab"
   return(result)
 }
 
@@ -289,13 +290,13 @@ crosstab.grouped_df <- function(data, row, col,
     digits = digits
   )
 
-  class(combined_result) <- "crosstab_results"
+  class(combined_result) <- "crosstab"
   return(combined_result)
 }
 
 #' Print method for crosstab results
 #' @export
-print.crosstab_results <- function(x, ...) {
+print.crosstab <- function(x, ...) {
 
   if (x$is_grouped) {
     # Print grouped results using standardized header

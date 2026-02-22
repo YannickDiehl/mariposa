@@ -111,3 +111,9 @@ survey_data \%>\%
   describe(age, weights = sampling_weight)
 
 }
+\seealso{
+Other descriptive: 
+\code{\link{crosstab}()},
+\code{\link{frequency}()}
+}
+\concept{descriptive}

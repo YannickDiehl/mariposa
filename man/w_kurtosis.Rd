@@ -13,9 +13,9 @@ w_kurtosis(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE)
 
 \item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed}
+\item{na.rm}{Logical; if TRUE, missing values are removed (default: TRUE)}
 
-\item{excess}{Logical; if TRUE, returns excess kurtosis (kurtosis - 3), if FALSE returns raw kurtosis (default: TRUE)}
+\item{excess}{Logical; if TRUE, returns excess kurtosis (default: TRUE, matching SPSS)}
 }
 \value{
 A w_kurtosis object (list) containing results and metadata, or numeric values in summarise context
@@ -23,6 +23,8 @@ A w_kurtosis object (list) containing results and metadata, or numeric values in
 \description{
 Calculate weighted kurtosis for numeric variables, with support for
 grouped data and multiple variables simultaneously.
+Uses the SPSS Type 2 (sample-corrected) excess kurtosis formula.
+Reference: Joanes & Gill (1998), "Comparing measures of sample skewness and kurtosis"
 }
 \examples{
 # Load required packages and data
@@ -46,4 +48,19 @@ survey_data \%>\% summarise(kurt_age = w_kurtosis(age, weights = sampling_weight
 
 # Unweighted (for comparison)
 survey_data \%>\% w_kurtosis(age)
+
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

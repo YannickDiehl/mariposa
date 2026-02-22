@@ -21,6 +21,8 @@ A w_sd object (list) containing results and metadata, or numeric values in summa
 \description{
 Calculate weighted standard deviation for numeric variables, with support for
 grouped data and multiple variables simultaneously.
+Uses the SPSS frequency weights formula: \eqn{s_w = \sqrt{\sum w_i (x_i - \bar{x}_w)^2 / (V_1 - 1)}}
+where \eqn{V_1 = \sum w_i}.
 }
 \examples{
 # Load required packages and data
@@ -43,3 +45,17 @@ survey_data \%>\% summarise(sd_age = w_sd(age, weights = sampling_weight))
 survey_data \%>\% w_sd(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

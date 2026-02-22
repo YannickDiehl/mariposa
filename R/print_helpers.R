@@ -5,9 +5,9 @@
 # all print methods in the mariposa package.
 #
 # STYLE GUIDE:
-# 1. Headers: Title with dash separator matching title length
+# 1. Headers: cli_rule with title
 # 2. Weighted prefix: "[Weighted] {Test Name} Results/Statistics"
-# 3. Information order: Title → Test Info → Parameters → Results → Significance
+# 3. Information order: Title -> Test Info -> Parameters -> Results -> Significance
 # 4. Grouped data: "Group: var = value" format with consistent indentation
 # 5. Tables: Dynamic width calculation with proper alignment
 # 6. Significance codes: Standard *** ** * convention at the bottom
@@ -19,8 +19,7 @@
 #' @keywords internal
 print_header <- function(title, newline_before = TRUE) {
   if (newline_before) cat("\n")
-  cat(title, "\n", sep = "")
-  cat(paste(rep("-", nchar(title)), collapse = ""), "\n")
+  cli_rule(title)
 }
 
 #' Print test information section
@@ -28,13 +27,16 @@ print_header <- function(title, newline_before = TRUE) {
 #' @param indent Number of spaces to indent
 #' @keywords internal
 print_info_section <- function(info, indent = 0) {
-  indent_str <- paste(rep(" ", indent), collapse = "")
-
+  items <- character(0)
   for (name in names(info)) {
     value <- info[[name]]
     if (!is.null(value) && !is.na(value) && value != "") {
-      cat(sprintf("%s%s: %s\n", indent_str, name, value))
+      items <- c(items, paste0(name, ": ", value))
     }
+  }
+  if (length(items) > 0) {
+    names(items) <- rep("*", length(items))
+    cli_bullets(items)
   }
 }
 
@@ -55,7 +57,8 @@ add_significance_stars <- function(p_value,
 #' @keywords internal
 print_significance_legend <- function(show = TRUE) {
   if (show) {
-    cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+    cli_text("")
+    cli_text("Signif. codes: 0 {.strong ***} 0.001 {.strong **} 0.01 {.strong *} 0.05")
   }
 }
 
@@ -72,7 +75,8 @@ print_group_header <- function(group_values, prefix = "Group") {
   } else {
     group_str <- paste(names(group_values), "=", group_values, collapse = ", ")
   }
-  cat(sprintf("\n%s: %s\n", prefix, group_str))
+  cli_text("")
+  cli_h2("{prefix}: {group_str}")
 }
 
 #' Calculate dynamic table width
@@ -95,7 +99,7 @@ get_table_width <- function(df, min_width = 40) {
 #' @param char Character to use for the line
 #' @keywords internal
 print_separator <- function(width = 40, char = "-") {
-  cat(paste(rep(char, width), collapse = ""), "\n")
+  cli_rule()
 }
 
 #' Format numeric value with appropriate decimal places
@@ -125,14 +129,19 @@ get_standard_title <- function(test_name, weights = NULL, suffix = "Results") {
 #' @param params List of parameters (conf.level, alternative, etc.)
 #' @keywords internal
 print_test_parameters <- function(params) {
+  items <- character(0)
   if (!is.null(params$conf.level)) {
-    cat(sprintf("Confidence level: %.1f%%\n", params$conf.level * 100))
+    items <- c(items, paste0("Confidence level: ", sprintf("%.1f%%", params$conf.level * 100)))
   }
   if (!is.null(params$alternative)) {
-    cat(sprintf("Alternative hypothesis: %s\n", params$alternative))
+    items <- c(items, paste0("Alternative hypothesis: ", params$alternative))
   }
   if (!is.null(params$mu)) {
-    cat(sprintf("Null hypothesis (mu): %.3f\n", params$mu))
+    items <- c(items, paste0("Null hypothesis (mu): ", sprintf("%.3f", params$mu)))
+  }
+  if (length(items) > 0) {
+    names(items) <- rep("*", length(items))
+    cli_bullets(items)
   }
 }
 
@@ -168,9 +177,9 @@ print_results_table <- function(df, digits = 3, row.names = FALSE) {
 #' @keywords internal
 print_footer_notes <- function(notes = NULL) {
   if (!is.null(notes) && length(notes) > 0) {
-    cat("\nNotes:\n")
-    for (note in notes) {
-      cat(sprintf("  - %s\n", note))
-    }
+    cli_text("")
+    cli_text("{.strong Notes:}")
+    names(notes) <- rep("i", length(notes))
+    cli_bullets(notes)
   }
 }

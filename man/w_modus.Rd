@@ -42,3 +42,17 @@ survey_data \%>\% summarise(mode_gender = w_modus(gender, weights = sampling_wei
 # Unweighted (for comparison)
 survey_data \%>\% w_modus(gender)
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

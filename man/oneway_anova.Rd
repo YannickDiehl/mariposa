@@ -192,4 +192,10 @@ measures of effect size for some common research designs. Psychological Methods,
 \code{\link{tukey_test}} for post-hoc pairwise comparisons.
 
 \code{\link{levene_test}} for testing homogeneity of variances.
+
+Other hypothesis_tests: 
+\code{\link{chi_square}()},
+\code{\link{mann_whitney}()},
+\code{\link{t_test}()}
 }
+\concept{hypothesis_tests}

@@ -1,9 +1,10 @@
 # =============================================================================
-# SURVEYSTAT PACKAGE IMPORTS
+# MARIPOSA PACKAGE IMPORTS
 # =============================================================================
 # Central import file for all external package dependencies
 # This file contains all necessary @importFrom statements to make the package functional
 
+#' @importFrom cli cli_abort cli_warn cli_inform cli_h1 cli_h2 cli_text cli_rule cli_bullets cli_alert_success cli_alert_info cli_alert_warning cli_div cli_end
 #' @importFrom rlang enquo quo_is_null as_name expr %||% enquos syms sym quo eval_tidy
 #' @importFrom dplyr %>% group_vars group_modify select all_of distinct ungroup arrange desc group_by summarise group_split bind_rows group_keys mutate across rowwise c_across
 #' @importFrom tidyselect eval_select starts_with ends_with contains where all_of any_of

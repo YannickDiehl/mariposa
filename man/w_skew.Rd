@@ -13,7 +13,7 @@ w_skew(data, ..., weights = NULL, na.rm = TRUE)
 
 \item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed}
+\item{na.rm}{Logical; if TRUE, missing values are removed (default: TRUE)}
 }
 \value{
 A w_skew object (list) containing results and metadata, or numeric values in summarise context
@@ -21,6 +21,7 @@ A w_skew object (list) containing results and metadata, or numeric values in sum
 \description{
 Calculate weighted skewness for numeric variables, with support for
 grouped data and multiple variables simultaneously.
+Uses the SPSS Type 2 (sample-corrected) skewness formula.
 }
 \examples{
 # Load required packages and data
@@ -41,4 +42,19 @@ survey_data \%>\% summarise(skew_age = w_skew(age, weights = sampling_weight))
 
 # Unweighted (for comparison)
 survey_data \%>\% w_skew(age)
+
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

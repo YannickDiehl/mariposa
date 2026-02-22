@@ -21,6 +21,8 @@ A w_se object (list) containing results and metadata, or numeric values in summa
 \description{
 Calculate weighted standard error for numeric variables, with support for
 grouped data and multiple variables simultaneously.
+Formula: \eqn{SE_w = s_w / \sqrt{V_1}} where \eqn{s_w} is the weighted SD
+and \eqn{V_1 = \sum w_i}.
 }
 \examples{
 # Load required packages and data
@@ -31,7 +33,7 @@ data(survey_data)
 survey_data \%>\% w_se(age, weights = sampling_weight)
 
 # Multiple variables
-survey_data \%>\% w_se(age, income, life_satisfaction, weights = sampling_weight)
+survey_data \%>\% w_se(age, income, weights = sampling_weight)
 
 # Grouped data
 survey_data \%>\% group_by(region) \%>\% w_se(age, weights = sampling_weight)
@@ -43,3 +45,17 @@ survey_data \%>\% summarise(se_age = w_se(age, weights = sampling_weight))
 survey_data \%>\% w_se(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

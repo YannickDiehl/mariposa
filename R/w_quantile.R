@@ -32,6 +32,7 @@
 #' # Unweighted (for comparison)
 #' survey_data %>% w_quantile(age)
 #'
+#' @family weighted_statistics
 #' @export
 w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE) {
   
@@ -66,7 +67,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
   
   # Data frame handling
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   # Get variables and weights
@@ -82,7 +83,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
     if (weights_name %in% names(data)) {
       weights_vec <- data[[weights_name]]
     } else {
-      stop("Weights variable '", weights_name, "' not found in data")
+      cli_abort("Weights variable {.var {weights_name}} not found in data.")
     }
   }
   
@@ -233,11 +234,8 @@ print.w_quantile <- function(x, digits = 3, ...) {
   # Determine if this is weighted or unweighted
   is_weighted <- !is.null(x$weights)
   
-  if (is_weighted) {
-    .print_header("Weighted Quantile")
-  } else {
-    .print_header("Quantile")
-  }
+  test_type <- get_standard_title("Quantile", x$weights, "Statistics")
+  print_header(test_type)
   
   if (x$grouped) {
     # Get unique groups
@@ -316,9 +314,9 @@ print.w_quantile <- function(x, digits = 3, ...) {
       if (length(all_results) > 0) {
         results_df <- do.call(rbind, all_results)
         results_df_print <- as.data.frame(results_df)
-        .print_border(results_df_print)
+        print_separator(get_table_width(results_df_print))
         print(results_df_print, row.names = FALSE)
-        .print_border(results_df_print)
+        print_separator(get_table_width(results_df_print))
       }
     }
   } else {
@@ -368,7 +366,7 @@ print.w_quantile <- function(x, digits = 3, ...) {
       results_df <- do.call(rbind, all_results)
       results_df_print <- as.data.frame(results_df)
       print(results_df_print, row.names = FALSE)
-      .print_border(results_df_print)
+      print_separator(get_table_width(results_df_print))
     } else {
       cat("No results to display.\n")
       cat("------------------------\n")
