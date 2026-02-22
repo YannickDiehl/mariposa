@@ -57,6 +57,7 @@ Which variance assumption fits your data best
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -216,7 +217,11 @@ measures of effect size for some common research designs. Psychological Methods,
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></code> for the base R ANOVA function.</p>
 <p><code><a href="https://rdrr.io/r/stats/oneway.test.html" class="external-link">oneway.test</a></code> for Welch's ANOVA.</p>
 <p><code><a href="tukey_test.html">tukey_test</a></code> for post-hoc pairwise comparisons.</p>
-<p><code><a href="levene_test.html">levene_test</a></code> for testing homogeneity of variances.</p></div>
+<p><code><a href="levene_test.html">levene_test</a></code> for testing homogeneity of variances.</p>
+<p>Other hypothesis_tests:
+<code><a href="chi_square.html">chi_square()</a></code>,
+<code><a href="mann_whitney.html">mann_whitney()</a></code>,
+<code><a href="t_test.html">t_test()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -228,8 +233,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="co"># Basic one-way ANOVA (comparing across education levels)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dependent Variable: life_satisfaction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
@@ -278,8 +283,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="co"># Multiple dependent variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">trust_government</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Null hypothesis: All group means are equal for each variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: At least one group mean differs for each variable</span>
@@ -353,8 +358,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Null hypothesis: All group means are equal for each variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: At least one group mean differs for each variable</span>
@@ -455,8 +460,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted One-Way ANOVA Results </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dependent Variable: income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
@@ -507,16 +512,18 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Null hypothesis: All group means are equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: At least one group mean differs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -544,8 +551,10 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       0.043           0.037         0.037       small</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -587,8 +596,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="co"># Unequal variances (Welch's ANOVA)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, var.equal <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dependent Variable: income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
@@ -640,8 +649,7 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Follow up with post-hoc tests</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dependent Variable: life_satisfaction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
@@ -679,8 +687,7 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># Check homogeneity of variances</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Center: mean</span>

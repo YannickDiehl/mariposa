@@ -33,6 +33,7 @@ patterns, and within-subject correlations."><meta property="og:image" content="h
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -127,56 +128,71 @@ a clear Group x Time interaction suitable for repeated measures testing.</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">group</span>, <span class="va">time</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="describe.html">describe</a></span><span class="op">(</span><span class="va">outcome_score</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Control, time = T1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Descriptive Statistics ──────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Control, time = T1</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 26.224  26.36 3.352 14.937 4.221   -0.387 60       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Control, time = T2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Control, time = T2</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 26.996 27.505 2.749 11.326 4.242   -0.508 51       9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Control, time = T3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Control, time = T3</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable  Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 27.46 27.901 2.865 11.694 4.823   -0.081 49      11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Control, time = T4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Control, time = T4</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 27.944 28.253 3.452 14.255 4.564   -0.334 41      19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Treatment, time = T1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Treatment, time = T1</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 25.216 25.328 3.924 17.558 4.364   -0.098 59       1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Treatment, time = T2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Treatment, time = T2</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median  SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 27.078 27.087 4.2 20.332 5.534    0.189 55       5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Treatment, time = T3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Treatment, time = T3</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 29.288 29.515 3.619 15.305 5.775    0.211 48      12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: group = Treatment, time = T4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: group = Treatment, time = T4</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable   Mean Median    SD  Range   IQR Skewness  N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  outcome_score 30.826 30.552 3.059 11.133 5.038     0.25 37      23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -45,6 +45,7 @@ When to use alternative tests that don't assume equal variance
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -76,13 +77,13 @@ out in similar ways.</p>
 <span><span class="co"># S3 method for class 'data.frame'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, <span class="va">group</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'oneway_anova_results'</span></span>
+<span><span class="co"># S3 method for class 'oneway_anova'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 't_test_results'</span></span>
+<span><span class="co"># S3 method for class 't_test'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'mann_whitney_results'</span></span>
+<span><span class="co"># S3 method for class 'mann_whitney'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'grouped_df'</span></span>
@@ -176,6 +177,12 @@ out in similar ways.</p>
 </ul></div>
 
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other posthoc:
+<code><a href="scheffe_test.html">scheffe_test()</a></code>,
+<code><a href="tukey_test.html">tukey_test()</a></code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -186,8 +193,7 @@ out in similar ways.</p>
 <span class="r-in"><span><span class="co"># Standalone Levene test (test homogeneity of variances)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Center: mean</span>
@@ -210,8 +216,7 @@ out in similar ways.</p>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">trust_government</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Center: mean</span>
@@ -243,8 +248,7 @@ out in similar ways.</p>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Levene's Test for Homogeneity of Variance  ─────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
@@ -270,8 +274,7 @@ out in similar ways.</p>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Center: mean</span>
@@ -299,8 +302,7 @@ out in similar ways.</p>
 <span class="r-in"><span>  <span class="fu"><a href="t_test.html">t_test</a></span><span class="op">(</span><span class="va">age</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">levene_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Center: mean</span>
@@ -326,8 +328,7 @@ out in similar ways.</p>
 <span class="r-in"><span><span class="co"># Using mean instead of median as center</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">region</span>, center <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouping variable: region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Center: mean</span>

@@ -45,6 +45,7 @@ What patterns exist in your data
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -77,7 +78,7 @@ preference? Or are they independent of each other?</p>
 <span></span>
 <span><span class="fu">cramers_v</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">gamma</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">goodman_gamma</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -153,6 +154,13 @@ preference? Or are they independent of each other?</p>
 </ul></div>
 
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other hypothesis_tests:
+<code><a href="mann_whitney.html">mann_whitney()</a></code>,
+<code><a href="oneway_anova.html">oneway_anova()</a></code>,
+<code><a href="t_test.html">t_test()</a></code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -171,8 +179,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-in"><span><span class="co"># Basic chi-squared test for independence</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Chi-Squared Test of Independence  ───────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Variables: gender x region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -199,7 +206,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Measure Value p_value sig Interpretation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V 0.013   0.519            Neglig.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Phi 0.013   0.519            Neglig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma 0.033   0.519               Weak</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma 0.033   0.659               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×2 | N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -208,8 +215,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Chi-Squared Test of Independence </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Variables: gender x education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
@@ -236,7 +242,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Measure  Value p_value sig Interpretation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V  0.042   0.221            Neglig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.011   0.722               Weak</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.011   0.795               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×4 | N = 2517</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
@@ -248,8 +254,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">employment</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Chi-Squared Test of Independence  ───────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Variables tested: gender x employment </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouped by: region </span>
@@ -272,7 +277,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Measure  Value p_value sig Interpretation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V  0.111   0.201              Small</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.093   0.265               Weak</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.093   0.468               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×5 | N = 485</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
@@ -295,7 +300,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Measure  Value p_value sig Interpretation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V  0.045   0.384            Neglig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.053   0.198               Weak</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.053   0.381               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×5 | N = 2015</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
@@ -305,8 +310,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-in"><span><span class="co"># With continuity correction</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, correct <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Chi-Squared Test of Independence  ───────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Variables: gender x region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Yates' continuity correction applied</span>
@@ -334,7 +338,7 @@ preference? Or are they independent of each other?</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Measure Value p_value sig Interpretation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V 0.012   0.553            Neglig.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Phi 0.012   0.553            Neglig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma 0.033   0.519               Weak</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma 0.033   0.659               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×2 | N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

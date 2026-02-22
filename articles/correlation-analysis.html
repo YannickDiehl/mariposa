@@ -52,6 +52,7 @@
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -86,9 +87,6 @@
 <span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     frequency</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     gamma</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
@@ -121,12 +119,9 @@ or when you have many ties</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Pearson Correlation </span></span>
-<span><span class="co">#&gt; -------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Pearson Correlation  ────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
@@ -157,13 +152,10 @@ correlation - <strong>r = 0</strong>: No linear relationship - <strong>r
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
@@ -193,13 +185,10 @@ correlation - <strong>r = 0</strong>: No linear relationship - <strong>r
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Matrix:</span></span>
@@ -255,13 +244,10 @@ correlation - <strong>r = 0</strong>: No linear relationship - <strong>r
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = East</span></span>
@@ -304,13 +290,10 @@ correlation - <strong>r = 0</strong>: No linear relationship - <strong>r
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>,</span>
 <span>              conf.level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
@@ -483,12 +466,9 @@ tied values exist</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/kendall_tau.html">kendall_tau</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Kendall's Tau-b Correlation </span></span>
-<span><span class="co">#&gt; ---------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
+<span><span class="co">#&gt; ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ┌─ political_orientation × life_satisfaction ─┐</span></span>
@@ -510,13 +490,10 @@ tied values exist</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/kendall_tau.html">kendall_tau</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">life_satisfaction</span>,</span>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Kendall's Tau-b Correlation </span></span>
-<span><span class="co">#&gt; ------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
+<span><span class="co">#&gt; ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ┌─ political_orientation × life_satisfaction ─┐</span></span>
@@ -608,13 +585,10 @@ unknown</p>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cor_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Matrix:</span></span>
@@ -727,13 +701,10 @@ unknown</p>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">regional_cors</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = East</span></span>
@@ -848,13 +819,10 @@ unknown</p>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">age_correlations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Matrix:</span></span>
@@ -951,13 +919,10 @@ unknown</p>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">income_correlations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Matrix:</span></span>
@@ -1060,13 +1025,10 @@ unknown</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = Basic Secondary</span></span>
@@ -1138,13 +1100,10 @@ unknown</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Correlation in young adults:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Correlation in young adults:</span></span>
 <span><span class="va">young</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × life_satisfaction ---</span></span>
@@ -1169,13 +1128,10 @@ unknown</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation in middle-aged:</span></span>
 <span><span class="va">middle</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × life_satisfaction ---</span></span>
@@ -1200,13 +1156,10 @@ unknown</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation in older adults:</span></span>
 <span><span class="va">older</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × life_satisfaction ---</span></span>
@@ -1241,13 +1194,10 @@ unknown</p>
 <span>              <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>,</span>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cor_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Matrix:</span></span>
@@ -1382,13 +1332,10 @@ unknown</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; ----------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = East</span></span>

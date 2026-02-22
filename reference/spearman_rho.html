@@ -39,6 +39,7 @@ the assumptions of Pearson correlation are not met."><meta property="og:image" c
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -110,7 +111,7 @@ weighted ranks for mathematically correct survey analysis.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>"spearman_rho_results"</code> containing:</p><dl><dt>correlations</dt>
+    <p>An object of class <code>"spearman_rho"</code> containing:</p><dl><dt>correlations</dt>
 <dd><p>Data frame with rho coefficients, p-values, and t-statistics</p></dd>
 
 <dt>n_obs</dt>
@@ -202,7 +203,10 @@ American Journal of Psychology, 15(1), 72-101.</p>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> with method="spearman" for base R implementation
 <code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> with method="spearman" for significance testing
 <code><a href="kendall_tau.html">kendall_tau</a></code> for Kendall's rank correlation
-<code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis</p></div>
+<code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis</p>
+<p>Other correlation:
+<code><a href="kendall_tau.html">kendall_tau()</a></code>,
+<code><a href="pearson_cor.html">pearson_cor()</a></code></p></div>
     </div>
 
     <div class="section level2">

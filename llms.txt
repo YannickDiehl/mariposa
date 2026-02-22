@@ -1,0 +1,360 @@
+# *mariposa*: marburg initiative for political and social analysis
+
+## 🎯 SPSS → R Migration Made Simple
+
+**Finally, R analysis that matches SPSS exactly.**
+
+mariposa delivers 100% SPSS-compatible results for survey researchers
+migrating to R. No more explaining why your R numbers don’t match SPSS.
+No more parallel analyses. Just identical results, every time.
+
+``` r
+# Your SPSS workflow, now in R
+survey_data %>%
+  t_test(satisfaction, group = gender, weights = weight)
+
+# ✓ Same test statistics
+# ✓ Same p-values
+# ✓ Same confidence intervals
+# ✓ Same weighted calculations
+```
+
+## Why mariposa?
+
+### The Migration Challenge
+
+Moving from SPSS to R typically means: - 🔴 Results that don’t match -
+🔴 Rewriting all validation procedures - 🔴 Learning complex survey
+packages with different outputs - 🔴 Losing confidence in your analyses
+
+### The mariposa Solution
+
+- ✅ **100% SPSS-validated** - Statistical tests match
+- ✅ **Familiar workflow** - Functions work like you expect
+- ✅ **Survey-ready** - Built-in weight handling for every function
+- ✅ **Production-quality output** - Publication-ready tables with
+  proper formatting
+- ✅ **Tidyverse native** - Modern R workflow with dplyr integration
+
+## Installation
+
+``` r
+# Install from GitHub
+devtools::install_github("YannickDiehl/mariposa")
+
+# Load the package
+library(mariposa)
+library(dplyr)  # For modern workflow
+```
+
+## Quick Start
+
+### Your First Analysis
+
+``` r
+# Load example survey data (2,500 respondents)
+data(survey_data)
+
+# Descriptive statistics with survey weights
+survey_data %>%
+  describe(age, income, satisfaction, weights = sampling_weight)
+
+# Frequency table for categorical data
+survey_data %>%
+  frequency(education, weights = sampling_weight)
+
+# Compare groups with t-test
+survey_data %>%
+  t_test(satisfaction, group = gender, weights = sampling_weight)
+```
+
+### Professional Output
+
+    t-Test Results
+    --------------
+
+    Grouping variable: gender
+    Groups compared: Male vs. Female
+    Confidence level: 95.0%
+    Alternative hypothesis: two.sided
+    Null hypothesis (mu): 0.000
+
+
+    --- life_satisfaction ---
+
+      Male: mean = 3.603, n = 1149.0
+      Female: mean = 3.651, n = 1272.0
+
+
+    t-test Results:
+    --------------------------------------------------------------------------------
+            Assumption t_stat       df p_value mean_diff        conf_int sig
+       Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]
+     Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]
+    --------------------------------------------------------------------------------
+
+    Effect Sizes:
+    ------------
+              Variable Cohens_d Hedges_g Glass_Delta Effect_Size
+     life_satisfaction   -0.041   -0.041      -0.041  negligible
+
+
+    Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+
+## Core Features
+
+### 📊 Statistical Functions (46+)
+
+| Category           | Functions                                                                                                                                                                                                                                                                                         | Purpose                     |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| **Descriptive**    | [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)                                                     | Summaries and distributions |
+| **T-Tests**        | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)                                                                                                                                                                                                                         | Mean comparisons            |
+| **ANOVA**          | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)                                                                                                                                                                                                             | Multiple group analysis     |
+| **Non-parametric** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)                                                                                                                                                                                                             | Distribution-free tests     |
+| **Correlation**    | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md), [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md), [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)                                   | Relationships               |
+| **Post-hoc**       | [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md), [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md), [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)                                     | Follow-up analyses          |
+| **Chi-square**     | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md), [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md), [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md), [`gamma()`](https://rdrr.io/r/base/Special.html) | Categorical associations    |
+
+### ⚖️ Survey Weights Built-In
+
+Every function handles survey weights correctly:
+
+``` r
+# Weighted mean, median, SD
+survey_data %>%
+  w_mean(age, income, weights = sampling_weight)
+
+# Grouped weighted analysis
+survey_data %>%
+  group_by(region) %>%
+  describe(satisfaction, weights = sampling_weight)
+```
+
+### 🔄 Modern R Workflow
+
+Full tidyverse integration:
+
+``` r
+# Complex analysis pipeline
+survey_data %>%
+  filter(age >= 18) %>%
+  group_by(region, education) %>%
+  t_test(satisfaction, group = gender, weights = sampling_weight) %>%
+  filter(p_value < 0.05)
+```
+
+### 🧩 S3 Methods for Extended Analysis
+
+Seamless post-hoc testing:
+
+``` r
+# Run ANOVA
+anova_result <- survey_data %>%
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+
+# Automatic post-hoc tests
+anova_result %>% tukey_test()    # Pairwise comparisons
+anova_result %>% levene_test()   # Variance homogeneity
+```
+
+## SPSS Compatibility
+
+### Validated Against SPSS v29
+
+Every function tested across four scenarios:
+
+- [x] Unweighted, ungrouped
+- [x] Weighted, ungrouped
+- [x] Unweighted, grouped
+- [x] Weighted, grouped
+
+### Migration Example
+
+**SPSS Syntax:**
+
+``` spss
+WEIGHT BY sampling_weight.
+T-TEST GROUPS=gender(1 2)
+  /VARIABLES=satisfaction.
+```
+
+**mariposa Equivalent:**
+
+``` r
+survey_data %>%
+  t_test(satisfaction, group = gender, weights = sampling_weight)
+```
+
+**Result: Identical output, guaranteed.**
+
+## Documentation
+
+- 📖 [Complete
+  Reference](https://yanndiehl.github.io/mariposa/reference/) - All
+  functions with examples
+- 🎓 [Tutorials](https://yanndiehl.github.io/mariposa/articles/) -
+  Step-by-step guides
+- 🔄 [SPSS Migration
+  Guide](https://yanndiehl.github.io/mariposa/articles/spss-migration.html) -
+  Side-by-side comparisons
+- 📊 [Survey Weights
+  Guide](https://yanndiehl.github.io/mariposa/articles/survey-weights.html) -
+  Weight handling explained
+
+## Support
+
+- 🐛 **Issues**: [GitHub
+  Issues](https://github.com/YannickDiehl/mariposa/issues)
+- 💡 **Discussions**: [GitHub
+  Discussions](https://github.com/YannickDiehl/mariposa/discussions)
+
+## License
+
+MIT © Yannick Diehl
+
+------------------------------------------------------------------------
+
+**mariposa** - When your R results must match SPSS exactly.
+
+# Package index
+
+## 🎯 Descriptive Statistics
+
+Core descriptive and frequency analysis functions
+
+- [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+  : Get to Know Your Numeric Data
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  : Count How Many People Chose Each Option
+- [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+  : Compare Two Categories: See How They Relate
+
+## 📈 Hypothesis Testing
+
+Statistical tests for comparing groups and testing hypotheses
+
+- [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+  : Test If Two Groups Differ
+- [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
+  : Compare Two Groups Without Assuming Normal Data
+- [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  : Test If Two Categories Are Related
+- [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+  : Compare Multiple Groups: Are Their Averages Different?
+
+## 🔗 Correlation Analysis
+
+Correlation coefficients for continuous and ordinal variables
+
+- [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
+  : Measure How Strongly Variables Are Related
+- [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
+  : Kendall's Tau Correlation Analysis
+- [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md)
+  : Spearman's Rank Correlation Analysis
+
+## 🔍 Post-Hoc Analysis
+
+S3 generics for extended analysis of test results
+
+- [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)
+  : Find Which Specific Groups Differ After ANOVA
+- [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md)
+  : Compare All Groups More Conservatively After ANOVA
+- [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)
+  : Test If Groups Vary Similarly
+
+## 📊 Weighted Statistics
+
+Specialized weighted statistical functions for survey data
+
+- [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
+  : Calculate Population-Representative Averages
+- [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md)
+  : Weighted Standard Deviation
+- [`w_var()`](https://YannickDiehl.github.io/mariposa/reference/w_var.md)
+  : Weighted Variance
+- [`w_se()`](https://YannickDiehl.github.io/mariposa/reference/w_se.md)
+  : Weighted Standard Error
+- [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
+  : Weighted Median
+- [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md)
+  : Weighted Interquartile Range (IQR)
+- [`w_range()`](https://YannickDiehl.github.io/mariposa/reference/w_range.md)
+  : Weighted Range
+- [`w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md)
+  : Weighted Quantiles
+- [`w_modus()`](https://YannickDiehl.github.io/mariposa/reference/w_modus.md)
+  : Weighted Mode (Modus)
+- [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md)
+  : Weighted Skewness
+- [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md)
+  : Weighted Kurtosis
+
+## 📋 Datasets
+
+Synthetic survey and longitudinal datasets for testing and examples
+
+- [`survey_data`](https://YannickDiehl.github.io/mariposa/reference/survey_data.md)
+  : Social Survey Data (Synthetic)
+- [`longitudinal_data`](https://YannickDiehl.github.io/mariposa/reference/longitudinal_data.md)
+  : Longitudinal Study Data (Synthetic)
+- [`longitudinal_data_wide`](https://YannickDiehl.github.io/mariposa/reference/longitudinal_data_wide.md)
+  : Longitudinal Study Data - Wide Format (Synthetic)
+
+## 🛠️ Print Methods
+
+Professional output formatting methods
+
+- [`print(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.chi_square.md)
+  : Print method for chi_square
+- [`print(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.crosstab.md)
+  : Print method for crosstab results
+- [`print(`*`<describe>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.describe.md)
+  : Print method for describe objects
+- [`print(`*`<frequency>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.frequency.md)
+  : Print method for frequency objects
+- [`print(`*`<kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.kendall_tau.md)
+  : Print method for kendall_tau
+- [`print(`*`<levene_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.levene_test.md)
+  : Print method for Levene test results
+- [`print(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.mann_whitney.md)
+  : Print method for Mann-Whitney test results
+- [`print(`*`<oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.oneway_anova.md)
+  : Print ANOVA test results
+- [`print(`*`<pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.pearson_cor.md)
+  : Print method for pearson_cor
+- [`print(`*`<scheffe_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.scheffe_test.md)
+  : Print Scheffe test results
+- [`print(`*`<spearman_rho>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.spearman_rho.md)
+  : Print method for spearman_rho
+- [`print(`*`<t_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.t_test.md)
+  : Print t-test results
+- [`print(`*`<tukey_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.tukey_test.md)
+  : Print Tukey HSD test results
+- [`print(`*`<w_modus>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.w_modus.md)
+  : Print method for w_modus objects
+
+# Articles
+
+### Getting Started
+
+- [Introduction to
+  mariposa](https://YannickDiehl.github.io/mariposa/articles/introduction.md):
+
+### Core Analysis Functions
+
+- [Descriptive Statistics and
+  Frequencies](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md):
+- [Comparing Groups and Testing
+  Hypotheses](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md):
+- [Understanding Relationships: Correlation
+  Analysis](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md):
+
+### Advanced Topics
+
+- [Working with Survey
+  Weights](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md):

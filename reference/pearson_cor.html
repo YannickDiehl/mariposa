@@ -45,6 +45,7 @@ Significance: Whether the relationship is real or could be due to chance
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -175,7 +176,10 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> for the base R correlation function
-<code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> for correlation significance testing</p></div>
+<code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> for correlation significance testing</p>
+<p>Other correlation:
+<code><a href="kendall_tau.html">kendall_tau()</a></code>,
+<code><a href="spearman_rho.html">spearman_rho()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -188,11 +192,10 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Pearson Correlation  ────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
@@ -217,11 +220,10 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Pearson Correlation  ────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
@@ -269,12 +271,11 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
@@ -300,11 +301,10 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Pearson Correlation  ────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
@@ -388,12 +388,11 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
@@ -594,11 +593,10 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, na.rm <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Pearson Correlation  ────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: listwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: listwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
@@ -624,12 +622,11 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Pearson Correlation  ───────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>

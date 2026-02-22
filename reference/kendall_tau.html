@@ -39,6 +39,7 @@ correlations, it uses survey-weighted rank calculations."><meta property="og:ima
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/YannickDiehl/mariposa" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -108,7 +109,7 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>"kendall_tau_results"</code> containing:</p><dl><dt>correlations</dt>
+    <p>An object of class <code>"kendall_tau"</code> containing:</p><dl><dt>correlations</dt>
 <dd><p>Data frame with tau coefficients, p-values, and z-scores</p></dd>
 
 <dt>n_obs</dt>
@@ -187,7 +188,10 @@ for weighted correlations. Should be a numeric variable with positive values.</p
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> with method="kendall" for base R implementation
 <code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> with method="kendall" for significance testing
-<code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis</p></div>
+<code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis</p>
+<p>Other correlation:
+<code><a href="pearson_cor.html">pearson_cor()</a></code>,
+<code><a href="spearman_rho.html">spearman_rho()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -200,11 +204,10 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ┌─ life_satisfaction × political_orientation ─┐</span>
@@ -223,11 +226,10 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span>, <span class="va">trust_media</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
@@ -268,12 +270,11 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ┌─ age × income ─┐</span>
@@ -293,14 +294,15 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
@@ -333,8 +335,10 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.030 -0.878 0.3799 465    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.338  9.099 0.0000 410 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ─────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
@@ -374,12 +378,11 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
@@ -420,11 +423,10 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, na.rm <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: listwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: listwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ┌─ age × income ─┐</span>
@@ -443,11 +445,10 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: greater</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: greater</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ┌─ age × income ─┐</span>
@@ -468,12 +469,11 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <span class="r-in"><span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------- </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Alternative hypothesis: two.sided</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>

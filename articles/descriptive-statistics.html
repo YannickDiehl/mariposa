@@ -52,6 +52,7 @@
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -86,9 +87,6 @@
 <span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     frequency</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     gamma</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
@@ -119,12 +117,10 @@ responses across two categorical variables</p>
 <p>The simplest way to get descriptive statistics:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ---------------------- </span></span>
+<span><span class="co">#&gt; ── Descriptive Statistics ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  Variable  Mean Median     SD Range IQR Skewness    N Missing</span></span>
 <span><span class="co">#&gt;       age 50.55     50 16.976    77  24    0.172 2500       0</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 <p>This gives you the mean, median, standard deviation, and other key
 statistics for age.</p>
 </div>
@@ -135,14 +131,12 @@ statistics for age.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ---------------------- </span></span>
+<span><span class="co">#&gt; ── Descriptive Statistics ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness    N Missing</span></span>
 <span><span class="co">#&gt;                age   50.550     50   16.976    77   24    0.172 2500       0</span></span>
 <span><span class="co">#&gt;             income 3753.934   3500 1432.802  7200 1900    0.730 2186     314</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.628      4    1.153     4    2   -0.501 2421      79</span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="with-survey-weights">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights"></a>
@@ -152,14 +146,12 @@ statistics for age.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;                age   50.514     50   17.084    77   25    0.159      2468.8</span></span>
 <span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 <p>The weighted results better represent your target population.</p>
 </div>
 <div class="section level3">
@@ -170,23 +162,23 @@ statistics for age.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ------------------------------- </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Group: region = East</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = East</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;       age   52.278     53   17.595    77   24    0.098       477.0</span></span>
 <span><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = West</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Group: region = West</span> ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;       age   50.067     49   16.927    77   24    0.170      1993.1</span></span>
 <span><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="customizing-output">Customizing Output<a class="anchor" aria-label="anchor" href="#customizing-output"></a>
@@ -196,25 +188,21 @@ statistics for age.</p>
 <code class="sourceCode R"><span><span class="co"># Just the essentials</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, show <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"range"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ---------------------- </span></span>
+<span><span class="co">#&gt; ── Descriptive Statistics ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  Variable     Mean       SD Range    N Missing</span></span>
 <span><span class="co">#&gt;       age   50.550   16.976    77 2500       0</span></span>
 <span><span class="co">#&gt;    income 3753.934 1432.802  7200 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------------</span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span></span>
 <span><span class="co"># Everything available</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, show <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ---------------------- </span></span>
+<span><span class="co">#&gt; ── Descriptive Statistics ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  Variable  Mean Median     SD   SE Range IQR Skewness Kurtosis Variance Mode</span></span>
 <span><span class="co">#&gt;       age 50.55     50 16.976 0.34    77  24    0.172   -0.364  288.185   18</span></span>
 <span><span class="co">#&gt;  Q25 Q50 Q75    N Missing</span></span>
 <span><span class="co">#&gt;   38  50  62 2500       0</span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -227,9 +215,7 @@ statistics for age.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; -------------------------- </span></span>
+<span><span class="co">#&gt; ── Frequency Analysis Results ──────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education (Highest educational attainment)</span></span>
 <span><span class="co">#&gt; # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span></span>
@@ -259,9 +245,7 @@ percentages</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Frequency Analysis Results ─────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education (Highest educational attainment)</span></span>
 <span><span class="co">#&gt; # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span></span>
@@ -283,9 +267,7 @@ percentages</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, <span class="va">region</span>,</span>
 <span>            weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Frequency Analysis Results ─────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education (Highest educational attainment)</span></span>
 <span><span class="co">#&gt; # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span></span>
@@ -332,13 +314,13 @@ percentages</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Frequency Analysis Results ─────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education (Highest educational attainment)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: gender = Male</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Group: gender = Male</span> ──</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # total N=1195 valid N=1195 mean=NA sd=NA skewness=NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; +------+--------------------+--------+--------+--------+--------+</span></span>
@@ -350,8 +332,8 @@ percentages</p>
 <span><span class="co">#&gt; |Univer|University          |176     |14.73   |14.73   |100.00  |</span></span>
 <span><span class="co">#&gt; +------+--------------------+--------+--------+--------+--------+</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Group: gender = Female</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: gender = Female</span></span>
 <span><span class="co">#&gt; # total N=1321 valid N=1321 mean=NA sd=NA skewness=NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; +------+--------------------+--------+--------+--------+--------+</span></span>
@@ -444,9 +426,7 @@ percentages (percentage of total)</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Grouped Crosstabulation </span></span>
-<span><span class="co">#&gt; --------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Grouped Crosstabulation  ───────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- Group: region = East ---</span></span>
@@ -512,16 +492,14 @@ percentages (percentage of total)</p>
 <code class="sourceCode R"><span><span class="co"># Check for outliers and missing data</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, show <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ---------------------- </span></span>
+<span><span class="co">#&gt; ── Descriptive Statistics ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD     SE Range  IQR Skewness Kurtosis</span></span>
 <span><span class="co">#&gt;       age   50.550     50   16.976  0.340    77   24    0.172   -0.364</span></span>
 <span><span class="co">#&gt;    income 3753.934   3500 1432.802 30.645  7200 1900    0.730    0.376</span></span>
 <span><span class="co">#&gt;     Variance Mode  Q25  Q50  Q75    N Missing</span></span>
 <span><span class="co">#&gt;      288.185   18   38   50   62 2500       0</span></span>
 <span><span class="co">#&gt;  2052920.442 3200 2700 3500 4600 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 <p>Look for: - Data entry errors (impossible values) - Missing data
 patterns - Distribution issues (extreme skewness)</p>
 </div>
@@ -572,14 +550,12 @@ patterns - Distribution issues (extreme skewness)</p>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span>,</span>
 <span>           show <span class="op">=</span> <span class="st">"short"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;                age   50.514     50   17.084    77   25    0.159      2468.8</span></span>
 <span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span></span>
 <span><span class="co"># 2. Check distributions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n=== Key Frequencies ===\n"</span><span class="op">)</span></span>
@@ -588,9 +564,7 @@ patterns - Distribution issues (extreme skewness)</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>,</span>
 <span>            weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------------- </span></span>
+<span><span class="co">#&gt; ── Weighted Frequency Analysis Results ─────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education (Highest educational attainment)</span></span>
 <span><span class="co">#&gt; # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span></span>
@@ -657,23 +631,23 @@ patterns - Distribution issues (extreme skewness)</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ------------------------------- </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Group: region = East</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = East</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = West</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Group: region = West</span> ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
