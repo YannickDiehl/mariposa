@@ -1,6 +1,11 @@
 /* Custom CSS for mariposa pkgdown site */
+/* Color palette inspired by the Marburg hex logo:
+   - Dark teal (#2c3e50) for headings and accents
+   - Soft gold (#d4a843) for highlights
+   - Slate blue (#5d7b93) for secondary elements
+*/
 
-/* Enlarge the logo in the page header */
+/* Logo sizing in the page header */
 .page-header img.logo {
   height: 180px !important;
   width: auto !important;
@@ -8,7 +13,6 @@
   margin-right: 20px;
 }
 
-/* Ensure logo looks good on mobile */
 @media (max-width: 768px) {
   .page-header img.logo {
     height: 140px !important;
@@ -16,7 +20,7 @@
   }
 }
 
-/* Style the subtitle headers */
+/* Subtitle styling */
 .page-header + .section h3 {
   color: #2c3e50;
   font-weight: 500;
@@ -31,7 +35,19 @@
   margin-bottom: 20px;
 }
 
-/* Better spacing for badges */
+/* Badge spacing */
 .section.level1 > p:first-of-type {
   margin-top: 15px;
+}
+
+/* Code block styling */
+pre {
+  border-left: 3px solid #d4a843;
+  border-radius: 4px;
+}
+
+/* Reference section cards */
+.section h2 {
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.4em;
 }

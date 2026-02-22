@@ -2,44 +2,28 @@
 
 ``` r
 library(mariposa)
-#> 
-#> Attaching package: 'mariposa'
-#> The following object is masked from 'package:stats':
-#> 
-#>     frequency
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 ```
 
-## What is mariposa?
+## Overview
 
-mariposa (Marburg Initiative for Political and Social Analysis) makes it
-easy to analyze survey data in R. Whether you’re working with customer
-satisfaction surveys, social research, or market research data, this
-package helps you get insights quickly and accurately.
+mariposa (*Marburg Initiative for Political and Social Analysis*) makes
+it easy to analyze survey data in R. Whether you are working with social
+surveys, customer satisfaction data, or market research, this package
+helps you get reliable results quickly.
 
-The package handles the complexities of survey analysis for you - things
+The package handles the complexities of survey analysis for you — things
 like sampling weights, grouped comparisons, and missing data are all
-taken care of automatically.
+taken care of automatically. Every function is validated against SPSS,
+so you can trust the numbers.
 
 ## Getting Started
 
-Let’s start with a simple example. We’ll use the included survey data
-which contains responses from 2,500 people about their life
-satisfaction, demographics, and opinions.
+Let’s start with the included example data. It contains responses from
+2,500 people about their life satisfaction, demographics, and opinions.
 
 ``` r
-# Load the example survey data
 data(survey_data)
-
-# Take a quick look at what we have
 glimpse(survey_data)
 #> Rows: 2,500
 #> Columns: 16
@@ -63,37 +47,37 @@ glimpse(survey_data)
 
 ## Understanding Your Data
 
-### Getting Summary Statistics
+### Summary Statistics
 
-Want to know the average age or income in your survey? The
+The
 [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
-function gives you a complete summary:
+function gives you a complete summary of numeric variables. The
+`weights` argument ensures results represent the population correctly:
 
 ``` r
-# Get a summary of age and income
-# The weights ensure results represent the population correctly
 survey_data %>%
   describe(age, income, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.514     50   17.084    77   25    0.159      2468.8
 #>    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
-This shows you: - **n**: How many valid responses - **mean**: The
-average value - **sd**: Standard deviation (how spread out values are) -
-**median**: The middle value - **range**: Minimum and maximum values
+The output shows:
 
-### Looking at Categories
+- **n**: Number of valid responses
+- **mean**: The average ($\bar{x}$)
+- **sd**: Standard deviation — how spread out the values are
+- **median**: The middle value (50th percentile)
+- **range**: Minimum and maximum values
 
-For categorical data like education or employment status, use
+### Categorical Variables
+
+For categorical data like education level or employment status, use
 [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md):
 
 ``` r
 survey_data %>%
   frequency(education, weights = sampling_weight)
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -108,25 +92,19 @@ survey_data %>%
 #> +------+--------------------+--------+--------+--------+--------+
 ```
 
-This tells you: - How many people are in each category - What percentage
-they represent - Cumulative percentages
+This tells you how many people fall into each category, what percentage
+they represent, and cumulative percentages.
 
 ## Comparing Groups
 
-### Are There Differences?
+### Two Groups: t-Test
 
-Want to know if men and women differ in life satisfaction? Use a t-test:
+Want to know if men and women differ in life satisfaction? Use
+[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md):
 
 ``` r
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -146,8 +124,6 @@ survey_data %>%
 #>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  life_satisfaction   -0.043   -0.043      -0.043  negligible
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -157,17 +133,18 @@ survey_data %>%
 #> - Large effect: |effect| ~ 0.8
 ```
 
-If the p-value is less than 0.05, there’s a statistically significant
-difference.
+If the p-value is below 0.05, the difference is statistically
+significant. But always check the effect size too — a significant result
+with a tiny effect might not be practically meaningful.
 
-### Multiple Group Comparisons
+### Three or More Groups: ANOVA
 
-When you have more than two groups, use ANOVA:
+When comparing more than two groups, use
+[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md):
 
 ``` r
 survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
-#> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -217,17 +194,13 @@ survey_data %>%
 
 ## Finding Relationships
 
-### Correlation Analysis
+### Correlation
 
-Are age and income related? Check their correlation:
+Are age and income related? Pearson’s *r* measures linear association:
 
 ``` r
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> ── Weighted Pearson Correlation  ───────────────────────────────────────────────
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Confidence level: 95.0%
 #> 
 #> 
 #> --- age × income ---
@@ -249,11 +222,11 @@ survey_data %>%
 #> r² represents the proportion of variance explained
 ```
 
-- Positive correlation: As one goes up, the other tends to go up
-- Negative correlation: As one goes up, the other tends to go down
-- Near zero: No linear relationship
+- **r \> 0**: As one variable increases, the other tends to increase
+- **r \< 0**: As one increases, the other tends to decrease
+- **r near 0**: No linear relationship
 
-### Cross-tabulation
+### Cross-Tabulation
 
 See how two categorical variables relate:
 
@@ -289,32 +262,22 @@ survey_data %>%
 
 ### Regional Analysis
 
-Compare statistics across regions easily:
+Use [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+from dplyr to compare statistics across subgroups:
 
 ``` r
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#> 
-#> ── Group: region = East ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: region = West ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
-### Multiple Tests at Once
+### Multiple Variables at Once
 
 Test several variables simultaneously:
 
@@ -322,13 +285,6 @@ Test several variables simultaneously:
 survey_data %>%
   t_test(trust_government, trust_media, trust_science,
          group = gender, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- trust_government ---
@@ -384,8 +340,6 @@ survey_data %>%
 #>       Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  trust_science   -0.058   -0.058      -0.057  negligible
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -397,14 +351,12 @@ survey_data %>%
 
 ## Why Weights Matter
 
-Survey weights make your results representative of the population.
-Here’s the difference they make:
+Survey weights make your results representative of the population. Here
+is the difference they make:
 
 ``` r
-# Without weights - just your sample
 unweighted <- mean(survey_data$age, na.rm = TRUE)
 
-# With weights - represents the population
 weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
 weighted <- weighted_result$results$weighted_mean
 
@@ -416,67 +368,38 @@ cat("Difference:", round(weighted - unweighted, 1), "years\n")
 #> Difference: 0 years
 ```
 
-## Common Analysis Workflow
+Always use weights when they are provided — unweighted results can be
+misleading.
 
-Here’s a typical analysis pattern:
+## A Typical Workflow
+
+Here is how a complete analysis might look:
 
 ``` r
-# 1. Start with descriptive statistics
-cat("=== Basic Summary ===\n")
-#> === Basic Summary ===
+# 1. Descriptive overview
 survey_data %>%
   describe(life_satisfaction, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.625      4 1.152     4   2   -0.498      2390.9
-#> ────────────────────────────────────────────────────────────────────────────────
 
-# 2. Check distribution across groups
-cat("\n=== By Education Level ===\n")
-#> 
-#> === By Education Level ===
+# 2. Compare across groups
 survey_data %>%
   group_by(education) %>%
   describe(life_satisfaction, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#> 
-#> ── Group: education = Basic Secondary ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: education = Intermediate Secondary ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable  Mean Median   SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: education = Academic Secondary ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: education = University ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
-#> ────────────────────────────────────────────────────────────────────────────────
 
 # 3. Test for significant differences
-cat("\n=== Statistical Test ===\n")
-#> 
-#> === Statistical Test ===
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 print(result)
-#> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -523,162 +446,56 @@ print(result)
 #> 
 #> Post-hoc tests: Use tukey_test() for pairwise comparisons
 
-# 4. If significant, see which groups differ
-# Check if result has p_value column (data frame structure)
-if (!is.null(result) && "p_value" %in% names(result) && result$p_value[1] < 0.05) {
-  cat("\n=== Post-hoc Comparisons ===\n")
-  tukey_test(result)
-}
+# 4. If significant, find out which groups differ
+tukey_test(result)
+#> 
+#> Dependent Variable: life_satisfaction
+#> Grouping Variable: education
+#> Weights Variable: sampling_weight
+#> Confidence level: 95.0%
+#> Family-wise error rate controlled using Tukey HSD
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#> Weighted Tukey Results:
+#> ------------------------------------------------------------------------------------ 
+#>                                   Comparison Difference Lower CI Upper CI
+#>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339
+#>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491
+#>                 Basic Secondary - University     -0.832   -1.011   -0.654
+#>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008
+#>          Intermediate Secondary - University     -0.342   -0.529   -0.156
+#>              Academic Secondary - University     -0.189   -0.376   -0.003
+#>  p-value Sig
+#>    <.001 ***
+#>    <.001 ***
+#>    <.001 ***
+#>    0.071    
+#>    <.001 ***
+#>    0.046   *
+#> ------------------------------------------------------------------------------------ 
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Interpretation:
+#> - Positive differences: First group > Second group
+#> - Negative differences: First group < Second group
+#> - Confidence intervals not containing 0 indicate significant differences
+#> - p-values are adjusted for multiple comparisons (family-wise error control)
 ```
 
 ## Tips for Success
 
-### 1. Always Start with Descriptives
-
-Before running tests, understand your data:
-
-``` r
-survey_data %>%
-  describe(income, show = "all", weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#>  Variable     Mean Median       SD     SE Range  IQR Skewness Kurtosis Variance
-#>    income 3743.099   3500 1423.966 30.353  7200 1900    0.724    0.384  2027678
-#>  Mode  Q25  Q50  Q75 Effective_N
-#>  3200 2700 3500 4600      2158.9
-#> ────────────────────────────────────────────────────────────────────────────────
-```
-
-### 2. Check Your Assumptions
-
-Many tests assume normal distribution. Check skewness: - Skewness near
-0: Roughly normal - Skewness \> 1 or \< -1: Quite skewed
-
-### 3. Use Appropriate Tests
-
-- **Continuous data** (age, income): t-test, ANOVA, Pearson correlation
-- **Ordinal data** (ratings): Mann-Whitney, Spearman correlation
-- **Categorical data** (yes/no): Chi-square test
-
-### 4. Report Effect Sizes
-
-Statistical significance doesn’t always mean practical importance. Check
-effect sizes!
-
-## Getting Help
-
-### Function Documentation
-
-Every function has detailed help:
-
-``` r
-?describe
-?t_test
-?pearson_cor
-```
-
-### Vignettes
-
-For detailed guides: -
-[`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md) -
-Deep dive into summaries and frequencies -
-[`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md) -
-All about comparing groups -
-[`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md) -
-Understanding relationships -
-[`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md) -
-Working with weighted data
-
-### Workflow Example
-
-Here’s how to analyze a survey question from start to finish:
-
-``` r
-# Question: Does income relate to life satisfaction?
-
-# 1. Look at both variables
-cat("=== Income Summary ===\n")
-#> === Income Summary ===
-survey_data %>%
-  describe(income, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#> ────────────────────────────────────────────────────────────────────────────────
-
-cat("\n=== Life Satisfaction Summary ===\n")
-#> 
-#> === Life Satisfaction Summary ===
-survey_data %>%
-  describe(life_satisfaction, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.625      4 1.152     4   2   -0.498      2390.9
-#> ────────────────────────────────────────────────────────────────────────────────
-
-# 2. Check correlation
-cat("\n=== Correlation ===\n")
-#> 
-#> === Correlation ===
-cor_result <- survey_data %>%
-  pearson_cor(income, life_satisfaction, weights = sampling_weight)
-print(cor_result)
-#> ── Weighted Pearson Correlation  ───────────────────────────────────────────────
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Confidence level: 95.0%
-#> 
-#> 
-#> --- income × life_satisfaction ---
-#> 
-#>   Correlation: r = 0.450
-#>   Effect size: r² = 0.203
-#>   Sample size: n = 2130
-#>   95% CI: [0.416, 0.483]
-#>   p-value: 0.0000
-#>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
-
-# 3. Interpret
-if (!is.null(cor_result) && "p_value" %in% names(cor_result) && cor_result$p_value[1] < 0.05) {
-  if (cor_result$correlation[1] > 0) {
-    cat("\nHigher income is associated with greater life satisfaction.\n")
-  } else {
-    cat("\nHigher income is associated with lower life satisfaction.\n")
-  }
-  cat("Correlation strength:", round(cor_result$correlation[1], 2),
-      "(", ifelse(abs(cor_result$correlation[1]) < 0.3, "weak",
-                  ifelse(abs(cor_result$correlation[1]) < 0.7, "moderate", "strong")),
-      ")\n")
-} else {
-  cat("\nNo significant relationship found between income and life satisfaction.\n")
-}
-#> 
-#> No significant relationship found between income and life satisfaction.
-```
-
-## Next Steps
-
-Now that you understand the basics:
-
-1.  **Explore your own data** - Start with
-    [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
-    and
-    [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
-2.  **Test your hypotheses** - Use t-tests, ANOVA, or chi-square
-3.  **Dig deeper** - Check out the other vignettes for advanced
-    techniques
-4.  **Stay accurate** - Always use weights when provided
-
-Remember: Good analysis tells a story. Start broad, then focus on what’s
-interesting!
+1.  **Always start with descriptives.** Understand your data before
+    running tests.
+2.  **Check your assumptions.** Skewness near 0 suggests roughly normal
+    data; values beyond $\pm 1$ indicate notable skew.
+3.  **Use appropriate tests.** Continuous data: t-test, ANOVA, Pearson.
+    Ordinal data: Mann-Whitney, Spearman. Categorical data: chi-square.
+4.  **Report effect sizes.** Statistical significance alone does not
+    tell you whether a difference matters in practice.
 
 ## Quick Reference
 
@@ -692,9 +509,17 @@ interesting!
 | Measure correlation | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)   | `pearson_cor(age, income)`                |
 | Cross-tabulate      | [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)         | `crosstab(education, region)`             |
 
-All functions support: - ✓ Survey weights via `weights =` - ✓ Grouped
+All functions support survey weights via `weights =` and grouped
 analysis via
-[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html) - ✓
-Multiple variables at once - ✓ Missing data handling
+[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html).
 
-Welcome to mariposa - happy analyzing!
+## Next Steps
+
+- [`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md)
+  — Deep dive into summaries and frequencies
+- [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
+  — Comparing groups and testing differences
+- [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
+  — Measuring relationships
+- [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)
+  — Working with weighted data

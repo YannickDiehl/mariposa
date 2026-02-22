@@ -5,7 +5,7 @@
 - [Introduction to
   mariposa](https://YannickDiehl.github.io/mariposa/articles/introduction.md):
 
-### Core Analysis Functions
+### Core Analysis
 
 - [Descriptive Statistics and
   Frequencies](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md):

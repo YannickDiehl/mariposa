@@ -1,8 +1,8 @@
 # Package index
 
-## 🎯 Descriptive Statistics
+## Descriptive Statistics
 
-Core descriptive and frequency analysis functions
+Summarize and explore your survey data
 
 - [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
   : Get to Know Your Numeric Data
@@ -11,12 +11,14 @@ Core descriptive and frequency analysis functions
 - [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
   : Compare Two Categories: See How They Relate
 
-## 📈 Hypothesis Testing
+## Hypothesis Testing
 
-Statistical tests for comparing groups and testing hypotheses
+Compare groups and test for significant differences
 
 - [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
   : Test If Two Groups Differ
+- [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+  : Compare Multiple Groups: Are Their Averages Different?
 - [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
   : Compare Two Groups Without Assuming Normal Data
 - [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
@@ -24,23 +26,21 @@ Statistical tests for comparing groups and testing hypotheses
   [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   : Test If Two Categories Are Related
-- [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
-  : Compare Multiple Groups: Are Their Averages Different?
 
-## 🔗 Correlation Analysis
+## Correlation Analysis
 
-Correlation coefficients for continuous and ordinal variables
+Measure relationships between variables
 
 - [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
   : Measure How Strongly Variables Are Related
-- [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
-  : Kendall's Tau Correlation Analysis
 - [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md)
   : Spearman's Rank Correlation Analysis
+- [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
+  : Kendall's Tau Correlation Analysis
 
-## 🔍 Post-Hoc Analysis
+## Post-Hoc Analysis
 
-S3 generics for extended analysis of test results
+Follow-up tests for detailed group comparisons
 
 - [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)
   : Find Which Specific Groups Differ After ANOVA
@@ -49,20 +49,20 @@ S3 generics for extended analysis of test results
 - [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)
   : Test If Groups Vary Similarly
 
-## 📊 Weighted Statistics
+## Weighted Statistics
 
-Specialized weighted statistical functions for survey data
+Individual weighted statistics for survey data
 
 - [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
   : Calculate Population-Representative Averages
+- [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
+  : Weighted Median
 - [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md)
   : Weighted Standard Deviation
 - [`w_var()`](https://YannickDiehl.github.io/mariposa/reference/w_var.md)
   : Weighted Variance
 - [`w_se()`](https://YannickDiehl.github.io/mariposa/reference/w_se.md)
   : Weighted Standard Error
-- [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
-  : Weighted Median
 - [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md)
   : Weighted Interquartile Range (IQR)
 - [`w_range()`](https://YannickDiehl.github.io/mariposa/reference/w_range.md)
@@ -76,9 +76,9 @@ Specialized weighted statistical functions for survey data
 - [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md)
   : Weighted Kurtosis
 
-## 📋 Datasets
+## Datasets
 
-Synthetic survey and longitudinal datasets for testing and examples
+Example datasets for learning and testing
 
 - [`survey_data`](https://YannickDiehl.github.io/mariposa/reference/survey_data.md)
   : Social Survey Data (Synthetic)
@@ -87,9 +87,9 @@ Synthetic survey and longitudinal datasets for testing and examples
 - [`longitudinal_data_wide`](https://YannickDiehl.github.io/mariposa/reference/longitudinal_data_wide.md)
   : Longitudinal Study Data - Wide Format (Synthetic)
 
-## 🛠️ Print Methods
+## Print Methods
 
-Professional output formatting methods
+Formatted output for all result types
 
 - [`print(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.chi_square.md)
   : Print method for chi_square

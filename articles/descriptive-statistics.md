@@ -2,36 +2,24 @@
 
 ``` r
 library(mariposa)
-#> 
-#> Attaching package: 'mariposa'
-#> The following object is masked from 'package:stats':
-#> 
-#>     frequency
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 data(survey_data)
 ```
 
-## What Does This Do?
+## Overview
 
 Descriptive statistics help you understand your data before doing any
-complex analysis. Think of it as getting to know your survey responses -
-what’s typical, what’s unusual, and how spread out the answers are.
+complex analysis. Think of it as getting to know your survey responses —
+what is typical, what is unusual, and how spread out the answers are.
 
-The main functions covered here: -
-[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md) -
-Get a complete summary of numeric variables -
-[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md) -
-See how many people chose each option -
-[`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md) -
-Compare responses across two categorical variables
+This guide covers three functions:
+
+- [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+  — Summary statistics for numeric variables
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  — Frequency tables for categorical variables
+- [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+  — Cross-tabulations comparing two categorical variables
 
 ## Getting Summary Statistics
 
@@ -41,14 +29,12 @@ The simplest way to get descriptive statistics:
 
 ``` r
 survey_data %>% describe(age)
-#> ── Descriptive Statistics ──────────────────────────────────────────────────────
 #>  Variable  Mean Median     SD Range IQR Skewness    N Missing
 #>       age 50.55     50 16.976    77  24    0.172 2500       0
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
-This gives you the mean, median, standard deviation, and other key
-statistics for age.
+This gives you the mean ($\bar{x}$), median, standard deviation (*SD*),
+and other key statistics.
 
 ### Multiple Variables at Once
 
@@ -57,82 +43,65 @@ Analyze several variables together:
 ``` r
 survey_data %>%
   describe(age, income, life_satisfaction)
-#> ── Descriptive Statistics ──────────────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness    N Missing
 #>                age   50.550     50   16.976    77   24    0.172 2500       0
 #>             income 3753.934   3500 1432.802  7200 1900    0.730 2186     314
 #>  life_satisfaction    3.628      4    1.153     4    2   -0.501 2421      79
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
 ### With Survey Weights
 
-To get population-representative statistics:
+To get population-representative statistics, add the `weights` argument:
 
 ``` r
 survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
 #>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
 #>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
-The weighted results better represent your target population.
+The weighted results better represent your target population by
+correcting for sampling biases.
 
 ### Grouped Analysis
 
-Compare statistics across groups:
+Compare statistics across groups using
+[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html):
 
 ``` r
 survey_data %>%
   group_by(region) %>%
   describe(age, income, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#> 
-#> ── Group: region = East ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   52.278     53   17.595    77   24    0.098       477.0
 #>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: region = West ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.067     49   16.927    77   24    0.170      1993.1
 #>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
 ### Customizing Output
 
-Choose which statistics to display:
+Choose which statistics to display with the `show` argument:
 
 ``` r
 # Just the essentials
 survey_data %>%
   describe(age, income, show = c("mean", "sd", "range"))
-#> ── Descriptive Statistics ──────────────────────────────────────────────────────
 #>  Variable     Mean       SD Range    N Missing
 #>       age   50.550   16.976    77 2500       0
 #>    income 3753.934 1432.802  7200 2186     314
-#> ────────────────────────────────────────────────────────────────────────────────
 
 # Everything available
 survey_data %>%
   describe(age, show = "all")
-#> ── Descriptive Statistics ──────────────────────────────────────────────────────
 #>  Variable  Mean Median     SD   SE Range IQR Skewness Kurtosis Variance Mode
 #>       age 50.55     50 16.976 0.34    77  24    0.172   -0.364  288.185   18
 #>  Q25 Q50 Q75    N Missing
 #>   38  50  62 2500       0
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
 ## Frequency Tables
@@ -145,7 +114,6 @@ For categorical variables, use
 ``` r
 survey_data %>%
   frequency(education)
-#> ── Frequency Analysis Results ──────────────────────────────────────────────────
 #> 
 #> education (Highest educational attainment)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
@@ -160,21 +128,24 @@ survey_data %>%
 #> +------+--------------------+--------+--------+--------+--------+
 ```
 
-### With Percentages
+### Understanding the Output
 
-The output shows: - **Frequency**: How many people gave each answer -
-**Percent**: Percentage including missing values - **Valid Percent**:
-Percentage excluding missing values - **Cumulative Percent**: Running
-total of valid percentages
+The output includes:
+
+- **Frequency**: Count of responses in each category
+- **Percent**: Percentage of all cases (including missing)
+- **Valid Percent**: Percentage of non-missing cases only
+- **Cumulative Percent**: Running total of valid percentages
+
+When reporting results, use *Valid Percent* if missing values are truly
+missing (e.g., skip patterns), and *Percent* when non-response is
+meaningful.
 
 ### Weighted Frequencies
-
-Include survey weights for representative results:
 
 ``` r
 survey_data %>%
   frequency(education, weights = sampling_weight)
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -191,13 +162,12 @@ survey_data %>%
 
 ### Multiple Variables
 
-Analyze several categorical variables:
+Analyze several categorical variables at once:
 
 ``` r
 survey_data %>%
   frequency(education, employment, region,
             weights = sampling_weight)
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -245,13 +215,8 @@ See how distributions vary by group:
 survey_data %>%
   group_by(gender) %>%
   frequency(education, weights = sampling_weight)
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
 #> 
 #> education (Highest educational attainment)
-#> 
-#> 
-#> ── Group: gender = Male ──
-#> 
 #> # total N=1195 valid N=1195 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -262,9 +227,6 @@ survey_data %>%
 #> |Academ|Academic Secondary  |326     |27.31   |27.31   |85.27   |
 #> |Univer|University          |176     |14.73   |14.73   |100.00  |
 #> +------+--------------------+--------+--------+--------+--------+
-#> 
-#> ── Group: gender = Female ──
-#> 
 #> # total N=1321 valid N=1321 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -277,11 +239,11 @@ survey_data %>%
 #> +------+--------------------+--------+--------+--------+--------+
 ```
 
-## Cross-tabulation
+## Cross-Tabulation
 
 ### Basic Crosstab
 
-Examine relationships between two categorical variables:
+Examine the relationship between two categorical variables:
 
 ``` r
 survey_data %>%
@@ -313,13 +275,19 @@ survey_data %>%
 
 ### Understanding the Output
 
-Crosstabs show: - Count in each cell - Row percentages (sum to 100%
-across rows) - Column percentages (sum to 100% down columns) - Cell
-percentages (percentage of total)
+Cross-tabulations show several types of percentages:
+
+- **Count**: Number of cases in each cell
+- **Row %**: Percentage within each row (sums to 100% across)
+- **Column %**: Percentage within each column (sums to 100% down)
+- **Cell %**: Percentage of the total sample
+
+Row percentages answer: “Of people with this education level, what
+proportion has each employment status?” Column percentages answer: “Of
+people with this employment status, what proportion has each education
+level?”
 
 ### Weighted Crosstabs
-
-Include survey weights:
 
 ``` r
 survey_data %>%
@@ -351,13 +319,12 @@ survey_data %>%
 
 ### Grouped Crosstabs
 
-Create separate crosstabs for each group:
+Create separate cross-tabulations for each subgroup:
 
 ``` r
 survey_data %>%
   group_by(region) %>%
   crosstab(education, employment, weights = sampling_weight)
-#> ── Weighted Grouped Crosstabulation  ───────────────────────────────────────────
 #> 
 #> 
 #> --- Group: region = East ---
@@ -416,80 +383,68 @@ survey_data %>%
 
 ### 1. Always Check Your Data First
 
-Start with basic descriptives to spot issues:
+Start with basic descriptives to spot potential issues:
 
 ``` r
-# Check for outliers and missing data
 survey_data %>%
   describe(age, income, show = "all")
-#> ── Descriptive Statistics ──────────────────────────────────────────────────────
 #>  Variable     Mean Median       SD     SE Range  IQR Skewness Kurtosis
 #>       age   50.550     50   16.976  0.340    77   24    0.172   -0.364
 #>    income 3753.934   3500 1432.802 30.645  7200 1900    0.730    0.376
 #>     Variance Mode  Q25  Q50  Q75    N Missing
 #>      288.185   18   38   50   62 2500       0
 #>  2052920.442 3200 2700 3500 4600 2186     314
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
 
-Look for: - Data entry errors (impossible values) - Missing data
-patterns - Distribution issues (extreme skewness)
+Look for:
+
+- **Impossible values** (e.g., negative ages) indicating data entry
+  errors
+- **High rates of missing data** that might bias results
+- **Extreme skewness** (values beyond $\pm 1$) suggesting non-normal
+  distributions
 
 ### 2. Use Weights When Available
 
-Unweighted results can be misleading. Here’s a comparison:
+Unweighted results can be misleading:
 
 ``` r
-# Compare weighted vs unweighted
 unweighted_mean <- survey_data %>%
   summarise(mean_age = mean(age, na.rm = TRUE)) %>%
   pull()
 
 weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
 
-cat("Unweighted mean age:", unweighted_mean, "\n")
-#> Unweighted mean age: 50.5496
-cat("Weighted mean age:", weighted_result$results$weighted_mean, "\n")
-#> Weighted mean age: 50.5144
+cat("Unweighted mean age:", round(unweighted_mean, 1), "\n")
+#> Unweighted mean age: 50.5
+cat("Weighted mean age:", round(weighted_result$results$weighted_mean, 1), "\n")
+#> Weighted mean age: 50.5
 ```
 
-### 3. Report the Right Percentage
+### 3. Consider Your Audience
 
-- Use **Valid %** when missing values are truly missing (skip patterns)
-- Use **Raw %** when “no response” is meaningful
-
-### 4. Consider Your Audience
-
-- For technical audiences: Include SD, skewness, kurtosis
-- For general audiences: Focus on mean, median, percentages
+- **Technical audience**: Include *SD*, skewness, kurtosis
+- **General audience**: Focus on mean, median, and percentages
 
 ## Complete Example
 
-Here’s a typical descriptive analysis workflow:
+A typical descriptive analysis workflow:
 
 ``` r
 # 1. Overall summary
-cat("=== Overall Summary ===\n")
-#> === Overall Summary ===
 survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight,
            show = "short")
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
 #>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
 #>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
-#> ────────────────────────────────────────────────────────────────────────────────
 
-# 2. Check distributions
-cat("\n=== Key Frequencies ===\n")
-#> 
-#> === Key Frequencies ===
+# 2. Key distributions
 survey_data %>%
   frequency(education, employment,
             weights = sampling_weight)
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -517,10 +472,7 @@ survey_data %>%
 #> |Other |Other               |115     |4.59    |4.59    |100.00  |
 #> +------+--------------------+--------+--------+--------+--------+
 
-# 3. Examine relationships
-cat("\n=== Education by Employment ===\n")
-#> 
-#> === Education by Employment ===
+# 3. Relationship between categories
 survey_data %>%
   crosstab(education, employment,
            weights = sampling_weight)
@@ -548,44 +500,43 @@ survey_data %>%
 #> 
 #> N = 2516 (Weighted)
 
-# 4. Group comparisons
-cat("\n=== Regional Differences ===\n")
-#> 
-#> === Regional Differences ===
+# 4. Regional comparisons
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction,
            weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#> 
-#> ── Group: region = East ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: region = West ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
-#> ────────────────────────────────────────────────────────────────────────────────
 ```
+
+## Summary
+
+1.  **[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)**
+    gives you a full picture of numeric variables
+2.  **[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)**
+    shows the distribution of categorical variables
+3.  **[`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)**
+    reveals relationships between two categorical variables
+4.  All three functions support **survey weights** and **grouped
+    analysis**
+5.  Always explore your data descriptively before running statistical
+    tests
 
 ## Next Steps
 
-Now that you understand your data’s basic patterns: - Test hypotheses
-with
-[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
-or
-[`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) -
-Explore relationships with
-[`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
-or
-[`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) -
-Build models based on these insights
-
-Remember: Good analysis starts with understanding your data!
+- Test for significant differences with
+  [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+  or
+  [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  — see
+  [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
+- Explore relationships with
+  [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
+  — see
+  [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
+- Learn about weighted analysis — see
+  [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)

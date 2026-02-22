@@ -2,32 +2,22 @@
 
 ``` r
 library(mariposa)
-#> 
-#> Attaching package: 'mariposa'
-#> The following object is masked from 'package:stats':
-#> 
-#>     frequency
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 data(survey_data)
 ```
 
-## When to Use These Tests
+## Overview
 
 Statistical tests help you determine whether differences between groups
-are real or just due to random chance. Here’s when to use each test:
+are real or just due to random chance. This guide covers the main tests
+available in mariposa:
 
-- **t-test**: Compare means between two groups
-- **ANOVA**: Compare means across three or more groups
-- **Chi-square**: Test relationships between categorical variables
-- **Mann-Whitney**: Non-parametric alternative when data isn’t normal
+| Test                                                                                  | Use when…                                                        |
+|---------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)             | Comparing means between **two** groups                           |
+| [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | Comparing means across **three or more** groups                  |
+| [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)     | Testing relationships between **categorical** variables          |
+| [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md) | Non-parametric alternative when data is not normally distributed |
 
 ## t-Tests
 
@@ -38,12 +28,6 @@ Compare average life satisfaction between genders:
 ``` r
 survey_data %>%
   t_test(life_satisfaction, group = gender)
-#> ── t-Test Results ──────────────────────────────────────────────────────────────
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -63,8 +47,6 @@ survey_data %>%
 #>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  life_satisfaction   -0.041   -0.041      -0.041  negligible
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -79,13 +61,6 @@ With survey weights for representative results:
 ``` r
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -105,8 +80,6 @@ survey_data %>%
 #>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  life_satisfaction   -0.043   -0.043      -0.043  negligible
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -116,22 +89,18 @@ survey_data %>%
 #> - Large effect: |effect| ~ 0.8
 ```
 
+The output shows two versions: one assuming equal variances (Student’s
+t-test) and one not assuming equal variances (Welch’s t-test). When in
+doubt, use the Welch version — it is more robust.
+
 ### Multiple Variables at Once
 
-Test several outcomes simultaneously:
+Test several outcome variables simultaneously:
 
 ``` r
-# Test all trust variables between genders
 survey_data %>%
   t_test(trust_government, trust_science, trust_media,
          group = gender, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- trust_government ---
@@ -187,8 +156,6 @@ survey_data %>%
 #>     Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  trust_media    -0.09    -0.09       -0.09  negligible
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -200,13 +167,13 @@ survey_data %>%
 
 ### One-Sample t-Test
 
-Test whether the population mean differs from a specific value:
+Test whether a population mean differs from a specific value. For
+example, is average life satisfaction different from 3 (the scale
+midpoint)?
 
 ``` r
-# Is average life satisfaction different from 3 (neutral)?
 survey_data %>%
   t_test(life_satisfaction, mu = 3, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -216,8 +183,6 @@ survey_data %>%
 #>  Assumption t_stat   df p_value mean_diff       conf_int sig
 #>      t-test 26.776 2436       0     3.625 [3.579, 3.671] ***
 #> ----------------------------------------------------------------------
-#> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -236,13 +201,6 @@ Run separate tests for each region:
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> Group: region = East
@@ -284,8 +242,6 @@ survey_data %>%
 #>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>    income        0        0           0  negligible
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -302,10 +258,8 @@ survey_data %>%
 Compare means across multiple groups (3+ categories):
 
 ``` r
-# Compare life satisfaction across education levels
 survey_data %>%
   oneway_anova(life_satisfaction, group = education)
-#> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -358,7 +312,6 @@ survey_data %>%
 survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
-#> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -406,20 +359,26 @@ survey_data %>%
 #> Post-hoc tests: Use tukey_test() for pairwise comparisons
 ```
 
+The output includes $\eta^{2}$ (eta-squared), which tells you how much
+of the variance in the outcome is explained by group membership:
+
+- **Small effect**: $\eta^{2} \approx 0.01$
+- **Medium effect**: $\eta^{2} \approx 0.06$
+- **Large effect**: $\eta^{2} \approx 0.14$
+
 ### Post-Hoc Tests
 
-When ANOVA is significant, use post-hoc tests to see which groups
-differ:
+When ANOVA is significant, it tells you that *at least one* group
+differs — but not *which* groups differ. Use post-hoc tests to find out:
 
 ``` r
-# First run ANOVA and save result
+# Save the ANOVA result
 anova_result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 
-# Then run Tukey test on the result
+# Tukey HSD: identifies which pairs of groups differ
 tukey_test(anova_result)
-#> ── Weighted Tukey HSD Post-Hoc Test Results ────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -457,9 +416,8 @@ tukey_test(anova_result)
 #> - Confidence intervals not containing 0 indicate significant differences
 #> - p-values are adjusted for multiple comparisons (family-wise error control)
 
-# Or Scheffe test (more conservative)
+# Scheffe test: more conservative (fewer false positives)
 scheffe_test(anova_result)
-#> ── Weighted Scheffe Post-Hoc Test Results ──────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -502,11 +460,11 @@ scheffe_test(anova_result)
 
 ### Testing Assumptions
 
-Check if variances are equal across groups:
+ANOVA assumes equal variances across groups. Check this with Levene’s
+test:
 
 ``` r
 levene_test(anova_result)
-#> ── Weighted Levene's Test for Homogeneity of Variance  ─────────────────────────
 #> 
 #> Grouping variable: education
 #> Weights variable: sampling_weight
@@ -531,17 +489,19 @@ levene_test(anova_result)
 #> - Use Welch's t-test (unequal variances)
 ```
 
+If Levene’s test is significant ($p < 0.05$), variances are unequal. In
+that case, the Welch correction (included in the ANOVA output) is more
+appropriate.
+
 ## Chi-Square Test
 
 ### Basic Chi-Square
 
-Test if two categorical variables are related:
+Test whether two categorical variables are related:
 
 ``` r
-# Is education related to employment status?
 survey_data %>%
   chi_square(education, employment)
-#> ── Chi-Squared Test of Independence  ───────────────────────────────────────────
 #> 
 #> Variables: education x employment
 #> 
@@ -579,12 +539,15 @@ survey_data %>%
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
+A significant result means the variables are not independent — knowing
+someone’s education tells you something about their employment status
+(or vice versa).
+
 ### With Survey Weights
 
 ``` r
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
-#> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────
 #> 
 #> Variables: education x employment
 #> Weights variable: sampling_weight
@@ -623,15 +586,13 @@ survey_data %>%
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
-### Multiple Tests
+### Multiple Comparisons
 
-Test several relationships separately:
+Test several relationships:
 
 ``` r
-# Test association between employment and education
 survey_data %>%
   chi_square(employment, education, weights = sampling_weight)
-#> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────
 #> 
 #> Variables: employment x education
 #> Weights variable: sampling_weight
@@ -685,10 +646,8 @@ survey_data %>%
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
-# Test association between employment and gender
 survey_data %>%
   chi_square(employment, gender, weights = sampling_weight)
-#> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────
 #> 
 #> Variables: employment x gender
 #> Weights variable: sampling_weight
@@ -727,65 +686,25 @@ survey_data %>%
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-
-# Test association between employment and region
-survey_data %>%
-  chi_square(employment, region, weights = sampling_weight)
-#> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────
-#> 
-#> Variables: employment x region
-#> Weights variable: sampling_weight
-#> 
-#> Observed Frequencies:
-#>             var2
-#> var1         East West
-#>   Student      12   68
-#>   Employed    320 1282
-#>   Unemployed   33  151
-#>   Retired     123  411
-#>   Other        21   94
-#> 
-#> Expected Frequencies:
-#>             var2
-#> var1            East     West
-#>   Student     16.191   63.809
-#>   Employed   324.222 1277.778
-#>   Unemployed  37.239  146.761
-#>   Retired    108.074  425.926
-#>   Other       23.274   91.726
-#> 
-#> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>        4.897  4   0.298    
-#> -------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure  Value p_value sig Interpretation
-#>  Cramer's V  0.044   0.298            Neglig.
-#>       Gamma -0.054   0.350               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 5×2 | N = 2515
-#> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 ## Mann-Whitney Test
 
 ### When to Use
 
-Use when: - Data is not normally distributed - Sample sizes are small -
-Data is ordinal (ranked)
+Use the Mann-Whitney *U* test (also called Wilcoxon rank-sum test) when:
+
+- Your data is **not normally distributed**
+- Sample sizes are **small**
+- The variable is **ordinal** (ranked categories)
+
+It compares the *distributions* rather than the means.
 
 ### Basic Usage
 
 ``` r
-# Compare political orientation between regions
 survey_data %>%
   mann_whitney(political_orientation, group = region)
-#> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
 #> 
 #> Grouping variable: region
 #> Groups compared: East vs. West
@@ -821,7 +740,6 @@ survey_data %>%
 survey_data %>%
   mann_whitney(political_orientation, group = region,
                weights = sampling_weight)
-#> ── Weighted Mann-Whitney U Test Results ────────────────────────────────────────
 #> 
 #> Grouping variable: region
 #> Groups compared: East vs. West
@@ -856,20 +774,23 @@ survey_data %>%
 
 ### Understanding p-values
 
-- **p \< 0.05**: Statistically significant difference
-- **p ≥ 0.05**: No significant difference detected
-- Remember: “not significant” ≠ “no difference”
+- $p < 0.05$: The difference is statistically significant at the 5%
+  level
+- $p \geq 0.05$: No significant difference detected
+
+Important: “not significant” does **not** mean “no difference” — it
+means we cannot rule out that the difference is due to chance, given the
+sample size.
 
 ### Effect Sizes Matter
 
-Statistical significance doesn’t always mean practical importance:
+With large samples, even tiny differences can be statistically
+significant. Always check effect sizes:
 
 ``` r
-# ANOVA provides eta-squared effect size
 result <- survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
 print(result)
-#> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
 #> Dependent Variable: income
 #> Grouping Variable: education
@@ -917,65 +838,42 @@ print(result)
 #> Post-hoc tests: Use tukey_test() for pairwise comparisons
 ```
 
-Effect size guidelines: - Small: η² = 0.01 - Medium: η² = 0.06 - Large:
-η² = 0.14
+The t-test provides Cohen’s *d* (small: 0.2, medium: 0.5, large: 0.8)
+and ANOVA provides $\eta^{2}$.
 
 ### Sample Size Effects
 
-Large samples can make tiny differences “significant”: - Always check
-effect sizes - Consider practical significance - Look at confidence
-intervals
+Large samples detect small effects. Small samples may miss real effects.
+Consider:
+
+- Always report effect sizes alongside p-values
+- Look at confidence intervals for practical significance
+- Do not interpret $p = 0.049$ and $p = 0.051$ as fundamentally
+  different
 
 ## Complete Example
 
-Here’s a typical hypothesis testing workflow:
+A typical hypothesis testing workflow:
 
 ``` r
-# 1. Descriptive statistics first
-cat("=== Descriptive Summary ===\n")
-#> === Descriptive Summary ===
+# 1. Descriptive overview
 survey_data %>%
   group_by(education) %>%
   describe(life_satisfaction, weights = sampling_weight)
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
-#> 
-#> ── Group: education = Basic Secondary ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: education = Intermediate Secondary ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable  Mean Median   SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: education = Academic Secondary ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: education = University ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
 #>           Variable Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
-#> ────────────────────────────────────────────────────────────────────────────────
 
-# 2. Test for overall difference
-cat("\n=== ANOVA Test ===\n")
-#> 
-#> === ANOVA Test ===
+# 2. Test for overall differences
 anova_result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 print(anova_result)
-#> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
 #> Dependent Variable: life_satisfaction
 #> Grouping Variable: education
@@ -1022,18 +920,47 @@ print(anova_result)
 #> 
 #> Post-hoc tests: Use tukey_test() for pairwise comparisons
 
-# 3. If significant, see which groups differ
-if (!is.null(anova_result) && "p_value" %in% names(anova_result) && !is.na(anova_result$p_value[1]) && anova_result$p_value[1] < 0.05) {
-  cat("\n=== Post-hoc Comparisons ===\n")
-  tukey_test(anova_result)
-}
+# 3. Post-hoc: which groups differ?
+tukey_test(anova_result)
+#> 
+#> Dependent Variable: life_satisfaction
+#> Grouping Variable: education
+#> Weights Variable: sampling_weight
+#> Confidence level: 95.0%
+#> Family-wise error rate controlled using Tukey HSD
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#> Weighted Tukey Results:
+#> ------------------------------------------------------------------------------------ 
+#>                                   Comparison Difference Lower CI Upper CI
+#>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339
+#>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491
+#>                 Basic Secondary - University     -0.832   -1.011   -0.654
+#>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008
+#>          Intermediate Secondary - University     -0.342   -0.529   -0.156
+#>              Academic Secondary - University     -0.189   -0.376   -0.003
+#>  p-value Sig
+#>    <.001 ***
+#>    <.001 ***
+#>    <.001 ***
+#>    0.071    
+#>    <.001 ***
+#>    0.046   *
+#> ------------------------------------------------------------------------------------ 
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Interpretation:
+#> - Positive differences: First group > Second group
+#> - Negative differences: First group < Second group
+#> - Confidence intervals not containing 0 indicate significant differences
+#> - p-values are adjusted for multiple comparisons (family-wise error control)
 
 # 4. Check assumptions
-cat("\n=== Assumption Check ===\n")
-#> 
-#> === Assumption Check ===
 levene_test(anova_result)
-#> ── Weighted Levene's Test for Homogeneity of Variance  ─────────────────────────
 #> 
 #> Grouping variable: education
 #> Weights variable: sampling_weight
@@ -1060,63 +987,40 @@ levene_test(anova_result)
 
 ## Best Practices
 
-### 1. Check Assumptions First
+1.  **Check assumptions first.** Inspect skewness and kurtosis before
+    choosing a test. For non-normal data, consider
+    [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md).
+2.  **Use appropriate tests.** Normal data with equal variances:
+    t-test/ANOVA. Non-normal or ordinal: Mann-Whitney. Categorical:
+    chi-square.
+3.  **Report completely.** Always include the test statistic, degrees of
+    freedom, p-value, effect size, and confidence intervals.
+4.  **Watch for multiple comparisons.** Running many tests inflates the
+    chance of false positives. Consider Bonferroni correction or
+    pre-register your hypotheses.
+5.  **Significance is not importance.** A statistically significant
+    result with a negligible effect size may not be practically
+    relevant.
 
-Before t-test or ANOVA:
+## Summary
 
-``` r
-# Visual check for normality
-# (In practice, create histograms or Q-Q plots)
-survey_data %>%
-  group_by(gender) %>%
-  describe(life_satisfaction, show = c("skew", "kurtosis"))
-#> ── Descriptive Statistics ──────────────────────────────────────────────────────
-#> 
-#> ── Group: gender = Male ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
-#>           Variable Skewness Kurtosis    N Missing
-#>  life_satisfaction   -0.468   -0.644 1149      45
-#> ────────────────────────────────────────────────────────────────────────────────
-#> 
-#> ── Group: gender = Female ──
-#> 
-#> ────────────────────────────────────────────────────────────────────────────────
-#>           Variable Skewness Kurtosis    N Missing
-#>  life_satisfaction   -0.531   -0.559 1272      34
-#> ────────────────────────────────────────────────────────────────────────────────
-```
-
-### 2. Use Appropriate Tests
-
-- **Normal data + equal variances**: t-test/ANOVA
-- **Non-normal or ordinal**: Mann-Whitney
-- **Categorical**: Chi-square
-
-### 3. Report Completely
-
-Always report: - Test statistic - Degrees of freedom - p-value - Effect
-size - Confidence intervals
-
-### 4. Multiple Comparisons
-
-When running many tests, consider: - Bonferroni correction - False
-Discovery Rate (FDR) - Pre-registration of hypotheses
-
-## Common Mistakes to Avoid
-
-1.  **Ignoring assumptions**: Check normality and variance
-2.  **p-hacking**: Don’t test everything hoping for significance
-3.  **Ignoring weights**: Unweighted tests can be misleading
-4.  **Over-interpreting p-values**: p = 0.049 vs p = 0.051 is not
-    meaningfully different
-5.  **Forgetting effect sizes**: Significance ≠ importance
+1.  **[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)**
+    compares means between two groups — use it for questions like “Do
+    men and women differ?”
+2.  **[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)**
+    extends this to three or more groups, with post-hoc tests to
+    identify which groups differ
+3.  **[`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)**
+    tests whether categorical variables are related
+4.  **[`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)**
+    is the non-parametric alternative when assumptions are not met
+5.  Always report **effect sizes** alongside p-values
 
 ## Next Steps
 
-After finding significant differences: - Explore with
-[`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
-for categorical relationships - Use
-[`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
-for continuous associations - Consider regression models for controlling
-confounds - Validate findings with different subgroups
+- Explore relationships between continuous variables — see
+  [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
+- Learn about weighted analysis — see
+  [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)
+- Revisit your data — see
+  [`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md)

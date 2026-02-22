@@ -30,9 +30,10 @@ kendall_tau(
 
 - ...:
 
-  \<\code{\link\[dplyr\]{dplyr_tidy_select}}\> Variables for correlation
-  analysis. Supports all tidyselect helpers. If more than two variables
-  are selected, a correlation matrix is computed.
+  \<[`dplyr_tidy_select`](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html)\>
+  Variables for correlation analysis. Supports all tidyselect helpers.
+  If more than two variables are selected, a correlation matrix is
+  computed.
 
 - weights:
 
