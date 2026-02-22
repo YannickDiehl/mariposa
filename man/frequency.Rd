@@ -112,3 +112,9 @@ survey_data \%>\% frequency(employment, weights = sampling_weight,
                          show.na = TRUE, show.sum = TRUE)
 
 }
+\seealso{
+Other descriptive: 
+\code{\link{crosstab}()},
+\code{\link{describe}()}
+}
+\concept{descriptive}

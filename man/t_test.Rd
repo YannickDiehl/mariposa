@@ -201,7 +201,13 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.
 \seealso{
 \code{\link[stats]{t.test}} for the base R t-test function.
 
-\code{\link{print.t_test_results}} for printing results.
+\code{\link{print.t_test}} for printing results.
 
 \code{\link[dplyr]{group_by}} for grouped analyses.
+
+Other hypothesis_tests: 
+\code{\link{chi_square}()},
+\code{\link{mann_whitney}()},
+\code{\link{oneway_anova}()}
 }
+\concept{hypothesis_tests}

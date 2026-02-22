@@ -769,7 +769,7 @@ compare_two_sample_with_spss <- function(r_result, spss_ref, test_name,
 }
 
 #' Extract results for grouped t-test analysis
-extract_group_t_test_results <- function(result, group_var, group_value) {
+extract_group_t_test <- function(result, group_var, group_value) {
   # t_test returns a data frame with grouped results
   if (is.data.frame(result$results)) {
     group_data <- result$results[result$results[[group_var]] == group_value, ]
@@ -886,7 +886,7 @@ test_that("Test 3a: Two-sample t-test (unweighted, life_satisfaction by gender, 
     t_test(life_satisfaction, group = gender)
 
   # Test East region
-  east_result <- extract_group_t_test_results(result, "region", "East")
+  east_result <- extract_group_t_test(result, "region", "East")
   compare_two_sample_with_spss(
     east_result,
     spss_values$test_3a_life_by_gender_grouped$east,
@@ -894,7 +894,7 @@ test_that("Test 3a: Two-sample t-test (unweighted, life_satisfaction by gender, 
   )
 
   # Test West region
-  west_result <- extract_group_t_test_results(result, "region", "West")
+  west_result <- extract_group_t_test(result, "region", "West")
   compare_two_sample_with_spss(
     west_result,
     spss_values$test_3a_life_by_gender_grouped$west,
@@ -908,7 +908,7 @@ test_that("Test 3b: Two-sample t-test (unweighted, income by gender, grouped by 
     t_test(income, group = gender)
 
   # Test East region
-  east_result <- extract_group_t_test_results(result, "region", "East")
+  east_result <- extract_group_t_test(result, "region", "East")
   compare_two_sample_with_spss(
     east_result,
     spss_values$test_3b_income_by_gender_grouped$east,
@@ -916,7 +916,7 @@ test_that("Test 3b: Two-sample t-test (unweighted, income by gender, grouped by 
   )
 
   # Test West region
-  west_result <- extract_group_t_test_results(result, "region", "West")
+  west_result <- extract_group_t_test(result, "region", "West")
   compare_two_sample_with_spss(
     west_result,
     spss_values$test_3b_income_by_gender_grouped$west,
@@ -930,7 +930,7 @@ test_that("Test 3c: Two-sample t-test (unweighted, age by gender, grouped by reg
     t_test(age, group = gender)
 
   # Test East region
-  east_result <- extract_group_t_test_results(result, "region", "East")
+  east_result <- extract_group_t_test(result, "region", "East")
   compare_two_sample_with_spss(
     east_result,
     spss_values$test_3c_age_by_gender_grouped$east,
@@ -938,7 +938,7 @@ test_that("Test 3c: Two-sample t-test (unweighted, age by gender, grouped by reg
   )
 
   # Test West region
-  west_result <- extract_group_t_test_results(result, "region", "West")
+  west_result <- extract_group_t_test(result, "region", "West")
   compare_two_sample_with_spss(
     west_result,
     spss_values$test_3c_age_by_gender_grouped$west,
@@ -953,7 +953,7 @@ test_that("Test 4a: Two-sample t-test (weighted, life_satisfaction by gender, gr
     t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
   # Test East region
-  east_result <- extract_group_t_test_results(result, "region", "East")
+  east_result <- extract_group_t_test(result, "region", "East")
   compare_two_sample_with_spss(
     east_result,
     spss_values$test_4a_life_by_gender_weighted_grouped$east,
@@ -961,7 +961,7 @@ test_that("Test 4a: Two-sample t-test (weighted, life_satisfaction by gender, gr
   )
 
   # Test West region
-  west_result <- extract_group_t_test_results(result, "region", "West")
+  west_result <- extract_group_t_test(result, "region", "West")
   compare_two_sample_with_spss(
     west_result,
     spss_values$test_4a_life_by_gender_weighted_grouped$west,
@@ -975,7 +975,7 @@ test_that("Test 4b: Two-sample t-test (weighted, income by gender, grouped by re
     t_test(income, group = gender, weights = sampling_weight)
 
   # Test East region
-  east_result <- extract_group_t_test_results(result, "region", "East")
+  east_result <- extract_group_t_test(result, "region", "East")
   compare_two_sample_with_spss(
     east_result,
     spss_values$test_4b_income_by_gender_weighted_grouped$east,
@@ -983,7 +983,7 @@ test_that("Test 4b: Two-sample t-test (weighted, income by gender, grouped by re
   )
 
   # Test West region
-  west_result <- extract_group_t_test_results(result, "region", "West")
+  west_result <- extract_group_t_test(result, "region", "West")
   compare_two_sample_with_spss(
     west_result,
     spss_values$test_4b_income_by_gender_weighted_grouped$west,
@@ -997,7 +997,7 @@ test_that("Test 4c: Two-sample t-test (weighted, age by gender, grouped by regio
     t_test(age, group = gender, weights = sampling_weight)
 
   # Test East region
-  east_result <- extract_group_t_test_results(result, "region", "East")
+  east_result <- extract_group_t_test(result, "region", "East")
   compare_two_sample_with_spss(
     east_result,
     spss_values$test_4c_age_by_gender_weighted_grouped$east,
@@ -1005,7 +1005,7 @@ test_that("Test 4c: Two-sample t-test (weighted, age by gender, grouped by regio
   )
 
   # Test West region
-  west_result <- extract_group_t_test_results(result, "region", "West")
+  west_result <- extract_group_t_test(result, "region", "West")
   compare_two_sample_with_spss(
     west_result,
     spss_values$test_4c_age_by_gender_weighted_grouped$west,

@@ -1,0 +1,188 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+=========== Test 1a ===========
+Descriptives for age and income (unweighted, ungrouped)
+Descriptives
+Descriptive Statistics
+
+           N         Range     Minimum   Maximum   Mean               Std.      Variance  Skewness             Kurtosis             
+                                                                      Deviation                                                     
+           Statistic Statistic Statistic Statistic Statistic Std.     Statistic Statistic Statistic Std. Error Statistic Std. Error 
+                                                             Error                                                                  
+ Age in    2500      77.00     18.00     95.00     50.5496   .33952   16.97602  288.185   .172      .049       -.364     .098       
+ years                                                                                                                              
+ Monthly   2186      7200.00   800.00    8000.00   3753.9341 30.64510 1432.8016 2052920.4 .730      .052       .376      .105       
+ household                                                            1         42                                                  
+ income                                                                                                                             
+ (EUR)                                                                                                                              
+ Valid N   2186                                                                                                                     
+ (listwise                                                                                                                          
+ )                                                                                                                                  
+
+=========== Test 1b ===========
+
+=========== Test 1b ===========
+Frequencies for age and income (unweighted, ungrouped)
+Frequencies
+Statistics
+
+                     Age in years Monthly household income (EUR) 
+ N           Valid   2500         2186                           
+             Missing 0            314                            
+ Median              50.0000      3500.0000                      
+ Mode                18.00        3200.00                        
+ Percentiles 25      38.0000      2700.0000                      
+             50      50.0000      3500.0000                      
+             75      62.0000      4600.0000                      
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+=========== Test 2a ===========
+Descriptives for age and income (weighted, ungrouped)
+Descriptives
+Descriptive Statistics
+
+           N         Range     Minimum   Maximum   Mean               Std.      Variance  Skewness             Kurtosis             
+                                                                      Deviation                                                     
+           Statistic Statistic Statistic Statistic Statistic Std.     Statistic Statistic Statistic Std. Error Statistic Std. Error 
+                                                             Error                                                                  
+ Age in    2516      77.00     18.00     95.00     50.5144   .34058   17.08382  291.857   .159      .049       -.396     .098       
+ years                                                                                                                              
+ Monthly   2201      7200.00   800.00    8000.00   3743.0994 30.35257 1423.9655 2027677.9 .725      .052       .388      .104       
+ household                                                            8         66                                                  
+ income                                                                                                                             
+ (EUR)                                                                                                                              
+ Valid N   2201                                                                                                                     
+ (listwise                                                                                                                          
+ )                                                                                                                                  
+
+=========== Test 2b ===========
+
+=========== Test 2b ===========
+Frequencies for age and income (weighted, ungrouped)
+Frequencies
+Statistics
+
+                     Age in years Monthly household income (EUR) 
+ N           Valid   2516         2201                           
+             Missing 0            315                            
+ Median              50.0000      3500.0000                      
+ Mode                18.00        3200.00                        
+ Percentiles 25      38.0000      2700.0000                      
+             50      50.0000      3500.0000                      
+             75      63.0000      4600.0000                      
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+=========== Test 3a ===========
+Descriptives for age and income (unweighted, grouped by region)
+Descriptives
+Descriptive Statistics
+
+ Region              N         Range     Minimum   Maximum   Mean                Std.      Variance  Skewness            Kurtosis            
+ (East/Wes                                                                       Deviation                                                   
+ t)                  Statistic Statistic Statistic Statistic Statistic Std.      Statistic Statistic Statistic Std.      Statistic Std.      
+                                                                       Error                                   Error               Error     
+ East      Age in    485       77.00     18.00     95.00     51.8680   .79101    17.42028  303.466   .148      .111      -.337     .221      
+           years                                                                                                                             
+           Monthly   429       7200.00   800.00    8000.00   3752.4476 66.95917  1386.8793 1923434.4 .729      .118      .489      .235      
+           household                                                             8         16                                                
+           income                                                                                                                            
+           (EUR)                                                                                                                             
+           Valid N   429                                                                                                                     
+           (listwise                                                                                                                         
+           )                                                                                                                                 
+ West      Age in    2015      77.00     18.00     95.00     50.2323   .37551    16.85635  284.137   .175      .055      -.373     .109      
+           years                                                                                                                             
+           Monthly   1757      7200.00   800.00    8000.00   3754.2971 34.45361  1444.1777 2085649.2 .731      .058      .353      .117      
+           household                                                             0         35                                                
+           income                                                                                                                            
+           (EUR)                                                                                                                             
+           Valid N   1757                                                                                                                    
+           (listwise                                                                                                                         
+           )                                                                                                                                 
+
+=========== Test 3b ===========
+
+=========== Test 3b ===========
+Frequencies for age and income (unweighted, grouped by region)
+Frequencies
+Statistics
+
+ Region (East/West)                     Age in years Monthly household income (EUR) 
+ East               N           Valid   485          429                            
+                                Missing 0            56                             
+                    Median              52.0000      3600.0000                      
+                    Mode                18.00        3800.00                        
+                    Percentiles 25      39.0000      2800.0000                      
+                                50      52.0000      3600.0000                      
+                                75      63.0000      4500.0000                      
+ West               N           Valid   2015         1757                           
+                                Missing 0            258                            
+                    Median              49.0000      3500.0000                      
+                    Mode                18.00        3100.00                        
+                    Percentiles 25      38.0000      2700.0000                      
+                                50      49.0000      3500.0000                      
+                                75      62.0000      4600.0000                      
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+=========== Test 4a ===========
+Descriptives for age and income (weighted, grouped by region)
+Descriptives
+Descriptive Statistics
+
+ Region              N         Range     Minimum   Maximum   Mean                Std.      Variance  Skewness            Kurtosis            
+ (East/Wes                                                                       Deviation                                                   
+ t)                  Statistic Statistic Statistic Statistic Statistic Std.      Statistic Statistic Statistic Std.      Statistic Std.      
+                                                                       Error                                   Error               Error     
+ East      Age in    509       77.00     18.00     95.00     52.2778   .77988    17.59548  309.601   .098      .108      -.389     .216      
+           years                                                                                                                             
+           Monthly   449       7200.00   800.00    8000.00   3760.6866 65.48281  1388.3212 1927435.7 .721      .115      .502      .230      
+           household                                                             0         55                                                
+           income                                                                                                                            
+           (EUR)                                                                                                                             
+           Valid N   449                                                                                                                     
+           (listwise                                                                                                                         
+           )                                                                                                                                 
+ West      Age in    2007      77.00     18.00     95.00     50.0672   .37783    16.92689  286.520   .170      .055      -.396     .109      
+           years                                                                                                                             
+           Monthly   1751      7200.00   800.00    8000.00   3738.5858 34.24889  1433.3249 2054420.3 .727      .058      .364      .117      
+           household                                                             5         99                                                
+           income                                                                                                                            
+           (EUR)                                                                                                                             
+           Valid N   1751                                                                                                                    
+           (listwise                                                                                                                         
+           )                                                                                                                                 
+
+=========== Test 4b ===========
+
+=========== Test 4b ===========
+Frequencies for age and income (weighted, grouped by region)
+Frequencies
+Statistics
+
+ Region (East/West)                     Age in years Monthly household income (EUR) 
+ East               N           Valid   509          449                            
+                                Missing 0            60                             
+                    Median              53.0000      3600.0000                      
+                    Mode                18.00        3800.00                        
+                    Percentiles 25      40.0000      2800.0000                      
+                                50      53.0000      3600.0000                      
+                                75      64.0000      4500.0000                      
+ West               N           Valid   2007         1751                           
+                                Missing 0            256                            
+                    Median              49.0000      3500.0000                      
+                    Mode                18.00        3100.00                        
+                    Percentiles 25      38.0000      2700.0000                      
+                                50      49.0000      3500.0000                      
+                                75      62.0000      4600.0000                      
+

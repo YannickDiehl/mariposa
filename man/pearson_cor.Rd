@@ -158,4 +158,9 @@ in samples from an indefinitely large population. Biometrika, 10(4), 507-521.
 \seealso{
 \code{\link[stats]{cor}} for the base R correlation function
 \code{\link[stats]{cor.test}} for correlation significance testing
+
+Other correlation: 
+\code{\link{kendall_tau}()},
+\code{\link{spearman_rho}()}
 }
+\concept{correlation}

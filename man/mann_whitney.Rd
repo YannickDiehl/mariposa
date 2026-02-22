@@ -174,4 +174,10 @@ Bulletin, 1(6), 80-83.
 \code{\link[survey]{svyranktest}} for survey-weighted rank tests.
 
 \code{\link{t_test}} for parametric t-tests.
+
+Other hypothesis_tests: 
+\code{\link{chi_square}()},
+\code{\link{oneway_anova}()},
+\code{\link{t_test}()}
 }
+\concept{hypothesis_tests}

@@ -145,17 +145,18 @@
 #'
 #' # Note: For repeated measures ANOVA, use rm_anova_test() function instead
 #'
+#' @family hypothesis_tests
 #' @export
 oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE, 
                       conf.level = 0.95) {
   
   # Input validation
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   if (conf.level <= 0 || conf.level >= 1) {
-    stop("conf.level must be between 0 and 1")
+    cli_abort("{.arg conf.level} must be between 0 and 1.")
   }
   
   # Check if data is grouped
@@ -172,12 +173,19 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   var_names <- names(vars)
   
   if (length(var_names) == 0) {
-    stop("At least one dependent variable must be specified")
+    cli_abort("At least one dependent variable must be specified.")
   }
-  
+
+  # Validate that selected variables are numeric
+  for (vn in var_names) {
+    if (!is.numeric(data[[vn]])) {
+      cli_abort("Variable {.var {vn}} is not numeric. {.fn oneway_anova} requires numeric dependent variables.")
+    }
+  }
+
   # Group variable (required for ANOVA)
   if (quo_is_null(group_quo)) {
-    stop("group parameter is required for ANOVA")
+    cli_abort("{.arg group} is required for ANOVA.")
   }
   
   g_var <- eval_select(expr(!!group_quo), data = data)
@@ -205,12 +213,14 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
     data[[g_name]] <- factor(data[[g_name]])
     g_values <- data[[g_name]]
   } else {
-    stop(sprintf("Grouping variable '%s' must be numeric, character, or factor", g_name))
+    cli_abort("Grouping variable {.var {g_name}} must be numeric, character, or factor.")
   }
   
   if (length(g_levels) < 2) {
-    stop(sprintf("Grouping variable '%s' must have at least 2 unique values for ANOVA, found %d", 
-                g_name, length(g_levels)))
+    cli_abort(c(
+      "Grouping variable {.var {g_name}} must have at least 2 unique values for ANOVA.",
+      "x" = "Found {length(g_levels)} level{?s}."
+    ))
   }
   
   # Perform standard between-subjects ANOVA
@@ -238,7 +248,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
     g <- g[valid_indices]
     
     if (length(unique(g)) < 2) {
-      stop(sprintf("Variable '%s': After removing NAs, grouping variable must have at least 2 levels", var_name))
+      cli_abort("Variable {.var {var_name}}: After removing NAs, grouping variable must have at least 2 levels.")
     }
     
     # Get group levels
@@ -570,20 +580,20 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       is_grouped = is_grouped,
       conf.level = conf.level,
       group_levels = g_levels,
-      data = data  # Store original data for post-hoc tests
+      data = data[, unique(c(var_names, group_name, weight_name, group_vars)), drop = FALSE]
     ),
-    class = "oneway_anova_results"
+    class = "oneway_anova"
   )
 }
 
 #' Print ANOVA test results
 #'
 #' @description
-#' Print method for objects of class \code{"oneway_anova_results"}. Provides a 
+#' Print method for objects of class \code{"oneway_anova"}. Provides a 
 #' formatted display of ANOVA results including descriptive statistics, ANOVA 
 #' tables, assumption tests, and effect sizes.
 #'
-#' @param x An object of class \code{"oneway_anova_results"} returned by \code{\link{oneway_anova}}.
+#' @param x An object of class \code{"oneway_anova"} returned by \code{\link{oneway_anova}}.
 #' @param digits Integer specifying the number of decimal places to display 
 #'   for numeric values. Default is \code{3}.
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
@@ -607,21 +617,15 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @export
-print.oneway_anova_results <- function(x, digits = 3, ...) {
+print.oneway_anova <- function(x, digits = 3, ...) {
   
   # Check if this is repeated measures ANOVA
   if (!is.null(x$repeated) && x$repeated) {
     return(print_repeated_measures_anova(x, digits, ...))
   }
   # Determine test type based on weights
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted One-Way ANOVA Results"
-  } else {
-    "One-Way ANOVA Results"
-  }
-  
-  cat(test_type, "\n")
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  test_type <- get_standard_title("One-Way ANOVA", x$weights, "Results")
+  print_header(test_type)
   
   # Print basic info
   if (!x$is_grouped) {

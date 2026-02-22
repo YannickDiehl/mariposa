@@ -78,6 +78,7 @@
 #' # With continuity correction
 #' survey_data %>% chi_square(gender, region, correct = TRUE)
 #' 
+#' @family hypothesis_tests
 #' @export
 chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   
@@ -94,7 +95,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   var_names <- names(vars)
   
   if (length(var_names) != 2) {
-    stop("Exactly two variables must be specified")
+    cli_abort("Exactly two variables must be specified for {.fn chi_square}.")
   }
   
   # Get weight variable name if provided
@@ -196,6 +197,18 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     results_df$residuals <- list(test_result$residuals)
   }
   
+  # Warn if any expected cell counts are < 5
+  for (i in seq_len(nrow(results_df))) {
+    exp_tbl <- results_df$expected[[i]]
+    if (!is.null(exp_tbl)) {
+      n_low <- sum(exp_tbl < 5)
+      if (n_low > 0) {
+        pct_low <- round(100 * n_low / length(exp_tbl), 1)
+        cli_warn("{n_low} cell{?s} ({pct_low}%) ha{?s/ve} expected count < 5. Chi-squared approximation may be unreliable.")
+      }
+    }
+  }
+
   # Calculate effect sizes
   results_df$cramers_v <- NA_real_
   results_df$phi <- NA_real_
@@ -237,102 +250,57 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
       results_df$cramers_v_p_value[i] <- results_df$p_value[i]
 
       # Goodman and Kruskal's Gamma
-      # Calculate concordant and discordant pairs for ordinal association
+      # Calculate concordant (C_ij) and discordant (D_ij) pair counts per cell
       obs_table <- results_df$observed[[i]]
-      P <- 0  # Concordant pairs
-      Q <- 0  # Discordant pairs
 
-      # Calculate concordant and discordant pairs
-      # For each cell, compare with all other cells
+      # For each cell (i,j), compute:
+      #   C_ij = sum of all cells below-right (concordant with this cell)
+      #   D_ij = sum of all cells below-left (discordant with this cell)
+      C_mat <- matrix(0, nrow = r, ncol = c)
+      D_mat <- matrix(0, nrow = r, ncol = c)
+
       for (row1 in 1:r) {
         for (col1 in 1:c) {
-          n1 <- obs_table[row1, col1]
-          if (n1 > 0) {
-            # Count concordant pairs (cells below and to the right)
-            if (row1 < r && col1 < c) {
-              for (row2 in (row1+1):r) {
-                for (col2 in (col1+1):c) {
-                  P <- P + n1 * obs_table[row2, col2]
-                }
+          # Concordant: cells below and to the right
+          if (row1 < r && col1 < c) {
+            for (row2 in (row1 + 1):r) {
+              for (col2 in (col1 + 1):c) {
+                C_mat[row1, col1] <- C_mat[row1, col1] + obs_table[row2, col2]
               }
             }
-
-            # Count discordant pairs (cells below and to the left)
-            if (row1 < r && col1 > 1) {
-              for (row2 in (row1+1):r) {
-                for (col2 in 1:(col1-1)) {
-                  Q <- Q + n1 * obs_table[row2, col2]
-                }
+          }
+          # Discordant: cells below and to the left
+          if (row1 < r && col1 > 1) {
+            for (row2 in (row1 + 1):r) {
+              for (col2 in 1:(col1 - 1)) {
+                D_mat[row1, col1] <- D_mat[row1, col1] + obs_table[row2, col2]
               }
             }
           }
         }
       }
 
-      # Convert to numeric to prevent integer overflow
-      P <- as.numeric(P)
-      Q <- as.numeric(Q)
+      # P = total concordant pairs, Q = total discordant pairs
+      P <- as.numeric(sum(obs_table * C_mat))
+      Q <- as.numeric(sum(obs_table * D_mat))
 
       # Calculate Gamma
       if ((P + Q) > 0) {
         results_df$gamma[i] <- (P - Q) / (P + Q)
-
-        # Calculate Gamma's p-value using SPSS methodology
         gamma <- results_df$gamma[i]
 
-        # Calculate ASE using formulas that match SPSS
-        if (P > 0 || Q > 0) {
-          ase <- NA_real_
+        # ASE0 under null hypothesis (SPSS method)
+        # Formula: ASE0 = (2 / (P + Q)) * sqrt(sum(n_ij * (C_ij - D_ij)^2) - (P - Q)^2 / n)
+        # Reference: Goodman & Kruskal (1963); Agresti (2002)
+        sum_nij_diff_sq <- sum(as.numeric(obs_table) * (C_mat - D_mat)^2)
+        inner <- sum_nij_diff_sq - (P - Q)^2 / n
 
-          if (r == 2 && c == 2) {
-            # For 2x2 tables: Use adjusted Goodman-Kruskal formula
-            # SPSS uses a special adjustment factor for 2x2 tables
-            base_ase <- 2 * sqrt(P * Q) / ((P + Q) * sqrt(n))
-            # Empirically derived factor for 2x2 tables to match SPSS
-            adjustment_factor <- 2.53
-            ase <- base_ase * adjustment_factor
-          } else {
-            # For larger tables: Use table-dimension-based adjustment factors
-            # This formula empirically matches SPSS ASE calculations
-            # Base ASE formula (Goodman-Kruskal)
-            base_ase <- 2 * sqrt(P * Q) / ((P + Q) * sqrt(n))
+        if (inner > 0) {
+          ase0 <- (2 / (P + Q)) * sqrt(inner)
 
-            # Apply table-dimension-dependent adjustment factor
-            # Empirically derived to match SPSS reference values exactly
-            if (r == 2 || c == 2) {
-              # 2xC or Rx2 tables (excluding 2x2 which is handled above)
-              max_dim <- max(r, c)
-              if (max_dim == 4) {
-                # 2x4 tables: slight sample-size adjustment
-                adjustment_factor <- 1.5 + 0.02 * sqrt(n/100)
-              } else if (max_dim == 5) {
-                # 2x5 tables: consistent factor
-                adjustment_factor <- 1.84
-              } else {
-                # Other 2xC tables
-                adjustment_factor <- 1.3 + 0.1 * max_dim
-              }
-            } else if (r <= 4 && c <= 5) {
-              # Small to medium RxC tables (like 4x5)
-              # These don't need adjustment in SPSS
-              adjustment_factor <- 1.0
-            } else {
-              # Large RxC tables
-              adjustment_factor <- 1.0 + 0.05 * sqrt(r * c)
-            }
-
-            ase <- base_ase * adjustment_factor
-          }
-
-          # Calculate t-statistic and p-value
-          if (!is.na(ase) && ase > 0) {
-            t_stat <- gamma / ase
-
-            # Two-tailed p-value from normal distribution (SPSS approach)
-            results_df$gamma_p_value[i] <- 2 * (1 - pnorm(abs(t_stat)))
-          } else {
-            results_df$gamma_p_value[i] <- NA_real_
-          }
+          # Z-statistic and two-tailed p-value (SPSS approach)
+          z_stat <- gamma / ase0
+          results_df$gamma_p_value[i] <- 2 * (1 - pnorm(abs(z_stat)))
         } else {
           results_df$gamma_p_value[i] <- NA_real_
         }
@@ -350,22 +318,14 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     weights = w_name,
     correct = correct,
     is_grouped = is_grouped,
-    groups = group_vars,
-    data = data
+    groups = group_vars
   )
   
-  class(result) <- "chi_square_results"
+  class(result) <- "chi_square"
   return(result)
 }
 
 # Helper functions for print method
-.sig_star <- function(p_value) {
-  if (is.na(p_value)) return("   ")
-  if (p_value < 0.001) return("***")
-  if (p_value < 0.01) return(" **")
-  if (p_value < 0.05) return("  *")
-  return("   ")
-}
 
 .interpret_cramers_v <- function(v) {
   if (is.na(v)) return("-")
@@ -398,13 +358,13 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   return(sprintf(" %5.3f", p))
 }
 
-#' Print method for chi_square_results
+#' Print method for chi_square
 #'
 #' @param x Chi-squared test results object
 #' @param digits Number of decimal places (default: 3)
 #' @param ... Additional arguments passed to print
 #' @export
-print.chi_square_results <- function(x, digits = 3, ...) {
+print.chi_square <- function(x, digits = 3, ...) {
 
   # Determine test type using standardized helper
   test_type <- get_standard_title("Chi-Squared Test of Independence", x$weights, "")
@@ -481,9 +441,9 @@ print.chi_square_results <- function(x, digits = 3, ...) {
             ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
           ),
           sig = c(
-            as.character(.sig_star(cramers_v_p)),
-            as.character(.sig_star(phi_p)),
-            as.character(.sig_star(gamma_p))
+            as.character(add_significance_stars(cramers_v_p)),
+            as.character(add_significance_stars(phi_p)),
+            as.character(add_significance_stars(gamma_p))
           ),
           Interpretation = c(
             .interpret_cramers_v(cramers_v),
@@ -501,8 +461,8 @@ print.chi_square_results <- function(x, digits = 3, ...) {
             ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
           ),
           sig = c(
-            as.character(.sig_star(cramers_v_p)),
-            as.character(.sig_star(gamma_p))
+            as.character(add_significance_stars(cramers_v_p)),
+            as.character(add_significance_stars(gamma_p))
           ),
           Interpretation = c(
             .interpret_cramers_v(cramers_v),
@@ -595,9 +555,9 @@ print.chi_square_results <- function(x, digits = 3, ...) {
               ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
             ),
             sig = c(
-              as.character(.sig_star(cramers_v_p)),
-              as.character(.sig_star(phi_p)),
-              as.character(.sig_star(gamma_p))
+              as.character(add_significance_stars(cramers_v_p)),
+              as.character(add_significance_stars(phi_p)),
+              as.character(add_significance_stars(gamma_p))
             ),
             Interpretation = c(
               .interpret_cramers_v(cramers_v),
@@ -615,8 +575,8 @@ print.chi_square_results <- function(x, digits = 3, ...) {
               ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
             ),
             sig = c(
-              as.character(.sig_star(cramers_v_p)),
-              as.character(.sig_star(gamma_p))
+              as.character(add_significance_stars(cramers_v_p)),
+              as.character(add_significance_stars(gamma_p))
             ),
             Interpretation = c(
               .interpret_cramers_v(cramers_v),
@@ -656,4 +616,4 @@ cramers_v <- chi_square
 
 #' @rdname chi_square
 #' @export
-gamma <- chi_square
+goodman_gamma <- chi_square

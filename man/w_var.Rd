@@ -21,6 +21,8 @@ A w_var object (list) containing results and metadata, or numeric values in summ
 \description{
 Calculate weighted variance for numeric variables, with support for
 grouped data and multiple variables simultaneously.
+Uses the SPSS frequency weights formula: \eqn{s^2_w = \sum w_i (x_i - \bar{x}_w)^2 / (V_1 - 1)}
+where \eqn{V_1 = \sum w_i}.
 }
 \examples{
 # Load required packages and data
@@ -31,7 +33,7 @@ data(survey_data)
 survey_data \%>\% w_var(age, weights = sampling_weight)
 
 # Multiple variables
-survey_data \%>\% w_var(age, income, life_satisfaction, weights = sampling_weight)
+survey_data \%>\% w_var(age, income, weights = sampling_weight)
 
 # Grouped data
 survey_data \%>\% group_by(region) \%>\% w_var(age, weights = sampling_weight)
@@ -43,3 +45,17 @@ survey_data \%>\% summarise(var_age = w_var(age, weights = sampling_weight))
 survey_data \%>\% w_var(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_range}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()}
+}
+\concept{weighted_statistics}

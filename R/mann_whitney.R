@@ -134,6 +134,7 @@
 #'   mann_whitney(income, group = gender, weights = sampling_weight)
 #' print(result)
 #'
+#' @family hypothesis_tests
 #' @export
 mann_whitney <- function(data, ..., group, weights = NULL, mu = 0, 
                              alternative = c("two.sided", "less", "greater"),
@@ -141,7 +142,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   
   # Input validation
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
   
   alternative <- match.arg(alternative)
@@ -161,7 +162,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   
   # Group is required for Mann-Whitney test
   if (quo_is_null(group_quo)) {
-    stop("group argument is required for Mann-Whitney test")
+    cli_abort("{.arg group} is required for Mann-Whitney test.")
   }
   
   g_var <- eval_select(expr(!!group_quo), data = data)
@@ -200,8 +201,11 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     }
     
     if (length(g_levels) != 2) {
-      stop(sprintf("Mann-Whitney test requires exactly 2 groups, found %d in variable '%s'. For >2 groups, use a Kruskal-Wallis test instead.", 
-                  length(g_levels), group_name))
+      cli_abort(c(
+        "Mann-Whitney test requires exactly 2 groups.",
+        "x" = "Found {length(g_levels)} group{?s} in variable {.var {group_name}}.",
+        "i" = "For >2 groups, use a Kruskal-Wallis test instead."
+      ))
     }
     
     # Split data by groups
@@ -396,7 +400,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
         )
         
       }, error = function(e) {
-        warning(sprintf("Mann-Whitney test failed for variable '%s': %s", var_name, e$message))
+        cli_warn("Mann-Whitney test failed for variable {.var {var_name}}: {e$message}")
         results_list[[var_name]] <- tibble(
           Variable = var_name,
           U = NA_real_,
@@ -445,10 +449,10 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     mu = mu,
     alternative = alternative,
     conf.level = conf.level,
-    data = data  # Store original data for levene_test
+    data = data[, unique(c(var_names, g_name, w_name, group_vars)), drop = FALSE]
   )
   
-  class(result) <- "mann_whitney_results"
+  class(result) <- "mann_whitney"
   return(result)
 }
 
@@ -464,12 +468,12 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
 #' Print method for Mann-Whitney test results
 #'
-#' @param x A mann_whitney_results object
+#' @param x A mann_whitney object
 #' @param digits Number of decimal places to display
 #' @param ... Additional arguments (not used)
 #' @export
-#' @method print mann_whitney_results
-print.mann_whitney_results <- function(x, digits = 3, ...) {
+#' @method print mann_whitney
+print.mann_whitney <- function(x, digits = 3, ...) {
 
   # Determine test type using standardized helper
   weights_name <- x$weight_var %||% x$weights

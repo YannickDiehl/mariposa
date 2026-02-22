@@ -92,6 +92,7 @@
 #' # Using mean instead of median as center
 #' survey_data %>% levene_test(income, group = region, center = "mean")
 #'
+#' @family posthoc
 #' @export
 levene_test <- function(x, ...) {
   UseMethod("levene_test")
@@ -103,7 +104,7 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
   
   # Input validation
   if (!is.data.frame(x)) {
-    stop("x must be a data frame")
+    cli_abort("{.arg x} must be a data frame.")
   }
   
   center <- match.arg(center)
@@ -118,12 +119,12 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
   var_names <- names(vars)
   
   if (length(var_names) == 0) {
-    stop("At least one variable must be specified")
+    cli_abort("At least one variable must be specified.")
   }
   
   # Group is required
   if (quo_is_null(group_quo)) {
-    stop("group argument is required for Levene's test")
+    cli_abort("{.arg group} is required for Levene's test.")
   }
   
   g_var <- eval_select(expr(!!group_quo), data = x)
@@ -153,7 +154,7 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
       )
       
     }, error = function(e) {
-      warning(sprintf("Levene test failed for variable '%s': %s", var_name, e$message))
+      cli_warn("Levene test failed for variable {.var {var_name}}: {e$message}")
       results_list[[var_name]] <- tibble(
         Variable = var_name,
         F_statistic = NA_real_,
@@ -177,23 +178,23 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
     original_test = NULL
   )
   
-  class(result) <- "levene_test_results"
+  class(result) <- "levene_test"
   return(result)
 }
 
 #' @rdname levene_test
 #' @export
-levene_test.oneway_anova_results <- function(x, center = c("mean", "median"), ...) {
+levene_test.oneway_anova <- function(x, center = c("mean", "median"), ...) {
   
   center <- match.arg(center)
   
   # Extract information from ANOVA results
   if (is.null(x$group)) {
-    stop("Levene test requires a grouping variable")
+    cli_abort("Levene test requires a grouping variable.")
   }
   
   if (is.null(x$data)) {
-    stop("Original data not available in oneway_anova results. Please use: levene_test(data, variables, group = group)")
+    cli_abort(c("Original data not available in {.fn oneway_anova} results.", "i" = "Use: {.code levene_test(data, variables, group = group)}"))
   }
   
   # Check if this is a grouped analysis
@@ -229,8 +230,7 @@ levene_test.oneway_anova_results <- function(x, center = c("mean", "median"), ..
           results_list <- append(results_list, list(result_row))
           
         }, error = function(e) {
-          warning(sprintf("Levene test failed for variable '%s' in group %s: %s", 
-                         var_name, paste(group_info, collapse = ", "), e$message))
+          cli_warn("Levene test failed for variable {.var {var_name}} in group {paste(group_info, collapse = ', ')}: {e$message}")
         })
       }
     }
@@ -259,7 +259,7 @@ levene_test.oneway_anova_results <- function(x, center = c("mean", "median"), ..
         )
         
       }, error = function(e) {
-        warning(sprintf("Levene test failed for variable '%s': %s", var_name, e$message))
+        cli_warn("Levene test failed for variable {.var {var_name}}: {e$message}")
         results_list[[var_name]] <- tibble(
           Variable = var_name,
           F_statistic = NA_real_,
@@ -286,23 +286,23 @@ levene_test.oneway_anova_results <- function(x, center = c("mean", "median"), ..
     original_test = x
   )
   
-  class(result) <- "levene_test_results"
+  class(result) <- "levene_test"
   return(result)
 }
 
 #' @rdname levene_test
 #' @export
-levene_test.t_test_results <- function(x, center = c("mean", "median"), ...) {
+levene_test.t_test <- function(x, center = c("mean", "median"), ...) {
   
   center <- match.arg(center)
   
   # Extract information from t-test results
   if (is.null(x$group)) {
-    stop("Levene test requires a grouping variable (two-sample t-test)")
+    cli_abort("Levene test requires a grouping variable (two-sample t-test).")
   }
   
   if (is.null(x$data)) {
-    stop("Original data not available in t_test results. Please use: levene_test(data, variables, group = group)")
+    cli_abort(c("Original data not available in {.fn t_test} results.", "i" = "Use: {.code levene_test(data, variables, group = group)}"))
   }
   
   # Check if this is a grouped analysis
@@ -360,7 +360,7 @@ levene_test.t_test_results <- function(x, center = c("mean", "median"), ...) {
       groups = group_vars
     )
     
-    class(result) <- "levene_test_results"
+    class(result) <- "levene_test"
     return(result)
     
   } else {
@@ -384,10 +384,12 @@ levene_test.t_test_results <- function(x, center = c("mean", "median"), ...) {
 
 #' @rdname levene_test
 #' @export
-levene_test.mann_whitney_results <- function(x, ...) {
-  stop("Levene's test is not appropriate for Mann-Whitney U test results.\n",
-       "Mann-Whitney U test is non-parametric and does not assume equal variances.\n",
-       "Use Levene's test only with parametric tests like t-test.")
+levene_test.mann_whitney <- function(x, ...) {
+  cli_abort(c(
+    "Levene's test is not appropriate for Mann-Whitney U test results.",
+    "i" = "Mann-Whitney U test is non-parametric and does not assume equal variances.",
+    "i" = "Use Levene's test only with parametric tests like t-test."
+  ))
 }
 
 #' @rdname levene_test
@@ -399,7 +401,7 @@ levene_test.grouped_df <- function(x, variable, group = NULL, weights = NULL, ce
   group_vars <- dplyr::group_vars(data)
   
   if (length(group_vars) == 0) {
-    stop("Data must be grouped using group_by() for grouped analysis")
+    cli_abort("Data must be grouped using {.fn group_by} for grouped analysis.")
   }
   
   # Get variable names
@@ -408,7 +410,7 @@ levene_test.grouped_df <- function(x, variable, group = NULL, weights = NULL, ce
   weight_name <- if (!is.null(substitute(weights))) deparse(substitute(weights)) else NULL
   
   if (is.null(group_name)) {
-    stop("Group variable must be specified for Levene test")
+    cli_abort("{.arg group} must be specified for Levene test.")
   }
   
   # Get unique groups
@@ -470,7 +472,7 @@ levene_test.grouped_df <- function(x, variable, group = NULL, weights = NULL, ce
     method = if (!is.null(weight_name)) "Weighted Levene's Test" else "Levene's Test"
   )
   
-  class(result_obj) <- "levene_test_results"
+  class(result_obj) <- "levene_test"
   return(result_obj)
 }
 
@@ -504,7 +506,7 @@ perform_grouped_levene_test <- function(data, var_name, group_name, weight_name 
   }
   
   if (length(g_levels) < 2) {
-    stop(sprintf("Levene test requires at least 2 groups, found %d", length(g_levels)))
+    cli_abort(c("Levene test requires at least 2 groups.", "x" = "Found {length(g_levels)} group{?s}."))
   }
   
   # Calculate deviations from group centers
@@ -609,7 +611,7 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
   
   # Check for constant variable (all values identical)
   if (length(unique(x[!is.na(x)])) <= 1) {
-    warning(sprintf("Variable '%s' has constant values. Levene test requires variability.", var_name))
+    cli_warn("Variable {.var {var_name}} has constant values. Levene test requires variability.")
     return(list(
       F_stat = NaN,
       df1 = NA_integer_,
@@ -637,7 +639,7 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
   }
   
   if (length(g_levels) < 2) {
-    stop(sprintf("Levene test requires at least 2 groups, found %d", length(g_levels)))
+    cli_abort(c("Levene test requires at least 2 groups.", "x" = "Found {length(g_levels)} group{?s}."))
   }
   
   # Calculate deviations from group centers
@@ -730,12 +732,12 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
 
 #' Print method for Levene test results
 #'
-#' @param x A levene_test_results object
+#' @param x A levene_test object
 #' @param digits Number of decimal places to display
 #' @param ... Additional arguments (not used)
 #' @export
-#' @method print levene_test_results
-print.levene_test_results <- function(x, digits = 3, ...) {
+#' @method print levene_test
+print.levene_test <- function(x, digits = 3, ...) {
 
   # Determine test type using standardized helper
   weights_name <- x$weight_var %||% x$weights
@@ -774,7 +776,7 @@ print.levene_test_results <- function(x, digits = 3, ...) {
       unique_groups <- unique(x$results$Group)
       group_column <- "Group"
     } else if (!is.null(x$groups) && length(x$groups) > 0) {
-      # t_test_results grouped analysis: separate column for each group variable
+      # t_test grouped analysis: separate column for each group variable
       group_combinations <- unique(x$results[x$groups])
       unique_groups <- apply(group_combinations, 1, function(row) {
         group_parts <- sapply(x$groups, function(group_var) {

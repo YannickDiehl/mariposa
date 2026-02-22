@@ -3,9 +3,9 @@
 \name{levene_test}
 \alias{levene_test}
 \alias{levene_test.data.frame}
-\alias{levene_test.oneway_anova_results}
-\alias{levene_test.t_test_results}
-\alias{levene_test.mann_whitney_results}
+\alias{levene_test.oneway_anova}
+\alias{levene_test.t_test}
+\alias{levene_test.mann_whitney}
 \alias{levene_test.grouped_df}
 \title{Test If Groups Vary Similarly}
 \usage{
@@ -13,11 +13,11 @@ levene_test(x, ...)
 
 \method{levene_test}{data.frame}(x, ..., group, weights = NULL, center = c("mean", "median"))
 
-\method{levene_test}{oneway_anova_results}(x, center = c("mean", "median"), ...)
+\method{levene_test}{oneway_anova}(x, center = c("mean", "median"), ...)
 
-\method{levene_test}{t_test_results}(x, center = c("mean", "median"), ...)
+\method{levene_test}{t_test}(x, center = c("mean", "median"), ...)
 
-\method{levene_test}{mann_whitney_results}(x, ...)
+\method{levene_test}{mann_whitney}(x, ...)
 
 \method{levene_test}{grouped_df}(x, variable, group = NULL, weights = NULL, center = "mean", ...)
 }
@@ -140,3 +140,9 @@ survey_data \%>\%
 survey_data \%>\% levene_test(income, group = region, center = "mean")
 
 }
+\seealso{
+Other posthoc: 
+\code{\link{scheffe_test}()},
+\code{\link{tukey_test}()}
+}
+\concept{posthoc}

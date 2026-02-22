@@ -227,7 +227,7 @@ compare_levene_with_spss <- function(r_result, spss_ref, test_name,
     f_stat <- unname(r_result$F_statistic[1])
     p_val <- unname(r_result$p_value[1])
   } else if ("results" %in% names(r_result)) {
-    # Full levene_test_results object
+    # Full levene_test object
     f_stat <- unname(r_result$results$F_statistic[1])
     p_val <- unname(r_result$results$p_value[1])
   } else {

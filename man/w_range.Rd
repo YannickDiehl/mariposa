@@ -19,19 +19,21 @@ w_range(data, ..., weights = NULL, na.rm = TRUE)
 A w_range object (list) containing results and metadata, or numeric values in summarise context
 }
 \description{
-Calculate weighted range (max - min) for numeric variables, with support for
+Calculate range (max - min) for numeric variables, with support for
 grouped data and multiple variables simultaneously.
+Note: Range is not affected by weights (same data values regardless of weighting),
+but this function supports the standard w_* interface for consistency.
 }
 \examples{
 # Load required packages and data
 library(dplyr)
 data(survey_data)
 
-# Basic weighted range (max - min)
+# Basic range
 survey_data \%>\% w_range(age, weights = sampling_weight)
 
 # Multiple variables
-survey_data \%>\% w_range(age, income, life_satisfaction, weights = sampling_weight)
+survey_data \%>\% w_range(age, income, weights = sampling_weight)
 
 # Grouped data
 survey_data \%>\% group_by(region) \%>\% w_range(age, weights = sampling_weight)
@@ -43,3 +45,17 @@ survey_data \%>\% summarise(range_age = w_range(age, weights = sampling_weight))
 survey_data \%>\% w_range(age)
 
 }
+\seealso{
+Other weighted_statistics: 
+\code{\link{w_iqr}()},
+\code{\link{w_kurtosis}()},
+\code{\link{w_mean}()},
+\code{\link{w_median}()},
+\code{\link{w_modus}()},
+\code{\link{w_quantile}()},
+\code{\link{w_sd}()},
+\code{\link{w_se}()},
+\code{\link{w_skew}()},
+\code{\link{w_var}()}
+}
+\concept{weighted_statistics}

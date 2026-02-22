@@ -118,17 +118,18 @@
 #'
 #' anova_grouped %>% tukey_test()
 #'
+#' @family posthoc
 #' @export
 tukey_test <- function(x, conf.level = 0.95, ...) {
   UseMethod("tukey_test")
 }
 
 #' @export
-tukey_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
+tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   
   # Input validation
   if (conf.level <= 0 || conf.level >= 1) {
-    stop("conf.level must be between 0 and 1")
+    cli_abort("{.arg conf.level} must be between 0 and 1.")
   }
   
   # Helper function to perform Tukey test for single variable
@@ -349,18 +350,18 @@ tukey_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
       conf.level = conf.level,
       anova_results = x  # Store original ANOVA results
     ),
-    class = "tukey_test_results"
+    class = "tukey_test"
   )
 }
 
 #' Print Tukey HSD test results
 #'
 #' @description
-#' Print method for objects of class \code{"tukey_test_results"}. Provides a 
+#' Print method for objects of class \code{"tukey_test"}. Provides a 
 #' formatted display of Tukey post-hoc test results including pairwise 
 #' comparisons, confidence intervals, and adjusted p-values.
 #'
-#' @param x An object of class \code{"tukey_test_results"} returned by \code{\link{tukey_test}}.
+#' @param x An object of class \code{"tukey_test"} returned by \code{\link{tukey_test}}.
 #' @param digits Integer specifying the number of decimal places to display 
 #'   for numeric values. Default is \code{3}.
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
@@ -380,7 +381,7 @@ tukey_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @export
-print.tukey_test_results <- function(x, digits = 3, ...) {
+print.tukey_test <- function(x, digits = 3, ...) {
   # Determine test type using standardized helper
   weights_name <- x$weight_var %||% x$weights
   test_type <- get_standard_title("Tukey HSD Post-Hoc Test", weights_name, "Results")

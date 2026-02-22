@@ -118,17 +118,18 @@
 #' # Custom confidence level (99%)
 #' anova_result %>% scheffe_test(conf.level = 0.99)
 #'
+#' @family posthoc
 #' @export
 scheffe_test <- function(x, conf.level = 0.95, ...) {
   UseMethod("scheffe_test")
 }
 
 #' @export
-scheffe_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
+scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
 
   # Input validation
   if (conf.level <= 0 || conf.level >= 1) {
-    stop("conf.level must be between 0 and 1")
+    cli_abort("{.arg conf.level} must be between 0 and 1.")
   }
 
   # Helper function to perform Scheffe test for single variable
@@ -344,18 +345,18 @@ scheffe_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
       conf.level = conf.level,
       anova_results = x  # Store original ANOVA results
     ),
-    class = "scheffe_test_results"
+    class = "scheffe_test"
   )
 }
 
 #' Print Scheffe test results
 #'
 #' @description
-#' Print method for objects of class \code{"scheffe_test_results"}. Provides a
+#' Print method for objects of class \code{"scheffe_test"}. Provides a
 #' formatted display of Scheffe post-hoc test results including pairwise
 #' comparisons, confidence intervals, and adjusted p-values.
 #'
-#' @param x An object of class \code{"scheffe_test_results"} returned by \code{\link{scheffe_test}}.
+#' @param x An object of class \code{"scheffe_test"} returned by \code{\link{scheffe_test}}.
 #' @param digits Integer specifying the number of decimal places to display
 #'   for numeric values. Default is \code{3}.
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
@@ -375,7 +376,7 @@ scheffe_test.oneway_anova_results <- function(x, conf.level = 0.95, ...) {
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @export
-print.scheffe_test_results <- function(x, digits = 3, ...) {
+print.scheffe_test <- function(x, digits = 3, ...) {
   # Determine test type using standardized helper
   weights_name <- x$weight_var %||% x$weights
   test_type <- get_standard_title("Scheffe Post-Hoc Test", weights_name, "Results")
