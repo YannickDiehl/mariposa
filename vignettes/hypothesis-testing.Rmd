@@ -10,7 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -20,14 +22,16 @@ library(dplyr)
 data(survey_data)
 ```
 
-## When to Use These Tests
+## Overview
 
-Statistical tests help you determine whether differences between groups are real or just due to random chance. Here's when to use each test:
+Statistical tests help you determine whether differences between groups are real or just due to random chance. This guide covers the main tests available in mariposa:
 
-- **t-test**: Compare means between two groups
-- **ANOVA**: Compare means across three or more groups
-- **Chi-square**: Test relationships between categorical variables
-- **Mann-Whitney**: Non-parametric alternative when data isn't normal
+| Test | Use when... |
+|------|-------------|
+| `t_test()` | Comparing means between **two** groups |
+| `oneway_anova()` | Comparing means across **three or more** groups |
+| `chi_square()` | Testing relationships between **categorical** variables |
+| `mann_whitney()` | Non-parametric alternative when data is not normally distributed |
 
 ## t-Tests
 
@@ -47,12 +51,13 @@ survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 ```
 
+The output shows two versions: one assuming equal variances (Student's t-test) and one not assuming equal variances (Welch's t-test). When in doubt, use the Welch version --- it is more robust.
+
 ### Multiple Variables at Once
 
-Test several outcomes simultaneously:
+Test several outcome variables simultaneously:
 
 ```{r}
-# Test all trust variables between genders
 survey_data %>%
   t_test(trust_government, trust_science, trust_media,
          group = gender, weights = sampling_weight)
@@ -60,10 +65,9 @@ survey_data %>%
 
 ### One-Sample t-Test
 
-Test whether the population mean differs from a specific value:
+Test whether a population mean differs from a specific value. For example, is average life satisfaction different from 3 (the scale midpoint)?
 
 ```{r}
-# Is average life satisfaction different from 3 (neutral)?
 survey_data %>%
   t_test(life_satisfaction, mu = 3, weights = sampling_weight)
 ```
@@ -85,7 +89,6 @@ survey_data %>%
 Compare means across multiple groups (3+ categories):
 
 ```{r}
-# Compare life satisfaction across education levels
 survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 ```
@@ -98,42 +101,51 @@ survey_data %>%
                weights = sampling_weight)
 ```
 
+The output includes $\eta^2$ (eta-squared), which tells you how much of the variance in the outcome is explained by group membership:
+
+- **Small effect**: $\eta^2 \approx 0.01$
+- **Medium effect**: $\eta^2 \approx 0.06$
+- **Large effect**: $\eta^2 \approx 0.14$
+
 ### Post-Hoc Tests
 
-When ANOVA is significant, use post-hoc tests to see which groups differ:
+When ANOVA is significant, it tells you that *at least one* group differs --- but not *which* groups differ. Use post-hoc tests to find out:
 
 ```{r}
-# First run ANOVA and save result
+# Save the ANOVA result
 anova_result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 
-# Then run Tukey test on the result
+# Tukey HSD: identifies which pairs of groups differ
 tukey_test(anova_result)
 
-# Or Scheffe test (more conservative)
+# Scheffe test: more conservative (fewer false positives)
 scheffe_test(anova_result)
 ```
 
 ### Testing Assumptions
 
-Check if variances are equal across groups:
+ANOVA assumes equal variances across groups. Check this with Levene's test:
 
 ```{r}
 levene_test(anova_result)
 ```
 
+If Levene's test is significant ($p < 0.05$), variances are unequal. In that case, the Welch correction (included in the ANOVA output) is more appropriate.
+
 ## Chi-Square Test
 
 ### Basic Chi-Square
 
-Test if two categorical variables are related:
+Test whether two categorical variables are related:
 
 ```{r}
-# Is education related to employment status?
 survey_data %>%
   chi_square(education, employment)
 ```
+
+A significant result means the variables are not independent --- knowing someone's education tells you something about their employment status (or vice versa).
 
 ### With Survey Weights
 
@@ -142,37 +154,33 @@ survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
 ```
 
-### Multiple Tests
+### Multiple Comparisons
 
-Test several relationships separately:
+Test several relationships:
 
 ```{r}
-# Test association between employment and education
 survey_data %>%
   chi_square(employment, education, weights = sampling_weight)
 
-# Test association between employment and gender
 survey_data %>%
   chi_square(employment, gender, weights = sampling_weight)
-
-# Test association between employment and region
-survey_data %>%
-  chi_square(employment, region, weights = sampling_weight)
 ```
 
 ## Mann-Whitney Test
 
 ### When to Use
 
-Use when:
-- Data is not normally distributed
-- Sample sizes are small
-- Data is ordinal (ranked)
+Use the Mann-Whitney *U* test (also called Wilcoxon rank-sum test) when:
+
+- Your data is **not normally distributed**
+- Sample sizes are **small**
+- The variable is **ordinal** (ranked categories)
+
+It compares the *distributions* rather than the means.
 
 ### Basic Usage
 
 ```{r}
-# Compare political orientation between regions
 survey_data %>%
   mann_whitney(political_orientation, group = region)
 ```
@@ -189,109 +197,72 @@ survey_data %>%
 
 ### Understanding p-values
 
-- **p < 0.05**: Statistically significant difference
-- **p ≥ 0.05**: No significant difference detected
-- Remember: "not significant" ≠ "no difference"
+- $p < 0.05$: The difference is statistically significant at the 5% level
+- $p \geq 0.05$: No significant difference detected
+
+Important: "not significant" does **not** mean "no difference" --- it means we cannot rule out that the difference is due to chance, given the sample size.
 
 ### Effect Sizes Matter
 
-Statistical significance doesn't always mean practical importance:
+With large samples, even tiny differences can be statistically significant. Always check effect sizes:
 
 ```{r}
-# ANOVA provides eta-squared effect size
 result <- survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
 print(result)
 ```
 
-Effect size guidelines:
-- Small: η² = 0.01
-- Medium: η² = 0.06
-- Large: η² = 0.14
+The t-test provides Cohen's *d* (small: 0.2, medium: 0.5, large: 0.8) and ANOVA provides $\eta^2$.
 
 ### Sample Size Effects
 
-Large samples can make tiny differences "significant":
-- Always check effect sizes
-- Consider practical significance
-- Look at confidence intervals
+Large samples detect small effects. Small samples may miss real effects. Consider:
+
+- Always report effect sizes alongside p-values
+- Look at confidence intervals for practical significance
+- Do not interpret $p = 0.049$ and $p = 0.051$ as fundamentally different
 
 ## Complete Example
 
-Here's a typical hypothesis testing workflow:
+A typical hypothesis testing workflow:
 
 ```{r}
-# 1. Descriptive statistics first
-cat("=== Descriptive Summary ===\n")
+# 1. Descriptive overview
 survey_data %>%
   group_by(education) %>%
   describe(life_satisfaction, weights = sampling_weight)
 
-# 2. Test for overall difference
-cat("\n=== ANOVA Test ===\n")
+# 2. Test for overall differences
 anova_result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 print(anova_result)
 
-# 3. If significant, see which groups differ
-if (!is.null(anova_result) && "p_value" %in% names(anova_result) && !is.na(anova_result$p_value[1]) && anova_result$p_value[1] < 0.05) {
-  cat("\n=== Post-hoc Comparisons ===\n")
-  tukey_test(anova_result)
-}
+# 3. Post-hoc: which groups differ?
+tukey_test(anova_result)
 
 # 4. Check assumptions
-cat("\n=== Assumption Check ===\n")
 levene_test(anova_result)
 ```
 
 ## Best Practices
 
-### 1. Check Assumptions First
+1. **Check assumptions first.** Inspect skewness and kurtosis before choosing a test. For non-normal data, consider `mann_whitney()`.
+2. **Use appropriate tests.** Normal data with equal variances: t-test/ANOVA. Non-normal or ordinal: Mann-Whitney. Categorical: chi-square.
+3. **Report completely.** Always include the test statistic, degrees of freedom, p-value, effect size, and confidence intervals.
+4. **Watch for multiple comparisons.** Running many tests inflates the chance of false positives. Consider Bonferroni correction or pre-register your hypotheses.
+5. **Significance is not importance.** A statistically significant result with a negligible effect size may not be practically relevant.
 
-Before t-test or ANOVA:
-```{r}
-# Visual check for normality
-# (In practice, create histograms or Q-Q plots)
-survey_data %>%
-  group_by(gender) %>%
-  describe(life_satisfaction, show = c("skew", "kurtosis"))
-```
+## Summary
 
-### 2. Use Appropriate Tests
-
-- **Normal data + equal variances**: t-test/ANOVA
-- **Non-normal or ordinal**: Mann-Whitney
-- **Categorical**: Chi-square
-
-### 3. Report Completely
-
-Always report:
-- Test statistic
-- Degrees of freedom
-- p-value
-- Effect size
-- Confidence intervals
-
-### 4. Multiple Comparisons
-
-When running many tests, consider:
-- Bonferroni correction
-- False Discovery Rate (FDR)
-- Pre-registration of hypotheses
-
-## Common Mistakes to Avoid
-
-1. **Ignoring assumptions**: Check normality and variance
-2. **p-hacking**: Don't test everything hoping for significance
-3. **Ignoring weights**: Unweighted tests can be misleading
-4. **Over-interpreting p-values**: p = 0.049 vs p = 0.051 is not meaningfully different
-5. **Forgetting effect sizes**: Significance ≠ importance
+1. **`t_test()`** compares means between two groups --- use it for questions like "Do men and women differ?"
+2. **`oneway_anova()`** extends this to three or more groups, with post-hoc tests to identify which groups differ
+3. **`chi_square()`** tests whether categorical variables are related
+4. **`mann_whitney()`** is the non-parametric alternative when assumptions are not met
+5. Always report **effect sizes** alongside p-values
 
 ## Next Steps
 
-After finding significant differences:
-- Explore with `crosstab()` for categorical relationships
-- Use `pearson_cor()` for continuous associations
-- Consider regression models for controlling confounds
-- Validate findings with different subgroups
+- Explore relationships between continuous variables --- see `vignette("correlation-analysis")`
+- Learn about weighted analysis --- see `vignette("survey-weights")`
+- Revisit your data --- see `vignette("descriptive-statistics")`

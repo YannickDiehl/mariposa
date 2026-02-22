@@ -10,7 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -20,14 +22,15 @@ library(dplyr)
 data(survey_data)
 ```
 
-## What Does This Do?
+## Overview
 
-Descriptive statistics help you understand your data before doing any complex analysis. Think of it as getting to know your survey responses - what's typical, what's unusual, and how spread out the answers are.
+Descriptive statistics help you understand your data before doing any complex analysis. Think of it as getting to know your survey responses --- what is typical, what is unusual, and how spread out the answers are.
 
-The main functions covered here:
-- `describe()` - Get a complete summary of numeric variables
-- `frequency()` - See how many people chose each option
-- `crosstab()` - Compare responses across two categorical variables
+This guide covers three functions:
+
+- `describe()` --- Summary statistics for numeric variables
+- `frequency()` --- Frequency tables for categorical variables
+- `crosstab()` --- Cross-tabulations comparing two categorical variables
 
 ## Getting Summary Statistics
 
@@ -39,7 +42,7 @@ The simplest way to get descriptive statistics:
 survey_data %>% describe(age)
 ```
 
-This gives you the mean, median, standard deviation, and other key statistics for age.
+This gives you the mean ($\bar{x}$), median, standard deviation (*SD*), and other key statistics.
 
 ### Multiple Variables at Once
 
@@ -52,7 +55,7 @@ survey_data %>%
 
 ### With Survey Weights
 
-To get population-representative statistics:
+To get population-representative statistics, add the `weights` argument:
 
 ```{r}
 survey_data %>%
@@ -60,11 +63,11 @@ survey_data %>%
            weights = sampling_weight)
 ```
 
-The weighted results better represent your target population.
+The weighted results better represent your target population by correcting for sampling biases.
 
 ### Grouped Analysis
 
-Compare statistics across groups:
+Compare statistics across groups using `group_by()`:
 
 ```{r}
 survey_data %>%
@@ -74,7 +77,7 @@ survey_data %>%
 
 ### Customizing Output
 
-Choose which statistics to display:
+Choose which statistics to display with the `show` argument:
 
 ```{r}
 # Just the essentials
@@ -97,17 +100,18 @@ survey_data %>%
   frequency(education)
 ```
 
-### With Percentages
+### Understanding the Output
 
-The output shows:
-- **Frequency**: How many people gave each answer
-- **Percent**: Percentage including missing values
-- **Valid Percent**: Percentage excluding missing values
+The output includes:
+
+- **Frequency**: Count of responses in each category
+- **Percent**: Percentage of all cases (including missing)
+- **Valid Percent**: Percentage of non-missing cases only
 - **Cumulative Percent**: Running total of valid percentages
 
-### Weighted Frequencies
+When reporting results, use *Valid Percent* if missing values are truly missing (e.g., skip patterns), and *Percent* when non-response is meaningful.
 
-Include survey weights for representative results:
+### Weighted Frequencies
 
 ```{r}
 survey_data %>%
@@ -116,7 +120,7 @@ survey_data %>%
 
 ### Multiple Variables
 
-Analyze several categorical variables:
+Analyze several categorical variables at once:
 
 ```{r}
 survey_data %>%
@@ -134,11 +138,11 @@ survey_data %>%
   frequency(education, weights = sampling_weight)
 ```
 
-## Cross-tabulation
+## Cross-Tabulation
 
 ### Basic Crosstab
 
-Examine relationships between two categorical variables:
+Examine the relationship between two categorical variables:
 
 ```{r}
 survey_data %>%
@@ -147,15 +151,17 @@ survey_data %>%
 
 ### Understanding the Output
 
-Crosstabs show:
-- Count in each cell
-- Row percentages (sum to 100% across rows)
-- Column percentages (sum to 100% down columns)
-- Cell percentages (percentage of total)
+Cross-tabulations show several types of percentages:
+
+- **Count**: Number of cases in each cell
+- **Row %**: Percentage within each row (sums to 100% across)
+- **Column %**: Percentage within each column (sums to 100% down)
+- **Cell %**: Percentage of the total sample
+
+Row percentages answer: "Of people with this education level, what proportion has each employment status?"
+Column percentages answer: "Of people with this employment status, what proportion has each education level?"
 
 ### Weighted Crosstabs
-
-Include survey weights:
 
 ```{r}
 survey_data %>%
@@ -164,7 +170,7 @@ survey_data %>%
 
 ### Grouped Crosstabs
 
-Create separate crosstabs for each group:
+Create separate cross-tabulations for each subgroup:
 
 ```{r}
 survey_data %>%
@@ -176,79 +182,77 @@ survey_data %>%
 
 ### 1. Always Check Your Data First
 
-Start with basic descriptives to spot issues:
+Start with basic descriptives to spot potential issues:
 
 ```{r}
-# Check for outliers and missing data
 survey_data %>%
   describe(age, income, show = "all")
 ```
 
 Look for:
-- Data entry errors (impossible values)
-- Missing data patterns
-- Distribution issues (extreme skewness)
+
+- **Impossible values** (e.g., negative ages) indicating data entry errors
+- **High rates of missing data** that might bias results
+- **Extreme skewness** (values beyond $\pm 1$) suggesting non-normal distributions
 
 ### 2. Use Weights When Available
-Unweighted results can be misleading. Here's a comparison:
+
+Unweighted results can be misleading:
 
 ```{r}
-# Compare weighted vs unweighted
 unweighted_mean <- survey_data %>%
   summarise(mean_age = mean(age, na.rm = TRUE)) %>%
   pull()
 
 weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
 
-cat("Unweighted mean age:", unweighted_mean, "\n")
-cat("Weighted mean age:", weighted_result$results$weighted_mean, "\n")
+cat("Unweighted mean age:", round(unweighted_mean, 1), "\n")
+cat("Weighted mean age:", round(weighted_result$results$weighted_mean, 1), "\n")
 ```
 
-### 3. Report the Right Percentage
-- Use **Valid %** when missing values are truly missing (skip patterns)
-- Use **Raw %** when "no response" is meaningful
+### 3. Consider Your Audience
 
-### 4. Consider Your Audience
-- For technical audiences: Include SD, skewness, kurtosis
-- For general audiences: Focus on mean, median, percentages
+- **Technical audience**: Include *SD*, skewness, kurtosis
+- **General audience**: Focus on mean, median, and percentages
 
 ## Complete Example
 
-Here's a typical descriptive analysis workflow:
+A typical descriptive analysis workflow:
 
 ```{r}
 # 1. Overall summary
-cat("=== Overall Summary ===\n")
 survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight,
            show = "short")
 
-# 2. Check distributions
-cat("\n=== Key Frequencies ===\n")
+# 2. Key distributions
 survey_data %>%
   frequency(education, employment,
             weights = sampling_weight)
 
-# 3. Examine relationships
-cat("\n=== Education by Employment ===\n")
+# 3. Relationship between categories
 survey_data %>%
   crosstab(education, employment,
            weights = sampling_weight)
 
-# 4. Group comparisons
-cat("\n=== Regional Differences ===\n")
+# 4. Regional comparisons
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction,
            weights = sampling_weight)
 ```
 
+## Summary
+
+1. **`describe()`** gives you a full picture of numeric variables
+2. **`frequency()`** shows the distribution of categorical variables
+3. **`crosstab()`** reveals relationships between two categorical variables
+4. All three functions support **survey weights** and **grouped analysis**
+5. Always explore your data descriptively before running statistical tests
+
 ## Next Steps
 
-Now that you understand your data's basic patterns:
-- Test hypotheses with `t_test()` or `chi_square()`
-- Explore relationships with `pearson_cor()` or `spearman_rho()`
-- Build models based on these insights
-
-Remember: Good analysis starts with understanding your data!
+- Test for significant differences with `t_test()` or `chi_square()` --- see `vignette("hypothesis-testing")`
+- Explore relationships with `pearson_cor()` --- see `vignette("correlation-analysis")`
+- Learn about weighted analysis --- see `vignette("survey-weights")`
