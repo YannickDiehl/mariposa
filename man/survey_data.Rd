@@ -62,9 +62,16 @@ survey_data \%>\% describe(age, income, weights = sampling_weight)
 survey_data \%>\% frequency(education, region, weights = sampling_weight)
 
 # Group comparisons
-survey_data \%>\% 
-  group_by(region) \%>\% 
+survey_data \%>\%
+  group_by(region) \%>\%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
+}
+\seealso{
+\code{\link{describe}} for descriptive statistics of numeric variables.
+
+\code{\link{frequency}} for categorical frequency tables.
+
+\code{\link{t_test}} for group comparisons.
 }
 \keyword{datasets}

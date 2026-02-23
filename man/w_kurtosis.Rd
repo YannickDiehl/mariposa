@@ -2,29 +2,87 @@
 % Please edit documentation in R/w_kurtosis.R
 \name{w_kurtosis}
 \alias{w_kurtosis}
-\title{Weighted Kurtosis}
+\title{Measure Population-Representative Kurtosis}
 \usage{
 w_kurtosis(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE)
 }
 \arguments{
-\item{data}{A data frame, or a numeric vector when used in summarise() context}
+\item{data}{Your survey data (a data frame or tibble)}
 
-\item{...}{Variable names (unquoted) or tidyselect expressions}
+\item{...}{The numeric variables you want to analyze. You can list multiple
+variables or use helpers like \code{starts_with("trust")}}
 
-\item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
+\item{weights}{Survey weights to make results representative of your population.
+Without weights, you get the simple sample kurtosis.}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed (default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
 
-\item{excess}{Logical; if TRUE, returns excess kurtosis (default: TRUE, matching SPSS)}
+\item{excess}{Show excess kurtosis? (Default: TRUE, matching SPSS). Excess
+kurtosis subtracts 3 so that a normal distribution has kurtosis of 0,
+making interpretation easier.}
 }
 \value{
-A w_kurtosis object (list) containing results and metadata, or numeric values in summarise context
+Population-weighted kurtosis value(s) with sample size information,
+including the weighted kurtosis, effective sample size (effective N), and the
+number of valid observations used.
 }
 \description{
-Calculate weighted kurtosis for numeric variables, with support for
-grouped data and multiple variables simultaneously.
-Uses the SPSS Type 2 (sample-corrected) excess kurtosis formula.
-Reference: Joanes & Gill (1998), "Comparing measures of sample skewness and kurtosis"
+\code{w_kurtosis()} measures how heavy the tails of your data's distribution
+are, using survey weights for population-representative results. Kurtosis tells
+you whether your data has unusually many extreme values (outliers) compared to
+a normal distribution:
+\itemize{
+\item \strong{Positive (excess) kurtosis}: Heavier tails than normal (more outliers)
+\item \strong{Negative (excess) kurtosis}: Lighter tails than normal (fewer outliers)
+\item \strong{Near zero}: Similar tail behavior to a normal distribution
+}
+}
+\details{
+\subsection{Understanding the Results}{
+\itemize{
+\item \strong{Weighted Kurtosis} (excess, default):
+\itemize{
+\item Near 0: Tail behavior similar to a normal distribution
+\item Positive (> 0): Heavier tails, more extreme values than normal
+\item Negative (< 0): Lighter tails, fewer extreme values than normal
+\item Values beyond 2 or below -2 indicate notable departure from normality
+}
+\item \strong{Effective N}: How many independent observations your weighted data
+represents.
+\item \strong{N}: The actual number of observations used.
+}
+
+Kurtosis is often checked together with skewness to assess normality. Both
+should be close to zero for normally distributed data.
+}
+
+\subsection{When to Use This}{
+
+Use \code{w_kurtosis()} when:
+\itemize{
+\item You need to assess whether a variable follows a normal distribution
+\item You want to check for unusually many outliers
+\item You are deciding whether parametric tests are appropriate
+\item You need SPSS-compatible weighted kurtosis values
+}
+}
+
+\subsection{Formula}{
+
+Uses the SPSS Type 2 (sample-corrected) excess kurtosis formula. First, the
+population excess kurtosis (\eqn{g_2}) is calculated:
+
+\eqn{g_2 = \frac{m_4}{m_2^2} - 3}
+
+where \eqn{m_2 = \sum w_i(x_i - \bar{x}_w)^2 / V_1} and
+\eqn{m_4 = \sum w_i(x_i - \bar{x}_w)^4 / V_1} with \eqn{V_1 = \sum w_i}.
+
+Then, the bias-corrected (Type 2) kurtosis is:
+
+\eqn{G_2 = \frac{(n+1) \cdot g_2 + 6}{(n-2)(n-3)} \cdot (n-1)}
+
+where \eqn{n = V_1} for weighted data.
+}
 }
 \examples{
 # Load required packages and data
@@ -50,7 +108,17 @@ survey_data \%>\% summarise(kurt_age = w_kurtosis(age, weights = sampling_weight
 survey_data \%>\% w_kurtosis(age)
 
 }
+\references{
+Joanes, D. N., & Gill, C. A. (1998). Comparing measures of sample skewness
+and kurtosis. The Statistician, 47(1), 183-189.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link{w_skew}} for weighted skewness (distribution asymmetry).
+
+\code{\link{describe}} for comprehensive descriptive statistics including kurtosis.
+
 Other weighted_statistics: 
 \code{\link{w_iqr}()},
 \code{\link{w_mean}()},

@@ -1,16 +1,50 @@
-#' Weighted Range
+#' Find the Range of Your Data
 #'
-#' Calculate range (max - min) for numeric variables, with support for
-#' grouped data and multiple variables simultaneously.
-#' Note: Range is not affected by weights (same data values regardless of weighting),
-#' but this function supports the standard w_* interface for consistency.
+#' @description
+#' \code{w_range()} calculates the range (maximum minus minimum) of your data.
+#' The range gives you the total spread from the smallest to the largest observed
+#' value. It provides the \code{w_*} interface for consistency with other
+#' weighted statistics, though the range itself is not affected by weights
+#' (the minimum and maximum values remain the same regardless of weighting).
 #'
-#' @param data A data frame, or a numeric vector when used in summarise() context
-#' @param ... Variable names (unquoted) or tidyselect expressions
-#' @param weights Name of the weights variable (unquoted), or a numeric vector of weights
-#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to analyze. You can list multiple
+#'   variables or use helpers like \code{starts_with("income")}
+#' @param weights Survey weights are accepted for interface consistency, but do
+#'   not affect the range calculation. The range depends only on the observed
+#'   minimum and maximum values.
+#' @param na.rm Remove missing values before calculating? (Default: TRUE)
 #'
-#' @return A w_range object (list) containing results and metadata, or numeric values in summarise context
+#' @return The range (max - min) with sample size information,
+#'   including the effective sample size (effective N) when weights are provided,
+#'   and the number of valid observations used.
+#'
+#' @details
+#' ## Understanding the Results
+#'
+#' - **Range**: The difference between the largest and smallest values. A large
+#'   range indicates that at least some values are far apart.
+#' - **Effective N**: Reported when weights are provided, for consistency with
+#'   other weighted statistics.
+#' - **N**: The actual number of observations used.
+#'
+#' Note: The range is sensitive to outliers. A single extreme value can
+#' dramatically increase the range. Consider using \code{\link{w_iqr}} for a
+#' more robust measure of spread.
+#'
+#' ## When to Use This
+#'
+#' Use \code{w_range()} when:
+#' - You want a quick overview of the total spread of your data
+#' - You need to check for data entry errors (impossible values)
+#' - You want to compare the total spread across groups
+#'
+#' ## Formula
+#'
+#' \eqn{Range = \max(x) - \min(x)}
+#'
+#' Note: This statistic is weight-invariant. The minimum and maximum observed
+#' values do not change when weights are applied.
 #'
 #' @examples
 #' # Load required packages and data
@@ -31,6 +65,18 @@
 #'
 #' # Unweighted (for comparison)
 #' survey_data %>% w_range(age)
+#'
+#' @seealso
+#' \code{\link[base]{range}} for the base R range function.
+#'
+#' \code{\link{w_iqr}} for the weighted interquartile range (more robust).
+#'
+#' \code{\link{w_sd}} for weighted standard deviation (another spread measure).
+#'
+#' \code{\link{describe}} for comprehensive descriptive statistics including range.
+#'
+#' @references
+#' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'
 #' @family weighted_statistics
 #' @export
