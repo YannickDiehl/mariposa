@@ -8,3 +8,13 @@ Print method for crosstab results
 # S3 method for class 'crosstab'
 print(x, ...)
 ```
+
+## Arguments
+
+- x:
+
+  A crosstab result object
+
+- ...:
+
+  Additional arguments (currently unused)

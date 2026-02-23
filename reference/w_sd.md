@@ -1,9 +1,13 @@
-# Weighted Standard Deviation
+# Calculate Population-Representative Standard Deviations
 
-Calculate weighted standard deviation for numeric variables, with
-support for grouped data and multiple variables simultaneously. Uses the
-SPSS frequency weights formula: \\s_w = \sqrt{\sum w_i (x_i -
-\bar{x}\_w)^2 / (V_1 - 1)}\\ where \\V_1 = \sum w_i\\.
+`w_sd()` calculates standard deviations that accurately represent your
+population by using survey weights. The standard deviation tells you how
+spread out your data is around the average – a larger SD means more
+variation in responses, while a smaller SD means responses cluster
+tightly around the mean.
+
+Without weights, you describe spread in your sample only. With weights,
+you estimate how spread out values are in the entire population.
 
 ## Usage
 
@@ -15,27 +19,84 @@ w_sd(data, ..., weights = NULL, na.rm = TRUE)
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("trust")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample standard deviation.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_sd object (list) containing results and metadata, or numeric values
-in summarise context
+Population-weighted standard deviation(s) with sample size information,
+including the weighted SD, effective sample size (effective N), and the
+number of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted SD**: The population-representative standard deviation.
+  Roughly 68% of your population falls within one SD of the weighted
+  mean.
+
+- **Effective N**: How many independent observations your weighted data
+  represents. Always less than or equal to the actual sample size.
+
+- **N**: The actual number of observations used in the calculation.
+
+A large difference between weighted and unweighted SD suggests that the
+variability in your sample does not accurately reflect the population.
+
+### When to Use This
+
+Use `w_sd()` when:
+
+- You need to report how spread out a variable is in the population
+
+- You want to compare variability across groups with proper weighting
+
+- Your survey used complex sampling (oversampling, stratification)
+
+- You need SPSS-compatible weighted standard deviations
+
+### Formula
+
+The weighted standard deviation uses the SPSS frequency weights formula:
+
+\\s_w = \sqrt{\frac{\sum w_i (x_i - \bar{x}\_w)^2}{V_1 - 1}}\\
+
+where \\V_1 = \sum w_i\\ is the sum of all weights and \\\bar{x}\_w =
+\sum w_i x_i / V_1\\ is the weighted mean.
+
+The effective sample size is: \\n\_{eff} = (\sum w_i)^2 / \sum w_i^2\\
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`sd`](https://rdrr.io/r/stats/sd.html) for the base R standard
+deviation function.
+
+[`w_var`](https://YannickDiehl.github.io/mariposa/reference/w_var.md)
+for weighted variance (the square of weighted SD).
+
+[`w_mean`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
+for weighted means.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including SD.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

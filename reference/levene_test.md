@@ -58,6 +58,10 @@ levene_test(x, variable, group = NULL, weights = NULL, center = "mean", ...)
 
   How to measure center: `"mean"` (default) or `"median"` (more robust)
 
+- variable:
+
+  Variable to test (when using grouped data frame)
+
 - data:
 
   Your survey data (when x is not a test result)
@@ -135,7 +139,28 @@ You can use this function two ways:
 
 - Don't panic if violated - alternatives exist!
 
+## References
+
+Levene, H. (1960). Robust tests for equality of variances. In I. Olkin
+(Ed.), *Contributions to Probability and Statistics* (pp. 278–292).
+Stanford University Press.
+
+Brown, M. B., & Forsythe, A. B. (1974). Robust tests for the equality of
+variances. *Journal of the American Statistical Association*, 69(346),
+364–367.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+
 ## See also
+
+[`oneway_anova`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+for one-way ANOVA (which assumes equal variances).
+
+[`t_test`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+for group mean comparisons.
+
+[`var.test`](https://rdrr.io/r/stats/var.test.html) for the base R
+F-test of variance equality.
 
 Other posthoc:
 [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md),

@@ -1,8 +1,16 @@
-# Weighted Skewness
+# Measure Population-Representative Skewness
 
-Calculate weighted skewness for numeric variables, with support for
-grouped data and multiple variables simultaneously. Uses the SPSS Type 2
-(sample-corrected) skewness formula.
+`w_skew()` measures how asymmetric your data's distribution is, using
+survey weights for population-representative results. Skewness tells you
+whether values tend to trail off more to the left or right:
+
+- **Positive skew**: A long tail to the right (e.g., income – many low,
+  few very high)
+
+- **Negative skew**: A long tail to the left (e.g., exam scores – many
+  high, few very low)
+
+- **Near zero**: Roughly symmetric (e.g., height in a population)
 
 ## Usage
 
@@ -14,27 +22,93 @@ w_skew(data, ..., weights = NULL, na.rm = TRUE)
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("trust")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample skewness.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_skew object (list) containing results and metadata, or numeric
-values in summarise context
+Population-weighted skewness value(s) with sample size information,
+including the weighted skewness, effective sample size (effective N),
+and the number of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted Skewness**: The population-representative skewness value.
+
+  - Near 0: Distribution is roughly symmetric
+
+  - Between -0.5 and 0.5: Approximately symmetric
+
+  - Between -1 and -0.5 or 0.5 and 1: Moderately skewed
+
+  - Beyond -1 or 1: Highly skewed
+
+- **Effective N**: How many independent observations your weighted data
+  represents.
+
+- **N**: The actual number of observations used.
+
+High skewness suggests you might want to use the median instead of the
+mean as a measure of center, and non-parametric tests instead of
+t-tests.
+
+### When to Use This
+
+Use `w_skew()` when:
+
+- You need to check if a variable is normally distributed
+
+- You want to decide between parametric and non-parametric tests
+
+- You need to assess whether the mean is a good summary measure
+
+- You need SPSS-compatible weighted skewness values
+
+### Formula
+
+Uses the SPSS Type 2 (sample-corrected) skewness formula. First, the
+population skewness (\\g_1\\) is calculated:
+
+\\g_1 = \frac{m_3}{m_2^{3/2}}\\
+
+where \\m_2 = \sum w_i(x_i - \bar{x}\_w)^2 / V_1\\ and \\m_3 = \sum
+w_i(x_i - \bar{x}\_w)^3 / V_1\\ with \\V_1 = \sum w_i\\.
+
+Then, the bias-corrected (Type 2) skewness is:
+
+\\G_1 = g_1 \cdot \frac{\sqrt{n(n-1)}}{n-2}\\
+
+where \\n = V_1\\ for weighted data.
+
+## References
+
+Joanes, D. N., & Gill, C. A. (1998). Comparing measures of sample
+skewness and kurtosis. The Statistician, 47(1), 183-189.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`w_kurtosis`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md)
+for weighted kurtosis (tail heaviness).
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including skewness.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

@@ -118,7 +118,7 @@ Test results showing whether groups differ, including:
 
 - Zero: Groups have similar distributions
 
-### When to Use This Test
+### When to Use This
 
 Use Mann-Whitney test when:
 

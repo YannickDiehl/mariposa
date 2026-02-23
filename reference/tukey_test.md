@@ -244,12 +244,64 @@ anova_weighted %>% tukey_test()
 
 # Multiple variables
 anova_multi <- survey_data %>%
-  oneway_anova(trust_government, trust_companies, group = education)
-#> Error in oneway_anova(., trust_government, trust_companies, group = education): Can't select columns that don't exist.
-#> ✖ Column `trust_companies` doesn't exist.
+  oneway_anova(trust_government, trust_science, group = education)
 
 anova_multi %>% tukey_test()
-#> Error: object 'anova_multi' not found
+#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
+#> Grouping Variable: education
+#> Confidence level: 95.0%
+#> Family-wise error rate controlled using Tukey HSD
+#> 
+#> 
+#> --- trust_government ---
+#> 
+#> Tukey Results:
+#> ---------------------------------------------------------------------------------- 
+#>                                 Comparison Difference Lower CI Upper CI p-value
+#>     Intermediate Secondary-Basic Secondary     -0.066   -0.229    0.096   0.722
+#>         Academic Secondary-Basic Secondary     -0.037   -0.200    0.125   0.935
+#>                 University-Basic Secondary     -0.004   -0.191    0.184   1.000
+#>  Academic Secondary-Intermediate Secondary      0.029   -0.145    0.203   0.973
+#>          University-Intermediate Secondary      0.063   -0.135    0.260   0.847
+#>              University-Academic Secondary      0.034   -0.164    0.231   0.972
+#>  Sig
+#>     
+#>     
+#>     
+#>     
+#>     
+#>     
+#> ---------------------------------------------------------------------------------- 
+#> 
+#> 
+#> --- trust_science ---
+#> 
+#> Tukey Results:
+#> ---------------------------------------------------------------------------------- 
+#>                                 Comparison Difference Lower CI Upper CI p-value
+#>     Intermediate Secondary-Basic Secondary     -0.028   -0.170    0.113   0.956
+#>         Academic Secondary-Basic Secondary      0.049   -0.094    0.191   0.817
+#>                 University-Basic Secondary     -0.011   -0.174    0.153   0.998
+#>  Academic Secondary-Intermediate Secondary      0.077   -0.075    0.229   0.563
+#>          University-Intermediate Secondary      0.018   -0.154    0.190   0.993
+#>              University-Academic Secondary     -0.059   -0.232    0.114   0.815
+#>  Sig
+#>     
+#>     
+#>     
+#>     
+#>     
+#>     
+#> ---------------------------------------------------------------------------------- 
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Interpretation:
+#> - Positive differences: First group > Second group
+#> - Negative differences: First group < Second group
+#> - Confidence intervals not containing 0 indicate significant differences
+#> - p-values are adjusted for multiple comparisons (family-wise error control)
 
 # Grouped analysis
 anova_grouped <- survey_data %>%

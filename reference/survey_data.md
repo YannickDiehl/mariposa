@@ -103,6 +103,17 @@ The data includes proper variable labels and follows social survey
 conventions for coding and structure. Generated with set.seed(2024) for
 reproducibility.
 
+## See also
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for descriptive statistics of numeric variables.
+
+[`frequency`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+for categorical frequency tables.
+
+[`t_test`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+for group comparisons.
+
 ## Examples
 
 ``` r
@@ -149,8 +160,8 @@ survey_data %>% frequency(education, region, weights = sampling_weight)
 #> 
 
 # Group comparisons
-survey_data %>% 
-  group_by(region) %>% 
+survey_data %>%
+  group_by(region) %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 

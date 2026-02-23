@@ -1,9 +1,17 @@
-# Weighted Kurtosis
+# Measure Population-Representative Kurtosis
 
-Calculate weighted kurtosis for numeric variables, with support for
-grouped data and multiple variables simultaneously. Uses the SPSS Type 2
-(sample-corrected) excess kurtosis formula. Reference: Joanes & Gill
-(1998), "Comparing measures of sample skewness and kurtosis"
+`w_kurtosis()` measures how heavy the tails of your data's distribution
+are, using survey weights for population-representative results.
+Kurtosis tells you whether your data has unusually many extreme values
+(outliers) compared to a normal distribution:
+
+- **Positive (excess) kurtosis**: Heavier tails than normal (more
+  outliers)
+
+- **Negative (excess) kurtosis**: Lighter tails than normal (fewer
+  outliers)
+
+- **Near zero**: Similar tail behavior to a normal distribution
 
 ## Usage
 
@@ -15,32 +23,99 @@ w_kurtosis(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE)
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("trust")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample kurtosis.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 - excess:
 
-  Logical; if TRUE, returns excess kurtosis (default: TRUE, matching
-  SPSS)
+  Show excess kurtosis? (Default: TRUE, matching SPSS). Excess kurtosis
+  subtracts 3 so that a normal distribution has kurtosis of 0, making
+  interpretation easier.
 
 ## Value
 
-A w_kurtosis object (list) containing results and metadata, or numeric
-values in summarise context
+Population-weighted kurtosis value(s) with sample size information,
+including the weighted kurtosis, effective sample size (effective N),
+and the number of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted Kurtosis** (excess, default):
+
+  - Near 0: Tail behavior similar to a normal distribution
+
+  - Positive (\> 0): Heavier tails, more extreme values than normal
+
+  - Negative (\< 0): Lighter tails, fewer extreme values than normal
+
+  - Values beyond 2 or below -2 indicate notable departure from
+    normality
+
+- **Effective N**: How many independent observations your weighted data
+  represents.
+
+- **N**: The actual number of observations used.
+
+Kurtosis is often checked together with skewness to assess normality.
+Both should be close to zero for normally distributed data.
+
+### When to Use This
+
+Use `w_kurtosis()` when:
+
+- You need to assess whether a variable follows a normal distribution
+
+- You want to check for unusually many outliers
+
+- You are deciding whether parametric tests are appropriate
+
+- You need SPSS-compatible weighted kurtosis values
+
+### Formula
+
+Uses the SPSS Type 2 (sample-corrected) excess kurtosis formula. First,
+the population excess kurtosis (\\g_2\\) is calculated:
+
+\\g_2 = \frac{m_4}{m_2^2} - 3\\
+
+where \\m_2 = \sum w_i(x_i - \bar{x}\_w)^2 / V_1\\ and \\m_4 = \sum
+w_i(x_i - \bar{x}\_w)^4 / V_1\\ with \\V_1 = \sum w_i\\.
+
+Then, the bias-corrected (Type 2) kurtosis is:
+
+\\G_2 = \frac{(n+1) \cdot g_2 + 6}{(n-2)(n-3)} \cdot (n-1)\\
+
+where \\n = V_1\\ for weighted data.
+
+## References
+
+Joanes, D. N., & Gill, C. A. (1998). Comparing measures of sample
+skewness and kurtosis. The Statistician, 47(1), 183-189.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`w_skew`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md)
+for weighted skewness (distribution asymmetry).
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including kurtosis.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

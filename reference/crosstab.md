@@ -73,7 +73,7 @@ A cross-tabulation table showing the relationship between two variables
 
 ## Details
 
-### Understanding the Output
+### Understanding the Results
 
 The crosstab table shows:
 
@@ -122,6 +122,15 @@ Use crosstab when you want to:
 - Consider combining sparse categories if many cells are empty
 
 ## See also
+
+[`table`](https://rdrr.io/r/base/table.html) for base R contingency
+tables.
+
+[`frequency`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+for single-variable frequency tables.
+
+[`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+for testing if the cross-tabulated variables are related.
 
 Other descriptive:
 [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),

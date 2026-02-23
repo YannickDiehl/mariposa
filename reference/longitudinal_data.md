@@ -82,6 +82,14 @@ with higher dropout in later time points. The treatment effect
 demonstrates a clear Group x Time interaction suitable for repeated
 measures testing.
 
+## See also
+
+[`longitudinal_data_wide`](https://YannickDiehl.github.io/mariposa/reference/longitudinal_data_wide.md)
+for the wide format version.
+
+[`survey_data`](https://YannickDiehl.github.io/mariposa/reference/survey_data.md)
+for the cross-sectional survey dataset.
+
 ## Examples
 
 ``` r

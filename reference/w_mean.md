@@ -36,10 +36,10 @@ Population-weighted average(s) with sample size information
 
 ## Details
 
-### Why Use Weighted Means?
+### When to Use This
 
-Survey samples rarely match the population perfectly. Weights correct
-for:
+Use `w_mean()` when your survey uses sampling weights and you need
+population-representative averages. Weights correct for:
 
 - Oversampling of certain groups (weights \< 1)
 
@@ -49,7 +49,7 @@ for:
 
 - Complex survey designs
 
-### Understanding the Output
+### Understanding the Results
 
 - **Weighted Mean**: The population-representative average
 
@@ -60,9 +60,27 @@ for:
 
 ### Formula
 
-Weighted mean: \\\bar{x}\_w = \sum(w_i \cdot x_i) / \sum(w_i)\\
+\\\bar{x}\_w = \frac{\sum w_i \cdot x_i}{\sum w_i}\\
+
+The effective sample size is: \\n\_{eff} = (\sum w_i)^2 / \sum w_i^2\\
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`weighted.mean`](https://rdrr.io/r/stats/weighted.mean.html) for the
+base R weighted mean function.
+
+[`w_sd`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md) for
+weighted standard deviation.
+
+[`w_median`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
+for weighted median.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

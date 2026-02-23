@@ -83,7 +83,7 @@ A frequency table showing counts and percentages for each category
 
 ## Details
 
-### Understanding the Output
+### Understanding the Results
 
 The frequency table shows:
 
@@ -115,6 +115,18 @@ estimating population values. Always use weights for population
 inference.
 
 ## See also
+
+[`table`](https://rdrr.io/r/base/table.html) for base R frequency
+tables.
+
+[`crosstab`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+for cross-tabulation of two variables.
+
+[`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+for testing relationships between categories.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for numeric variable summaries.
 
 Other descriptive:
 [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),

@@ -76,7 +76,7 @@ A summary table with descriptive statistics for each variable
 
 ## Details
 
-### Understanding the Output
+### Understanding the Results
 
 Key statistics and what they tell you:
 
@@ -121,6 +121,22 @@ Always start here! Use `describe()` to:
 - **Small SD**: Responses are similar
 
 ## See also
+
+[`summary`](https://rdrr.io/r/base/summary.html) for base R summary
+statistics.
+
+[`frequency`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+for categorical variable summaries.
+
+[`w_mean`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md),
+[`w_sd`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md),
+[`w_median`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
+for individual weighted statistics.
+
+[`t_test`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+and
+[`oneway_anova`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+for group comparisons.
 
 Other descriptive:
 [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),

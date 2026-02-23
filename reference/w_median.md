@@ -1,7 +1,10 @@
-# Weighted Median
+# Find the Population-Representative Middle Value
 
-Calculate weighted median for numeric variables, with support for
-grouped data and multiple variables simultaneously.
+`w_median()` finds the median (middle value) of your data using survey
+weights. The weighted median is the value where half the population
+falls below and half falls above. Unlike the mean, the median is not
+pulled by extreme values, making it a robust measure of the "typical"
+value in your population.
 
 ## Usage
 
@@ -13,27 +16,85 @@ w_median(data, ..., weights = NULL, na.rm = TRUE)
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("income")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample median.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_median object (list) containing results and metadata, or numeric
-values in summarise context
+Population-weighted median(s) with sample size information, including
+the weighted median, effective sample size (effective N), and the number
+of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted Median**: The value that splits the weighted population in
+  half. 50% of the population (by weight) falls below this value, 50%
+  above.
+
+- **Effective N**: How many independent observations your weighted data
+  represents.
+
+- **N**: The actual number of observations used.
+
+Comparing the weighted median to the weighted mean is informative:
+
+- If they are similar, the distribution is roughly symmetric.
+
+- If the mean is much larger than the median, the distribution is
+  right-skewed (a few very high values pull the mean up, e.g., income).
+
+### When to Use This
+
+Use `w_median()` when:
+
+- Your data has outliers or is skewed (e.g., income, housing prices)
+
+- You want a robust "typical value" not influenced by extremes
+
+- You need the weighted 50th percentile
+
+- You need SPSS-compatible weighted median values
+
+### Formula
+
+The weighted median is calculated using cumulative weights: observations
+are sorted by value, weights are accumulated, and the median is the
+value where the cumulative weight reaches 50% of the total weight.
+Linear interpolation is used when the 50% point falls between two
+observations.
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`median`](https://rdrr.io/r/stats/median.html) for the base R median
+function.
+
+[`w_mean`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
+for weighted means.
+
+[`w_quantile`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md)
+for arbitrary weighted percentiles.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including the median.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

@@ -1,7 +1,13 @@
-# Weighted Mode (Modus)
+# Find the Most Common Value in Your Population
 
-Calculate weighted mode for variables, with support for grouped data and
-multiple variables simultaneously.
+`w_modus()` finds the mode (most frequently occurring value) of your
+data using survey weights for population-representative results. The
+mode tells you which category or value is the most common in your
+population. This is especially useful for categorical variables (e.g.,
+the most common education level, the most frequent employment status).
+
+Unlike mean and median, the mode works with both numeric and categorical
+data.
 
 ## Usage
 
@@ -13,27 +19,86 @@ w_modus(data, ..., weights = NULL, na.rm = TRUE)
 
 - data:
 
-  A data frame, or a vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The variables you want to analyze. Works best with categorical or
+  discrete numeric variables. You can list multiple variables or use
+  helpers like `starts_with("trust")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, the mode is simply the most frequent value in your
+  sample.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_modus object (list) containing results and metadata, or values in
-summarise context
+Population-weighted mode(s) with sample size information, including the
+most common value (by weighted frequency), effective sample size
+(effective N), and the number of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted Mode**: The value that occurs most frequently in the
+  weighted population. For weighted data, the mode is the value whose
+  observations have the largest total weight.
+
+- **Effective N**: How many independent observations your weighted data
+  represents.
+
+- **N**: The actual number of observations used.
+
+If multiple values share the highest weighted frequency (ties), the
+first value encountered is returned.
+
+### When to Use This
+
+Use `w_modus()` when:
+
+- You want to find the most common response (e.g., most popular
+  education level)
+
+- You are working with categorical or ordinal data
+
+- You want the "typical" value for discrete data where mean is not
+  meaningful
+
+- You need SPSS-compatible weighted mode values
+
+### Formula
+
+The weighted mode is the value \\x_k\\ that maximizes the total weight:
+
+\\\text{Mode}\_w = \arg\max\_{x_k} \sum\_{i: x_i = x_k} w_i\\
+
+In other words, sum the weights for each unique value and pick the value
+with the largest total weight.
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`w_median`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
+for the weighted middle value.
+
+[`w_mean`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
+for weighted means.
+
+[`frequency`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+for complete frequency tables of categorical variables.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including the mode.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

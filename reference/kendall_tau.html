@@ -80,18 +80,17 @@ correlations, it uses survey-weighted rank calculations.</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>A data frame or tibble containing the variables to analyze</p></dd>
+<dd><p>Your survey data (a data frame or tibble)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html" class="external-link">dplyr_tidy_select</a></code>&gt; Variables for correlation analysis.
-Supports all tidyselect helpers. If more than two variables are selected,
-a correlation matrix is computed.</p></dd>
+<dd><p>The variables you want to correlate. List two for a single
+correlation or more for a correlation matrix. You can use helpers like
+<code>starts_with("trust")</code>.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>&lt;\code{\link[dplyr]{dplyr_data_masking}}&gt; Optional sampling weights
-for weighted correlations. Should be a numeric variable with positive values.</p></dd>
+<dd><p>Optional survey weights for population-representative results.</p></dd>
 
 
 <dt id="arg-alternative">alternative<a class="anchor" aria-label="anchor" href="#arg-alternative"></a></dt>
@@ -109,56 +108,34 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>"kendall_tau"</code> containing:</p><dl><dt>correlations</dt>
-<dd><p>Data frame with tau coefficients, p-values, and z-scores</p></dd>
-
-<dt>n_obs</dt>
-<dd><p>Matrix of sample sizes for each correlation</p></dd>
-
-<dt>variables</dt>
-<dd><p>Character vector of analyzed variable names</p></dd>
-
-<dt>weights</dt>
-<dd><p>Name of the weights variable (if used)</p></dd>
-
-<dt>alternative</dt>
-<dd><p>Alternative hypothesis used</p></dd>
-
-<dt>is_grouped</dt>
-<dd><p>Logical indicating if data was grouped</p></dd>
-
-<dt>groups</dt>
-<dd><p>Grouping variables (if any)</p></dd>
-
-
-</dl></div>
+    <p>Correlation results showing rank-based relationships between variables,
+including the tau-b coefficient, p-value, z-score, and sample size for each
+pair. For multiple variables, correlation, significance, and sample size
+matrices are also provided.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 <div class="section">
-<h3 id="what-kendall-s-tau-measures">What Kendall's Tau Measures<a class="anchor" aria-label="anchor" href="#what-kendall-s-tau-measures"></a></h3>
+<h3 id="understanding-the-results">Understanding the Results<a class="anchor" aria-label="anchor" href="#understanding-the-results"></a></h3>
 
 
 <p>Kendall's tau measures how often pairs of observations are in the same order
-(concordant) versus different order (discordant). It's particularly useful for:</p><ul><li><p>Ordinal data (like rating scales: strongly disagree to strongly agree)</p></li>
-<li><p>Data with outliers (more robust than Pearson correlation)</p></li>
-<li><p>Small sample sizes</p></li>
-<li><p>Non-linear but monotonic relationships</p></li>
-</ul></div>
-
-<div class="section">
-<h3 id="interpreting-results">Interpreting Results<a class="anchor" aria-label="anchor" href="#interpreting-results"></a></h3>
-
-
+(concordant) versus different order (discordant). It is particularly useful for
+ordinal data, data with outliers, small sample sizes, and non-linear but
+monotonic relationships.</p>
 <p>The tau value ranges from -1 to +1:</p><ul><li><p><strong>Strong positive</strong> (0.5 to 1.0): High values of one variable tend to go with high values of the other</p></li>
 <li><p><strong>Moderate positive</strong> (0.3 to 0.5): Some tendency for values to increase together</p></li>
 <li><p><strong>Weak positive</strong> (0 to 0.3): Slight tendency for values to increase together</p></li>
 <li><p><strong>No correlation</strong> (near 0): No relationship between the variables</p></li>
 <li><p><strong>Negative values</strong>: As one variable increases, the other tends to decrease</p></li>
+</ul><p>The output also provides:</p><ul><li><p><strong>p-value</strong>: Probability of seeing this correlation by chance (smaller = stronger evidence)</p></li>
+<li><p><strong>n</strong>: Number of observations used</p></li>
+<li><p><strong>significance stars</strong>: Quick visual indicator of statistical significance</p></li>
 </ul></div>
 
 <div class="section">
-<h3 id="when-to-use-kendall-s-tau">When to Use Kendall's Tau<a class="anchor" aria-label="anchor" href="#when-to-use-kendall-s-tau"></a></h3>
+<h3 id="when-to-use-this">When to Use This<a class="anchor" aria-label="anchor" href="#when-to-use-this"></a></h3>
 
 
 <p>Choose Kendall's tau when:</p><ul><li><p>Your data is ordinal (ranked categories)</p></li>
@@ -167,28 +144,22 @@ for weighted correlations. Should be a numeric variable with positive values.</p
 <li><p>You want a more conservative measure than Spearman's rho</p></li>
 </ul></div>
 
-<div class="section">
-<h3 id="understanding-the-output">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output"></a></h3>
-
-
-<p>The function provides:</p><ul><li><p><strong>tau</strong>: The correlation coefficient</p></li>
-<li><p><strong>p-value</strong>: Probability of seeing this correlation by chance (smaller = stronger evidence)</p></li>
-<li><p><strong>n</strong>: Number of observations used</p></li>
-<li><p><strong>significance stars</strong>: Quick visual indicator of statistical significance</p></li>
-</ul></div>
-
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Kendall, M.G. (1938). A new measure of rank correlation. Biometrika, 30(1/2), 81-93.</p>
-<p>Kendall, M.G. (1945). The treatment of ties in ranking problems. Biometrika, 33(3), 239-251.</p>
-<p>Agresti, A. (2010). Analysis of Ordinal Categorical Data (2nd ed.). John Wiley &amp; Sons.</p>
+    <p>Kendall, M. G. (1938). A new measure of rank correlation.
+<em>Biometrika</em>, 30(1/2), 81–93.</p>
+<p>Kendall, M. G. (1945). The treatment of ties in ranking problems.
+<em>Biometrika</em>, 33(3), 239–251.</p>
+<p>Agresti, A. (2010). <em>Analysis of Ordinal Categorical Data</em> (2nd ed.).
+John Wiley &amp; Sons.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> with method="kendall" for base R implementation
-<code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> with method="kendall" for significance testing
-<code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis</p>
+    <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> with <code>method = "kendall"</code> for the base R
+implementation.</p>
+<p><code><a href="spearman_rho.html">spearman_rho</a></code> for Spearman's rank correlation.</p>
+<p><code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis.</p>
 <p>Other correlation:
 <code><a href="pearson_cor.html">pearson_cor()</a></code>,
 <code><a href="spearman_rho.html">spearman_rho()</a></code></p></div>

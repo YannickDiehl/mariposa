@@ -1,7 +1,10 @@
-# Weighted Quantiles
+# Calculate Population-Representative Percentiles
 
-Calculate weighted quantiles for numeric variables, with support for
-grouped data and multiple variables simultaneously.
+`w_quantile()` calculates percentiles (quantiles) using survey weights
+for population-representative results. Percentiles divide your data into
+equal portions – for example, the 25th percentile is the value below
+which 25% of your population falls. This is essential for understanding
+the distribution of variables like income, age, or satisfaction scores.
 
 ## Usage
 
@@ -19,31 +22,97 @@ w_quantile(
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("income")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample quantiles.
 
 - probs:
 
-  Numeric vector of probabilities (default: c(0, 0.25, 0.5, 0.75, 1))
+  Which percentiles to calculate, as proportions between 0 and 1.
+  Default: `c(0, 0.25, 0.5, 0.75, 1)` for the minimum, 25th percentile,
+  median, 75th percentile, and maximum. Use `c(0.1, 0.5, 0.9)` for
+  deciles, or `c(0.25, 0.5, 0.75)` for quartiles only.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_quantile object (list) containing results and metadata, or numeric
-values in summarise context
+Population-weighted quantile(s) with sample size information, including
+the weighted percentile values, effective sample size (effective N), and
+the number of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Percentile values**: The data values at each requested percentile in
+  the weighted population. For example, if the weighted 25th percentile
+  of income is 35,000, then 25% of the population earns less than that.
+
+- **Effective N**: How many independent observations your weighted data
+  represents.
+
+- **N**: The actual number of observations used.
+
+Common percentiles and their meaning:
+
+- **0% (minimum)**: The smallest observed value
+
+- **25% (Q1)**: One quarter of the population falls below this value
+
+- **50% (median)**: Half the population falls below this value
+
+- **75% (Q3)**: Three quarters of the population falls below this value
+
+- **100% (maximum)**: The largest observed value
+
+### When to Use This
+
+Use `w_quantile()` when:
+
+- You want to know at what values the population splits into groups
+
+- You need to construct population-representative income brackets or age
+  groups
+
+- You want to identify the median or quartiles with proper weighting
+
+- You need SPSS-compatible weighted percentile values
+
+### Formula
+
+Weighted quantiles are calculated using cumulative weights. Observations
+are sorted by value, weights are accumulated, and the requested
+percentile is found by linear interpolation at the point where the
+cumulative weight proportion reaches the target probability.
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`quantile`](https://rdrr.io/r/stats/quantile.html) for the base R
+quantile function.
+
+[`w_median`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
+for the weighted median (50th percentile).
+
+[`w_iqr`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md)
+for the weighted interquartile range (Q3 - Q1).
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including quantiles.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

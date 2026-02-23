@@ -1,9 +1,10 @@
-# Weighted Standard Error
+# Calculate Population-Representative Standard Errors
 
-Calculate weighted standard error for numeric variables, with support
-for grouped data and multiple variables simultaneously. Formula: \\SE_w
-= s_w / \sqrt{V_1}\\ where \\s_w\\ is the weighted SD and \\V_1 = \sum
-w_i\\.
+`w_se()` calculates the standard error of the mean using survey weights.
+The standard error tells you how precisely you have estimated the
+population mean – a smaller SE means your estimate is more precise. This
+is essential for constructing confidence intervals and assessing the
+reliability of your weighted mean estimates.
 
 ## Usage
 
@@ -15,27 +16,80 @@ w_se(data, ..., weights = NULL, na.rm = TRUE)
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("trust")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample standard error.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_se object (list) containing results and metadata, or numeric values
-in summarise context
+Population-weighted standard error(s) with sample size information,
+including the weighted SE, effective sample size (effective N), and the
+number of valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted SE**: The precision of your weighted mean estimate. Smaller
+  values mean more precise estimates. You can build a 95% confidence
+  interval as: weighted mean +/- 1.96 \* weighted SE.
+
+- **Effective N**: How many independent observations your weighted data
+  represents. Weights that vary a lot reduce effective N, increasing the
+  SE.
+
+- **N**: The actual number of observations used.
+
+### When to Use This
+
+Use `w_se()` when:
+
+- You need to report precision of mean estimates
+
+- You want to construct confidence intervals for weighted means
+
+- You need to compare precision across subgroups
+
+- You need SPSS-compatible weighted standard errors
+
+### Formula
+
+The weighted standard error is calculated as:
+
+\\SE_w = \frac{s_w}{\sqrt{V_1}}\\
+
+where \\s_w\\ is the weighted standard deviation (see
+[`w_sd`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md)) and
+\\V_1 = \sum w_i\\ is the sum of all weights.
+
+For the unweighted case: \\SE = s / \sqrt{n}\\
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`w_sd`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md) for
+weighted standard deviation.
+
+[`w_mean`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
+for weighted means.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including SE.
 
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),

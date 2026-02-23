@@ -26,20 +26,17 @@ kendall_tau(
 
 - data:
 
-  A data frame or tibble containing the variables to analyze
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  \<[`dplyr_tidy_select`](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html)\>
-  Variables for correlation analysis. Supports all tidyselect helpers.
-  If more than two variables are selected, a correlation matrix is
-  computed.
+  The variables you want to correlate. List two for a single correlation
+  or more for a correlation matrix. You can use helpers like
+  `starts_with("trust")`.
 
 - weights:
 
-  \<\code{\link\[dplyr\]{dplyr_data_masking}}\> Optional sampling
-  weights for weighted correlations. Should be a numeric variable with
-  positive values.
+  Optional survey weights for population-representative results.
 
 - alternative:
 
@@ -63,53 +60,19 @@ kendall_tau(
 
 ## Value
 
-An object of class `"kendall_tau"` containing:
-
-- correlations:
-
-  Data frame with tau coefficients, p-values, and z-scores
-
-- n_obs:
-
-  Matrix of sample sizes for each correlation
-
-- variables:
-
-  Character vector of analyzed variable names
-
-- weights:
-
-  Name of the weights variable (if used)
-
-- alternative:
-
-  Alternative hypothesis used
-
-- is_grouped:
-
-  Logical indicating if data was grouped
-
-- groups:
-
-  Grouping variables (if any)
+Correlation results showing rank-based relationships between variables,
+including the tau-b coefficient, p-value, z-score, and sample size for
+each pair. For multiple variables, correlation, significance, and sample
+size matrices are also provided.
 
 ## Details
 
-### What Kendall's Tau Measures
+### Understanding the Results
 
 Kendall's tau measures how often pairs of observations are in the same
-order (concordant) versus different order (discordant). It's
-particularly useful for:
-
-- Ordinal data (like rating scales: strongly disagree to strongly agree)
-
-- Data with outliers (more robust than Pearson correlation)
-
-- Small sample sizes
-
-- Non-linear but monotonic relationships
-
-### Interpreting Results
+order (concordant) versus different order (discordant). It is
+particularly useful for ordinal data, data with outliers, small sample
+sizes, and non-linear but monotonic relationships.
 
 The tau value ranges from -1 to +1:
 
@@ -127,7 +90,17 @@ The tau value ranges from -1 to +1:
 - **Negative values**: As one variable increases, the other tends to
   decrease
 
-### When to Use Kendall's Tau
+The output also provides:
+
+- **p-value**: Probability of seeing this correlation by chance (smaller
+  = stronger evidence)
+
+- **n**: Number of observations used
+
+- **significance stars**: Quick visual indicator of statistical
+  significance
+
+### When to Use This
 
 Choose Kendall's tau when:
 
@@ -139,38 +112,27 @@ Choose Kendall's tau when:
 
 - You want a more conservative measure than Spearman's rho
 
-### Understanding the Output
-
-The function provides:
-
-- **tau**: The correlation coefficient
-
-- **p-value**: Probability of seeing this correlation by chance (smaller
-  = stronger evidence)
-
-- **n**: Number of observations used
-
-- **significance stars**: Quick visual indicator of statistical
-  significance
-
 ## References
 
-Kendall, M.G. (1938). A new measure of rank correlation. Biometrika,
-30(1/2), 81-93.
+Kendall, M. G. (1938). A new measure of rank correlation. *Biometrika*,
+30(1/2), 81–93.
 
-Kendall, M.G. (1945). The treatment of ties in ranking problems.
-Biometrika, 33(3), 239-251.
+Kendall, M. G. (1945). The treatment of ties in ranking problems.
+*Biometrika*, 33(3), 239–251.
 
-Agresti, A. (2010). Analysis of Ordinal Categorical Data (2nd ed.). John
-Wiley & Sons.
+Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd ed.).
+John Wiley & Sons.
 
 ## See also
 
-[`cor`](https://rdrr.io/r/stats/cor.html) with method="kendall" for base
-R implementation [`cor.test`](https://rdrr.io/r/stats/cor.test.html)
-with method="kendall" for significance testing
+[`cor`](https://rdrr.io/r/stats/cor.html) with `method = "kendall"` for
+the base R implementation.
+
+[`spearman_rho`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md)
+for Spearman's rank correlation.
+
 [`pearson_cor`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
-for Pearson correlation analysis
+for Pearson correlation analysis.
 
 Other correlation:
 [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md),

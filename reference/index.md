@@ -56,25 +56,25 @@ Individual weighted statistics for survey data
 - [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md)
   : Calculate Population-Representative Averages
 - [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md)
-  : Weighted Median
+  : Find the Population-Representative Middle Value
 - [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md)
-  : Weighted Standard Deviation
+  : Calculate Population-Representative Standard Deviations
 - [`w_var()`](https://YannickDiehl.github.io/mariposa/reference/w_var.md)
-  : Weighted Variance
+  : Calculate Population-Representative Variance
 - [`w_se()`](https://YannickDiehl.github.io/mariposa/reference/w_se.md)
-  : Weighted Standard Error
+  : Calculate Population-Representative Standard Errors
 - [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md)
-  : Weighted Interquartile Range (IQR)
+  : Measure Population-Representative Spread (IQR)
 - [`w_range()`](https://YannickDiehl.github.io/mariposa/reference/w_range.md)
-  : Weighted Range
+  : Find the Range of Your Data
 - [`w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md)
-  : Weighted Quantiles
+  : Calculate Population-Representative Percentiles
 - [`w_modus()`](https://YannickDiehl.github.io/mariposa/reference/w_modus.md)
-  : Weighted Mode (Modus)
+  : Find the Most Common Value in Your Population
 - [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md)
-  : Weighted Skewness
+  : Measure Population-Representative Skewness
 - [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md)
-  : Weighted Kurtosis
+  : Measure Population-Representative Kurtosis
 
 ## Datasets
 

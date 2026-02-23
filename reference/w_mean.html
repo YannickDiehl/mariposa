@@ -90,17 +90,18 @@ Without weights, you get the simple sample average.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 <div class="section">
-<h3 id="why-use-weighted-means-">Why Use Weighted Means?<a class="anchor" aria-label="anchor" href="#why-use-weighted-means-"></a></h3>
+<h3 id="when-to-use-this">When to Use This<a class="anchor" aria-label="anchor" href="#when-to-use-this"></a></h3>
 
 
-<p>Survey samples rarely match the population perfectly. Weights correct for:</p><ul><li><p>Oversampling of certain groups (weights &lt; 1)</p></li>
+<p>Use <code>w_mean()</code> when your survey uses sampling weights and you need
+population-representative averages. Weights correct for:</p><ul><li><p>Oversampling of certain groups (weights &lt; 1)</p></li>
 <li><p>Undersampling of other groups (weights &gt; 1)</p></li>
 <li><p>Non-response patterns</p></li>
 <li><p>Complex survey designs</p></li>
 </ul></div>
 
 <div class="section">
-<h3 id="understanding-the-output">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output"></a></h3>
+<h3 id="understanding-the-results">Understanding the Results<a class="anchor" aria-label="anchor" href="#understanding-the-results"></a></h3>
 
 <ul><li><p><strong>Weighted Mean</strong>: The population-representative average</p></li>
 <li><p><strong>Effective N</strong>: How many independent observations your weighted data represents</p></li>
@@ -111,13 +112,22 @@ Without weights, you get the simple sample average.</p></dd>
 <h3 id="formula">Formula<a class="anchor" aria-label="anchor" href="#formula"></a></h3>
 
 
-<p>Weighted mean: \(\bar{x}_w = \sum(w_i \cdot x_i) / \sum(w_i)\)</p>
+<p>\(\bar{x}_w = \frac{\sum w_i \cdot x_i}{\sum w_i}\)</p>
+<p>The effective sample size is: \(n_{eff} = (\sum w_i)^2 / \sum w_i^2\)</p>
 </div>
 
     </div>
     <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other weighted_statistics:
+    <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/weighted.mean.html" class="external-link">weighted.mean</a></code> for the base R weighted mean function.</p>
+<p><code><a href="w_sd.html">w_sd</a></code> for weighted standard deviation.</p>
+<p><code><a href="w_median.html">w_median</a></code> for weighted median.</p>
+<p><code><a href="describe.html">describe</a></code> for comprehensive descriptive statistics.</p>
+<p>Other weighted_statistics:
 <code><a href="w_iqr.html">w_iqr()</a></code>,
 <code><a href="w_kurtosis.html">w_kurtosis()</a></code>,
 <code><a href="w_median.html">w_median()</a></code>,

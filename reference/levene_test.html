@@ -114,6 +114,10 @@ out in similar ways.</p>
 <dd><p>How to measure center: <code>"mean"</code> (default) or <code>"median"</code> (more robust)</p></dd>
 
 
+<dt id="arg-variable">variable<a class="anchor" aria-label="anchor" href="#arg-variable"></a></dt>
+<dd><p>Variable to test (when using grouped data frame)</p></dd>
+
+
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>Your survey data (when x is not a test result)</p></dd>
 
@@ -178,8 +182,21 @@ out in similar ways.</p>
 
     </div>
     <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Levene, H. (1960). Robust tests for equality of variances. In I. Olkin
+(Ed.), <em>Contributions to Probability and Statistics</em> (pp. 278–292).
+Stanford University Press.</p>
+<p>Brown, M. B., &amp; Forsythe, A. B. (1974). Robust tests for the equality of
+variances. <em>Journal of the American Statistical Association</em>, 69(346),
+364–367.</p>
+<p>IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other posthoc:
+    <div class="dont-index"><p><code><a href="oneway_anova.html">oneway_anova</a></code> for one-way ANOVA (which assumes equal variances).</p>
+<p><code><a href="t_test.html">t_test</a></code> for group mean comparisons.</p>
+<p><code><a href="https://rdrr.io/r/stats/var.test.html" class="external-link">var.test</a></code> for the base R F-test of variance equality.</p>
+<p>Other posthoc:
 <code><a href="scheffe_test.html">scheffe_test()</a></code>,
 <code><a href="tukey_test.html">tukey_test()</a></code></p></div>
     </div>

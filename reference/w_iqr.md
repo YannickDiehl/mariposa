@@ -1,7 +1,10 @@
-# Weighted Interquartile Range (IQR)
+# Measure Population-Representative Spread (IQR)
 
-Calculate weighted interquartile range (Q3 - Q1) for numeric variables,
-with support for grouped data and multiple variables simultaneously.
+`w_iqr()` calculates the interquartile range using survey weights. The
+IQR is the distance between the 25th and 75th percentiles – it tells you
+the range that contains the middle 50% of your population. Unlike the
+standard deviation, the IQR is not affected by outliers, making it a
+robust measure of spread.
 
 ## Usage
 
@@ -13,27 +16,84 @@ w_iqr(data, ..., weights = NULL, na.rm = TRUE)
 
 - data:
 
-  A data frame, or a numeric vector when used in summarise() context
+  Your survey data (a data frame or tibble)
 
 - ...:
 
-  Variable names (unquoted) or tidyselect expressions
+  The numeric variables you want to analyze. You can list multiple
+  variables or use helpers like `starts_with("income")`
 
 - weights:
 
-  Name of the weights variable (unquoted), or a numeric vector of
-  weights
+  Survey weights to make results representative of your population.
+  Without weights, you get the simple sample IQR.
 
 - na.rm:
 
-  Logical; if TRUE, missing values are removed (default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 ## Value
 
-A w_iqr object (list) containing results and metadata, or numeric values
-in summarise context
+Population-weighted IQR(s) with sample size information, including the
+weighted IQR, effective sample size (effective N), and the number of
+valid observations used.
+
+## Details
+
+### Understanding the Results
+
+- **Weighted IQR**: The range that covers the middle 50% of the weighted
+  population. A larger IQR means more spread in the central part of the
+  data.
+
+- **Effective N**: How many independent observations your weighted data
+  represents.
+
+- **N**: The actual number of observations used.
+
+The IQR is especially useful when your data is skewed. For example, with
+income data, the IQR gives a better sense of "typical spread" than the
+SD because extreme incomes do not distort it.
+
+### When to Use This
+
+Use `w_iqr()` when:
+
+- Your data has outliers or is skewed (e.g., income, response times)
+
+- You want a robust measure of spread that is not influenced by extremes
+
+- You need to describe the spread of the middle 50% of your population
+
+- You need SPSS-compatible weighted IQR values
+
+### Formula
+
+\\IQR_w = Q\_{3,w} - Q\_{1,w}\\
+
+where \\Q\_{1,w}\\ and \\Q\_{3,w}\\ are the weighted 25th and 75th
+percentiles, calculated using cumulative weights (see
+[`w_quantile`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md)).
+
+## References
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 ## See also
+
+[`IQR`](https://rdrr.io/r/stats/IQR.html) for the base R IQR function.
+
+[`w_quantile`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md)
+for arbitrary weighted percentiles.
+
+[`w_sd`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md) for
+weighted standard deviation (another spread measure).
+
+[`w_range`](https://YannickDiehl.github.io/mariposa/reference/w_range.md)
+for the full weighted range.
+
+[`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+for comprehensive descriptive statistics including IQR.
 
 Other weighted_statistics:
 [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md),

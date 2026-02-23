@@ -113,7 +113,28 @@ Use chi-squared test when:
 
 - Consider using crosstab() for detailed percentage breakdowns
 
+## References
+
+Pearson, K. (1900). On the criterion that a given system of deviations
+from the probable in the case of a correlated system of variables is
+such that it can be reasonably supposed to have arisen from random
+sampling. *Philosophical Magazine*, 50(302), 157–175.
+
+Cramer, H. (1946). *Mathematical Methods of Statistics*. Princeton
+University Press.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+
 ## See also
+
+[`chisq.test`](https://rdrr.io/r/stats/chisq.test.html) for the base R
+chi-squared test.
+
+[`crosstab`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+for detailed cross-tabulation tables.
+
+[`frequency`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+for single-variable frequency tables.
 
 Other hypothesis_tests:
 [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),

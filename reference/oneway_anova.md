@@ -151,21 +151,6 @@ If ANOVA is significant:
 
 - Welch's robust test for equality of means
 
-### Interpretation Guidelines
-
-- **p-values**: p \< 0.05 indicates significant group differences at
-  alpha = 0.05
-
-- **Effect sizes**: eta-squared ~ 0.01 (small), eta-squared ~ 0.06
-  (medium), eta-squared ~ 0.14 (large)
-
-- **Eta-squared**: Proportion of variance explained (tends to
-  overestimate)
-
-- **Epsilon-squared**: Less biased than eta-squared
-
-- **Omega-squared**: Unbiased estimate (preferred for publication)
-
 ## References
 
 Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences

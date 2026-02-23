@@ -113,7 +113,7 @@ correlation or more for a correlation matrix.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 <div class="section">
-<h3 id="understanding-correlation-values">Understanding Correlation Values<a class="anchor" aria-label="anchor" href="#understanding-correlation-values"></a></h3>
+<h3 id="understanding-the-results">Understanding the Results<a class="anchor" aria-label="anchor" href="#understanding-the-results"></a></h3>
 
 
 <p><strong>Correlation coefficient (r)</strong> ranges from -1 to +1:</p><ul><li><p><strong>+1</strong>: Perfect positive relationship (as one goes up, the other always goes up)</p></li>
@@ -128,31 +128,25 @@ correlation or more for a correlation matrix.</p></dd>
 </ul><p><strong>P-value interpretation</strong>:</p><ul><li><p>p &lt; 0.001: Very strong evidence of a relationship</p></li>
 <li><p>p &lt; 0.01: Strong evidence of a relationship</p></li>
 <li><p>p &lt; 0.05: Moderate evidence of a relationship</p></li>
-<li><p>p ≥ 0.05: No significant relationship found</p></li>
+<li><p>p &gt;= 0.05: No significant relationship found</p></li>
+</ul><p>A correlation of 0.65 with p &lt; 0.001 means:</p><ul><li><p>Strong positive relationship (r = 0.65)</p></li>
+<li><p>As one variable increases, the other tends to increase</p></li>
+<li><p>Very unlikely to be due to chance (p &lt; 0.001)</p></li>
+<li><p>About 42% of variation is shared (r-squared = 0.65 squared = 0.42)</p></li>
 </ul></div>
 
 <div class="section">
-<h3 id="when-to-use-pearson-correlation">When to Use Pearson Correlation<a class="anchor" aria-label="anchor" href="#when-to-use-pearson-correlation"></a></h3>
+<h3 id="when-to-use-this">When to Use This<a class="anchor" aria-label="anchor" href="#when-to-use-this"></a></h3>
 
 
-<p>Use this when:</p><ul><li><p>Both variables are numeric and continuous</p></li>
+<p>Use Pearson correlation when:</p><ul><li><p>Both variables are numeric and continuous</p></li>
 <li><p>You expect a linear relationship</p></li>
 <li><p>Data is roughly normally distributed</p></li>
 <li><p>You want to measure strength of linear association</p></li>
 </ul><p>Don't use when:</p><ul><li><p>Data has extreme outliers (consider Spearman instead)</p></li>
 <li><p>Relationship is curved/non-linear</p></li>
 <li><p>Variables are categorical (use chi-squared test)</p></li>
-<li><p>You need to establish causation (correlation ≠ causation!)</p></li>
-</ul></div>
-
-<div class="section">
-<h3 id="reading-the-results">Reading the Results<a class="anchor" aria-label="anchor" href="#reading-the-results"></a></h3>
-
-
-<p>A correlation of 0.65 with p &lt; 0.001 means:</p><ul><li><p>Strong positive relationship (r = 0.65)</p></li>
-<li><p>As one variable increases, the other tends to increase</p></li>
-<li><p>Very unlikely to be due to chance (p &lt; 0.001)</p></li>
-<li><p>About 42% of variation is shared (r² = 0.65² = 0.42)</p></li>
+<li><p>You need to establish causation (correlation does not imply causation)</p></li>
 </ul></div>
 
 <div class="section">
@@ -168,15 +162,18 @@ correlation or more for a correlation matrix.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.).
-Lawrence Erlbaum Associates.</p>
-<p>Fisher, R.A. (1915). Frequency distribution of the values of the correlation coefficient
-in samples from an indefinitely large population. Biometrika, 10(4), 507-521.</p>
+    <p>Cohen, J. (1988). <em>Statistical Power Analysis for the Behavioral
+Sciences</em> (2nd ed.). Lawrence Erlbaum Associates.</p>
+<p>Fisher, R. A. (1915). Frequency distribution of the values of the
+correlation coefficient in samples from an indefinitely large population.
+<em>Biometrika</em>, 10(4), 507–521.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> for the base R correlation function
-<code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> for correlation significance testing</p>
+    <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code> for the base R correlation function.</p>
+<p><code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> for correlation significance testing.</p>
+<p><code><a href="spearman_rho.html">spearman_rho</a></code> for rank-based correlation (robust to outliers).</p>
+<p><code><a href="kendall_tau.html">kendall_tau</a></code> for ordinal correlation.</p>
 <p>Other correlation:
 <code><a href="kendall_tau.html">kendall_tau()</a></code>,
 <code><a href="spearman_rho.html">spearman_rho()</a></code></p></div>

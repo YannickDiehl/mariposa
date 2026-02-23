@@ -63,7 +63,7 @@ Correlation results showing relationships between variables, including:
 
 ## Details
 
-### Understanding Correlation Values
+### Understanding the Results
 
 **Correlation coefficient (r)** ranges from -1 to +1:
 
@@ -97,11 +97,21 @@ Correlation results showing relationships between variables, including:
 
 - p \< 0.05: Moderate evidence of a relationship
 
-- p ≥ 0.05: No significant relationship found
+- p \>= 0.05: No significant relationship found
 
-### When to Use Pearson Correlation
+A correlation of 0.65 with p \< 0.001 means:
 
-Use this when:
+- Strong positive relationship (r = 0.65)
+
+- As one variable increases, the other tends to increase
+
+- Very unlikely to be due to chance (p \< 0.001)
+
+- About 42% of variation is shared (r-squared = 0.65 squared = 0.42)
+
+### When to Use This
+
+Use Pearson correlation when:
 
 - Both variables are numeric and continuous
 
@@ -119,19 +129,7 @@ Don't use when:
 
 - Variables are categorical (use chi-squared test)
 
-- You need to establish causation (correlation ≠ causation!)
-
-### Reading the Results
-
-A correlation of 0.65 with p \< 0.001 means:
-
-- Strong positive relationship (r = 0.65)
-
-- As one variable increases, the other tends to increase
-
-- Very unlikely to be due to chance (p \< 0.001)
-
-- About 42% of variation is shared (r² = 0.65² = 0.42)
+- You need to establish causation (correlation does not imply causation)
 
 ### Tips for Success
 
@@ -148,18 +146,26 @@ A correlation of 0.65 with p \< 0.001 means:
 
 ## References
 
-Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences
-(2nd ed.). Lawrence Erlbaum Associates.
+Cohen, J. (1988). *Statistical Power Analysis for the Behavioral
+Sciences* (2nd ed.). Lawrence Erlbaum Associates.
 
-Fisher, R.A. (1915). Frequency distribution of the values of the
+Fisher, R. A. (1915). Frequency distribution of the values of the
 correlation coefficient in samples from an indefinitely large
-population. Biometrika, 10(4), 507-521.
+population. *Biometrika*, 10(4), 507–521.
 
 ## See also
 
 [`cor`](https://rdrr.io/r/stats/cor.html) for the base R correlation
-function [`cor.test`](https://rdrr.io/r/stats/cor.test.html) for
-correlation significance testing
+function.
+
+[`cor.test`](https://rdrr.io/r/stats/cor.test.html) for correlation
+significance testing.
+
+[`spearman_rho`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md)
+for rank-based correlation (robust to outliers).
+
+[`kendall_tau`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
+for ordinal correlation.
 
 Other correlation:
 [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md),

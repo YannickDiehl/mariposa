@@ -270,12 +270,64 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">anova_multi</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_companies</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in oneway_anova(., trust_government, trust_companies, group = education):</span> Can't select columns that don't exist.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">✖</span> Column `trust_companies` doesn't exist.</span>
+<span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_science</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_multi</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'anova_multi' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Family-wise error rate controlled using Tukey HSD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_government ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary     -0.066   -0.229    0.096   0.722</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary     -0.037   -0.200    0.125   0.935</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary     -0.004   -0.191    0.184   1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.029   -0.145    0.203   0.973</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.063   -0.135    0.260   0.847</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary      0.034   -0.164    0.231   0.972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_science ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary     -0.028   -0.170    0.113   0.956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary      0.049   -0.094    0.191   0.817</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary     -0.011   -0.174    0.153   0.998</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.077   -0.075    0.229   0.563</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.018   -0.154    0.190   0.993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary     -0.059   -0.232    0.114   0.815</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">anova_grouped</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
