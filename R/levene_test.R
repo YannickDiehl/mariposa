@@ -13,6 +13,7 @@
 #'
 #' @param x Either your data or test results from \code{t_test()} or \code{oneway_anova()}
 #' @param ... Variables to test (when using data frame)
+#' @param variable Variable to test (when using grouped data frame)
 #' @param data Your survey data (when x is not a test result)
 #' @param group The grouping variable for comparison
 #' @param weights Optional survey weights for population-representative results
@@ -91,6 +92,24 @@
 #' 
 #' # Using mean instead of median as center
 #' survey_data %>% levene_test(income, group = region, center = "mean")
+#'
+#' @seealso
+#' \code{\link{oneway_anova}} for one-way ANOVA (which assumes equal variances).
+#'
+#' \code{\link{t_test}} for group mean comparisons.
+#'
+#' \code{\link[stats]{var.test}} for the base R F-test of variance equality.
+#'
+#' @references
+#' Levene, H. (1960). Robust tests for equality of variances. In I. Olkin
+#' (Ed.), \emph{Contributions to Probability and Statistics} (pp. 278--292).
+#' Stanford University Press.
+#'
+#' Brown, M. B., & Forsythe, A. B. (1974). Robust tests for the equality of
+#' variances. \emph{Journal of the American Statistical Association}, 69(346),
+#' 364--367.
+#'
+#' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'
 #' @family posthoc
 #' @export

@@ -2,25 +2,68 @@
 % Please edit documentation in R/w_median.R
 \name{w_median}
 \alias{w_median}
-\title{Weighted Median}
+\title{Find the Population-Representative Middle Value}
 \usage{
 w_median(data, ..., weights = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{data}{A data frame, or a numeric vector when used in summarise() context}
+\item{data}{Your survey data (a data frame or tibble)}
 
-\item{...}{Variable names (unquoted) or tidyselect expressions}
+\item{...}{The numeric variables you want to analyze. You can list multiple
+variables or use helpers like \code{starts_with("income")}}
 
-\item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
+\item{weights}{Survey weights to make results representative of your population.
+Without weights, you get the simple sample median.}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed (default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
 }
 \value{
-A w_median object (list) containing results and metadata, or numeric values in summarise context
+Population-weighted median(s) with sample size information,
+including the weighted median, effective sample size (effective N), and the
+number of valid observations used.
 }
 \description{
-Calculate weighted median for numeric variables, with support for
-grouped data and multiple variables simultaneously.
+\code{w_median()} finds the median (middle value) of your data using survey
+weights. The weighted median is the value where half the population falls below
+and half falls above. Unlike the mean, the median is not pulled by extreme
+values, making it a robust measure of the "typical" value in your population.
+}
+\details{
+\subsection{Understanding the Results}{
+\itemize{
+\item \strong{Weighted Median}: The value that splits the weighted population in half.
+50\% of the population (by weight) falls below this value, 50\% above.
+\item \strong{Effective N}: How many independent observations your weighted data
+represents.
+\item \strong{N}: The actual number of observations used.
+}
+
+Comparing the weighted median to the weighted mean is informative:
+\itemize{
+\item If they are similar, the distribution is roughly symmetric.
+\item If the mean is much larger than the median, the distribution is
+right-skewed (a few very high values pull the mean up, e.g., income).
+}
+}
+
+\subsection{When to Use This}{
+
+Use \code{w_median()} when:
+\itemize{
+\item Your data has outliers or is skewed (e.g., income, housing prices)
+\item You want a robust "typical value" not influenced by extremes
+\item You need the weighted 50th percentile
+\item You need SPSS-compatible weighted median values
+}
+}
+
+\subsection{Formula}{
+
+The weighted median is calculated using cumulative weights: observations are
+sorted by value, weights are accumulated, and the median is the value where
+the cumulative weight reaches 50\% of the total weight. Linear interpolation
+is used when the 50\% point falls between two observations.
+}
 }
 \examples{
 # Load required packages and data
@@ -43,7 +86,18 @@ survey_data \%>\% summarise(med_age = w_median(age, weights = sampling_weight))
 survey_data \%>\% w_median(age)
 
 }
+\references{
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link[stats]{median}} for the base R median function.
+
+\code{\link{w_mean}} for weighted means.
+
+\code{\link{w_quantile}} for arbitrary weighted percentiles.
+
+\code{\link{describe}} for comprehensive descriptive statistics including the median.
+
 Other weighted_statistics: 
 \code{\link{w_iqr}()},
 \code{\link{w_kurtosis}()},

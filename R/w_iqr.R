@@ -1,14 +1,49 @@
-#' Weighted Interquartile Range (IQR)
+#' Measure Population-Representative Spread (IQR)
 #'
-#' Calculate weighted interquartile range (Q3 - Q1) for numeric variables,
-#' with support for grouped data and multiple variables simultaneously.
+#' @description
+#' \code{w_iqr()} calculates the interquartile range using survey weights. The IQR
+#' is the distance between the 25th and 75th percentiles -- it tells you the range
+#' that contains the middle 50% of your population. Unlike the standard deviation,
+#' the IQR is not affected by outliers, making it a robust measure of spread.
 #'
-#' @param data A data frame, or a numeric vector when used in summarise() context
-#' @param ... Variable names (unquoted) or tidyselect expressions
-#' @param weights Name of the weights variable (unquoted), or a numeric vector of weights
-#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to analyze. You can list multiple
+#'   variables or use helpers like \code{starts_with("income")}
+#' @param weights Survey weights to make results representative of your population.
+#'   Without weights, you get the simple sample IQR.
+#' @param na.rm Remove missing values before calculating? (Default: TRUE)
 #'
-#' @return A w_iqr object (list) containing results and metadata, or numeric values in summarise context
+#' @return Population-weighted IQR(s) with sample size information,
+#'   including the weighted IQR, effective sample size (effective N), and the
+#'   number of valid observations used.
+#'
+#' @details
+#' ## Understanding the Results
+#'
+#' - **Weighted IQR**: The range that covers the middle 50% of the weighted
+#'   population. A larger IQR means more spread in the central part of the data.
+#' - **Effective N**: How many independent observations your weighted data
+#'   represents.
+#' - **N**: The actual number of observations used.
+#'
+#' The IQR is especially useful when your data is skewed. For example, with
+#' income data, the IQR gives a better sense of "typical spread" than the SD
+#' because extreme incomes do not distort it.
+#'
+#' ## When to Use This
+#'
+#' Use \code{w_iqr()} when:
+#' - Your data has outliers or is skewed (e.g., income, response times)
+#' - You want a robust measure of spread that is not influenced by extremes
+#' - You need to describe the spread of the middle 50% of your population
+#' - You need SPSS-compatible weighted IQR values
+#'
+#' ## Formula
+#'
+#' \eqn{IQR_w = Q_{3,w} - Q_{1,w}}
+#'
+#' where \eqn{Q_{1,w}} and \eqn{Q_{3,w}} are the weighted 25th and 75th
+#' percentiles, calculated using cumulative weights (see \code{\link{w_quantile}}).
 #'
 #' @examples
 #' # Load required packages and data
@@ -29,6 +64,20 @@
 #'
 #' # Unweighted (for comparison)
 #' survey_data %>% w_iqr(age)
+#'
+#' @seealso
+#' \code{\link[stats]{IQR}} for the base R IQR function.
+#'
+#' \code{\link{w_quantile}} for arbitrary weighted percentiles.
+#'
+#' \code{\link{w_sd}} for weighted standard deviation (another spread measure).
+#'
+#' \code{\link{w_range}} for the full weighted range.
+#'
+#' \code{\link{describe}} for comprehensive descriptive statistics including IQR.
+#'
+#' @references
+#' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'
 #' @family weighted_statistics
 #' @export

@@ -40,20 +40,27 @@
 #' @source Generated synthetically using realistic demographic and 
 #'   attitudinal patterns. No real survey data was used.
 #'
+#' @seealso
+#' \code{\link{describe}} for descriptive statistics of numeric variables.
+#'
+#' \code{\link{frequency}} for categorical frequency tables.
+#'
+#' \code{\link{t_test}} for group comparisons.
+#'
 #' @examples
 #' # Load required packages and data
 #' library(dplyr)
 #' data(survey_data)
-#' 
+#'
 #' # Basic descriptive statistics
 #' survey_data %>% describe(age, income, weights = sampling_weight)
-#' 
+#'
 #' # Frequency analysis
 #' survey_data %>% frequency(education, region, weights = sampling_weight)
-#' 
+#'
 #' # Group comparisons
-#' survey_data %>% 
-#'   group_by(region) %>% 
+#' survey_data %>%
+#'   group_by(region) %>%
 #'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #'
 "survey_data"
@@ -97,11 +104,16 @@
 #' @source Generated synthetically with realistic longitudinal correlation 
 #'   patterns and treatment effects. No real study data was used.
 #'
+#' @seealso
+#' \code{\link{longitudinal_data_wide}} for the wide format version.
+#'
+#' \code{\link{survey_data}} for the cross-sectional survey dataset.
+#'
 #' @examples
 #' # Load required packages and data
 #' library(dplyr)
 #' data(longitudinal_data)
-#' 
+#'
 #' # Simple example analysis with wide format data
 #' # data(longitudinal_data_wide)
 #' # (Repeated measures functions coming in future version)

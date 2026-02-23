@@ -26,9 +26,10 @@ by using survey weights. This ensures that groups who were over- or under-sample
 contribute appropriately to the final average.
 }
 \details{
-\subsection{Why Use Weighted Means?}{
+\subsection{When to Use This}{
 
-Survey samples rarely match the population perfectly. Weights correct for:
+Use \code{w_mean()} when your survey uses sampling weights and you need
+population-representative averages. Weights correct for:
 \itemize{
 \item Oversampling of certain groups (weights < 1)
 \item Undersampling of other groups (weights > 1)
@@ -37,7 +38,7 @@ Survey samples rarely match the population perfectly. Weights correct for:
 }
 }
 
-\subsection{Understanding the Output}{
+\subsection{Understanding the Results}{
 \itemize{
 \item \strong{Weighted Mean}: The population-representative average
 \item \strong{Effective N}: How many independent observations your weighted data represents
@@ -47,7 +48,9 @@ Survey samples rarely match the population perfectly. Weights correct for:
 
 \subsection{Formula}{
 
-Weighted mean: \eqn{\bar{x}_w = \sum(w_i \cdot x_i) / \sum(w_i)}
+\eqn{\bar{x}_w = \frac{\sum w_i \cdot x_i}{\sum w_i}}
+
+The effective sample size is: \eqn{n_{eff} = (\sum w_i)^2 / \sum w_i^2}
 }
 }
 \examples{
@@ -71,7 +74,18 @@ survey_data \%>\% summarise(mean_age = w_mean(age, weights = sampling_weight))
 survey_data \%>\% w_mean(age)
 
 }
+\references{
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link[stats]{weighted.mean}} for the base R weighted mean function.
+
+\code{\link{w_sd}} for weighted standard deviation.
+
+\code{\link{w_median}} for weighted median.
+
+\code{\link{describe}} for comprehensive descriptive statistics.
+
 Other weighted_statistics: 
 \code{\link{w_iqr}()},
 \code{\link{w_kurtosis}()},
