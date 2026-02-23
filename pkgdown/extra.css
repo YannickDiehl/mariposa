@@ -5,35 +5,8 @@
    - Slate blue (#5d7b93) for secondary elements
 */
 
-/* Logo sizing in the page header */
-.page-header img.logo {
-  height: 180px !important;
-  width: auto !important;
-  max-width: 180px !important;
-  margin-right: 20px;
-}
-
-@media (max-width: 768px) {
-  .page-header img.logo {
-    height: 140px !important;
-    max-width: 140px !important;
-  }
-}
-
-/* Subtitle styling */
-.page-header + .section h3 {
-  color: #2c3e50;
-  font-weight: 500;
-  margin-top: -10px;
-  margin-bottom: 5px;
-}
-
-.page-header + .section h4 {
-  color: #7f8c8d;
-  font-weight: 400;
-  font-size: 1.1em;
-  margin-bottom: 20px;
-}
+/* Use pkgdown defaults for logo (float: right, 120px on home).
+   No overrides needed — the built-in styling matches sjmisc layout. */
 
 /* Badge spacing */
 .section.level1 > p:first-of-type {
@@ -46,8 +19,8 @@ pre {
   border-radius: 4px;
 }
 
-/* Reference section cards */
-.section h2 {
+/* Section heading separators — only for content sections, not page-header */
+.section.level2 > h2 {
   border-bottom: 2px solid #ecf0f1;
   padding-bottom: 0.4em;
 }
