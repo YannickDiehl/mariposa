@@ -15,15 +15,16 @@
 #' @return Population-weighted average(s) with sample size information
 #'
 #' @details
-#' ## Why Use Weighted Means?
+#' ## When to Use This
 #'
-#' Survey samples rarely match the population perfectly. Weights correct for:
+#' Use \code{w_mean()} when your survey uses sampling weights and you need
+#' population-representative averages. Weights correct for:
 #' - Oversampling of certain groups (weights < 1)
 #' - Undersampling of other groups (weights > 1)
 #' - Non-response patterns
 #' - Complex survey designs
 #'
-#' ## Understanding the Output
+#' ## Understanding the Results
 #'
 #' - **Weighted Mean**: The population-representative average
 #' - **Effective N**: How many independent observations your weighted data represents
@@ -31,7 +32,9 @@
 #'
 #' ## Formula
 #'
-#' Weighted mean: \eqn{\bar{x}_w = \sum(w_i \cdot x_i) / \sum(w_i)}
+#' \eqn{\bar{x}_w = \frac{\sum w_i \cdot x_i}{\sum w_i}}
+#'
+#' The effective sample size is: \eqn{n_{eff} = (\sum w_i)^2 / \sum w_i^2}
 #'
 #' @examples
 #' # Load required packages and data
@@ -52,6 +55,18 @@
 #'
 #' # Unweighted (for comparison)
 #' survey_data %>% w_mean(age)
+#'
+#' @seealso
+#' \code{\link[stats]{weighted.mean}} for the base R weighted mean function.
+#'
+#' \code{\link{w_sd}} for weighted standard deviation.
+#'
+#' \code{\link{w_median}} for weighted median.
+#'
+#' \code{\link{describe}} for comprehensive descriptive statistics.
+#'
+#' @references
+#' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'
 #' @family weighted_statistics
 #' @export

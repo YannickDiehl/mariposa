@@ -58,7 +58,7 @@
 #' - Negative: Group 2 tends to have higher values
 #' - Zero: Groups have similar distributions
 #'
-#' ## When to Use This Test
+#' ## When to Use This
 #'
 #' Use Mann-Whitney test when:
 #' - Your data is not normally distributed (skewed, outliers)

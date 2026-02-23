@@ -44,7 +44,7 @@ The correlation tells you:
 }
 }
 \details{
-\subsection{Understanding Correlation Values}{
+\subsection{Understanding the Results}{
 
 \strong{Correlation coefficient (r)} ranges from -1 to +1:
 \itemize{
@@ -68,13 +68,21 @@ The correlation tells you:
 \item p < 0.001: Very strong evidence of a relationship
 \item p < 0.01: Strong evidence of a relationship
 \item p < 0.05: Moderate evidence of a relationship
-\item p ≥ 0.05: No significant relationship found
+\item p >= 0.05: No significant relationship found
+}
+
+A correlation of 0.65 with p < 0.001 means:
+\itemize{
+\item Strong positive relationship (r = 0.65)
+\item As one variable increases, the other tends to increase
+\item Very unlikely to be due to chance (p < 0.001)
+\item About 42\% of variation is shared (r-squared = 0.65 squared = 0.42)
 }
 }
 
-\subsection{When to Use Pearson Correlation}{
+\subsection{When to Use This}{
 
-Use this when:
+Use Pearson correlation when:
 \itemize{
 \item Both variables are numeric and continuous
 \item You expect a linear relationship
@@ -87,18 +95,7 @@ Don't use when:
 \item Data has extreme outliers (consider Spearman instead)
 \item Relationship is curved/non-linear
 \item Variables are categorical (use chi-squared test)
-\item You need to establish causation (correlation ≠ causation!)
-}
-}
-
-\subsection{Reading the Results}{
-
-A correlation of 0.65 with p < 0.001 means:
-\itemize{
-\item Strong positive relationship (r = 0.65)
-\item As one variable increases, the other tends to increase
-\item Very unlikely to be due to chance (p < 0.001)
-\item About 42\% of variation is shared (r² = 0.65² = 0.42)
+\item You need to establish causation (correlation does not imply causation)
 }
 }
 
@@ -149,15 +146,21 @@ print(result)
 
 }
 \references{
-Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.).
-Lawrence Erlbaum Associates.
+Cohen, J. (1988). \emph{Statistical Power Analysis for the Behavioral
+Sciences} (2nd ed.). Lawrence Erlbaum Associates.
 
-Fisher, R.A. (1915). Frequency distribution of the values of the correlation coefficient
-in samples from an indefinitely large population. Biometrika, 10(4), 507-521.
+Fisher, R. A. (1915). Frequency distribution of the values of the
+correlation coefficient in samples from an indefinitely large population.
+\emph{Biometrika}, 10(4), 507--521.
 }
 \seealso{
-\code{\link[stats]{cor}} for the base R correlation function
-\code{\link[stats]{cor.test}} for correlation significance testing
+\code{\link[stats]{cor}} for the base R correlation function.
+
+\code{\link[stats]{cor.test}} for correlation significance testing.
+
+\code{\link{spearman_rho}} for rank-based correlation (robust to outliers).
+
+\code{\link{kendall_tau}} for ordinal correlation.
 
 Other correlation: 
 \code{\link{kendall_tau}()},

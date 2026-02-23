@@ -1,17 +1,60 @@
 
-#' Weighted Quantiles
+#' Calculate Population-Representative Percentiles
 #'
-#' Calculate weighted quantiles for numeric variables, with support for 
-#' grouped data and multiple variables simultaneously.
+#' @description
+#' \code{w_quantile()} calculates percentiles (quantiles) using survey weights
+#' for population-representative results. Percentiles divide your data into
+#' equal portions -- for example, the 25th percentile is the value below which
+#' 25% of your population falls. This is essential for understanding the
+#' distribution of variables like income, age, or satisfaction scores.
 #'
-#' @param data A data frame, or a numeric vector when used in summarise() context
-#' @param ... Variable names (unquoted) or tidyselect expressions
-#' @param weights Name of the weights variable (unquoted), or a numeric vector of weights
-#' @param probs Numeric vector of probabilities (default: c(0, 0.25, 0.5, 0.75, 1))
-#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to analyze. You can list multiple
+#'   variables or use helpers like \code{starts_with("income")}
+#' @param weights Survey weights to make results representative of your population.
+#'   Without weights, you get the simple sample quantiles.
+#' @param probs Which percentiles to calculate, as proportions between 0 and 1.
+#'   Default: \code{c(0, 0.25, 0.5, 0.75, 1)} for the minimum, 25th percentile,
+#'   median, 75th percentile, and maximum. Use \code{c(0.1, 0.5, 0.9)} for
+#'   deciles, or \code{c(0.25, 0.5, 0.75)} for quartiles only.
+#' @param na.rm Remove missing values before calculating? (Default: TRUE)
 #'
-#' @return A w_quantile object (list) containing results and metadata, or numeric values in summarise context
-#' 
+#' @return Population-weighted quantile(s) with sample size information,
+#'   including the weighted percentile values, effective sample size (effective N),
+#'   and the number of valid observations used.
+#'
+#' @details
+#' ## Understanding the Results
+#'
+#' - **Percentile values**: The data values at each requested percentile
+#'   in the weighted population. For example, if the weighted 25th percentile
+#'   of income is 35,000, then 25% of the population earns less than that.
+#' - **Effective N**: How many independent observations your weighted data
+#'   represents.
+#' - **N**: The actual number of observations used.
+#'
+#' Common percentiles and their meaning:
+#' - **0% (minimum)**: The smallest observed value
+#' - **25% (Q1)**: One quarter of the population falls below this value
+#' - **50% (median)**: Half the population falls below this value
+#' - **75% (Q3)**: Three quarters of the population falls below this value
+#' - **100% (maximum)**: The largest observed value
+#'
+#' ## When to Use This
+#'
+#' Use \code{w_quantile()} when:
+#' - You want to know at what values the population splits into groups
+#' - You need to construct population-representative income brackets or age groups
+#' - You want to identify the median or quartiles with proper weighting
+#' - You need SPSS-compatible weighted percentile values
+#'
+#' ## Formula
+#'
+#' Weighted quantiles are calculated using cumulative weights. Observations
+#' are sorted by value, weights are accumulated, and the requested percentile
+#' is found by linear interpolation at the point where the cumulative weight
+#' proportion reaches the target probability.
+#'
 #' @examples
 #' # Load required packages and data
 #' library(dplyr)
@@ -31,6 +74,18 @@
 #' 
 #' # Unweighted (for comparison)
 #' survey_data %>% w_quantile(age)
+#'
+#' @seealso
+#' \code{\link[stats]{quantile}} for the base R quantile function.
+#'
+#' \code{\link{w_median}} for the weighted median (50th percentile).
+#'
+#' \code{\link{w_iqr}} for the weighted interquartile range (Q3 - Q1).
+#'
+#' \code{\link{describe}} for comprehensive descriptive statistics including quantiles.
+#'
+#' @references
+#' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'
 #' @family weighted_statistics
 #' @export

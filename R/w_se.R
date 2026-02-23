@@ -1,16 +1,51 @@
-#' Weighted Standard Error
+#' Calculate Population-Representative Standard Errors
 #'
-#' Calculate weighted standard error for numeric variables, with support for
-#' grouped data and multiple variables simultaneously.
-#' Formula: \eqn{SE_w = s_w / \sqrt{V_1}} where \eqn{s_w} is the weighted SD
-#' and \eqn{V_1 = \sum w_i}.
+#' @description
+#' \code{w_se()} calculates the standard error of the mean using survey weights.
+#' The standard error tells you how precisely you have estimated the population
+#' mean -- a smaller SE means your estimate is more precise. This is essential
+#' for constructing confidence intervals and assessing the reliability of your
+#' weighted mean estimates.
 #'
-#' @param data A data frame, or a numeric vector when used in summarise() context
-#' @param ... Variable names (unquoted) or tidyselect expressions
-#' @param weights Name of the weights variable (unquoted), or a numeric vector of weights
-#' @param na.rm Logical; if TRUE, missing values are removed (default: TRUE)
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The numeric variables you want to analyze. You can list multiple
+#'   variables or use helpers like \code{starts_with("trust")}
+#' @param weights Survey weights to make results representative of your population.
+#'   Without weights, you get the simple sample standard error.
+#' @param na.rm Remove missing values before calculating? (Default: TRUE)
 #'
-#' @return A w_se object (list) containing results and metadata, or numeric values in summarise context
+#' @return Population-weighted standard error(s) with sample size information,
+#'   including the weighted SE, effective sample size (effective N), and the
+#'   number of valid observations used.
+#'
+#' @details
+#' ## Understanding the Results
+#'
+#' - **Weighted SE**: The precision of your weighted mean estimate. Smaller
+#'   values mean more precise estimates. You can build a 95% confidence
+#'   interval as: weighted mean +/- 1.96 * weighted SE.
+#' - **Effective N**: How many independent observations your weighted data
+#'   represents. Weights that vary a lot reduce effective N, increasing the SE.
+#' - **N**: The actual number of observations used.
+#'
+#' ## When to Use This
+#'
+#' Use \code{w_se()} when:
+#' - You need to report precision of mean estimates
+#' - You want to construct confidence intervals for weighted means
+#' - You need to compare precision across subgroups
+#' - You need SPSS-compatible weighted standard errors
+#'
+#' ## Formula
+#'
+#' The weighted standard error is calculated as:
+#'
+#' \eqn{SE_w = \frac{s_w}{\sqrt{V_1}}}
+#'
+#' where \eqn{s_w} is the weighted standard deviation (see \code{\link{w_sd}})
+#' and \eqn{V_1 = \sum w_i} is the sum of all weights.
+#'
+#' For the unweighted case: \eqn{SE = s / \sqrt{n}}
 #'
 #' @examples
 #' # Load required packages and data
@@ -31,6 +66,16 @@
 #'
 #' # Unweighted (for comparison)
 #' survey_data %>% w_se(age)
+#'
+#' @seealso
+#' \code{\link{w_sd}} for weighted standard deviation.
+#'
+#' \code{\link{w_mean}} for weighted means.
+#'
+#' \code{\link{describe}} for comprehensive descriptive statistics including SE.
+#'
+#' @references
+#' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'
 #' @family weighted_statistics
 #' @export
