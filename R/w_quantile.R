@@ -294,7 +294,7 @@ print.w_quantile <- function(x, digits = 3, ...) {
   
   if (x$grouped) {
     # Get unique groups
-    groups <- unique(x$results[x$group_vars])
+    groups <- unique(x$results[x$groups])
     
     # Print results for each group
     for (i in seq_len(nrow(groups))) {
