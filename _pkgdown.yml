@@ -4,9 +4,6 @@ template:
   bootstrap: 5
   bootswatch: flatly
   theme: arrow-light
-  includes:
-    in_header: |
-      <link rel="stylesheet" href="extra.css">
 
 home:
   title: mariposa - Professional Survey Analysis in R
