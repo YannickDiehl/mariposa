@@ -9,12 +9,11 @@
 #' relationships between variables. It is particularly suitable for ordinal data or when
 #' the assumptions of Pearson correlation are not met.
 #'
-#' @param data A data frame or tibble containing the variables to analyze
-#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Variables for correlation analysis.
-#'   Supports all tidyselect helpers. If more than two variables are selected,
-#'   a correlation matrix is computed.
-#' @param weights <\code{\link[dplyr]{dplyr_data_masking}}> Optional sampling weights
-#'   for weighted correlations. Should be a numeric variable with positive values.
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... The variables you want to correlate. List two for a single
+#'   correlation or more for a correlation matrix. You can use helpers like
+#'   \code{starts_with("trust")}.
+#' @param weights Optional survey weights for population-representative results.
 #'   Note: SPSS may not apply weights to Spearman's rho; our implementation uses
 #'   weighted ranks for mathematically correct survey analysis.
 #' @param alternative Character string specifying the alternative hypothesis:
@@ -29,28 +28,19 @@
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
 #'
-#' @return An object of class \code{"spearman_rho"} containing:
-#' \describe{
-#'   \item{correlations}{Data frame with rho coefficients, p-values, and t-statistics}
-#'   \item{n_obs}{Matrix of sample sizes for each correlation}
-#'   \item{variables}{Character vector of analyzed variable names}
-#'   \item{weights}{Name of the weights variable (if used)}
-#'   \item{alternative}{Alternative hypothesis used}
-#'   \item{is_grouped}{Logical indicating if data was grouped via group_by()}
-#'   \item{groups}{Grouping variables (if any)}
-#'   \item{matrices}{List of correlation, p-value, and sample size matrices}
-#' }
+#' @return Correlation results showing rank-based relationships between variables,
+#'   including the rho coefficient, p-value, t-statistic, and sample size for
+#'   each pair. For multiple variables, correlation, significance, and sample
+#'   size matrices are also provided.
 #'
 #' @details
-#' ## What Spearman's Rho Measures
+#' ## Understanding the Results
 #'
-#' Spearman's rho measures the strength and direction of a monotonic relationship between
-#' two variables. Unlike Pearson correlation, it doesn't require a linear relationship -
-#' it just needs one variable to consistently increase (or decrease) as the other increases.
-#'
-#' Think of it as ranking your data first, then checking if the ranks tend to go together.
-#'
-#' ## Interpreting Results
+#' Spearman's rho measures the strength and direction of a monotonic relationship
+#' between two variables. Unlike Pearson correlation, it does not require a linear
+#' relationship -- it just needs one variable to consistently increase (or decrease)
+#' as the other increases. Think of it as ranking your data first, then checking if
+#' the ranks tend to go together.
 #'
 #' The rho value ranges from -1 to +1:
 #' - **Strong positive** (0.7 to 1.0): High ranks in one variable go with high ranks in the other
@@ -59,13 +49,18 @@
 #' - **No correlation** (near 0): No relationship between the variables
 #' - **Negative values**: As one variable's rank increases, the other's tends to decrease
 #'
-#' ## When to Use Spearman's Rho
+#' The output also provides:
+#' - **p-value**: Probability of seeing this correlation by chance
+#' - **n**: Number of observation pairs used
+#' - **significance stars**: Visual indicator (*** very strong, ** strong, * moderate evidence)
+#'
+#' ## When to Use This
 #'
 #' Choose Spearman's rho when:
 #' - Your relationship is monotonic but not necessarily linear
 #' - Your data has outliers (they have less impact on ranks)
 #' - Your variables are ordinal (ordered categories)
-#' - You're not sure if your data meets Pearson correlation assumptions
+#' - You are not sure if your data meets Pearson correlation assumptions
 #' - You want to detect any monotonic trend, not just linear ones
 #'
 #' ## Spearman vs. Kendall
@@ -74,14 +69,6 @@
 #' - **Spearman's rho** is better for detecting linear relationships in ranks
 #' - **Kendall's tau** is more robust and has better statistical properties
 #' - **Spearman's rho** is more commonly reported in research
-#'
-#' ## Understanding the Output
-#'
-#' The function provides:
-#' - **rho**: The rank correlation coefficient
-#' - **p-value**: Probability of seeing this correlation by chance
-#' - **n**: Number of observation pairs used
-#' - **significance stars**: Visual indicator (*** very strong, ** strong, * moderate evidence)
 #'
 #' @examples
 #' # Load required packages and data
@@ -118,16 +105,19 @@
 #'   spearman_rho(age, income, alternative = "greater")
 #'
 #' @seealso
-#' \code{\link[stats]{cor}} with method="spearman" for base R implementation
-#' \code{\link[stats]{cor.test}} with method="spearman" for significance testing
-#' \code{\link{kendall_tau}} for Kendall's rank correlation
-#' \code{\link{pearson_cor}} for Pearson correlation analysis
+#' \code{\link[stats]{cor}} with \code{method = "spearman"} for the base R
+#' implementation.
+#'
+#' \code{\link{kendall_tau}} for Kendall's rank correlation.
+#'
+#' \code{\link{pearson_cor}} for Pearson correlation analysis.
 #'
 #' @references
-#' Spearman, C. (1904). The proof and measurement of association between two things.
-#' American Journal of Psychology, 15(1), 72-101.
+#' Spearman, C. (1904). The proof and measurement of association between two
+#' things. \emph{American Journal of Psychology}, 15(1), 72--101.
 #'
-#' Lehmann, E.L. (1975). Nonparametrics: Statistical Methods Based on Ranks. Holden-Day.
+#' Lehmann, E. L. (1975). \emph{Nonparametrics: Statistical Methods Based on
+#' Ranks}. Holden-Day.
 #'
 #' @family correlation
 #' @export

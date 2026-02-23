@@ -13,14 +13,13 @@ kendall_tau(
 )
 }
 \arguments{
-\item{data}{A data frame or tibble containing the variables to analyze}
+\item{data}{Your survey data (a data frame or tibble)}
 
-\item{...}{<\code{\link[dplyr]{dplyr_tidy_select}}> Variables for correlation analysis.
-Supports all tidyselect helpers. If more than two variables are selected,
-a correlation matrix is computed.}
+\item{...}{The variables you want to correlate. List two for a single
+correlation or more for a correlation matrix. You can use helpers like
+\code{starts_with("trust")}.}
 
-\item{weights}{\if{html}{\out{<\code{\link[dplyr]{dplyr_data_masking}}>}} Optional sampling weights
-for weighted correlations. Should be a numeric variable with positive values.}
+\item{weights}{Optional survey weights for population-representative results.}
 
 \item{alternative}{Character string specifying the alternative hypothesis:
 \itemize{
@@ -36,16 +35,10 @@ for weighted correlations. Should be a numeric variable with positive values.}
 }}
 }
 \value{
-An object of class \code{"kendall_tau"} containing:
-\describe{
-\item{correlations}{Data frame with tau coefficients, p-values, and z-scores}
-\item{n_obs}{Matrix of sample sizes for each correlation}
-\item{variables}{Character vector of analyzed variable names}
-\item{weights}{Name of the weights variable (if used)}
-\item{alternative}{Alternative hypothesis used}
-\item{is_grouped}{Logical indicating if data was grouped}
-\item{groups}{Grouping variables (if any)}
-}
+Correlation results showing rank-based relationships between variables,
+including the tau-b coefficient, p-value, z-score, and sample size for each
+pair. For multiple variables, correlation, significance, and sample size
+matrices are also provided.
 }
 \description{
 Calculates Kendall's tau-b rank correlation coefficients between variables with support
@@ -57,19 +50,12 @@ for ordinal data or when the assumptions of Pearson correlation are not met. For
 correlations, it uses survey-weighted rank calculations.
 }
 \details{
-\subsection{What Kendall's Tau Measures}{
+\subsection{Understanding the Results}{
 
 Kendall's tau measures how often pairs of observations are in the same order
-(concordant) versus different order (discordant). It's particularly useful for:
-\itemize{
-\item Ordinal data (like rating scales: strongly disagree to strongly agree)
-\item Data with outliers (more robust than Pearson correlation)
-\item Small sample sizes
-\item Non-linear but monotonic relationships
-}
-}
-
-\subsection{Interpreting Results}{
+(concordant) versus different order (discordant). It is particularly useful for
+ordinal data, data with outliers, small sample sizes, and non-linear but
+monotonic relationships.
 
 The tau value ranges from -1 to +1:
 \itemize{
@@ -79,9 +65,16 @@ The tau value ranges from -1 to +1:
 \item \strong{No correlation} (near 0): No relationship between the variables
 \item \strong{Negative values}: As one variable increases, the other tends to decrease
 }
+
+The output also provides:
+\itemize{
+\item \strong{p-value}: Probability of seeing this correlation by chance (smaller = stronger evidence)
+\item \strong{n}: Number of observations used
+\item \strong{significance stars}: Quick visual indicator of statistical significance
+}
 }
 
-\subsection{When to Use Kendall's Tau}{
+\subsection{When to Use This}{
 
 Choose Kendall's tau when:
 \itemize{
@@ -89,17 +82,6 @@ Choose Kendall's tau when:
 \item You have a small sample size (< 30 observations)
 \item Your data has outliers that might affect Pearson correlation
 \item You want a more conservative measure than Spearman's rho
-}
-}
-
-\subsection{Understanding the Output}{
-
-The function provides:
-\itemize{
-\item \strong{tau}: The correlation coefficient
-\item \strong{p-value}: Probability of seeing this correlation by chance (smaller = stronger evidence)
-\item \strong{n}: Number of observations used
-\item \strong{significance stars}: Quick visual indicator of statistical significance
 }
 }
 }
@@ -145,16 +127,22 @@ print(result)
 
 }
 \references{
-Kendall, M.G. (1938). A new measure of rank correlation. Biometrika, 30(1/2), 81-93.
+Kendall, M. G. (1938). A new measure of rank correlation.
+\emph{Biometrika}, 30(1/2), 81--93.
 
-Kendall, M.G. (1945). The treatment of ties in ranking problems. Biometrika, 33(3), 239-251.
+Kendall, M. G. (1945). The treatment of ties in ranking problems.
+\emph{Biometrika}, 33(3), 239--251.
 
-Agresti, A. (2010). Analysis of Ordinal Categorical Data (2nd ed.). John Wiley & Sons.
+Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data} (2nd ed.).
+John Wiley & Sons.
 }
 \seealso{
-\code{\link[stats]{cor}} with method="kendall" for base R implementation
-\code{\link[stats]{cor.test}} with method="kendall" for significance testing
-\code{\link{pearson_cor}} for Pearson correlation analysis
+\code{\link[stats]{cor}} with \code{method = "kendall"} for the base R
+implementation.
+
+\code{\link{spearman_rho}} for Spearman's rank correlation.
+
+\code{\link{pearson_cor}} for Pearson correlation analysis.
 
 Other correlation: 
 \code{\link{pearson_cor}()},

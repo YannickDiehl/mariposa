@@ -32,7 +32,7 @@
 #' @return A frequency table showing counts and percentages for each category
 #'
 #' @details
-#' ## Understanding the Output
+#' ## Understanding the Results
 #'
 #' The frequency table shows:
 #' - **Freq**: Number of responses in each category
@@ -75,6 +75,15 @@
 #' # Employment status with custom display options
 #' survey_data %>% frequency(employment, weights = sampling_weight, 
 #'                          show.na = TRUE, show.sum = TRUE)
+#'
+#' @seealso
+#' \code{\link[base]{table}} for base R frequency tables.
+#'
+#' \code{\link{crosstab}} for cross-tabulation of two variables.
+#'
+#' \code{\link{chi_square}} for testing relationships between categories.
+#'
+#' \code{\link{describe}} for numeric variable summaries.
 #'
 #' @family descriptive
 #' @export

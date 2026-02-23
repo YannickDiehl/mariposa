@@ -116,7 +116,24 @@ survey_data \%>\%
 survey_data \%>\% chi_square(gender, region, correct = TRUE)
 
 }
+\references{
+Pearson, K. (1900). On the criterion that a given system of deviations from
+the probable in the case of a correlated system of variables is such that it
+can be reasonably supposed to have arisen from random sampling.
+\emph{Philosophical Magazine}, 50(302), 157--175.
+
+Cramer, H. (1946). \emph{Mathematical Methods of Statistics}. Princeton
+University Press.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link[stats]{chisq.test}} for the base R chi-squared test.
+
+\code{\link{crosstab}} for detailed cross-tabulation tables.
+
+\code{\link{frequency}} for single-variable frequency tables.
+
 Other hypothesis_tests: 
 \code{\link{mann_whitney}()},
 \code{\link{oneway_anova}()},

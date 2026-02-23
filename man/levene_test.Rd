@@ -32,6 +32,8 @@ levene_test(x, ...)
 
 \item{center}{How to measure center: \code{"mean"} (default) or \code{"median"} (more robust)}
 
+\item{variable}{Variable to test (when using grouped data frame)}
+
 \item{data}{Your survey data (when x is not a test result)}
 }
 \value{
@@ -140,7 +142,24 @@ survey_data \%>\%
 survey_data \%>\% levene_test(income, group = region, center = "mean")
 
 }
+\references{
+Levene, H. (1960). Robust tests for equality of variances. In I. Olkin
+(Ed.), \emph{Contributions to Probability and Statistics} (pp. 278--292).
+Stanford University Press.
+
+Brown, M. B., & Forsythe, A. B. (1974). Robust tests for the equality of
+variances. \emph{Journal of the American Statistical Association}, 69(346),
+364--367.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link{oneway_anova}} for one-way ANOVA (which assumes equal variances).
+
+\code{\link{t_test}} for group mean comparisons.
+
+\code{\link[stats]{var.test}} for the base R F-test of variance equality.
+
 Other posthoc: 
 \code{\link{scheffe_test}()},
 \code{\link{tukey_test}()}

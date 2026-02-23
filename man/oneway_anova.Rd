@@ -122,16 +122,6 @@ If ANOVA is significant:
 \item Welch's robust test for equality of means
 }
 }
-
-\subsection{Interpretation Guidelines}{
-\itemize{
-\item \strong{p-values}: p < 0.05 indicates significant group differences at alpha = 0.05
-\item \strong{Effect sizes}: eta-squared ~ 0.01 (small), eta-squared ~ 0.06 (medium), eta-squared ~ 0.14 (large)
-\item \strong{Eta-squared}: Proportion of variance explained (tends to overestimate)
-\item \strong{Epsilon-squared}: Less biased than eta-squared
-\item \strong{Omega-squared}: Unbiased estimate (preferred for publication)
-}
-}
 }
 \examples{
 # Load required packages and data

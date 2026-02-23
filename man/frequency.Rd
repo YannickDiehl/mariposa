@@ -60,7 +60,7 @@ Think of it as creating a summary table that shows:
 }
 }
 \details{
-\subsection{Understanding the Output}{
+\subsection{Understanding the Results}{
 
 The frequency table shows:
 \itemize{
@@ -113,6 +113,14 @@ survey_data \%>\% frequency(employment, weights = sampling_weight,
 
 }
 \seealso{
+\code{\link[base]{table}} for base R frequency tables.
+
+\code{\link{crosstab}} for cross-tabulation of two variables.
+
+\code{\link{chi_square}} for testing relationships between categories.
+
+\code{\link{describe}} for numeric variable summaries.
+
 Other descriptive: 
 \code{\link{crosstab}()},
 \code{\link{describe}()}

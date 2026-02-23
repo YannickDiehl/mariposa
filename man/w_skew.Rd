@@ -2,26 +2,82 @@
 % Please edit documentation in R/w_skew.R
 \name{w_skew}
 \alias{w_skew}
-\title{Weighted Skewness}
+\title{Measure Population-Representative Skewness}
 \usage{
 w_skew(data, ..., weights = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{data}{A data frame, or a numeric vector when used in summarise() context}
+\item{data}{Your survey data (a data frame or tibble)}
 
-\item{...}{Variable names (unquoted) or tidyselect expressions}
+\item{...}{The numeric variables you want to analyze. You can list multiple
+variables or use helpers like \code{starts_with("trust")}}
 
-\item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
+\item{weights}{Survey weights to make results representative of your population.
+Without weights, you get the simple sample skewness.}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed (default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
 }
 \value{
-A w_skew object (list) containing results and metadata, or numeric values in summarise context
+Population-weighted skewness value(s) with sample size information,
+including the weighted skewness, effective sample size (effective N), and the
+number of valid observations used.
 }
 \description{
-Calculate weighted skewness for numeric variables, with support for
-grouped data and multiple variables simultaneously.
-Uses the SPSS Type 2 (sample-corrected) skewness formula.
+\code{w_skew()} measures how asymmetric your data's distribution is, using
+survey weights for population-representative results. Skewness tells you
+whether values tend to trail off more to the left or right:
+\itemize{
+\item \strong{Positive skew}: A long tail to the right (e.g., income -- many low, few very high)
+\item \strong{Negative skew}: A long tail to the left (e.g., exam scores -- many high, few very low)
+\item \strong{Near zero}: Roughly symmetric (e.g., height in a population)
+}
+}
+\details{
+\subsection{Understanding the Results}{
+\itemize{
+\item \strong{Weighted Skewness}: The population-representative skewness value.
+\itemize{
+\item Near 0: Distribution is roughly symmetric
+\item Between -0.5 and 0.5: Approximately symmetric
+\item Between -1 and -0.5 or 0.5 and 1: Moderately skewed
+\item Beyond -1 or 1: Highly skewed
+}
+\item \strong{Effective N}: How many independent observations your weighted data
+represents.
+\item \strong{N}: The actual number of observations used.
+}
+
+High skewness suggests you might want to use the median instead of the mean
+as a measure of center, and non-parametric tests instead of t-tests.
+}
+
+\subsection{When to Use This}{
+
+Use \code{w_skew()} when:
+\itemize{
+\item You need to check if a variable is normally distributed
+\item You want to decide between parametric and non-parametric tests
+\item You need to assess whether the mean is a good summary measure
+\item You need SPSS-compatible weighted skewness values
+}
+}
+
+\subsection{Formula}{
+
+Uses the SPSS Type 2 (sample-corrected) skewness formula. First, the
+population skewness (\eqn{g_1}) is calculated:
+
+\eqn{g_1 = \frac{m_3}{m_2^{3/2}}}
+
+where \eqn{m_2 = \sum w_i(x_i - \bar{x}_w)^2 / V_1} and
+\eqn{m_3 = \sum w_i(x_i - \bar{x}_w)^3 / V_1} with \eqn{V_1 = \sum w_i}.
+
+Then, the bias-corrected (Type 2) skewness is:
+
+\eqn{G_1 = g_1 \cdot \frac{\sqrt{n(n-1)}}{n-2}}
+
+where \eqn{n = V_1} for weighted data.
+}
 }
 \examples{
 # Load required packages and data
@@ -44,7 +100,17 @@ survey_data \%>\% summarise(skew_age = w_skew(age, weights = sampling_weight))
 survey_data \%>\% w_skew(age)
 
 }
+\references{
+Joanes, D. N., & Gill, C. A. (1998). Comparing measures of sample skewness
+and kurtosis. The Statistician, 47(1), 183-189.
+
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link{w_kurtosis}} for weighted kurtosis (tail heaviness).
+
+\code{\link{describe}} for comprehensive descriptive statistics including skewness.
+
 Other weighted_statistics: 
 \code{\link{w_iqr}()},
 \code{\link{w_kurtosis}()},

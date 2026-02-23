@@ -28,7 +28,7 @@
 #' - Sample size: Number of observations used
 #'
 #' @details
-#' ## Understanding Correlation Values
+#' ## Understanding the Results
 #'
 #' **Correlation coefficient (r)** ranges from -1 to +1:
 #' - **+1**: Perfect positive relationship (as one goes up, the other always goes up)
@@ -47,11 +47,17 @@
 #' - p < 0.001: Very strong evidence of a relationship
 #' - p < 0.01: Strong evidence of a relationship
 #' - p < 0.05: Moderate evidence of a relationship
-#' - p ≥ 0.05: No significant relationship found
+#' - p >= 0.05: No significant relationship found
 #'
-#' ## When to Use Pearson Correlation
+#' A correlation of 0.65 with p < 0.001 means:
+#' - Strong positive relationship (r = 0.65)
+#' - As one variable increases, the other tends to increase
+#' - Very unlikely to be due to chance (p < 0.001)
+#' - About 42% of variation is shared (r-squared = 0.65 squared = 0.42)
 #'
-#' Use this when:
+#' ## When to Use This
+#'
+#' Use Pearson correlation when:
 #' - Both variables are numeric and continuous
 #' - You expect a linear relationship
 #' - Data is roughly normally distributed
@@ -61,15 +67,7 @@
 #' - Data has extreme outliers (consider Spearman instead)
 #' - Relationship is curved/non-linear
 #' - Variables are categorical (use chi-squared test)
-#' - You need to establish causation (correlation ≠ causation!)
-#'
-#' ## Reading the Results
-#'
-#' A correlation of 0.65 with p < 0.001 means:
-#' - Strong positive relationship (r = 0.65)
-#' - As one variable increases, the other tends to increase
-#' - Very unlikely to be due to chance (p < 0.001)
-#' - About 42% of variation is shared (r² = 0.65² = 0.42)
+#' - You need to establish causation (correlation does not imply causation)
 #'
 #' ## Tips for Success
 #'
@@ -114,16 +112,22 @@
 #'   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
 #' print(result)
 #'
-#' @seealso 
-#' \code{\link[stats]{cor}} for the base R correlation function
-#' \code{\link[stats]{cor.test}} for correlation significance testing
+#' @seealso
+#' \code{\link[stats]{cor}} for the base R correlation function.
+#'
+#' \code{\link[stats]{cor.test}} for correlation significance testing.
+#'
+#' \code{\link{spearman_rho}} for rank-based correlation (robust to outliers).
+#'
+#' \code{\link{kendall_tau}} for ordinal correlation.
 #'
 #' @references
-#' Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.). 
-#' Lawrence Erlbaum Associates.
-#' 
-#' Fisher, R.A. (1915). Frequency distribution of the values of the correlation coefficient 
-#' in samples from an indefinitely large population. Biometrika, 10(4), 507-521.
+#' Cohen, J. (1988). \emph{Statistical Power Analysis for the Behavioral
+#' Sciences} (2nd ed.). Lawrence Erlbaum Associates.
+#'
+#' Fisher, R. A. (1915). Frequency distribution of the values of the
+#' correlation coefficient in samples from an indefinitely large population.
+#' \emph{Biometrika}, 10(4), 507--521.
 #'
 #' @family correlation
 #' @export

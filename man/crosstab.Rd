@@ -52,7 +52,7 @@ Think of it as a two-way frequency table that shows:
 }
 }
 \details{
-\subsection{Understanding the Output}{
+\subsection{Understanding the Results}{
 
 The crosstab table shows:
 \itemize{
@@ -116,6 +116,13 @@ survey_data \%>\% crosstab(education, employment, percentages = "col")
 
 }
 \seealso{
+\code{\link[base]{table}} for base R contingency tables.
+
+\code{\link{frequency}} for single-variable frequency tables.
+
+\code{\link{chi_square}} for testing if the cross-tabulated variables
+are related.
+
 Other descriptive: 
 \code{\link{describe}()},
 \code{\link{frequency}()}
