@@ -10,13 +10,13 @@ Source:
 [`DESCRIPTION`](https://github.com/YannickDiehl/mariposa/blob/main/DESCRIPTION)
 
 Diehl Y (2026). *mariposa: Marburg Initiative for Political and Social
-Analysis - Statistical Tools for Survey Data*. R package version 0.0.1,
+Analysis - Statistical Tools for Survey Data*. R package version 0.1.0,
 <https://github.com/YannickDiehl/mariposa>.
 
     @Manual{,
       title = {mariposa: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data},
       author = {Yannick Diehl},
       year = {2026},
-      note = {R package version 0.0.1},
+      note = {R package version 0.1.0},
       url = {https://github.com/YannickDiehl/mariposa},
     }

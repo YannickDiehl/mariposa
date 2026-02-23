@@ -167,6 +167,7 @@ survey_data %>%
 #> 
 #> Interpretation: weak negative correlation
 
+# \donttest{
 # Correlation matrix for multiple variables
 survey_data %>%
   kendall_tau(life_satisfaction, political_orientation, trust_media)
@@ -454,4 +455,5 @@ print(result)
 #> ─────────────────────────────────────────────────────────────────────
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+# }
 ```
