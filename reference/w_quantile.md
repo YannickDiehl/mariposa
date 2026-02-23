@@ -185,7 +185,7 @@ survey_data %>% group_by(region) %>% w_quantile(age, weights = sampling_weight)
 #> 
 #> ── Weighted Quantile Statistics ────────────────────────────────────────────────
 #> 
-#> Group: 
+#> Group: region = East
 #> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable Quantile   Value         Weights
 #>       age      Min  18.000 sampling_weight
@@ -195,6 +195,18 @@ survey_data %>% group_by(region) %>% w_quantile(age, weights = sampling_weight)
 #>       age      Max  95.000 sampling_weight
 #>       age        n 485.000 sampling_weight
 #>       age    eff_n 477.027 sampling_weight
+#> ────────────────────────────────────────────────────────────────────────────────
+#> 
+#> Group: region = West
+#> ────────────────────────────────────────────────────────────────────────────────
+#>  Variable Quantile    Value         Weights
+#>       age      Min   18.000 sampling_weight
+#>       age      25%   38.000 sampling_weight
+#>       age      50%   49.000 sampling_weight
+#>       age      75%   62.000 sampling_weight
+#>       age      Max   95.000 sampling_weight
+#>       age        n 2015.000 sampling_weight
+#>       age    eff_n 1993.079 sampling_weight
 #> ────────────────────────────────────────────────────────────────────────────────
 
 # Unweighted (for comparison)
