@@ -444,7 +444,7 @@ levene_test.grouped_df <- function(x, variable, group = NULL, weights = NULL, ce
     group_filter <- groups[i, , drop = FALSE]
     
     # Create filter condition
-    filter_conditions <- purrr::map2(names(group_filter), group_filter, ~ quo(!!sym(.x) == !!.y))
+    filter_conditions <- unname(Map(function(nm, val) quo(!!sym(nm) == !!val), names(group_filter), group_filter))
     
     # Filter data for this group (SPSS SELECT IF method)
     filtered_data <- data %>%
