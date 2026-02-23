@@ -107,7 +107,7 @@
 #'
 #' # Multiple variables
 #' anova_multi <- survey_data %>%
-#'   oneway_anova(trust_government, trust_companies, group = education)
+#'   oneway_anova(trust_government, trust_science, group = education)
 #'
 #' anova_multi %>% tukey_test()
 #'
