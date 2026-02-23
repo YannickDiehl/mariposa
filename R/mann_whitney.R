@@ -332,7 +332,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       U <- min(U1, U2)
       W <- max(R1, R2)  # W is the larger rank sum
       
-      # Convert Chi² to Z (for 1 df: Z = ±√Chi²)
+      # Convert Chi\u00b2 to Z (for 1 df: Z = \u00b1\u221aChi\u00b2)
       chi_squared <- as.numeric(survey_result$statistic)
       
       # Survey package uses Kruskal-Wallis test even for 2 groups
@@ -342,7 +342,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
         df <- as.numeric(survey_result$parameter)      # degrees of freedom
         
         Z <- t_stat
-        # Effect size for t-test: r = |t|/sqrt(t² + df)
+        # Effect size for t-test: r = |t|/sqrt(t\u00b2 + df)
         r <- abs(t_stat) / sqrt(t_stat^2 + df)
         
       } else {
@@ -626,9 +626,9 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
   
   cat("\nEffect Size Interpretation (r):\n")
-  cat("- Small effect: |r| ≈ 0.1\n")
-  cat("- Medium effect: |r| ≈ 0.3\n")
-  cat("- Large effect: |r| ≈ 0.5\n")
+  cat("- Small effect: |r| \u2248 0.1\n")
+  cat("- Medium effect: |r| \u2248 0.3\n")
+  cat("- Large effect: |r| \u2248 0.5\n")
   
   invisible(x)
 }
