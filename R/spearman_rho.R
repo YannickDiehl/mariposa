@@ -431,7 +431,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
   # Print header using standardized title
   title <- get_standard_title("Spearman's Rank Correlation Analysis", x$weights, "")
   cat(title, "\n")
-  cat("══════════════════════════════════════════════════════════════════════\n")
+  cat(strrep("\u2550", 70), "\n", sep = "")
 
   # Display analysis info
   cat("Method: Spearman's rho (rank correlation)\n")
@@ -446,7 +446,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
   # Helper function to print correlation matrix with nice formatting
   .print_rho_matrix <- function(mat, digits = 3, title = "Correlation Matrix:", type = "correlation") {
     cat("\n", title, "\n", sep = "")
-    cat("─────────────────────────────────────────────────────────────────────\n")
+    cat(strrep("\u2500", 69), "\n", sep = "")
 
     # Format matrix for printing
     if (type == "correlation") {
@@ -474,7 +474,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
   # Main results display
   if (x$is_grouped) {
     # Grouped analysis
-    cat("\n══ GROUPED ANALYSIS ══\n")
+    cat("\n\u2550\u2550 GROUPED ANALYSIS \u2550\u2550\n")
 
     # Get unique group combinations
     group_combinations <- unique(x$correlations[, x$groups, drop = FALSE])
@@ -531,7 +531,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
         # Detailed pairwise results
         cat("\nPairwise Results:\n")
-        cat("─────────────────────────────────────────────────────────────────────\n")
+        cat(strrep("\u2500", 69), "\n", sep = "")
 
         # Create results table
         output_df <- data.frame(
@@ -546,7 +546,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
         # Print the table
         print(output_df, row.names = FALSE, right = TRUE)
-        cat("─────────────────────────────────────────────────────────────────────\n")
+        cat(strrep("\u2500", 69), "\n", sep = "")
       }
     }
 
@@ -590,7 +590,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
       # Detailed pairwise results
       cat("\nPairwise Results:\n")
-      cat("─────────────────────────────────────────────────────────────────────\n")
+      cat(strrep("\u2500", 69), "\n", sep = "")
 
       # Create results table
       output_df <- data.frame(
@@ -605,7 +605,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
       # Print the table
       print(output_df, row.names = FALSE, right = TRUE)
-      cat("─────────────────────────────────────────────────────────────────────\n")
+      cat(strrep("\u2500", 69), "\n", sep = "")
     }
   }
 

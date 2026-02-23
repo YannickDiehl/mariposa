@@ -645,7 +645,7 @@ print.pearson_cor <- function(x, digits = 3, ...) {
         
         # Create results table
         output_df <- data.frame(
-          Variable_Pair = paste(group_corrs$var1, "×", group_corrs$var2),
+          Variable_Pair = paste(group_corrs$var1, "\u00d7", group_corrs$var2),
           r = round(group_corrs$correlation, digits),
           r_squared = round(group_corrs$r_squared, digits),
           p_value = round(group_corrs$p_value, 4),
@@ -667,12 +667,12 @@ print.pearson_cor <- function(x, digits = 3, ...) {
     
     if (length(x$variables) == 2) {
       # Single correlation - use variable block format like t_test
-      var_pair <- paste(x$variables[1], "×", x$variables[2])
+      var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
       cat(sprintf("\n--- %s ---\n\n", var_pair))
       
       # Show correlation statistics
       cat(sprintf("  Correlation: r = %.3f\n", x$correlations$correlation[1]))
-      cat(sprintf("  Effect size: r² = %.3f\n", x$correlations$r_squared[1]))
+      cat(sprintf("  Effect size: r\u00b2 = %.3f\n", x$correlations$r_squared[1]))
       cat(sprintf("  Sample size: n = %d\n", x$correlations$n[1]))
       cat(sprintf("  95%% CI: [%.3f, %.3f]\n", 
                  x$correlations$conf_int_lower[1],
@@ -707,7 +707,7 @@ print.pearson_cor <- function(x, digits = 3, ...) {
       
       # Create results table
       output_df <- data.frame(
-        Variable_Pair = paste(x$correlations$var1, "×", x$correlations$var2),
+        Variable_Pair = paste(x$correlations$var1, "\u00d7", x$correlations$var2),
         r = round(x$correlations$correlation, digits),
         r_squared = round(x$correlations$r_squared, digits),
         p_value = round(x$correlations$p_value, 4),
@@ -729,9 +729,9 @@ print.pearson_cor <- function(x, digits = 3, ...) {
   cat("Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
   cat("\nCorrelation Strength Interpretation:\n")
   cat("  |r| < 0.30:        Weak correlation\n")
-  cat("  0.30 ≤ |r| < 0.70: Moderate correlation\n")
-  cat("  |r| ≥ 0.70:        Strong correlation\n")
-  cat("\nr² represents the proportion of variance explained\n")
+  cat("  0.30 \u2264 |r| < 0.70: Moderate correlation\n")
+  cat("  |r| \u2265 0.70:        Strong correlation\n")
+  cat("\nr\u00b2 represents the proportion of variance explained\n")
   
   invisible(x)
 }

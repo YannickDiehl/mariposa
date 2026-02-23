@@ -341,8 +341,8 @@ print.crosstab <- function(x, ...) {
 .print_single_crosstab <- function(x) {
 
   # Header
-  cat("\nCrosstabulation: ", x$row_var, " × ", x$col_var, "\n", sep = "")
-  cat(paste(rep("─", 50), collapse = ""), "\n\n")
+  cat("\nCrosstabulation: ", x$row_var, " \u00d7 ", x$col_var, "\n", sep = "")
+  cat(paste(rep("\u2500", 50), collapse = ""), "\n\n")
 
   # Get dimensions
   n_rows <- length(x$row_levels)
@@ -378,7 +378,7 @@ print.crosstab <- function(x, ...) {
 
   # Print separator
   total_width <- row_label_width + (n_cols + 1) * col_width
-  cat(paste(rep("─", total_width), collapse = ""), "\n")
+  cat(paste(rep("\u2500", total_width), collapse = ""), "\n")
 
   # Print each row with counts
   for (i in 1:n_rows) {
@@ -437,7 +437,7 @@ print.crosstab <- function(x, ...) {
   }
 
   # Print total row separator
-  cat(paste(rep("─", total_width), collapse = ""), "\n")
+  cat(paste(rep("\u2500", total_width), collapse = ""), "\n")
 
   # Print totals row
   cat(sprintf("%-*s", row_label_width, "Total"))

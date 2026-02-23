@@ -255,18 +255,18 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       # Unweighted ANOVA
       
       # Descriptive statistics by group
-      group_stats <- purrr::map(group_levels, function(level) {
+      group_stats <- lapply(group_levels, function(level) {
         group_data <- y[g == level]
         n <- length(group_data)
         mean_val <- mean(group_data)
         sd_val <- sd(group_data)
         se_val <- sd_val / sqrt(n)
-        
+
         # Confidence interval for mean
         t_val <- qt((1 + conf.level) / 2, df = n - 1)
         ci_lower <- mean_val - t_val * se_val
         ci_upper <- mean_val + t_val * se_val
-        
+
         list(
           level = level,
           n = n,
@@ -310,26 +310,26 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       # Weighted ANOVA
       
       # Weighted descriptive statistics by group
-      group_stats <- purrr::map(group_levels, function(level) {
+      group_stats <- lapply(group_levels, function(level) {
         group_indices <- g == level
         group_data <- y[group_indices]
         group_weights <- w[group_indices]
-        
+
         n <- length(group_data)
         weighted_n <- sum(group_weights)
-        
+
         # Weighted mean and variance
         weighted_mean <- sum(group_data * group_weights) / sum(group_weights)
         weighted_var <- sum(group_weights * (group_data - weighted_mean)^2) / sum(group_weights)
         weighted_sd <- sqrt(weighted_var)
         weighted_se <- weighted_sd / sqrt(n)  # Use actual sample size for SE
-        
+
         # Approximate confidence interval (using effective sample size)
         eff_n <- sum(group_weights)^2 / sum(group_weights^2)
         t_val <- qt((1 + conf.level) / 2, df = eff_n - 1)
         ci_lower <- weighted_mean - t_val * weighted_se
         ci_upper <- weighted_mean + t_val * weighted_se
-        
+
         list(
           level = level,
           n = n,

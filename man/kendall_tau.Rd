@@ -94,6 +94,7 @@ data(survey_data)
 survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation)
 
+\donttest{
 # Correlation matrix for multiple variables
 survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation, trust_media)
@@ -124,6 +125,7 @@ result <- survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation, trust_media,
               weights = sampling_weight)
 print(result)
+}
 
 }
 \references{
