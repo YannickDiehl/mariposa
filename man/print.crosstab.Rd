@@ -6,6 +6,11 @@
 \usage{
 \method{print}{crosstab}(x, ...)
 }
+\arguments{
+\item{x}{A crosstab result object}
+
+\item{...}{Additional arguments (currently unused)}
+}
 \description{
 Print method for crosstab results
 }

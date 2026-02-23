@@ -53,7 +53,7 @@ Think of it as a health check for your data that reveals:
 }
 }
 \details{
-\subsection{Understanding the Output}{
+\subsection{Understanding the Results}{
 
 Key statistics and what they tell you:
 \itemize{
@@ -112,6 +112,15 @@ survey_data \%>\%
 
 }
 \seealso{
+\code{\link[base]{summary}} for base R summary statistics.
+
+\code{\link{frequency}} for categorical variable summaries.
+
+\code{\link{w_mean}}, \code{\link{w_sd}}, \code{\link{w_median}} for
+individual weighted statistics.
+
+\code{\link{t_test}} and \code{\link{oneway_anova}} for group comparisons.
+
 Other descriptive: 
 \code{\link{crosstab}()},
 \code{\link{frequency}()}

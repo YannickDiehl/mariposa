@@ -28,7 +28,7 @@
 #' @return A cross-tabulation table showing the relationship between two variables
 #'
 #' @details
-#' ## Understanding the Output
+#' ## Understanding the Results
 #'
 #' The crosstab table shows:
 #' - **Cell counts**: Number of people in each combination
@@ -79,6 +79,14 @@
 #'
 #' # Column percentages only
 #' survey_data %>% crosstab(education, employment, percentages = "col")
+#'
+#' @seealso
+#' \code{\link[base]{table}} for base R contingency tables.
+#'
+#' \code{\link{frequency}} for single-variable frequency tables.
+#'
+#' \code{\link{chi_square}} for testing if the cross-tabulated variables
+#' are related.
 #'
 #' @family descriptive
 #' @export
@@ -295,6 +303,8 @@ crosstab.grouped_df <- function(data, row, col,
 }
 
 #' Print method for crosstab results
+#' @param x A crosstab result object
+#' @param ... Additional arguments (currently unused)
 #' @export
 print.crosstab <- function(x, ...) {
 

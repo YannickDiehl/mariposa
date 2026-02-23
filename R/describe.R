@@ -30,7 +30,7 @@
 #' @return A summary table with descriptive statistics for each variable
 #'
 #' @details
-#' ## Understanding the Output
+#' ## Understanding the Results
 #'
 #' Key statistics and what they tell you:
 #' - **n**: How many valid responses (watch for too many missing)
@@ -79,9 +79,19 @@
 #'   group_by(region) %>% 
 #'   describe(age, weights = sampling_weight)
 #'
+#' @seealso
+#' \code{\link[base]{summary}} for base R summary statistics.
+#'
+#' \code{\link{frequency}} for categorical variable summaries.
+#'
+#' \code{\link{w_mean}}, \code{\link{w_sd}}, \code{\link{w_median}} for
+#' individual weighted statistics.
+#'
+#' \code{\link{t_test}} and \code{\link{oneway_anova}} for group comparisons.
+#'
 #' @family descriptive
 #' @export
-describe <- function(data, ..., weights = NULL, 
+describe <- function(data, ..., weights = NULL,
                      show = "short", 
                      probs = c(0.25, 0.5, 0.75),
                      na.rm = TRUE, 

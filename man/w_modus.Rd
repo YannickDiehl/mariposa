@@ -2,25 +2,71 @@
 % Please edit documentation in R/w_modus.R
 \name{w_modus}
 \alias{w_modus}
-\title{Weighted Mode (Modus)}
+\title{Find the Most Common Value in Your Population}
 \usage{
 w_modus(data, ..., weights = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{data}{A data frame, or a vector when used in summarise() context}
+\item{data}{Your survey data (a data frame or tibble)}
 
-\item{...}{Variable names (unquoted) or tidyselect expressions}
+\item{...}{The variables you want to analyze. Works best with categorical or
+discrete numeric variables. You can list multiple variables or use helpers
+like \code{starts_with("trust")}}
 
-\item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
+\item{weights}{Survey weights to make results representative of your population.
+Without weights, the mode is simply the most frequent value in your sample.}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
 }
 \value{
-A w_modus object (list) containing results and metadata, or values in summarise context
+Population-weighted mode(s) with sample size information,
+including the most common value (by weighted frequency), effective sample
+size (effective N), and the number of valid observations used.
 }
 \description{
-Calculate weighted mode for variables, with support for
-grouped data and multiple variables simultaneously.
+\code{w_modus()} finds the mode (most frequently occurring value) of your data
+using survey weights for population-representative results. The mode tells you
+which category or value is the most common in your population. This is
+especially useful for categorical variables (e.g., the most common education
+level, the most frequent employment status).
+
+Unlike mean and median, the mode works with both numeric and categorical data.
+}
+\details{
+\subsection{Understanding the Results}{
+\itemize{
+\item \strong{Weighted Mode}: The value that occurs most frequently in the weighted
+population. For weighted data, the mode is the value whose observations
+have the largest total weight.
+\item \strong{Effective N}: How many independent observations your weighted data
+represents.
+\item \strong{N}: The actual number of observations used.
+}
+
+If multiple values share the highest weighted frequency (ties), the first
+value encountered is returned.
+}
+
+\subsection{When to Use This}{
+
+Use \code{w_modus()} when:
+\itemize{
+\item You want to find the most common response (e.g., most popular education level)
+\item You are working with categorical or ordinal data
+\item You want the "typical" value for discrete data where mean is not meaningful
+\item You need SPSS-compatible weighted mode values
+}
+}
+
+\subsection{Formula}{
+
+The weighted mode is the value \eqn{x_k} that maximizes the total weight:
+
+\eqn{\text{Mode}_w = \arg\max_{x_k} \sum_{i: x_i = x_k} w_i}
+
+In other words, sum the weights for each unique value and pick the value
+with the largest total weight.
+}
 }
 \examples{
 # Load required packages and data
@@ -42,7 +88,18 @@ survey_data \%>\% summarise(mode_gender = w_modus(gender, weights = sampling_wei
 # Unweighted (for comparison)
 survey_data \%>\% w_modus(gender)
 }
+\references{
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link{w_median}} for the weighted middle value.
+
+\code{\link{w_mean}} for weighted means.
+
+\code{\link{frequency}} for complete frequency tables of categorical variables.
+
+\code{\link{describe}} for comprehensive descriptive statistics including the mode.
+
 Other weighted_statistics: 
 \code{\link{w_iqr}()},
 \code{\link{w_kurtosis}()},

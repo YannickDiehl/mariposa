@@ -62,4 +62,9 @@ longitudinal_data \%>\%
   describe(outcome_score)
 
 }
+\seealso{
+\code{\link{longitudinal_data_wide}} for the wide format version.
+
+\code{\link{survey_data}} for the cross-sectional survey dataset.
+}
 \keyword{datasets}
