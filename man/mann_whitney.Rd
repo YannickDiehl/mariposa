@@ -92,7 +92,7 @@ The test tells you:
 }
 }
 
-\subsection{When to Use This Test}{
+\subsection{When to Use This}{
 
 Use Mann-Whitney test when:
 \itemize{

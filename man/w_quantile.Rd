@@ -2,7 +2,7 @@
 % Please edit documentation in R/w_quantile.R
 \name{w_quantile}
 \alias{w_quantile}
-\title{Weighted Quantiles}
+\title{Calculate Population-Representative Percentiles}
 \usage{
 w_quantile(
   data,
@@ -13,22 +13,72 @@ w_quantile(
 )
 }
 \arguments{
-\item{data}{A data frame, or a numeric vector when used in summarise() context}
+\item{data}{Your survey data (a data frame or tibble)}
 
-\item{...}{Variable names (unquoted) or tidyselect expressions}
+\item{...}{The numeric variables you want to analyze. You can list multiple
+variables or use helpers like \code{starts_with("income")}}
 
-\item{weights}{Name of the weights variable (unquoted), or a numeric vector of weights}
+\item{weights}{Survey weights to make results representative of your population.
+Without weights, you get the simple sample quantiles.}
 
-\item{probs}{Numeric vector of probabilities (default: c(0, 0.25, 0.5, 0.75, 1))}
+\item{probs}{Which percentiles to calculate, as proportions between 0 and 1.
+Default: \code{c(0, 0.25, 0.5, 0.75, 1)} for the minimum, 25th percentile,
+median, 75th percentile, and maximum. Use \code{c(0.1, 0.5, 0.9)} for
+deciles, or \code{c(0.25, 0.5, 0.75)} for quartiles only.}
 
-\item{na.rm}{Logical; if TRUE, missing values are removed (default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
 }
 \value{
-A w_quantile object (list) containing results and metadata, or numeric values in summarise context
+Population-weighted quantile(s) with sample size information,
+including the weighted percentile values, effective sample size (effective N),
+and the number of valid observations used.
 }
 \description{
-Calculate weighted quantiles for numeric variables, with support for
-grouped data and multiple variables simultaneously.
+\code{w_quantile()} calculates percentiles (quantiles) using survey weights
+for population-representative results. Percentiles divide your data into
+equal portions -- for example, the 25th percentile is the value below which
+25\% of your population falls. This is essential for understanding the
+distribution of variables like income, age, or satisfaction scores.
+}
+\details{
+\subsection{Understanding the Results}{
+\itemize{
+\item \strong{Percentile values}: The data values at each requested percentile
+in the weighted population. For example, if the weighted 25th percentile
+of income is 35,000, then 25\% of the population earns less than that.
+\item \strong{Effective N}: How many independent observations your weighted data
+represents.
+\item \strong{N}: The actual number of observations used.
+}
+
+Common percentiles and their meaning:
+\itemize{
+\item \strong{0\% (minimum)}: The smallest observed value
+\item \strong{25\% (Q1)}: One quarter of the population falls below this value
+\item \strong{50\% (median)}: Half the population falls below this value
+\item \strong{75\% (Q3)}: Three quarters of the population falls below this value
+\item \strong{100\% (maximum)}: The largest observed value
+}
+}
+
+\subsection{When to Use This}{
+
+Use \code{w_quantile()} when:
+\itemize{
+\item You want to know at what values the population splits into groups
+\item You need to construct population-representative income brackets or age groups
+\item You want to identify the median or quartiles with proper weighting
+\item You need SPSS-compatible weighted percentile values
+}
+}
+
+\subsection{Formula}{
+
+Weighted quantiles are calculated using cumulative weights. Observations
+are sorted by value, weights are accumulated, and the requested percentile
+is found by linear interpolation at the point where the cumulative weight
+proportion reaches the target probability.
+}
 }
 \examples{
 # Load required packages and data
@@ -51,7 +101,18 @@ survey_data \%>\% group_by(region) \%>\% w_quantile(age, weights = sampling_weig
 survey_data \%>\% w_quantile(age)
 
 }
+\references{
+IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
+}
 \seealso{
+\code{\link[stats]{quantile}} for the base R quantile function.
+
+\code{\link{w_median}} for the weighted median (50th percentile).
+
+\code{\link{w_iqr}} for the weighted interquartile range (Q3 - Q1).
+
+\code{\link{describe}} for comprehensive descriptive statistics including quantiles.
+
 Other weighted_statistics: 
 \code{\link{w_iqr}()},
 \code{\link{w_kurtosis}()},
