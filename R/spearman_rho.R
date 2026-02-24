@@ -426,27 +426,26 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
 #' @param ... Additional arguments (not used)
 #' @export
 print.spearman_rho <- function(x, digits = 3, ...) {
-  # Header
-  cat("\n")
-  # Print header using standardized title
+  # Header using standardized helper
   title <- get_standard_title("Spearman's Rank Correlation Analysis", x$weights, "")
-  cat(title, "\n")
-  cat(strrep("\u2550", 70), "\n", sep = "")
+  print_header(title)
 
-  # Display analysis info
-  cat("Method: Spearman's rho (rank correlation)\n")
-  cat(sprintf("Variables: %s\n", paste(x$variables, collapse = ", ")))
-  if (!is.null(x$weights)) {
-    cat(sprintf("Weights: %s\n", x$weights))
-  }
-  cat(sprintf("Alternative hypothesis: %s\n", x$alternative))
-  cat(sprintf("Missing data handling: %s deletion\n",
-             if("na.rm" %in% names(x)) x$na.rm else "pairwise"))
+  # Display analysis info using standardized helpers
+  cat("\n")
+  test_info <- list(
+    "Method" = "Spearman's rho (rank correlation)",
+    "Variables" = paste(x$variables, collapse = ", "),
+    "Weights variable" = x$weights,
+    "Missing data handling" = paste(if("na.rm" %in% names(x)) x$na.rm else "pairwise", "deletion")
+  )
+  print_info_section(test_info)
+  test_params <- list(alternative = x$alternative)
+  print_test_parameters(test_params)
 
   # Helper function to print correlation matrix with nice formatting
   .print_rho_matrix <- function(mat, digits = 3, title = "Correlation Matrix:", type = "correlation") {
     cat("\n", title, "\n", sep = "")
-    cat(strrep("\u2500", 69), "\n", sep = "")
+    cat(paste(rep("-", 69), collapse = ""), "\n")
 
     # Format matrix for printing
     if (type == "correlation") {
@@ -474,17 +473,12 @@ print.spearman_rho <- function(x, digits = 3, ...) {
   # Main results display
   if (x$is_grouped) {
     # Grouped analysis
-    cat("\n\u2550\u2550 GROUPED ANALYSIS \u2550\u2550\n")
-
     # Get unique group combinations
     group_combinations <- unique(x$correlations[, x$groups, drop = FALSE])
 
     for (i in 1:nrow(group_combinations)) {
-      # Format group header
-      group_info <- sapply(names(group_combinations), function(g) {
-        paste(g, "=", group_combinations[i, g])
-      })
-      cat(sprintf("\nGroup: %s\n", paste(group_info, collapse = ", ")))
+      # Print group header using standardized helper
+      print_group_header(group_combinations[i, , drop = FALSE])
 
       # Filter correlations for this group
       group_corrs <- x$correlations
@@ -496,7 +490,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
       if (length(x$variables) == 2) {
         # Single correlation - use variable block format
         var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-        cat(sprintf("\n\u250c\u2500 %s \u2500\u2510\n\n", var_pair))
+        cat(sprintf("\n--- %s ---\n\n", var_pair))
 
         # Show correlation statistics
         cat(sprintf("  Spearman's rho: \u03c1 = %.3f\n", group_corrs$rho[1]))
@@ -531,7 +525,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
         # Detailed pairwise results
         cat("\nPairwise Results:\n")
-        cat(strrep("\u2500", 69), "\n", sep = "")
+        cat(paste(rep("-", 69), collapse = ""), "\n")
 
         # Create results table
         output_df <- data.frame(
@@ -546,7 +540,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
         # Print the table
         print(output_df, row.names = FALSE, right = TRUE)
-        cat(strrep("\u2500", 69), "\n", sep = "")
+        cat(paste(rep("-", 69), collapse = ""), "\n")
       }
     }
 
@@ -555,7 +549,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
     if (length(x$variables) == 2) {
       # Single correlation
       var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-      cat(sprintf("\n\u250c\u2500 %s \u2500\u2510\n\n", var_pair))
+      cat(sprintf("\n--- %s ---\n\n", var_pair))
 
       # Show correlation statistics
       cat(sprintf("  Spearman's rho: \u03c1 = %.3f\n", x$correlations$rho[1]))
@@ -590,7 +584,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
       # Detailed pairwise results
       cat("\nPairwise Results:\n")
-      cat(strrep("\u2500", 69), "\n", sep = "")
+      cat(paste(rep("-", 69), collapse = ""), "\n")
 
       # Create results table
       output_df <- data.frame(
@@ -605,13 +599,12 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
       # Print the table
       print(output_df, row.names = FALSE, right = TRUE)
-      cat(strrep("\u2500", 69), "\n", sep = "")
+      cat(paste(rep("-", 69), collapse = ""), "\n")
     }
   }
 
   # Footer section with interpretation
-  cat("\n")
-  cat("Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+  print_significance_legend()
 
   # Note about interpretation
   if (length(x$variables) == 2) {
