@@ -821,11 +821,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     groups <- unique(x$results[x$groups])
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) paste(g, "=", levels(val)[val]) else paste(g, "=", val)
-      })
-      cat(sprintf("\nGroup: %s\n", paste(group_info, collapse = ", ")))
+      print_group_header(group_values)
 
       group_results <- x$results
       for (g in names(group_values)) {

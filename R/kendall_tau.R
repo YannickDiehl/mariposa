@@ -665,7 +665,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
       if (length(x$variables) == 2) {
         # Single correlation - use variable block format
         var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-        cat(sprintf("\n\u250c\u2500 %s \u2500\u2510\n\n", var_pair))
+        cat(sprintf("\n--- %s ---\n\n", var_pair))
 
         # Show correlation statistics
         cat(sprintf("  Kendall's tau-b: τ = %.3f\n", group_corrs$tau[1]))
@@ -701,7 +701,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
         # Detailed pairwise results
         cat("\nPairwise Results:\n")
-        cat("─────────────────────────────────────────────────────────────────────\n")
+        cat(paste(rep("-", 69), collapse = ""), "\n")
 
         # Create results table
         output_df <- data.frame(
@@ -716,7 +716,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
         # Print the table
         print(output_df, row.names = FALSE, right = TRUE)
-        cat("─────────────────────────────────────────────────────────────────────\n")
+        cat(paste(rep("-", 69), collapse = ""), "\n")
       }
     }
 
@@ -725,7 +725,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
     if (length(x$variables) == 2) {
       # Single correlation
       var_pair <- paste(x$variables[1], "×", x$variables[2])
-      cat(sprintf("\n┌─ %s ─┐\n\n", var_pair))
+      cat(sprintf("\n--- %s ---\n\n", var_pair))
 
       # Show correlation statistics
       cat(sprintf("  Kendall's tau-b: τ = %.3f\n", x$correlations$tau[1]))
@@ -760,7 +760,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
       # Detailed pairwise results
       cat("\nPairwise Results:\n")
-      cat("─────────────────────────────────────────────────────────────────────\n")
+      cat(paste(rep("-", 69), collapse = ""), "\n")
 
       # Create results table
       output_df <- data.frame(
@@ -775,12 +775,12 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
       # Print the table
       print(output_df, row.names = FALSE, right = TRUE)
-      cat("─────────────────────────────────────────────────────────────────────\n")
+      cat(paste(rep("-", 69), collapse = ""), "\n")
     }
   }
 
   # Print significance codes
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+  print_significance_legend()
 
   # Note about interpretation
   if (length(x$variables) == 2) {

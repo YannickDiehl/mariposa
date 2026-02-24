@@ -529,6 +529,8 @@ print.frequency <- function(x, digits = 3, ...) {
       print_table(var_results, col_widths, print_line, print_row, format_int, format_num, x$options)
     }
   }
+
+  invisible(x)
 }
 
 # Helper function to print frequency table
@@ -585,3 +587,4 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
   print_line(active_widths)
   cat("\n")
 }
+

@@ -494,17 +494,20 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   if (!is.null(x$group)) {
     group_levels <- x$group_levels
     if (length(group_levels) >= 2) {
-      cat(sprintf("\nGrouping variable: %s\n", x$group))
-      cat(sprintf("Groups compared: %s vs. %s\n", 
-                  as.character(group_levels[1]), 
-                  as.character(group_levels[2])))
-      if (!is.null(x$weight_var) || !is.null(x$weights)) {
-        weight_name <- if (!is.null(x$weight_var)) x$weight_var else x$weights
-        cat(sprintf("Weights variable: %s\n", weight_name))
-      }
-      cat(sprintf("Null hypothesis (mu): %.3f\n", x$mu))
-      cat(sprintf("Alternative hypothesis: %s\n", x$alternative))
-      cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
+      cat("\n")
+      weight_name <- x$weight_var %||% x$weights
+      test_info <- list(
+        "Grouping variable" = x$group,
+        "Groups compared" = sprintf("%s vs. %s", as.character(group_levels[1]), as.character(group_levels[2])),
+        "Weights variable" = weight_name
+      )
+      print_info_section(test_info)
+      test_params <- list(
+        mu = x$mu,
+        alternative = x$alternative,
+        conf.level = x$conf.level
+      )
+      print_test_parameters(test_params)
       cat("\n")
     }
   }
@@ -519,28 +522,18 @@ print.mann_whitney <- function(x, digits = 3, ...) {
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
       
-      # Format group info
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", levels(val)[val])
-        } else {
-          paste(g, "=", val)
-        }
-      })
-      group_info <- paste(group_info, collapse = ", ")
-      
+      # Print group header using standardized helper
+      print_group_header(group_values)
+
       # Filter results for current group
       group_results <- x$results
       for (g in names(group_values)) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
-      
+
       if (nrow(group_results) == 0) next
       group_results <- group_results[!is.na(group_results$Variable), ]
       if (nrow(group_results) == 0) next
-      
-      cat(sprintf("\nGroup: %s\n", group_info))
       
       # Print each variable as separate block
       for (j in seq_len(nrow(group_results))) {
@@ -623,8 +616,8 @@ print.mann_whitney <- function(x, digits = 3, ...) {
     }
   }
   
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
-  
+  print_significance_legend()
+
   cat("\nEffect Size Interpretation (r):\n")
   cat("- Small effect: |r| ≈ 0.1\n")
   cat("- Medium effect: |r| ≈ 0.3\n")

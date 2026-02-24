@@ -588,11 +588,8 @@ print.pearson_cor <- function(x, digits = 3, ...) {
     group_combinations <- unique(x$correlations[x$groups])
     
     for (i in seq_len(nrow(group_combinations))) {
-      # Format group header (Template Standard)
-      group_info <- sapply(names(group_combinations), function(g) {
-        paste(g, "=", group_combinations[i, g])
-      })
-      cat(sprintf("\nGroup: %s\n", paste(group_info, collapse = ", ")))
+      # Print group header using standardized helper
+      print_group_header(group_combinations[i, , drop = FALSE])
       
       # Filter correlations for this group
       group_corrs <- x$correlations
@@ -725,8 +722,7 @@ print.pearson_cor <- function(x, digits = 3, ...) {
   }
   
   # Footer section with interpretation (Template Standard)
-  cat("\n")
-  cat("Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+  print_significance_legend()
   cat("\nCorrelation Strength Interpretation:\n")
   cat("  |r| < 0.30:        Weak correlation\n")
   cat("  0.30 ≤ |r| < 0.70: Moderate correlation\n")
