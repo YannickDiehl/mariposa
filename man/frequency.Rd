@@ -22,9 +22,9 @@ frequency(
 \item{...}{The categorical variables you want to analyze. You can list multiple
 variables separated by commas, or use helpers like \code{starts_with("trust")}}
 
-\item{weights}{Optional survey weights to make results representative of your
-population. Without weights, you get sample frequencies. With weights, you
-get population estimates.}
+\item{weights}{Optional survey weights for population-representative results.
+Without weights, you get sample frequencies. With weights, you get
+population estimates.}
 
 \item{sort.frq}{How to order the results:
 \itemize{

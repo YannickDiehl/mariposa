@@ -4,10 +4,12 @@
 \alias{print.crosstab}
 \title{Print method for crosstab results}
 \usage{
-\method{print}{crosstab}(x, ...)
+\method{print}{crosstab}(x, digits = 1, ...)
 }
 \arguments{
 \item{x}{A crosstab result object}
+
+\item{digits}{Number of decimal places for percentages (default: 1)}
 
 \item{...}{Additional arguments (currently unused)}
 }

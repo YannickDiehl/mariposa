@@ -229,7 +229,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
               stat_val <- modes[1]
               
               n_val <- length(x)
-              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
+              eff_n <- .effective_n(w)  # Effective sample size
             }
           }
           
@@ -295,7 +295,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
           stat_val <- modes[1]
           
           n_val <- length(x)
-          eff_n <- sum(w)^2 / sum(w^2)
+          eff_n <- .effective_n(w)
         }
       }
       
@@ -320,7 +320,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
           dplyr::select(dplyr::all_of(group_vars)) %>% 
           dplyr::distinct()
         
-        for (j in 1:nrow(group_combinations)) {
+        for (j in seq_len(nrow(group_combinations))) {
           group_filter <- group_combinations[j, , drop = FALSE]
           group_results <- results
           for (grp in names(group_filter)) {
@@ -402,10 +402,8 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
   result <- list(
     results = final_results,
     variables = var_names,
-    weight_var = weights_name,        # Test-compatible field name
-    weights = weights_name,           # Alternative field name
-    is_grouped = is_grouped,          # Test-compatible field
-    grouped = is_grouped,             # Alternative field
+    weights = weights_name,
+    is_grouped = is_grouped,
     groups = if (is_grouped) dplyr::group_vars(data) else NULL
   )
   
@@ -416,19 +414,13 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' Print method for w_modus objects
 #'
 #' @param x A w_modus object
-#' @param digits Number of decimal places to display
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @export
 #' @method print w_modus
 print.w_modus <- function(x, digits = 3, ...) {
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Mode Statistics"
-  } else {
-    "Mode Statistics"
-  }
-  
-  cat(sprintf("\n%s\n", test_type))
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
+  test_type <- get_standard_title("Mode", x$weights, "Statistics")
+  print_header(test_type)
   
   is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
   
