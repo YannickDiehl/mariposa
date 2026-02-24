@@ -119,8 +119,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   # Perform chi-squared test
   if (is_grouped) {
     # Group analysis
-    data_list <- group_split(data)
-    group_keys <- group_keys(data)
+    data_list <- dplyr::group_split(data)
+    group_keys <- dplyr::group_keys(data)
     
     results_list <- lapply(seq_along(data_list), function(i) {
       group_data <- data_list[[i]]
