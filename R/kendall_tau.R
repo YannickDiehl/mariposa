@@ -68,7 +68,6 @@
 #' survey_data %>%
 #'   kendall_tau(life_satisfaction, political_orientation)
 #'
-#' \donttest{
 #' # Correlation matrix for multiple variables
 #' survey_data %>%
 #'   kendall_tau(life_satisfaction, political_orientation, trust_media)
@@ -99,7 +98,6 @@
 #'   kendall_tau(life_satisfaction, political_orientation, trust_media,
 #'               weights = sampling_weight)
 #' print(result)
-#' }
 #'
 #' @seealso
 #' \code{\link[stats]{cor}} with \code{method = "kendall"} for the base R
@@ -667,10 +665,10 @@ print.kendall_tau <- function(x, digits = 3, ...) {
       if (length(x$variables) == 2) {
         # Single correlation - use variable block format
         var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-        cat(sprintf("\n\u250c\u2500 %s \u2500\u2510\n\n", var_pair))
+        cat(sprintf("\n--- %s ---\n\n", var_pair))
 
         # Show correlation statistics
-        cat(sprintf("  Kendall's tau-b: \u03c4 = %.3f\n", group_corrs$tau[1]))
+        cat(sprintf("  Kendall's tau-b: τ = %.3f\n", group_corrs$tau[1]))
         cat(sprintf("  Sample size: n = %d\n", group_corrs$n[1]))
         cat(sprintf("  z-score: %.3f\n", group_corrs$z_score[1]))
         cat(sprintf("  p-value (%s): %.4f\n",
@@ -703,11 +701,11 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
         # Detailed pairwise results
         cat("\nPairwise Results:\n")
-        cat(paste0(strrep("\u2500", 69), "\n"))
+        cat(paste(rep("-", 69), collapse = ""), "\n")
 
         # Create results table
         output_df <- data.frame(
-          Pair = paste(group_corrs$var1, "\u00d7", group_corrs$var2),
+          Pair = paste(group_corrs$var1, "×", group_corrs$var2),
           tau_b = sprintf("%.3f", group_corrs$tau),
           z = sprintf("%.3f", group_corrs$z_score),
           p = sprintf("%.4f", group_corrs$p_value),
@@ -718,7 +716,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
         # Print the table
         print(output_df, row.names = FALSE, right = TRUE)
-        cat(paste0(strrep("\u2500", 69), "\n"))
+        cat(paste(rep("-", 69), collapse = ""), "\n")
       }
     }
 
@@ -726,11 +724,11 @@ print.kendall_tau <- function(x, digits = 3, ...) {
     # Ungrouped analysis
     if (length(x$variables) == 2) {
       # Single correlation
-      var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-      cat(sprintf("\n\u250c\u2500 %s \u2500\u2510\n\n", var_pair))
+      var_pair <- paste(x$variables[1], "×", x$variables[2])
+      cat(sprintf("\n--- %s ---\n\n", var_pair))
 
       # Show correlation statistics
-      cat(sprintf("  Kendall's tau-b: \u03c4 = %.3f\n", x$correlations$tau[1]))
+      cat(sprintf("  Kendall's tau-b: τ = %.3f\n", x$correlations$tau[1]))
       cat(sprintf("  Sample size: n = %d\n", x$correlations$n[1]))
       cat(sprintf("  z-score: %.3f\n", x$correlations$z_score[1]))
       cat(sprintf("  p-value (%s): %.4f\n",
@@ -762,11 +760,11 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
       # Detailed pairwise results
       cat("\nPairwise Results:\n")
-      cat(paste0(strrep("\u2500", 69), "\n"))
+      cat(paste(rep("-", 69), collapse = ""), "\n")
 
       # Create results table
       output_df <- data.frame(
-        Pair = paste(x$correlations$var1, "\u00d7", x$correlations$var2),
+        Pair = paste(x$correlations$var1, "×", x$correlations$var2),
         tau_b = sprintf("%.3f", x$correlations$tau),
         z = sprintf("%.3f", x$correlations$z_score),
         p = sprintf("%.4f", x$correlations$p_value),
@@ -777,12 +775,12 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
       # Print the table
       print(output_df, row.names = FALSE, right = TRUE)
-      cat(paste0(strrep("\u2500", 69), "\n"))
+      cat(paste(rep("-", 69), collapse = ""), "\n")
     }
   }
 
   # Print significance codes
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+  print_significance_legend()
 
   # Note about interpretation
   if (length(x$variables) == 2) {

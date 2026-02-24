@@ -763,26 +763,20 @@ print.levene_test <- function(x, digits = 3, ...) {
   test_type <- get_standard_title("Levene's Test for Homogeneity of Variance", weights_name, "")
   print_header(test_type)
   
-  # Print test information (always show for both grouped and ungrouped)
+  # Print test information using standardized helpers
   cat("\n")
-  if (!is.null(x$group_var) || !is.null(x$group)) {
-    group_name <- if (!is.null(x$group_var)) x$group_var else x$group
-    cat(sprintf("Grouping variable: %s\n", group_name))
-  }
-  if (!is.null(x$weight_var) || !is.null(x$weights)) {
-    weight_name <- if (!is.null(x$weight_var)) x$weight_var else x$weights
-    cat(sprintf("Weights variable: %s\n", weight_name))
-  }
-  if (!is.null(x$center)) {
-    cat(sprintf("Center: %s\n", x$center))
-  }
+  group_name <- x$group_var %||% x$group
+  weight_name <- x$weight_var %||% x$weights
+  test_info <- list(
+    "Grouping variable" = group_name,
+    "Weights variable" = weight_name,
+    "Center" = x$center
+  )
+  print_info_section(test_info)
   cat("\n")
   
   # Add significance stars
-  x$results$sig <- cut(x$results$p_value, 
-                      breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                      labels = c("***", "**", "*", ""),
-                      right = FALSE)
+  x$results$sig <- sapply(x$results$p_value, add_significance_stars)
   
   # Check if this is grouped data
   is_grouped_data <- (!is.null(x$grouped) && x$grouped) || (!is.null(x$is_grouped) && x$is_grouped)
@@ -924,8 +918,8 @@ print.levene_test <- function(x, digits = 3, ...) {
     }
   }
   
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
-  
+  print_significance_legend()
+
   cat("\nInterpretation:\n")
   cat("- p > 0.05: Variances are homogeneous (equal variances assumed)\n")
   cat("- p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)\n")
