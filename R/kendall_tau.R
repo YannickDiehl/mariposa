@@ -25,7 +25,7 @@
 #'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
-#' @param na.rm \lifecycle{deprecated} Use \code{use} instead.
+#' @param na.rm Deprecated. Use \code{use} instead.
 #'
 #' @return Correlation results showing rank-based relationships between variables,
 #'   including the tau-b coefficient, p-value, z-score, and sample size for each
@@ -424,8 +424,8 @@ kendall_tau <- function(data, ..., weights = NULL,
   # Main execution logic
   if (is_grouped) {
     # Group analysis
-    data_list <- group_split(data)
-    group_keys <- group_keys(data)
+    data_list <- dplyr::group_split(data)
+    group_keys <- dplyr::group_keys(data)
 
     results_list <- lapply(seq_along(data_list), function(i) {
       group_data <- data_list[[i]]
@@ -620,7 +620,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
         # Create results table
         output_df <- data.frame(
-          Pair = paste(group_corrs$var1, "×", group_corrs$var2),
+          Pair = paste(group_corrs$var1, "\u00d7", group_corrs$var2),
           tau_b = sprintf("%.3f", group_corrs$tau),
           z = sprintf("%.3f", group_corrs$z_score),
           p = sprintf("%.4f", group_corrs$p_value),
@@ -672,7 +672,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
       # Create results table
       output_df <- data.frame(
-        Pair = paste(x$correlations$var1, "×", x$correlations$var2),
+        Pair = paste(x$correlations$var1, "\u00d7", x$correlations$var2),
         tau_b = sprintf("%.3f", x$correlations$tau),
         z = sprintf("%.3f", x$correlations$z_score),
         p = sprintf("%.4f", x$correlations$p_value),

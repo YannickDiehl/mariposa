@@ -27,7 +27,7 @@
 #'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
-#' @param na.rm \lifecycle{deprecated} Use \code{use} instead.
+#' @param na.rm Deprecated. Use \code{use} instead.
 #'
 #' @return Correlation results showing rank-based relationships between variables,
 #'   including the rho coefficient, p-value, t-statistic, and sample size for

@@ -22,7 +22,7 @@
 #'     \item \code{"pairwise"} (default): Use all available data for each pair
 #'     \item \code{"listwise"}: Only use complete cases across all variables
 #'   }
-#' @param na.rm \lifecycle{deprecated} Use \code{use} instead.
+#' @param na.rm Deprecated. Use \code{use} instead.
 #'
 #' @return Correlation results showing relationships between variables, including:
 #' - Correlation coefficient (r): Strength and direction of relationship
@@ -363,8 +363,8 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
   # Main execution logic
   if (is_grouped) {
     # Group analysis
-    data_list <- group_split(data)
-    group_keys <- group_keys(data)
+    data_list <- dplyr::group_split(data)
+    group_keys <- dplyr::group_keys(data)
     
     results_list <- lapply(seq_along(data_list), function(i) {
       group_data <- data_list[[i]]
