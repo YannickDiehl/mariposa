@@ -42,7 +42,7 @@ For one-sample tests, your benchmark value.}
 \item \code{"less"}: First group is lower
 }}
 
-\item{conf.level}{Confidence level (Default: 0.95 = 95\%)}
+\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 }
 \value{
 Test results showing whether groups differ, including:

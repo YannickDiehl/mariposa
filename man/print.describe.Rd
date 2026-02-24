@@ -4,10 +4,12 @@
 \alias{print.describe}
 \title{Print method for describe objects}
 \usage{
-\method{print}{describe}(x, ...)
+\method{print}{describe}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{A describe object}
+
+\item{digits}{Number of decimal places to display (default: 3)}
 
 \item{...}{Additional arguments (currently unused)}
 }

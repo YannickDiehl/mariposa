@@ -15,7 +15,7 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The numeric variables you want to summarize. List them separated by
 #'   commas, or use helpers like \code{starts_with("trust")}
-#' @param weights Optional survey weights to get population-representative statistics.
+#' @param weights Optional survey weights for population-representative results.
 #'   Without weights, you describe your sample. With weights, you describe the population.
 #' @param show Which statistics to display:
 #'   \itemize{
@@ -604,9 +604,10 @@ describe <- function(data, ..., weights = NULL,
 #' Automatically adjusts output based on whether analysis was weighted or unweighted.
 #'
 #' @param x A describe object
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (currently unused)
 #' @export
-print.describe <- function(x, ...) {
+print.describe <- function(x, digits = 3, ...) {
 
   # Determine if weighted analysis
   is_weighted <- !is.null(x$weights)
@@ -616,10 +617,10 @@ print.describe <- function(x, ...) {
   print_header(title)
 
   # Print results based on grouping
-  if (x$grouped) {
-    .print_grouped_results(x, is_weighted)
+  if (x$is_grouped) {
+    .print_grouped_results(x, is_weighted, digits = digits)
   } else {
-    .print_ungrouped_results(x, is_weighted)
+    .print_ungrouped_results(x, is_weighted, digits = digits)
   }
 
   invisible(x)
@@ -629,26 +630,26 @@ print.describe <- function(x, ...) {
 
 #' Print results for ungrouped data
 #' @keywords internal
-.print_ungrouped_results <- function(x, is_weighted) {
-  output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted)
+.print_ungrouped_results <- function(x, is_weighted, digits = 3) {
+  output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted, digits = digits)
   print(output_df, row.names = FALSE)
-  
+
   # Print footer border
   print_separator(get_table_width(output_df))
 }
 
 #' Print results for grouped data
 #' @keywords internal
-.print_grouped_results <- function(x, is_weighted) {
+.print_grouped_results <- function(x, is_weighted, digits = 3) {
   group_vars <- x$group_vars
   results_df <- x$results
-  
+
   # Get unique group combinations
   group_combinations <- results_df %>%
     dplyr::select(dplyr::all_of(group_vars)) %>%
     dplyr::distinct()
-  
-  for (i in 1:nrow(group_combinations)) {
+
+  for (i in seq_len(nrow(group_combinations))) {
     # Filter data for this group
     group_filter <- group_combinations[i, , drop = FALSE]
     filter_condition <- TRUE
@@ -656,12 +657,12 @@ print.describe <- function(x, ...) {
       filter_condition <- filter_condition & (results_df[[gvar]] == group_filter[[gvar]])
     }
     group_data <- results_df[filter_condition, , drop = FALSE]
-    
+
     # Print group header using standardized helper
     print_group_header(group_filter)
-    
+
     # Create and print output
-    temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted)
+    temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted, digits = digits)
     print_separator(get_table_width(temp_output))
     print(temp_output, row.names = FALSE)
     print_separator(get_table_width(temp_output))
@@ -670,7 +671,7 @@ print.describe <- function(x, ...) {
 
 #' Create formatted output data frame for printing
 #' @keywords internal
-.create_output_df <- function(results_df, variables, show, is_weighted) {
+.create_output_df <- function(results_df, variables, show, is_weighted, digits = 3) {
   output_rows <- list()
   
   for (var_name in variables) {
@@ -691,7 +692,7 @@ print.describe <- function(x, ...) {
         for (q_col in q_cols) {
           q_name <- gsub(paste0("^", var_name, "_"), "", q_col)
           if (q_col %in% names(results_df)) {
-            row_data[[q_name]] <- round(results_df[[q_col]], 3)
+            row_data[[q_name]] <- round(results_df[[q_col]], digits)
           }
         }
       } else if (col_name %in% names(results_df)) {
@@ -701,7 +702,7 @@ print.describe <- function(x, ...) {
                              "se" = "SE", "var" = "Variance", "range" = "Range",
                              "iqr" = "IQR", "skew" = "Skewness", "kurtosis" = "Kurtosis",
                              "mode" = "Mode")
-          row_data[[stat_name]] <- round(value, 3)
+          row_data[[stat_name]] <- round(value, digits)
         } else {
           row_data[["Mode"]] <- value
         }

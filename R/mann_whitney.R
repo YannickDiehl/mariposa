@@ -29,7 +29,7 @@
 #'     \item \code{"greater"}: Test if group 1 > group 2
 #'     \item \code{"less"}: Test if group 1 < group 2
 #'   }
-#' @param conf.level Confidence level for effect size (Default: 0.95 = 95%)
+#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #'
 #' @return Test results showing whether groups differ, including:
 #' - U and W statistics (test statistics)
@@ -151,29 +151,22 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) group_vars(data) else NULL
   
-  # Get variable names using tidyselect
-  dots <- enquos(...)
-  group_quo <- enquo(group)
-  weights_quo <- enquo(weights)
-  
-  # Evaluate selections
-  vars <- eval_select(expr(c(!!!dots)), data = data)
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
-  
-  # Group is required for Mann-Whitney test
+
+  # Process group variable (required for Mann-Whitney test)
+  group_quo <- enquo(group)
   if (quo_is_null(group_quo)) {
     cli_abort("{.arg group} is required for Mann-Whitney test.")
   }
-  
+
   g_var <- eval_select(expr(!!group_quo), data = data)
   g_name <- names(g_var)[1]  # Take first name
-  
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)[1]  # Take first name
-  } else {
-    w_name <- NULL
-  }
+
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
 
   # Helper function to perform Mann-Whitney test for a single variable
   perform_single_mann_whitney <- function(data, var_name, group_name, weight_name = NULL) {
@@ -301,7 +294,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       
       # Weighted ranks using midpoint method
       weighted_ranks <- rep(0, length(all_values))
-      for(i in 1:length(sorted_values)) {
+      for(i in seq_along(sorted_values)) {
         if(i == 1) {
           weighted_ranks[sorted_indices[i]] <- sorted_weights[i] / 2
         } else {
@@ -469,14 +462,14 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 #' Print method for Mann-Whitney test results
 #'
 #' @param x A mann_whitney object
-#' @param digits Number of decimal places to display
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @export
 #' @method print mann_whitney
 print.mann_whitney <- function(x, digits = 3, ...) {
 
   # Determine test type using standardized helper
-  weights_name <- x$weight_var %||% x$weights
+  weights_name <- x$weights
   test_type <- get_standard_title("Mann-Whitney U Test", weights_name, "Results")
   print_header(test_type)
   
@@ -487,15 +480,14 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
                       
   # Template Standard: Dual grouped data detection
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) || 
-                     (!is.null(x$is_grouped) && x$is_grouped)
+  is_grouped_data <- isTRUE(x$is_grouped)
   
   # Print info about grouping variable if present
   if (!is.null(x$group)) {
     group_levels <- x$group_levels
     if (length(group_levels) >= 2) {
       cat("\n")
-      weight_name <- x$weight_var %||% x$weights
+      weight_name <- x$weights
       test_info <- list(
         "Grouping variable" = x$group,
         "Groups compared" = sprintf("%s vs. %s", as.character(group_levels[1]), as.character(group_levels[2])),
@@ -565,7 +557,7 @@ print.mann_whitney <- function(x, digits = 3, ...) {
         stringsAsFactors = FALSE
       )
       
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Mann-Whitney U Test Results", "Mann-Whitney U Test Results")))
+        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weights), "Weighted Mann-Whitney U Test Results", "Mann-Whitney U Test Results")))
         border_width <- paste(rep("-", 70), collapse = "")
       cat(border_width, "\n")
       print(results_df, row.names = FALSE)
@@ -607,7 +599,7 @@ print.mann_whitney <- function(x, digits = 3, ...) {
       stringsAsFactors = FALSE
     )
     
-      cat(sprintf("\n%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Mann-Whitney U Test Results", "Mann-Whitney U Test Results")))
+      cat(sprintf("\n%s:\n", ifelse(!is.null(x$weights), "Weighted Mann-Whitney U Test Results", "Mann-Whitney U Test Results")))
       border_width <- paste(rep("-", 70), collapse = "")
     cat(border_width, "\n")
     print(results_df, row.names = FALSE)

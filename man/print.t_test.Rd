@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An object of class \code{"t_test"} returned by \code{\link{t_test}}.}
 
-\item{digits}{Integer specifying the number of decimal places to display
+\item{digits}{Number of decimal places to display (default: 3)
 for numeric values. Default is \code{3}.}
 
 \item{...}{Additional arguments passed to \code{\link[base]{print}}. Currently unused.}
