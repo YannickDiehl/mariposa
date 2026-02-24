@@ -317,13 +317,9 @@ print.crosstab <- function(x, ...) {
     for (i in seq_along(x$results)) {
       result <- x$results[[i]]
 
-      # Print group header
+      # Print group header using standardized helper
       group_info <- result$group_info
-      group_str <- paste(sapply(seq_along(group_info), function(j) {
-        paste(names(group_info)[j], "=", as.character(group_info[[j]]))
-      }), collapse = ", ")
-
-      cat(sprintf("\n--- Group: %s ---\n", group_str))
+      print_group_header(as.data.frame(group_info, stringsAsFactors = FALSE))
 
       # Print the crosstab for this group
       .print_single_crosstab(result)
@@ -342,7 +338,7 @@ print.crosstab <- function(x, ...) {
 
   # Header
   cat("\nCrosstabulation: ", x$row_var, " × ", x$col_var, "\n", sep = "")
-  cat(paste(rep("─", 50), collapse = ""), "\n\n")
+  cat(paste(rep("-", 50), collapse = ""), "\n\n")
 
   # Get dimensions
   n_rows <- length(x$row_levels)
@@ -378,7 +374,7 @@ print.crosstab <- function(x, ...) {
 
   # Print separator
   total_width <- row_label_width + (n_cols + 1) * col_width
-  cat(paste(rep("─", total_width), collapse = ""), "\n")
+  cat(paste(rep("-", total_width), collapse = ""), "\n")
 
   # Print each row with counts
   for (i in 1:n_rows) {
@@ -437,7 +433,7 @@ print.crosstab <- function(x, ...) {
   }
 
   # Print total row separator
-  cat(paste(rep("─", total_width), collapse = ""), "\n")
+  cat(paste(rep("-", total_width), collapse = ""), "\n")
 
   # Print totals row
   cat(sprintf("%-*s", row_label_width, "Total"))
