@@ -149,7 +149,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
-  group_vars <- if (is_grouped) group_vars(data) else NULL
+  grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
   
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
@@ -442,7 +442,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     mu = mu,
     alternative = alternative,
     conf.level = conf.level,
-    data = data[, unique(c(var_names, g_name, w_name, group_vars)), drop = FALSE]
+    data = data[, unique(c(var_names, g_name, w_name, grp_vars)), drop = FALSE]
   )
   
   class(result) <- "mann_whitney"
