@@ -61,7 +61,7 @@ crosstab(
 
 - na.rm:
 
-  Remove missing values? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE)
 
 - digits:
 

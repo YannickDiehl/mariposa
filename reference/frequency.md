@@ -42,9 +42,9 @@ frequency(
 
 - weights:
 
-  Optional survey weights to make results representative of your
-  population. Without weights, you get sample frequencies. With weights,
-  you get population estimates.
+  Optional survey weights for population-representative results. Without
+  weights, you get sample frequencies. With weights, you get population
+  estimates.
 
 - sort.frq:
 

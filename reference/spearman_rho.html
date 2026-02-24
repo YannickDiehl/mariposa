@@ -70,8 +70,9 @@ the assumptions of Pearson correlation are not met.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  alternative <span class="op">=</span> <span class="st">"two.sided"</span>,</span>
-<span>  na.rm <span class="op">=</span> <span class="st">"pairwise"</span></span>
+<span>  alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"less"</span>, <span class="st">"greater"</span><span class="op">)</span>,</span>
+<span>  use <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pairwise"</span>, <span class="st">"listwise"</span><span class="op">)</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,16 +97,20 @@ weighted ranks for mathematically correct survey analysis.</p></dd>
 
 
 <dt id="arg-alternative">alternative<a class="anchor" aria-label="anchor" href="#arg-alternative"></a></dt>
-<dd><p>Character string specifying the alternative hypothesis:</p><ul><li><p><code>"two.sided"</code> (default): Two-tailed test</p></li>
+<dd><p>Direction of the test:</p><ul><li><p><code>"two.sided"</code> (default): Two-tailed test</p></li>
 <li><p><code>"less"</code>: One-tailed test (negative correlation)</p></li>
 <li><p><code>"greater"</code>: One-tailed test (positive correlation)</p></li>
 </ul></dd>
 
 
-<dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Character string specifying missing data handling:</p><ul><li><p><code>"pairwise"</code> (default): Pairwise deletion - each correlation uses all available cases</p></li>
+<dt id="arg-use">use<a class="anchor" aria-label="anchor" href="#arg-use"></a></dt>
+<dd><p>How to handle missing values:</p><ul><li><p><code>"pairwise"</code> (default): Pairwise deletion - each correlation uses all available cases</p></li>
 <li><p><code>"listwise"</code>: Listwise deletion - only complete cases across all variables</p></li>
 </ul></dd>
+
+
+<dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
+<dd><p>Deprecated. Use <code>use</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -196,8 +201,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction × political_orientation ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spearman's rho: ρ = -0.004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2228</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t-statistic: -0.210</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2228</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8334</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -263,8 +268,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spearman's rho: ρ = 0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t-statistic: 0.163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -398,20 +403,20 @@ implementation.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Listwise deletion for missing data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, na.rm <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, use <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: age, income</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: listwise deletion</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spearman's rho: ρ = 0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t-statistic: 0.163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -433,8 +438,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spearman's rho: ρ = 0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t-statistic: 0.163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (1-tailed): 0.4351</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>

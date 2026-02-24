@@ -17,7 +17,7 @@ print(x, digits = 3, ...)
 
 - digits:
 
-  Number of decimal places to display
+  Number of decimal places to display (default: 3)
 
 - ...:
 

@@ -5,15 +5,11 @@ Print horizontal separator line
 ## Usage
 
 ``` r
-print_separator(width = 40, char = "-")
+print_separator(...)
 ```
 
 ## Arguments
 
-- width:
+- ...:
 
-  Width of the line
-
-- char:
-
-  Character to use for the line
+  Ignored (retained for backward compatibility)

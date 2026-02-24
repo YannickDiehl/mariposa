@@ -12,8 +12,7 @@ ungrouped results.
   weights_name,
   is_grouped,
   weighted_col,
-  unweighted_col,
-  is_grouped_flag
+  unweighted_col
 )
 ```
 
@@ -42,10 +41,6 @@ ungrouped results.
 - unweighted_col:
 
   Name for unweighted statistic column
-
-- is_grouped_flag:
-
-  Same as is_grouped (kept for clarity)
 
 ## Value
 

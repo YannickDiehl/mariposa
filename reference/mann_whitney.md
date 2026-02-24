@@ -70,7 +70,7 @@ mann_whitney(
 
 - conf.level:
 
-  Confidence level for effect size (Default: 0.95 = 95%)
+  Confidence level for intervals (Default: 0.95 = 95%)
 
 ## Value
 

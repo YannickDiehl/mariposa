@@ -163,9 +163,6 @@ individual weighted statistics.</p>
 <span></span>
 <span><span class="co"># Weighted mode (most common value)</span></span>
 <span><span class="fu"><a href="../reference/w_modus.html">w_modus</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Mode Statistics</span></span>
-<span><span class="co">#&gt; ------------------------ </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
 <span><span class="co">#&gt;   Variable  weighted_mode   effective_n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -222,12 +219,10 @@ individual weighted statistics.</p>
 <span><span class="fu"><a href="../reference/w_quantile.html">w_quantile</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>,</span>
 <span>           probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  Variable Quantile    Value         Weights</span></span>
-<span><span class="co">#&gt;    income      25% 2700.000 sampling_weight</span></span>
-<span><span class="co">#&gt;    income      50% 3500.000 sampling_weight</span></span>
-<span><span class="co">#&gt;    income      75% 4600.000 sampling_weight</span></span>
-<span><span class="co">#&gt;    income        n 2186.000 sampling_weight</span></span>
-<span><span class="co">#&gt;    income    eff_n 2158.917 sampling_weight</span></span>
+<span><span class="co">#&gt;  Variable Quantile Value    N Effective_N         Weights</span></span>
+<span><span class="co">#&gt;    income      25%  2700 2186      2158.9 sampling_weight</span></span>
+<span><span class="co">#&gt;    income      50%  3500 2186      2158.9 sampling_weight</span></span>
+<span><span class="co">#&gt;    income      75%  4600 2186      2158.9 sampling_weight</span></span>
 <span></span>
 <span><span class="co"># Weighted standard error</span></span>
 <span><span class="fu"><a href="../reference/w_se.html">w_se</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -396,7 +391,7 @@ argument:</p>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = -0.005</span></span>
-<span><span class="co">#&gt;   Effect size: r² = 0.000</span></span>
+<span><span class="co">#&gt;   Effect size: r²: 0.000</span></span>
 <span><span class="co">#&gt;   Sample size: n = 2201</span></span>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>

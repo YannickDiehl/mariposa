@@ -137,47 +137,39 @@ data(survey_data)
 survey_data %>% w_quantile(age, weights = sampling_weight)
 #> 
 #> ── Weighted Quantile Statistics ────────────────────────────────────────────────
-#>  Variable Quantile    Value         Weights
-#>       age      Min   18.000 sampling_weight
-#>       age      25%   38.000 sampling_weight
-#>       age      50%   50.000 sampling_weight
-#>       age      75%   63.000 sampling_weight
-#>       age      Max   95.000 sampling_weight
-#>       age        n 2500.000 sampling_weight
-#>       age    eff_n 2468.768 sampling_weight
+#>  Variable Quantile Value    N Effective_N         Weights
+#>       age      Min    18 2500      2468.8 sampling_weight
+#>       age      25%    38 2500      2468.8 sampling_weight
+#>       age      50%    50 2500      2468.8 sampling_weight
+#>       age      75%    63 2500      2468.8 sampling_weight
+#>       age      Max    95 2500      2468.8 sampling_weight
 #> ────────────────────────────────────────────────────────────────────────────────
 
 # Custom quantiles
 survey_data %>% w_quantile(income, weights = sampling_weight, probs = c(0.1, 0.5, 0.9))
 #> 
 #> ── Weighted Quantile Statistics ────────────────────────────────────────────────
-#>  Variable Quantile    Value         Weights
-#>    income      10% 2100.000 sampling_weight
-#>    income      50% 3500.000 sampling_weight
-#>    income      90% 5700.000 sampling_weight
-#>    income        n 2186.000 sampling_weight
-#>    income    eff_n 2158.917 sampling_weight
+#>  Variable Quantile Value    N Effective_N         Weights
+#>    income      10%  2100 2186      2158.9 sampling_weight
+#>    income      50%  3500 2186      2158.9 sampling_weight
+#>    income      90%  5700 2186      2158.9 sampling_weight
 #> ────────────────────────────────────────────────────────────────────────────────
 
 # Multiple variables
 survey_data %>% w_quantile(age, income, weights = sampling_weight)
 #> 
 #> ── Weighted Quantile Statistics ────────────────────────────────────────────────
-#>  Variable Quantile    Value         Weights
-#>       age      Min   18.000 sampling_weight
-#>       age      25%   38.000 sampling_weight
-#>       age      50%   50.000 sampling_weight
-#>       age      75%   63.000 sampling_weight
-#>       age      Max   95.000 sampling_weight
-#>       age        n 2500.000 sampling_weight
-#>       age    eff_n 2468.768 sampling_weight
-#>    income      Min  800.000 sampling_weight
-#>    income      25% 2700.000 sampling_weight
-#>    income      50% 3500.000 sampling_weight
-#>    income      75% 4600.000 sampling_weight
-#>    income      Max 8000.000 sampling_weight
-#>    income        n 2186.000 sampling_weight
-#>    income    eff_n 2158.917 sampling_weight
+#>  Variable Quantile Value    N Effective_N         Weights
+#>       age      Min    18 2500      2468.8 sampling_weight
+#>       age      25%    38 2500      2468.8 sampling_weight
+#>       age      50%    50 2500      2468.8 sampling_weight
+#>       age      75%    63 2500      2468.8 sampling_weight
+#>       age      Max    95 2500      2468.8 sampling_weight
+#>    income      Min   800 2186      2158.9 sampling_weight
+#>    income      25%  2700 2186      2158.9 sampling_weight
+#>    income      50%  3500 2186      2158.9 sampling_weight
+#>    income      75%  4600 2186      2158.9 sampling_weight
+#>    income      Max  8000 2186      2158.9 sampling_weight
 #> ────────────────────────────────────────────────────────────────────────────────
 
 # Grouped data  
@@ -187,39 +179,33 @@ survey_data %>% group_by(region) %>% w_quantile(age, weights = sampling_weight)
 #> 
 #> Group: region = East
 #> ────────────────────────────────────────────────────────────────────────────────
-#>  Variable Quantile   Value         Weights
-#>       age      Min  18.000 sampling_weight
-#>       age      25%  40.000 sampling_weight
-#>       age      50%  53.000 sampling_weight
-#>       age      75%  64.000 sampling_weight
-#>       age      Max  95.000 sampling_weight
-#>       age        n 485.000 sampling_weight
-#>       age    eff_n 477.027 sampling_weight
+#>  Variable Quantile Value   N Effective_N         Weights
+#>       age      Min    18 485         477 sampling_weight
+#>       age      25%    40 485         477 sampling_weight
+#>       age      50%    53 485         477 sampling_weight
+#>       age      75%    64 485         477 sampling_weight
+#>       age      Max    95 485         477 sampling_weight
 #> ────────────────────────────────────────────────────────────────────────────────
 #> 
 #> Group: region = West
 #> ────────────────────────────────────────────────────────────────────────────────
-#>  Variable Quantile    Value         Weights
-#>       age      Min   18.000 sampling_weight
-#>       age      25%   38.000 sampling_weight
-#>       age      50%   49.000 sampling_weight
-#>       age      75%   62.000 sampling_weight
-#>       age      Max   95.000 sampling_weight
-#>       age        n 2015.000 sampling_weight
-#>       age    eff_n 1993.079 sampling_weight
+#>  Variable Quantile Value    N Effective_N         Weights
+#>       age      Min    18 2015      1993.1 sampling_weight
+#>       age      25%    38 2015      1993.1 sampling_weight
+#>       age      50%    49 2015      1993.1 sampling_weight
+#>       age      75%    62 2015      1993.1 sampling_weight
+#>       age      Max    95 2015      1993.1 sampling_weight
 #> ────────────────────────────────────────────────────────────────────────────────
 
 # Unweighted (for comparison)
 survey_data %>% w_quantile(age)
 #> 
 #> ── Quantile Statistics ─────────────────────────────────────────────────────────
-#>  Variable Quantile Value
-#>       age      Min    18
-#>       age      25%    38
-#>       age      50%    50
-#>       age      75%    62
-#>       age      Max    95
-#>       age        n  2500
-#>       age    eff_n  2500
+#>  Variable Quantile Value    N
+#>       age      Min    18 2500
+#>       age      25%    38 2500
+#>       age      50%    50 2500
+#>       age      75%    62 2500
+#>       age      Max    95 2500
 #> ────────────────────────────────────────────────────────────────────────────────
 ```

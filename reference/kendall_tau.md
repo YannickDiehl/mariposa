@@ -17,8 +17,9 @@ kendall_tau(
   data,
   ...,
   weights = NULL,
-  alternative = "two.sided",
-  na.rm = "pairwise"
+  alternative = c("two.sided", "less", "greater"),
+  use = c("pairwise", "listwise"),
+  na.rm = NULL
 )
 ```
 
@@ -40,7 +41,7 @@ kendall_tau(
 
 - alternative:
 
-  Character string specifying the alternative hypothesis:
+  Direction of the test:
 
   - `"two.sided"` (default): Two-tailed test
 
@@ -48,15 +49,19 @@ kendall_tau(
 
   - `"greater"`: One-tailed test (positive correlation)
 
-- na.rm:
+- use:
 
-  Character string specifying missing data handling:
+  How to handle missing values:
 
   - `"pairwise"` (default): Pairwise deletion - each correlation uses
     all available cases
 
   - `"listwise"`: Listwise deletion - only complete cases across all
     variables
+
+- na.rm:
+
+  Deprecated. Use `use` instead.
 
 ## Value
 
@@ -158,8 +163,8 @@ survey_data %>%
 #> --- life_satisfaction × political_orientation ---
 #> 
 #>   Kendall's tau-b: τ = -0.004
-#>   Sample size: n = 2228
 #>   z-score: -0.212
+#>   Sample size: n = 2228
 #>   p-value (2-tailed): 0.8321
 #>   Significance: ns
 #> 
@@ -167,7 +172,6 @@ survey_data %>%
 #> 
 #> Interpretation: weak negative correlation
 
-# \donttest{
 # Correlation matrix for multiple variables
 survey_data %>%
   kendall_tau(life_satisfaction, political_orientation, trust_media)
@@ -226,8 +230,8 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Kendall's tau-b: τ = 0.003
-#>   Sample size: n = 2201
 #>   z-score: 0.202
+#>   Sample size: n = 2201
 #>   p-value (2-tailed): 0.8397
 #>   Significance: ns
 #> 
@@ -367,7 +371,7 @@ survey_data %>%
 
 # Listwise deletion for missing data
 survey_data %>%
-  kendall_tau(age, income, na.rm = "listwise")
+  kendall_tau(age, income, use = "listwise")
 #> 
 #> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────
 #> 
@@ -378,8 +382,8 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Kendall's tau-b: τ = 0.002
-#>   Sample size: n = 2186
 #>   z-score: 0.168
+#>   Sample size: n = 2186
 #>   p-value (2-tailed): 0.8667
 #>   Significance: ns
 #> 
@@ -400,8 +404,8 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Kendall's tau-b: τ = 0.002
-#>   Sample size: n = 2186
 #>   z-score: 0.168
+#>   Sample size: n = 2186
 #>   p-value (1-tailed): 0.4334
 #>   Significance: ns
 #> 
@@ -455,5 +459,4 @@ print(result)
 #> --------------------------------------------------------------------- 
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
-# }
 ```

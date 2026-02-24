@@ -33,7 +33,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.007
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2186
 #>   95% CI: [-0.048, 0.035]
 #>   p-value: 0.7608
@@ -65,7 +65,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.005
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
@@ -145,7 +145,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
-#>   Effect size: r-squared = 0.002
+#>   Effect size: r-squared: 0.002
 #>   Sample size: n = 449
 #>   95% CI: [-0.043, 0.142]
 #>   p-value: 0.2931
@@ -154,7 +154,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.019
-#>   Effect size: r-squared = 0.000
+#>   Effect size: r-squared: 0.000
 #>   Sample size: n = 1751
 #>   95% CI: [-0.066, 0.028]
 #>   p-value: 0.4267
@@ -182,7 +182,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.005
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
@@ -218,8 +218,8 @@ survey_data %>%
 #> --- political_orientation × environmental_concern ---
 #> 
 #>   Spearman's rho: ρ = -0.576
-#>   Sample size: n = 2207
 #>   t-statistic: -33.093
+#>   Sample size: n = 2207
 #>   p-value (2-tailed): 0.0000
 #>   Significance: ***
 #> 
@@ -236,8 +236,8 @@ survey_data %>%
 #> --- political_orientation × environmental_concern ---
 #> 
 #>   Spearman's rho: ρ = -0.576
-#>   Sample size: n = 2207
 #>   t-statistic: -33.093
+#>   Sample size: n = 2207
 #>   p-value (2-tailed): 0.0000
 #>   Significance: ***
 #> 
@@ -327,8 +327,8 @@ survey_data %>%
 #> --- political_orientation × life_satisfaction ---
 #> 
 #>   Kendall's tau-b: τ = -0.004
-#>   Sample size: n = 2228
 #>   z-score: -0.212
+#>   Sample size: n = 2228
 #>   p-value (2-tailed): 0.8321
 #>   Significance: ns
 #> 
@@ -346,8 +346,8 @@ survey_data %>%
 #> --- political_orientation × life_satisfaction ---
 #> 
 #>   Kendall's tau-b: τ = -0.004
-#>   Sample size: n = 2241
 #>   z-score: -0.298
+#>   Sample size: n = 2241
 #>   p-value (2-tailed): 0.7659
 #>   Significance: ns
 #> 
@@ -380,7 +380,7 @@ print(result)
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.005
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
@@ -747,7 +747,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
-#>   Effect size: r-squared = 0.002
+#>   Effect size: r-squared: 0.002
 #>   Sample size: n = 449
 #>   95% CI: [-0.043, 0.142]
 #>   p-value: 0.2931
@@ -756,7 +756,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.019
-#>   Effect size: r-squared = 0.000
+#>   Effect size: r-squared: 0.000
 #>   Sample size: n = 1751
 #>   95% CI: [-0.066, 0.028]
 #>   p-value: 0.4267

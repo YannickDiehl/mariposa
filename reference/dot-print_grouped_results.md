@@ -5,5 +5,5 @@ Print results for grouped data
 ## Usage
 
 ``` r
-.print_grouped_results(x, is_weighted)
+.print_grouped_results(x, is_weighted, digits = 3)
 ```

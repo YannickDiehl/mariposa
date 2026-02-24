@@ -42,9 +42,9 @@ describe(
 
 - weights:
 
-  Optional survey weights to get population-representative statistics.
-  Without weights, you describe your sample. With weights, you describe
-  the population.
+  Optional survey weights for population-representative results. Without
+  weights, you describe your sample. With weights, you describe the
+  population.
 
 - show:
 

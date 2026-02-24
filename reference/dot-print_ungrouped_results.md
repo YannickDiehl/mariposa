@@ -5,5 +5,5 @@ Print results for ungrouped data
 ## Usage
 
 ``` r
-.print_ungrouped_results(x, is_weighted)
+.print_ungrouped_results(x, is_weighted, digits = 3)
 ```

@@ -6,7 +6,7 @@ Print method for crosstab results
 
 ``` r
 # S3 method for class 'crosstab'
-print(x, ...)
+print(x, digits = 1, ...)
 ```
 
 ## Arguments
@@ -14,6 +14,10 @@ print(x, ...)
 - x:
 
   A crosstab result object
+
+- digits:
+
+  Number of decimal places for percentages (default: 1)
 
 - ...:
 

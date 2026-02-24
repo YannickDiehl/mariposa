@@ -198,7 +198,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.005
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276

@@ -73,7 +73,7 @@ t_test(
 
 - conf.level:
 
-  Confidence level (Default: 0.95 = 95%)
+  Confidence level for intervals (Default: 0.95 = 95%)
 
 ## Value
 

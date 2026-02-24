@@ -28,4 +28,4 @@ Shared print implementation used by all standard w\_\* functions.
 
 - digits:
 
-  Number of decimal places
+  Number of decimal places to display (default: 3)

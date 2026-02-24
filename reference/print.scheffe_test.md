@@ -20,8 +20,7 @@ print(x, digits = 3, ...)
 
 - digits:
 
-  Integer specifying the number of decimal places to display for numeric
-  values. Default is `3`.
+  Number of decimal places to display (default: 3)
 
 - ...:
 

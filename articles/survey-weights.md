@@ -84,9 +84,6 @@ w_median(survey_data, income, weights = sampling_weight)
 
 # Weighted mode (most common value)
 w_modus(survey_data, education, weights = sampling_weight)
-#> 
-#> Weighted Mode Statistics
-#> ------------------------ 
 #> # A tibble: 1 × 3
 #>   Variable  weighted_mode   effective_n
 #>   <chr>     <ord>                 <dbl>
@@ -143,12 +140,10 @@ w_kurtosis(survey_data, income, weights = sampling_weight)
 w_quantile(survey_data, income,
            probs = c(0.25, 0.5, 0.75),
            weights = sampling_weight)
-#>  Variable Quantile    Value         Weights
-#>    income      25% 2700.000 sampling_weight
-#>    income      50% 3500.000 sampling_weight
-#>    income      75% 4600.000 sampling_weight
-#>    income        n 2186.000 sampling_weight
-#>    income    eff_n 2158.917 sampling_weight
+#>  Variable Quantile Value    N Effective_N         Weights
+#>    income      25%  2700 2186      2158.9 sampling_weight
+#>    income      50%  3500 2186      2158.9 sampling_weight
+#>    income      75%  4600 2186      2158.9 sampling_weight
 
 # Weighted standard error
 w_se(survey_data, income, weights = sampling_weight)
@@ -315,7 +310,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.005
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276

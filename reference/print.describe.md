@@ -8,7 +8,7 @@ unweighted.
 
 ``` r
 # S3 method for class 'describe'
-print(x, ...)
+print(x, digits = 3, ...)
 ```
 
 ## Arguments
@@ -16,6 +16,10 @@ print(x, ...)
 - x:
 
   A describe object
+
+- digits:
+
+  Number of decimal places to display (default: 3)
 
 - ...:
 

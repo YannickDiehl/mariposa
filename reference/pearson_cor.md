@@ -19,7 +19,15 @@ The correlation tells you:
 ## Usage
 
 ``` r
-pearson_cor(data, ..., weights = NULL, conf.level = 0.95, na.rm = "pairwise")
+pearson_cor(
+  data,
+  ...,
+  weights = NULL,
+  conf.level = 0.95,
+  alternative = c("two.sided", "less", "greater"),
+  use = c("pairwise", "listwise"),
+  na.rm = NULL
+)
 ```
 
 ## Arguments
@@ -41,13 +49,22 @@ pearson_cor(data, ..., weights = NULL, conf.level = 0.95, na.rm = "pairwise")
 
   Confidence level for intervals (Default: 0.95 = 95%)
 
-- na.rm:
+- alternative:
+
+  Direction of the test: `"two.sided"` (default), `"less"`, or
+  `"greater"`.
+
+- use:
 
   How to handle missing values:
 
   - `"pairwise"` (default): Use all available data for each pair
 
   - `"listwise"`: Only use complete cases across all variables
+
+- na.rm:
+
+  Deprecated. Use `use` instead.
 
 ## Value
 
@@ -191,7 +208,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.007
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2186
 #>   95% CI: [-0.048, 0.035]
 #>   p-value: 0.7608
@@ -271,7 +288,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.005
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
@@ -585,7 +602,7 @@ survey_data %>%
 
 # Listwise deletion for missing data
 survey_data %>% 
-  pearson_cor(age, income, na.rm = "listwise")
+  pearson_cor(age, income, use = "listwise")
 #> 
 #> ── Pearson Correlation  ────────────────────────────────────────────────────────
 #> 
@@ -596,7 +613,7 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.007
-#>   Effect size: r² = 0.000
+#>   Effect size: r²: 0.000
 #>   Sample size: n = 2186
 #>   95% CI: [-0.048, 0.035]
 #>   p-value: 0.7608

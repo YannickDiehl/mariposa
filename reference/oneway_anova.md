@@ -63,7 +63,7 @@ oneway_anova(
 
 - conf.level:
 
-  Confidence level for group statistics (Default: 0.95 = 95%)
+  Confidence level for intervals (Default: 0.95 = 95%)
 
 ## Value
 

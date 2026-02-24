@@ -17,8 +17,9 @@ spearman_rho(
   data,
   ...,
   weights = NULL,
-  alternative = "two.sided",
-  na.rm = "pairwise"
+  alternative = c("two.sided", "less", "greater"),
+  use = c("pairwise", "listwise"),
+  na.rm = NULL
 )
 ```
 
@@ -42,7 +43,7 @@ spearman_rho(
 
 - alternative:
 
-  Character string specifying the alternative hypothesis:
+  Direction of the test:
 
   - `"two.sided"` (default): Two-tailed test
 
@@ -50,15 +51,19 @@ spearman_rho(
 
   - `"greater"`: One-tailed test (positive correlation)
 
-- na.rm:
+- use:
 
-  Character string specifying missing data handling:
+  How to handle missing values:
 
   - `"pairwise"` (default): Pairwise deletion - each correlation uses
     all available cases
 
   - `"listwise"`: Listwise deletion - only complete cases across all
     variables
+
+- na.rm:
+
+  Deprecated. Use `use` instead.
 
 ## Value
 
@@ -172,8 +177,8 @@ survey_data %>%
 #> --- life_satisfaction × political_orientation ---
 #> 
 #>   Spearman's rho: ρ = -0.004
-#>   Sample size: n = 2228
 #>   t-statistic: -0.210
+#>   Sample size: n = 2228
 #>   p-value (2-tailed): 0.8334
 #>   Significance: ns
 #> 
@@ -239,8 +244,8 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Spearman's rho: ρ = 0.003
-#>   Sample size: n = 2186
 #>   t-statistic: 0.163
+#>   Sample size: n = 2186
 #>   p-value (2-tailed): 0.8703
 #>   Significance: ns
 #> 
@@ -374,20 +379,20 @@ survey_data %>%
 
 # Listwise deletion for missing data
 survey_data %>%
-  spearman_rho(age, income, na.rm = "listwise")
+  spearman_rho(age, income, use = "listwise")
 #> 
 #> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
 #> 
 #> • Method: Spearman's rho (rank correlation)
 #> • Variables: age, income
-#> • Missing data handling: pairwise deletion
+#> • Missing data handling: listwise deletion
 #> • Alternative hypothesis: two.sided
 #> 
 #> --- age × income ---
 #> 
 #>   Spearman's rho: ρ = 0.003
-#>   Sample size: n = 2186
 #>   t-statistic: 0.163
+#>   Sample size: n = 2186
 #>   p-value (2-tailed): 0.8703
 #>   Significance: ns
 #> 
@@ -409,8 +414,8 @@ survey_data %>%
 #> --- age × income ---
 #> 
 #>   Spearman's rho: ρ = 0.003
-#>   Sample size: n = 2186
 #>   t-statistic: 0.163
+#>   Sample size: n = 2186
 #>   p-value (1-tailed): 0.4351
 #>   Significance: ns
 #> 

@@ -70,8 +70,9 @@ correlations, it uses survey-weighted rank calculations.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  alternative <span class="op">=</span> <span class="st">"two.sided"</span>,</span>
-<span>  na.rm <span class="op">=</span> <span class="st">"pairwise"</span></span>
+<span>  alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"less"</span>, <span class="st">"greater"</span><span class="op">)</span>,</span>
+<span>  use <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pairwise"</span>, <span class="st">"listwise"</span><span class="op">)</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,16 +95,20 @@ correlation or more for a correlation matrix. You can use helpers like
 
 
 <dt id="arg-alternative">alternative<a class="anchor" aria-label="anchor" href="#arg-alternative"></a></dt>
-<dd><p>Character string specifying the alternative hypothesis:</p><ul><li><p><code>"two.sided"</code> (default): Two-tailed test</p></li>
+<dd><p>Direction of the test:</p><ul><li><p><code>"two.sided"</code> (default): Two-tailed test</p></li>
 <li><p><code>"less"</code>: One-tailed test (negative correlation)</p></li>
 <li><p><code>"greater"</code>: One-tailed test (positive correlation)</p></li>
 </ul></dd>
 
 
-<dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Character string specifying missing data handling:</p><ul><li><p><code>"pairwise"</code> (default): Pairwise deletion - each correlation uses all available cases</p></li>
+<dt id="arg-use">use<a class="anchor" aria-label="anchor" href="#arg-use"></a></dt>
+<dd><p>How to handle missing values:</p><ul><li><p><code>"pairwise"</code> (default): Pairwise deletion - each correlation uses all available cases</p></li>
 <li><p><code>"listwise"</code>: Listwise deletion - only complete cases across all variables</p></li>
 </ul></dd>
+
+
+<dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
+<dd><p>Deprecated. Use <code>use</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -184,8 +189,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction × political_orientation ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = -0.004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2228</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: -0.212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2228</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8321</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -193,7 +198,6 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak negative correlation</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Correlation matrix for multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span>, <span class="va">trust_media</span><span class="op">)</span></span></span>
@@ -252,8 +256,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = 0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2201</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: 0.202</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2201</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8397</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -393,7 +397,7 @@ implementation.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Listwise deletion for missing data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, na.rm <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, use <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -404,8 +408,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = 0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: 0.168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8667</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -426,8 +430,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = 0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: 0.168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (1-tailed): 0.4334</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -481,7 +485,6 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
