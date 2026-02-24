@@ -392,17 +392,14 @@ print.chi_square <- function(x, digits = 3, ...) {
   sig <- sapply(x$results$p_value, add_significance_stars)
   
   if (!x$is_grouped) {
-    # Simple test display
-    cat(sprintf("\nVariables: %s x %s\n", x$variables[1], x$variables[2]))
-    
-    if (!is.null(x$weights)) {
-      cat(sprintf("Weights variable: %s\n", x$weights))
-    }
-    
-    if (x$correct) {
-      cat("Yates' continuity correction applied\n")
-    }
-    
+    # Simple test display using standardized helpers
+    cat("\n")
+    test_info <- list(
+      "Variables" = paste(x$variables[1], "x", x$variables[2]),
+      "Weights variable" = x$weights,
+      "Continuity correction" = if (x$correct) "Yates' correction applied" else NULL
+    )
+    print_info_section(test_info)
     cat("\n")
     
     # Print observed frequencies
@@ -513,14 +510,9 @@ print.chi_square <- function(x, digits = 3, ...) {
     
     # Print results for each group
     for (i in seq_len(nrow(results_table))) {
-      # Format group info
+      # Print group header using standardized helper
       group_values <- results_table[i, x$groups, drop = FALSE]
-      group_info <- sapply(seq_along(x$groups), function(j) {
-        paste(x$groups[j], "=", group_values[[j]])
-      })
-      group_info <- paste(group_info, collapse = ", ")
-      
-      cat(sprintf("\n--- Group: %s ---\n", group_info))
+      print_group_header(group_values)
       cat("\n")  # Blank line
       
       # Print observed frequencies
@@ -619,7 +611,7 @@ print.chi_square <- function(x, digits = 3, ...) {
     }
   }
   
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
+  print_significance_legend()
 
   invisible(x)
 }
