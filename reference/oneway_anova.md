@@ -194,11 +194,11 @@ survey_data %>%
 #> 
 #> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -212,7 +212,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
+#>  Between Groups     247.347    3      82.449 67.096   <.001   1
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 
@@ -228,7 +228,7 @@ survey_data %>%
 #>  life_satisfaction       0.077           0.076         0.076      medium
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -243,10 +243,11 @@ survey_data %>%
   oneway_anova(life_satisfaction, trust_government, group = education)
 #> 
 #> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
-#> Grouping Variable: education
-#> Null hypothesis: All group means are equal for each variable
-#> Alternative hypothesis: At least one group mean differs for each variable
-#> Confidence level: 95.0%
+#> 
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal for each variable
+#>   Alternative hypothesis: At least one group mean differs for each variable
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -260,7 +261,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
+#>  Between Groups     247.347    3      82.449 67.096   <.001   1
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 
@@ -287,7 +288,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       1.753    3       0.584 0.431   0.731    
+#>  Between Groups       1.753    3       0.584 0.431   0.731   4
 #>   Within Groups    3182.484 2350       1.354                  
 #>           Total    3184.237 2353                              
 #> -------------------------------------------------------------------------------- 
@@ -303,7 +304,7 @@ survey_data %>%
 #>  trust_government       0.001               0             0  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -318,10 +319,11 @@ survey_data %>%
   oneway_anova(starts_with("trust_"), group = education)
 #> 
 #> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
-#> Grouping Variable: education
-#> Null hypothesis: All group means are equal for each variable
-#> Alternative hypothesis: At least one group mean differs for each variable
-#> Confidence level: 95.0%
+#> 
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal for each variable
+#>   Alternative hypothesis: At least one group mean differs for each variable
 #> 
 #> 
 #> --- trust_government ---
@@ -335,7 +337,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       1.753    3       0.584 0.431   0.731    
+#>  Between Groups       1.753    3       0.584 0.431   0.731   4
 #>   Within Groups    3182.484 2350       1.354                  
 #>           Total    3184.237 2353                              
 #> -------------------------------------------------------------------------------- 
@@ -362,7 +364,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       3.662    3       1.221 0.902   0.439    
+#>  Between Groups       3.662    3       1.221 0.902   0.439   4
 #>   Within Groups    3198.645 2363       1.354                  
 #>           Total    3202.308 2366                              
 #> -------------------------------------------------------------------------------- 
@@ -389,7 +391,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       1.918    3       0.639 0.605   0.612    
+#>  Between Groups       1.918    3       0.639 0.605   0.612   4
 #>   Within Groups    2529.658 2394       1.057                  
 #>           Total    2531.576 2397                              
 #> -------------------------------------------------------------------------------- 
@@ -405,7 +407,7 @@ survey_data %>%
 #>  trust_science       0.001               0             0  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -421,12 +423,12 @@ survey_data %>%
 #> 
 #> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
-#> Dependent Variable: income
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#> • Dependent variable: income
+#> • Grouping variable: education
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- income ---
@@ -440,7 +442,7 @@ survey_data %>%
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df   Mean_Square       F p_value sig
-#>  Between Groups  1726289513    3 575429837.501 462.325   <.001 ***
+#>  Between Groups  1726289513    3 575429837.501 462.325   <.001   1
 #>   Within Groups  2734479256 2197   1244642.356                    
 #>           Total  4460768768 2200                                  
 #> -------------------------------------------------------------------------------- 
@@ -456,7 +458,7 @@ survey_data %>%
 #>    income       0.387           0.386         0.386       large
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -473,10 +475,10 @@ survey_data %>%
 #> 
 #> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> Grouping Variable: education
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> 
@@ -494,7 +496,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares  df Mean_Square    F p_value sig
-#>  Between Groups      29.235   3       9.745 6.95   <.001 ***
+#>  Between Groups      29.235   3       9.745 6.95   <.001   1
 #>   Within Groups     646.390 461       1.402                 
 #>           Total     675.626 464                             
 #> -------------------------------------------------------------------------------- 
@@ -525,7 +527,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     221.625    3      73.875 62.153   <.001 ***
+#>  Between Groups     221.625    3      73.875 62.153   <.001   1
 #>   Within Groups    2320.132 1952       1.189                   
 #>           Total    2541.756 1955                               
 #> -------------------------------------------------------------------------------- 
@@ -541,7 +543,7 @@ survey_data %>%
 #>  life_satisfaction       0.087           0.086         0.086      medium
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -557,11 +559,11 @@ survey_data %>%
 #> 
 #> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> Dependent Variable: income
-#> Grouping Variable: education
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#> • Dependent variable: income
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- income ---
@@ -575,7 +577,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df   Mean_Square       F p_value sig
-#>  Between Groups  1752783281    3 584261093.823 466.494   <.001 ***
+#>  Between Groups  1752783281    3 584261093.823 466.494   <.001   1
 #>   Within Groups  2732847885 2182    1252450.91                    
 #>           Total  4485631167 2185                                  
 #> -------------------------------------------------------------------------------- 
@@ -591,7 +593,7 @@ survey_data %>%
 #>    income       0.391            0.39          0.39       large
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -609,10 +611,10 @@ result <- survey_data %>%
 result %>% tukey_test()
 #> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
 #> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Confidence level: 95.0%
-#> Family-wise error rate controlled using Tukey HSD
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
+#>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -636,7 +638,7 @@ result %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -647,8 +649,8 @@ result %>% levene_test()  # Check homogeneity of variances
 #> 
 #> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> Grouping variable: education
-#> Center: mean
+#> • Grouping variable: education
+#> • Center: mean
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -659,7 +661,7 @@ result %>% levene_test()  # Check homogeneity of variances
 #>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
 #> -------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)

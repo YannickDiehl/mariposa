@@ -162,14 +162,14 @@ data(survey_data)
 survey_data %>%
   spearman_rho(life_satisfaction, political_orientation)
 #> 
-#> Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: life_satisfaction, political_orientation
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
+#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
 #> 
-#> ┌─ life_satisfaction × political_orientation ─┐
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: life_satisfaction, political_orientation
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: two.sided
+#> 
+#> --- life_satisfaction × political_orientation ---
 #> 
 #>   Spearman's rho: ρ = -0.004
 #>   Sample size: n = 2228
@@ -177,7 +177,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8334
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak negative monotonic relationship
 
@@ -185,58 +185,58 @@ survey_data %>%
 survey_data %>%
   spearman_rho(life_satisfaction, political_orientation, trust_media)
 #> 
-#> Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: life_satisfaction, political_orientation, trust_media
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
+#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
+#> 
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: life_satisfaction, political_orientation, trust_media
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: two.sided
 #> 
 #> 
 #> Spearman's Rho Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>               Variable life_satisfaction political_orientation trust_media
 #>      life_satisfaction             1.000                -0.004       0.028
 #>  political_orientation            -0.004                 1.000       0.003
 #>            trust_media             0.028                 0.003       1.000
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>               Variable life_satisfaction political_orientation trust_media
 #>      life_satisfaction               -                  0.8334      0.1805
 #>  political_orientation            0.8334                   -        0.8846
 #>            trust_media            0.1805                0.8846         -  
 #> 
 #> Sample Size Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>               Variable life_satisfaction political_orientation trust_media
 #>      life_satisfaction              2421                  2228        2291
 #>  political_orientation              2228                  2299        2177
 #>            trust_media              2291                  2177        2367
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                                       Pair    rho      t      p    n sig
 #>  life_satisfaction × political_orientation -0.004 -0.210 0.8334 2228    
 #>            life_satisfaction × trust_media  0.028  1.340 0.1805 2291    
 #>        political_orientation × trust_media  0.003  0.145 0.8846 2177    
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Weighted correlations (mathematically correct, though SPSS may not apply weights)
 survey_data %>%
   spearman_rho(age, income, weights = sampling_weight)
 #> 
-#> Weighted Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: age, income
-#> Weights: sampling_weight
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
+#> ── Weighted Spearman's Rank Correlation Analysis  ──────────────────────────────
 #> 
-#> ┌─ age × income ─┐
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: age, income
+#> • Weights variable: sampling_weight
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: two.sided
+#> 
+#> --- age × income ---
 #> 
 #>   Spearman's rho: ρ = 0.003
 #>   Sample size: n = 2186
@@ -244,7 +244,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8703
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak positive monotonic relationship
 
@@ -253,135 +253,137 @@ survey_data %>%
   group_by(region) %>%
   spearman_rho(age, income, life_satisfaction)
 #> 
-#> Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: age, income, life_satisfaction
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
+#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
 #> 
-#> ══ GROUPED ANALYSIS ══
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: age, income, life_satisfaction
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: two.sided
 #> 
-#> Group: region = East
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> Spearman's Rho Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>           Variable    age income life_satisfaction
 #>                age  1.000  0.058            -0.040
 #>             income  0.058  1.000             0.440
 #>  life_satisfaction -0.040  0.440             1.000
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>           Variable    age income life_satisfaction
 #>                age    -   0.2342            0.3913
 #>             income 0.2342    -              0.0000
 #>  life_satisfaction 0.3913 0.0000               -  
 #> 
 #> Sample Size Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>           Variable   age income life_satisfaction
 #>                age   485    429               465
 #>             income   429    429               410
 #>  life_satisfaction   465    410               465
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                        Pair    rho      t      p   n sig
 #>                age × income  0.058  1.191 0.2342 429    
 #>     age × life_satisfaction -0.040 -0.858 0.3913 465    
 #>  income × life_satisfaction  0.440  9.886 0.0000 410 ***
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Group: region = West
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> Spearman's Rho Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>           Variable    age income life_satisfaction
 #>                age  1.000 -0.008            -0.020
 #>             income -0.008  1.000             0.470
 #>  life_satisfaction -0.020  0.470             1.000
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>           Variable    age income life_satisfaction
 #>                age    -   0.7251            0.3819
 #>             income 0.7251    -              0.0000
 #>  life_satisfaction 0.3819 0.0000               -  
 #> 
 #> Sample Size Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>           Variable   age income life_satisfaction
 #>                age  2015   1757              1956
 #>             income  1757   1757              1705
 #>  life_satisfaction  1956   1705              1956
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                        Pair    rho      t      p    n sig
 #>                age × income -0.008 -0.352 0.7251 1757    
 #>     age × life_satisfaction -0.020 -0.875 0.3819 1956    
 #>  income × life_satisfaction  0.470 21.981 0.0000 1705 ***
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Using tidyselect helpers
 survey_data %>%
   spearman_rho(starts_with("trust"), weights = sampling_weight)
 #> 
-#> Weighted Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: trust_government, trust_media, trust_science
-#> Weights: sampling_weight
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
+#> ── Weighted Spearman's Rank Correlation Analysis  ──────────────────────────────
+#> 
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: trust_government, trust_media, trust_science
+#> • Weights variable: sampling_weight
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: two.sided
 #> 
 #> 
 #> Spearman's Rho Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>          Variable trust_government trust_media trust_science
 #>  trust_government            1.000       0.008         0.027
 #>       trust_media            0.008       1.000         0.016
 #>     trust_science            0.027       0.016         1.000
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>          Variable trust_government trust_media trust_science
 #>  trust_government              -        0.7227        0.2070
 #>       trust_media           0.7227         -          0.4533
 #>     trust_science           0.2070      0.4533           -  
 #> 
 #> Sample Size Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>          Variable trust_government trust_media trust_science
 #>  trust_government             2354        2227          2255
 #>       trust_media             2227        2367          2272
 #>     trust_science             2255        2272          2398
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                              Pair   rho     t      p    n sig
 #>    trust_government × trust_media 0.008 0.355 0.7227 2227    
 #>  trust_government × trust_science 0.027 1.262 0.2070 2255    
 #>       trust_media × trust_science 0.016 0.750 0.4533 2272    
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Listwise deletion for missing data
 survey_data %>%
   spearman_rho(age, income, na.rm = "listwise")
 #> 
-#> Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: age, income
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
+#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
 #> 
-#> ┌─ age × income ─┐
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: age, income
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: two.sided
+#> 
+#> --- age × income ---
 #> 
 #>   Spearman's rho: ρ = 0.003
 #>   Sample size: n = 2186
@@ -389,7 +391,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8703
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak positive monotonic relationship
 
@@ -397,14 +399,14 @@ survey_data %>%
 survey_data %>%
   spearman_rho(age, income, alternative = "greater")
 #> 
-#> Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: age, income
-#> Alternative hypothesis: greater
-#> Missing data handling: pairwise deletion
+#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
 #> 
-#> ┌─ age × income ─┐
+#> • Method: Spearman's rho (rank correlation)
+#> • Variables: age, income
+#> • Missing data handling: pairwise deletion
+#> • Alternative hypothesis: greater
+#> 
+#> --- age × income ---
 #> 
 #>   Spearman's rho: ρ = 0.003
 #>   Sample size: n = 2186
@@ -412,7 +414,7 @@ survey_data %>%
 #>   p-value (1-tailed): 0.4351
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak positive monotonic relationship
 ```

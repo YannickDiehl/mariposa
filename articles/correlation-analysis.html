@@ -146,8 +146,6 @@ situations:</p>
 <span><span class="co">#&gt;   p-value: 0.7608</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
 <span><span class="co">#&gt;   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span></span>
@@ -184,8 +182,6 @@ Perfect negative correlation</li>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -238,9 +234,7 @@ Perfect negative correlation</li>
 <span><span class="co">#&gt;     </span></span>
 <span><span class="co">#&gt;     </span></span>
 <span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt; ---------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; ----------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -258,9 +252,6 @@ Perfect negative correlation</li>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = East</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = 0.050</span></span>
@@ -270,8 +261,6 @@ Perfect negative correlation</li>
 <span><span class="co">#&gt;   p-value: 0.2931</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = West</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = -0.019</span></span>
@@ -280,8 +269,6 @@ Perfect negative correlation</li>
 <span><span class="co">#&gt;   95% CI: [-0.066, 0.028]</span></span>
 <span><span class="co">#&gt;   p-value: 0.4267</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -310,8 +297,6 @@ estimate:</p>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -349,22 +334,13 @@ raw values.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/spearman_rho.html">spearman_rho</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">environmental_concern</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Spearman's Rank Correlation Analysis  </span></span>
-<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co">#&gt; Method: Spearman's rho (rank correlation)</span></span>
-<span><span class="co">#&gt; Variables: political_orientation, environmental_concern</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ┌─ political_orientation × environmental_concern ─┐</span></span>
+<span><span class="co">#&gt; --- political_orientation × environmental_concern ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Spearman's rho: ρ = -0.576</span></span>
 <span><span class="co">#&gt;   Sample size: n = 2207</span></span>
 <span><span class="co">#&gt;   t-statistic: -33.093</span></span>
 <span><span class="co">#&gt;   p-value (2-tailed): 0.0000</span></span>
 <span><span class="co">#&gt;   Significance: ***</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Interpretation: moderate negative monotonic relationship</span></span></code></pre></div>
 </div>
@@ -376,23 +352,13 @@ raw values.</p>
 <span>  <span class="fu"><a href="../reference/spearman_rho.html">spearman_rho</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">environmental_concern</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Spearman's Rank Correlation Analysis  </span></span>
-<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co">#&gt; Method: Spearman's rho (rank correlation)</span></span>
-<span><span class="co">#&gt; Variables: political_orientation, environmental_concern</span></span>
-<span><span class="co">#&gt; Weights: sampling_weight</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ┌─ political_orientation × environmental_concern ─┐</span></span>
+<span><span class="co">#&gt; --- political_orientation × environmental_concern ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Spearman's rho: ρ = -0.576</span></span>
 <span><span class="co">#&gt;   Sample size: n = 2207</span></span>
 <span><span class="co">#&gt;   t-statistic: -33.093</span></span>
 <span><span class="co">#&gt;   p-value (2-tailed): 0.0000</span></span>
 <span><span class="co">#&gt;   Significance: ***</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Interpretation: moderate negative monotonic relationship</span></span></code></pre></div>
 </div>
@@ -405,17 +371,9 @@ raw values.</p>
 <span>               <span class="va">life_satisfaction</span>, <span class="va">trust_government</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Spearman's Rank Correlation Analysis  </span></span>
-<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co">#&gt; Method: Spearman's rho (rank correlation)</span></span>
-<span><span class="co">#&gt; Variables: political_orientation, environmental_concern, life_satisfaction, trust_government</span></span>
-<span><span class="co">#&gt; Weights: sampling_weight</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: two.sided</span></span>
-<span><span class="co">#&gt; Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Spearman's Rho Matrix:</span></span>
-<span><span class="co">#&gt; ─────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;               Variable political_orientation environmental_concern</span></span>
 <span><span class="co">#&gt;  political_orientation                 1.000                -0.576</span></span>
 <span><span class="co">#&gt;  environmental_concern                -0.576                 1.000</span></span>
@@ -428,7 +386,7 @@ raw values.</p>
 <span><span class="co">#&gt;              0.002            1.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Significance Matrix (p-values, 2-tailed):</span></span>
-<span><span class="co">#&gt; ─────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;               Variable political_orientation environmental_concern</span></span>
 <span><span class="co">#&gt;  political_orientation                   -                  0.0000</span></span>
 <span><span class="co">#&gt;  environmental_concern                0.0000                   -  </span></span>
@@ -441,7 +399,7 @@ raw values.</p>
 <span><span class="co">#&gt;             0.9425              -  </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Sample Size Matrix:</span></span>
-<span><span class="co">#&gt; ─────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;               Variable political_orientation environmental_concern</span></span>
 <span><span class="co">#&gt;  political_orientation                  2299                  2207</span></span>
 <span><span class="co">#&gt;  environmental_concern                  2207                  2400</span></span>
@@ -454,7 +412,7 @@ raw values.</p>
 <span><span class="co">#&gt;               2280             2354</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Pairwise Results:</span></span>
-<span><span class="co">#&gt; ─────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;                                           Pair    rho       t      p    n sig</span></span>
 <span><span class="co">#&gt;  political_orientation × environmental_concern -0.576 -33.093 0.0000 2207 ***</span></span>
 <span><span class="co">#&gt;      political_orientation × life_satisfaction -0.004  -0.210 0.8334 2228    </span></span>
@@ -462,9 +420,7 @@ raw values.</p>
 <span><span class="co">#&gt;      environmental_concern × life_satisfaction  0.003   0.121 0.9041 2324    </span></span>
 <span><span class="co">#&gt;       environmental_concern × trust_government  0.067   3.175 0.0015 2260  **</span></span>
 <span><span class="co">#&gt;           life_satisfaction × trust_government  0.002   0.072 0.9425 2280    </span></span>
-<span><span class="co">#&gt; ─────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<span><span class="co">#&gt; ---------------------------------------------------------------------</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -498,15 +454,13 @@ but is considered more robust.</p>
 <span>  <span class="fu"><a href="../reference/kendall_tau.html">kendall_tau</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ┌─ political_orientation × life_satisfaction ─┐</span></span>
+<span><span class="co">#&gt; --- political_orientation × life_satisfaction ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Kendall's tau-b: τ = -0.004</span></span>
 <span><span class="co">#&gt;   Sample size: n = 2228</span></span>
 <span><span class="co">#&gt;   z-score: -0.212</span></span>
 <span><span class="co">#&gt;   p-value (2-tailed): 0.8321</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Interpretation: weak negative correlation</span></span></code></pre></div>
 </div>
@@ -519,15 +473,13 @@ but is considered more robust.</p>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ┌─ political_orientation × life_satisfaction ─┐</span></span>
+<span><span class="co">#&gt; --- political_orientation × life_satisfaction ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Kendall's tau-b: τ = -0.004</span></span>
 <span><span class="co">#&gt;   Sample size: n = 2241</span></span>
 <span><span class="co">#&gt;   z-score: -0.298</span></span>
 <span><span class="co">#&gt;   p-value (2-tailed): 0.7659</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Interpretation: weak negative correlation</span></span></code></pre></div>
 </div>
@@ -581,8 +533,6 @@ is considered a strong finding.</p>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -751,9 +701,7 @@ may be non-linear.</p>
 <span><span class="co">#&gt;   [-0.044, 0.037] 2340    </span></span>
 <span><span class="co">#&gt;    [0.023, 0.105] 2276  **</span></span>
 <span><span class="co">#&gt;   [-0.030, 0.052] 2296    </span></span>
-<span><span class="co">#&gt; ---------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; ----------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -844,9 +792,7 @@ may be non-linear.</p>
 <span><span class="co">#&gt;  2242    </span></span>
 <span><span class="co">#&gt;  2271    </span></span>
 <span><span class="co">#&gt;  2286    </span></span>
-<span><span class="co">#&gt; ---------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; ----------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -941,9 +887,7 @@ may be non-linear.</p>
 <span><span class="co">#&gt;   [-0.046, 0.037] 2241    </span></span>
 <span><span class="co">#&gt;   [-0.044, 0.037] 2340    </span></span>
 <span><span class="co">#&gt;  [-0.611, -0.556] 2221 ***</span></span>
-<span><span class="co">#&gt; ---------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; ----------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -969,9 +913,6 @@ may be non-linear.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = East</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = 0.050</span></span>
@@ -981,8 +922,6 @@ may be non-linear.</p>
 <span><span class="co">#&gt;   p-value: 0.2931</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = West</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = -0.019</span></span>
@@ -991,8 +930,6 @@ may be non-linear.</p>
 <span><span class="co">#&gt;   95% CI: [-0.066, 0.028]</span></span>
 <span><span class="co">#&gt;   p-value: 0.4267</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>

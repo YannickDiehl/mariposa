@@ -39,8 +39,6 @@ survey_data %>%
 #>   p-value: 0.7608
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
 #>   0.30 ≤ |r| < 0.70: Moderate correlation
@@ -72,8 +70,6 @@ survey_data %>%
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -127,9 +123,7 @@ survey_data %>%
 #>     
 #>     
 #>     
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -148,9 +142,6 @@ survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
-#> 
-#> Group: region = East
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
@@ -160,8 +151,6 @@ survey_data %>%
 #>   p-value: 0.2931
 #>   Significance: ns
 #> 
-#> Group: region = West
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.019
@@ -170,8 +159,6 @@ survey_data %>%
 #>   95% CI: [-0.066, 0.028]
 #>   p-value: 0.4267
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -201,8 +188,6 @@ survey_data %>%
 #>   p-value: 0.8276
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
 #>   0.30 ≤ |r| < 0.70: Moderate correlation
@@ -230,22 +215,13 @@ raw values.
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern)
 #> 
-#> Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: political_orientation, environmental_concern
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
-#> 
-#> ┌─ political_orientation × environmental_concern ─┐
+#> --- political_orientation × environmental_concern ---
 #> 
 #>   Spearman's rho: ρ = -0.576
 #>   Sample size: n = 2207
 #>   t-statistic: -33.093
 #>   p-value (2-tailed): 0.0000
 #>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: moderate negative monotonic relationship
 ```
@@ -257,23 +233,13 @@ survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                weights = sampling_weight)
 #> 
-#> Weighted Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: political_orientation, environmental_concern
-#> Weights: sampling_weight
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
-#> 
-#> ┌─ political_orientation × environmental_concern ─┐
+#> --- political_orientation × environmental_concern ---
 #> 
 #>   Spearman's rho: ρ = -0.576
 #>   Sample size: n = 2207
 #>   t-statistic: -33.093
 #>   p-value (2-tailed): 0.0000
 #>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: moderate negative monotonic relationship
 ```
@@ -286,17 +252,9 @@ survey_data %>%
                life_satisfaction, trust_government,
                weights = sampling_weight)
 #> 
-#> Weighted Spearman's Rank Correlation Analysis  
-#> ══════════════════════════════════════════════════════════════════════
-#> Method: Spearman's rho (rank correlation)
-#> Variables: political_orientation, environmental_concern, life_satisfaction, trust_government
-#> Weights: sampling_weight
-#> Alternative hypothesis: two.sided
-#> Missing data handling: pairwise deletion
-#> 
 #> 
 #> Spearman's Rho Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>               Variable political_orientation environmental_concern
 #>  political_orientation                 1.000                -0.576
 #>  environmental_concern                -0.576                 1.000
@@ -309,7 +267,7 @@ survey_data %>%
 #>              0.002            1.000
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>               Variable political_orientation environmental_concern
 #>  political_orientation                   -                  0.0000
 #>  environmental_concern                0.0000                   -  
@@ -322,7 +280,7 @@ survey_data %>%
 #>             0.9425              -  
 #> 
 #> Sample Size Matrix:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>               Variable political_orientation environmental_concern
 #>  political_orientation                  2299                  2207
 #>  environmental_concern                  2207                  2400
@@ -335,7 +293,7 @@ survey_data %>%
 #>               2280             2354
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                                           Pair    rho       t      p    n sig
 #>  political_orientation × environmental_concern -0.576 -33.093 0.0000 2207 ***
 #>      political_orientation × life_satisfaction -0.004  -0.210 0.8334 2228    
@@ -343,9 +301,7 @@ survey_data %>%
 #>      environmental_concern × life_satisfaction  0.003   0.121 0.9041 2324    
 #>       environmental_concern × trust_government  0.067   3.175 0.0015 2260  **
 #>           life_satisfaction × trust_government  0.002   0.072 0.9425 2280    
-#> ─────────────────────────────────────────────────────────────────────
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ---------------------------------------------------------------------
 ```
 
 ## Kendall’s Tau
@@ -368,15 +324,13 @@ survey_data %>%
   kendall_tau(political_orientation, life_satisfaction)
 #> 
 #> 
-#> ┌─ political_orientation × life_satisfaction ─┐
+#> --- political_orientation × life_satisfaction ---
 #> 
 #>   Kendall's tau-b: τ = -0.004
 #>   Sample size: n = 2228
 #>   z-score: -0.212
 #>   p-value (2-tailed): 0.8321
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak negative correlation
 ```
@@ -389,15 +343,13 @@ survey_data %>%
               weights = sampling_weight)
 #> 
 #> 
-#> ┌─ political_orientation × life_satisfaction ─┐
+#> --- political_orientation × life_satisfaction ---
 #> 
 #>   Kendall's tau-b: τ = -0.004
 #>   Sample size: n = 2241
 #>   z-score: -0.298
 #>   p-value (2-tailed): 0.7659
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak negative correlation
 ```
@@ -433,8 +385,6 @@ print(result)
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -582,9 +532,7 @@ survey_data %>%
 #>   [-0.044, 0.037] 2340    
 #>    [0.023, 0.105] 2276  **
 #>   [-0.030, 0.052] 2296    
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -675,9 +623,7 @@ survey_data %>%
 #>  2242    
 #>  2271    
 #>  2286    
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -772,9 +718,7 @@ print(cor_matrix)
 #>   [-0.046, 0.037] 2241    
 #>   [-0.044, 0.037] 2340    
 #>  [-0.611, -0.556] 2221 ***
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -800,9 +744,6 @@ survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
-#> 
-#> Group: region = East
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
@@ -812,8 +753,6 @@ survey_data %>%
 #>   p-value: 0.2931
 #>   Significance: ns
 #> 
-#> Group: region = West
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.019
@@ -822,8 +761,6 @@ survey_data %>%
 #>   95% CI: [-0.066, 0.028]
 #>   p-value: 0.4267
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation

@@ -155,7 +155,7 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> 
 #> 
-#> ┌─ life_satisfaction × political_orientation ─┐
+#> --- life_satisfaction × political_orientation ---
 #> 
 #>   Kendall's tau-b: τ = -0.004
 #>   Sample size: n = 2228
@@ -163,7 +163,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8321
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak negative correlation
 
@@ -203,14 +203,14 @@ survey_data %>%
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                                       Pair  tau_b      z      p    n sig
 #>  life_satisfaction × political_orientation -0.004 -0.212 0.8321 2228    
 #>            life_satisfaction × trust_media  0.023  1.356 0.1751 2291    
 #>        political_orientation × trust_media  0.003  0.148 0.8823 2177    
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Weighted correlations
 survey_data %>%
@@ -223,7 +223,7 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> 
 #> 
-#> ┌─ age × income ─┐
+#> --- age × income ---
 #> 
 #>   Kendall's tau-b: τ = 0.003
 #>   Sample size: n = 2201
@@ -231,7 +231,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8397
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak positive correlation
 
@@ -275,12 +275,12 @@ survey_data %>%
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                        Pair  tau_b      z      p   n sig
 #>                age × income  0.040  1.208 0.2272 429    
 #>     age × life_satisfaction -0.030 -0.878 0.3799 465    
 #>  income × life_satisfaction  0.338  9.099 0.0000 410 ***
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
 #> 
 #> ── Group: region = West ──
@@ -311,14 +311,14 @@ survey_data %>%
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                        Pair  tau_b      z      p    n sig
 #>                age × income -0.006 -0.351 0.7257 1757    
 #>     age × life_satisfaction -0.015 -0.884 0.3766 1956    
 #>  income × life_satisfaction  0.357 19.639 0.0000 1705 ***
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Using tidyselect helpers for ordinal variables
 survey_data %>%
@@ -356,14 +356,14 @@ survey_data %>%
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                              Pair tau_b     z      p    n sig
 #>    trust_government × trust_media 0.007 0.467 0.6405 2242    
 #>  trust_government × trust_science 0.021 1.465 0.1429 2271    
 #>       trust_media × trust_science 0.013 0.927 0.3537 2286    
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Listwise deletion for missing data
 survey_data %>%
@@ -375,7 +375,7 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> 
 #> 
-#> ┌─ age × income ─┐
+#> --- age × income ---
 #> 
 #>   Kendall's tau-b: τ = 0.002
 #>   Sample size: n = 2186
@@ -383,7 +383,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8667
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak positive correlation
 
@@ -397,7 +397,7 @@ survey_data %>%
 #> • Alternative hypothesis: greater
 #> 
 #> 
-#> ┌─ age × income ─┐
+#> --- age × income ---
 #> 
 #>   Kendall's tau-b: τ = 0.002
 #>   Sample size: n = 2186
@@ -405,7 +405,7 @@ survey_data %>%
 #>   p-value (1-tailed): 0.4334
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation: weak positive correlation
 
@@ -447,13 +447,13 @@ print(result)
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #>                                       Pair  tau_b      z      p    n sig
 #>  life_satisfaction × political_orientation -0.004 -0.298 0.7659 2241    
 #>            life_satisfaction × trust_media  0.021  1.505 0.1323 2305    
 #>        political_orientation × trust_media  0.003  0.238 0.8118 2190    
-#> ─────────────────────────────────────────────────────────────────────
+#> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 # }
 ```

@@ -202,9 +202,6 @@ survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> 
-#> 
-#> Group: region = East
-#> 
 #> --- income ---
 #> 
 #>   Male: mean = 3873.994, n = 218.0
@@ -221,9 +218,6 @@ survey_data %>%
 #> ------------ 
 #>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>    income    0.159    0.158       0.149  negligible
-#> 
-#> 
-#> Group: region = West
 #> 
 #> --- income ---
 #> 
@@ -260,12 +254,8 @@ Compare means across multiple groups (3+ categories):
 ``` r
 survey_data %>%
   oneway_anova(life_satisfaction, group = education)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -279,7 +269,7 @@ survey_data %>%
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
+#>  Between Groups     247.347    3      82.449 67.096   <.001   1
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 
@@ -293,9 +283,6 @@ survey_data %>%
 #> ------------ 
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.077           0.076         0.076      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -312,13 +299,8 @@ survey_data %>%
 survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -332,7 +314,7 @@ survey_data %>%
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001 ***
+#>  Between Groups     241.130    3      80.377 65.359   <.001   1
 #>   Within Groups    2992.019 2433        1.23                   
 #>           Total    3233.149 2436                               
 #> -------------------------------------------------------------------------------- 
@@ -346,9 +328,6 @@ survey_data %>%
 #> ------------ 
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -379,12 +358,7 @@ anova_result <- survey_data %>%
 
 # Tukey HSD: identifies which pairs of groups differ
 tukey_test(anova_result)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Confidence level: 95.0%
-#> Family-wise error rate controlled using Tukey HSD
+#>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -405,10 +379,7 @@ tukey_test(anova_result)
 #>    0.071    
 #>    <.001 ***
 #>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ------------------------------------------------------------------------------------
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -418,13 +389,8 @@ tukey_test(anova_result)
 
 # Scheffe test: more conservative (fewer false positives)
 scheffe_test(anova_result)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Confidence level: 95.0%
-#> Family-wise error rate controlled using Scheffe's method
-#> Note: Most conservative post-hoc test (widest confidence intervals)
+#>   Family-wise error rate controlled using Scheffe's method
+#>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -445,10 +411,7 @@ scheffe_test(anova_result)
 #>    0.115    
 #>    <.001 ***
 #>    0.079    
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ------------------------------------------------------------------------------------
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -466,10 +429,6 @@ test:
 ``` r
 levene_test(anova_result)
 #> 
-#> Grouping variable: education
-#> Weights variable: sampling_weight
-#> Center: mean
-#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -477,9 +436,7 @@ levene_test(anova_result)
 #> -------------------------------------------------------------------- 
 #>           Variable F_statistic df1  df2 p_value sig        Conclusion
 #>  life_satisfaction      31.287   3 2433       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> --------------------------------------------------------------------
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
@@ -502,8 +459,6 @@ Test whether two categorical variables are related:
 ``` r
 survey_data %>%
   chi_square(education, employment)
-#> 
-#> Variables: education x employment
 #> 
 #> Observed Frequencies:
 #>                         var2
@@ -535,8 +490,6 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> Table size: 4×5 | N = 2500
 #> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 A significant result means the variables are not independent — knowing
@@ -548,9 +501,6 @@ someone’s education tells you something about their employment status
 ``` r
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
-#> 
-#> Variables: education x employment
-#> Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
 #>                         var2
@@ -582,8 +532,6 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> Table size: 4×5 | N = 2518
 #> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 ### Multiple Comparisons
@@ -593,9 +541,6 @@ Test several relationships:
 ``` r
 survey_data %>%
   chi_square(employment, education, weights = sampling_weight)
-#> 
-#> Variables: employment x education
-#> Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
 #>             var2
@@ -643,14 +588,9 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> Table size: 5×4 | N = 2518
 #> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 survey_data %>%
   chi_square(employment, gender, weights = sampling_weight)
-#> 
-#> Variables: employment x gender
-#> Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
 #>             var2
@@ -684,8 +624,6 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> Table size: 5×2 | N = 2515
 #> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 ## Mann-Whitney Test
@@ -706,12 +644,6 @@ It compares the *distributions* rather than the means.
 survey_data %>%
   mann_whitney(political_orientation, group = region)
 #> 
-#> Grouping variable: region
-#> Groups compared: East vs. West
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
-#> 
 #> 
 #> --- political_orientation ---
 #> 
@@ -723,10 +655,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #>            Test       U       W      Z p_value effect_r sig
 #>  Mann-Whitney U 409,008 507,354 -0.173   0.862    0.004    
-#> ---------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------------------------------------------------------------
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -741,13 +670,6 @@ survey_data %>%
   mann_whitney(political_orientation, group = region,
                weights = sampling_weight)
 #> 
-#> Grouping variable: region
-#> Groups compared: East vs. West
-#> Weights variable: sampling_weight
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
-#> 
 #> 
 #> --- political_orientation ---
 #> 
@@ -759,10 +681,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 318,211 2,247,673 -21.44   0.862    0.446    
-#> ---------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------------------------------------------------------------
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -791,13 +710,8 @@ significant. Always check effect sizes:
 result <- survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
 print(result)
-#> 
-#> Dependent Variable: income
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- income ---
@@ -811,7 +725,7 @@ print(result)
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df   Mean_Square       F p_value sig
-#>  Between Groups  1726289513    3 575429837.501 462.325   <.001 ***
+#>  Between Groups  1726289513    3 575429837.501 462.325   <.001   1
 #>   Within Groups  2734479256 2197   1244642.356                    
 #>           Total  4460768768 2200                                  
 #> -------------------------------------------------------------------------------- 
@@ -825,9 +739,6 @@ print(result)
 #> ------------ 
 #>  Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>    income       0.387           0.386         0.386       large
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -874,13 +785,8 @@ anova_result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 print(anova_result)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -894,7 +800,7 @@ print(anova_result)
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001 ***
+#>  Between Groups     241.130    3      80.377 65.359   <.001   1
 #>   Within Groups    2992.019 2433        1.23                   
 #>           Total    3233.149 2436                               
 #> -------------------------------------------------------------------------------- 
@@ -909,9 +815,6 @@ print(anova_result)
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
 #> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
 #> - Epsilon-squared: Less biased than eta-squared
@@ -922,12 +825,7 @@ print(anova_result)
 
 # 3. Post-hoc: which groups differ?
 tukey_test(anova_result)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Confidence level: 95.0%
-#> Family-wise error rate controlled using Tukey HSD
+#>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -948,10 +846,7 @@ tukey_test(anova_result)
 #>    0.071    
 #>    <.001 ***
 #>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ------------------------------------------------------------------------------------
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -962,10 +857,6 @@ tukey_test(anova_result)
 # 4. Check assumptions
 levene_test(anova_result)
 #> 
-#> Grouping variable: education
-#> Weights variable: sampling_weight
-#> Center: mean
-#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -973,9 +864,7 @@ levene_test(anova_result)
 #> -------------------------------------------------------------------- 
 #>           Variable F_statistic df1  df2 p_value sig        Conclusion
 #>  life_satisfaction      31.287   3 2433       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> --------------------------------------------------------------------
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)

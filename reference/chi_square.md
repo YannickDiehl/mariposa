@@ -161,7 +161,7 @@ survey_data %>% chi_square(gender, region)
 #> 
 #> ── Chi-Squared Test of Independence  ───────────────────────────────────────────
 #> 
-#> Variables: gender x region
+#> • Variables: gender x region
 #> 
 #> Observed Frequencies:
 #>         var2
@@ -190,15 +190,15 @@ survey_data %>% chi_square(gender, region)
 #> ---------------------------------------------------------------------- 
 #> Table size: 2×2 | N = 2500
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # With weights
 survey_data %>% chi_square(gender, education, weights = sampling_weight)
 #> 
 #> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────
 #> 
-#> Variables: gender x education
-#> Weights variable: sampling_weight
+#> • Variables: gender x education
+#> • Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
 #>         var2
@@ -227,7 +227,7 @@ survey_data %>% chi_square(gender, education, weights = sampling_weight)
 #> Table size: 2×4 | N = 2517
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # Grouped analysis
 survey_data %>% 
@@ -239,7 +239,9 @@ survey_data %>%
 #> Variables tested: gender x employment 
 #> Grouped by: region 
 #> 
-#> --- Group: region = East ---
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> Observed Frequencies:
 #>         var2
@@ -262,7 +264,9 @@ survey_data %>%
 #> Table size: 2×5 | N = 485
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> --- Group: region = West ---
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> Observed Frequencies:
 #>         var2
@@ -285,15 +289,15 @@ survey_data %>%
 #> Table size: 2×5 | N = 2015
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 
 # With continuity correction
 survey_data %>% chi_square(gender, region, correct = TRUE)
 #> 
 #> ── Chi-Squared Test of Independence  ───────────────────────────────────────────
 #> 
-#> Variables: gender x region
-#> Yates' continuity correction applied
+#> • Variables: gender x region
+#> • Continuity correction: Yates' correction applied
 #> 
 #> Observed Frequencies:
 #>         var2
@@ -322,5 +326,5 @@ survey_data %>% chi_square(gender, region, correct = TRUE)
 #> ---------------------------------------------------------------------- 
 #> Table size: 2×2 | N = 2500
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 ```

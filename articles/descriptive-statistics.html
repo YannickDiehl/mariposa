@@ -336,12 +336,12 @@ non-response is meaningful.</p>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         employment </span></span>
 <span><span class="co">#&gt; education </span></span>
 <span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Basic Secondary                    0         571          65         171          34         841</span></span>
 <span><span class="co">#&gt;                                 0.0%       67.9%        7.7%       20.3%        4.0%      100.0%  (row %)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -353,7 +353,7 @@ non-response is meaningful.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; University                        34         251          22          72          20         399</span></span>
 <span><span class="co">#&gt;                                 8.5%       62.9%        5.5%       18.0%        5.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Total                             78        1600         182         525         115        2500</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 2500</span></span></code></pre></div>
@@ -387,12 +387,12 @@ level?”</p>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         employment </span></span>
 <span><span class="co">#&gt; education </span></span>
 <span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Basic Secondary                    0         573          66         175          34         848</span></span>
 <span><span class="co">#&gt;                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -404,7 +404,7 @@ level?”</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; University                        34         240          21          72          20         385</span></span>
 <span><span class="co">#&gt;                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Total                             80        1603         184         534         115        2516</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 2516 (Weighted)</span></span></code></pre></div>
@@ -418,16 +418,13 @@ level?”</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- Group: region = East ---</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         employment </span></span>
 <span><span class="co">#&gt; education </span></span>
 <span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Basic Secondary                    0         112          11          39          12         175</span></span>
 <span><span class="co">#&gt;                                 0.0%       64.1%        6.6%       22.4%        6.9%      100.0%  (row %)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -439,21 +436,18 @@ level?”</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; University                         5          53           1          19           4          82</span></span>
 <span><span class="co">#&gt;                                 6.4%       64.3%        1.2%       23.2%        4.9%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Total                             12         320          33         123          21         509</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 509 (Weighted)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- Group: region = West ---</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         employment </span></span>
 <span><span class="co">#&gt; education </span></span>
 <span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Basic Secondary                    0         461          55         136          21         673</span></span>
 <span><span class="co">#&gt;                                 0.0%       68.5%        8.2%       20.1%        3.2%      100.0%  (row %)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -465,7 +459,7 @@ level?”</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; University                        28         187          20          52          16         303</span></span>
 <span><span class="co">#&gt;                                 9.4%       61.7%        6.5%       17.3%        5.2%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Total                             68        1282         151         411          94        2007</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 2007 (Weighted)</span></span></code></pre></div>
@@ -582,12 +576,12 @@ percentages</li>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         employment </span></span>
 <span><span class="co">#&gt; education </span></span>
 <span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Basic Secondary                    0         573          66         175          34         848</span></span>
 <span><span class="co">#&gt;                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -599,7 +593,7 @@ percentages</li>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; University                        34         240          21          72          20         385</span></span>
 <span><span class="co">#&gt;                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Total                             80        1603         184         534         115        2516</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 2516 (Weighted)</span></span>

@@ -190,10 +190,10 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span><span class="va">anova_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dependent Variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Family-wise error rate controlled using Tukey HSD</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
@@ -216,8 +216,8 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -232,11 +232,11 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span><span class="va">anova_weighted</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Tukey HSD Post-Hoc Test Results ────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dependent Variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights Variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Family-wise error rate controlled using Tukey HSD</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
@@ -259,8 +259,8 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    0.046   *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -274,9 +274,10 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_multi</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Family-wise error rate controlled using Tukey HSD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_government ---</span>
@@ -320,8 +321,8 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -337,12 +338,14 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span><span class="va">anova_grouped</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Grouping Variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Family-wise error rate controlled using Tukey HSD</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -364,8 +367,10 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -387,8 +392,8 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>

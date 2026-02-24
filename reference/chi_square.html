@@ -194,7 +194,7 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Chi-Squared Test of Independence  ───────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Variables: gender x region</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: gender x region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
@@ -222,16 +222,16 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma 0.033   0.659               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×2 | N = 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Variables: gender x education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: gender x education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
@@ -259,8 +259,8 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×4 | N = 2517</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
@@ -271,8 +271,10 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Variables tested: gender x employment </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouped by: region </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- Group: region = East ---</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
@@ -294,8 +296,10 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×5 | N = 485</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- Group: region = West ---</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
@@ -317,16 +321,16 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×5 | N = 2015</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With continuity correction</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, correct <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Chi-Squared Test of Independence  ───────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Variables: gender x region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Yates' continuity correction applied</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: gender x region</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Continuity correction: Yates' correction applied</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
@@ -354,8 +358,8 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma 0.033   0.659               Weak</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×2 | N = 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

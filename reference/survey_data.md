@@ -173,7 +173,9 @@ survey_data %>%
 #> • Null hypothesis (mu): 0.000
 #> 
 #> 
-#> Group: region = East
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -193,7 +195,9 @@ survey_data %>%
 #>  life_satisfaction    0.058    0.058       0.058  negligible
 #> 
 #> 
-#> Group: region = West
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 

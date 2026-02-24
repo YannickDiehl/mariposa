@@ -309,13 +309,8 @@ argument:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Dependent Variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; Grouping Variable: education</span></span>
-<span><span class="co">#&gt; Weights Variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Null hypothesis: All group means are equal</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: At least one group mean differs</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt;   Null hypothesis: All group means are equal</span></span>
+<span><span class="co">#&gt;   Alternative hypothesis: At least one group mean differs</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
@@ -329,7 +324,7 @@ argument:</p>
 <span><span class="co">#&gt; Weighted ANOVA Results:</span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;          Source Sum_Squares   df Mean_Square      F p_value sig</span></span>
-<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001 ***</span></span>
+<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001   1</span></span>
 <span><span class="co">#&gt;   Within Groups    2992.019 2433        1.23                   </span></span>
 <span><span class="co">#&gt;           Total    3233.149 2436                               </span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
@@ -343,9 +338,6 @@ argument:</p>
 <span><span class="co">#&gt; ------------ </span></span>
 <span><span class="co">#&gt;           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span></span>
 <span><span class="co">#&gt;  life_satisfaction       0.075           0.073         0.073      medium</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation:</span></span>
 <span><span class="co">#&gt; - Eta-squared: Proportion of variance explained (biased upward)</span></span>
@@ -361,9 +353,6 @@ argument:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chi_square.html">chi_square</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Variables: education x employment</span></span>
-<span><span class="co">#&gt; Weights variable: sampling_weight</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Observed Frequencies:</span></span>
 <span><span class="co">#&gt;                         var2</span></span>
@@ -394,9 +383,7 @@ argument:</p>
 <span><span class="co">#&gt;       Gamma -0.062   0.122               Weak</span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; Table size: 4×5 | N = 2518</span></span>
-<span><span class="co">#&gt; Note: Phi coefficient only shown for 2x2 tables</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: Phi coefficient only shown for 2x2 tables</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="weighted-correlations">Weighted Correlations<a class="anchor" aria-label="anchor" href="#weighted-correlations"></a>
@@ -414,8 +401,6 @@ argument:</p>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>

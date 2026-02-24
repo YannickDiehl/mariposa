@@ -226,13 +226,8 @@ with a tiny effect might not be practically meaningful.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Dependent Variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; Grouping Variable: education</span></span>
-<span><span class="co">#&gt; Weights Variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Null hypothesis: All group means are equal</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: At least one group mean differs</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt;   Null hypothesis: All group means are equal</span></span>
+<span><span class="co">#&gt;   Alternative hypothesis: At least one group mean differs</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
@@ -246,7 +241,7 @@ with a tiny effect might not be practically meaningful.</p>
 <span><span class="co">#&gt; Weighted ANOVA Results:</span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;          Source Sum_Squares   df Mean_Square      F p_value sig</span></span>
-<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001 ***</span></span>
+<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001   1</span></span>
 <span><span class="co">#&gt;   Within Groups    2992.019 2433        1.23                   </span></span>
 <span><span class="co">#&gt;           Total    3233.149 2436                               </span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
@@ -260,9 +255,6 @@ with a tiny effect might not be practically meaningful.</p>
 <span><span class="co">#&gt; ------------ </span></span>
 <span><span class="co">#&gt;           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span></span>
 <span><span class="co">#&gt;  life_satisfaction       0.075           0.073         0.073      medium</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation:</span></span>
 <span><span class="co">#&gt; - Eta-squared: Proportion of variance explained (biased upward)</span></span>
@@ -295,8 +287,6 @@ association:</p>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
 <span><span class="co">#&gt;   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span></span>
@@ -323,12 +313,12 @@ decrease</li>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         employment </span></span>
 <span><span class="co">#&gt; education </span></span>
 <span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Basic Secondary                    0         573          66         175          34         848</span></span>
 <span><span class="co">#&gt;                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -340,7 +330,7 @@ decrease</li>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; University                        34         240          21          72          20         385</span></span>
 <span><span class="co">#&gt;                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────── </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
 <span><span class="co">#&gt; Total                             80        1603         184         534         115        2516</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 2516 (Weighted)</span></span></code></pre></div>
@@ -486,13 +476,8 @@ misleading.</p>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Dependent Variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; Grouping Variable: education</span></span>
-<span><span class="co">#&gt; Weights Variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Null hypothesis: All group means are equal</span></span>
-<span><span class="co">#&gt; Alternative hypothesis: At least one group mean differs</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt;   Null hypothesis: All group means are equal</span></span>
+<span><span class="co">#&gt;   Alternative hypothesis: At least one group mean differs</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
@@ -506,7 +491,7 @@ misleading.</p>
 <span><span class="co">#&gt; Weighted ANOVA Results:</span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;          Source Sum_Squares   df Mean_Square      F p_value sig</span></span>
-<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001 ***</span></span>
+<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001   1</span></span>
 <span><span class="co">#&gt;   Within Groups    2992.019 2433        1.23                   </span></span>
 <span><span class="co">#&gt;           Total    3233.149 2436                               </span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
@@ -521,9 +506,6 @@ misleading.</p>
 <span><span class="co">#&gt;           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span></span>
 <span><span class="co">#&gt;  life_satisfaction       0.075           0.073         0.073      medium</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation:</span></span>
 <span><span class="co">#&gt; - Eta-squared: Proportion of variance explained (biased upward)</span></span>
 <span><span class="co">#&gt; - Epsilon-squared: Less biased than eta-squared</span></span>
@@ -534,12 +516,7 @@ misleading.</p>
 <span></span>
 <span><span class="co"># 4. If significant, find out which groups differ</span></span>
 <span><span class="fu"><a href="../reference/tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Dependent Variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; Grouping Variable: education</span></span>
-<span><span class="co">#&gt; Weights Variable: sampling_weight</span></span>
-<span><span class="co">#&gt; Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt; Family-wise error rate controlled using Tukey HSD</span></span>
+<span><span class="co">#&gt;   Family-wise error rate controlled using Tukey HSD</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
@@ -560,10 +537,7 @@ misleading.</p>
 <span><span class="co">#&gt;    0.071    </span></span>
 <span><span class="co">#&gt;    &lt;.001 ***</span></span>
 <span><span class="co">#&gt;    0.046   *</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Interpretation:</span></span>
 <span><span class="co">#&gt; - Positive differences: First group &gt; Second group</span></span>

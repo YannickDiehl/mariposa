@@ -145,13 +145,8 @@ When comparing more than two groups, use
 ``` r
 survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -165,7 +160,7 @@ survey_data %>%
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001 ***
+#>  Between Groups     241.130    3      80.377 65.359   <.001   1
 #>   Within Groups    2992.019 2433        1.23                   
 #>           Total    3233.149 2436                               
 #> -------------------------------------------------------------------------------- 
@@ -179,9 +174,6 @@ survey_data %>%
 #> ------------ 
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -212,8 +204,6 @@ survey_data %>%
 #>   p-value: 0.8276
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
 #>   0.30 ≤ |r| < 0.70: Moderate correlation
@@ -235,12 +225,12 @@ survey_data %>%
   crosstab(education, employment, weights = sampling_weight)
 #> 
 #> Crosstabulation: education × employment
-#> ────────────────────────────────────────────────── 
+#> -------------------------------------------------- 
 #> 
 #>                         employment 
 #> education 
 #>                              Student    Employed  Unemployed     Retired       Other       Total
-#> ──────────────────────────────────────────────────────────────────────────────────────────────── 
+#> ------------------------------------------------------------------------------------------------ 
 #> Basic Secondary                    0         573          66         175          34         848
 #>                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)
 #> 
@@ -252,7 +242,7 @@ survey_data %>%
 #> 
 #> University                        34         240          21          72          20         385
 #>                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)
-#> ──────────────────────────────────────────────────────────────────────────────────────────────── 
+#> ------------------------------------------------------------------------------------------------ 
 #> Total                             80        1603         184         534         115        2516
 #> 
 #> N = 2516 (Weighted)
@@ -400,13 +390,8 @@ result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 print(result)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Null hypothesis: All group means are equal
-#> Alternative hypothesis: At least one group mean differs
-#> Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -420,7 +405,7 @@ print(result)
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001 ***
+#>  Between Groups     241.130    3      80.377 65.359   <.001   1
 #>   Within Groups    2992.019 2433        1.23                   
 #>           Total    3233.149 2436                               
 #> -------------------------------------------------------------------------------- 
@@ -435,9 +420,6 @@ print(result)
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
 #> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
 #> - Epsilon-squared: Less biased than eta-squared
@@ -448,12 +430,7 @@ print(result)
 
 # 4. If significant, find out which groups differ
 tukey_test(result)
-#> 
-#> Dependent Variable: life_satisfaction
-#> Grouping Variable: education
-#> Weights Variable: sampling_weight
-#> Confidence level: 95.0%
-#> Family-wise error rate controlled using Tukey HSD
+#>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -474,10 +451,7 @@ tukey_test(result)
 #>    0.071    
 #>    <.001 ***
 #>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ------------------------------------------------------------------------------------
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group

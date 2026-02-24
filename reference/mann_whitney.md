@@ -194,11 +194,11 @@ survey_data %>%
 #> 
 #> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
 #> 
-#> Grouping variable: gender
-#> Groups compared: Male vs. Female
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- age ---
@@ -214,7 +214,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -227,11 +227,11 @@ survey_data %>%
 #> 
 #> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
 #> 
-#> Grouping variable: region
-#> Groups compared: East vs. West
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
+#> • Grouping variable: region
+#> • Groups compared: East vs. West
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- age ---
@@ -273,7 +273,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -286,11 +286,11 @@ survey_data %>%
 #> 
 #> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
 #> 
-#> Grouping variable: gender
-#> Groups compared: Male vs. Female
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- trust_government ---
@@ -332,7 +332,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -345,12 +345,12 @@ survey_data %>%
 #> 
 #> ── Weighted Mann-Whitney U Test Results ────────────────────────────────────────
 #> 
-#> Grouping variable: region
-#> Groups compared: East vs. West
-#> Weights variable: sampling_weight
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
+#> • Grouping variable: region
+#> • Groups compared: East vs. West
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
@@ -366,7 +366,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -380,14 +380,16 @@ survey_data %>%
 #> 
 #> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
 #> 
-#> Grouping variable: gender
-#> Groups compared: Male vs. Female
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
-#> Group: education = Basic Secondary
+#> 
+#> ── Group: education = Basic Secondary ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -401,7 +403,9 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Group: education = Intermediate Secondary
+#> 
+#> ── Group: education = Intermediate Secondary ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -415,7 +419,9 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Group: education = Academic Secondary
+#> 
+#> ── Group: education = Academic Secondary ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -429,7 +435,9 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Group: education = University
+#> 
+#> ── Group: education = University ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -443,7 +451,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -456,11 +464,11 @@ survey_data %>%
 #> 
 #> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
 #> 
-#> Grouping variable: region
-#> Groups compared: East vs. West
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: greater
-#> Confidence level: 95.0%
+#> • Grouping variable: region
+#> • Groups compared: East vs. West
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: greater
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -476,7 +484,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
@@ -490,12 +498,12 @@ print(result)
 #> 
 #> ── Weighted Mann-Whitney U Test Results ────────────────────────────────────────
 #> 
-#> Grouping variable: gender
-#> Groups compared: Male vs. Female
-#> Weights variable: sampling_weight
-#> Null hypothesis (mu): 0.000
-#> Alternative hypothesis: two.sided
-#> Confidence level: 95.0%
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
@@ -511,7 +519,7 @@ print(result)
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1
