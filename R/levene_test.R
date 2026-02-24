@@ -345,7 +345,7 @@ levene_test.t_test <- function(x, center = c("mean", "median"), ...) {
       }
       
       # Perform Levene test for this group
-      if (!is.null(x$weight_var) || !is.null(x$weights)) {
+      if (!is.null(x$weights)) {
         group_result <- levene_test.data.frame(group_data, !!!syms(x$variables), 
                                               group = !!sym(x$group), 
                                               weights = !!sym(x$weights),
@@ -384,7 +384,7 @@ levene_test.t_test <- function(x, center = c("mean", "median"), ...) {
     
   } else {
     # Handle ungrouped data (original behavior)
-    if (!is.null(x$weight_var) || !is.null(x$weights)) {
+    if (!is.null(x$weights)) {
       result <- levene_test.data.frame(x$data, !!!syms(x$variables), 
                                       group = !!sym(x$group), 
                                       weights = !!sym(x$weights),
@@ -752,21 +752,21 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
 #' Print method for Levene test results
 #'
 #' @param x A levene_test object
-#' @param digits Number of decimal places to display
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @export
 #' @method print levene_test
 print.levene_test <- function(x, digits = 3, ...) {
 
   # Determine test type using standardized helper
-  weights_name <- x$weight_var %||% x$weights
+  weights_name <- x$weights
   test_type <- get_standard_title("Levene's Test for Homogeneity of Variance", weights_name, "")
   print_header(test_type)
   
   # Print test information using standardized helpers
   cat("\n")
   group_name <- x$group_var %||% x$group
-  weight_name <- x$weight_var %||% x$weights
+  weight_name <- x$weights
   test_info <- list(
     "Grouping variable" = group_name,
     "Weights variable" = weight_name,
@@ -779,7 +779,7 @@ print.levene_test <- function(x, digits = 3, ...) {
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
   
   # Check if this is grouped data
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) || (!is.null(x$is_grouped) && x$is_grouped)
+  is_grouped_data <- isTRUE(x$is_grouped)
     if (is_grouped_data) {
     # Handle grouped results - group by group identity, then show all variables for each group
     
@@ -869,7 +869,7 @@ print.levene_test <- function(x, digits = 3, ...) {
         total_width <- sum(col_widths) + length(col_widths) - 1
         border_width <- paste(rep("-", total_width), collapse = "")
         
-        cat(sprintf("%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Levene's Test Results", "Levene's Test Results")))
+        cat(sprintf("%s:\n", ifelse(!is.null(x$weights), "Weighted Levene's Test Results", "Levene's Test Results")))
         cat(border_width, "\n")
         print(results_df, row.names = FALSE)
         cat(border_width, "\n")
@@ -907,7 +907,7 @@ print.levene_test <- function(x, digits = 3, ...) {
       total_width <- sum(col_widths) + length(col_widths) - 1
       border_width <- paste(rep("-", total_width), collapse = "")
       
-      cat(sprintf("%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Levene's Test Results", "Levene's Test Results")))
+      cat(sprintf("%s:\n", ifelse(!is.null(x$weights), "Weighted Levene's Test Results", "Levene's Test Results")))
       cat(border_width, "\n")
       print(results_df, row.names = FALSE)
       cat(border_width, "\n")

@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A w_modus object}
 
-\item{digits}{Number of decimal places to display}
+\item{digits}{Number of decimal places to display (default: 3)}
 
 \item{...}{Additional arguments (not used)}
 }

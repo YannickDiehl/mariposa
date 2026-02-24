@@ -15,11 +15,14 @@
 #'   correlation or more for a correlation matrix.
 #' @param weights Optional survey weights for population-representative results
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
-#' @param na.rm How to handle missing values:
+#' @param alternative Direction of the test: \code{"two.sided"} (default),
+#'   \code{"less"}, or \code{"greater"}.
+#' @param use How to handle missing values:
 #'   \itemize{
 #'     \item \code{"pairwise"} (default): Use all available data for each pair
 #'     \item \code{"listwise"}: Only use complete cases across all variables
 #'   }
+#' @param na.rm \lifecycle{deprecated} Use \code{use} instead.
 #'
 #' @return Correlation results showing relationships between variables, including:
 #' - Correlation coefficient (r): Strength and direction of relationship
@@ -105,7 +108,7 @@
 #' 
 #' # Listwise deletion for missing data
 #' survey_data %>% 
-#'   pearson_cor(age, income, na.rm = "listwise")
+#'   pearson_cor(age, income, use = "listwise")
 #' 
 #' # Store results for further analysis
 #' result <- survey_data %>% 
@@ -131,16 +134,22 @@
 #'
 #' @family correlation
 #' @export
-pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "pairwise") {
-  
+pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
+                        alternative = c("two.sided", "less", "greater"),
+                        use = c("pairwise", "listwise"), na.rm = NULL) {
+
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }
-  
-  if (!na.rm %in% c("pairwise", "listwise")) {
-    cli_abort("{.arg na.rm} must be either {.val pairwise} or {.val listwise}.")
+
+  # Handle deprecated na.rm parameter
+  if (!is.null(na.rm)) {
+    cli_warn("{.arg na.rm} is deprecated in correlation functions. Use {.arg use} instead.")
+    use <- na.rm
   }
+  use <- match.arg(use)
+  alternative <- match.arg(alternative)
   
   if (conf.level <= 0 || conf.level >= 1) {
     cli_abort("{.arg conf.level} must be between 0 and 1.")
@@ -150,35 +159,27 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
   
-  # Get variable names using tidyselect
-  dots <- enquos(...)
-  weights_quo <- enquo(weights)
-  
-  # Evaluate selections
-  vars <- eval_select(expr(c(!!!dots)), data = data)
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
-  
+
   if (length(var_names) < 2) {
     cli_abort("At least two variables must be specified for correlation analysis.")
   }
-  
+
   # Validate that all selected variables are numeric
   for (var_name in var_names) {
     if (!is.numeric(data[[var_name]])) {
       cli_abort("Variable {.var {var_name}} is not numeric.")
     }
   }
-  
-  # Get weights if provided
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)
-  } else {
-    w_name <- NULL
-  }
+
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
   
   # Helper function to calculate weighted correlation
-  calculate_weighted_cor <- function(x, y, w = NULL, conf.level = 0.95) {
+  calculate_weighted_cor <- function(x, y, w = NULL, conf.level = 0.95, alternative = "two.sided") {
     if (!is.null(w)) {
       # Remove missing values
       valid <- !is.na(x) & !is.na(y) & !is.na(w) & w > 0
@@ -211,7 +212,7 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
       
       # SPSS compatibility: use sum of weights for significance testing
       # Also calculate true effective sample size for reference
-      n_eff_true <- sum(w)^2 / sum(w^2)  # Statistically correct effective sample size
+      n_eff_true <- .effective_n(w)  # Statistically correct effective sample size
       n_eff <- sum(w)  # SPSS uses sum of weights for df calculation
       
     } else {
@@ -245,7 +246,11 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
       p_value <- 0
     } else {
       t_stat <- r * sqrt(df / (1 - r^2))
-      p_value <- 2 * pt(-abs(t_stat), df)
+      p_value <- switch(alternative,
+        "two.sided" = 2 * pt(-abs(t_stat), df),
+        "less" = pt(t_stat, df),
+        "greater" = pt(t_stat, df, lower.tail = FALSE)
+      )
     }
     
     # Calculate confidence interval using Fisher's z transformation
@@ -279,7 +284,7 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
   }
   
   # Helper function to calculate all pairwise correlations
-  calculate_correlation_matrix <- function(data, var_names, w_name = NULL, conf.level = 0.95, na.rm = "pairwise") {
+  calculate_correlation_matrix <- function(data, var_names, w_name = NULL, conf.level = 0.95, alternative = "two.sided", use = "pairwise") {
     n_vars <- length(var_names)
     
     # Initialize storage
@@ -299,7 +304,7 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
     weights_vec <- if (!is.null(w_name)) data[[w_name]] else NULL
     
     # Handle listwise deletion if requested
-    if (na.rm == "listwise") {
+    if (use == "listwise") {
       complete_cases <- complete.cases(data[var_names])
       if (!is.null(weights_vec)) {
         complete_cases <- complete_cases & !is.na(weights_vec)
@@ -311,7 +316,7 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
     }
     
     # Calculate correlations for each pair
-    for (i in 1:n_vars) {
+    for (i in seq_len(n_vars)) {
       for (j in i:n_vars) {
         if (i == j) {
           # Diagonal: perfect correlation with self
@@ -329,10 +334,11 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
         } else {
           # Calculate correlation
           result <- calculate_weighted_cor(
-            data[[var_names[i]]], 
-            data[[var_names[j]]], 
+            data[[var_names[i]]],
+            data[[var_names[j]]],
             weights_vec,
-            conf.level
+            conf.level,
+            alternative
           )
           
           # Store results (symmetric)
@@ -366,18 +372,19 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
       
       # Calculate correlation matrix for this group
       cor_results <- calculate_correlation_matrix(
-        group_data, 
-        var_names, 
-        w_name, 
-        conf.level, 
-        na.rm
+        group_data,
+        var_names,
+        w_name,
+        conf.level,
+        alternative,
+        use
       )
-      
+
       # Convert to long format for results data frame
       long_results <- list()
       k <- 1
       
-      for (i in 1:length(var_names)) {
+      for (i in seq_along(var_names)) {
         for (j in i:length(var_names)) {
           if (i != j) {  # Skip diagonal
             result_row <- cbind(
@@ -409,11 +416,12 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
     matrices_list <- lapply(seq_along(data_list), function(i) {
       group_data <- data_list[[i]]
       calculate_correlation_matrix(
-        group_data, 
-        var_names, 
-        w_name, 
-        conf.level, 
-        na.rm
+        group_data,
+        var_names,
+        w_name,
+        conf.level,
+        alternative,
+        use
       )
     })
     
@@ -422,18 +430,19 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
   } else {
     # Single analysis for whole dataset
     cor_results <- calculate_correlation_matrix(
-      data, 
-      var_names, 
-      w_name, 
-      conf.level, 
-      na.rm
+      data,
+      var_names,
+      w_name,
+      conf.level,
+      alternative,
+      use
     )
     
     # Convert to long format for results data frame
     long_results <- list()
     k <- 1
     
-    for (i in 1:length(var_names)) {
+    for (i in seq_along(var_names)) {
       for (j in i:length(var_names)) {
         if (i != j) {  # Skip diagonal
           result_row <- data.frame(
@@ -474,7 +483,8 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
     variables = var_names,
     weights = w_name,
     conf.level = conf.level,
-    na.rm = na.rm,
+    use = use,
+    alternative = alternative,
     is_grouped = is_grouped,
     groups = group_vars,
     group_keys = if(is_grouped) group_keys else NULL
@@ -482,79 +492,6 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95, na.rm = "p
   
   class(result) <- "pearson_cor"
   return(result)
-}
-
-#' Internal function to print correlation matrices without cutoff
-#' @keywords internal
-.print_correlation_matrix <- function(mat, digits = 3, title = "Correlation Matrix:", 
-                                      type = "correlation") {
-  # Get current console width
-  old_width <- getOption("width")
-  
-  # Calculate required width for the matrix
-  n_vars <- ncol(mat)
-  max_rowname_length <- max(nchar(rownames(mat)), na.rm = TRUE)
-  
-  # Determine value width based on type
-  if (type == "correlation") {
-    # Correlations: -1.000 to 1.000
-    value_width <- digits + 4  # e.g., "-0.xxx" or " 1.000"
-  } else if (type == "pvalue") {
-    # P-values: 0.0000 to 1.0000
-    value_width <- digits + 3  # e.g., "0.xxxx"
-  } else {
-    # Sample sizes: integers
-    value_width <- max(nchar(format(mat, scientific = FALSE)), na.rm = TRUE) + 1
-  }
-  
-  # Calculate total required width
-  # rowname + spaces + (n_vars * (value_width + space between))
-  required_width <- max_rowname_length + 2 + (n_vars * (value_width + 1))
-  
-  # Adjust console width if needed (cap at 200 for readability)
-  width_adjusted <- FALSE
-  if (required_width > old_width && required_width <= 200) {
-    options(width = required_width)
-    on.exit(options(width = old_width), add = TRUE)
-    width_adjusted <- TRUE
-  } else if (required_width > 200) {
-    # For very wide matrices, use maximum reasonable width
-    options(width = 200)
-    on.exit(options(width = old_width), add = TRUE)
-    width_adjusted <- TRUE
-  }
-  
-  # For very large matrices (> 6 variables), use more compact formatting
-  if (n_vars > 6 && type == "correlation") {
-    digits <- min(digits, 2)
-    value_width <- digits + 4
-  }
-  
-  # Print title and border
-  cat(paste0("\n", title, "\n"))
-  border_width <- paste(rep("-", nchar(title)), collapse = "")
-  cat(border_width, "\n")
-  
-  # Format matrix based on type
-  if (type == "correlation") {
-    # Format correlation matrix with consistent spacing
-    formatted_mat <- format(round(mat, digits), width = value_width, nsmall = digits, justify = "right")
-  } else if (type == "pvalue") {
-    # Format p-value matrix
-    formatted_mat <- format(round(mat, digits), width = value_width, nsmall = digits, justify = "right")
-  } else {
-    # Format sample size matrix (integers)
-    formatted_mat <- format(mat, width = value_width, justify = "right")
-  }
-  
-  # Print the formatted matrix
-  print(formatted_mat, quote = FALSE, right = TRUE)
-  cat(border_width, "\n")
-  
-  # If we had to adjust width for a very large matrix, add a note
-  if (width_adjusted && required_width > 200) {
-    cat("Note: Matrix display adjusted for console width.\n")
-  }
 }
 
 #' Print method for pearson_cor
@@ -574,7 +511,7 @@ print.pearson_cor <- function(x, digits = 3, ...) {
   cat("\n")
   test_info <- list(
     "Weights variable" = x$weights,
-    "Missing data handling" = paste(x$na.rm, "deletion")
+    "Missing data handling" = paste(x$use, "deletion")
   )
   print_info_section(test_info)
 
@@ -599,39 +536,32 @@ print.pearson_cor <- function(x, digits = 3, ...) {
       
       # For each pair of variables, show results like t_test does
       if (length(x$variables) == 2) {
-        # Single correlation - use variable block format
         var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
         cat(sprintf("\n--- %s ---\n\n", var_pair))
-        
-        # Show correlation statistics
-        cat(sprintf("  Correlation: r = %.3f\n", group_corrs$correlation[1]))
-        cat(sprintf("  Effect size: r-squared = %.3f\n", group_corrs$r_squared[1]))
-        cat(sprintf("  Sample size: n = %d\n", group_corrs$n[1]))
-        cat(sprintf("  95%% CI: [%.3f, %.3f]\n", 
-                   group_corrs$conf_int_lower[1],
-                   group_corrs$conf_int_upper[1]))
-        cat(sprintf("  p-value: %.4f\n", group_corrs$p_value[1]))
-        # Display significance on separate line for clarity
-        sig_text <- if (group_corrs$sig[1] == "") "ns" else group_corrs$sig[1]
-        cat(sprintf("  Significance: %s\n", sig_text))
+        .print_single_pair(group_corrs, stat_label = "r", stat_col = "correlation",
+                           corr_name = "Correlation",
+                           secondary_label = "Effect size: r-squared",
+                           secondary_col = "r_squared",
+                           ci_lower_col = "conf_int_lower",
+                           ci_upper_col = "conf_int_upper")
         
       } else {
         # Multiple correlations - show matrix first, then detailed results
         # Use the smart matrix printer for all matrices
         cor_matrix <- x$matrices[[i]]$correlations
-        .print_correlation_matrix(cor_matrix, digits = digits, 
+        .print_cor_matrix(cor_matrix, digits = digits, 
                                   title = "Correlation Matrix:", 
                                   type = "correlation")
         
         # Print p-value matrix
         p_matrix <- x$matrices[[i]]$p_values
-        .print_correlation_matrix(p_matrix, digits = 4, 
+        .print_cor_matrix(p_matrix, digits = 4, 
                                   title = "Significance Matrix (p-values):", 
                                   type = "pvalue")
         
         # Print sample size matrix
         n_matrix <- x$matrices[[i]]$n_obs
-        .print_correlation_matrix(n_matrix, digits = 0, 
+        .print_cor_matrix(n_matrix, digits = 0, 
                                   title = "Sample Size Matrix:", 
                                   type = "n")
         
@@ -663,37 +593,30 @@ print.pearson_cor <- function(x, digits = 3, ...) {
     # Ungrouped analysis
     
     if (length(x$variables) == 2) {
-      # Single correlation - use variable block format like t_test
       var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
       cat(sprintf("\n--- %s ---\n\n", var_pair))
-      
-      # Show correlation statistics
-      cat(sprintf("  Correlation: r = %.3f\n", x$correlations$correlation[1]))
-      cat(sprintf("  Effect size: r\u00b2 = %.3f\n", x$correlations$r_squared[1]))
-      cat(sprintf("  Sample size: n = %d\n", x$correlations$n[1]))
-      cat(sprintf("  95%% CI: [%.3f, %.3f]\n", 
-                 x$correlations$conf_int_lower[1],
-                 x$correlations$conf_int_upper[1]))
-      cat(sprintf("  p-value: %.4f\n", x$correlations$p_value[1]))
-      # Display significance on separate line for clarity
-      sig_text <- if (x$correlations$sig[1] == "") "ns" else x$correlations$sig[1]
-      cat(sprintf("  Significance: %s\n", sig_text))
+      .print_single_pair(x$correlations, stat_label = "r", stat_col = "correlation",
+                         corr_name = "Correlation",
+                         secondary_label = "Effect size: r\u00b2",
+                         secondary_col = "r_squared",
+                         ci_lower_col = "conf_int_lower",
+                         ci_upper_col = "conf_int_upper")
       
     } else {
       # Multiple correlations - show matrix then detailed results
       # Use the smart matrix printer for all matrices
       cor_matrix <- x$matrices[[1]]$correlations
-      .print_correlation_matrix(cor_matrix, digits = digits, 
+      .print_cor_matrix(cor_matrix, digits = digits, 
                                 title = "Correlation Matrix:", 
                                 type = "correlation")
       
       p_matrix <- x$matrices[[1]]$p_values
-      .print_correlation_matrix(p_matrix, digits = 4, 
+      .print_cor_matrix(p_matrix, digits = 4, 
                                 title = "Significance Matrix (p-values):", 
                                 type = "pvalue")
       
       n_matrix <- x$matrices[[1]]$n_obs
-      .print_correlation_matrix(n_matrix, digits = 0, 
+      .print_cor_matrix(n_matrix, digits = 0, 
                                 title = "Sample Size Matrix:", 
                                 type = "n")
       

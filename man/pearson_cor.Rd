@@ -4,7 +4,15 @@
 \alias{pearson_cor}
 \title{Measure How Strongly Variables Are Related}
 \usage{
-pearson_cor(data, ..., weights = NULL, conf.level = 0.95, na.rm = "pairwise")
+pearson_cor(
+  data,
+  ...,
+  weights = NULL,
+  conf.level = 0.95,
+  alternative = c("two.sided", "less", "greater"),
+  use = c("pairwise", "listwise"),
+  na.rm = NULL
+)
 }
 \arguments{
 \item{data}{Your survey data (a data frame or tibble)}
@@ -16,11 +24,16 @@ correlation or more for a correlation matrix.}
 
 \item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 
-\item{na.rm}{How to handle missing values:
+\item{alternative}{Direction of the test: \code{"two.sided"} (default),
+\code{"less"}, or \code{"greater"}.}
+
+\item{use}{How to handle missing values:
 \itemize{
 \item \code{"pairwise"} (default): Use all available data for each pair
 \item \code{"listwise"}: Only use complete cases across all variables
 }}
+
+\item{na.rm}{\lifecycle{deprecated} Use \code{use} instead.}
 }
 \value{
 Correlation results showing relationships between variables, including:
@@ -137,7 +150,7 @@ survey_data \%>\%
 
 # Listwise deletion for missing data
 survey_data \%>\% 
-  pearson_cor(age, income, na.rm = "listwise")
+  pearson_cor(age, income, use = "listwise")
 
 # Store results for further analysis
 result <- survey_data \%>\% 

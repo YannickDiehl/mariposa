@@ -186,7 +186,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
               quantiles <- .w_quantile(x, w, probs = probs, na.rm = FALSE)
               names(quantiles) <- quantile_labels
               n_val <- length(x)
-              eff_n <- sum(w)^2 / sum(w^2)  # Effective sample size
+              eff_n <- .effective_n(w)  # Effective sample size
             }
           }
           
@@ -236,7 +236,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
           quantiles <- .w_quantile(x, w, probs = probs, na.rm = FALSE)
           names(quantiles) <- quantile_labels
           n_val <- length(x)
-          eff_n <- sum(w)^2 / sum(w^2)
+          eff_n <- .effective_n(w)
         }
       }
       
@@ -260,11 +260,9 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
   result <- list(
     results = results,
     variables = var_names,
-    weight_var = weights_name,        # Test-compatible field name
-    weights = weights_name,           # Alternative field name
+    weights = weights_name,
     probs = probs,
-    is_grouped = is_grouped,          # Test-compatible field
-    grouped = is_grouped,             # Alternative field
+    is_grouped = is_grouped,
     groups = if (is_grouped) dplyr::group_vars(data) else NULL
   )
   
@@ -292,7 +290,7 @@ print.w_quantile <- function(x, digits = 3, ...) {
   test_type <- get_standard_title("Quantile", x$weights, "Statistics")
   print_header(test_type)
   
-  if (x$grouped) {
+  if (x$is_grouped) {
     # Get unique groups
     groups <- unique(x$results[x$groups])
     
@@ -330,15 +328,15 @@ print.w_quantile <- function(x, digits = 3, ...) {
       for (var_name in x$variables) {
         # Get quantile columns for this variable
         var_quantile_cols <- names(group_results)[grepl(paste0("^", var_name, "_"), names(group_results))]
-        var_quantile_cols <- var_quantile_cols[!grepl("_n_eff$", var_quantile_cols)]
-        
+        var_quantile_cols <- var_quantile_cols[!grepl("_(n|eff_n)$", var_quantile_cols)]
+
         if (length(var_quantile_cols) > 0) {
           # Get quantile values
           quantile_values <- as.numeric(group_results[1, var_quantile_cols])
-          
+
           # Create clean quantile names
           quantile_names <- gsub(paste0(var_name, "_"), "", var_quantile_cols)
-          
+
                      # Create display table for this variable
            var_results <- data.frame(
              Variable = rep(var_name, length(quantile_names)),
@@ -346,15 +344,15 @@ print.w_quantile <- function(x, digits = 3, ...) {
              Value = round(quantile_values, digits),
              stringsAsFactors = FALSE
            )
-          
+
           # Add sample size info
-          n_eff_col <- paste0(var_name, "_n_eff")
-          if (n_eff_col %in% names(group_results)) {
-            var_results$N <- rep(round(group_results[[n_eff_col]][1], 1), nrow(var_results))
-            # Only add Effective_N for weighted calculations
-            if (is_weighted) {
-              var_results$Effective_N <- rep(round(group_results[[n_eff_col]][1], 1), nrow(var_results))
-            }
+          n_col <- paste0(var_name, "_n")
+          n_eff_col <- paste0(var_name, "_eff_n")
+          if (n_col %in% names(group_results)) {
+            var_results$N <- rep(round(group_results[[n_col]][1], 1), nrow(var_results))
+          }
+          if (is_weighted && n_eff_col %in% names(group_results)) {
+            var_results$Effective_N <- rep(round(group_results[[n_eff_col]][1], 1), nrow(var_results))
           }
           
           # Add weights info
@@ -381,15 +379,15 @@ print.w_quantile <- function(x, digits = 3, ...) {
     for (var_name in x$variables) {
       # Get quantile columns for this variable
       var_quantile_cols <- names(x$results)[grepl(paste0("^", var_name, "_"), names(x$results))]
-      var_quantile_cols <- var_quantile_cols[!grepl("_n_eff$", var_quantile_cols)]
-      
+      var_quantile_cols <- var_quantile_cols[!grepl("_(n|eff_n)$", var_quantile_cols)]
+
       if (length(var_quantile_cols) > 0) {
         # Get quantile values
         quantile_values <- as.numeric(x$results[1, var_quantile_cols])
-        
+
         # Create clean quantile names
         quantile_names <- gsub(paste0(var_name, "_"), "", var_quantile_cols)
-        
+
         # Create display table for this variable
         var_results <- data.frame(
           Variable = rep(var_name, length(quantile_names)),
@@ -397,15 +395,15 @@ print.w_quantile <- function(x, digits = 3, ...) {
           Value = round(quantile_values, digits),
           stringsAsFactors = FALSE
         )
-        
+
         # Add sample size info
-        n_eff_col <- paste0(var_name, "_n_eff")
-        if (n_eff_col %in% names(x$results)) {
-          var_results$N <- rep(round(x$results[[n_eff_col]][1], 1), nrow(var_results))
-          # Only add Effective_N for weighted calculations
-          if (is_weighted) {
-            var_results$Effective_N <- rep(round(x$results[[n_eff_col]][1], 1), nrow(var_results))
-          }
+        n_col <- paste0(var_name, "_n")
+        n_eff_col <- paste0(var_name, "_eff_n")
+        if (n_col %in% names(x$results)) {
+          var_results$N <- rep(round(x$results[[n_col]][1], 1), nrow(var_results))
+        }
+        if (is_weighted && n_eff_col %in% names(x$results)) {
+          var_results$Effective_N <- rep(round(x$results[[n_eff_col]][1], 1), nrow(var_results))
         }
         
         # Add weights info

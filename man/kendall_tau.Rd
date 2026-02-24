@@ -8,8 +8,9 @@ kendall_tau(
   data,
   ...,
   weights = NULL,
-  alternative = "two.sided",
-  na.rm = "pairwise"
+  alternative = c("two.sided", "less", "greater"),
+  use = c("pairwise", "listwise"),
+  na.rm = NULL
 )
 }
 \arguments{
@@ -21,18 +22,20 @@ correlation or more for a correlation matrix. You can use helpers like
 
 \item{weights}{Optional survey weights for population-representative results.}
 
-\item{alternative}{Character string specifying the alternative hypothesis:
+\item{alternative}{Direction of the test:
 \itemize{
 \item \code{"two.sided"} (default): Two-tailed test
 \item \code{"less"}: One-tailed test (negative correlation)
 \item \code{"greater"}: One-tailed test (positive correlation)
 }}
 
-\item{na.rm}{Character string specifying missing data handling:
+\item{use}{How to handle missing values:
 \itemize{
 \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 }}
+
+\item{na.rm}{\lifecycle{deprecated} Use \code{use} instead.}
 }
 \value{
 Correlation results showing rank-based relationships between variables,
@@ -94,7 +97,6 @@ data(survey_data)
 survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation)
 
-\donttest{
 # Correlation matrix for multiple variables
 survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation, trust_media)
@@ -114,7 +116,7 @@ survey_data \%>\%
 
 # Listwise deletion for missing data
 survey_data \%>\%
-  kendall_tau(age, income, na.rm = "listwise")
+  kendall_tau(age, income, use = "listwise")
 
 # One-tailed test
 survey_data \%>\%
@@ -125,7 +127,6 @@ result <- survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation, trust_media,
               weights = sampling_weight)
 print(result)
-}
 
 }
 \references{
