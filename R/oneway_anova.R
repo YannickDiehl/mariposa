@@ -620,52 +620,32 @@ print.oneway_anova <- function(x, digits = 3, ...) {
   test_type <- get_standard_title("One-Way ANOVA", x$weights, "Results")
   print_header(test_type)
   
-  # Print basic info
-  if (!x$is_grouped) {
-    if (length(x$variables) == 1) {
-      cat(sprintf("\nDependent Variable: %s\n", x$variables[1]))
-    }
-    cat(sprintf("Grouping Variable: %s\n", x$group))
-    if (!is.null(x$weights)) {
-      cat(sprintf("Weights Variable: %s\n", x$weights))
-    }
-    cat(sprintf("Null hypothesis: All group means are equal%s\n", 
-                ifelse(length(x$variables) > 1, " for each variable", "")))
-    cat(sprintf("Alternative hypothesis: At least one group mean differs%s\n",
-                ifelse(length(x$variables) > 1, " for each variable", "")))
-    cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
-    cat("\n")
-  } else {
-    cat(sprintf("\nGrouping Variable: %s\n", x$group))
-    if (!is.null(x$weights)) {
-      cat(sprintf("Weights Variable: %s\n", x$weights))
-    }
-    cat(sprintf("Null hypothesis: All group means are equal%s\n", 
-                ifelse(length(x$variables) > 1, " for each variable", "")))
-    cat(sprintf("Alternative hypothesis: At least one group mean differs%s\n",
-                ifelse(length(x$variables) > 1, " for each variable", "")))
-    cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
-    cat("\n")
-  }
+  # Print basic info using standardized helpers
+  cat("\n")
+  multi_var_suffix <- ifelse(length(x$variables) > 1, " for each variable", "")
+  test_info <- list(
+    "Dependent variable" = if (!x$is_grouped && length(x$variables) == 1) x$variables[1] else NULL,
+    "Grouping variable" = x$group,
+    "Weights variable" = x$weights
+  )
+  print_info_section(test_info)
+  test_params <- list(
+    conf.level = x$conf.level
+  )
+  print_test_parameters(test_params)
+  cat(sprintf("  Null hypothesis: All group means are equal%s\n", multi_var_suffix))
+  cat(sprintf("  Alternative hypothesis: At least one group mean differs%s\n", multi_var_suffix))
+  cat("\n")
   
-  # Add significance stars (handle both numeric and character p_values)
+  # Add significance stars using standardized helper
   p_values <- x$results$p_value
   if (is.character(p_values)) {
-    # Convert character p_values to numeric, handling "n/a"
     p_numeric <- suppressWarnings(as.numeric(p_values))
     p_numeric[is.na(p_numeric)] <- 1  # Set "n/a" to 1 (non-significant)
   } else {
     p_numeric <- p_values
   }
-
-  # Create significance stars properly
-  sig_stars <- rep("", length(p_numeric))
-  sig_stars[p_numeric < 0.001] <- "***"
-  sig_stars[p_numeric >= 0.001 & p_numeric < 0.01] <- "**"
-  sig_stars[p_numeric >= 0.01 & p_numeric < 0.05] <- "*"
-  sig_stars[p_numeric >= 0.05] <- ""
-  
-  x$results$sig <- sig_stars
+  x$results$sig <- sapply(p_numeric, add_significance_stars)
   
   # Template Standard: Dual grouped data detection
   is_grouped_data <- (!is.null(x$grouped) && x$grouped) || (!is.null(x$is_grouped) && x$is_grouped)
@@ -908,8 +888,8 @@ print.oneway_anova <- function(x, digits = 3, ...) {
     }
   }
   
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
-  
+  print_significance_legend()
+
   # Add interpretation guidelines only once at the end
   cat("\nEffect Size Interpretation:\n")
   cat("- Eta-squared: Proportion of variance explained (biased upward)\n")
@@ -924,57 +904,44 @@ print.oneway_anova <- function(x, digits = 3, ...) {
     cat(sprintf("\nPost-hoc tests: Use tukey_test() for pairwise comparisons%s\n",
                 ifelse(length(x$variables) > 1, " on each variable", "")))
   }
+
+  invisible(x)
 }
 
 # Print method for repeated measures ANOVA
 print_repeated_measures_anova <- function(x, digits = 3, ...) {
   
-  # Determine test type
-  test_type <- if (!is.null(x$weights)) {
-    "Weighted Mixed ANOVA Results (Repeated Measures)"
-  } else {
-    "Mixed ANOVA Results (Repeated Measures)"
-  }
+  # Determine test type using standardized helpers
+  test_type <- get_standard_title("Mixed ANOVA (Repeated Measures)", x$weights, "Results")
+  print_header(test_type)
   
-  cat(sprintf("\n%s\n", test_type))
-  cat(paste(rep("-", nchar(test_type)), collapse = ""), "\n")
-  
-  # Print test information
+  # Print test information using standardized helpers
   cat("\n")
-  cat(sprintf("Between-Subjects Factor: %s\n", x$group))
-  # Dynamic display of time points
-  if (length(x$variables) == 2) {
-    cat(sprintf("Within-Subjects Factor: Time (%s vs %s)\n", x$variables[1], x$variables[2]))
+  within_factor <- if (length(x$variables) == 2) {
+    sprintf("Time (%s vs %s)", x$variables[1], x$variables[2])
   } else {
-    cat(sprintf("Within-Subjects Factor: Time (%s)\n", paste(x$variables, collapse = " vs ")))
+    sprintf("Time (%s)", paste(x$variables, collapse = " vs "))
   }
-  if (!is.null(x$weights)) {
-    cat(sprintf("Weights variable: %s\n", x$weights))
-  }
-  if (!is.null(x$subject_id)) {
-    cat(sprintf("Subject ID: %s\n", x$subject_id))
-  }
-  cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
+  test_info <- list(
+    "Between-Subjects Factor" = x$group,
+    "Within-Subjects Factor" = within_factor,
+    "Weights variable" = x$weights,
+    "Subject ID" = x$subject_id
+  )
+  print_info_section(test_info)
+  test_params <- list(conf.level = x$conf.level)
+  print_test_parameters(test_params)
   cat("\n")
   
-  # Add significance stars (handle both numeric and character p_values)
+  # Add significance stars using standardized helper
   p_values <- x$results$p_value
   if (is.character(p_values)) {
-    # Convert character p_values to numeric, handling "n/a"
     p_numeric <- suppressWarnings(as.numeric(p_values))
     p_numeric[is.na(p_numeric)] <- 1  # Set "n/a" to 1 (non-significant)
   } else {
     p_numeric <- p_values
   }
-
-  # Create significance stars properly
-  sig_stars <- rep("", length(p_numeric))
-  sig_stars[p_numeric < 0.001] <- "***"
-  sig_stars[p_numeric >= 0.001 & p_numeric < 0.01] <- "**"
-  sig_stars[p_numeric >= 0.01 & p_numeric < 0.05] <- "*"
-  sig_stars[p_numeric >= 0.05] <- ""
-  
-  x$results$sig <- sig_stars
+  x$results$sig <- sapply(p_numeric, add_significance_stars)
   
   # Print multivariate tests first (if available)
   if (!is.null(x$multivariate_tests)) {

@@ -387,25 +387,17 @@ print.tukey_test <- function(x, digits = 3, ...) {
   test_type <- get_standard_title("Tukey HSD Post-Hoc Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
   
-  # Print basic info
-  if (!x$is_grouped) {
-    if (length(x$variables) == 1) {
-      cat(sprintf("\nDependent Variable: %s\n", x$variables[1]))
-    }
-    cat(sprintf("Grouping Variable: %s\n", x$group))
-    if (!is.null(x$weight_var) || !is.null(x$weights)) {
-      cat(sprintf("Weights Variable: %s\n", x$weights))
-    }
-    cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
-    cat("Family-wise error rate controlled using Tukey HSD\n\n")
-  } else {
-    cat(sprintf("\nGrouping Variable: %s\n", x$group))
-    if (!is.null(x$weight_var) || !is.null(x$weights)) {
-      cat(sprintf("Weights Variable: %s\n", x$weights))
-    }
-    cat(sprintf("Confidence level: %.1f%%\n", x$conf.level * 100))
-    cat("Family-wise error rate controlled using Tukey HSD\n\n")
-  }
+  # Print basic info using standardized helpers
+  cat("\n")
+  test_info <- list(
+    "Dependent variable" = if (!x$is_grouped && length(x$variables) == 1) x$variables[1] else NULL,
+    "Grouping variable" = x$group,
+    "Weights variable" = x$weight_var %||% x$weights
+  )
+  print_info_section(test_info)
+  test_params <- list(conf.level = x$conf.level)
+  print_test_parameters(test_params)
+  cat("  Family-wise error rate controlled using Tukey HSD\n\n")
   
   if (nrow(x$results) == 0) {
     cat("No post-hoc comparisons available.\n")
@@ -416,11 +408,8 @@ print.tukey_test <- function(x, digits = 3, ...) {
     return(invisible(x))
   }
   
-  # Add significance stars
-  x$results$sig <- cut(x$results$p_adjusted, 
-                      breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                      labels = c("***", "**", "*", ""),
-                      right = FALSE)
+  # Add significance stars using standardized helper
+  x$results$sig <- sapply(x$results$p_adjusted, add_significance_stars)
   
   # Template Standard: Dual grouped data detection
   is_grouped_data <- (!is.null(x$grouped) && x$grouped) || (!is.null(x$is_grouped) && x$is_grouped)
@@ -432,26 +421,16 @@ print.tukey_test <- function(x, digits = 3, ...) {
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
       
-      # Format group info
-      group_info <- sapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) {
-          paste(g, "=", levels(val)[val])
-        } else {
-          paste(g, "=", val)
-        }
-      })
-      group_info <- paste(group_info, collapse = ", ")
-      
+      # Print group header using standardized helper
+      print_group_header(group_values)
+
       # Filter results for current group
       group_results <- x$results
       for (g in names(group_values)) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
-      
+
       if (nrow(group_results) == 0) next
-      
-      cat(sprintf("\nGroup: %s\n", group_info))
       
       # Print each variable as separate block
       for (var in x$variables) {
@@ -527,13 +506,13 @@ print.tukey_test <- function(x, digits = 3, ...) {
     }
   }
   
-  cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
-  
+  print_significance_legend()
+
   cat("\nInterpretation:\n")
   cat("- Positive differences: First group > Second group\n")
   cat("- Negative differences: First group < Second group\n")
   cat("- Confidence intervals not containing 0 indicate significant differences\n")
   cat("- p-values are adjusted for multiple comparisons (family-wise error control)\n")
-  
+
   invisible(x)
-} 
+}
