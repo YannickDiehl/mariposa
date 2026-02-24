@@ -13,9 +13,9 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The categorical variables you want to analyze. You can list multiple
 #'   variables separated by commas, or use helpers like \code{starts_with("trust")}
-#' @param weights Optional survey weights to make results representative of your
-#'   population. Without weights, you get sample frequencies. With weights, you
-#'   get population estimates.
+#' @param weights Optional survey weights for population-representative results.
+#'   Without weights, you get sample frequencies. With weights, you get
+#'   population estimates.
 #' @param sort.frq How to order the results:
 #'   \itemize{
 #'     \item \code{"none"} (default): Keep original order
@@ -91,17 +91,18 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
                      show.na = TRUE, show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto") {
   
   if (!is.data.frame(data)) cli_abort("{.arg data} must be a data frame.")
-  
+
   # Check grouping and get variable names
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) group_vars(data) else NULL
-  
-  vars <- eval_select(expr(c(!!!enquos(...))), data = data)
+
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
-  
-  w_name <- if (!quo_is_null(enquo(weights))) {
-    names(eval_select(expr(!!enquo(weights)), data = data))
-  } else NULL
+
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
   
   # Handle show.labels logic: auto-detect or use explicit user setting
   if (show.labels == "auto") {
@@ -479,7 +480,7 @@ print.frequency <- function(x, digits = 3, ...) {
   col_widths <- c(Value = 6, Label = 20, N = 8, Raw = 8, Valid = 8, Cum = 8)
   
   # Determine test type
-  weights_name <- x$weight_var %||% x$weights
+  weights_name <- x$weights
   title <- get_standard_title("Frequency Analysis", weights_name, "Results")
   print_header(title)
 

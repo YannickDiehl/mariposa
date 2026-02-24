@@ -15,7 +15,7 @@
 
 \item{unweighted_col}{Column name for unweighted values}
 
-\item{digits}{Number of decimal places}
+\item{digits}{Number of decimal places to display (default: 3)}
 }
 \description{
 Shared print implementation used by all standard w_* functions.

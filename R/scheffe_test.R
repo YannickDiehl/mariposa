@@ -357,8 +357,7 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
 #' comparisons, confidence intervals, and adjusted p-values.
 #'
 #' @param x An object of class \code{"scheffe_test"} returned by \code{\link{scheffe_test}}.
-#' @param digits Integer specifying the number of decimal places to display
-#'   for numeric values. Default is \code{3}.
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
 #'
 #' @details
@@ -378,7 +377,7 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
 #' @export
 print.scheffe_test <- function(x, digits = 3, ...) {
   # Determine test type using standardized helper
-  weights_name <- x$weight_var %||% x$weights
+  weights_name <- x$weights
   test_type <- get_standard_title("Scheffe Post-Hoc Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
 
@@ -387,7 +386,7 @@ print.scheffe_test <- function(x, digits = 3, ...) {
   test_info <- list(
     "Dependent variable" = if (!x$is_grouped && length(x$variables) == 1) x$variables[1] else NULL,
     "Grouping variable" = x$group,
-    "Weights variable" = x$weight_var %||% x$weights
+    "Weights variable" = x$weights
   )
   print_info_section(test_info)
   test_params <- list(conf.level = x$conf.level)
@@ -408,7 +407,7 @@ print.scheffe_test <- function(x, digits = 3, ...) {
   x$results$sig <- sapply(x$results$p_adjusted, add_significance_stars)
 
   # Template Standard: Dual grouped data detection
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) || (!is.null(x$is_grouped) && x$is_grouped)
+  is_grouped_data <- isTRUE(x$is_grouped)
   if (is_grouped_data) {
     # Get unique groups
     groups <- unique(x$results[x$groups])
@@ -436,7 +435,7 @@ print.scheffe_test <- function(x, digits = 3, ...) {
         cat(sprintf("\n--- %s ---\n", var))
         cat("\n")  # Add blank line after variable name
 
-        cat(sprintf("%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Scheffe Results", "Scheffe Results")))
+        cat(sprintf("%s:\n", ifelse(!is.null(x$weights), "Weighted Scheffe Results", "Scheffe Results")))
 
         # Format display table
         display_table <- var_results[, c("Comparison", "Estimate", "conf_low",
@@ -473,7 +472,7 @@ print.scheffe_test <- function(x, digits = 3, ...) {
       cat(sprintf("\n--- %s ---\n", var))
       cat("\n")  # Add blank line after variable name
 
-      cat(sprintf("%s:\n", ifelse(!is.null(x$weight_var) || !is.null(x$weights), "Weighted Scheffe Results", "Scheffe Results")))
+      cat(sprintf("%s:\n", ifelse(!is.null(x$weights), "Weighted Scheffe Results", "Scheffe Results")))
 
       # Format display table
       display_table <- var_results[, c("Comparison", "Estimate", "conf_low",

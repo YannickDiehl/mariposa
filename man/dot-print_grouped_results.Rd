@@ -4,7 +4,7 @@
 \alias{.print_grouped_results}
 \title{Print results for grouped data}
 \usage{
-.print_grouped_results(x, is_weighted)
+.print_grouped_results(x, is_weighted, digits = 3)
 }
 \description{
 Print results for grouped data
