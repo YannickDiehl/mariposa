@@ -4,12 +4,10 @@
 \alias{print_separator}
 \title{Print horizontal separator line}
 \usage{
-print_separator(width = 40, char = "-")
+print_separator(...)
 }
 \arguments{
-\item{width}{Width of the line}
-
-\item{char}{Character to use for the line}
+\item{...}{Ignored (retained for backward compatibility)}
 }
 \description{
 Print horizontal separator line

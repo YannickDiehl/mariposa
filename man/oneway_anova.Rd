@@ -30,7 +30,7 @@ region, age_group). Must have at least 3 groups for ANOVA.}
 \item FALSE: Welch's ANOVA (allows unequal variances)
 }}
 
-\item{conf.level}{Confidence level for group statistics (Default: 0.95 = 95\%)}
+\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 }
 \value{
 ANOVA results showing whether groups differ, including:

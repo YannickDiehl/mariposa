@@ -30,7 +30,7 @@
 #'     \item \code{"greater"}: First group is higher
 #'     \item \code{"less"}: First group is lower
 #'   }
-#' @param conf.level Confidence level (Default: 0.95 = 95%)
+#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #'
 #' @return Test results showing whether groups differ, including:
 #' - t-statistic and p-value for statistical significance
@@ -179,13 +179,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) group_vars(data) else NULL
   
-  # Get variable names using tidyselect
-  dots <- enquos(...)
-  group_quo <- enquo(group)
-  weights_quo <- enquo(weights)
-  
-  # Evaluate selections
-  vars <- eval_select(expr(c(!!!dots)), data = data)
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
 
   # Validate that selected variables are numeric
@@ -195,19 +190,18 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     }
   }
 
+  # Process group variable
+  group_quo <- enquo(group)
   if (!quo_is_null(group_quo)) {
     g_var <- eval_select(expr(!!group_quo), data = data)
     g_name <- names(g_var)
   } else {
     g_name <- NULL
   }
-  
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)
-  } else {
-    w_name <- NULL
-  }
+
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
   
 
 
@@ -275,12 +269,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       hedges_g <- cohens_d * hedges_j
     }
     
-    # Return all three effect sizes in a list
-    if (exists("hedges_g") && exists("glass_delta")) {
-      return(list(cohens_d = cohens_d, hedges_g = hedges_g, glass_delta = glass_delta))
-    } else {
-      return(list(cohens_d = cohens_d, hedges_g = cohens_d, glass_delta = cohens_d))
-    }
+    return(list(cohens_d = cohens_d, hedges_g = hedges_g, glass_delta = glass_delta))
   }
 
   # Helper function to perform t-test for a single variable
@@ -715,10 +704,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
 # Internal implementation shared by both print methods
 .print_t_test_impl <- function(x, digits = 3) {
-  weights_name <- x$weight_var %||% x$weights
+  weights_name <- x$weights
   is_weighted <- !is.null(weights_name)
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) ||
-                     (!is.null(x$is_grouped) && x$is_grouped)
+  is_grouped_data <- isTRUE(x$is_grouped)
   results_label <- if (is_weighted) "Weighted t-test Results" else "t-test Results"
 
   # Print test info
@@ -861,7 +849,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 #' statistics, p-values, effect sizes, and confidence intervals.
 #'
 #' @param x An object of class \code{"t_test"} returned by \code{\link{t_test}}.
-#' @param digits Integer specifying the number of decimal places to display
+#' @param digits Number of decimal places to display (default: 3)
 #'   for numeric values. Default is \code{3}.
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
 #'
@@ -883,7 +871,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 #' @export
 #' @method print t_test
 print.t_test <- function(x, digits = 3, ...) {
-  weights_name <- x$weight_var %||% x$weights
+  weights_name <- x$weights
   test_type <- get_standard_title("t-Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
   x$results$p_value <- as.numeric(x$results$p_value)

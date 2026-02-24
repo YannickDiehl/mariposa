@@ -34,7 +34,7 @@ treatment/control). Must have exactly two groups.}
 \item \code{"less"}: Test if group 1 < group 2
 }}
 
-\item{conf.level}{Confidence level for effect size (Default: 0.95 = 95\%)}
+\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 }
 \value{
 Test results showing whether groups differ, including:

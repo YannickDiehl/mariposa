@@ -32,7 +32,7 @@ crosstab(
 \item \code{"none"}: Just counts, no percentages
 }}
 
-\item{na.rm}{Remove missing values? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
 
 \item{digits}{Decimal places for percentages (Default: 1)}
 }
