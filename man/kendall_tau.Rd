@@ -35,7 +35,7 @@ correlation or more for a correlation matrix. You can use helpers like
 \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 }}
 
-\item{na.rm}{\lifecycle{deprecated} Use \code{use} instead.}
+\item{na.rm}{Deprecated. Use \code{use} instead.}
 }
 \value{
 Correlation results showing rank-based relationships between variables,

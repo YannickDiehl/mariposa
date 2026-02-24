@@ -220,17 +220,15 @@ format_variable_name <- function(var, label = NULL) {
 #' Used by pearson_cor, spearman_rho, and kendall_tau print methods
 #' for two-variable analyses.
 #'
-#' @param var1 First variable name
-#' @param var2 Second variable name
 #' @param corr_row One-row data.frame with the correlation results
-#' @param stat_label Display label for the statistic (e.g. "r", "\u03c1", "\u03c4")
+#' @param stat_label Display label for the statistic (e.g. "r", rho, tau)
 #' @param stat_col Column name holding the correlation value
 #' @param corr_name Full name for the statistic line (e.g. "Correlation", "Spearman's rho")
 #' @param secondary_label Optional label for a second statistic
 #' @param secondary_col Optional column name for the second statistic
 #' @param ci_lower_col Column name for CI lower bound (NULL to skip)
 #' @param ci_upper_col Column name for CI upper bound (NULL to skip)
-#' @param alternative NULL or "two.sided"/"less"/"greater" — shown as suffix on p-value
+#' @param alternative NULL or "two.sided"/"less"/"greater" - shown as suffix on p-value
 #' @keywords internal
 .print_single_pair <- function(corr_row, stat_label, stat_col,
                                corr_name = "Correlation",

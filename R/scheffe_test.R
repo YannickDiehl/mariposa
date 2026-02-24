@@ -285,8 +285,8 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   if (x$is_grouped) {
     # Get original data and split by groups
     data <- x$data
-    data_list <- group_split(data)
-    group_keys <- group_keys(data)
+    data_list <- dplyr::group_split(data)
+    group_keys <- dplyr::group_keys(data)
 
     # Perform Scheffe test for each group
     for (i in seq_along(data_list)) {

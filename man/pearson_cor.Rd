@@ -33,7 +33,7 @@ correlation or more for a correlation matrix.}
 \item \code{"listwise"}: Only use complete cases across all variables
 }}
 
-\item{na.rm}{\lifecycle{deprecated} Use \code{use} instead.}
+\item{na.rm}{Deprecated. Use \code{use} instead.}
 }
 \value{
 Correlation results showing relationships between variables, including:

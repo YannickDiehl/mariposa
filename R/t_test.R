@@ -177,7 +177,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
-  group_vars <- if (is_grouped) group_vars(data) else NULL
+  grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
   
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
@@ -524,8 +524,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   # Main execution logic
   if (is_grouped) {
     # Split data by groups
-    data_list <- group_split(data)
-    group_keys <- group_keys(data)
+    data_list <- dplyr::group_split(data)
+    group_keys <- dplyr::group_keys(data)
     
     # Perform t-tests for each group
     results_list <- lapply(seq_along(data_list), function(i) {
@@ -644,7 +644,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       group = g_name,
       weights = w_name,
       var.equal = var.equal,
-      groups = group_vars,
+      groups = grp_vars,
       is_grouped = is_grouped,
       mu = mu,
       alternative = alternative,
@@ -658,7 +658,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           unique(g_var)
         }
       } else NULL,
-      data = data[, unique(c(var_names, g_name, w_name, group_vars)), drop = FALSE]
+      data = data[, unique(c(var_names, g_name, w_name, grp_vars)), drop = FALSE]
     ),
     class = "t_test"
   )
