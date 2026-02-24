@@ -94,7 +94,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
 
   # Check grouping and get variable names
   is_grouped <- inherits(data, "grouped_df")
-  group_vars <- if (is_grouped) group_vars(data) else NULL
+  grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
 
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
@@ -166,7 +166,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
     stats = results$stats,
     variables = var_names,
     weights = w_name,
-    groups = group_vars,
+    groups = grp_vars,
     is_grouped = is_grouped,
     options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels),
     labels = sapply(var_names, function(var) attr(data[[var]], "label") %||% var)
@@ -440,8 +440,8 @@ calculate_ungrouped_frequencies <- function(data, var_names, w_name, sort.frq, s
 
 # Helper function: Calculate frequencies for grouped data
 calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE) {
-  data_list <- group_split(data)
-  group_keys <- group_keys(data)
+  data_list <- dplyr::group_split(data)
+  group_keys <- dplyr::group_keys(data)
   
   results_list <- lapply(seq_along(data_list), function(i) {
     process_variables(data_list[[i]], var_names, w_name, sort.frq, show.na, group_keys[i, , drop = FALSE])

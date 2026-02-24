@@ -425,5 +425,6 @@ print.w_quantile <- function(x, digits = 3, ...) {
       cat("------------------------\n")
     }
   }
-} 
+  invisible(x)
+}
 
