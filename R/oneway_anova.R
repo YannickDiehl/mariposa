@@ -154,7 +154,7 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
-  group_vars <- if (is_grouped) group_vars(data) else NULL
+  grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
   
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
@@ -206,11 +206,11 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   
   # Perform standard between-subjects ANOVA
   return(perform_between_subjects_anova(data, var_names, g_name, w_name, conf.level, var.equal, 
-                                      is_grouped, group_vars, g_levels))
+                                      is_grouped, grp_vars, g_levels))
 }
 
 # Helper function to perform standard between-subjects ANOVA  
-perform_between_subjects_anova <- function(data, var_names, group_name, weight_name, conf.level, var.equal, is_grouped, group_vars, g_levels) {
+perform_between_subjects_anova <- function(data, var_names, group_name, weight_name, conf.level, var.equal, is_grouped, grp_vars, g_levels) {
   
   # Helper function to perform single ANOVA
   perform_single_anova <- function(data, var_name, group_name, weight_name = NULL) {
@@ -460,8 +460,8 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
   # Main execution logic
   if (is_grouped) {
     # Split data by groups
-    data_list <- group_split(data)
-    group_keys <- group_keys(data)
+    data_list <- dplyr::group_split(data)
+    group_keys <- dplyr::group_keys(data)
     
     # Perform ANOVA for each group
     results_list <- lapply(seq_along(data_list), function(i) {
@@ -557,11 +557,11 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       group = group_name,
       weights = weight_name,
       var.equal = var.equal,
-      groups = group_vars,
+      groups = grp_vars,
       is_grouped = is_grouped,
       conf.level = conf.level,
       group_levels = g_levels,
-      data = data[, unique(c(var_names, group_name, weight_name, group_vars)), drop = FALSE]
+      data = data[, unique(c(var_names, group_name, weight_name, grp_vars)), drop = FALSE]
     ),
     class = "oneway_anova"
   )

@@ -338,7 +338,7 @@ print.crosstab <- function(x, digits = 1, ...) {
 .print_single_crosstab <- function(x, digits = 1) {
 
   # Header
-  cat("\nCrosstabulation: ", x$row_var, " × ", x$col_var, "\n", sep = "")
+  cat("\nCrosstabulation: ", x$row_var, " \u00d7 ", x$col_var, "\n", sep = "")
   cat(paste(rep("-", 50), collapse = ""), "\n\n")
 
   # Get dimensions

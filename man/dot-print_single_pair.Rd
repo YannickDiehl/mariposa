@@ -19,7 +19,7 @@
 \arguments{
 \item{corr_row}{One-row data.frame with the correlation results}
 
-\item{stat_label}{Display label for the statistic (e.g. "r", "\u03c1", "\u03c4")}
+\item{stat_label}{Display label for the statistic (e.g. "r", rho, tau)}
 
 \item{stat_col}{Column name holding the correlation value}
 
@@ -33,11 +33,7 @@
 
 \item{ci_upper_col}{Column name for CI upper bound (NULL to skip)}
 
-\item{alternative}{NULL or "two.sided"/"less"/"greater" — shown as suffix on p-value}
-
-\item{var1}{First variable name}
-
-\item{var2}{Second variable name}
+\item{alternative}{NULL or "two.sided"/"less"/"greater" - shown as suffix on p-value}
 }
 \description{
 Used by pearson_cor, spearman_rho, and kendall_tau print methods
