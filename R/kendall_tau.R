@@ -14,17 +14,18 @@
 #'   correlation or more for a correlation matrix. You can use helpers like
 #'   \code{starts_with("trust")}.
 #' @param weights Optional survey weights for population-representative results.
-#' @param alternative Character string specifying the alternative hypothesis:
+#' @param alternative Direction of the test:
 #'   \itemize{
 #'     \item \code{"two.sided"} (default): Two-tailed test
 #'     \item \code{"less"}: One-tailed test (negative correlation)
 #'     \item \code{"greater"}: One-tailed test (positive correlation)
 #'   }
-#' @param na.rm Character string specifying missing data handling:
+#' @param use How to handle missing values:
 #'   \itemize{
 #'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
+#' @param na.rm \lifecycle{deprecated} Use \code{use} instead.
 #'
 #' @return Correlation results showing rank-based relationships between variables,
 #'   including the tau-b coefficient, p-value, z-score, and sample size for each
@@ -87,7 +88,7 @@
 #'
 #' # Listwise deletion for missing data
 #' survey_data %>%
-#'   kendall_tau(age, income, na.rm = "listwise")
+#'   kendall_tau(age, income, use = "listwise")
 #'
 #' # One-tailed test
 #' survey_data %>%
@@ -119,32 +120,30 @@
 #'
 #' @family correlation
 #' @export
-kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na.rm = "pairwise") {
+kendall_tau <- function(data, ..., weights = NULL,
+                        alternative = c("two.sided", "less", "greater"),
+                        use = c("pairwise", "listwise"), na.rm = NULL) {
 
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }
 
-  if (!na.rm %in% c("pairwise", "listwise")) {
-    cli_abort("{.arg na.rm} must be either {.val pairwise} or {.val listwise}.")
+  # Handle deprecated na.rm parameter
+  if (!is.null(na.rm)) {
+    cli_warn("{.arg na.rm} is deprecated in correlation functions. Use {.arg use} instead.")
+    use <- na.rm
   }
-
-  if (!alternative %in% c("two.sided", "less", "greater")) {
-    cli_abort("{.arg alternative} must be {.val two.sided}, {.val less}, or {.val greater}.")
-  }
+  use <- match.arg(use)
+  alternative <- match.arg(alternative)
 
 
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
 
-  # Get variable names using tidyselect
-  dots <- enquos(...)
-  weights_quo <- enquo(weights)
-
-  # Evaluate selections
-  vars <- eval_select(expr(c(!!!dots)), data = data)
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
 
   if (length(var_names) < 2) {
@@ -158,13 +157,9 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     }
   }
 
-  # Get weights if provided
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)
-  } else {
-    w_name <- NULL
-  }
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
 
   # Helper function to calculate weighted Kendall's tau
   calculate_weighted_tau <- function(x, y, w = NULL, alternative = "two.sided") {
@@ -356,7 +351,7 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
   }
 
   # Helper function to calculate all pairwise correlations
-  calculate_correlation_matrix <- function(data, var_names, w_name = NULL, alternative = "two.sided", na.rm = "pairwise") {
+  calculate_correlation_matrix <- function(data, var_names, w_name = NULL, alternative = "two.sided", use = "pairwise") {
     n_vars <- length(var_names)
 
     # Initialize storage
@@ -374,7 +369,7 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     weights_vec <- if (!is.null(w_name)) data[[w_name]] else NULL
 
     # Handle listwise deletion if requested
-    if (na.rm == "listwise") {
+    if (use == "listwise") {
       complete_cases <- complete.cases(data[var_names])
       if (!is.null(weights_vec)) {
         complete_cases <- complete_cases & !is.na(weights_vec)
@@ -386,7 +381,7 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     }
 
     # Calculate correlations for each pair
-    for (i in 1:n_vars) {
+    for (i in seq_len(n_vars)) {
       for (j in i:n_vars) {
         if (i == j) {
           # Diagonal: perfect correlation with self
@@ -442,14 +437,14 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
         var_names,
         w_name,
         alternative,
-        na.rm
+        use
       )
 
       # Convert to long format for results data frame
       long_results <- list()
       k <- 1
 
-      for (i in 1:length(var_names)) {
+      for (i in seq_along(var_names)) {
         for (j in i:length(var_names)) {
           if (i != j) {  # Skip diagonal
             result_row <- cbind(
@@ -484,7 +479,7 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
         var_names,
         w_name,
         alternative,
-        na.rm
+        use
       )
     })
 
@@ -497,14 +492,14 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
       var_names,
       w_name,
       alternative,
-      na.rm
+      use
     )
 
     # Convert to long format for results data frame
     long_results <- list()
     k <- 1
 
-    for (i in 1:length(var_names)) {
+    for (i in seq_along(var_names)) {
       for (j in i:length(var_names)) {
         if (i != j) {  # Skip diagonal
           result_row <- data.frame(
@@ -541,7 +536,7 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
     variables = var_names,
     weights = w_name,
     alternative = alternative,
-    na.rm = na.rm,
+    use = use,
     is_grouped = is_grouped,
     groups = group_vars,
     group_keys = if(is_grouped) group_keys else NULL
@@ -549,79 +544,6 @@ kendall_tau <- function(data, ..., weights = NULL, alternative = "two.sided", na
 
   class(result) <- "kendall_tau"
   return(result)
-}
-
-#' Internal function to print correlation matrices without cutoff
-#' @keywords internal
-.print_tau_matrix <- function(mat, digits = 3, title = "Kendall's Tau Matrix:",
-                              type = "correlation") {
-  # Get current console width
-  old_width <- getOption("width")
-
-  # Calculate required width for the matrix
-  n_vars <- ncol(mat)
-  max_rowname_length <- max(nchar(rownames(mat)), na.rm = TRUE)
-
-  # Determine value width based on type
-  if (type == "correlation") {
-    # Tau values: -1.000 to 1.000
-    value_width <- digits + 4  # e.g., "-0.xxx" or " 1.000"
-  } else if (type == "pvalue") {
-    # P-values: 0.0000 to 1.0000
-    value_width <- digits + 3  # e.g., "0.xxxx"
-  } else {
-    # Sample sizes: integers
-    value_width <- max(nchar(format(mat, scientific = FALSE)), na.rm = TRUE) + 1
-  }
-
-  # Calculate total required width
-  # rowname + spaces + (n_vars * (value_width + space between))
-  required_width <- max_rowname_length + 2 + (n_vars * (value_width + 1))
-
-  # Adjust console width if needed (cap at 200 for readability)
-  width_adjusted <- FALSE
-  if (required_width > old_width && required_width <= 200) {
-    options(width = required_width)
-    on.exit(options(width = old_width), add = TRUE)
-    width_adjusted <- TRUE
-  } else if (required_width > 200) {
-    # For very wide matrices, use maximum reasonable width
-    options(width = 200)
-    on.exit(options(width = old_width), add = TRUE)
-    width_adjusted <- TRUE
-  }
-
-  # For very large matrices (> 6 variables), use more compact formatting
-  if (n_vars > 6 && type == "correlation") {
-    digits <- min(digits, 2)
-    value_width <- digits + 4
-  }
-
-  # Print title and border
-  cat(paste0("\n", title, "\n"))
-  border_width <- paste(rep("-", nchar(title)), collapse = "")
-  cat(border_width, "\n")
-
-  # Format matrix based on type
-  if (type == "correlation") {
-    # Format tau matrix with consistent spacing
-    formatted_mat <- format(round(mat, digits), width = value_width, nsmall = digits, justify = "right")
-  } else if (type == "pvalue") {
-    # Format p-value matrix
-    formatted_mat <- format(round(mat, digits), width = value_width, nsmall = digits, justify = "right")
-  } else {
-    # Format sample size matrix (integers)
-    formatted_mat <- format(mat, width = value_width, justify = "right")
-  }
-
-  # Print the formatted matrix
-  print(formatted_mat, quote = FALSE, right = TRUE)
-  cat(border_width, "\n")
-
-  # If we had to adjust width for a very large matrix, add a note
-  if (width_adjusted && required_width > 200) {
-    cat("Note: Matrix display adjusted for console width.\n")
-  }
 }
 
 #' Print method for kendall_tau
@@ -641,7 +563,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
   cat("\n")
   test_info <- list(
     "Weights variable" = x$weights,
-    "Missing data handling" = paste(x$na.rm, "deletion"),
+    "Missing data handling" = paste(x$use, "deletion"),
     "Alternative hypothesis" = x$alternative
   )
   print_info_section(test_info)
@@ -663,39 +585,32 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 
       # For each pair of variables, show results
       if (length(x$variables) == 2) {
-        # Single correlation - use variable block format
         var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
         cat(sprintf("\n--- %s ---\n\n", var_pair))
-
-        # Show correlation statistics
-        cat(sprintf("  Kendall's tau-b: τ = %.3f\n", group_corrs$tau[1]))
-        cat(sprintf("  Sample size: n = %d\n", group_corrs$n[1]))
-        cat(sprintf("  z-score: %.3f\n", group_corrs$z_score[1]))
-        cat(sprintf("  p-value (%s): %.4f\n",
-                   if(x$alternative == "two.sided") "2-tailed" else "1-tailed",
-                   group_corrs$p_value[1]))
-        # Display significance
-        sig_text <- if (group_corrs$sig[1] == "") "ns" else group_corrs$sig[1]
-        cat(sprintf("  Significance: %s\n", sig_text))
+        .print_single_pair(group_corrs, stat_label = "\u03c4", stat_col = "tau",
+                           corr_name = "Kendall's tau-b",
+                           secondary_label = "z-score",
+                           secondary_col = "z_score",
+                           alternative = x$alternative)
 
       } else {
         # Multiple correlations - show matrix first, then detailed results
         # Use the smart matrix printer for all matrices
         tau_matrix <- x$matrices[[i]]$tau
-        .print_tau_matrix(tau_matrix, digits = digits,
+        .print_cor_matrix(tau_matrix, digits = digits,
                          title = "Kendall's Tau-b Matrix:",
                          type = "correlation")
 
         # Print p-value matrix
         p_matrix <- x$matrices[[i]]$p_values
-        .print_tau_matrix(p_matrix, digits = 4,
+        .print_cor_matrix(p_matrix, digits = 4,
                          title = sprintf("Significance Matrix (p-values, %s):",
                                        if(x$alternative == "two.sided") "2-tailed" else "1-tailed"),
                          type = "pvalue")
 
         # Print sample size matrix
         n_matrix <- x$matrices[[i]]$n_obs
-        .print_tau_matrix(n_matrix, digits = 0,
+        .print_cor_matrix(n_matrix, digits = 0,
                          title = "Sample Size Matrix:",
                          type = "n")
 
@@ -723,38 +638,31 @@ print.kendall_tau <- function(x, digits = 3, ...) {
   } else {
     # Ungrouped analysis
     if (length(x$variables) == 2) {
-      # Single correlation
-      var_pair <- paste(x$variables[1], "×", x$variables[2])
+      var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
       cat(sprintf("\n--- %s ---\n\n", var_pair))
-
-      # Show correlation statistics
-      cat(sprintf("  Kendall's tau-b: τ = %.3f\n", x$correlations$tau[1]))
-      cat(sprintf("  Sample size: n = %d\n", x$correlations$n[1]))
-      cat(sprintf("  z-score: %.3f\n", x$correlations$z_score[1]))
-      cat(sprintf("  p-value (%s): %.4f\n",
-                 if(x$alternative == "two.sided") "2-tailed" else "1-tailed",
-                 x$correlations$p_value[1]))
-      # Display significance
-      sig_text <- if (x$correlations$sig[1] == "") "ns" else x$correlations$sig[1]
-      cat(sprintf("  Significance: %s\n", sig_text))
+      .print_single_pair(x$correlations, stat_label = "\u03c4", stat_col = "tau",
+                         corr_name = "Kendall's tau-b",
+                         secondary_label = "z-score",
+                         secondary_col = "z_score",
+                         alternative = x$alternative)
 
     } else {
       # Multiple correlations - show matrices
       tau_matrix <- x$matrices[[1]]$tau
-      .print_tau_matrix(tau_matrix, digits = digits,
+      .print_cor_matrix(tau_matrix, digits = digits,
                        title = "Kendall's Tau-b Matrix:",
                        type = "correlation")
 
       # Print p-value matrix
       p_matrix <- x$matrices[[1]]$p_values
-      .print_tau_matrix(p_matrix, digits = 4,
+      .print_cor_matrix(p_matrix, digits = 4,
                        title = sprintf("Significance Matrix (p-values, %s):",
                                      if(x$alternative == "two.sided") "2-tailed" else "1-tailed"),
                        type = "pvalue")
 
       # Print sample size matrix
       n_matrix <- x$matrices[[1]]$n_obs
-      .print_tau_matrix(n_matrix, digits = 0,
+      .print_cor_matrix(n_matrix, digits = 0,
                        title = "Sample Size Matrix:",
                        type = "n")
 

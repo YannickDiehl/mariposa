@@ -25,7 +25,7 @@
 #' @param var.equal Should we assume all groups have similar variance? (Default: TRUE)
 #'   - TRUE: Standard ANOVA (assumes equal variances)
 #'   - FALSE: Welch's ANOVA (allows unequal variances)
-#' @param conf.level Confidence level for group statistics (Default: 0.95 = 95%)
+#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #'
 #' @return ANOVA results showing whether groups differ, including:
 #' - F-statistic and p-value (are groups different?)
@@ -156,18 +156,9 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) group_vars(data) else NULL
   
-  # Get variable names using tidyselect
-  dots <- enquos(...)
-  group_quo <- enquo(group)
-  weights_quo <- enquo(weights)
-  
-  # Evaluate selections
-  vars <- eval_select(expr(c(!!!dots)), data = data)
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
-  
-  if (length(var_names) == 0) {
-    cli_abort("At least one dependent variable must be specified.")
-  }
 
   # Validate that selected variables are numeric
   for (vn in var_names) {
@@ -176,21 +167,18 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
     }
   }
 
-  # Group variable (required for ANOVA)
+  # Process group variable (required for ANOVA)
+  group_quo <- enquo(group)
   if (quo_is_null(group_quo)) {
     cli_abort("{.arg group} is required for ANOVA.")
   }
-  
+
   g_var <- eval_select(expr(!!group_quo), data = data)
   g_name <- names(g_var)
-  
-  # Weights variable (optional)
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)
-  } else {
-    w_name <- NULL
-  }
+
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
   
   # Validate and prepare grouping variable
   g_values <- data[[g_name]]
@@ -587,7 +575,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
 #' tables, assumption tests, and effect sizes.
 #'
 #' @param x An object of class \code{"oneway_anova"} returned by \code{\link{oneway_anova}}.
-#' @param digits Integer specifying the number of decimal places to display 
+#' @param digits Number of decimal places to display (default: 3)
 #'   for numeric values. Default is \code{3}.
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
 #'
@@ -648,7 +636,7 @@ print.oneway_anova <- function(x, digits = 3, ...) {
   x$results$sig <- sapply(p_numeric, add_significance_stars)
   
   # Template Standard: Dual grouped data detection
-  is_grouped_data <- (!is.null(x$grouped) && x$grouped) || (!is.null(x$is_grouped) && x$is_grouped)
+  is_grouped_data <- isTRUE(x$is_grouped)
   if (is_grouped_data) {
     # Get unique groups
     groups <- unique(x$results[x$groups])
@@ -1038,7 +1026,7 @@ print_repeated_measures_anova <- function(x, digits = 3, ...) {
     cat("--------------------------------------------------------------------------------\n")
     
     # Print each row with controlled width
-    for (i in 1:nrow(ws_display)) {
+    for (i in seq_len(nrow(ws_display))) {
       # Format p-values and add significance stars
       sig_val <- ws_display$Sig[i]
       if (!is.na(sig_val) && sig_val != "") {

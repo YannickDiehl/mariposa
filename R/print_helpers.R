@@ -95,10 +95,9 @@ get_table_width <- function(df, min_width = 40) {
 }
 
 #' Print horizontal separator line
-#' @param width Width of the line
-#' @param char Character to use for the line
+#' @param ... Ignored (retained for backward compatibility)
 #' @keywords internal
-print_separator <- function(width = 40, char = "-") {
+print_separator <- function(...) {
   cli_rule()
 }
 
@@ -157,29 +156,109 @@ format_variable_name <- function(var, label = NULL) {
   }
 }
 
-#' Print results table with consistent formatting
-#' @param df Data frame to print
-#' @param digits Number of decimal places for numeric columns
-#' @param row.names Whether to show row names
+#' Print a correlation/p-value/sample-size matrix with adaptive console width
+#' @param mat Named numeric matrix
+#' @param digits Number of decimal places
+#' @param title Section title printed above the matrix
+#' @param type One of "correlation", "pvalue", or "n"
 #' @keywords internal
-print_results_table <- function(df, digits = 3, row.names = FALSE) {
-  # Format numeric columns
-  numeric_cols <- sapply(df, is.numeric)
-  df[numeric_cols] <- lapply(df[numeric_cols], function(x) {
-    ifelse(is.na(x), NA, round(x, digits))
-  })
+.print_cor_matrix <- function(mat, digits = 3, title = "Correlation Matrix:",
+                              type = "correlation") {
+  old_width <- getOption("width")
 
-  print(df, row.names = row.names)
-}
+  n_vars <- ncol(mat)
+  max_rowname_length <- max(nchar(rownames(mat)), na.rm = TRUE)
 
-#' Print method footer with optional notes
-#' @param notes Character vector of notes to display
-#' @keywords internal
-print_footer_notes <- function(notes = NULL) {
-  if (!is.null(notes) && length(notes) > 0) {
-    cli_text("")
-    cli_text("{.strong Notes:}")
-    names(notes) <- rep("i", length(notes))
-    cli_bullets(notes)
+  if (type == "correlation") {
+    value_width <- digits + 4
+  } else if (type == "pvalue") {
+    value_width <- digits + 3
+  } else {
+    value_width <- max(nchar(format(mat, scientific = FALSE)), na.rm = TRUE) + 1
+  }
+
+  required_width <- max_rowname_length + 2 + (n_vars * (value_width + 1))
+
+  width_adjusted <- FALSE
+  if (required_width > old_width && required_width <= 200) {
+    options(width = required_width)
+    on.exit(options(width = old_width), add = TRUE)
+    width_adjusted <- TRUE
+  } else if (required_width > 200) {
+    options(width = 200)
+    on.exit(options(width = old_width), add = TRUE)
+    width_adjusted <- TRUE
+  }
+
+  if (n_vars > 6 && type == "correlation") {
+    digits <- min(digits, 2)
+    value_width <- digits + 4
+  }
+
+  cat(paste0("\n", title, "\n"))
+  border_width <- paste(rep("-", nchar(title)), collapse = "")
+  cat(border_width, "\n")
+
+  if (type == "correlation") {
+    formatted_mat <- format(round(mat, digits), width = value_width, nsmall = digits, justify = "right")
+  } else if (type == "pvalue") {
+    formatted_mat <- format(round(mat, digits), width = value_width, nsmall = digits, justify = "right")
+  } else {
+    formatted_mat <- format(mat, width = value_width, justify = "right")
+  }
+
+  print(formatted_mat, quote = FALSE, right = TRUE)
+  cat(border_width, "\n")
+
+  if (width_adjusted && required_width > 200) {
+    cat("Note: Matrix display adjusted for console width.\n")
   }
 }
+
+#' Print a single correlation pair in detailed block format
+#'
+#' Used by pearson_cor, spearman_rho, and kendall_tau print methods
+#' for two-variable analyses.
+#'
+#' @param var1 First variable name
+#' @param var2 Second variable name
+#' @param corr_row One-row data.frame with the correlation results
+#' @param stat_label Display label for the statistic (e.g. "r", "\u03c1", "\u03c4")
+#' @param stat_col Column name holding the correlation value
+#' @param corr_name Full name for the statistic line (e.g. "Correlation", "Spearman's rho")
+#' @param secondary_label Optional label for a second statistic
+#' @param secondary_col Optional column name for the second statistic
+#' @param ci_lower_col Column name for CI lower bound (NULL to skip)
+#' @param ci_upper_col Column name for CI upper bound (NULL to skip)
+#' @param alternative NULL or "two.sided"/"less"/"greater" — shown as suffix on p-value
+#' @keywords internal
+.print_single_pair <- function(corr_row, stat_label, stat_col,
+                               corr_name = "Correlation",
+                               secondary_label = NULL, secondary_col = NULL,
+                               ci_lower_col = NULL, ci_upper_col = NULL,
+                               alternative = NULL) {
+  cat(sprintf("  %s: %s = %.3f\n", corr_name, stat_label, corr_row[[stat_col]][1]))
+  if (!is.null(secondary_label) && !is.null(secondary_col)) {
+    cat(sprintf("  %s: %.3f\n", secondary_label, corr_row[[secondary_col]][1]))
+  }
+  cat(sprintf("  Sample size: n = %d\n", corr_row$n[1]))
+  if (!is.null(ci_lower_col) && !is.null(ci_upper_col)) {
+    cat(sprintf("  95%% CI: [%.3f, %.3f]\n",
+                corr_row[[ci_lower_col]][1], corr_row[[ci_upper_col]][1]))
+  }
+  if (!is.null(alternative) && alternative != "two.sided") {
+    p_label <- "1-tailed"
+  } else if (!is.null(alternative)) {
+    p_label <- "2-tailed"
+  } else {
+    p_label <- NULL
+  }
+  if (!is.null(p_label)) {
+    cat(sprintf("  p-value (%s): %.4f\n", p_label, corr_row$p_value[1]))
+  } else {
+    cat(sprintf("  p-value: %.4f\n", corr_row$p_value[1]))
+  }
+  sig_text <- if (corr_row$sig[1] == "") "ns" else corr_row$sig[1]
+  cat(sprintf("  Significance: %s\n", sig_text))
+}
+

@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An object of class "spearman_rho"}
 
-\item{digits}{Number of decimal places to display}
+\item{digits}{Number of decimal places to display (default: 3)}
 
 \item{...}{Additional arguments (not used)}
 }

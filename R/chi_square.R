@@ -100,29 +100,21 @@
 #' @export
 chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   
-  # Get variable names
-  dots <- enquos(...)
-  weights_quo <- enquo(weights)
-  
   # Get data structure
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
-  
-  # Select variables
-  vars <- tidyselect::eval_select(expr(c(!!!dots)), data = data)
+
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
-  
+
   if (length(var_names) != 2) {
     cli_abort("Exactly two variables must be specified for {.fn chi_square}.")
   }
-  
-  # Get weight variable name if provided
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)
-  } else {
-    w_name <- NULL
-  }
+
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
   
   # Perform chi-squared test
   if (is_grouped) {
@@ -345,6 +337,67 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 
 # Helper functions for print method
 
+#' Print chi-square effect sizes table
+#' @param df Data frame containing effect size columns
+#' @param i Row index to extract from
+#' @param digits Number of decimal places
+#' @keywords internal
+.print_chi_effect_sizes <- function(df, i, digits) {
+  cramers_v <- df$cramers_v[i]
+  if (is.na(cramers_v)) return(invisible(NULL))
+
+  rows <- df$table_rows[i]
+  cols <- df$table_cols[i]
+  is_2x2 <- (rows == 2 && cols == 2)
+  n <- df$n[i]
+
+  phi <- df$phi[i]
+  gamma <- df$gamma[i]
+  cramers_v_p <- df$cramers_v_p_value[i]
+  phi_p <- df$phi_p_value[i]
+  gamma_p <- df$gamma_p_value[i]
+
+  cat("\nEffect Sizes:\n")
+  border_width <- paste(rep("-", 70), collapse = "")
+  cat(border_width, "\n")
+
+  fmt_p <- function(p) ifelse(p < 0.001, "<.001", round(p, digits))
+
+  if (is_2x2) {
+    effect_table <- data.frame(
+      Measure = c("Cramer's V", "Phi", "Gamma"),
+      Value = round(c(cramers_v, phi, gamma), digits),
+      p_value = c(fmt_p(cramers_v_p), fmt_p(phi_p), fmt_p(gamma_p)),
+      sig = c(as.character(add_significance_stars(cramers_v_p)),
+              as.character(add_significance_stars(phi_p)),
+              as.character(add_significance_stars(gamma_p))),
+      Interpretation = c(.interpret_cramers_v(cramers_v),
+                         .interpret_phi(phi),
+                         .interpret_gamma(gamma)),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    effect_table <- data.frame(
+      Measure = c("Cramer's V", "Gamma"),
+      Value = round(c(cramers_v, gamma), digits),
+      p_value = c(fmt_p(cramers_v_p), fmt_p(gamma_p)),
+      sig = c(as.character(add_significance_stars(cramers_v_p)),
+              as.character(add_significance_stars(gamma_p))),
+      Interpretation = c(.interpret_cramers_v(cramers_v),
+                         .interpret_gamma(gamma)),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  print(effect_table, row.names = FALSE)
+  cat(border_width, "\n")
+  cat(sprintf("Table size: %d\u00d7%d | N = %d\n", rows, cols, n))
+
+  if (!is_2x2) {
+    cat("Note: Phi coefficient only shown for 2x2 tables\n")
+  }
+}
+
 .interpret_cramers_v <- function(v) {
   if (is.na(v)) return("-")
   if (v < 0.1) return("Neglig.")
@@ -379,7 +432,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 #' Print method for chi_square
 #'
 #' @param x Chi-squared test results object
-#' @param digits Number of decimal places (default: 3)
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #' @export
 print.chi_square <- function(x, digits = 3, ...) {
@@ -425,80 +478,7 @@ print.chi_square <- function(x, digits = 3, ...) {
     print(results_table, row.names = FALSE)
     cat(border_width, "\n")
     
-    # Print effect sizes with p-values in professional table
-    cramers_v <- x$results$cramers_v[1]
-    if (!is.na(cramers_v)) {
-      # Check table dimensions
-      rows <- x$results$table_rows[1]
-      cols <- x$results$table_cols[1]
-      is_2x2 <- (rows == 2 && cols == 2)
-      n <- x$results$n[1]
-
-      # Get effect sizes and p-values
-      phi <- x$results$phi[1]
-      gamma <- x$results$gamma[1]
-      cramers_v_p <- x$results$cramers_v_p_value[1]
-      phi_p <- x$results$phi_p_value[1]
-      gamma_p <- x$results$gamma_p_value[1]
-
-      cat("\nEffect Sizes:\n")
-      border_width <- paste(rep("-", 70), collapse = "")
-      cat(border_width, "\n")
-
-      # Create effect sizes data.frame
-      if (is_2x2) {
-        effect_table <- data.frame(
-          Measure = c("Cramer's V", "Phi", "Gamma"),
-          Value = round(c(cramers_v, phi, gamma), digits),
-          p_value = c(
-            ifelse(cramers_v_p < 0.001, "<.001", round(cramers_v_p, digits)),
-            ifelse(phi_p < 0.001, "<.001", round(phi_p, digits)),
-            ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
-          ),
-          sig = c(
-            as.character(add_significance_stars(cramers_v_p)),
-            as.character(add_significance_stars(phi_p)),
-            as.character(add_significance_stars(gamma_p))
-          ),
-          Interpretation = c(
-            .interpret_cramers_v(cramers_v),
-            .interpret_phi(phi),
-            .interpret_gamma(gamma)
-          ),
-          stringsAsFactors = FALSE
-        )
-      } else {
-        effect_table <- data.frame(
-          Measure = c("Cramer's V", "Gamma"),
-          Value = round(c(cramers_v, gamma), digits),
-          p_value = c(
-            ifelse(cramers_v_p < 0.001, "<.001", round(cramers_v_p, digits)),
-            ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
-          ),
-          sig = c(
-            as.character(add_significance_stars(cramers_v_p)),
-            as.character(add_significance_stars(gamma_p))
-          ),
-          Interpretation = c(
-            .interpret_cramers_v(cramers_v),
-            .interpret_gamma(gamma)
-          ),
-          stringsAsFactors = FALSE
-        )
-      }
-
-      # Print the table
-      print(effect_table, row.names = FALSE)
-      cat(border_width, "\n")
-
-      # Add table info
-      cat(sprintf("Table size: %d\u00d7%d | N = %d\n", rows, cols, n))
-
-      # Add note for non-2x2 tables if needed
-      if (!is_2x2) {
-        cat("Note: Phi coefficient only shown for 2x2 tables\n")
-      }
-    }
+    .print_chi_effect_sizes(x$results, 1, digits)
     
   } else {
     # Grouped tests
@@ -534,80 +514,7 @@ print.chi_square <- function(x, digits = 3, ...) {
       print(test_results, row.names = FALSE)
       cat(border_width, "\n")
       
-      # Print effect sizes with p-values in professional table
-      cramers_v <- results_table$cramers_v[i]
-      if (!is.na(cramers_v)) {
-        # Check table dimensions
-        rows <- results_table$table_rows[i]
-        cols <- results_table$table_cols[i]
-        is_2x2 <- (rows == 2 && cols == 2)
-        n <- results_table$n[i]
-
-        # Get effect sizes and p-values
-        phi <- results_table$phi[i]
-        gamma <- results_table$gamma[i]
-        cramers_v_p <- results_table$cramers_v_p_value[i]
-        phi_p <- results_table$phi_p_value[i]
-        gamma_p <- results_table$gamma_p_value[i]
-
-        cat("\nEffect Sizes:\n")
-        border_width <- paste(rep("-", 70), collapse = "")
-        cat(border_width, "\n")
-
-        # Create effect sizes data.frame
-        if (is_2x2) {
-          effect_table <- data.frame(
-            Measure = c("Cramer's V", "Phi", "Gamma"),
-            Value = round(c(cramers_v, phi, gamma), digits),
-            p_value = c(
-              ifelse(cramers_v_p < 0.001, "<.001", round(cramers_v_p, digits)),
-              ifelse(phi_p < 0.001, "<.001", round(phi_p, digits)),
-              ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
-            ),
-            sig = c(
-              as.character(add_significance_stars(cramers_v_p)),
-              as.character(add_significance_stars(phi_p)),
-              as.character(add_significance_stars(gamma_p))
-            ),
-            Interpretation = c(
-              .interpret_cramers_v(cramers_v),
-              .interpret_phi(phi),
-              .interpret_gamma(gamma)
-            ),
-            stringsAsFactors = FALSE
-          )
-        } else {
-          effect_table <- data.frame(
-            Measure = c("Cramer's V", "Gamma"),
-            Value = round(c(cramers_v, gamma), digits),
-            p_value = c(
-              ifelse(cramers_v_p < 0.001, "<.001", round(cramers_v_p, digits)),
-              ifelse(gamma_p < 0.001, "<.001", round(gamma_p, digits))
-            ),
-            sig = c(
-              as.character(add_significance_stars(cramers_v_p)),
-              as.character(add_significance_stars(gamma_p))
-            ),
-            Interpretation = c(
-              .interpret_cramers_v(cramers_v),
-              .interpret_gamma(gamma)
-            ),
-            stringsAsFactors = FALSE
-          )
-        }
-
-        # Print the table
-        print(effect_table, row.names = FALSE)
-        cat(border_width, "\n")
-
-        # Add table info
-        cat(sprintf("Table size: %d\u00d7%d | N = %d\n", rows, cols, n))
-
-        # Add note for non-2x2 tables if needed
-        if (!is_2x2) {
-          cat("Note: Phi coefficient only shown for 2x2 tables\n")
-        }
-      }
+      .print_chi_effect_sizes(results_table, i, digits)
     }
   }
   

@@ -16,17 +16,18 @@
 #' @param weights Optional survey weights for population-representative results.
 #'   Note: SPSS may not apply weights to Spearman's rho; our implementation uses
 #'   weighted ranks for mathematically correct survey analysis.
-#' @param alternative Character string specifying the alternative hypothesis:
+#' @param alternative Direction of the test:
 #'   \itemize{
 #'     \item \code{"two.sided"} (default): Two-tailed test
 #'     \item \code{"less"}: One-tailed test (negative correlation)
 #'     \item \code{"greater"}: One-tailed test (positive correlation)
 #'   }
-#' @param na.rm Character string specifying missing data handling:
+#' @param use How to handle missing values:
 #'   \itemize{
 #'     \item \code{"pairwise"} (default): Pairwise deletion - each correlation uses all available cases
 #'     \item \code{"listwise"}: Listwise deletion - only complete cases across all variables
 #'   }
+#' @param na.rm \lifecycle{deprecated} Use \code{use} instead.
 #'
 #' @return Correlation results showing rank-based relationships between variables,
 #'   including the rho coefficient, p-value, t-statistic, and sample size for
@@ -98,7 +99,7 @@
 #'
 #' # Listwise deletion for missing data
 #' survey_data %>%
-#'   spearman_rho(age, income, na.rm = "listwise")
+#'   spearman_rho(age, income, use = "listwise")
 #'
 #' # One-tailed test
 #' survey_data %>%
@@ -121,33 +122,30 @@
 #'
 #' @family correlation
 #' @export
-spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
-                        na.rm = "pairwise") {
+spearman_rho <- function(data, ..., weights = NULL,
+                        alternative = c("two.sided", "less", "greater"),
+                        use = c("pairwise", "listwise"), na.rm = NULL) {
 
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }
 
-  if (!na.rm %in% c("pairwise", "listwise")) {
-    cli_abort("{.arg na.rm} must be either {.val pairwise} or {.val listwise}.")
+  # Handle deprecated na.rm parameter
+  if (!is.null(na.rm)) {
+    cli_warn("{.arg na.rm} is deprecated in correlation functions. Use {.arg use} instead.")
+    use <- na.rm
   }
-
-  if (!alternative %in% c("two.sided", "less", "greater")) {
-    cli_abort("{.arg alternative} must be {.val two.sided}, {.val less}, or {.val greater}.")
-  }
+  use <- match.arg(use)
+  alternative <- match.arg(alternative)
 
 
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   group_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
 
-  # Get variable names using tidyselect
-  dots <- enquos(...)
-  weights_quo <- enquo(weights)
-
-  # Evaluate selections
-  vars <- eval_select(expr(c(!!!dots)), data = data)
+  # Select variables using centralized helper
+  vars <- .process_variables(data, ...)
   var_names <- names(vars)
 
   if (length(var_names) < 2) {
@@ -161,26 +159,9 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     }
   }
 
-  # Get weights if provided
-  if (!quo_is_null(weights_quo)) {
-    w_var <- eval_select(expr(!!weights_quo), data = data)
-    w_name <- names(w_var)
-  } else {
-    w_name <- NULL
-  }
-
-  # Helper function to calculate weighted ranks
-  calculate_weighted_ranks <- function(x, w = NULL) {
-    if (is.null(w)) {
-      # Unweighted ranks with tie handling (average ranks)
-      rank(x, na.last = "keep", ties.method = "average")
-    } else {
-      # For weighted Spearman, SPSS uses unweighted ranks
-      # This matches SPSS NONPAR CORR behavior
-      # The weights are applied later in the correlation calculation
-      rank(x, na.last = "keep", ties.method = "average")
-    }
-  }
+  # Process weights using centralized helper
+  weights_info <- .process_weights(data, rlang::enquo(weights))
+  w_name <- weights_info$name
 
   # Helper function to calculate Spearman's rho
   calculate_spearman_rho <- function(x, y, w = NULL, alternative = "two.sided") {
@@ -265,7 +246,7 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
   # Function to perform analysis for a single group or entire dataset
   perform_analysis <- function(group_data) {
     # Apply listwise deletion if requested
-    if (na.rm == "listwise") {
+    if (use == "listwise") {
       complete_vars <- var_names
       if (!is.null(w_name)) {
         complete_vars <- c(complete_vars, w_name)
@@ -326,7 +307,7 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     diag(p_matrix) <- 0
 
     # Fill matrices
-    for (k in 1:nrow(correlations)) {
+    for (k in seq_len(nrow(correlations))) {
       i <- which(var_names == correlations$var1[k])
       j <- which(var_names == correlations$var2[k])
 
@@ -336,7 +317,7 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     }
 
     # Fill diagonal of n_matrix
-    for (i in 1:n_vars) {
+    for (i in seq_len(n_vars)) {
       if (!is.null(w_name)) {
         valid <- !is.na(group_data[[var_names[i]]]) &
                 !is.na(group_data[[w_name]]) &
@@ -370,7 +351,7 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     all_correlations <- list()
     matrices <- list()
 
-    for (i in 1:length(results_list)) {
+    for (i in seq_along(results_list)) {
       # Add group columns to correlations
       group_cols <- group_info[i, , drop = FALSE]
       correlations <- results_list[[i]]$correlations
@@ -410,6 +391,7 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
     variables = var_names,
     weights = w_name,
     alternative = alternative,
+    use = use,
     is_grouped = is_grouped,
     groups = group_vars,
     n_obs = if (!is_grouped) matrices[[1]]$n_obs else NULL
@@ -422,7 +404,7 @@ spearman_rho <- function(data, ..., weights = NULL, alternative = "two.sided",
 #' Print method for spearman_rho
 #'
 #' @param x An object of class "spearman_rho"
-#' @param digits Number of decimal places to display
+#' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @export
 print.spearman_rho <- function(x, digits = 3, ...) {
@@ -436,7 +418,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
     "Method" = "Spearman's rho (rank correlation)",
     "Variables" = paste(x$variables, collapse = ", "),
     "Weights variable" = x$weights,
-    "Missing data handling" = paste(if("na.rm" %in% names(x)) x$na.rm else "pairwise", "deletion")
+    "Missing data handling" = paste(if("use" %in% names(x)) x$use else "pairwise", "deletion")
   )
   print_info_section(test_info)
   test_params <- list(alternative = x$alternative)
@@ -476,7 +458,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
     # Get unique group combinations
     group_combinations <- unique(x$correlations[, x$groups, drop = FALSE])
 
-    for (i in 1:nrow(group_combinations)) {
+    for (i in seq_len(nrow(group_combinations))) {
       # Print group header using standardized helper
       print_group_header(group_combinations[i, , drop = FALSE])
 
@@ -488,20 +470,13 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 
       # For each pair of variables, show results
       if (length(x$variables) == 2) {
-        # Single correlation - use variable block format
         var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
         cat(sprintf("\n--- %s ---\n\n", var_pair))
-
-        # Show correlation statistics
-        cat(sprintf("  Spearman's rho: \u03c1 = %.3f\n", group_corrs$rho[1]))
-        cat(sprintf("  Sample size: n = %d\n", group_corrs$n[1]))
-        cat(sprintf("  t-statistic: %.3f\n", group_corrs$t_stat[1]))
-        cat(sprintf("  p-value (%s): %.4f\n",
-                   if(x$alternative == "two.sided") "2-tailed" else "1-tailed",
-                   group_corrs$p_value[1]))
-        # Display significance
-        sig_text <- if (group_corrs$sig[1] == "") "ns" else group_corrs$sig[1]
-        cat(sprintf("  Significance: %s\n", sig_text))
+        .print_single_pair(group_corrs, stat_label = "\u03c1", stat_col = "rho",
+                           corr_name = "Spearman's rho",
+                           secondary_label = "t-statistic",
+                           secondary_col = "t_stat",
+                           alternative = x$alternative)
 
       } else {
         # Multiple correlations - show matrix first, then detailed results
@@ -547,20 +522,13 @@ print.spearman_rho <- function(x, digits = 3, ...) {
   } else {
     # Ungrouped analysis
     if (length(x$variables) == 2) {
-      # Single correlation
       var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
       cat(sprintf("\n--- %s ---\n\n", var_pair))
-
-      # Show correlation statistics
-      cat(sprintf("  Spearman's rho: \u03c1 = %.3f\n", x$correlations$rho[1]))
-      cat(sprintf("  Sample size: n = %d\n", x$correlations$n[1]))
-      cat(sprintf("  t-statistic: %.3f\n", x$correlations$t_stat[1]))
-      cat(sprintf("  p-value (%s): %.4f\n",
-                 if(x$alternative == "two.sided") "2-tailed" else "1-tailed",
-                 x$correlations$p_value[1]))
-      # Display significance
-      sig_text <- if (x$correlations$sig[1] == "") "ns" else x$correlations$sig[1]
-      cat(sprintf("  Significance: %s\n", sig_text))
+      .print_single_pair(x$correlations, stat_label = "\u03c1", stat_col = "rho",
+                         corr_name = "Spearman's rho",
+                         secondary_label = "t-statistic",
+                         secondary_col = "t_stat",
+                         alternative = x$alternative)
 
     } else {
       # Multiple correlations - show matrices

@@ -4,7 +4,7 @@
 \alias{.print_ungrouped_results}
 \title{Print results for ungrouped data}
 \usage{
-.print_ungrouped_results(x, is_weighted)
+.print_ungrouped_results(x, is_weighted, digits = 3)
 }
 \description{
 Print results for ungrouped data

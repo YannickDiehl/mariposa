@@ -105,7 +105,7 @@
         } else {
           stat_val <- stat_fn(x, w = w)
           n_val <- length(x)
-          eff_n <- sum(w)^2 / sum(w^2)
+          eff_n <- .effective_n(w)
         }
       }
 
@@ -133,8 +133,7 @@
   final_results <- .w_format_results(
     results, var_names, weights_name, is_grouped,
     weighted_col = weighted_col,
-    unweighted_col = unweighted_col,
-    is_grouped_flag = is_grouped
+    unweighted_col = unweighted_col
   )
 
   # --- Create S3 object -----------------------------------------------------
@@ -142,10 +141,8 @@
     list(
       results = final_results,
       variables = var_names,
-      weight_var = weights_name,
       weights = weights_name,
       is_grouped = is_grouped,
-      grouped = is_grouped,
       groups = if (is_grouped) dplyr::group_vars(data) else NULL
     ),
     extra_args
@@ -167,11 +164,10 @@
 #' @param is_grouped Logical
 #' @param weighted_col Name for weighted statistic column
 #' @param unweighted_col Name for unweighted statistic column
-#' @param is_grouped_flag Same as is_grouped (kept for clarity)
 #' @return Formatted tibble
 #' @keywords internal
 .w_format_results <- function(results, var_names, weights_name, is_grouped,
-                              weighted_col, unweighted_col, is_grouped_flag) {
+                              weighted_col, unweighted_col) {
 
   if (length(var_names) > 1) {
     # Multiple variables: build long format
@@ -257,7 +253,7 @@
 #' @param stat_label Display name (e.g., "Mean", "Standard Deviation")
 #' @param weighted_col Column name for weighted values
 #' @param unweighted_col Column name for unweighted values
-#' @param digits Number of decimal places
+#' @param digits Number of decimal places to display (default: 3)
 #' @keywords internal
 .print_w_statistic <- function(x, stat_label, weighted_col, unweighted_col,
                                digits = 3) {

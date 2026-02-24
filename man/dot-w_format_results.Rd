@@ -10,8 +10,7 @@
   weights_name,
   is_grouped,
   weighted_col,
-  unweighted_col,
-  is_grouped_flag
+  unweighted_col
 )
 }
 \arguments{
@@ -26,8 +25,6 @@
 \item{weighted_col}{Name for weighted statistic column}
 
 \item{unweighted_col}{Name for unweighted statistic column}
-
-\item{is_grouped_flag}{Same as is_grouped (kept for clarity)}
 }
 \value{
 Formatted tibble

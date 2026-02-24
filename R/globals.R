@@ -59,5 +59,5 @@ utils::globalVariables(c(
   "Q25", "Q50", "Q75",
 
   # Effect size fields
-  "effective_n", "weighted_quantile_value"
+  "effective_n"
 ))

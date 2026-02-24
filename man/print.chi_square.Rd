@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{Chi-squared test results object}
 
-\item{digits}{Number of decimal places (default: 3)}
+\item{digits}{Number of decimal places to display (default: 3)}
 
 \item{...}{Additional arguments passed to print}
 }
