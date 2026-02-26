@@ -755,23 +755,20 @@ test) when:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/mann_whitney.html">mann_whitney</a></span><span class="op">(</span><span class="va">political_orientation</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- political_orientation ---</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   East: rank mean = 1145.3, n = 443.0</span></span>
 <span><span class="co">#&gt;   West: rank mean = 1151.1, n = 1856.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Mann-Whitney U Test Results:</span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; ---------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;            Test       U       W      Z p_value effect_r sig</span></span>
 <span><span class="co">#&gt;  Mann-Whitney U 409,008 507,354 -0.173   0.862    0.004    </span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation (r):</span></span>
-<span><span class="co">#&gt; - Small effect: |r| ≈ 0.1</span></span>
-<span><span class="co">#&gt; - Medium effect: |r| ≈ 0.3</span></span>
-<span><span class="co">#&gt; - Large effect: |r| ≈ 0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; - Small effect: |r| ~ 0.1</span></span>
+<span><span class="co">#&gt; - Medium effect: |r| ~ 0.3</span></span>
+<span><span class="co">#&gt; - Large effect: |r| ~ 0.5</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="with-survey-weights-2">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights-2"></a>
@@ -781,27 +778,24 @@ test) when:</p>
 <span>  <span class="fu"><a href="../reference/mann_whitney.html">mann_whitney</a></span><span class="op">(</span><span class="va">political_orientation</span>, group <span class="op">=</span> <span class="va">region</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- political_orientation ---</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   East: rank mean = 1150.6, n = 464.0</span></span>
 <span><span class="co">#&gt;   West: rank mean = 1157.8, n = 1848.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Mann-Whitney U Test Results:</span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;            Test       U       W     Z p_value effect_r sig</span></span>
 <span><span class="co">#&gt;  Mann-Whitney U 426,033 533,921 0.207   0.836    0.004    </span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span></span>
 <span><span class="co">#&gt; U and W are descriptive statistics derived from weighted ranks.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation (r):</span></span>
-<span><span class="co">#&gt; - Small effect: |r| ≈ 0.1</span></span>
-<span><span class="co">#&gt; - Medium effect: |r| ≈ 0.3</span></span>
-<span><span class="co">#&gt; - Large effect: |r| ≈ 0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; - Small effect: |r| ~ 0.1</span></span>
+<span><span class="co">#&gt; - Medium effect: |r| ~ 0.3</span></span>
+<span><span class="co">#&gt; - Large effect: |r| ~ 0.5</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

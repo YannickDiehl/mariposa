@@ -644,23 +644,20 @@ It compares the *distributions* rather than the means.
 survey_data %>%
   mann_whitney(political_orientation, group = region)
 #> 
-#> 
-#> --- political_orientation ---
-#> 
 #>   East: rank mean = 1145.3, n = 443.0
 #>   West: rank mean = 1151.1, n = 1856.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ---------------------------------------------------------- 
 #>            Test       U       W      Z p_value effect_r sig
 #>  Mann-Whitney U 409,008 507,354 -0.173   0.862    0.004    
-#> ----------------------------------------------------------------------
+#> ----------------------------------------------------------
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 ```
 
 ### With Survey Weights
@@ -670,27 +667,24 @@ survey_data %>%
   mann_whitney(political_orientation, group = region,
                weights = sampling_weight)
 #> 
-#> 
-#> --- political_orientation ---
-#> 
 #>   East: rank mean = 1150.6, n = 464.0
 #>   West: rank mean = 1157.8, n = 1848.5
 #> 
 #> 
 #> Weighted Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> --------------------------------------------------------- 
 #>            Test       U       W     Z p_value effect_r sig
 #>  Mann-Whitney U 426,033 533,921 0.207   0.836    0.004    
-#> ---------------------------------------------------------------------- 
+#> --------------------------------------------------------- 
 #> 
 #> 
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
 #> U and W are descriptive statistics derived from weighted ranks.
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 ```
 
 ## Interpreting Results

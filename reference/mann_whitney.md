@@ -166,6 +166,9 @@ Mathematical Statistics, 18(1), 50-60.
 Wilcoxon, F. (1945). Individual comparisons by ranking methods.
 Biometrics Bulletin, 1(6), 80-83.
 
+Lumley, T., & Scott, A. (2013). Two-sample rank tests under complex
+sampling. Biometrika, 100(4), 831-842.
+
 ## See also
 
 [`wilcox.test`](https://rdrr.io/r/stats/wilcox.test.html) for the base R
@@ -201,26 +204,25 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> • Null hypothesis (mu): 0.000
 #> 
-#> 
-#> --- age ---
+#> ── age ─────────────────────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 1248.0, n = 1194.0
 #>   Female: rank mean = 1252.8, n = 1306.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 776,732 1,490,147 -0.164    0.87    0.003    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 
 # Multiple variables
 survey_data %>%
@@ -234,52 +236,49 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> • Null hypothesis (mu): 0.000
 #> 
-#> 
-#> --- age ---
+#> ── age ─────────────────────────────────────────────────────────────────────────
 #> 
 #>   East: rank mean = 1304.9, n = 485.0
 #>   West: rank mean = 1237.4, n = 2015.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ----------------------------------------------------------- 
 #>            Test       U         W     Z p_value effect_r sig
 #>  Mann-Whitney U 462,234 2,493,354 -1.85   0.064    0.037    
-#> ---------------------------------------------------------------------- 
+#> ----------------------------------------------------------- 
 #> 
-#> 
-#> --- income ---
+#> ── income ──────────────────────────────────────────────────────────────────────
 #> 
 #>   East: rank mean = 1099.7, n = 429.0
 #>   West: rank mean = 1092.0, n = 1757.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 374,226 1,918,630 -0.226   0.821    0.005    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
-#> 
-#> --- life_satisfaction ---
+#> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   East: rank mean = 1215.7, n = 465.0
 #>   West: rank mean = 1209.9, n = 1956.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 452,568 2,366,514 -0.168   0.867    0.003    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 
 # Using tidyselect helpers
 survey_data %>%
@@ -293,52 +292,49 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> • Null hypothesis (mu): 0.000
 #> 
-#> 
-#> --- trust_government ---
+#> ── trust_government ────────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 1166.5, n = 1123.0
 #>   Female: rank mean = 1187.6, n = 1231.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 678,806 1,309,932 -0.775   0.438    0.016    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
-#> 
-#> --- trust_media ---
+#> ── trust_media ─────────────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 1150.9, n = 1129.0
 #>   Female: rank mean = 1214.2, n = 1238.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ----------------------------------------------------------- 
 #>            Test       U         W     Z p_value effect_r sig
 #>  Mann-Whitney U 661,523 1,299,408 -2.32    0.02    0.048   *
-#> ---------------------------------------------------------------------- 
+#> ----------------------------------------------------------- 
 #> 
-#> 
-#> --- trust_science ---
+#> ── trust_science ───────────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 1182.1, n = 1142.0
 #>   Female: rank mean = 1215.3, n = 1256.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 697,309 1,349,962 -1.234   0.217    0.025    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 
 # Weighted analysis
 survey_data %>%
@@ -353,18 +349,17 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> • Null hypothesis (mu): 0.000
 #> 
-#> 
-#> --- income ---
+#> ── income ──────────────────────────────────────────────────────────────────────
 #> 
 #>   East: rank mean = 1115.0, n = 449.5
 #>   West: rank mean = 1096.8, n = 1751.4
 #> 
 #> 
 #> Weighted Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 386,321 1,920,975 -0.536   0.592    0.011    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
 #> 
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
@@ -373,9 +368,9 @@ survey_data %>%
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 
 # Grouped analysis (separate tests for each education level)
 survey_data %>%
@@ -394,73 +389,73 @@ survey_data %>%
 #> 
 #> ── Group: education = Basic Secondary ──
 #> 
-#> 
-#> --- life_satisfaction ---
+#> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 404.7, n = 382.0
 #>   Female: rank mean = 405.3, n = 427.0
 #> 
+#> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> --------------------------------------------------------- 
 #>            Test      U       W      Z p_value effect_r sig
 #>  Mann-Whitney U 81,439 154,592 -0.036   0.971    0.001    
-#> ---------------------------------------------------------------------- 
+#> --------------------------------------------------------- 
 #> 
 #> 
 #> 
 #> ── Group: education = Intermediate Secondary ──
 #> 
-#> 
-#> --- life_satisfaction ---
+#> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 301.9, n = 281.0
 #>   Female: rank mean = 315.8, n = 337.0
 #> 
+#> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> -------------------------------------------------------- 
 #>            Test      U      W      Z p_value effect_r sig
 #>  Mann-Whitney U 45,218 84,839 -1.001   0.317     0.04    
-#> ---------------------------------------------------------------------- 
+#> -------------------------------------------------------- 
 #> 
 #> 
 #> 
 #> ── Group: education = Academic Secondary ──
 #> 
-#> 
-#> --- life_satisfaction ---
+#> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 304.9, n = 305.0
 #>   Female: rank mean = 303.1, n = 302.0
 #> 
+#> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------- 
 #>            Test      U      W     Z p_value effect_r sig
 #>  Mann-Whitney U 45,788 91,540 -0.13   0.897    0.005    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------- 
 #> 
 #> 
 #> 
 #> ── Group: education = University ──
 #> 
-#> 
-#> --- life_satisfaction ---
+#> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 186.7, n = 181.0
 #>   Female: rank mean = 200.4, n = 206.0
 #> 
+#> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> -------------------------------------------------------- 
 #>            Test      U      W      Z p_value effect_r sig
 #>  Mann-Whitney U 17,319 33,790 -1.281     0.2    0.065    
-#> ---------------------------------------------------------------------- 
+#> -------------------------------------------------------- 
 #> 
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 
 # One-sided test
 survey_data %>%
@@ -474,26 +469,25 @@ survey_data %>%
 #> • Alternative hypothesis: greater
 #> • Null hypothesis (mu): 0.000
 #> 
-#> 
-#> --- life_satisfaction ---
+#> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   East: rank mean = 1215.7, n = 465.0
 #>   West: rank mean = 1209.9, n = 1956.0
 #> 
 #> 
 #> Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 452,568 2,366,514 -0.168   0.433    0.003    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 
 # Store results for further analysis
 result <- survey_data %>%
@@ -509,18 +503,17 @@ print(result)
 #> • Alternative hypothesis: two.sided
 #> • Null hypothesis (mu): 0.000
 #> 
-#> 
-#> --- income ---
+#> ── income ──────────────────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 1111.3, n = 1047.9
 #>   Female: rank mean = 1090.7, n = 1153.1
 #> 
 #> 
 #> Weighted Mann-Whitney U Test Results:
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #>            Test       U         W      Z p_value effect_r sig
 #>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    
-#> ---------------------------------------------------------------------- 
+#> ------------------------------------------------------------ 
 #> 
 #> 
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
@@ -529,7 +522,7 @@ print(result)
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: |r| ≈ 0.1
-#> - Medium effect: |r| ≈ 0.3
-#> - Large effect: |r| ≈ 0.5
+#> - Small effect: |r| ~ 0.1
+#> - Medium effect: |r| ~ 0.3
+#> - Large effect: |r| ~ 0.5
 ```
