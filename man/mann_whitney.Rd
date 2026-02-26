@@ -167,6 +167,9 @@ Statistics, 18(1), 50-60.
 
 Wilcoxon, F. (1945). Individual comparisons by ranking methods. Biometrics
 Bulletin, 1(6), 80-83.
+
+Lumley, T., & Scott, A. (2013). Two-sample rank tests under complex sampling.
+Biometrika, 100(4), 831-842.
 }
 \seealso{
 \code{\link[stats]{wilcox.test}} for the base R Wilcoxon test function.
