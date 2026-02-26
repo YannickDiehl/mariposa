@@ -6,7 +6,7 @@
 * SPSS Version: 29.0.0.0
 *
 * Variables tested: life_satisfaction, income, age
-* Group variable: gender (Female vs Male)
+* Group variable: gender (1=Male, 2=Female, already numeric in .sav)
 * Split file variable: region (East vs West)
 * Weight variable: sampling_weight
 *
@@ -17,12 +17,20 @@
 * Note: SPSS does not output effect size r directly.
 *   Calculate manually: r = |Z| / sqrt(N_total)
 *
-* IMPORTANT: Group order in syntax is ('Female' 'Male') to match
-*   R's alphabetical sorting of character group levels.
+* Group order: gender(1 2) = Male vs Female
+*   This matches R factor levels: levels(survey_data$gender) = c("Male","Female")
 
 GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/survey_data.sav'.
 
+* Save output to text file.
+* Use COMMANDS filter instead of SUBTYPES to capture all NPAR Tests output.
+OMS
+  /IF COMMANDS=['NPAR Tests']
+  /DESTINATION FORMAT=TEXT
+   OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/outputs/mann_whitney_output.txt'.
+
 COMPUTE original_order = $CASENUM.
+EXECUTE.
 
 * ================================================
 * TEST 1: UNWEIGHTED / UNGROUPED
@@ -31,21 +39,18 @@ COMPUTE original_order = $CASENUM.
 TITLE '=========== UNWEIGHTED / UNGROUPED ==========='.
 
 TITLE '=========== Test 1a: life_satisfaction by gender ==========='.
-SUBTITLE 'Mann-Whitney U Test: Life Satisfaction by Gender (unweighted)'.
 NPAR TESTS
-  /M-W= life_satisfaction BY gender('Female' 'Male')
+  /M-W= life_satisfaction BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 1b: income by gender ==========='.
-SUBTITLE 'Mann-Whitney U Test: Income by Gender (unweighted)'.
 NPAR TESTS
-  /M-W= income BY gender('Female' 'Male')
+  /M-W= income BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 1c: age by gender ==========='.
-SUBTITLE 'Mann-Whitney U Test: Age by Gender (unweighted)'.
 NPAR TESTS
-  /M-W= age BY gender('Female' 'Male')
+  /M-W= age BY gender(1 2)
   /MISSING ANALYSIS.
 
 * ================================================
@@ -57,21 +62,18 @@ TITLE '=========== WEIGHTED / UNGROUPED ==========='.
 WEIGHT BY sampling_weight.
 
 TITLE '=========== Test 2a: life_satisfaction by gender (weighted) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Life Satisfaction by Gender (weighted)'.
 NPAR TESTS
-  /M-W= life_satisfaction BY gender('Female' 'Male')
+  /M-W= life_satisfaction BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 2b: income by gender (weighted) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Income by Gender (weighted)'.
 NPAR TESTS
-  /M-W= income BY gender('Female' 'Male')
+  /M-W= income BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 2c: age by gender (weighted) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Age by Gender (weighted)'.
 NPAR TESTS
-  /M-W= age BY gender('Female' 'Male')
+  /M-W= age BY gender(1 2)
   /MISSING ANALYSIS.
 
 WEIGHT OFF.
@@ -86,21 +88,18 @@ SORT CASES BY region.
 SPLIT FILE BY region.
 
 TITLE '=========== Test 3a: life_satisfaction by gender (grouped by region) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Life Satisfaction by Gender (grouped by region)'.
 NPAR TESTS
-  /M-W= life_satisfaction BY gender('Female' 'Male')
+  /M-W= life_satisfaction BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 3b: income by gender (grouped by region) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Income by Gender (grouped by region)'.
 NPAR TESTS
-  /M-W= income BY gender('Female' 'Male')
+  /M-W= income BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 3c: age by gender (grouped by region) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Age by Gender (grouped by region)'.
 NPAR TESTS
-  /M-W= age BY gender('Female' 'Male')
+  /M-W= age BY gender(1 2)
   /MISSING ANALYSIS.
 
 * ================================================
@@ -112,26 +111,25 @@ TITLE '=========== WEIGHTED / GROUPED ==========='.
 WEIGHT BY sampling_weight.
 
 TITLE '=========== Test 4a: life_satisfaction by gender (weighted, grouped by region) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Life Satisfaction by Gender (weighted, grouped by region)'.
 NPAR TESTS
-  /M-W= life_satisfaction BY gender('Female' 'Male')
+  /M-W= life_satisfaction BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 4b: income by gender (weighted, grouped by region) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Income by Gender (weighted, grouped by region)'.
 NPAR TESTS
-  /M-W= income BY gender('Female' 'Male')
+  /M-W= income BY gender(1 2)
   /MISSING ANALYSIS.
 
 TITLE '=========== Test 4c: age by gender (weighted, grouped by region) ==========='.
-SUBTITLE 'Mann-Whitney U Test: Age by Gender (weighted, grouped by region)'.
 NPAR TESTS
-  /M-W= age BY gender('Female' 'Male')
+  /M-W= age BY gender(1 2)
   /MISSING ANALYSIS.
 
 WEIGHT OFF.
 SPLIT FILE OFF.
 SORT CASES BY original_order.
+
+OMSEND.
 
 EXECUTE.
 
@@ -139,12 +137,17 @@ EXECUTE.
 * NOTES FOR VALIDATION
 * ================================================
 *
+* Gender coding in .sav file:
+*   1 = Male, 2 = Female (numeric with value labels)
+*   Matches R factor: levels(survey_data$gender) = c("Male", "Female")
+*   So gender(1 2) => Group 1 = Male, Group 2 = Female
+*
 * Key values to extract from SPSS output per test:
 *
 * Ranks Table:
-*   - Female: N, Mean Rank, Sum of Ranks
-*   - Male:   N, Mean Rank, Sum of Ranks
-*   - Total:  N
+*   - Male (1):   N, Mean Rank, Sum of Ranks
+*   - Female (2): N, Mean Rank, Sum of Ranks
+*   - Total:      N
 *
 * Test Statistics Table:
 *   - Mann-Whitney U
@@ -154,7 +157,7 @@ EXECUTE.
 *
 * Manual calculations needed:
 *   - Effect size r = |Z| / sqrt(N_total)
-*   - Rank mean difference = Mean_Rank_Female - Mean_Rank_Male
+*   - Rank mean difference = Mean_Rank_Male - Mean_Rank_Female
 *
 * Weighted analyses:
 *   - SPSS applies frequency weights to ranks
@@ -164,4 +167,7 @@ EXECUTE.
 * Expected output structure per test:
 *   12 test combinations (4 scenarios x 3 variables)
 *   For grouped tests (3 & 4): separate output per region (East, West)
-*   Total reference values: 12 + 12 (grouped) = 24 result sets
+*   Total reference values: 6 ungrouped + 12 grouped = 18 result sets
+*
+* Output saved to:
+*   tests/spss_reference/outputs/mann_whitney_output.txt

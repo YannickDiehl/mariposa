@@ -24,12 +24,13 @@ Imports:
     tidyselect,
     tibble,
     tidyr
-Suggests: 
+Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
     covr,
-    haven (>= 2.4.0)
+    haven (>= 2.4.0),
+    survey
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
