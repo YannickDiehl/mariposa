@@ -206,7 +206,7 @@ Bulletin, 1(6), 80-83.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test</a></code> for the base R Wilcoxon test function.</p>
-<p><code>svyranktest</code> for survey-weighted rank tests.</p>
+<p><code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">svyranktest</a></code> for survey-weighted rank tests.</p>
 <p><code><a href="t_test.html">t_test</a></code> for parametric t-tests.</p>
 <p>Other hypothesis_tests:
 <code><a href="chi_square.html">chi_square()</a></code>,
@@ -387,16 +387,19 @@ Bulletin, 1(6), 80-83.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1096.1, n = 449.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1101.6, n = 1751.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1115.0, n = 449.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1096.8, n = 1751.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 391,442 1,929,377 -0.406   0.821    0.009    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 386,321 1,920,975 -0.536   0.592    0.011    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> U and W are descriptive statistics derived from weighted ranks.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -540,16 +543,19 @@ Bulletin, 1(6), 80-83.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1099.0, n = 1047.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1101.8, n = 1153.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1111.3, n = 1047.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1090.7, n = 1153.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 602,040 1,270,474 -0.211   0.486    0.005    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> U and W are descriptive statistics derived from weighted ranks.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

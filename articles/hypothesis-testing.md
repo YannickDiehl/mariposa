@@ -673,15 +673,19 @@ survey_data %>%
 #> 
 #> --- political_orientation ---
 #> 
-#>   East: rank mean = 918.3, n = 464.0
-#>   West: rank mean = 1216.0, n = 1848.5
+#>   East: rank mean = 1150.6, n = 464.0
+#>   West: rank mean = 1157.8, n = 1848.5
 #> 
 #> 
 #> Weighted Mann-Whitney U Test Results:
 #> ---------------------------------------------------------------------- 
-#>            Test       U         W      Z p_value effect_r sig
-#>  Mann-Whitney U 318,211 2,247,673 -21.44   0.862    0.446    
-#> ----------------------------------------------------------------------
+#>            Test       U       W     Z p_value effect_r sig
+#>  Mann-Whitney U 426,033 533,921 0.207   0.836    0.004    
+#> ---------------------------------------------------------------------- 
+#> 
+#> 
+#> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
+#> U and W are descriptive statistics derived from weighted ranks.
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ≈ 0.1

@@ -171,7 +171,8 @@ Biometrics Bulletin, 1(6), 80-83.
 [`wilcox.test`](https://rdrr.io/r/stats/wilcox.test.html) for the base R
 Wilcoxon test function.
 
-`svyranktest` for survey-weighted rank tests.
+[`svyranktest`](https://rdrr.io/pkg/survey/man/svyranktest.html) for
+survey-weighted rank tests.
 
 [`t_test`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
 for parametric t-tests.
@@ -355,16 +356,19 @@ survey_data %>%
 #> 
 #> --- income ---
 #> 
-#>   East: rank mean = 1096.1, n = 449.5
-#>   West: rank mean = 1101.6, n = 1751.4
+#>   East: rank mean = 1115.0, n = 449.5
+#>   West: rank mean = 1096.8, n = 1751.4
 #> 
 #> 
 #> Weighted Mann-Whitney U Test Results:
 #> ---------------------------------------------------------------------- 
 #>            Test       U         W      Z p_value effect_r sig
-#>  Mann-Whitney U 391,442 1,929,377 -0.406   0.821    0.009    
+#>  Mann-Whitney U 386,321 1,920,975 -0.536   0.592    0.011    
 #> ---------------------------------------------------------------------- 
 #> 
+#> 
+#> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
+#> U and W are descriptive statistics derived from weighted ranks.
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
@@ -508,16 +512,19 @@ print(result)
 #> 
 #> --- income ---
 #> 
-#>   Male: rank mean = 1099.0, n = 1047.9
-#>   Female: rank mean = 1101.8, n = 1153.1
+#>   Male: rank mean = 1111.3, n = 1047.9
+#>   Female: rank mean = 1090.7, n = 1153.1
 #> 
 #> 
 #> Weighted Mann-Whitney U Test Results:
 #> ---------------------------------------------------------------------- 
 #>            Test       U         W      Z p_value effect_r sig
-#>  Mann-Whitney U 602,040 1,270,474 -0.211   0.486    0.005    
+#>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    
 #> ---------------------------------------------------------------------- 
 #> 
+#> 
+#> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
+#> U and W are descriptive statistics derived from weighted ranks.
 #> 
 #> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
