@@ -96,8 +96,11 @@
 #' variables is stochastically larger than the other. The Annals of Mathematical 
 #' Statistics, 18(1), 50-60.
 #' 
-#' Wilcoxon, F. (1945). Individual comparisons by ranking methods. Biometrics 
+#' Wilcoxon, F. (1945). Individual comparisons by ranking methods. Biometrics
 #' Bulletin, 1(6), 80-83.
+#'
+#' Lumley, T., & Scott, A. (2013). Two-sample rank tests under complex sampling.
+#' Biometrika, 100(4), 831-842.
 #'
 #' @examples
 #' # Load required packages and data
@@ -251,9 +254,10 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       r <- abs(Z) / sqrt(n1 + n2)
       
       # Get p-value from wilcox.test for accuracy
-      test_result <- wilcox.test(x1, x2, alternative = alternative, 
+      test_result <- wilcox.test(x1, x2, alternative = alternative,
                                mu = mu, exact = FALSE, conf.int = TRUE,
                                conf.level = conf.level)
+      p_value <- test_result$p.value
       
       group_stats <- list(
         group1 = list(name = as.character(g_levels[1]), rank_mean = rank_mean1, n = n1),
@@ -261,111 +265,87 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       )
       
     } else {
-      # Weighted Mann-Whitney test using survey package
-      # Note: Using standard wilcox.test for weighted analysis
-      # Survey package dependency removed per project requirements
-      
-      # Create temporary data frame for survey design
-      temp_data <- data.frame(
-        x = x,
-        g = g,
-        w = w
-      )
-      
-      # Use wilcox.test for weighted analysis (survey package not required)
-      survey_result <- wilcox.test(x ~ g, data = temp_data)
-      
-      # Calculate weighted statistics
-      group1_data <- temp_data[temp_data$g == g_levels[1], ]
-      group2_data <- temp_data[temp_data$g == g_levels[2], ]
-      
-      n1_weighted <- sum(group1_data$w)
-      n2_weighted <- sum(group2_data$w)
-      
-      # Weighted ranking using combined approach
-      all_values <- c(group1_data$x, group2_data$x)
-      all_weights <- c(group1_data$w, group2_data$w)
-      
-      # Calculate weighted ranks for all values combined
-      sorted_indices <- order(all_values)
-      sorted_values <- all_values[sorted_indices]
-      sorted_weights <- all_weights[sorted_indices]
-      cumsum_weights <- cumsum(sorted_weights)
-      
-      # Weighted ranks using midpoint method
-      weighted_ranks <- rep(0, length(all_values))
-      for(i in seq_along(sorted_values)) {
-        if(i == 1) {
-          weighted_ranks[sorted_indices[i]] <- sorted_weights[i] / 2
-        } else {
-          weighted_ranks[sorted_indices[i]] <- cumsum_weights[i-1] + sorted_weights[i] / 2
-        }
+      # ---------------------------------------------------------------
+      # Weighted: Lumley & Scott (2013) design-based rank test
+      # ---------------------------------------------------------------
+      # Uses Horvitz-Thompson midranks + WLS regression + sandwich
+      # variance. Validated against survey::svyranktest() to machine
+      # precision.
+      # ---------------------------------------------------------------
+
+      n <- length(x)
+
+      # 1. Weighted midranks (Horvitz-Thompson estimator)
+      ii <- order(x)
+      N_pop <- sum(w)
+      rankhat <- numeric(n)
+      rankhat[ii] <- ave(cumsum(w[ii]) - w[ii] / 2, factor(x[ii]))
+      rankscore <- rankhat / N_pop
+
+      # 2. WLS regression: rankscore ~ group
+      g_numeric <- as.numeric(g == g_levels[2])
+      xmat <- cbind(1, g_numeric)
+      XtWX_inv <- solve(crossprod(xmat, w * xmat))
+      beta <- XtWX_inv %*% crossprod(xmat, w * rankscore)
+      residuals_vec <- as.vector(rankscore - xmat %*% beta)
+
+      # 3. Influence function + sandwich variance
+      infn <- (xmat * residuals_vec) %*% XtWX_inv
+      V <- n * var(w * infn)
+
+      # 4. t-test on the group coefficient
+      t_stat <- as.numeric(beta[2]) / sqrt(V[2, 2])
+      df_t <- n - 2
+
+      # 5. p-value respecting alternative hypothesis
+      if (alternative == "two.sided") {
+        p_value <- 2 * pt(-abs(t_stat), df = df_t)
+      } else if (alternative == "less") {
+        p_value <- pt(t_stat, df = df_t, lower.tail = FALSE)
+      } else {
+        p_value <- pt(t_stat, df = df_t)
       }
-      
-      # Split ranks by groups
-      n1_unweighted <- nrow(group1_data)
-      n2_unweighted <- nrow(group2_data)
-      
-      group1_weighted_ranks <- weighted_ranks[1:n1_unweighted]
-      group2_weighted_ranks <- weighted_ranks[(n1_unweighted+1):(n1_unweighted+n2_unweighted)]
-      
-      # Weighted rank means
-      rank_mean1 <- sum(group1_weighted_ranks * group1_data$w) / n1_weighted
-      rank_mean2 <- sum(group2_weighted_ranks * group2_data$w) / n2_weighted
-      
-      # Calculate weighted rank sums
-      R1 <- sum(group1_weighted_ranks * group1_data$w)
-      R2 <- sum(group2_weighted_ranks * group2_data$w)
-      
-      # Calculate weighted U statistics
+
+      # 6. Weighted group statistics
+      w1 <- w[g == g_levels[1]]
+      w2 <- w[g == g_levels[2]]
+      rankhat1 <- rankhat[g == g_levels[1]]
+      rankhat2 <- rankhat[g == g_levels[2]]
+
+      n1_weighted <- sum(w1)
+      n2_weighted <- sum(w2)
+      rank_mean1 <- sum(w1 * rankhat1) / n1_weighted
+      rank_mean2 <- sum(w2 * rankhat2) / n2_weighted
+
+      # 7. Descriptive U and W from weighted ranks
+      R1 <- sum(w1 * rankhat1)
+      R2 <- sum(w2 * rankhat2)
       U1 <- R1 - n1_weighted * (n1_weighted + 1) / 2
       U2 <- R2 - n2_weighted * (n2_weighted + 1) / 2
-      
-      # Use smaller U as the test statistic (following convention)
       U <- min(U1, U2)
-      W <- max(R1, R2)  # W is the larger rank sum
-      
-      # Convert Chi\u00b2 to Z (for 1 df: Z = \u00b1\u221aChi\u00b2)
-      chi_squared <- as.numeric(survey_result$statistic)
-      
-      # Survey package uses Kruskal-Wallis test even for 2 groups
-      if (grepl("KruskalWallis", survey_result$method)) {
-        # Extract t-statistic and df from survey result
-        t_stat <- as.numeric(survey_result$statistic)  # t-statistic
-        df <- as.numeric(survey_result$parameter)      # degrees of freedom
-        
-        Z <- t_stat
-        # Effect size for t-test: r = |t|/sqrt(t\u00b2 + df)
-        r <- abs(t_stat) / sqrt(t_stat^2 + df)
-        
-      } else {
-        # Fallback: calculate from rank means
-        pooled_se <- sqrt((n1_weighted + n2_weighted + 1) / 12)
-        Z <- (rank_mean1 - rank_mean2) / pooled_se
-      r <- abs(Z) / sqrt(n1_weighted + n2_weighted)
-      }
-      
-      # Ensure r is a single numeric value
-      if (length(r) == 0 || is.na(r) || !is.finite(r)) {
-        r <- 0
-      }
-      
-      test_result <- list(
-        statistic = W,
-        p.value = survey_result$p.value
-      )
-      
+      W_report <- if (U1 < U2) R1 else R2
+
+      # 8. Z = t-statistic (asymptotically equivalent)
+      Z <- t_stat
+
+      # 9. Effect size: r = |t| / sqrt(t^2 + df)
+      r <- abs(t_stat) / sqrt(t_stat^2 + df_t)
+
       group_stats <- list(
-        group1 = list(name = as.character(g_levels[1]), rank_mean = rank_mean1, n = round(n1_weighted, 1)),
-        group2 = list(name = as.character(g_levels[2]), rank_mean = rank_mean2, n = round(n2_weighted, 1))
+        group1 = list(name = as.character(g_levels[1]),
+                      rank_mean = rank_mean1,
+                      n = round(n1_weighted, 1)),
+        group2 = list(name = as.character(g_levels[2]),
+                      rank_mean = rank_mean2,
+                      n = round(n2_weighted, 1))
       )
     }
-    
+
     return(list(
       U = U,
-      W = if (is.null(weight_name)) W_report else test_result$statistic,
+      W = W_report,
       Z = Z,
-      p_value = test_result$p.value,
+      p_value = p_value,
       effect_size_r = r,
       rank_mean_diff = rank_mean1 - rank_mean2,
       group_levels = g_levels,
@@ -608,6 +588,11 @@ print.mann_whitney <- function(x, digits = 3, ...) {
     }
   }
   
+  if (!is.null(x$weights)) {
+    cat("\nNote: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).\n")
+    cat("U and W are descriptive statistics derived from weighted ranks.\n")
+  }
+
   print_significance_legend()
 
   cat("\nEffect Size Interpretation (r):\n")
