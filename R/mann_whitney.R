@@ -82,9 +82,8 @@
 #' - Look at both p-values and effect sizes
 #' - Consider plotting the data to see the pattern
 #' - Use this for Likert scales and rating data
-
 #'
-#' @seealso 
+#' @seealso
 #' \code{\link[stats]{wilcox.test}} for the base R Wilcoxon test function.
 #' 
 #' \code{\link[survey]{svyranktest}} for survey-weighted rank tests.
@@ -429,14 +428,47 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   return(result)
 }
 
-# Helper function for dynamic borders (matching t_test style)
+# Helper: print a single variable block (rank means + test table)
 #' @keywords internal
-.get_mann_whitney_border <- function(df) {
-  col_widths <- sapply(names(df), function(col) {
-    max(nchar(as.character(df[[col]])), nchar(col), na.rm = TRUE)
+.print_mw_variable_block <- function(var_name, row_data, stats, weights, digits) {
+  cli_rule(var_name)
+  cat("\n")
+
+  # Print group rank means
+  if (!is.null(stats) && !is.null(stats$group1)) {
+    cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n",
+                stats$group1$name, stats$group1$rank_mean, stats$group1$n))
+    cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n",
+                stats$group2$name, stats$group2$rank_mean, stats$group2$n))
+    cat("\n")
+  }
+
+  # Build results table
+  results_df <- data.frame(
+    Test = "Mann-Whitney U",
+    U = ifelse(is.na(row_data$U), "NA",
+               format(round(row_data$U, 0), big.mark = ",")),
+    W = ifelse(is.na(row_data$W), "NA",
+               format(round(row_data$W, 0), big.mark = ",")),
+    Z = round(row_data$Z, digits),
+    p_value = round(row_data$p_value, digits),
+    effect_r = round(row_data$effect_size_r, digits),
+    sig = row_data$sig,
+    stringsAsFactors = FALSE
+  )
+
+  # Dynamic border width from actual table content
+  col_widths <- sapply(names(results_df), function(col) {
+    max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
   })
   total_width <- sum(col_widths) + length(col_widths) - 1
-  return(paste(rep("-", total_width), collapse = ""))
+  border <- paste(rep("-", total_width), collapse = "")
+
+  label <- if (!is.null(weights)) "Weighted Mann-Whitney U Test Results" else "Mann-Whitney U Test Results"
+  cat(sprintf("\n%s:\n", label))
+  cat(border, "\n")
+  print(results_df, row.names = FALSE)
+  cat(border, "\n\n")
 }
 
 #' Print method for Mann-Whitney test results
@@ -452,49 +484,44 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   weights_name <- x$weights
   test_type <- get_standard_title("Mann-Whitney U Test", weights_name, "Results")
   print_header(test_type)
-  
+
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
-  
+
   # Add significance stars using standard helper
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
-                      
+
   # Template Standard: Dual grouped data detection
   is_grouped_data <- isTRUE(x$is_grouped)
-  
+
   # Print info about grouping variable if present
   if (!is.null(x$group)) {
     group_levels <- x$group_levels
     if (length(group_levels) >= 2) {
       cat("\n")
-      weight_name <- x$weights
       test_info <- list(
         "Grouping variable" = x$group,
         "Groups compared" = sprintf("%s vs. %s", as.character(group_levels[1]), as.character(group_levels[2])),
-        "Weights variable" = weight_name
+        "Weights variable" = weights_name
       )
       print_info_section(test_info)
-      test_params <- list(
+      print_test_parameters(list(
         mu = x$mu,
         alternative = x$alternative,
         conf.level = x$conf.level
-      )
-      print_test_parameters(test_params)
+      ))
       cat("\n")
     }
   }
-  
+
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("Variable", "U", "W", "Z", "p_value", 
-                                             "effect_size_r", "rank_mean_diff", "group_stats", "sig"))
+    group_vars <- setdiff(names(x$results), c("Variable", "U", "W", "Z", "p_value",
+                                               "effect_size_r", "rank_mean_diff", "group_stats", "sig"))
     groups <- unique(x$results[group_vars])
-    
-    # Print results for each group
+
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      
-      # Print group header using standardized helper
       print_group_header(group_values)
 
       # Filter results for current group
@@ -502,92 +529,33 @@ print.mann_whitney <- function(x, digits = 3, ...) {
       for (g in names(group_values)) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
-
-      if (nrow(group_results) == 0) next
       group_results <- group_results[!is.na(group_results$Variable), ]
       if (nrow(group_results) == 0) next
-      
-      # Print each variable as separate block
+
       for (j in seq_len(nrow(group_results))) {
-        var <- group_results$Variable[j]
-        stats <- group_results$group_stats[[j]]
-        
-        cat(sprintf("\n--- %s ---\n", var))
-        cat("\n")  # Add blank line after variable name
-        
-        # Print group rank means
-        if (!is.null(stats) && !is.null(stats$group1)) {
-          cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n", 
-                      stats$group1$name, stats$group1$rank_mean, stats$group1$n))
-          cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n", 
-                      stats$group2$name, stats$group2$rank_mean, stats$group2$n))
-      }
-      
-        # Create and print test table for this variable
-      results_df <- data.frame(
-          Test = "Mann-Whitney U",
-          U = ifelse(is.na(group_results$U[j]), "NA", 
-                    format(round(group_results$U[j], 0), big.mark = ",")),
-          W = ifelse(is.na(group_results$W[j]), "NA", 
-                    format(round(group_results$W[j], 0), big.mark = ",")),
-          Z = round(group_results$Z[j], digits),
-          p_value = round(group_results$p_value[j], digits),
-          effect_r = round(group_results$effect_size_r[j], digits),
-          sig = group_results$sig[j],
-        stringsAsFactors = FALSE
-      )
-      
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weights), "Weighted Mann-Whitney U Test Results", "Mann-Whitney U Test Results")))
-        border_width <- paste(rep("-", 70), collapse = "")
-      cat(border_width, "\n")
-      print(results_df, row.names = FALSE)
-      cat(border_width, "\n")
-        cat("\n")
+        .print_mw_variable_block(
+          var_name  = group_results$Variable[j],
+          row_data  = group_results[j, ],
+          stats     = group_results$group_stats[[j]],
+          weights   = x$weights,
+          digits    = digits
+        )
       }
     }
   } else {
-    # Print results for ungrouped data - each variable as separate block
     valid_results <- x$results[!is.na(x$results$Variable), ]
-    
+
     for (i in seq_len(nrow(valid_results))) {
-      var_name <- valid_results$Variable[i]
-      stats <- valid_results$group_stats[[i]]
-        
-      cat(sprintf("\n--- %s ---\n", var_name))
-      cat("\n")  # Add blank line after variable name
-      
-      # Print group rank means if available
-      if (!is.null(x$group) && !is.null(stats) && !is.null(stats$group1)) {
-          cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n", 
-                      stats$group1$name, stats$group1$rank_mean, stats$group1$n))
-          cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n", 
-                      stats$group2$name, stats$group2$rank_mean, stats$group2$n))
-    cat("\n")
-      }
-    
-      # Create test table for this variable
-    results_df <- data.frame(
-        Test = "Mann-Whitney U",
-        U = ifelse(is.na(valid_results$U[i]), "NA", 
-                  format(round(valid_results$U[i], 0), big.mark = ",")),
-        W = ifelse(is.na(valid_results$W[i]), "NA", 
-                  format(round(valid_results$W[i], 0), big.mark = ",")),
-        Z = round(valid_results$Z[i], digits),
-        p_value = round(valid_results$p_value[i], digits),
-        effect_r = round(valid_results$effect_size_r[i], digits),
-        sig = valid_results$sig[i],
-      stringsAsFactors = FALSE
-    )
-    
-      cat(sprintf("\n%s:\n", ifelse(!is.null(x$weights), "Weighted Mann-Whitney U Test Results", "Mann-Whitney U Test Results")))
-      border_width <- paste(rep("-", 70), collapse = "")
-    cat(border_width, "\n")
-    print(results_df, row.names = FALSE)
-    cat(border_width, "\n")
-      cat("\n")
+      .print_mw_variable_block(
+        var_name  = valid_results$Variable[i],
+        row_data  = valid_results[i, ],
+        stats     = valid_results$group_stats[[i]],
+        weights   = x$weights,
+        digits    = digits
+      )
     }
   }
-  
+
   if (!is.null(x$weights)) {
     cat("\nNote: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).\n")
     cat("U and W are descriptive statistics derived from weighted ranks.\n")
@@ -596,10 +564,10 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   print_significance_legend()
 
   cat("\nEffect Size Interpretation (r):\n")
-  cat("- Small effect: |r| \u2248 0.1\n")
-  cat("- Medium effect: |r| \u2248 0.3\n")
-  cat("- Large effect: |r| \u2248 0.5\n")
-  
+  cat("- Small effect: |r| ~ 0.1\n")
+  cat("- Medium effect: |r| ~ 0.3\n")
+  cat("- Large effect: |r| ~ 0.5\n")
+
   invisible(x)
 }
 
