@@ -794,8 +794,8 @@ survey_data %>%
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> political_orientation
-#> ---------------------
+#> 
+#> --- political_orientation ---
 #> 
 #>   East: rank mean = 1145.3, n = 443.0
 #>   West: rank mean = 1151.1, n = 1856.0
@@ -833,8 +833,8 @@ survey_data %>%
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> political_orientation
-#> ---------------------
+#> 
+#> --- political_orientation ---
 #> 
 #>   East: rank mean = 1150.6, n = 464.0
 #>   West: rank mean = 1157.8, n = 1848.5
