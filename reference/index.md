@@ -27,6 +27,20 @@ Compare groups and test for significant differences
   [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   : Test If Two Categories Are Related
 
+## Non-Parametric Tests
+
+Distribution-free tests for ordinal and nominal data
+
+- [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
+  : Compare Multiple Groups Without Assuming Normal Data
+- [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
+  : Compare Two Related Measurements Without Assuming Normality
+- [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
+  : Compare Three or More Related Measurements Without Assuming
+  Normality
+- [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md)
+  : Test Whether a Proportion Matches an Expected Value
+
 ## Correlation Analysis
 
 Measure relationships between variables
@@ -48,6 +62,28 @@ Follow-up tests for detailed group comparisons
   : Compare All Groups More Conservatively After ANOVA
 - [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)
   : Test If Groups Vary Similarly
+
+## Scale Analysis
+
+Factor analysis, reliability, and scale construction
+
+- [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md)
+  : Check How Reliably Your Scale Measures a Concept
+- [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md) :
+  Explore the Structure Behind Your Survey Items
+- [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+  : Create a Mean Index Across Items
+- [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)
+  : Transform Scores to Percent of Maximum Possible (POMPS)
+
+## Regression Analysis
+
+Linear and logistic regression with SPSS-compatible output
+
+- [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+  : Run a Linear Regression
+- [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+  : Run a Logistic Regression
 
 ## Weighted Statistics
 
@@ -91,6 +127,8 @@ Example datasets for learning and testing
 
 Formatted output for all result types
 
+- [`print(`*`<binomial_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.binomial_test.md)
+  : Print method for binomial test results
 - [`print(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.chi_square.md)
   : Print method for chi_square
 - [`print(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.crosstab.md)
@@ -99,8 +137,12 @@ Formatted output for all result types
   : Print method for describe objects
 - [`print(`*`<frequency>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.frequency.md)
   : Print method for frequency objects
+- [`print(`*`<friedman_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.friedman_test.md)
+  : Print method for Friedman test results
 - [`print(`*`<kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.kendall_tau.md)
   : Print method for kendall_tau
+- [`print(`*`<kruskal_wallis>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.kruskal_wallis.md)
+  : Print method for Kruskal-Wallis test results
 - [`print(`*`<levene_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.levene_test.md)
   : Print method for Levene test results
 - [`print(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.mann_whitney.md)
@@ -119,3 +161,5 @@ Formatted output for all result types
   : Print Tukey HSD test results
 - [`print(`*`<w_modus>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.w_modus.md)
   : Print method for w_modus objects
+- [`print(`*`<wilcoxon_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.wilcoxon_test.md)
+  : Print method for Wilcoxon signed-rank test results

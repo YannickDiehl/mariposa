@@ -1,5 +1,105 @@
 # Changelog
 
+## mariposa 0.3.0
+
+### New Functions
+
+- Added
+  [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
+  for comparing 3+ independent groups on ordinal data (non-parametric
+  alternative to one-way ANOVA). Supports survey weights,
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
+  and multi-variable analysis. Effect size: Eta-squared.
+
+- Added
+  [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
+  for comparing two paired measurements without assuming normality
+  (Wilcoxon signed-rank test). Includes rank categories (negative,
+  positive, ties) and effect size r.
+
+- Added
+  [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
+  for comparing 3+ related measurements on ordinal data (non-parametric
+  alternative to repeated-measures ANOVA). Effect size: Kendall’s W.
+
+- Added
+  [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md)
+  for testing whether an observed proportion matches an expected value
+  (exact binomial test). Supports multiple binary variables and custom
+  test proportions.
+
+### SPSS Validation
+
+- Added 294 new SPSS validation tests across all 4 non-parametric
+  functions, covering weighted/unweighted and grouped/ungrouped
+  scenarios.
+
+- Total test suite: 2,227 tests passing (0 failures, 0 skips).
+
+------------------------------------------------------------------------
+
+## mariposa 0.2.0
+
+### New Functions
+
+- Added
+  [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md)
+  for Cronbach’s Alpha with item statistics, including corrected
+  item-total correlations, alpha-if-item-deleted, and inter-item
+  correlation matrix. Genuine implementation with full survey weight
+  support.
+
+- Added
+  [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)
+  for Exploratory Factor Analysis with PCA extraction. Supports Varimax
+  rotation (Base R) and Oblimin rotation (via optional `GPArotation`
+  package). Includes KMO measure, Bartlett’s test, communalities, and
+  sorted factor loading matrix with configurable blank threshold.
+
+- Added
+  [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+  for creating mean indices across survey items, with `min_valid`
+  parameter matching SPSS `MEAN.x()` syntax. Designed for use inside
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
+
+- Added
+  [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)
+  for Percent of Maximum Possible Scores transformation, rescaling
+  values to a 0-100 range for cross-scale comparability.
+
+- Added
+  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+  as a wrapper around [`stats::lm()`](https://rdrr.io/r/stats/lm.html)
+  with SPSS-compatible output: coefficients table (B, SE, Beta, t, p),
+  ANOVA table, model summary (R, R-squared, adjusted R-squared), and
+  standardized coefficients. Supports both formula and SPSS-style
+  (dependent/predictors) interfaces.
+
+- Added
+  [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+  as a wrapper around [`stats::glm()`](https://rdrr.io/r/stats/glm.html)
+  with odds ratios, Wald statistics, pseudo-R-squared measures
+  (Nagelkerke, Cox-Snell, McFadden), and classification table.
+
+### Dependencies
+
+- Added `GPArotation` as suggested dependency for Oblimin rotation in
+  [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md).
+
+- Added `MASS` as suggested dependency for enhanced regression
+  diagnostics.
+
+### Improvements
+
+- All 6 new functions support survey weights and grouped analysis via
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html).
+
+- All functions include comprehensive roxygen2 documentation with
+  practical examples, “When to Use” guidance, and “Understanding the
+  Output” sections.
+
+------------------------------------------------------------------------
+
 ## mariposa 0.1.0
 
 ### Breaking Changes

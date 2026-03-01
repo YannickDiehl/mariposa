@@ -181,9 +181,13 @@ survey-weighted rank tests.
 for parametric t-tests.
 
 Other hypothesis_tests:
+[`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
 [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md),
+[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
+[`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
 [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
-[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
+[`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
 
 ## Examples
 

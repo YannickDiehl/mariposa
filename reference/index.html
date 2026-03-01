@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,8 @@
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
+    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -111,6 +113,43 @@
         </dt>
         <dd>Test If Two Categories Are Related</dd>
       </dl></div><div class="section level2">
+      <h2 id="non-parametric-tests">Non-Parametric Tests<a class="anchor" aria-label="anchor" href="#non-parametric-tests"></a></h2>
+
+      <div class="section-desc"><p>Distribution-free tests for ordinal and nominal data</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code>
+
+        </dt>
+        <dd>Compare Multiple Groups Without Assuming Normal Data</dd>
+
+        <dt>
+
+          <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code>
+
+        </dt>
+        <dd>Compare Two Related Measurements Without Assuming Normality</dd>
+
+        <dt>
+
+          <code><a href="friedman_test.html">friedman_test()</a></code>
+
+        </dt>
+        <dd>Compare Three or More Related Measurements Without Assuming Normality</dd>
+
+        <dt>
+
+          <code><a href="binomial_test.html">binomial_test()</a></code>
+
+        </dt>
+        <dd>Test Whether a Proportion Matches an Expected Value</dd>
+      </dl></div><div class="section level2">
       <h2 id="correlation-analysis">Correlation Analysis<a class="anchor" aria-label="anchor" href="#correlation-analysis"></a></h2>
 
       <div class="section-desc"><p>Measure relationships between variables</p></div>
@@ -170,6 +209,66 @@
 
         </dt>
         <dd>Test If Groups Vary Similarly</dd>
+      </dl></div><div class="section level2">
+      <h2 id="scale-analysis">Scale Analysis<a class="anchor" aria-label="anchor" href="#scale-analysis"></a></h2>
+
+      <div class="section-desc"><p>Factor analysis, reliability, and scale construction</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="reliability.html">reliability()</a></code>
+
+        </dt>
+        <dd>Check How Reliably Your Scale Measures a Concept</dd>
+
+        <dt>
+
+          <code><a href="efa.html">efa()</a></code>
+
+        </dt>
+        <dd>Explore the Structure Behind Your Survey Items</dd>
+
+        <dt>
+
+          <code><a href="scale_index.html">scale_index()</a></code>
+
+        </dt>
+        <dd>Create a Mean Index Across Items</dd>
+
+        <dt>
+
+          <code><a href="pomps.html">pomps()</a></code>
+
+        </dt>
+        <dd>Transform Scores to Percent of Maximum Possible (POMPS)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="regression-analysis">Regression Analysis<a class="anchor" aria-label="anchor" href="#regression-analysis"></a></h2>
+
+      <div class="section-desc"><p>Linear and logistic regression with SPSS-compatible output</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="linear_regression.html">linear_regression()</a></code>
+
+        </dt>
+        <dd>Run a Linear Regression</dd>
+
+        <dt>
+
+          <code><a href="logistic_regression.html">logistic_regression()</a></code>
+
+        </dt>
+        <dd>Run a Logistic Regression</dd>
       </dl></div><div class="section level2">
       <h2 id="weighted-statistics">Weighted Statistics<a class="anchor" aria-label="anchor" href="#weighted-statistics"></a></h2>
 
@@ -298,6 +397,13 @@
 
       <dl><dt>
 
+          <code><a href="print.binomial_test.html">print(<i>&lt;binomial_test&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print method for binomial test results</dd>
+
+        <dt>
+
           <code><a href="print.chi_square.html">print(<i>&lt;chi_square&gt;</i>)</a></code>
 
         </dt>
@@ -326,10 +432,24 @@
 
         <dt>
 
+          <code><a href="print.friedman_test.html">print(<i>&lt;friedman_test&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print method for Friedman test results</dd>
+
+        <dt>
+
           <code><a href="print.kendall_tau.html">print(<i>&lt;kendall_tau&gt;</i>)</a></code>
 
         </dt>
         <dd>Print method for kendall_tau</dd>
+
+        <dt>
+
+          <code><a href="print.kruskal_wallis.html">print(<i>&lt;kruskal_wallis&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print method for Kruskal-Wallis test results</dd>
 
         <dt>
 
@@ -393,6 +513,13 @@
 
         </dt>
         <dd>Print method for w_modus objects</dd>
+
+        <dt>
+
+          <code><a href="print.wilcoxon_test.html">print(<i>&lt;wilcoxon_test&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print method for Wilcoxon signed-rank test results</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

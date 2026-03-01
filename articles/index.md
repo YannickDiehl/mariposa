@@ -16,5 +16,9 @@
 
 ### Advanced Topics
 
+- [Scale
+  Analysis](https://YannickDiehl.github.io/mariposa/articles/scale-analysis.md):
+- [Regression
+  Analysis](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.md):
 - [Working with Survey
   Weights](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md):

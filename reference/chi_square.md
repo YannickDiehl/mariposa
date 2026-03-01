@@ -137,23 +137,19 @@ for detailed cross-tabulation tables.
 for single-variable frequency tables.
 
 Other hypothesis_tests:
+[`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
+[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
+[`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
 [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),
 [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
-[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
+[`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
 
 ## Examples
 
 ``` r
 # Load required packages and data
 library(dplyr)
-#> 
-#> Attaching package: ‘dplyr’
-#> The following objects are masked from ‘package:stats’:
-#> 
-#>     filter, lag
-#> The following objects are masked from ‘package:base’:
-#> 
-#>     intersect, setdiff, setequal, union
 data(survey_data)
 
 # Basic chi-squared test for independence
