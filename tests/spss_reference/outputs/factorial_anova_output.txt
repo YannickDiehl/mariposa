@@ -1,0 +1,822 @@
+﻿Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender region                                           
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                                 
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=gender region gender*region.                                                 
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.04                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label N    
+ Gender      1.00 Male        1149 
+             2.00 Female      1272 
+ Region      1.00 East        465  
+ (East/West) 2.00 West        1956 
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region (East/West) Mean Std. Deviation N    
+ Male   East               3.65 1.209          228  
+        West               3.59 1.154          921  
+        Total              3.60 1.165          1149 
+ Female East               3.59 1.206          237  
+        West               3.67 1.127          1035 
+        Total              3.65 1.142          1272 
+ Total  East               3.62 1.207          465  
+        West               3.63 1.140          1956 
+        Total              3.63 1.153          2421 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                       Levene Statistic df1 df2      Sig. 
+ Life             Based on Mean                        1.586            3   2417     .191 
+ satisfaction     Based on Median                      1.405            3   2417     .240 
+ (1=dissatisfied, Based on Median and with adjusted df 1.405            3   2411.573 .240 
+ 5=satisfied)     Based on trimmed mean                1.612            3   2417     .185 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Design: Intercept + gender + region + gender * region
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source          Type III Sum of Squares df   Mean Square F         Sig. Partial Eta Squared 
+ Corrected Model 3.311(a)                3    1.104       .830      .477 .001                
+ Intercept       19718.320               1    19718.320   14828.083 .000 .860                
+ gender          .006                    1    .006        .005      .946 .000                
+ region          .025                    1    .025        .019      .891 .000                
+ gender * region 1.893                   1    1.893       1.424     .233 .001                
+ Error           3214.116                2417 1.330                                          
+ Total           35088.000               2421                                                
+ Corrected Total 3217.428                2420                                                
+a R Squared = .001 (Adjusted R Squared = .000)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY gender education                                                   
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                                 
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=gender education gender*education.                                           
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.04                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1046 
+             2.00 Female                 1140 
+ Highest     1.00 Basic Secondary        735  
+ educational 2.00 Intermediate Secondary 548  
+ attainment  3.00 Academic Secondary     548  
+             4.00 University             355  
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Highest educational attainment Mean      Std. Deviation N    
+ Male   Basic Secondary                2803.4286 774.95889      350  
+        Intermediate Secondary         3574.0891 996.64920      247  
+        Academic Secondary             4246.4539 1180.77942     282  
+        University                     5318.5629 1718.80537     167  
+        Total                          3776.0038 1430.04925     1046 
+ Female Basic Secondary                2718.7013 795.83118      385  
+        Intermediate Secondary         3607.6412 996.21354      301  
+        Academic Secondary             4200.3759 1178.11804     266  
+        University                     5353.7234 1612.26481     188  
+        Total                          3733.6842 1435.65121     1140 
+ Total  Basic Secondary                2759.0476 786.56752      735  
+        Intermediate Secondary         3592.5182 995.63887      548  
+        Academic Secondary             4224.0876 1178.63526     548  
+        University                     5337.1831 1660.95846     355  
+        Total                          3753.9341 1432.80161     2186 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                Levene Statistic df1 df2      Sig. 
+ Monthly   Based on Mean                        44.988           7   2178     .000 
+ household Based on Median                      44.534           7   2178     .000 
+ income    Based on Median and with adjusted df 44.534           7   1687.574 .000 
+ (EUR)     Based on trimmed mean                44.953           7   2178     .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Monthly household income (EUR)
+b Design: Intercept + gender + education + gender * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source             Type III Sum of Squares df   Mean Square     F         Sig. Partial Eta Squared 
+ Corrected Model    1754652069.848(a)       7    250664581.407   199.909   .000 .391                
+ Intercept          32212607064.511         1    32212607064.511 25690.075 .000 .922                
+ gender             122637.601              1    122637.601      .098      .755 .000                
+ education          1743617622.524          3    581205874.175   463.521   .000 .390                
+ gender * education 1499440.759             3    499813.586      .399      .754 .001                
+ Error              2730979096.667          2178 1253893.066                                        
+ Total              35290790000.000         2186                                                    
+ Corrected Total    4485631166.515          2185                                                    
+a R Squared = .391 (Adjusted R Squared = .389)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA trust_government BY gender region                                            
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                                 
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=gender region gender*region.                                                 
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label N    
+ Gender      1.00 Male        1123 
+             2.00 Female      1231 
+ Region      1.00 East        460  
+ (East/West) 2.00 West        1894 
+
+Descriptive Statistics
+Dependent Variable Trust in government (1=none, 5=complete) 
+
+ Gender Region (East/West) Mean Std. Deviation N    
+ Male   East               2.57 1.172          223  
+        West               2.61 1.189          900  
+        Total              2.60 1.185          1123 
+ Female East               2.65 1.168          237  
+        West               2.63 1.138          994  
+        Total              2.64 1.143          1231 
+ Total  East               2.61 1.169          460  
+        West               2.62 1.162          1894 
+        Total              2.62 1.163          2354 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                  Levene Statistic df1 df2      Sig. 
+ Trust in    Based on Mean                        1.241            3   2350     .293 
+ government  Based on Median                      .773             3   2350     .509 
+ (1=none,    Based on Median and with adjusted df .773             3   2331.928 .509 
+ 5=complete) Based on trimmed mean                1.263            3   2350     .285 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Trust in government (1=none, 5=complete)
+b Design: Intercept + gender + region + gender * region
+
+Tests of Between-Subjects Effects
+Dependent Variable Trust in government (1=none, 5=complete) 
+
+ Source          Type III Sum of Squares df   Mean Square F        Sig. Partial Eta Squared 
+ Corrected Model 1.086(a)                3    .362        .267     .849 .000                
+ Intercept       10112.993               1    10112.993   7466.042 .000 .761                
+ gender          1.004                   1    1.004       .741     .389 .000                
+ region          .091                    1    .091        .067     .796 .000                
+ gender * region .394                    1    .394        .291     .590 .000                
+ Error           3183.150                2350 1.355                                         
+ Total           19351.000               2354                                               
+ Corrected Total 3184.237                2353                                               
+a R Squared = .000 (Adjusted R Squared = -.001)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender region                                           
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                                 
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=gender region gender*region.                                                 
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label N    
+ Gender      1.00 Male        1149 
+             2.00 Female      1272 
+ Region      1.00 East        465  
+ (East/West) 2.00 West        1956 
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region (East/West) Mean Std. Deviation N    
+ Male   East               3.65 1.209          228  
+        West               3.59 1.154          921  
+        Total              3.60 1.165          1149 
+ Female East               3.59 1.206          237  
+        West               3.67 1.127          1035 
+        Total              3.65 1.142          1272 
+ Total  East               3.62 1.207          465  
+        West               3.63 1.140          1956 
+        Total              3.63 1.153          2421 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                       Levene Statistic df1 df2      Sig. 
+ Life             Based on Mean                        1.586            3   2417     .191 
+ satisfaction     Based on Median                      1.405            3   2417     .240 
+ (1=dissatisfied, Based on Median and with adjusted df 1.405            3   2411.573 .240 
+ 5=satisfied)     Based on trimmed mean                1.612            3   2417     .185 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Design: Intercept + gender + region + gender * region
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source          Type III Sum of Squares df   Mean Square F         Sig. Partial Eta Squared 
+ Corrected Model 3.311(a)                3    1.104       .830      .477 .001                
+ Intercept       19718.320               1    19718.320   14828.083 .000 .860                
+ gender          .006                    1    .006        .005      .946 .000                
+ region          .025                    1    .025        .019      .891 .000                
+ gender * region 1.893                   1    1.893       1.424     .233 .001                
+ Error           3214.116                2417 1.330                                          
+ Total           35088.000               2421                                                
+ Corrected Total 3217.428                2420                                                
+a R Squared = .001 (Adjusted R Squared = .000)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY gender education                                                   
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                                 
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=gender education gender*education.                                           
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1046 
+             2.00 Female                 1140 
+ Highest     1.00 Basic Secondary        735  
+ educational 2.00 Intermediate Secondary 548  
+ attainment  3.00 Academic Secondary     548  
+             4.00 University             355  
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Highest educational attainment Mean      Std. Deviation N    
+ Male   Basic Secondary                2803.4286 774.95889      350  
+        Intermediate Secondary         3574.0891 996.64920      247  
+        Academic Secondary             4246.4539 1180.77942     282  
+        University                     5318.5629 1718.80537     167  
+        Total                          3776.0038 1430.04925     1046 
+ Female Basic Secondary                2718.7013 795.83118      385  
+        Intermediate Secondary         3607.6412 996.21354      301  
+        Academic Secondary             4200.3759 1178.11804     266  
+        University                     5353.7234 1612.26481     188  
+        Total                          3733.6842 1435.65121     1140 
+ Total  Basic Secondary                2759.0476 786.56752      735  
+        Intermediate Secondary         3592.5182 995.63887      548  
+        Academic Secondary             4224.0876 1178.63526     548  
+        University                     5337.1831 1660.95846     355  
+        Total                          3753.9341 1432.80161     2186 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                Levene Statistic df1 df2      Sig. 
+ Monthly   Based on Mean                        44.988           7   2178     .000 
+ household Based on Median                      44.534           7   2178     .000 
+ income    Based on Median and with adjusted df 44.534           7   1687.574 .000 
+ (EUR)     Based on trimmed mean                44.953           7   2178     .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Monthly household income (EUR)
+b Design: Intercept + gender + education + gender * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source             Type III Sum of Squares df   Mean Square     F         Sig. Partial Eta Squared 
+ Corrected Model    1754652069.848(a)       7    250664581.407   199.909   .000 .391                
+ Intercept          32212607064.511         1    32212607064.511 25690.075 .000 .922                
+ gender             122637.601              1    122637.601      .098      .755 .000                
+ education          1743617622.524          3    581205874.175   463.521   .000 .390                
+ gender * education 1499440.759             3    499813.586      .399      .754 .001                
+ Error              2730979096.667          2178 1253893.066                                        
+ Total              35290790000.000         2186                                                    
+ Corrected Total    4485631166.515          2185                                                    
+a R Squared = .391 (Adjusted R Squared = .389)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender region education                          
+                                               /METHOD=SSTYPE(3)                                                             
+                                               /INTERCEPT=INCLUDE                                                            
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                          
+                                               /CRITERIA=ALPHA(.05)                                                          
+                                               /DESIGN=gender region education gender*region gender*education region*education gender*region*education. 
+                                                                                                                             
+ Resources     Processor Time                 00:00:00.06                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1149 
+             2.00 Female                 1272 
+ Region      1.00 East                   465  
+ (East/West) 2.00 West                   1956 
+ Highest     1.00 Basic Secondary        809  
+ educational 2.00 Intermediate Secondary 618  
+ attainment  3.00 Academic Secondary     607  
+             4.00 University             387  
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region (East/West) Highest educational attainment Mean Std. Deviation N    
+ Male   East               Basic Secondary                3.32 1.329          76   
+                           Intermediate Secondary         3.66 1.183          59   
+                           Academic Secondary             3.86 1.135          56   
+                           University                     4.03 .928           37   
+                           Total                          3.65 1.209          228  
+        West               Basic Secondary                3.17 1.212          306  
+                           Intermediate Secondary         3.64 1.135          222  
+                           Academic Secondary             3.86 .981           249  
+                           University                     3.94 1.072          144  
+                           Total                          3.59 1.154          921  
+        Total              Basic Secondary                3.20 1.235          382  
+                           Intermediate Secondary         3.65 1.143          281  
+                           Academic Secondary             3.86 1.009          305  
+                           University                     3.96 1.043          181  
+                           Total                          3.60 1.165          1149 
+ Female East               Basic Secondary                3.29 1.352          85   
+                           Intermediate Secondary         3.62 1.106          60   
+                           Academic Secondary             3.81 1.047          54   
+                           University                     3.87 1.119          38   
+                           Total                          3.59 1.206          237  
+        West               Basic Secondary                3.18 1.227          342  
+                           Intermediate Secondary         3.77 1.081          277  
+                           Academic Secondary             3.86 .978           248  
+                           University                     4.18 .794           168  
+                           Total                          3.67 1.127          1035 
+        Total              Basic Secondary                3.21 1.252          427  
+                           Intermediate Secondary         3.74 1.086          337  
+                           Academic Secondary             3.85 .989           302  
+                           University                     4.13 .869           206  
+                           Total                          3.65 1.142          1272 
+ Total  East               Basic Secondary                3.30 1.337          161  
+                           Intermediate Secondary         3.64 1.140          119  
+                           Academic Secondary             3.84 1.088          110  
+                           University                     3.95 1.025          75   
+                           Total                          3.62 1.207          465  
+        West               Basic Secondary                3.18 1.219          648  
+                           Intermediate Secondary         3.72 1.106          499  
+                           Academic Secondary             3.86 .978           497  
+                           University                     4.07 .939           312  
+                           Total                          3.63 1.140          1956 
+        Total              Basic Secondary                3.20 1.243          809  
+                           Intermediate Secondary         3.70 1.112          618  
+                           Academic Secondary             3.85 .998           607  
+                           University                     4.05 .957           387  
+                           Total                          3.63 1.153          2421 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                       Levene Statistic df1 df2      Sig. 
+ Life             Based on Mean                        7.061            15  2405     .000 
+ satisfaction     Based on Median                      5.560            15  2405     .000 
+ (1=dissatisfied, Based on Median and with adjusted df 5.560            15  2320.629 .000 
+ 5=satisfied)     Based on trimmed mean                7.189            15  2405     .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Design: Intercept + gender + region + education + gender * region + gender * education + region * education + gender * region * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source                      Type III Sum of Squares df   Mean Square F         Sig. Partial Eta Squared 
+ Corrected Model             258.289(a)              15   17.219      13.995    .000 .080                
+ Intercept                   19011.236               1    19011.236   15451.124 .000 .865                
+ gender                      .082                    1    .082        .067      .796 .000                
+ region                      .132                    1    .132        .107      .744 .000                
+ education                   128.816                 3    42.939      34.898    .000 .042                
+ gender * region             2.351                   1    2.351       1.911     .167 .001                
+ gender * education          .277                    3    .092        .075      .973 .000                
+ region * education          3.326                   3    1.109       .901      .440 .001                
+ gender * region * education 1.655                   3    .552        .448      .719 .001                
+ Error                       2959.139                2405 1.230                                          
+ Total                       35088.000               2421                                                
+ Corrected Total             3217.428                2420                                                
+a R Squared = .080 (Adjusted R Squared = .075)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY gender region education                          
+                                               /METHOD=SSTYPE(3)                                                  
+                                               /INTERCEPT=INCLUDE                                                 
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                               
+                                               /CRITERIA=ALPHA(.05)                                               
+                                               /DESIGN=gender region education gender*region gender*education region*education gender*region*education. 
+                                                                                                                  
+ Resources     Processor Time                 00:00:00.06                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1046 
+             2.00 Female                 1140 
+ Region      1.00 East                   429  
+ (East/West) 2.00 West                   1757 
+ Highest     1.00 Basic Secondary        735  
+ educational 2.00 Intermediate Secondary 548  
+ attainment  3.00 Academic Secondary     548  
+             4.00 University             355  
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Region (East/West) Highest educational attainment Mean      Std. Deviation N    
+ Male   East               Basic Secondary                2839.7260 806.69761      73   
+                           Intermediate Secondary         3739.2157 1081.86477     51   
+                           Academic Secondary             4280.0000 1307.90376     50   
+                           University                     5612.1212 1446.71127     33   
+                           Total                          3851.2077 1466.48182     207  
+        West               Basic Secondary                2793.8628 767.59451      277  
+                           Intermediate Secondary         3531.1224 971.59703      196  
+                           Academic Secondary             4239.2241 1154.50006     232  
+                           University                     5246.2687 1776.82054     134  
+                           Total                          3757.4493 1421.19607     839  
+        Total              Basic Secondary                2803.4286 774.95889      350  
+                           Intermediate Secondary         3574.0891 996.64920      247  
+                           Academic Secondary             4246.4539 1180.77942     282  
+                           University                     5318.5629 1718.80537     167  
+                           Total                          3776.0038 1430.04925     1046 
+ Female East               Basic Secondary                2949.3827 761.43343      81   
+                           Intermediate Secondary         3491.0714 872.87962      56   
+                           Academic Secondary             4116.6667 1226.19171     48   
+                           University                     4881.0811 1745.44452     37   
+                           Total                          3660.3604 1304.90056     222  
+        West               Basic Secondary                2657.2368 794.71040      304  
+                           Intermediate Secondary         3634.2857 1022.07600     245  
+                           Academic Secondary             4218.8073 1169.37277     218  
+                           University                     5469.5364 1562.30571     151  
+                           Total                          3751.4161 1465.63438     918  
+        Total              Basic Secondary                2718.7013 795.83118      385  
+                           Intermediate Secondary         3607.6412 996.21354      301  
+                           Academic Secondary             4200.3759 1178.11804     266  
+                           University                     5353.7234 1612.26481     188  
+                           Total                          3733.6842 1435.65121     1140 
+ Total  East               Basic Secondary                2897.4026 782.56726      154  
+                           Intermediate Secondary         3609.3458 981.29032      107  
+                           Academic Secondary             4200.0000 1264.66653     98   
+                           University                     5225.7143 1641.72812     70   
+                           Total                          3752.4476 1386.87938     429  
+        West               Basic Secondary                2722.3752 784.20740      581  
+                           Intermediate Secondary         3588.4354 1000.14888     441  
+                           Academic Secondary             4229.3333 1160.47836     450  
+                           University                     5364.5614 1667.36706     285  
+                           Total                          3754.2971 1444.17770     1757 
+        Total              Basic Secondary                2759.0476 786.56752      735  
+                           Intermediate Secondary         3592.5182 995.63887      548  
+                           Academic Secondary             4224.0876 1178.63526     548  
+                           University                     5337.1831 1660.95846     355  
+                           Total                          3753.9341 1432.80161     2186 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                Levene Statistic df1 df2      Sig. 
+ Monthly   Based on Mean                        21.493           15  2170     .000 
+ household Based on Median                      21.150           15  2170     .000 
+ income    Based on Median and with adjusted df 21.150           15  1657.457 .000 
+ (EUR)     Based on trimmed mean                21.462           15  2170     .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Monthly household income (EUR)
+b Design: Intercept + gender + region + education + gender * region + gender * education + region * education + gender * region * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source                      Type III Sum of Squares df   Mean Square     F         Sig. Partial Eta Squared 
+ Corrected Model             1777233472.651(a)       15   118482231.510   94.929    .000 .396                
+ Intercept                   20213547861.158         1    20213547861.158 16195.332 .000 .882                
+ gender                      3714208.739             1    3714208.739     2.976     .085 .001                
+ region                      70450.166               1    70450.166       .056      .812 .000                
+ education                   1045824300.441          3    348608100.147   279.309   .000 .279                
+ gender * region             7200424.027             1    7200424.027     5.769     .016 .003                
+ gender * education          2235577.666             3    745192.555      .597      .617 .001                
+ region * education          3707480.291             3    1235826.764     .990      .396 .001                
+ gender * region * education 14559992.317            3    4853330.772     3.889     .009 .005                
+ Error                       2708397693.864          2170 1248109.536                                        
+ Total                       35290790000.000         2186                                                    
+ Corrected Total             4485631166.515          2185                                                    
+a R Squared = .396 (Adjusted R Squared = .392)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender region education                          
+                                               /METHOD=SSTYPE(3)                                                             
+                                               /INTERCEPT=INCLUDE                                                            
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                                          
+                                               /CRITERIA=ALPHA(.05)                                                          
+                                               /DESIGN=gender region education gender*region gender*education region*education gender*region*education. 
+                                                                                                                             
+ Resources     Processor Time                 00:00:00.06                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1149 
+             2.00 Female                 1272 
+ Region      1.00 East                   465  
+ (East/West) 2.00 West                   1956 
+ Highest     1.00 Basic Secondary        809  
+ educational 2.00 Intermediate Secondary 618  
+ attainment  3.00 Academic Secondary     607  
+             4.00 University             387  
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region (East/West) Highest educational attainment Mean Std. Deviation N    
+ Male   East               Basic Secondary                3.32 1.329          76   
+                           Intermediate Secondary         3.66 1.183          59   
+                           Academic Secondary             3.86 1.135          56   
+                           University                     4.03 .928           37   
+                           Total                          3.65 1.209          228  
+        West               Basic Secondary                3.17 1.212          306  
+                           Intermediate Secondary         3.64 1.135          222  
+                           Academic Secondary             3.86 .981           249  
+                           University                     3.94 1.072          144  
+                           Total                          3.59 1.154          921  
+        Total              Basic Secondary                3.20 1.235          382  
+                           Intermediate Secondary         3.65 1.143          281  
+                           Academic Secondary             3.86 1.009          305  
+                           University                     3.96 1.043          181  
+                           Total                          3.60 1.165          1149 
+ Female East               Basic Secondary                3.29 1.352          85   
+                           Intermediate Secondary         3.62 1.106          60   
+                           Academic Secondary             3.81 1.047          54   
+                           University                     3.87 1.119          38   
+                           Total                          3.59 1.206          237  
+        West               Basic Secondary                3.18 1.227          342  
+                           Intermediate Secondary         3.77 1.081          277  
+                           Academic Secondary             3.86 .978           248  
+                           University                     4.18 .794           168  
+                           Total                          3.67 1.127          1035 
+        Total              Basic Secondary                3.21 1.252          427  
+                           Intermediate Secondary         3.74 1.086          337  
+                           Academic Secondary             3.85 .989           302  
+                           University                     4.13 .869           206  
+                           Total                          3.65 1.142          1272 
+ Total  East               Basic Secondary                3.30 1.337          161  
+                           Intermediate Secondary         3.64 1.140          119  
+                           Academic Secondary             3.84 1.088          110  
+                           University                     3.95 1.025          75   
+                           Total                          3.62 1.207          465  
+        West               Basic Secondary                3.18 1.219          648  
+                           Intermediate Secondary         3.72 1.106          499  
+                           Academic Secondary             3.86 .978           497  
+                           University                     4.07 .939           312  
+                           Total                          3.63 1.140          1956 
+        Total              Basic Secondary                3.20 1.243          809  
+                           Intermediate Secondary         3.70 1.112          618  
+                           Academic Secondary             3.85 .998           607  
+                           University                     4.05 .957           387  
+                           Total                          3.63 1.153          2421 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                       Levene Statistic df1 df2      Sig. 
+ Life             Based on Mean                        7.061            15  2405     .000 
+ satisfaction     Based on Median                      5.560            15  2405     .000 
+ (1=dissatisfied, Based on Median and with adjusted df 5.560            15  2320.629 .000 
+ 5=satisfied)     Based on trimmed mean                7.189            15  2405     .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Design: Intercept + gender + region + education + gender * region + gender * education + region * education + gender * region * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source                      Type III Sum of Squares df   Mean Square F         Sig. Partial Eta Squared 
+ Corrected Model             258.289(a)              15   17.219      13.995    .000 .080                
+ Intercept                   19011.236               1    19011.236   15451.124 .000 .865                
+ gender                      .082                    1    .082        .067      .796 .000                
+ region                      .132                    1    .132        .107      .744 .000                
+ education                   128.816                 3    42.939      34.898    .000 .042                
+ gender * region             2.351                   1    2.351       1.911     .167 .001                
+ gender * education          .277                    3    .092        .075      .973 .000                
+ region * education          3.326                   3    1.109       .901      .440 .001                
+ gender * region * education 1.655                   3    .552        .448      .719 .001                
+ Error                       2959.139                2405 1.230                                          
+ Total                       35088.000               2421                                                
+ Corrected Total             3217.428                2420                                                
+a R Squared = .080 (Adjusted R Squared = .075)
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               01-MAR-2026 15:05:19                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY gender region education                          
+                                               /METHOD=SSTYPE(3)                                                  
+                                               /INTERCEPT=INCLUDE                                                 
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY                               
+                                               /CRITERIA=ALPHA(.05)                                               
+                                               /DESIGN=gender region education gender*region gender*education region*education gender*region*education. 
+                                                                                                                  
+ Resources     Processor Time                 00:00:00.06                                                                           
+               Elapsed Time                   00:00:01.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1046 
+             2.00 Female                 1140 
+ Region      1.00 East                   429  
+ (East/West) 2.00 West                   1757 
+ Highest     1.00 Basic Secondary        735  
+ educational 2.00 Intermediate Secondary 548  
+ attainment  3.00 Academic Secondary     548  
+             4.00 University             355  
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Region (East/West) Highest educational attainment Mean      Std. Deviation N    
+ Male   East               Basic Secondary                2839.7260 806.69761      73   
+                           Intermediate Secondary         3739.2157 1081.86477     51   
+                           Academic Secondary             4280.0000 1307.90376     50   
+                           University                     5612.1212 1446.71127     33   
+                           Total                          3851.2077 1466.48182     207  
+        West               Basic Secondary                2793.8628 767.59451      277  
+                           Intermediate Secondary         3531.1224 971.59703      196  
+                           Academic Secondary             4239.2241 1154.50006     232  
+                           University                     5246.2687 1776.82054     134  
+                           Total                          3757.4493 1421.19607     839  
+        Total              Basic Secondary                2803.4286 774.95889      350  
+                           Intermediate Secondary         3574.0891 996.64920      247  
+                           Academic Secondary             4246.4539 1180.77942     282  
+                           University                     5318.5629 1718.80537     167  
+                           Total                          3776.0038 1430.04925     1046 
+ Female East               Basic Secondary                2949.3827 761.43343      81   
+                           Intermediate Secondary         3491.0714 872.87962      56   
+                           Academic Secondary             4116.6667 1226.19171     48   
+                           University                     4881.0811 1745.44452     37   
+                           Total                          3660.3604 1304.90056     222  
+        West               Basic Secondary                2657.2368 794.71040      304  
+                           Intermediate Secondary         3634.2857 1022.07600     245  
+                           Academic Secondary             4218.8073 1169.37277     218  
+                           University                     5469.5364 1562.30571     151  
+                           Total                          3751.4161 1465.63438     918  
+        Total              Basic Secondary                2718.7013 795.83118      385  
+                           Intermediate Secondary         3607.6412 996.21354      301  
+                           Academic Secondary             4200.3759 1178.11804     266  
+                           University                     5353.7234 1612.26481     188  
+                           Total                          3733.6842 1435.65121     1140 
+ Total  East               Basic Secondary                2897.4026 782.56726      154  
+                           Intermediate Secondary         3609.3458 981.29032      107  
+                           Academic Secondary             4200.0000 1264.66653     98   
+                           University                     5225.7143 1641.72812     70   
+                           Total                          3752.4476 1386.87938     429  
+        West               Basic Secondary                2722.3752 784.20740      581  
+                           Intermediate Secondary         3588.4354 1000.14888     441  
+                           Academic Secondary             4229.3333 1160.47836     450  
+                           University                     5364.5614 1667.36706     285  
+                           Total                          3754.2971 1444.17770     1757 
+        Total              Basic Secondary                2759.0476 786.56752      735  
+                           Intermediate Secondary         3592.5182 995.63887      548  
+                           Academic Secondary             4224.0876 1178.63526     548  
+                           University                     5337.1831 1660.95846     355  
+                           Total                          3753.9341 1432.80161     2186 
+
+Levene's Test of Equality of Error Variances(a,b)
+
+                                                Levene Statistic df1 df2      Sig. 
+ Monthly   Based on Mean                        21.493           15  2170     .000 
+ household Based on Median                      21.150           15  2170     .000 
+ income    Based on Median and with adjusted df 21.150           15  1657.457 .000 
+ (EUR)     Based on trimmed mean                21.462           15  2170     .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Dependent variable: Monthly household income (EUR)
+b Design: Intercept + gender + region + education + gender * region + gender * education + region * education + gender * region * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source                      Type III Sum of Squares df   Mean Square     F         Sig. Partial Eta Squared 
+ Corrected Model             1777233472.651(a)       15   118482231.510   94.929    .000 .396                
+ Intercept                   20213547861.158         1    20213547861.158 16195.332 .000 .882                
+ gender                      3714208.739             1    3714208.739     2.976     .085 .001                
+ region                      70450.166               1    70450.166       .056      .812 .000                
+ education                   1045824300.441          3    348608100.147   279.309   .000 .279                
+ gender * region             7200424.027             1    7200424.027     5.769     .016 .003                
+ gender * education          2235577.666             3    745192.555      .597      .617 .001                
+ region * education          3707480.291             3    1235826.764     .990      .396 .001                
+ gender * region * education 14559992.317            3    4853330.772     3.889     .009 .005                
+ Error                       2708397693.864          2170 1248109.536                                        
+ Total                       35290790000.000         2186                                                    
+ Corrected Total             4485631166.515          2185                                                    
+a R Squared = .396 (Adjusted R Squared = .392)
+
