@@ -5,7 +5,7 @@
 # all print methods in the mariposa package.
 #
 # STYLE GUIDE:
-# 1. Headers: cli_rule with title
+# 1. Headers: plain text with dash underline
 # 2. Weighted prefix: "[Weighted] {Test Name} Results/Statistics"
 # 3. Information order: Title -> Test Info -> Parameters -> Results -> Significance
 # 4. Grouped data: "Group: var = value" format with consistent indentation
@@ -19,7 +19,8 @@
 #' @keywords internal
 print_header <- function(title, newline_before = TRUE) {
   if (newline_before) cat("\n")
-  cli_rule(title)
+  cat(title, "\n", sep = "")
+  cat(paste(rep("-", nchar(title)), collapse = ""), "\n", sep = "")
 }
 
 #' Print test information section
@@ -27,16 +28,12 @@ print_header <- function(title, newline_before = TRUE) {
 #' @param indent Number of spaces to indent
 #' @keywords internal
 print_info_section <- function(info, indent = 0) {
-  items <- character(0)
+  prefix <- paste(rep(" ", indent), collapse = "")
   for (name in names(info)) {
     value <- info[[name]]
     if (!is.null(value) && !is.na(value) && value != "") {
-      items <- c(items, paste0(name, ": ", value))
+      cat(prefix, "- ", name, ": ", value, "\n", sep = "")
     }
-  }
-  if (length(items) > 0) {
-    names(items) <- rep("*", length(items))
-    cli_bullets(items)
   }
 }
 
@@ -57,8 +54,8 @@ add_significance_stars <- function(p_value,
 #' @keywords internal
 print_significance_legend <- function(show = TRUE) {
   if (show) {
-    cli_text("")
-    cli_text("Signif. codes: 0 {.strong ***} 0.001 {.strong **} 0.01 {.strong *} 0.05")
+    cat("\n")
+    cat("Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05\n")
   }
 }
 
@@ -99,7 +96,7 @@ get_table_width <- function(df, min_width = 40) {
 #' @param ... Ignored (retained for backward compatibility)
 #' @keywords internal
 print_separator <- function(...) {
-  cli_rule()
+  cat(paste(rep("-", 40), collapse = ""), "\n", sep = "")
 }
 
 #' Format numeric value with appropriate decimal places
@@ -129,19 +126,14 @@ get_standard_title <- function(test_name, weights = NULL, suffix = "Results") {
 #' @param params List of parameters (conf.level, alternative, etc.)
 #' @keywords internal
 print_test_parameters <- function(params) {
-  items <- character(0)
   if (!is.null(params$conf.level)) {
-    items <- c(items, paste0("Confidence level: ", sprintf("%.1f%%", params$conf.level * 100)))
+    cat("- Confidence level: ", sprintf("%.1f%%", params$conf.level * 100), "\n", sep = "")
   }
   if (!is.null(params$alternative)) {
-    items <- c(items, paste0("Alternative hypothesis: ", params$alternative))
+    cat("- Alternative hypothesis: ", params$alternative, "\n", sep = "")
   }
   if (!is.null(params$mu)) {
-    items <- c(items, paste0("Null hypothesis (mu): ", sprintf("%.3f", params$mu)))
-  }
-  if (length(items) > 0) {
-    names(items) <- rep("*", length(items))
-    cli_bullets(items)
+    cat("- Null hypothesis (mu): ", sprintf("%.3f", params$mu), "\n", sep = "")
   }
 }
 
