@@ -124,16 +124,18 @@ data(survey_data)
 # Basic descriptive statistics
 survey_data %>% describe(age, income, weights = sampling_weight)
 #> 
-#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.514     50   17.084    77   25    0.159      2468.8
 #>    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#> ────────────────────────────────────────────────────────────────────────────────
+#> ----------------------------------------
 
 # Frequency analysis
 survey_data %>% frequency(education, region, weights = sampling_weight)
 #> 
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -163,14 +165,15 @@ survey_data %>% frequency(education, region, weights = sampling_weight)
 survey_data %>%
   group_by(region) %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
+#> Weighted t-Test Results
+#> -----------------------
 #> 
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> Group: region = East
@@ -215,7 +218,7 @@ survey_data %>%
 #>  life_satisfaction    -0.07    -0.07       -0.07  negligible
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)

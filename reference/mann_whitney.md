@@ -196,15 +196,17 @@ data(survey_data)
 survey_data %>%
   mann_whitney(age, group = gender)
 #> 
-#> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
+#> Mann-Whitney U Test Results
+#> ---------------------------
 #> 
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
-#> ── age ─────────────────────────────────────────────────────────────────────────
+#> age
+#> ---
 #> 
 #>   Male: rank mean = 1248.0, n = 1194.0
 #>   Female: rank mean = 1252.8, n = 1306.0
@@ -217,7 +219,7 @@ survey_data %>%
 #> ------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1
@@ -228,15 +230,17 @@ survey_data %>%
 survey_data %>%
   mann_whitney(age, income, life_satisfaction, group = region)
 #> 
-#> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
+#> Mann-Whitney U Test Results
+#> ---------------------------
 #> 
-#> • Grouping variable: region
-#> • Groups compared: East vs. West
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: region
+#> - Groups compared: East vs. West
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
-#> ── age ─────────────────────────────────────────────────────────────────────────
+#> age
+#> ---
 #> 
 #>   East: rank mean = 1304.9, n = 485.0
 #>   West: rank mean = 1237.4, n = 2015.0
@@ -248,7 +252,8 @@ survey_data %>%
 #>  Mann-Whitney U 462,234 2,493,354 -1.85   0.064    0.037    
 #> ----------------------------------------------------------- 
 #> 
-#> ── income ──────────────────────────────────────────────────────────────────────
+#> income
+#> ------
 #> 
 #>   East: rank mean = 1099.7, n = 429.0
 #>   West: rank mean = 1092.0, n = 1757.0
@@ -260,7 +265,8 @@ survey_data %>%
 #>  Mann-Whitney U 374,226 1,918,630 -0.226   0.821    0.005    
 #> ------------------------------------------------------------ 
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
+#> life_satisfaction
+#> -----------------
 #> 
 #>   East: rank mean = 1215.7, n = 465.0
 #>   West: rank mean = 1209.9, n = 1956.0
@@ -273,7 +279,7 @@ survey_data %>%
 #> ------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1
@@ -284,15 +290,17 @@ survey_data %>%
 survey_data %>%
   mann_whitney(starts_with("trust_"), group = gender)
 #> 
-#> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
+#> Mann-Whitney U Test Results
+#> ---------------------------
 #> 
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
-#> ── trust_government ────────────────────────────────────────────────────────────
+#> trust_government
+#> ----------------
 #> 
 #>   Male: rank mean = 1166.5, n = 1123.0
 #>   Female: rank mean = 1187.6, n = 1231.0
@@ -304,7 +312,8 @@ survey_data %>%
 #>  Mann-Whitney U 678,806 1,309,932 -0.775   0.438    0.016    
 #> ------------------------------------------------------------ 
 #> 
-#> ── trust_media ─────────────────────────────────────────────────────────────────
+#> trust_media
+#> -----------
 #> 
 #>   Male: rank mean = 1150.9, n = 1129.0
 #>   Female: rank mean = 1214.2, n = 1238.0
@@ -316,7 +325,8 @@ survey_data %>%
 #>  Mann-Whitney U 661,523 1,299,408 -2.32    0.02    0.048   *
 #> ----------------------------------------------------------- 
 #> 
-#> ── trust_science ───────────────────────────────────────────────────────────────
+#> trust_science
+#> -------------
 #> 
 #>   Male: rank mean = 1182.1, n = 1142.0
 #>   Female: rank mean = 1215.3, n = 1256.0
@@ -329,7 +339,7 @@ survey_data %>%
 #> ------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1
@@ -340,16 +350,18 @@ survey_data %>%
 survey_data %>%
   mann_whitney(income, group = region, weights = sampling_weight)
 #> 
-#> ── Weighted Mann-Whitney U Test Results ────────────────────────────────────────
+#> Weighted Mann-Whitney U Test Results
+#> ------------------------------------
 #> 
-#> • Grouping variable: region
-#> • Groups compared: East vs. West
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: region
+#> - Groups compared: East vs. West
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
-#> ── income ──────────────────────────────────────────────────────────────────────
+#> income
+#> ------
 #> 
 #>   East: rank mean = 1115.0, n = 449.5
 #>   West: rank mean = 1096.8, n = 1751.4
@@ -365,7 +377,7 @@ survey_data %>%
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
 #> U and W are descriptive statistics derived from weighted ranks.
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1
@@ -377,18 +389,20 @@ survey_data %>%
   group_by(education) %>%
   mann_whitney(life_satisfaction, group = gender)
 #> 
-#> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
+#> Mann-Whitney U Test Results
+#> ---------------------------
 #> 
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> Group: education = Basic Secondary
 #> ----------------------------------
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
+#> life_satisfaction
+#> -----------------
 #> 
 #>   Male: rank mean = 404.7, n = 382.0
 #>   Female: rank mean = 405.3, n = 427.0
@@ -403,7 +417,8 @@ survey_data %>%
 #> 
 #> Group: education = Intermediate Secondary
 #> -----------------------------------------
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
+#> life_satisfaction
+#> -----------------
 #> 
 #>   Male: rank mean = 301.9, n = 281.0
 #>   Female: rank mean = 315.8, n = 337.0
@@ -418,7 +433,8 @@ survey_data %>%
 #> 
 #> Group: education = Academic Secondary
 #> -------------------------------------
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
+#> life_satisfaction
+#> -----------------
 #> 
 #>   Male: rank mean = 304.9, n = 305.0
 #>   Female: rank mean = 303.1, n = 302.0
@@ -433,7 +449,8 @@ survey_data %>%
 #> 
 #> Group: education = University
 #> -----------------------------
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
+#> life_satisfaction
+#> -----------------
 #> 
 #>   Male: rank mean = 186.7, n = 181.0
 #>   Female: rank mean = 200.4, n = 206.0
@@ -446,7 +463,7 @@ survey_data %>%
 #> -------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1
@@ -457,15 +474,17 @@ survey_data %>%
 survey_data %>%
   mann_whitney(life_satisfaction, group = region, alternative = "greater")
 #> 
-#> ── Mann-Whitney U Test Results ─────────────────────────────────────────────────
+#> Mann-Whitney U Test Results
+#> ---------------------------
 #> 
-#> • Grouping variable: region
-#> • Groups compared: East vs. West
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: greater
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: region
+#> - Groups compared: East vs. West
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: greater
+#> - Null hypothesis (mu): 0.000
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
+#> life_satisfaction
+#> -----------------
 #> 
 #>   East: rank mean = 1215.7, n = 465.0
 #>   West: rank mean = 1209.9, n = 1956.0
@@ -478,7 +497,7 @@ survey_data %>%
 #> ------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1
@@ -490,16 +509,18 @@ result <- survey_data %>%
   mann_whitney(income, group = gender, weights = sampling_weight)
 print(result)
 #> 
-#> ── Weighted Mann-Whitney U Test Results ────────────────────────────────────────
+#> Weighted Mann-Whitney U Test Results
+#> ------------------------------------
 #> 
-#> • Grouping variable: gender
-#> • Groups compared: Male vs. Female
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
-#> • Alternative hypothesis: two.sided
-#> • Null hypothesis (mu): 0.000
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
-#> ── income ──────────────────────────────────────────────────────────────────────
+#> income
+#> ------
 #> 
 #>   Male: rank mean = 1111.3, n = 1047.9
 #>   Female: rank mean = 1090.7, n = 1153.1
@@ -515,7 +536,7 @@ print(result)
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
 #> U and W are descriptive statistics derived from weighted ranks.
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
 #> - Small effect: |r| ~ 0.1

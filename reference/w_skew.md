@@ -132,7 +132,8 @@ data(survey_data)
 # Basic weighted skewness
 survey_data %>% w_skew(age, weights = sampling_weight)
 #> 
-#> ── Weighted Skewness Statistics ────────────────────────────────────────────────
+#> Weighted Skewness Statistics
+#> ----------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_skew Effective_N
@@ -142,7 +143,8 @@ survey_data %>% w_skew(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_skew(age, income, life_satisfaction, weights = sampling_weight)
 #> 
-#> ── Weighted Skewness Statistics ────────────────────────────────────────────────
+#> Weighted Skewness Statistics
+#> ----------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_skew Effective_N
@@ -160,7 +162,8 @@ survey_data %>% w_skew(age, income, life_satisfaction, weights = sampling_weight
 # Grouped data
 survey_data %>% group_by(region) %>% w_skew(age, weights = sampling_weight)
 #> 
-#> ── Weighted Skewness Statistics ────────────────────────────────────────────────
+#> Weighted Skewness Statistics
+#> ----------------------------
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -179,7 +182,8 @@ survey_data %>% summarise(skew_age = w_skew(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_skew(age)
 #> 
-#> ── Skewness Statistics ─────────────────────────────────────────────────────────
+#> Skewness Statistics
+#> -------------------
 #> 
 #> --- age ---
 #>  Variable  skew    N

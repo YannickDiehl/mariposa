@@ -195,7 +195,8 @@ survey_data %>%
   group_by(employment) %>%
   crosstab(gender, region, weights = sampling_weight)
 #> 
-#> ── Weighted Grouped Crosstabulation  ───────────────────────────────────────────
+#> Weighted Grouped Crosstabulation 
+#> ---------------------------------
 #> 
 #> 
 #> Group: employment = Student

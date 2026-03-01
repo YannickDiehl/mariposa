@@ -29,8 +29,12 @@ The simplest way to get descriptive statistics:
 
 ``` r
 survey_data %>% describe(age)
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable  Mean Median     SD Range IQR Skewness    N Missing
 #>       age 50.55     50 16.976    77  24    0.172 2500       0
+#> ----------------------------------------
 ```
 
 This gives you the mean ($\bar{x}$), median, standard deviation (*SD*),
@@ -43,10 +47,14 @@ Analyze several variables together:
 ``` r
 survey_data %>%
   describe(age, income, life_satisfaction)
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness    N Missing
 #>                age   50.550     50   16.976    77   24    0.172 2500       0
 #>             income 3753.934   3500 1432.802  7200 1900    0.730 2186     314
 #>  life_satisfaction    3.628      4    1.153     4    2   -0.501 2421      79
+#> ----------------------------------------
 ```
 
 ### With Survey Weights
@@ -57,10 +65,14 @@ To get population-representative statistics, add the `weights` argument:
 survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
 #>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
 #>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#> ----------------------------------------
 ```
 
 The weighted results better represent your target population by
@@ -76,17 +88,24 @@ survey_data %>%
   group_by(region) %>%
   describe(age, income, weights = sampling_weight)
 #> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
 #> Group: region = East
 #> --------------------
+#> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   52.278     53   17.595    77   24    0.098       477.0
 #>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
+#> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.067     49   16.927    77   24    0.170      1993.1
 #>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#> ----------------------------------------
 ```
 
 ### Customizing Output
@@ -97,17 +116,25 @@ Choose which statistics to display with the `show` argument:
 # Just the essentials
 survey_data %>%
   describe(age, income, show = c("mean", "sd", "range"))
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable     Mean       SD Range    N Missing
 #>       age   50.550   16.976    77 2500       0
 #>    income 3753.934 1432.802  7200 2186     314
+#> ----------------------------------------
 
 # Everything available
 survey_data %>%
   describe(age, show = "all")
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable  Mean Median     SD   SE Range IQR Skewness Kurtosis Variance Mode
 #>       age 50.55     50 16.976 0.34    77  24    0.172   -0.364  288.185   18
 #>  Q25 Q50 Q75    N Missing
 #>   38  50  62 2500       0
+#> ----------------------------------------
 ```
 
 ## Frequency Tables
@@ -120,6 +147,9 @@ For categorical variables, use
 ``` r
 survey_data %>%
   frequency(education)
+#> 
+#> Frequency Analysis Results
+#> --------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
@@ -153,6 +183,9 @@ meaningful.
 survey_data %>%
   frequency(education, weights = sampling_weight)
 #> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
 #> 
@@ -174,6 +207,9 @@ Analyze several categorical variables at once:
 survey_data %>%
   frequency(education, employment, region,
             weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -221,6 +257,9 @@ See how distributions vary by group:
 survey_data %>%
   group_by(gender) %>%
   frequency(education, weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> 
@@ -339,6 +378,9 @@ survey_data %>%
   group_by(region) %>%
   crosstab(education, employment, weights = sampling_weight)
 #> 
+#> Weighted Grouped Crosstabulation 
+#> ---------------------------------
+#> 
 #> 
 #> Group: region = East
 #> --------------------
@@ -403,12 +445,16 @@ Start with basic descriptives to spot potential issues:
 ``` r
 survey_data %>%
   describe(age, income, show = "all")
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable     Mean Median       SD     SE Range  IQR Skewness Kurtosis
 #>       age   50.550     50   16.976  0.340    77   24    0.172   -0.364
 #>    income 3753.934   3500 1432.802 30.645  7200 1900    0.730    0.376
 #>     Variance Mode  Q25  Q50  Q75    N Missing
 #>      288.185   18   38   50   62 2500       0
 #>  2052920.442 3200 2700 3500 4600 2186     314
+#> ----------------------------------------
 ```
 
 Look for:
@@ -451,15 +497,22 @@ survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight,
            show = "short")
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
 #>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
 #>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#> ----------------------------------------
 
 # 2. Key distributions
 survey_data %>%
   frequency(education, employment,
             weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -521,17 +574,24 @@ survey_data %>%
   describe(income, life_satisfaction,
            weights = sampling_weight)
 #> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
 #> Group: region = East
 #> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
+#> ----------------------------------------
 ```
 
 ## Summary

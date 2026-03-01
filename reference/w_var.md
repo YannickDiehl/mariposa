@@ -126,7 +126,8 @@ data(survey_data)
 # Basic weighted variance
 survey_data %>% w_var(age, weights = sampling_weight)
 #> 
-#> ── Weighted Variance Statistics ────────────────────────────────────────────────
+#> Weighted Variance Statistics
+#> ----------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_var Effective_N
@@ -136,7 +137,8 @@ survey_data %>% w_var(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_var(age, income, weights = sampling_weight)
 #> 
-#> ── Weighted Variance Statistics ────────────────────────────────────────────────
+#> Weighted Variance Statistics
+#> ----------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_var Effective_N
@@ -150,7 +152,8 @@ survey_data %>% w_var(age, income, weights = sampling_weight)
 # Grouped data
 survey_data %>% group_by(region) %>% w_var(age, weights = sampling_weight)
 #> 
-#> ── Weighted Variance Statistics ────────────────────────────────────────────────
+#> Weighted Variance Statistics
+#> ----------------------------
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -169,7 +172,8 @@ survey_data %>% summarise(var_age = w_var(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_var(age)
 #> 
-#> ── Variance Statistics ─────────────────────────────────────────────────────────
+#> Variance Statistics
+#> -------------------
 #> 
 #> --- age ---
 #>  Variable     var    N

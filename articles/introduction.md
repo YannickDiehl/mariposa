@@ -57,9 +57,13 @@ function gives you a complete summary of numeric variables. The
 ``` r
 survey_data %>%
   describe(age, income, weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.514     50   17.084    77   25    0.159      2468.8
 #>    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
+#> ----------------------------------------
 ```
 
 The output shows:
@@ -78,6 +82,9 @@ For categorical data like education level or employment status, use
 ``` r
 survey_data %>%
   frequency(education, weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -105,6 +112,15 @@ Want to know if men and women differ in life satisfaction? Use
 ``` r
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
+#> Weighted t-Test Results
+#> -----------------------
+#> 
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -123,6 +139,9 @@ survey_data %>%
 #> ------------ 
 #>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  life_satisfaction   -0.043   -0.043      -0.043  negligible
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -145,6 +164,14 @@ When comparing more than two groups, use
 ``` r
 survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+#> 
+#> Weighted One-Way ANOVA Results
+#> ------------------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
@@ -175,6 +202,9 @@ survey_data %>%
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
 #> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
 #> - Epsilon-squared: Less biased than eta-squared
@@ -194,6 +224,13 @@ Are age and income related? Pearson’s *r* measures linear association:
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
+#> Weighted Pearson Correlation 
+#> -----------------------------
+#> 
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Confidence level: 95.0%
+#> 
 #> 
 #> --- age × income ---
 #> 
@@ -203,6 +240,8 @@ survey_data %>%
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -260,17 +299,24 @@ survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction, weights = sampling_weight)
 #> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
 #> Group: region = East
 #> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
+#> ----------------------------------------
 ```
 
 ### Multiple Variables at Once
@@ -281,6 +327,15 @@ Test several variables simultaneously:
 survey_data %>%
   t_test(trust_government, trust_media, trust_science,
          group = gender, weights = sampling_weight)
+#> Weighted t-Test Results
+#> -----------------------
+#> 
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- trust_government ---
@@ -336,6 +391,9 @@ survey_data %>%
 #>       Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>  trust_science   -0.058   -0.058      -0.057  negligible
 #> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -375,39 +433,62 @@ Here is how a complete analysis might look:
 # 1. Descriptive overview
 survey_data %>%
   describe(life_satisfaction, weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.625      4 1.152     4   2   -0.498      2390.9
+#> ----------------------------------------
 
 # 2. Compare across groups
 survey_data %>%
   group_by(education) %>%
   describe(life_satisfaction, weights = sampling_weight)
 #> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
 #> Group: education = Basic Secondary
 #> ----------------------------------
+#> ----------------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
+#> ----------------------------------------
 #> 
 #> Group: education = Intermediate Secondary
 #> -----------------------------------------
+#> ----------------------------------------
 #>           Variable  Mean Median   SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
+#> ----------------------------------------
 #> 
 #> Group: education = Academic Secondary
 #> -------------------------------------
+#> ----------------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
+#> ----------------------------------------
 #> 
 #> Group: education = University
 #> -----------------------------
+#> ----------------------------------------
 #>           Variable Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
+#> ----------------------------------------
 
 # 3. Test for significant differences
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 print(result)
+#> 
+#> Weighted One-Way ANOVA Results
+#> ------------------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
@@ -438,6 +519,9 @@ print(result)
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
 #> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
 #> - Epsilon-squared: Less biased than eta-squared
@@ -448,6 +532,13 @@ print(result)
 
 # 4. If significant, find out which groups differ
 tukey_test(result)
+#> Weighted Tukey HSD Post-Hoc Test Results
+#> ----------------------------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -469,7 +560,10 @@ tukey_test(result)
 #>    0.071    
 #>    <.001 ***
 #>    0.046   *
-#> ------------------------------------------------------------------------------------
+#> ------------------------------------------------------------------------------------ 
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group

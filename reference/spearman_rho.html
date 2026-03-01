@@ -191,12 +191,13 @@ implementation.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: life_satisfaction, political_orientation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: life_satisfaction, political_orientation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction × political_orientation ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -205,8 +206,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2228</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8334</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak negative monotonic relationship</span>
 <span class="r-in"><span></span></span>
@@ -214,12 +215,13 @@ implementation.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span>, <span class="va">trust_media</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: life_satisfaction, political_orientation, trust_media</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: life_satisfaction, political_orientation, trust_media</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rho Matrix:</span>
@@ -250,20 +252,21 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            life_satisfaction × trust_media  0.028  1.340 0.1805 2291    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        political_orientation × trust_media  0.003  0.145 0.8846 2177    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted correlations (mathematically correct, though SPSS may not apply weights)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Spearman's Rank Correlation Analysis  ──────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: age, income</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: age, income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -272,8 +275,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak positive monotonic relationship</span>
 <span class="r-in"><span></span></span>
@@ -282,12 +285,13 @@ implementation.</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: age, income, life_satisfaction</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: age, income, life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
@@ -352,20 +356,21 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.020 -0.875 0.3819 1956    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.470 21.981 0.0000 1705 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Spearman's Rank Correlation Analysis  ──────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: trust_government, trust_media, trust_science</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rho Matrix:</span>
@@ -396,19 +401,20 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government × trust_science 0.027 1.262 0.2070 2255    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media × trust_science 0.016 0.750 0.4533 2272    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Listwise deletion for missing data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, use <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: age, income</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: listwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: age, income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: listwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -417,8 +423,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak positive monotonic relationship</span>
 <span class="r-in"><span></span></span>
@@ -426,12 +432,13 @@ implementation.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">spearman_rho</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Spearman's Rank Correlation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Method: Spearman's rho (rank correlation)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Variables: age, income</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Missing data handling: pairwise deletion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Alternative hypothesis: greater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: Spearman's rho (rank correlation)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: age, income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: greater</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -440,8 +447,8 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (1-tailed): 0.4351</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak positive monotonic relationship</span>
 <span class="r-in"><span></span></span>

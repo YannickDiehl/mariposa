@@ -167,12 +167,13 @@ data(survey_data)
 survey_data %>%
   spearman_rho(life_satisfaction, political_orientation)
 #> 
-#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
+#> Spearman's Rank Correlation Analysis 
+#> -------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: life_satisfaction, political_orientation
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: life_satisfaction, political_orientation
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> --- life_satisfaction × political_orientation ---
 #> 
@@ -182,7 +183,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8334
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak negative monotonic relationship
 
@@ -190,12 +191,13 @@ survey_data %>%
 survey_data %>%
   spearman_rho(life_satisfaction, political_orientation, trust_media)
 #> 
-#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
+#> Spearman's Rank Correlation Analysis 
+#> -------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: life_satisfaction, political_orientation, trust_media
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: life_satisfaction, political_orientation, trust_media
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Spearman's Rho Matrix:
@@ -227,19 +229,20 @@ survey_data %>%
 #>        political_orientation × trust_media  0.003  0.145 0.8846 2177    
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Weighted correlations (mathematically correct, though SPSS may not apply weights)
 survey_data %>%
   spearman_rho(age, income, weights = sampling_weight)
 #> 
-#> ── Weighted Spearman's Rank Correlation Analysis  ──────────────────────────────
+#> Weighted Spearman's Rank Correlation Analysis 
+#> ----------------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: age, income
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: age, income
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> --- age × income ---
 #> 
@@ -249,7 +252,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8703
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak positive monotonic relationship
 
@@ -258,12 +261,13 @@ survey_data %>%
   group_by(region) %>%
   spearman_rho(age, income, life_satisfaction)
 #> 
-#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
+#> Spearman's Rank Correlation Analysis 
+#> -------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: age, income, life_satisfaction
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: age, income, life_satisfaction
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> Group: region = East
 #> --------------------
@@ -329,19 +333,20 @@ survey_data %>%
 #>  income × life_satisfaction  0.470 21.981 0.0000 1705 ***
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Using tidyselect helpers
 survey_data %>%
   spearman_rho(starts_with("trust"), weights = sampling_weight)
 #> 
-#> ── Weighted Spearman's Rank Correlation Analysis  ──────────────────────────────
+#> Weighted Spearman's Rank Correlation Analysis 
+#> ----------------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: trust_government, trust_media, trust_science
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: trust_government, trust_media, trust_science
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Spearman's Rho Matrix:
@@ -373,18 +378,19 @@ survey_data %>%
 #>       trust_media × trust_science 0.016 0.750 0.4533 2272    
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Listwise deletion for missing data
 survey_data %>%
   spearman_rho(age, income, use = "listwise")
 #> 
-#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
+#> Spearman's Rank Correlation Analysis 
+#> -------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: age, income
-#> • Missing data handling: listwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: age, income
+#> - Missing data handling: listwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> --- age × income ---
 #> 
@@ -394,7 +400,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8703
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak positive monotonic relationship
 
@@ -402,12 +408,13 @@ survey_data %>%
 survey_data %>%
   spearman_rho(age, income, alternative = "greater")
 #> 
-#> ── Spearman's Rank Correlation Analysis  ───────────────────────────────────────
+#> Spearman's Rank Correlation Analysis 
+#> -------------------------------------
 #> 
-#> • Method: Spearman's rho (rank correlation)
-#> • Variables: age, income
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: greater
+#> - Method: Spearman's rho (rank correlation)
+#> - Variables: age, income
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: greater
 #> 
 #> --- age × income ---
 #> 
@@ -417,7 +424,7 @@ survey_data %>%
 #>   p-value (1-tailed): 0.4351
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak positive monotonic relationship
 ```

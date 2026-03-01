@@ -162,11 +162,12 @@ anova_result <- survey_data %>%
 
 # Tukey post-hoc comparisons
 anova_result %>% tukey_test()
-#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
+#> Tukey HSD Post-Hoc Test Results
+#> -------------------------------
 #> 
-#> • Dependent variable: life_satisfaction
-#> • Grouping variable: education
-#> • Confidence level: 95.0%
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -191,7 +192,7 @@ anova_result %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -204,12 +205,13 @@ anova_weighted <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
 anova_weighted %>% tukey_test()
-#> ── Weighted Tukey HSD Post-Hoc Test Results ────────────────────────────────────
+#> Weighted Tukey HSD Post-Hoc Test Results
+#> ----------------------------------------
 #> 
-#> • Dependent variable: life_satisfaction
-#> • Grouping variable: education
-#> • Weights variable: sampling_weight
-#> • Confidence level: 95.0%
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -234,7 +236,7 @@ anova_weighted %>% tukey_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -247,10 +249,11 @@ anova_multi <- survey_data %>%
   oneway_anova(trust_government, trust_science, group = education)
 
 anova_multi %>% tukey_test()
-#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
+#> Tukey HSD Post-Hoc Test Results
+#> -------------------------------
 #> 
-#> • Grouping variable: education
-#> • Confidence level: 95.0%
+#> - Grouping variable: education
+#> - Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -296,7 +299,7 @@ anova_multi %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -310,10 +313,11 @@ anova_grouped <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 
 anova_grouped %>% tukey_test()
-#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
+#> Tukey HSD Post-Hoc Test Results
+#> -------------------------------
 #> 
-#> • Grouping variable: education
-#> • Confidence level: 95.0%
+#> - Grouping variable: education
+#> - Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -365,7 +369,7 @@ anova_grouped %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group

@@ -139,7 +139,8 @@ data(survey_data)
 # Basic weighted kurtosis (excess kurtosis, default)
 survey_data %>% w_kurtosis(age, weights = sampling_weight)
 #> 
-#> ── Weighted Excess Kurtosis Statistics ─────────────────────────────────────────
+#> Weighted Excess Kurtosis Statistics
+#> -----------------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_kurtosis Effective_N
@@ -149,7 +150,8 @@ survey_data %>% w_kurtosis(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_kurtosis(age, income, life_satisfaction, weights = sampling_weight)
 #> 
-#> ── Weighted Excess Kurtosis Statistics ─────────────────────────────────────────
+#> Weighted Excess Kurtosis Statistics
+#> -----------------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_kurtosis Effective_N
@@ -167,7 +169,8 @@ survey_data %>% w_kurtosis(age, income, life_satisfaction, weights = sampling_we
 # Grouped data
 survey_data %>% group_by(region) %>% w_kurtosis(age, weights = sampling_weight)
 #> 
-#> ── Weighted Excess Kurtosis Statistics ─────────────────────────────────────────
+#> Weighted Excess Kurtosis Statistics
+#> -----------------------------------
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -179,7 +182,8 @@ survey_data %>% group_by(region) %>% w_kurtosis(age, weights = sampling_weight)
 # Raw kurtosis (not excess)
 survey_data %>% w_kurtosis(age, weights = sampling_weight, excess = FALSE)
 #> 
-#> ── Weighted Kurtosis Statistics ────────────────────────────────────────────────
+#> Weighted Kurtosis Statistics
+#> ----------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_kurtosis Effective_N
@@ -196,7 +200,8 @@ survey_data %>% summarise(kurt_age = w_kurtosis(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_kurtosis(age)
 #> 
-#> ── Excess Kurtosis Statistics ──────────────────────────────────────────────────
+#> Excess Kurtosis Statistics
+#> --------------------------
 #> 
 #> --- age ---
 #>  Variable kurtosis    N
