@@ -1,15 +1,16 @@
 Package: mariposa
 Type: Package
 Title: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data
-Version: 0.1.0
+Version: 0.3.0
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
            role = c("aut", "cre"))
 Description: Professional statistical analysis of survey data with full support
     for survey weights, grouped operations, and tidyverse integration. Provides
-    27 functions for descriptive statistics, hypothesis testing, correlation
-    analysis, post-hoc comparisons, and weighted statistics. All results are validated against SPSS
+    37 functions for descriptive statistics, hypothesis testing, correlation
+    analysis, post-hoc comparisons, weighted statistics, scale analysis,
+    regression, and non-parametric tests. All results are validated against SPSS
     v29 for reproducibility. Designed for survey researchers, social scientists,
     and students working with complex survey designs.
 License: MIT + file LICENSE
@@ -38,5 +39,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
-URL: https://github.com/YannickDiehl/mariposa
+URL: https://YannickDiehl.github.io/mariposa/,
+    https://github.com/YannickDiehl/mariposa
 BugReports: https://github.com/YannickDiehl/mariposa/issues

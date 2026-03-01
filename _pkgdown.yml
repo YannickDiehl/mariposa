@@ -37,6 +37,10 @@ navbar:
         href: articles/correlation-analysis.html
       - text: "-------"
       - text: "Advanced Topics"
+      - text: "Scale Analysis"
+        href: articles/scale-analysis.html
+      - text: "Regression Analysis"
+        href: articles/regression-analysis.html
       - text: "Working with Survey Weights"
         href: articles/survey-weights.html
     github:
@@ -60,6 +64,14 @@ reference:
   - mann_whitney
   - chi_square
 
+- title: "Non-Parametric Tests"
+  desc: "Distribution-free tests for ordinal and nominal data"
+  contents:
+  - kruskal_wallis
+  - wilcoxon_test
+  - friedman_test
+  - binomial_test
+
 - title: "Correlation Analysis"
   desc: "Measure relationships between variables"
   contents:
@@ -73,6 +85,20 @@ reference:
   - tukey_test
   - scheffe_test
   - levene_test
+
+- title: "Scale Analysis"
+  desc: "Factor analysis, reliability, and scale construction"
+  contents:
+  - reliability
+  - efa
+  - scale_index
+  - pomps
+
+- title: "Regression Analysis"
+  desc: "Linear and logistic regression with SPSS-compatible output"
+  contents:
+  - linear_regression
+  - logistic_regression
 
 - title: "Weighted Statistics"
   desc: "Individual weighted statistics for survey data"
@@ -117,6 +143,8 @@ articles:
 - title: "Advanced Topics"
   navbar: ~
   contents:
+  - scale-analysis
+  - regression-analysis
   - survey-weights
 
 footer:
