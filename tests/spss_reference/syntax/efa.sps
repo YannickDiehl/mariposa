@@ -7,13 +7,16 @@
 * Weight: sampling_weight
 * Grouping: region
 
+GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/survey_data.sav'.
+
 * Start Output Management System to save results as text
 
 OMS
-  /IF SUBTYPES=['KMO and Bartlett''s Test' 'Communalities' 'Total Variance Explained' 'Component Matrix' 'Rotated Component Matrix' 'Pattern Matrix' 'Structure Matrix' 'Component Correlation Matrix' 'Correlation Matrix' 'Anti-image Matrices']
+  /IF COMMANDS=['Factor Analysis']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/outputs/efa_output.txt'.
 
 COMPUTE original_order = $CASENUM.
+EXECUTE.
 
 * ============================================================================.
 * TEST 1: UNWEIGHTED / UNGROUPED

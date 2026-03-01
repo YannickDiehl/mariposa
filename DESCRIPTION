@@ -30,7 +30,9 @@ Suggests:
     rmarkdown,
     covr,
     haven (>= 2.4.0),
-    survey
+    survey,
+    GPArotation,
+    MASS
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)

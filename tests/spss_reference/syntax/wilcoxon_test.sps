@@ -16,10 +16,11 @@ GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/
 * Start Output Management System to save results as text
 
 OMS
-  /IF SUBTYPES=['Wilcoxon Signed Ranks Test' 'Test Statistics' 'Ranks']
+  /IF COMMANDS=['NPAR Tests']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/outputs/wilcoxon_test_output.txt'.
 
 COMPUTE original_order = $CASENUM.
+EXECUTE.
 
 * ============================================================================.
 * TEST 1: UNWEIGHTED / UNGROUPED
@@ -136,20 +137,10 @@ SORT CASES BY original_order.
 
 TITLE '=========== ADDITIONAL TESTS: LONGITUDINAL DATA ==========='.
 
-GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/longitudinal_data.sav'.
+GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/longitudinal_data_wide.sav'.
 
-* Note: longitudinal_data.sav may be in long format (480 rows, 4 timepoints per subject).
-* If long format, restructure to wide format first:
-* SORT CASES BY subject_id time_numeric.
-* CASESTOVARS
-*   /ID=subject_id
-*   /INDEX=time_numeric
-*   /GROUPBY=VARIABLE
-*   /FIXED=group age gender.
-* This creates outcome_score.1, outcome_score.2, outcome_score.3, outcome_score.4
-* Adjust variable names in tests below if needed.
-
-* If already in wide format with score_T1, score_T2, score_T3, score_T4:
+* Note: longitudinal_data_wide.sav is in wide format (120 rows, 1 per subject)
+* with columns: subject_id, group, age, gender, score_T1, score_T2, score_T3, score_T4
 
 TITLE '=========== Test 5a ==========='.
 
@@ -226,8 +217,7 @@ EXECUTE.
 *   - Classic pre/post repeated measures design
 *   - 120 subjects, 4 timepoints
 *   - No weight variable available
-*   - Wide format needed (score_T1, score_T2, score_T3, score_T4)
-*   - If .sav is in long format, CASESTOVARS must run first
+*   - Uses longitudinal_data_wide.sav (wide format: score_T1, score_T2, score_T3, score_T4)
 *   - Treatment group (Control/Treatment) used for grouped analysis
 *
 * Weighted Analyses:

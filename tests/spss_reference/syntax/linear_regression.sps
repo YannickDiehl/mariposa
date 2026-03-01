@@ -28,7 +28,8 @@ TITLE '=========== Test 1a ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ age (unweighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -40,7 +41,8 @@ TITLE '=========== Test 1b ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ trust items (unweighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -52,7 +54,8 @@ TITLE '=========== Test 1c ==========='.
 SUBTITLE 'Linear Regression: income ~ age + education + life_satisfaction (unweighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT income
@@ -64,7 +67,8 @@ TITLE '=========== Test 1d ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ 4 predictors (unweighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -84,7 +88,8 @@ TITLE '=========== Test 2a ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ age (weighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -96,7 +101,8 @@ TITLE '=========== Test 2b ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ trust items (weighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -108,7 +114,8 @@ TITLE '=========== Test 2c ==========='.
 SUBTITLE 'Linear Regression: income ~ age + education + life_satisfaction (weighted, ungrouped)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT income
@@ -131,7 +138,8 @@ TITLE '=========== Test 3a ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ age (unweighted, grouped by region)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -143,7 +151,8 @@ TITLE '=========== Test 3b ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ trust items (unweighted, grouped by region)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -163,7 +172,8 @@ TITLE '=========== Test 4a ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ age (weighted, grouped by region)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
@@ -175,7 +185,8 @@ TITLE '=========== Test 4b ==========='.
 SUBTITLE 'Linear Regression: life_satisfaction ~ trust items (weighted, grouped by region)'.
 REGRESSION
   /MISSING LISTWISE
-  /STATISTICS COEFF OUTS R ANOVA DESCRIPTIVES
+  /STATISTICS COEFF OUTS R ANOVA
+  /DESCRIPTIVES
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN
   /DEPENDENT life_satisfaction
