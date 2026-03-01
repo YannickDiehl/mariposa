@@ -179,8 +179,12 @@ Biometrika, 100(4), 831-842.
 \code{\link{t_test}} for parametric t-tests.
 
 Other hypothesis_tests: 
+\code{\link{binomial_test}()},
 \code{\link{chi_square}()},
+\code{\link{friedman_test}()},
+\code{\link{kruskal_wallis}()},
 \code{\link{oneway_anova}()},
-\code{\link{t_test}()}
+\code{\link{t_test}()},
+\code{\link{wilcoxon_test}()}
 }
 \concept{hypothesis_tests}

@@ -135,8 +135,12 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 \code{\link{frequency}} for single-variable frequency tables.
 
 Other hypothesis_tests: 
+\code{\link{binomial_test}()},
+\code{\link{friedman_test}()},
+\code{\link{kruskal_wallis}()},
 \code{\link{mann_whitney}()},
 \code{\link{oneway_anova}()},
-\code{\link{t_test}()}
+\code{\link{t_test}()},
+\code{\link{wilcoxon_test}()}
 }
 \concept{hypothesis_tests}
