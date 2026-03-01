@@ -431,7 +431,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 # Helper: print a single variable block (rank means + test table)
 #' @keywords internal
 .print_mw_variable_block <- function(var_name, row_data, stats, weights, digits) {
-  cli_rule(var_name)
+  cat(sprintf("\n--- %s ---\n", var_name))
   cat("\n")
 
   # Print group rank means
