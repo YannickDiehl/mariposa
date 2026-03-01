@@ -1,0 +1,547 @@
+﻿NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_media (PAIRED)                                 
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                               N      Mean Rank Sum of Ranks 
+ Trust in media (1=none,        Negative Ranks 955(a) 887.53    847592.50    
+ 5=complete) - Trust in         Positive Ranks 770(b) 832.57    641082.50    
+ government (1=none,            Ties           502(c)                        
+ 5=complete)                    Total          2227                          
+a Trust in media (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in media (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in media (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+                        Trust in media (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ Z                      -5.097(b)                                                                      
+ Asymp. Sig. (2-tailed) .000                                                                           
+a Wilcoxon Signed Ranks Test
+b Based on positive ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_science (PAIRED)                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                               N       Mean Rank Sum of Ranks 
+ Trust in science (1=none,      Negative Ranks 355(a)  671.62    238424.00    
+ 5=complete) - Trust in         Positive Ranks 1424(b) 944.44    1344886.00   
+ government (1=none,            Ties           476(c)                         
+ 5=complete)                    Total          2255                           
+a Trust in science (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in science (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in science (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+                        Trust in science (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ Z                      -25.945(b)                                                                       
+ Asymp. Sig. (2-tailed) .000                                                                             
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_media WITH trust_science (PAIRED)                                    
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                     N       Mean Rank Sum of Ranks 
+ Trust in science     Negative Ranks 322(a)  648.09    208685.50    
+ (1=none, 5=complete) Positive Ranks 1558(b) 1000.93   1559454.50   
+ - Trust in media     Ties           392(c)                         
+ (1=none, 5=complete) Total          2272                           
+a Trust in science (1=none, 5=complete) < Trust in media (1=none, 5=complete)
+b Trust in science (1=none, 5=complete) > Trust in media (1=none, 5=complete)
+c Trust in science (1=none, 5=complete) = Trust in media (1=none, 5=complete)
+
+Test Statistics(a)
+
+                        Trust in science (1=none, 5=complete) - Trust in media (1=none, 5=complete) 
+ Z                      -29.091(b)                                                                  
+ Asymp. Sig. (2-tailed) .000                                                                        
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_media (PAIRED)                                 
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                               N      Mean Rank Sum of Ranks 
+ Trust in media (1=none,        Negative Ranks 955(a) 887.53    847592.50    
+ 5=complete) - Trust in         Positive Ranks 770(b) 832.57    641082.50    
+ government (1=none,            Ties           502(c)                        
+ 5=complete)                    Total          2227                          
+a Trust in media (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in media (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in media (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+                        Trust in media (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ Z                      -5.097(b)                                                                      
+ Asymp. Sig. (2-tailed) .000                                                                           
+a Wilcoxon Signed Ranks Test
+b Based on positive ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_science (PAIRED)                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                               N       Mean Rank Sum of Ranks 
+ Trust in science (1=none,      Negative Ranks 355(a)  671.62    238424.00    
+ 5=complete) - Trust in         Positive Ranks 1424(b) 944.44    1344886.00   
+ government (1=none,            Ties           476(c)                         
+ 5=complete)                    Total          2255                           
+a Trust in science (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in science (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in science (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+                        Trust in science (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ Z                      -25.945(b)                                                                       
+ Asymp. Sig. (2-tailed) .000                                                                             
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_media (PAIRED)                                 
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+ Region (East/West)                                               N      Mean Rank Sum of Ranks 
+ East               Trust in media (1=none,        Negative Ranks 191(a) 183.16    34983.50     
+                    5=complete) - Trust in         Positive Ranks 155(b) 161.60    25047.50     
+                    government (1=none,            Ties           89(c)                         
+                    5=complete)                    Total          435                           
+ West               Trust in media (1=none,        Negative Ranks 764(a) 705.10    538697.50    
+                    5=complete) - Trust in         Positive Ranks 615(b) 671.24    412812.50    
+                    government (1=none,            Ties           413(c)                        
+                    5=complete)                    Total          1792                          
+a Trust in media (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in media (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in media (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+ Region (East/West)                        Trust in media (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ East               Z                      -2.727(b)                                                                      
+                    Asymp. Sig. (2-tailed) .006                                                                           
+ West               Z                      -4.346(b)                                                                      
+                    Asymp. Sig. (2-tailed) .000                                                                           
+a Wilcoxon Signed Ranks Test
+b Based on positive ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:14                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_science (PAIRED)                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:01.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+ Region (East/West)                                               N       Mean Rank Sum of Ranks 
+ East               Trust in science (1=none,      Negative Ranks 64(a)   142.14    9097.00      
+                    5=complete) - Trust in         Positive Ranks 287(b)  183.55    52679.00     
+                    government (1=none,            Ties           93(c)                          
+                    5=complete)                    Total          444                            
+ West               Trust in science (1=none,      Negative Ranks 291(a)  531.02    154526.50    
+                    5=complete) - Trust in         Positive Ranks 1137(b) 761.46    865779.50    
+                    government (1=none,            Ties           383(c)                         
+                    5=complete)                    Total          1811                           
+a Trust in science (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in science (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in science (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+ Region (East/West)                        Trust in science (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ East               Z                      -11.635(b)                                                                       
+                    Asymp. Sig. (2-tailed) .000                                                                             
+ West               Z                      -23.191(b)                                                                       
+                    Asymp. Sig. (2-tailed) .000                                                                             
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:15                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_media (PAIRED)                                 
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+ Region (East/West)                                               N      Mean Rank Sum of Ranks 
+ East               Trust in media (1=none,        Negative Ranks 191(a) 183.16    34983.50     
+                    5=complete) - Trust in         Positive Ranks 155(b) 161.60    25047.50     
+                    government (1=none,            Ties           89(c)                         
+                    5=complete)                    Total          435                           
+ West               Trust in media (1=none,        Negative Ranks 764(a) 705.10    538697.50    
+                    5=complete) - Trust in         Positive Ranks 615(b) 671.24    412812.50    
+                    government (1=none,            Ties           413(c)                        
+                    5=complete)                    Total          1792                          
+a Trust in media (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in media (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in media (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+ Region (East/West)                        Trust in media (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ East               Z                      -2.727(b)                                                                      
+                    Asymp. Sig. (2-tailed) .006                                                                           
+ West               Z                      -4.346(b)                                                                      
+                    Asymp. Sig. (2-tailed) .000                                                                           
+a Wilcoxon Signed Ranks Test
+b Based on positive ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:15                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=trust_government WITH trust_science (PAIRED)                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+ Region (East/West)                                               N       Mean Rank Sum of Ranks 
+ East               Trust in science (1=none,      Negative Ranks 64(a)   142.14    9097.00      
+                    5=complete) - Trust in         Positive Ranks 287(b)  183.55    52679.00     
+                    government (1=none,            Ties           93(c)                          
+                    5=complete)                    Total          444                            
+ West               Trust in science (1=none,      Negative Ranks 291(a)  531.02    154526.50    
+                    5=complete) - Trust in         Positive Ranks 1137(b) 761.46    865779.50    
+                    government (1=none,            Ties           383(c)                         
+                    5=complete)                    Total          1811                           
+a Trust in science (1=none, 5=complete) < Trust in government (1=none, 5=complete)
+b Trust in science (1=none, 5=complete) > Trust in government (1=none, 5=complete)
+c Trust in science (1=none, 5=complete) = Trust in government (1=none, 5=complete)
+
+Test Statistics(a)
+
+ Region (East/West)                        Trust in science (1=none, 5=complete) - Trust in government (1=none, 5=complete) 
+ East               Z                      -11.635(b)                                                                       
+                    Asymp. Sig. (2-tailed) .000                                                                             
+ West               Z                      -23.191(b)                                                                       
+                    Asymp. Sig. (2-tailed) .000                                                                             
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:15                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/longitudinal_data_wide.sav                                                       
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 120                                                                                   
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=score_T1 WITH score_T2 (PAIRED)                                            
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/longitudinal_data_wide.sav
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                N     Mean Rank Sum of Ranks 
+ Outcome score   Negative Ranks 27(a) 40.19     1085.00      
+ at Time 2 -     Positive Ranks 78(b) 57.44     4480.00      
+ Outcome score   Ties           0(c)                         
+ at Time 1       Total          105                          
+a Outcome score at Time 2 < Outcome score at Time 1
+b Outcome score at Time 2 > Outcome score at Time 1
+c Outcome score at Time 2 = Outcome score at Time 1
+
+Test Statistics(a)
+
+                        Outcome score at Time 2 - Outcome score at Time 1 
+ Z                      -5.427(b)                                         
+ Asymp. Sig. (2-tailed) .000                                              
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:15                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/longitudinal_data_wide.sav                                                       
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 120                                                                                   
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=score_T1 WITH score_T3 (PAIRED)                                            
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+                                N     Mean Rank Sum of Ranks 
+ Outcome score   Negative Ranks 21(a) 30.95     650.00       
+ at Time 3 -     Positive Ranks 75(b) 53.41     4006.00      
+ Outcome score   Ties           0(c)                         
+ at Time 1       Total          96                           
+a Outcome score at Time 3 < Outcome score at Time 1
+b Outcome score at Time 3 > Outcome score at Time 1
+c Outcome score at Time 3 = Outcome score at Time 1
+
+Test Statistics(a)
+
+                        Outcome score at Time 3 - Outcome score at Time 1 
+ Z                      -6.132(b)                                         
+ Asymp. Sig. (2-tailed) .000                                              
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:49:15                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/longitudinal_data_wide.sav                                                       
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Treatment group (Control/Treatment)                                                   
+               N of Rows in Working Data File 120                                                                                   
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /WILCOXON=score_T1 WITH score_T2 (PAIRED)                                            
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Wilcoxon Signed Ranks Test
+Ranks
+
+ Treatment group (Control/Treatment)                                N     Mean Rank Sum of Ranks 
+ Control                             Outcome score   Negative Ranks 18(a) 21.94     395.00       
+                                     at Time 2 -     Positive Ranks 33(b) 28.21     931.00       
+                                     Outcome score   Ties           0(c)                         
+                                     at Time 1       Total          51                           
+ Treatment                           Outcome score   Negative Ranks 9(a)  17.89     161.00       
+                                     at Time 2 -     Positive Ranks 45(b) 29.42     1324.00      
+                                     Outcome score   Ties           0(c)                         
+                                     at Time 1       Total          54                           
+a Outcome score at Time 2 < Outcome score at Time 1
+b Outcome score at Time 2 > Outcome score at Time 1
+c Outcome score at Time 2 = Outcome score at Time 1
+
+Test Statistics(a)
+
+ Treatment group (Control/Treatment)                        Outcome score at Time 2 - Outcome score at Time 1 
+ Control                             Z                      -2.512(b)                                         
+                                     Asymp. Sig. (2-tailed) .012                                              
+ Treatment                           Z                      -5.007(b)                                         
+                                     Asymp. Sig. (2-tailed) .000                                              
+a Wilcoxon Signed Ranks Test
+b Based on negative ranks.
+

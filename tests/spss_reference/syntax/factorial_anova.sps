@@ -7,13 +7,16 @@
 * Weight: sampling_weight
 * Note: No SPLIT FILE used -- instead, 3-way ANOVA replaces grouped scenario
 
+GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/survey_data.sav'.
+
 * Start Output Management System to save results as text
 
 OMS
-  /IF SUBTYPES=['Tests of Between-Subjects Effects' 'Descriptive Statistics' 'Levene''s Test of Equality of Error Variances' 'Estimated Marginal Means' 'Grand Mean']
+  /IF COMMANDS=['UNIANOVA']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/outputs/factorial_anova_output.txt'.
 
 COMPUTE original_order = $CASENUM.
+EXECUTE.
 
 * ============================================================================.
 * TEST 1: UNWEIGHTED - TWO-WAY DESIGNS
@@ -105,6 +108,19 @@ UNIANOVA life_satisfaction BY gender region education
   /CRITERIA=ALPHA(.05)
   /DESIGN=gender region education gender*region gender*education region*education gender*region*education.
 
+TITLE '=========== Test 3b ==========='.
+
+* Test 3b: 2x2x4 ANOVA - income by gender * region * education
+* Note: Second DV for three-way design to validate interaction computation
+* with a metric DV that shows stronger effects.
+SUBTITLE 'Factorial ANOVA: income BY gender * region * education (unweighted, 2x2x4)'.
+UNIANOVA income BY gender region education
+  /METHOD=SSTYPE(3)
+  /INTERCEPT=INCLUDE
+  /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
+  /CRITERIA=ALPHA(.05)
+  /DESIGN=gender region education gender*region gender*education region*education gender*region*education.
+
 * ============================================================================.
 * TEST 4: WEIGHTED - THREE-WAY DESIGN
 * ============================================================================.
@@ -118,6 +134,17 @@ TITLE '=========== Test 4a ==========='.
 * Test 4a: 2x2x4 ANOVA - life_satisfaction by gender * region * education (weighted)
 SUBTITLE 'Factorial ANOVA: life_satisfaction BY gender * region * education (weighted, 2x2x4)'.
 UNIANOVA life_satisfaction BY gender region education
+  /METHOD=SSTYPE(3)
+  /INTERCEPT=INCLUDE
+  /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
+  /CRITERIA=ALPHA(.05)
+  /DESIGN=gender region education gender*region gender*education region*education gender*region*education.
+
+TITLE '=========== Test 4b ==========='.
+
+* Test 4b: 2x2x4 ANOVA - income by gender * region * education (weighted)
+SUBTITLE 'Factorial ANOVA: income BY gender * region * education (weighted, 2x2x4)'.
+UNIANOVA income BY gender region education
   /METHOD=SSTYPE(3)
   /INTERCEPT=INCLUDE
   /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
