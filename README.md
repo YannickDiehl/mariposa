@@ -9,7 +9,7 @@
 
 **Professional statistical analysis for survey data in R.**
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) provides 46+ statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via `dplyr::group_by()`, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility.
+mariposa (*Marburg Initiative for Political and Social Analysis*) provides 37 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via `dplyr::group_by()`, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility.
 
 ## Installation
 
@@ -38,6 +38,16 @@ survey_data %>%
 # Compare groups with t-test
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
+
+# Scale analysis workflow
+reliability(survey_data, trust_government, trust_media, trust_science)
+
+survey_data <- survey_data %>%
+  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+
+# Regression
+survey_data %>%
+  linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
 ```
 
 ## Core Features
@@ -49,10 +59,12 @@ survey_data %>%
 | **Descriptive** | `describe()`, `frequency()`, `crosstab()` | Summaries and distributions |
 | **T-Tests** | `t_test()` | Mean comparisons (independent, paired, one-sample) |
 | **ANOVA** | `oneway_anova()` | Multiple group comparisons |
-| **Non-parametric** | `mann_whitney()` | Distribution-free tests |
+| **Non-parametric** | `mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`, `friedman_test()`, `binomial_test()` | Distribution-free tests |
 | **Correlation** | `pearson_cor()`, `spearman_rho()`, `kendall_tau()` | Relationships between variables |
 | **Post-hoc** | `tukey_test()`, `scheffe_test()`, `levene_test()` | Follow-up analyses |
 | **Chi-square** | `chi_square()` | Categorical associations |
+| **Scale analysis** | `reliability()`, `efa()`, `scale_index()`, `pomps()` | Cronbach's Alpha, factor analysis, index construction |
+| **Regression** | `linear_regression()`, `logistic_regression()` | Linear and logistic models with SPSS-style output |
 | **Weighted stats** | `w_mean()`, `w_median()`, `w_sd()`, + 8 more | Individual weighted statistics |
 
 ### Survey Weights Built-In
@@ -113,6 +125,8 @@ survey_data %>%
 
 - [Complete Reference](https://YannickDiehl.github.io/mariposa/reference/) - All functions with examples
 - [Getting Started](https://YannickDiehl.github.io/mariposa/articles/introduction.html) - Introduction and first steps
+- [Scale Analysis](https://YannickDiehl.github.io/mariposa/articles/scale-analysis.html) - Reliability, factor analysis, and scale construction
+- [Regression Analysis](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.html) - Linear and logistic regression
 - [Survey Weights Guide](https://YannickDiehl.github.io/mariposa/articles/survey-weights.html) - Working with weighted data
 
 ## Support
