@@ -1,0 +1,532 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+Reliability
+Scale: Trust Scale
+Reliability Statistics
+
+ Cronbach's Alpha Cronbach's Alpha Based on Standardized Items N of Items 
+ .047             .048                                         3          
+
+Item Statistics
+
+                                          Mean Std. Deviation N    
+ Trust in government (1=none, 5=complete) 2.62 1.162          2135 
+ Trust in media (1=none, 5=complete)      2.43 1.156          2135 
+ Trust in science (1=none, 5=complete)    3.62 1.034          2135 
+
+Inter-Item Correlation Matrix
+
+                                     Trust in government (1=none,        Trust in media (1=none, 5=complete) Trust in science (1=none,           
+                                     5=complete)                                                             5=complete)                         
+ Trust in government (1=none,        1.000                               .014                                .020                                
+ 5=complete)                                                                                                                                     
+ Trust in media (1=none, 5=complete) .014                                1.000                               .015                                
+ Trust in science (1=none,           .020                                .015                                1.000                               
+ 5=complete)                                                                                                                                     
+
+Item-Total Statistics
+
+                            Scale Mean if Item Deleted Scale Variance if Item     Corrected Item-Total       Squared Multiple           Cronbach's Alpha if Item   
+                                                       Deleted                    Correlation                Correlation                Deleted                    
+ Trust in government        6.05                       2.440                      .024                       .001                       .029                       
+ (1=none, 5=complete)                                                                                                                                              
+ Trust in media (1=none,    6.25                       2.467                      .020                       .000                       .040                       
+ 5=complete)                                                                                                                                                       
+ Trust in science (1=none,  5.05                       2.723                      .025                       .001                       .027                       
+ 5=complete)                                                                                                                                                       
+
+=========== Test 1b ===========
+
+Reliability
+Scale: Attitude Scale
+Reliability Statistics
+
+ Cronbach's Alpha(a) Cronbach's Alpha Based on Standardized Items(a) N of Items 
+ -.929               -.958                                           3          
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+Item Statistics
+
+                                                 Mean Std. Deviation N    
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.162          2139 
+ Environmental concern (1=low, 5=high)           3.58 1.189          2139 
+ Political orientation (1=left, 5=right)         2.72 1.084          2139 
+
+Inter-Item Correlation Matrix
+
+                                       Life satisfaction (1=dissatisfied,    Environmental concern (1=low, 5=high) Political orientation (1=left,        
+                                       5=satisfied)                                                                5=right)                              
+ Life satisfaction (1=dissatisfied,    1.000                                 .002                                  .002                                  
+ 5=satisfied)                                                                                                                                            
+ Environmental concern (1=low, 5=high) .002                                  1.000                                 -.588                                 
+ Political orientation (1=left,        .002                                  -.588                                 1.000                                 
+ 5=right)                                                                                                                                                
+
+Item-Total Statistics
+
+                            Scale Mean if Item Deleted Scale Variance if Item     Corrected Item-Total       Squared Multiple           Cronbach's Alpha if Item   
+                                                       Deleted                    Correlation                Correlation                Deleted                    
+ Life satisfaction          6.30                       1.072                      .004                       1.77E-005                  -2.829(a)                  
+ (1=dissatisfied,                                                                                                                                                  
+ 5=satisfied)                                                                                                                                                      
+ Environmental concern      6.34                       2.529                      -.399                      .346                       .003                       
+ (1=low, 5=high)                                                                                                                                                   
+ Political orientation      7.20                       2.769                      -.419                      .346                       .004                       
+ (1=left, 5=right)                                                                                                                                                 
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== Test 1c ===========
+
+Reliability
+Scale: Full Scale
+Reliability Statistics
+
+ Cronbach's Alpha(a) Cronbach's Alpha Based on Standardized Items(a) N of Items 
+ -.208               -.204                                           6          
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+Item Statistics
+
+                                                 Mean Std. Deviation N    
+ Trust in government (1=none, 5=complete)        2.62 1.162          1826 
+ Trust in media (1=none, 5=complete)             2.43 1.147          1826 
+ Trust in science (1=none, 5=complete)           3.60 1.039          1826 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.65 1.154          1826 
+ Environmental concern (1=low, 5=high)           3.58 1.202          1826 
+ Political orientation (1=left, 5=right)         2.72 1.088          1826 
+
+Inter-Item Correlation Matrix
+
+                                     Trust in government (1=none,        Trust in media (1=none, 5=complete) Trust in science (1=none,           Life satisfaction (1=dissatisfied,  Environmental concern (1=low,       Political orientation (1=left,      
+                                     5=complete)                                                             5=complete)                         5=satisfied)                        5=high)                             5=right)                            
+ Trust in government (1=none,        1.000                               .022                                .024                                .012                                .064                                -.060                               
+ 5=complete)                                                                                                                                                                                                                                                 
+ Trust in media (1=none, 5=complete) .022                                1.000                               .017                                .044                                .005                                .011                                
+ Trust in science (1=none,           .024                                .017                                1.000                               -.016                               -.033                               .050                                
+ 5=complete)                                                                                                                                                                                                                                                 
+ Life satisfaction (1=dissatisfied,  .012                                .044                                -.016                               1.000                               .025                                -.006                               
+ 5=satisfied)                                                                                                                                                                                                                                                
+ Environmental concern (1=low,       .064                                .005                                -.033                               .025                                1.000                               -.594                               
+ 5=high)                                                                                                                                                                                                                                                     
+ Political orientation (1=left,      -.060                               .011                                .050                                -.006                               -.594                               1.000                               
+ 5=right)                                                                                                                                                                                                                                                    
+
+Item-Total Statistics
+
+                            Scale Mean if Item Deleted Scale Variance if Item     Corrected Item-Total       Squared Multiple           Cronbach's Alpha if Item   
+                                                       Deleted                    Correlation                Correlation                Deleted                    
+ Trust in government        15.98                      5.042                      .034                       .006                       -.326(a)                   
+ (1=none, 5=complete)                                                                                                                                              
+ Trust in media (1=none,    16.16                      4.998                      .050                       .003                       -.348(a)                   
+ 5=complete)                                                                                                                                                       
+ Trust in science (1=none,  15.00                      5.403                      .018                       .004                       -.283(a)                   
+ 5=complete)                                                                                                                                                       
+ Life satisfaction          14.95                      5.076                      .031                       .003                       -.320(a)                   
+ (1=dissatisfied,                                                                                                                                                  
+ 5=satisfied)                                                                                                                                                      
+ Environmental concern      15.02                      6.503                      -.225                      .354                       .046                       
+ (1=low, 5=high)                                                                                                                                                   
+ Political orientation      15.88                      6.967                      -.275                      .355                       .080                       
+ (1=left, 5=right)                                                                                                                                                 
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+Reliability
+Scale: Trust Scale
+Reliability Statistics
+
+ Cronbach's Alpha Cronbach's Alpha Based on Standardized Items N of Items 
+ .052             .053                                         3          
+
+Item Statistics
+
+                                          Mean Std. Deviation N       
+ Trust in government (1=none, 5=complete) 2.62 1.162          2150.20 
+ Trust in media (1=none, 5=complete)      2.43 1.158          2150.20 
+ Trust in science (1=none, 5=complete)    3.62 1.033          2150.20 
+
+Inter-Item Correlation Matrix
+
+                                     Trust in government (1=none,        Trust in media (1=none, 5=complete) Trust in science (1=none,           
+                                     5=complete)                                                             5=complete)                         
+ Trust in government (1=none,        1.000                               .017                                .021                                
+ 5=complete)                                                                                                                                     
+ Trust in media (1=none, 5=complete) .017                                1.000                               .017                                
+ Trust in science (1=none,           .021                                .017                                1.000                               
+ 5=complete)                                                                                                                                     
+
+Item-Total Statistics
+
+                            Scale Mean if Item Deleted Scale Variance if Item     Corrected Item-Total       Squared Multiple           Cronbach's Alpha if Item   
+                                                       Deleted                    Correlation                Correlation                Deleted                    
+ Trust in government        6.06                       2.451                      .026                       .001                       .033                       
+ (1=none, 5=complete)                                                                                                                                              
+ Trust in media (1=none,    6.25                       2.469                      .023                       .001                       .041                       
+ 5=complete)                                                                                                                                                       
+ Trust in science (1=none,  5.05                       2.737                      .027                       .001                       .033                       
+ 5=complete)                                                                                                                                                       
+
+=========== Test 2b ===========
+
+Reliability
+Scale: Attitude Scale
+Reliability Statistics
+
+ Cronbach's Alpha(a) Cronbach's Alpha Based on Standardized Items(a) N of Items 
+ -.929               -.957                                           3          
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+Item Statistics
+
+                                                 Mean Std. Deviation N       
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.160          2151.88 
+ Environmental concern (1=low, 5=high)           3.58 1.187          2151.88 
+ Political orientation (1=left, 5=right)         2.73 1.085          2151.88 
+
+Inter-Item Correlation Matrix
+
+                                       Life satisfaction (1=dissatisfied,    Environmental concern (1=low, 5=high) Political orientation (1=left,        
+                                       5=satisfied)                                                                5=right)                              
+ Life satisfaction (1=dissatisfied,    1.000                                 .002                                  -.001                                 
+ 5=satisfied)                                                                                                                                            
+ Environmental concern (1=low, 5=high) .002                                  1.000                                 -.586                                 
+ Political orientation (1=left,        -.001                                 -.586                                 1.000                                 
+ 5=right)                                                                                                                                                
+
+Item-Total Statistics
+
+                            Scale Mean if Item Deleted Scale Variance if Item     Corrected Item-Total       Squared Multiple           Cronbach's Alpha if Item   
+                                                       Deleted                    Correlation                Correlation                Deleted                    
+ Life satisfaction          6.31                       1.077                      .002                       6.37E-006                  -2.799(a)                  
+ (1=dissatisfied,                                                                                                                                                  
+ 5=satisfied)                                                                                                                                                      
+ Environmental concern      6.34                       2.520                      -.398                      .343                       -.002(a)                   
+ (1=low, 5=high)                                                                                                                                                   
+ Political orientation      7.20                       2.762                      -.419                      .343                       .005                       
+ (1=left, 5=right)                                                                                                                                                 
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== Test 2c ===========
+
+Reliability
+Scale: Full Scale
+Reliability Statistics
+
+ Cronbach's Alpha(a) Cronbach's Alpha Based on Standardized Items(a) N of Items 
+ -.203               -.200                                           6          
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+Item Statistics
+
+                                                 Mean Std. Deviation N       
+ Trust in government (1=none, 5=complete)        2.62 1.162          1837.79 
+ Trust in media (1=none, 5=complete)             2.44 1.150          1837.79 
+ Trust in science (1=none, 5=complete)           3.60 1.040          1837.79 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.65 1.153          1837.79 
+ Environmental concern (1=low, 5=high)           3.58 1.198          1837.79 
+ Political orientation (1=left, 5=right)         2.72 1.088          1837.79 
+
+Inter-Item Correlation Matrix
+
+                                     Trust in government (1=none,        Trust in media (1=none, 5=complete) Trust in science (1=none,           Life satisfaction (1=dissatisfied,  Environmental concern (1=low,       Political orientation (1=left,      
+                                     5=complete)                                                             5=complete)                         5=satisfied)                        5=high)                             5=right)                            
+ Trust in government (1=none,        1.000                               .024                                .025                                .017                                .067                                -.061                               
+ 5=complete)                                                                                                                                                                                                                                                 
+ Trust in media (1=none, 5=complete) .024                                1.000                               .020                                .043                                .002                                .013                                
+ Trust in science (1=none,           .025                                .020                                1.000                               -.021                               -.036                               .054                                
+ 5=complete)                                                                                                                                                                                                                                                 
+ Life satisfaction (1=dissatisfied,  .017                                .043                                -.021                               1.000                               .025                                -.010                               
+ 5=satisfied)                                                                                                                                                                                                                                                
+ Environmental concern (1=low,       .067                                .002                                -.036                               .025                                1.000                               -.591                               
+ 5=high)                                                                                                                                                                                                                                                     
+ Political orientation (1=left,      -.061                               .013                                .054                                -.010                               -.591                               1.000                               
+ 5=right)                                                                                                                                                                                                                                                    
+
+Item-Total Statistics
+
+                            Scale Mean if Item Deleted Scale Variance if Item     Corrected Item-Total       Squared Multiple           Cronbach's Alpha if Item   
+                                                       Deleted                    Correlation                Correlation                Deleted                    
+ Trust in government        15.99                      5.037                      .039                       .007                       -.326(a)                   
+ (1=none, 5=complete)                                                                                                                                              
+ Trust in media (1=none,    16.17                      5.006                      .051                       .003                       -.343(a)                   
+ 5=complete)                                                                                                                                                       
+ Trust in science (1=none,  15.01                      5.417                      .019                       .005                       -.278(a)                   
+ 5=complete)                                                                                                                                                       
+ Life satisfaction          14.96                      5.105                      .030                       .003                       -.311(a)                   
+ (1=dissatisfied,                                                                                                                                                  
+ 5=satisfied)                                                                                                                                                      
+ Environmental concern      15.03                      6.525                      -.224                      .351                       .050                       
+ (1=low, 5=high)                                                                                                                                                   
+ Political orientation      15.89                      6.973                      -.273                      .351                       .081                       
+ (1=left, 5=right)                                                                                                                                                 
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Reliability
+Scale: Trust Scale
+Reliability Statistics
+
+ Region (East/West) Cronbach's Alpha Cronbach's Alpha Based on Standardized Items N of Items 
+ East               .037             .042                                         3          
+ West               .050             .050                                         3          
+
+Item Statistics
+
+ Region (East/West)                                          Mean Std. Deviation N    
+ East               Trust in government (1=none, 5=complete) 2.62 1.165          422  
+                    Trust in media (1=none, 5=complete)      2.40 1.091          422  
+                    Trust in science (1=none, 5=complete)    3.66 1.009          422  
+ West               Trust in government (1=none, 5=complete) 2.62 1.161          1713 
+                    Trust in media (1=none, 5=complete)      2.44 1.172          1713 
+                    Trust in science (1=none, 5=complete)    3.62 1.040          1713 
+
+Inter-Item Correlation Matrix
+
+ Region (East/West)                             Trust in government         Trust in media (1=none,     Trust in science (1=none,   
+                                                (1=none, 5=complete)        5=complete)                 5=complete)                 
+ East               Trust in government         1.000                       -.017                       .001                        
+                    (1=none, 5=complete)                                                                                            
+                    Trust in media (1=none,     -.017                       1.000                       .060                        
+                    5=complete)                                                                                                     
+                    Trust in science (1=none,   .001                        .060                        1.000                       
+                    5=complete)                                                                                                     
+ West               Trust in government         1.000                       .021                        .025                        
+                    (1=none, 5=complete)                                                                                            
+                    Trust in media (1=none,     .021                        1.000                       .005                        
+                    5=complete)                                                                                                     
+                    Trust in science (1=none,   .025                        .005                        1.000                       
+                    5=complete)                                                                                                     
+
+Item-Total Statistics
+
+ Region (East/West)                    Scale Mean if Item Scale Variance if  Corrected          Squared Multiple   Cronbach's Alpha   
+                                       Deleted            Item Deleted       Item-Total         Correlation        if Item Deleted    
+                                                                             Correlation                                              
+ East               Trust in           6.06               2.339              -.012              .000               .112               
+                    government                                                                                                        
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in media     6.28               2.378              .026               .004               .002               
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in science   5.01               2.503              .042               .004               -.035(a)           
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+ West               Trust in           6.05               2.467              .032               .001               .010               
+                    government                                                                                                        
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in media     6.24               2.491              .019               .000               .049               
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in science   5.06               2.779              .021               .001               .041               
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== Test 3b ===========
+
+Reliability
+Scale: Attitude Scale
+Reliability Statistics
+
+ Region (East/West) Cronbach's Alpha(a) Cronbach's Alpha Based on Standardized Items(a) N of Items 
+ East               -.855               -.934                                           3          
+ West               -.948               -.964                                           3          
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+Item Statistics
+
+ Region (East/West)                                                 Mean Std. Deviation N    
+ East               Life satisfaction (1=dissatisfied, 5=satisfied) 3.61 1.219          411  
+                    Environmental concern (1=low, 5=high)           3.59 1.189          411  
+                    Political orientation (1=left, 5=right)         2.73 1.088          411  
+ West               Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.148          1728 
+                    Environmental concern (1=low, 5=high)           3.58 1.189          1728 
+                    Political orientation (1=left, 5=right)         2.72 1.083          1728 
+
+Inter-Item Correlation Matrix
+
+ Region (East/West)                             Life satisfaction           Environmental concern       Political orientation       
+                                                (1=dissatisfied,            (1=low, 5=high)             (1=left, 5=right)           
+                                                5=satisfied)                                                                        
+ East               Life satisfaction           1.000                       .014                        .016                        
+                    (1=dissatisfied,                                                                                                
+                    5=satisfied)                                                                                                    
+                    Environmental concern       .014                        1.000                       -.606                       
+                    (1=low, 5=high)                                                                                                 
+                    Political orientation       .016                        -.606                       1.000                       
+                    (1=left, 5=right)                                                                                               
+ West               Life satisfaction           1.000                       -.001                       -.002                       
+                    (1=dissatisfied,                                                                                                
+                    5=satisfied)                                                                                                    
+                    Environmental concern       -.001                       1.000                       -.584                       
+                    (1=low, 5=high)                                                                                                 
+                    Political orientation       -.002                       -.584                       1.000                       
+                    (1=left, 5=right)                                                                                               
+
+Item-Total Statistics
+
+ Region (East/West)                    Scale Mean if Item Scale Variance if  Corrected          Squared Multiple   Cronbach's Alpha   
+                                       Deleted            Item Deleted       Item-Total         Correlation        if Item Deleted    
+                                                                             Correlation                                              
+ East               Life satisfaction  6.32               1.028              .034               .001               -3.049(a)          
+                    (1=dissatisfied,                                                                                                  
+                    5=satisfied)                                                                                                      
+                    Environmental      6.34               2.713              -.390              .368               .032               
+                    concern (1=low,                                                                                                   
+                    5=high)                                                                                                           
+                    Political          7.20               2.942              -.409              .368               .029               
+                    orientation                                                                                                       
+                    (1=left, 5=right)                                                                                                 
+ West               Life satisfaction  6.30               1.083              -.003              1.08E-005          -2.780(a)          
+                    (1=dissatisfied,                                                                                                  
+                    5=satisfied)                                                                                                      
+                    Environmental      6.34               2.486              -.402              .341               -.004(a)           
+                    concern (1=low,                                                                                                   
+                    5=high)                                                                                                           
+                    Political          7.20               2.729              -.422              .341               -.002(a)           
+                    orientation                                                                                                       
+                    (1=left, 5=right)                                                                                                 
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Reliability
+Scale: Trust Scale
+Reliability Statistics
+
+ Region (East/West) Cronbach's Alpha Cronbach's Alpha Based on Standardized Items N of Items 
+ East               .061             .066                                         3          
+ West               .051             .050                                         3          
+
+Item Statistics
+
+ Region (East/West)                                          Mean Std. Deviation N       
+ East               Trust in government (1=none, 5=complete) 2.61 1.166          443.65  
+                    Trust in media (1=none, 5=complete)      2.40 1.092          443.65  
+                    Trust in science (1=none, 5=complete)    3.66 1.007          443.65  
+ West               Trust in government (1=none, 5=complete) 2.62 1.161          1706.55 
+                    Trust in media (1=none, 5=complete)      2.44 1.175          1706.55 
+                    Trust in science (1=none, 5=complete)    3.61 1.040          1706.55 
+
+Inter-Item Correlation Matrix
+
+ Region (East/West)                             Trust in government         Trust in media (1=none,     Trust in science (1=none,   
+                                                (1=none, 5=complete)        5=complete)                 5=complete)                 
+ East               Trust in government         1.000                       -.014                       .016                        
+                    (1=none, 5=complete)                                                                                            
+                    Trust in media (1=none,     -.014                       1.000                       .068                        
+                    5=complete)                                                                                                     
+                    Trust in science (1=none,   .016                        .068                        1.000                       
+                    5=complete)                                                                                                     
+ West               Trust in government         1.000                       .024                        .023                        
+                    (1=none, 5=complete)                                                                                            
+                    Trust in media (1=none,     .024                        1.000                       .006                        
+                    5=complete)                                                                                                     
+                    Trust in science (1=none,   .023                        .006                        1.000                       
+                    5=complete)                                                                                                     
+
+Item-Total Statistics
+
+ Region (East/West)                    Scale Mean if Item Scale Variance if  Corrected          Squared Multiple   Cronbach's Alpha   
+                                       Deleted            Item Deleted       Item-Total         Correlation        if Item Deleted    
+                                                                             Correlation                                              
+ East               Trust in           6.06               2.356              .000               .000               .127               
+                    government                                                                                                        
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in media     6.27               2.412              .034               .005               .030               
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in science   5.01               2.517              .058               .005               -.028(a)           
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+ West               Trust in           6.06               2.477              .033               .001               .011               
+                    government                                                                                                        
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in media     6.24               2.485              .021               .001               .044               
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+                    Trust in science   5.07               2.795              .020               .001               .047               
+                    (1=none,                                                                                                          
+                    5=complete)                                                                                                       
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+=========== Test 4b ===========
+
+Reliability
+Scale: Attitude Scale
+Reliability Statistics
+
+ Region (East/West) Cronbach's Alpha(a) Cronbach's Alpha Based on Standardized Items(a) N of Items 
+ East               -.882               -.956                                           3          
+ West               -.942               -.958                                           3          
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+
+Item Statistics
+
+ Region (East/West)                                                 Mean Std. Deviation N       
+ East               Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.214          429.65  
+                    Environmental concern (1=low, 5=high)           3.59 1.194          429.65  
+                    Political orientation (1=left, 5=right)         2.74 1.088          429.65  
+ West               Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.147          1722.24 
+                    Environmental concern (1=low, 5=high)           3.58 1.185          1722.24 
+                    Political orientation (1=left, 5=right)         2.73 1.084          1722.24 
+
+Inter-Item Correlation Matrix
+
+ Region (East/West)                             Life satisfaction           Environmental concern       Political orientation       
+                                                (1=dissatisfied,            (1=low, 5=high)             (1=left, 5=right)           
+                                                5=satisfied)                                                                        
+ East               Life satisfaction           1.000                       .012                        .011                        
+                    (1=dissatisfied,                                                                                                
+                    5=satisfied)                                                                                                    
+                    Environmental concern       .012                        1.000                       -.606                       
+                    (1=low, 5=high)                                                                                                 
+                    Political orientation       .011                        -.606                       1.000                       
+                    (1=left, 5=right)                                                                                               
+ West               Life satisfaction           1.000                       .000                        -.004                       
+                    (1=dissatisfied,                                                                                                
+                    5=satisfied)                                                                                                    
+                    Environmental concern       .000                        1.000                       -.580                       
+                    (1=low, 5=high)                                                                                                 
+                    Political orientation       -.004                       -.580                       1.000                       
+                    (1=left, 5=right)                                                                                               
+
+Item-Total Statistics
+
+ Region (East/West)                    Scale Mean if Item Scale Variance if  Corrected          Squared Multiple   Cronbach's Alpha   
+                                       Deleted            Item Deleted       Item-Total         Correlation        if Item Deleted    
+                                                                             Correlation                                              
+ East               Life satisfaction  6.33               1.033              .025               .001               -3.047(a)          
+                    (1=dissatisfied,                                                                                                  
+                    5=satisfied)                                                                                                      
+                    Environmental      6.35               2.686              -.394              .368               .021               
+                    concern (1=low,                                                                                                   
+                    5=high)                                                                                                           
+                    Political          7.21               2.934              -.415              .368               .024               
+                    orientation                                                                                                       
+                    (1=left, 5=right)                                                                                                 
+ West               Life satisfaction  6.31               1.089              -.004              2.76E-005          -2.741(a)          
+                    (1=dissatisfied,                                                                                                  
+                    5=satisfied)                                                                                                      
+                    Environmental      6.34               2.480              -.400              .337               -.009(a)           
+                    concern (1=low,                                                                                                   
+                    5=high)                                                                                                           
+                    Political          7.20               2.721              -.420              .337               -2.13E-005(a)      
+                    orientation                                                                                                       
+                    (1=left, 5=right)                                                                                                 
+a The value is negative due to a negative average covariance among items. This violates reliability model assumptions. You may want to check item codings.
+

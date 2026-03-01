@@ -1,0 +1,458 @@
+﻿NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=life_satisfaction BY education(1,4)                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+                  Highest educational attainment N    Mean Rank 
+ Life             Basic Secondary                809  974.29    
+ satisfaction     Intermediate Secondary         618  1250.73   
+ (1=dissatisfied, Academic Secondary             607  1329.56   
+ 5=satisfied)     University                     387  1456.42   
+                  Total                          2421           
+
+Test Statistics(a,b)
+
+                  Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Kruskal-Wallis H 171.178                                         
+ df               3                                               
+ Asymp. Sig.      .000                                            
+a Kruskal Wallis Test
+b Grouping Variable: Highest educational attainment
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=income BY employment(1,5)                                                       
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+           Employment status N    Mean Rank 
+ Monthly   Student           65   1495.58   
+ household Employed          1390 1075.60   
+ income    Unemployed        159  1073.29   
+ (EUR)     Retired           471  1089.83   
+           Other             101  1129.95   
+           Total             2186           
+
+Test Statistics(a,b)
+
+                  Monthly household income (EUR) 
+ Kruskal-Wallis H 28.026                         
+ df               4                              
+ Asymp. Sig.      .000                           
+a Kruskal Wallis Test
+b Grouping Variable: Employment status
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=trust_government BY education(1,4)                                              
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+             Highest educational attainment N    Mean Rank 
+ Trust in    Basic Secondary                791  1191.27   
+ government  Intermediate Secondary         592  1156.01   
+ (1=none,    Academic Secondary             595  1170.90   
+ 5=complete) University                     376  1192.82   
+             Total                          2354           
+
+Test Statistics(a,b)
+
+                  Trust in government (1=none, 5=complete) 
+ Kruskal-Wallis H 1.235                                    
+ df               3                                        
+ Asymp. Sig.      .745                                     
+a Kruskal Wallis Test
+b Grouping Variable: Highest educational attainment
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=life_satisfaction BY education(1,4)                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+                  Highest educational attainment N    Mean Rank 
+ Life             Basic Secondary                809  974.29    
+ satisfaction     Intermediate Secondary         618  1250.73   
+ (1=dissatisfied, Academic Secondary             607  1329.56   
+ 5=satisfied)     University                     387  1456.42   
+                  Total                          2421           
+
+Test Statistics(a,b)
+
+                  Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Kruskal-Wallis H 171.178                                         
+ df               3                                               
+ Asymp. Sig.      .000                                            
+a Kruskal Wallis Test
+b Grouping Variable: Highest educational attainment
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=income BY employment(1,5)                                                       
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+           Employment status N    Mean Rank 
+ Monthly   Student           65   1495.58   
+ household Employed          1390 1075.60   
+ income    Unemployed        159  1073.29   
+ (EUR)     Retired           471  1089.83   
+           Other             101  1129.95   
+           Total             2186           
+
+Test Statistics(a,b)
+
+                  Monthly household income (EUR) 
+ Kruskal-Wallis H 28.026                         
+ df               4                              
+ Asymp. Sig.      .000                           
+a Kruskal Wallis Test
+b Grouping Variable: Employment status
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=trust_government BY education(1,4)                                              
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+             Highest educational attainment N    Mean Rank 
+ Trust in    Basic Secondary                791  1191.27   
+ government  Intermediate Secondary         592  1156.01   
+ (1=none,    Academic Secondary             595  1170.90   
+ 5=complete) University                     376  1192.82   
+             Total                          2354           
+
+Test Statistics(a,b)
+
+                  Trust in government (1=none, 5=complete) 
+ Kruskal-Wallis H 1.235                                    
+ df               3                                        
+ Asymp. Sig.      .745                                     
+a Kruskal Wallis Test
+b Grouping Variable: Highest educational attainment
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=life_satisfaction BY education(1,4)                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+ Region (East/West)                  Highest educational attainment N    Mean Rank 
+ East               Life             Basic Secondary                161  202.35    
+                    satisfaction     Intermediate Secondary         119  232.99    
+                    (1=dissatisfied, Academic Secondary             110  254.85    
+                    5=satisfied)     University                     75   266.77    
+                                     Total                          465            
+ West               Life             Basic Secondary                648  771.38    
+                    satisfaction     Intermediate Secondary         499  1018.44   
+                    (1=dissatisfied, Academic Secondary             497  1075.24   
+                    5=satisfied)     University                     312  1190.70   
+                                     Total                          1956           
+
+Test Statistics(a,b)
+
+ Region (East/West)                  Life satisfaction (1=dissatisfied, 5=satisfied) 
+ East               Kruskal-Wallis H 17.105                                          
+                    df               3                                               
+                    Asymp. Sig.      .001                                            
+ West               Kruskal-Wallis H 158.807                                         
+                    df               3                                               
+                    Asymp. Sig.      .000                                            
+a Kruskal Wallis Test
+b Grouping Variable: Highest educational attainment
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=income BY employment(1,5)                                                       
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+ Region (East/West)           Employment status N    Mean Rank 
+ East               Monthly   Student           8    294.19    
+                    household Employed          273  213.94    
+                    income    Unemployed        28   170.63    
+                    (EUR)     Retired           100  230.44    
+                              Other             20   182.68    
+                              Total             429            
+ West               Monthly   Student           57   1201.74   
+                    household Employed          1117 862.13    
+                    income    Unemployed        131  898.09    
+                    (EUR)     Retired           371  858.55    
+                              Other             81   947.28    
+                              Total             1757           
+
+Test Statistics(a,b)
+
+ Region (East/West)                  Monthly household income (EUR) 
+ East               Kruskal-Wallis H 9.787                          
+                    df               4                              
+                    Asymp. Sig.      .044                           
+ West               Kruskal-Wallis H 26.570                         
+                    df               4                              
+                    Asymp. Sig.      .000                           
+a Kruskal Wallis Test
+b Grouping Variable: Employment status
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=life_satisfaction BY education(1,4)                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+ Region (East/West)                  Highest educational attainment N    Mean Rank 
+ East               Life             Basic Secondary                161  202.35    
+                    satisfaction     Intermediate Secondary         119  232.99    
+                    (1=dissatisfied, Academic Secondary             110  254.85    
+                    5=satisfied)     University                     75   266.77    
+                                     Total                          465            
+ West               Life             Basic Secondary                648  771.38    
+                    satisfaction     Intermediate Secondary         499  1018.44   
+                    (1=dissatisfied, Academic Secondary             497  1075.24   
+                    5=satisfied)     University                     312  1190.70   
+                                     Total                          1956           
+
+Test Statistics(a,b)
+
+ Region (East/West)                  Life satisfaction (1=dissatisfied, 5=satisfied) 
+ East               Kruskal-Wallis H 17.105                                          
+                    df               3                                               
+                    Asymp. Sig.      .001                                            
+ West               Kruskal-Wallis H 158.807                                         
+                    df               3                                               
+                    Asymp. Sig.      .000                                            
+a Kruskal Wallis Test
+b Grouping Variable: Highest educational attainment
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 15:05:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /K-W=income BY employment(1,5)                                                       
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Kruskal-Wallis Test
+Ranks
+
+ Region (East/West)           Employment status N    Mean Rank 
+ East               Monthly   Student           8    294.19    
+                    household Employed          273  213.94    
+                    income    Unemployed        28   170.63    
+                    (EUR)     Retired           100  230.44    
+                              Other             20   182.68    
+                              Total             429            
+ West               Monthly   Student           57   1201.74   
+                    household Employed          1117 862.13    
+                    income    Unemployed        131  898.09    
+                    (EUR)     Retired           371  858.55    
+                              Other             81   947.28    
+                              Total             1757           
+
+Test Statistics(a,b)
+
+ Region (East/West)                  Monthly household income (EUR) 
+ East               Kruskal-Wallis H 9.787                          
+                    df               4                              
+                    Asymp. Sig.      .044                           
+ West               Kruskal-Wallis H 26.570                         
+                    df               4                              
+                    Asymp. Sig.      .000                           
+a Kruskal Wallis Test
+b Grouping Variable: Employment status
+
