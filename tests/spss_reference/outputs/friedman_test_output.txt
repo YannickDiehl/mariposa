@@ -1,0 +1,337 @@
+﻿NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:53                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=trust_government trust_media trust_science                                 
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     393216                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+                                          Mean Rank 
+ Trust in government (1=none, 5=complete) 1.81      
+ Trust in media (1=none, 5=complete)      1.68      
+ Trust in science (1=none, 5=complete)    2.51      
+
+Test Statistics(a)
+
+ N           2135     
+ Chi-Square  1009.035 
+ df          2        
+ Asymp. Sig. .000     
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:53                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=life_satisfaction environmental_concern political_orientation              
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     393216                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+                                                 Mean Rank 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 2.21      
+ Environmental concern (1=low, 5=high)           2.17      
+ Political orientation (1=left, 5=right)         1.62      
+
+Test Statistics(a)
+
+ N           2139    
+ Chi-Square  553.909 
+ df          2       
+ Asymp. Sig. .000    
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:54                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=trust_government trust_media trust_science                                 
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     393216                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+                                          Mean Rank 
+ Trust in government (1=none, 5=complete) 1.81      
+ Trust in media (1=none, 5=complete)      1.68      
+ Trust in science (1=none, 5=complete)    2.51      
+
+Test Statistics(a)
+
+ N           2135     
+ Chi-Square  1009.035 
+ df          2        
+ Asymp. Sig. .000     
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:54                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=life_satisfaction environmental_concern political_orientation              
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     393216                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+                                                 Mean Rank 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 2.21      
+ Environmental concern (1=low, 5=high)           2.17      
+ Political orientation (1=left, 5=right)         1.62      
+
+Test Statistics(a)
+
+ N           2139    
+ Chi-Square  553.909 
+ df          2       
+ Asymp. Sig. .000    
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:54                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=trust_government trust_media trust_science                                 
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     393216                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+ Region (East/West)                                          Mean Rank 
+ East               Trust in government (1=none, 5=complete) 1.80      
+                    Trust in media (1=none, 5=complete)      1.67      
+                    Trust in science (1=none, 5=complete)    2.53      
+ West               Trust in government (1=none, 5=complete) 1.81      
+                    Trust in media (1=none, 5=complete)      1.68      
+                    Trust in science (1=none, 5=complete)    2.50      
+
+Test Statistics(a)
+
+ East N           422     
+      Chi-Square  217.100 
+      df          2       
+      Asymp. Sig. .000    
+ West N           1713    
+      Chi-Square  792.344 
+      df          2       
+      Asymp. Sig. .000    
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:54                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=trust_government trust_media trust_science                                 
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     393216                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+ Region (East/West)                                          Mean Rank 
+ East               Trust in government (1=none, 5=complete) 1.80      
+                    Trust in media (1=none, 5=complete)      1.67      
+                    Trust in science (1=none, 5=complete)    2.53      
+ West               Trust in government (1=none, 5=complete) 1.81      
+                    Trust in media (1=none, 5=complete)      1.68      
+                    Trust in science (1=none, 5=complete)    2.50      
+
+Test Statistics(a)
+
+ East N           422     
+      Chi-Square  217.100 
+      df          2       
+      Asymp. Sig. .000    
+ West N           1713    
+      Chi-Square  792.344 
+      df          2       
+      Asymp. Sig. .000    
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:54                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/longitudinal_data_wide.sav                                                       
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 120                                                                                   
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=score_T1 score_T2 score_T3 score_T4                                        
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     349525                                                                                
+a Based on availability of workspace memory.
+
+/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/longitudinal_data_wide.sav
+Friedman Test
+Ranks
+
+                         Mean Rank 
+ Outcome score at Time 1 1.65      
+ Outcome score at Time 2 2.31      
+ Outcome score at Time 3 2.84      
+ Outcome score at Time 4 3.20      
+
+Test Statistics(a)
+
+ N           75     
+ Chi-Square  61.192 
+ df          3      
+ Asymp. Sig. .000   
+a Friedman Test
+
+NPar Tests
+Notes
+
+ Output Created                               01-MAR-2026 14:48:54                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/longitudinal_data_wide.sav                                                       
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Treatment group (Control/Treatment)                                                   
+               N of Rows in Working Data File 120                                                                                   
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for all tests are based on cases with no missing data for any variables    
+                                              used.                                                                                 
+ Syntax                                       NPAR TESTS                                                                            
+                                               /FRIEDMAN=score_T1 score_T2 score_T3 score_T4                                        
+                                               /MISSING LISTWISE.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     349525                                                                                
+a Based on availability of workspace memory.
+
+Friedman Test
+Ranks
+
+ Treatment group (Control/Treatment)                         Mean Rank 
+ Control                             Outcome score at Time 1 2.08      
+                                     Outcome score at Time 2 2.51      
+                                     Outcome score at Time 3 2.62      
+                                     Outcome score at Time 4 2.79      
+ Treatment                           Outcome score at Time 1 1.19      
+                                     Outcome score at Time 2 2.08      
+                                     Outcome score at Time 3 3.08      
+                                     Outcome score at Time 4 3.64      
+
+Test Statistics(a)
+
+ Control   N           39     
+           Chi-Square  6.538  
+           df          3      
+           Asymp. Sig. .088   
+ Treatment N           36     
+           Chi-Square  75.933 
+           df          3      
+           Asymp. Sig. .000   
+a Friedman Test
+

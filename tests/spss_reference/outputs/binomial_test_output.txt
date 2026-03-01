@@ -1,0 +1,121 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+NPar Tests
+Binomial Test
+
+                   Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ Female    Group 1 Male     1306 .52            .50        .026                  
+ (0=Male,  Group 2 Female   1194 .48                                             
+ 1=Female) Total            2500 1.00                                            
+
+=========== Test 1b ===========
+
+NPar Tests
+Binomial Test
+
+                     Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ East region Group 1 East     485  .19            .50        .000                  
+ (0=West,    Group 2 West     2015 .81                                             
+ 1=East)     Total            2500 1.00                                            
+
+=========== Test 1c ===========
+
+NPar Tests
+Binomial Test
+
+                       Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ High Life     Group 1 High     1397 .58            .50        .000                  
+ Satisfaction  Group 2 Low      1024 .42                                             
+ (0=No, 1=Yes) Total            2421 1.00                                            
+
+=========== Test 1d ===========
+
+NPar Tests
+Binomial Test
+
+                       Category N    Observed Prop. Test Prop. Exact Sig. (1-tailed) 
+ High Life     Group 1 High     1397 .6             .6         .011(a)               
+ Satisfaction  Group 2 Low      1024 .4                                              
+ (0=No, 1=Yes) Total            2421 1.0                                             
+a Alternative hypothesis states that the proportion of cases in the first group < .6.
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+NPar Tests
+Binomial Test
+
+                   Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ Female    Group 1 Male     1306 .52            .50        .026                  
+ (0=Male,  Group 2 Female   1194 .48                                             
+ 1=Female) Total            2500 1.00                                            
+
+=========== Test 2b ===========
+
+NPar Tests
+Binomial Test
+
+                       Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ High Life     Group 1 High     1397 .58            .50        .000                  
+ Satisfaction  Group 2 Low      1024 .42                                             
+ (0=No, 1=Yes) Total            2421 1.00                                            
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+NPar Tests
+Binomial Test
+
+ Region (East/West)                   Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ East               Female    Group 1 Male     247  .51            .50        .716                  
+                    (0=Male,  Group 2 Female   238  .49                                             
+                    1=Female) Total            485  1.00                                            
+ West               Female    Group 1 Female   956  .47            .50        .023                  
+                    (0=Male,  Group 2 Male     1059 .53                                             
+                    1=Female) Total            2015 1.00                                            
+
+=========== Test 3b ===========
+
+NPar Tests
+Binomial Test
+
+ Region (East/West)                       Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ East               High Life     Group 1 High     271  .58            .50        .000                  
+                    Satisfaction  Group 2 Low      194  .42                                             
+                    (0=No, 1=Yes) Total            465  1.00                                            
+ West               High Life     Group 1 Low      830  .42            .50        .000                  
+                    Satisfaction  Group 2 High     1126 .58                                             
+                    (0=No, 1=Yes) Total            1956 1.00                                            
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+NPar Tests
+Binomial Test
+
+ Region (East/West)                   Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ East               Female    Group 1 Male     247  .51            .50        .716                  
+                    (0=Male,  Group 2 Female   238  .49                                             
+                    1=Female) Total            485  1.00                                            
+ West               Female    Group 1 Female   956  .47            .50        .023                  
+                    (0=Male,  Group 2 Male     1059 .53                                             
+                    1=Female) Total            2015 1.00                                            
+
+=========== Test 4b ===========
+
+NPar Tests
+Binomial Test
+
+ Region (East/West)                       Category N    Observed Prop. Test Prop. Exact Sig. (2-tailed) 
+ East               High Life     Group 1 High     271  .58            .50        .000                  
+                    Satisfaction  Group 2 Low      194  .42                                             
+                    (0=No, 1=Yes) Total            465  1.00                                            
+ West               High Life     Group 1 Low      830  .42            .50        .000                  
+                    Satisfaction  Group 2 High     1126 .58                                             
+                    (0=No, 1=Yes) Total            1956 1.00                                            
+
