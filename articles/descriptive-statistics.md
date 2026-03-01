@@ -75,9 +75,15 @@ Compare statistics across groups using
 survey_data %>%
   group_by(region) %>%
   describe(age, income, weights = sampling_weight)
+#> 
+#> Group: region = East
+#> --------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   52.278     53   17.595    77   24    0.098       477.0
 #>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#> 
+#> Group: region = West
+#> --------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.067     49   16.927    77   24    0.170      1993.1
 #>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
@@ -217,6 +223,9 @@ survey_data %>%
   frequency(education, weights = sampling_weight)
 #> 
 #> education (Highest educational attainment)
+#> 
+#> Group: gender = Male
+#> --------------------
 #> # total N=1195 valid N=1195 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -227,6 +236,10 @@ survey_data %>%
 #> |Academ|Academic Secondary  |326     |27.31   |27.31   |85.27   |
 #> |Univer|University          |176     |14.73   |14.73   |100.00  |
 #> +------+--------------------+--------+--------+--------+--------+
+#> 
+#> 
+#> Group: gender = Female
+#> ----------------------
 #> # total N=1321 valid N=1321 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -326,6 +339,10 @@ survey_data %>%
   group_by(region) %>%
   crosstab(education, employment, weights = sampling_weight)
 #> 
+#> 
+#> Group: region = East
+#> --------------------
+#> 
 #> Crosstabulation: education × employment
 #> -------------------------------------------------- 
 #> 
@@ -348,6 +365,10 @@ survey_data %>%
 #> Total                             12         320          33         123          21         509
 #> 
 #> N = 509 (Weighted)
+#> 
+#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Crosstabulation: education × employment
 #> -------------------------------------------------- 
@@ -499,9 +520,15 @@ survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction,
            weights = sampling_weight)
+#> 
+#> Group: region = East
+#> --------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> 
+#> Group: region = West
+#> --------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8

@@ -202,6 +202,10 @@ survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> 
+#> 
+#> Group: region = East
+#> --------------------
+#> 
 #> --- income ---
 #> 
 #>   Male: mean = 3873.994, n = 218.0
@@ -218,6 +222,10 @@ survey_data %>%
 #> ------------ 
 #>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>    income    0.159    0.158       0.149  negligible
+#> 
+#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> --- income ---
 #> 
@@ -769,12 +777,24 @@ A typical hypothesis testing workflow:
 survey_data %>%
   group_by(education) %>%
   describe(life_satisfaction, weights = sampling_weight)
+#> 
+#> Group: education = Basic Secondary
+#> ----------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
+#> 
+#> Group: education = Intermediate Secondary
+#> -----------------------------------------
 #>           Variable  Mean Median   SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
+#> 
+#> Group: education = Academic Secondary
+#> -------------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
+#> 
+#> Group: education = University
+#> -----------------------------
 #>           Variable Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
 

@@ -239,9 +239,8 @@ survey_data %>%
 #> Variables tested: gender x employment 
 #> Grouped by: region 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> Observed Frequencies:
 #>         var2
@@ -264,9 +263,8 @@ survey_data %>%
 #> Table size: 2×5 | N = 485
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Observed Frequencies:
 #>         var2

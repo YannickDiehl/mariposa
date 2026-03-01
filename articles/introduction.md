@@ -259,9 +259,15 @@ from dplyr to compare statistics across subgroups:
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction, weights = sampling_weight)
+#> 
+#> Group: region = East
+#> --------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> 
+#> Group: region = West
+#> --------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
@@ -376,12 +382,24 @@ survey_data %>%
 survey_data %>%
   group_by(education) %>%
   describe(life_satisfaction, weights = sampling_weight)
+#> 
+#> Group: education = Basic Secondary
+#> ----------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
+#> 
+#> Group: education = Intermediate Secondary
+#> -----------------------------------------
 #>           Variable  Mean Median   SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
+#> 
+#> Group: education = Academic Secondary
+#> -------------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
+#> 
+#> Group: education = University
+#> -----------------------------
 #>           Variable Mean Median    SD Range IQR Skewness Effective_N
 #>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
 

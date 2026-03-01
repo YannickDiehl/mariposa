@@ -297,6 +297,10 @@ midpoint)?</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Male: mean = 3873.994, n = 218.0</span></span>
@@ -313,6 +317,10 @@ midpoint)?</p>
 <span><span class="co">#&gt; ------------ </span></span>
 <span><span class="co">#&gt;  Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
 <span><span class="co">#&gt;    income    0.159    0.158       0.149  negligible</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -891,12 +899,24 @@ as fundamentally different</li>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: education = Basic Secondary</span></span>
+<span><span class="co">#&gt; ----------------------------------</span></span>
 <span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: education = Intermediate Secondary</span></span>
+<span><span class="co">#&gt; -----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable  Mean Median   SD Range IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: education = Academic Secondary</span></span>
+<span><span class="co">#&gt; -------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: education = University</span></span>
+<span><span class="co">#&gt; -----------------------------</span></span>
 <span><span class="co">#&gt;           Variable Mean Median    SD Range IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8</span></span>
 <span></span>

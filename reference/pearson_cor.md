@@ -314,9 +314,8 @@ survey_data %>%
 #> • Confidence level: 95.0%
 #> 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> Correlation Matrix:
 #> ------------------- 
@@ -350,9 +349,8 @@ survey_data %>%
 #>  income × life_satisfaction  0.448     0.201  0.0000  [0.367, 0.522] 410 ***
 #> ---------------- 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Correlation Matrix:
 #> ------------------- 

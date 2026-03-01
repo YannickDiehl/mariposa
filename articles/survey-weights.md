@@ -334,10 +334,16 @@ survey_data %>%
   group_by(region) %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight)
+#> 
+#> Group: region = East
+#> --------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   52.278     53   17.595    77   24    0.098       477.0
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> 
+#> Group: region = West
+#> --------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.067     49   16.927    77   24    0.170      1993.1
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
@@ -474,8 +480,14 @@ for (var in vars_to_check) {
 survey_data %>%
   group_by(region) %>%
   describe(income, weights = sampling_weight)
+#> 
+#> Group: region = East
+#> --------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#> 
+#> Group: region = West
+#> --------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 

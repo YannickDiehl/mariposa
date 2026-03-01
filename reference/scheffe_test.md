@@ -321,9 +321,8 @@ anova_grouped %>% scheffe_test()
 #>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -346,9 +345,8 @@ anova_grouped %>% scheffe_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> --- life_satisfaction ---
 #> 

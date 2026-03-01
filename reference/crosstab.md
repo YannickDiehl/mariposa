@@ -198,9 +198,8 @@ survey_data %>%
 #> ── Weighted Grouped Crosstabulation  ───────────────────────────────────────────
 #> 
 #> 
-#> 
-#> ── Group: employment = Student ──
-#> 
+#> Group: employment = Student
+#> ---------------------------
 #> 
 #> Crosstabulation: gender × region
 #> -------------------------------------------------- 
@@ -220,9 +219,8 @@ survey_data %>%
 #> N = 80 (Weighted)
 #> 
 #> 
-#> 
-#> ── Group: employment = Employed ──
-#> 
+#> Group: employment = Employed
+#> ----------------------------
 #> 
 #> Crosstabulation: gender × region
 #> -------------------------------------------------- 
@@ -242,9 +240,8 @@ survey_data %>%
 #> N = 1603 (Weighted)
 #> 
 #> 
-#> 
-#> ── Group: employment = Unemployed ──
-#> 
+#> Group: employment = Unemployed
+#> ------------------------------
 #> 
 #> Crosstabulation: gender × region
 #> -------------------------------------------------- 
@@ -264,9 +261,8 @@ survey_data %>%
 #> N = 184 (Weighted)
 #> 
 #> 
-#> 
-#> ── Group: employment = Retired ──
-#> 
+#> Group: employment = Retired
+#> ---------------------------
 #> 
 #> Crosstabulation: gender × region
 #> -------------------------------------------------- 
@@ -286,9 +282,8 @@ survey_data %>%
 #> N = 534 (Weighted)
 #> 
 #> 
-#> 
-#> ── Group: employment = Other ──
-#> 
+#> Group: employment = Other
+#> -------------------------
 #> 
 #> Crosstabulation: gender × region
 #> -------------------------------------------------- 

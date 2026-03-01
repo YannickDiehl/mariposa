@@ -386,9 +386,8 @@ survey_data %>%
 #> • Null hypothesis (mu): 0.000
 #> 
 #> 
-#> 
-#> ── Group: education = Basic Secondary ──
-#> 
+#> Group: education = Basic Secondary
+#> ----------------------------------
 #> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 404.7, n = 382.0
@@ -402,9 +401,8 @@ survey_data %>%
 #> --------------------------------------------------------- 
 #> 
 #> 
-#> 
-#> ── Group: education = Intermediate Secondary ──
-#> 
+#> Group: education = Intermediate Secondary
+#> -----------------------------------------
 #> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 301.9, n = 281.0
@@ -418,9 +416,8 @@ survey_data %>%
 #> -------------------------------------------------------- 
 #> 
 #> 
-#> 
-#> ── Group: education = Academic Secondary ──
-#> 
+#> Group: education = Academic Secondary
+#> -------------------------------------
 #> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 304.9, n = 305.0
@@ -434,9 +431,8 @@ survey_data %>%
 #> ------------------------------------------------------- 
 #> 
 #> 
-#> 
-#> ── Group: education = University ──
-#> 
+#> Group: education = University
+#> -----------------------------
 #> ── life_satisfaction ───────────────────────────────────────────────────────────
 #> 
 #>   Male: rank mean = 186.7, n = 181.0

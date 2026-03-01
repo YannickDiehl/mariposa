@@ -265,9 +265,8 @@ survey_data %>%
 #> • Missing data handling: pairwise deletion
 #> • Alternative hypothesis: two.sided
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> Spearman's Rho Matrix:
 #> --------------------------------------------------------------------- 
@@ -298,9 +297,8 @@ survey_data %>%
 #>  income × life_satisfaction  0.440  9.886 0.0000 410 ***
 #> --------------------------------------------------------------------- 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Spearman's Rho Matrix:
 #> --------------------------------------------------------------------- 

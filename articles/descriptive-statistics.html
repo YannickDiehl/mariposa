@@ -154,9 +154,15 @@ correcting for sampling biases.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;       age   52.278     53   17.595    77   24    0.098       477.0</span></span>
 <span><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;       age   50.067     49   16.927    77   24    0.170      1993.1</span></span>
 <span><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span></code></pre></div>
@@ -302,6 +308,9 @@ non-response is meaningful.</p>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education (Highest educational attainment)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: gender = Male</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; # total N=1195 valid N=1195 mean=NA sd=NA skewness=NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; +------+--------------------+--------+--------+--------+--------+</span></span>
@@ -312,6 +321,10 @@ non-response is meaningful.</p>
 <span><span class="co">#&gt; |Academ|Academic Secondary  |326     |27.31   |27.31   |85.27   |</span></span>
 <span><span class="co">#&gt; |Univer|University          |176     |14.73   |14.73   |100.00  |</span></span>
 <span><span class="co">#&gt; +------+--------------------+--------+--------+--------+--------+</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: gender = Female</span></span>
+<span><span class="co">#&gt; ----------------------</span></span>
 <span><span class="co">#&gt; # total N=1321 valid N=1321 mean=NA sd=NA skewness=NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; +------+--------------------+--------+--------+--------+--------+</span></span>
@@ -418,6 +431,10 @@ level?”</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
 <span><span class="co">#&gt; -------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -440,6 +457,10 @@ level?”</p>
 <span><span class="co">#&gt; Total                             12         320          33         123          21         509</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; N = 509 (Weighted)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
 <span><span class="co">#&gt; -------------------------------------------------- </span></span>
@@ -603,9 +624,15 @@ percentages</li>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span></code></pre></div>

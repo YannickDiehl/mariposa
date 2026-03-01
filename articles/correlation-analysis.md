@@ -142,6 +142,10 @@ survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
+#> 
+#> Group: region = East
+#> --------------------
+#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
@@ -150,6 +154,9 @@ survey_data %>%
 #>   95% CI: [-0.043, 0.142]
 #>   p-value: 0.2931
 #>   Significance: ns
+#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> --- age × income ---
 #> 
@@ -744,6 +751,10 @@ survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
+#> 
+#> Group: region = East
+#> --------------------
+#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
@@ -752,6 +763,9 @@ survey_data %>%
 #>   95% CI: [-0.043, 0.142]
 #>   p-value: 0.2931
 #>   Significance: ns
+#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> --- age × income ---
 #> 

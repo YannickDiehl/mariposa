@@ -481,9 +481,8 @@ survey_data %>%
 #>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -512,9 +511,8 @@ survey_data %>%
 #>  life_satisfaction       0.043           0.037         0.037       small
 #> 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> --- life_satisfaction ---
 #> 

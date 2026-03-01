@@ -317,9 +317,8 @@ anova_grouped %>% tukey_test()
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -342,9 +341,8 @@ anova_grouped %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> --- life_satisfaction ---
 #> 

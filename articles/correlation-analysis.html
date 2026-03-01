@@ -252,6 +252,10 @@ Perfect negative correlation</li>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = 0.050</span></span>
@@ -260,6 +264,9 @@ Perfect negative correlation</li>
 <span><span class="co">#&gt;   95% CI: [-0.043, 0.142]</span></span>
 <span><span class="co">#&gt;   p-value: 0.2931</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -913,6 +920,10 @@ may be non-linear.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = 0.050</span></span>
@@ -921,6 +932,9 @@ may be non-linear.</p>
 <span><span class="co">#&gt;   95% CI: [-0.043, 0.142]</span></span>
 <span><span class="co">#&gt;   p-value: 0.2931</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
 <span><span class="co">#&gt; </span></span>

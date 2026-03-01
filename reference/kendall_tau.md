@@ -250,9 +250,8 @@ survey_data %>%
 #> • Alternative hypothesis: two.sided
 #> 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> Kendall's Tau-b Matrix:
 #> ----------------------- 
@@ -286,9 +285,8 @@ survey_data %>%
 #>  income × life_satisfaction  0.338  9.099 0.0000 410 ***
 #> --------------------------------------------------------------------- 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Kendall's Tau-b Matrix:
 #> ----------------------- 
