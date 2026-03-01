@@ -6,11 +6,11 @@ mariposa is a comprehensive R package for professional statistical analysis of s
 
 ### Package Purpose
 - **Primary Goal**: Provide SPSS-compatible statistical analysis for survey researchers migrating from SPSS to R
-- **Key Differentiator**: 100% validated results matching SPSS output (83/83 tests pass)
+- **Key Differentiator**: 100% validated results matching SPSS output (2,227+ tests pass)
 - **Target Users**: Survey researchers, data scientists, statistical analysts working with complex survey designs
 
 ### Core Capabilities
-- 46+ statistical functions across 6 categories
+- 37 exported functions across 9 categories
 - Full survey weight support with 11 specialized `w_*` functions
 - Tidyverse integration (dplyr, tidyselect, group_by support)
 - S3 generics system for extensible post-hoc analysis
@@ -20,20 +20,29 @@ mariposa is a comprehensive R package for professional statistical analysis of s
 
 ```
 mariposa/
-├── R/                          # Source code (31 function files)
+├── R/                          # Source code (39 function files)
 │   ├── describe.R              # Descriptive statistics
 │   ├── frequency.R             # Frequency tables
 │   ├── crosstab.R              # Cross-tabulation analysis
 │   ├── t_test.R                # T-tests (paired/independent)
-│   ├── oneway_anova_test.R     # One-way ANOVA
-│   ├── chi_squared_test.R      # Chi-square tests
-│   ├── mann_whitney_test.R     # Non-parametric tests
+│   ├── oneway_anova.R          # One-way ANOVA
+│   ├── chi_square.R            # Chi-square tests
+│   ├── mann_whitney.R          # Mann-Whitney U test
+│   ├── kruskal_wallis.R        # Kruskal-Wallis H test (v0.3.0)
+│   ├── wilcoxon_test.R         # Wilcoxon signed-rank test (v0.3.0)
+│   ├── friedman_test.R         # Friedman test (v0.3.0)
+│   ├── binomial_test.R         # Binomial test (v0.3.0)
 │   ├── pearson_cor.R           # Pearson correlation
 │   ├── spearman_rho.R          # Spearman correlation
 │   ├── kendall_tau.R           # Kendall's tau
 │   ├── tukey_test.R            # Post-hoc Tukey HSD
 │   ├── scheffe_test.R          # Post-hoc Scheffe test
 │   ├── levene_test.R           # Homogeneity of variance
+│   ├── reliability.R           # Cronbach's Alpha (v0.2.0)
+│   ├── efa.R                   # Exploratory Factor Analysis (v0.2.0)
+│   ├── scale_helpers.R         # scale_index() and pomps() (v0.2.0)
+│   ├── linear_regression.R     # Linear regression (v0.2.0)
+│   ├── logistic_regression.R   # Logistic regression (v0.2.0)
 │   ├── w_*.R                   # Weighted statistics (11 files)
 │   ├── helpers.R               # Utility functions
 │   ├── globals.R               # Global variables
@@ -44,11 +53,13 @@ mariposa/
 │   ├── testthat/              # Unit tests with SPSS validation
 │   └── spss_reference/        # SPSS reference data
 │
-├── vignettes/                  # User guides (5 comprehensive guides)
+├── vignettes/                  # User guides (7 comprehensive guides)
 │   ├── introduction.Rmd        # Getting started guide
 │   ├── descriptive-statistics.Rmd
 │   ├── hypothesis-testing.Rmd
 │   ├── correlation-analysis.Rmd
+│   ├── scale-analysis.Rmd      # Reliability, EFA, scale construction (v0.2.0)
+│   ├── regression-analysis.Rmd # Linear and logistic regression (v0.2.0)
 │   └── survey-weights.Rmd
 │
 ├── data/                       # Example datasets
@@ -205,8 +216,8 @@ data %>%
 ### S3 Generic Pattern
 ```r
 # Primary function creates classed result
-result <- oneway_anova_test(...)
-class(result) <- c("anova_test_result", "data.frame")
+result <- oneway_anova(...)
+class(result) <- "oneway_anova"
 
 # S3 methods dispatch on result class
 tukey_test(result)  # Works automatically
@@ -253,42 +264,45 @@ tukey_test(result)  # Works automatically
 - `frequency()` - Categorical frequency tables
 - `crosstab()` - Cross-tabulations with percentages
 
-### 2. Hypothesis Testing (6 functions)
+### 2. Hypothesis Testing (4 functions)
 - `t_test()` - Independent/paired t-tests
 - `oneway_anova()` - One-way ANOVA
-- `mann_whitney()` - Non-parametric alternative
+- `mann_whitney()` - Mann-Whitney U test
 - `chi_square()` - Independence tests
-- `rm_t_test()` - Repeated measures t-test
-- `rm_anova_test()` - Repeated measures ANOVA
 
-### 3. Correlation Analysis (3 functions)
+### 3. Non-Parametric Tests (4 functions, v0.3.0)
+- `kruskal_wallis()` - Kruskal-Wallis H test (3+ independent groups)
+- `wilcoxon_test()` - Wilcoxon signed-rank test (paired)
+- `friedman_test()` - Friedman test (3+ related measurements)
+- `binomial_test()` - Exact binomial test (proportions)
+
+### 4. Correlation Analysis (3 functions)
 - `pearson_cor()` - Linear correlation
 - `spearman_rho()` - Rank correlation
 - `kendall_tau()` - Ordinal correlation
 
-### 4. Post-Hoc Analysis (5 S3 generics)
+### 5. Post-Hoc Analysis (3 S3 generics)
 - `tukey_test()` - Tukey HSD comparisons
 - `scheffe_test()` - Scheffe comparisons
 - `levene_test()` - Variance homogeneity
-- `emmeans()` - Estimated marginal means
-- `mauchly_test()` - Sphericity test
 
-### 5. Weighted Statistics (11 functions)
+### 6. Scale Analysis (4 functions, v0.2.0)
+- `reliability()` - Cronbach's Alpha with item statistics
+- `efa()` - Exploratory Factor Analysis (PCA, Varimax, Oblimin)
+- `scale_index()` - Mean index across items
+- `pomps()` - Percent of Maximum Possible Scores transformation
+
+### 7. Regression Analysis (2 functions, v0.2.0)
+- `linear_regression()` - Linear regression with SPSS-style output (wrapper around `stats::lm()`)
+- `logistic_regression()` - Logistic regression with odds ratios (wrapper around `stats::glm()`)
+
+### 8. Weighted Statistics (11 functions)
 - `w_mean()`, `w_median()`, `w_sd()`, `w_var()`
 - `w_quantile()`, `w_iqr()`, `w_range()`
 - `w_skew()`, `w_kurtosis()`, `w_se()`, `w_modus()`
 
-### 6. Print Methods (20+ methods)
-- Professional output formatting for all result types
-
-### 7. Planned for v0.2.0 (Scale Analysis & Regression)
-- `reliability()` - Cronbach's Alpha with item statistics (genuine implementation)
-- `efa()` - Exploratory Factor Analysis with PCA, Varimax, Oblimin (hybrid: Base R + GPArotation)
-- `scale_index()` - Mean index across items (genuine implementation)
-- `pomps()` - Percent of Maximum Possible Scores transformation (genuine implementation)
-- `linear_regression()` - Linear regression with SPSS-style output (wrapper around `stats::lm()`)
-- `logistic_regression()` - Logistic regression with odds ratios (wrapper around `stats::glm()`)
-- See [Implementation Roadmap](IMPLEMENTATION_ROADMAP.md) for full details
+### 9. Effect Size Helpers (3 functions)
+- `phi()`, `cramers_v()`, `goodman_gamma()`
 
 ## 🚀 Build & Release
 
@@ -304,7 +318,7 @@ tukey_test(result)  # Works automatically
 - [ ] Vignettes build (`devtools::build_vignettes()`)
 - [ ] NEWS.md updated
 - [ ] Version bumped in DESCRIPTION
-- [ ] SPSS validation complete (83/83 tests)
+- [ ] SPSS validation complete
 
 ### CRAN Submission
 ```r
@@ -319,14 +333,14 @@ devtools::release()
 ## 📚 Important Links
 
 ### Internal Resources (in .claude/)
-- [Implementation Roadmap v0.2.0](IMPLEMENTATION_ROADMAP.md) - Strategic plan for new functions
+- [Implementation Roadmap](IMPLEMENTATION_ROADMAP.md) - Strategic plan for new functions (v0.2.0 + v0.3.0)
 - [SPSS Validation Guide](spss-validation-guide.md)
 - [Test Template](spss-validation-test.R)
 - [SPSS Syntax Template](spss-syntax-template.sps)
 - [Print Method Style Guide](PRINT_METHOD_STYLE_GUIDE.md)
 
 ### External Resources
-- [Package Website](https://yourusername.github.io/mariposa/)
+- [Package Website](https://YannickDiehl.github.io/mariposa/)
 - [GitHub Repository](https://github.com/YannickDiehl/mariposa)
 - [Issue Tracker](https://github.com/YannickDiehl/mariposa/issues)
 
@@ -368,10 +382,11 @@ trace(.validate_weights, browser)
 ## 📝 Version History
 
 - **0.1.0**: Initial release with 27 exported functions, full SPSS validation (83/83 tests)
-- **0.2.0** (planned): Scale analysis (reliability, EFA) + regression (linear, logistic)
-- Future: Non-parametric extensions, factorial ANOVA, cluster analysis
+- **0.2.0**: Scale analysis (reliability, EFA, scale_index, pomps) + regression (linear, logistic) - 6 new functions
+- **0.3.0**: Non-parametric tests (kruskal_wallis, wilcoxon_test, friedman_test, binomial_test) - 4 new functions, 294 SPSS validations
+- Future: Factorial ANOVA, cluster analysis
 
 ---
 
-*Last updated: February 2026*
+*Last updated: March 2026*
 *Maintained by: Yannick Diehl*
