@@ -424,7 +424,7 @@ test_that("Print method works without error", {
   # Weighted
   result_w <- logistic_regression(survey_data, high_satisfaction ~ age,
                                   weights = sampling_weight)
-  expect_output(print(result_w), "\\[Weighted\\]")
+  expect_output(print(result_w), "Weighted Logistic Regression")
 
   # Grouped
   result_g <- logistic_regression(

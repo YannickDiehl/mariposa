@@ -2,7 +2,7 @@
 % Please edit documentation in R/logistic_regression.R
 \name{logistic_regression}
 \alias{logistic_regression}
-\title{Logistic Regression Analysis}
+\title{Run a Logistic Regression}
 \usage{
 logistic_regression(
   data,
@@ -14,8 +14,8 @@ logistic_regression(
 )
 }
 \arguments{
-\item{data}{A data frame or tibble. If grouped (via \code{dplyr::group_by()}),
-separate regressions are run for each group.}
+\item{data}{Your survey data (a data frame or tibble). If grouped
+(via \code{dplyr::group_by()}), separate regressions are run for each group.}
 
 \item{formula}{A formula specifying the model (e.g., \code{y ~ x1 + x2}).
 If provided, \code{dependent} and \code{predictors} are ignored.}
@@ -50,9 +50,9 @@ An object of class \code{"logistic_regression"} containing:
 }
 }
 \description{
-Performs binary logistic regression with SPSS-compatible output.
-Wraps \code{stats::glm(family = binomial)} and adds odds ratios,
-pseudo R-squared measures, classification table, and model tests
+\code{logistic_regression()} performs binary logistic regression with
+SPSS-compatible output. Wraps \code{stats::glm(family = binomial)} and adds
+odds ratios, pseudo R-squared measures, classification table, and model tests
 matching SPSS LOGISTIC REGRESSION output.
 
 Supports two interface styles:
@@ -62,6 +62,43 @@ Supports two interface styles:
 }
 }
 \details{
+\subsection{Understanding the Results}{
+
+The output includes five sections matching SPSS LOGISTIC REGRESSION output:
+\itemize{
+\item \strong{Omnibus Test}: Tests whether the model as a whole is significant.
+A significant chi-square means the model predicts better than chance.
+\item \strong{Model Summary}: -2 Log Likelihood and pseudo R-squared values.
+Lower -2LL = better fit. Higher R-squared = more variance explained.
+\item \strong{Hosmer-Lemeshow Test}: Goodness-of-fit test. A non-significant
+result (p > 0.05) means the model fits the data well.
+\item \strong{Classification Table}: How well the model classifies cases.
+Shows percentage correctly predicted for each group and overall.
+\item \strong{Coefficients}: B, Wald test, odds ratios (Exp(B)), and CIs.
+}
+
+Interpreting odds ratios (Exp(B)):
+\itemize{
+\item \strong{Exp(B) > 1}: Predictor increases the odds of the outcome
+\item \strong{Exp(B) < 1}: Predictor decreases the odds of the outcome
+\item \strong{Exp(B) = 1}: Predictor has no effect on the odds
+}
+}
+
+\subsection{When to Use This}{
+
+Use \code{logistic_regression()} when:
+\itemize{
+\item Your dependent variable is binary (yes/no, 0/1, pass/fail)
+\item You want to predict group membership from one or more predictors
+\item You need odds ratios to interpret predictor effects
+}
+
+For continuous outcomes, use \code{\link{linear_regression}} instead.
+}
+
+\subsection{Technical Details}{
+
 \strong{Dependent Variable}: Must be binary. Factors with exactly 2 levels
 are automatically converted to 0/1 (first level = 0, second level = 1).
 Numeric variables must contain only 0 and 1 values.
@@ -83,7 +120,11 @@ weights (matching SPSS WEIGHT BY behavior).
 \code{dplyr::group_by()}, a separate regression is run for each group
 (matching SPSS SPLIT FILE BY).
 }
+}
 \examples{
+library(dplyr)
+data(survey_data)
+
 # Create binary DV
 survey_data$high_satisfaction <- ifelse(survey_data$life_satisfaction >= 4, 1, 0)
 
@@ -108,3 +149,12 @@ survey_data |>
   logistic_regression(high_satisfaction ~ age)
 
 }
+\seealso{
+\code{\link{linear_regression}} for continuous outcome variables.
+
+\code{\link{chi_square}} for testing associations between categorical variables.
+
+Other regression: 
+\code{\link{linear_regression}()}
+}
+\concept{regression}

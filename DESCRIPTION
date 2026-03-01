@@ -31,7 +31,8 @@ Suggests:
     covr,
     haven (>= 2.4.0),
     survey,
-    GPArotation
+    GPArotation,
+    MASS
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
