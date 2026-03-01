@@ -36,7 +36,13 @@ mariposa umfasst aktuell **27 exportierte Funktionen** in 6 Kategorien:
 
 ### 1.3 Validierungsstatus
 
-83/83 SPSS-Validierungstests bestanden. Toleranzen:
+**v0.1.0:** 83/83 SPSS-Validierungstests bestanden.
+**v0.2.0:** 6 neue Funktionen (reliability, efa, scale_index, pomps, linear_regression, logistic_regression) - SPSS-validiert (Branch: condescending-tesla).
+**v0.3.0:** 294 neue SPSS-Validierungen (Kruskal-Wallis, Wilcoxon, Friedman, Binomial).
+**Gesamt (v0.3.0 Branch): 2227 Tests bestanden (0 Fehler, 0 Skips).**
+**Gesamt (v0.2.0 Branch): 2613 Tests bestanden (laut Commit-Nachricht).**
+
+Toleranzen:
 - Counts: Exakt (0)
 - Prozente: +/- 0.1
 - Teststatistiken: +/- 0.00001
@@ -81,28 +87,28 @@ Die SPSS-Syntax deckt folgende Verfahren ab:
 
 Das Referenzdiagramm "Art der Analyse" zeigt den vollstaendigen Methodenkanon. Folgende Verfahren fehlen **zusaetzlich** zur SPSS-Syntax:
 
-| Kategorie | Verfahren | Skalenniveau | Prioritaet |
+| Kategorie | Verfahren | Skalenniveau | Status |
 |---|---|---|---|
 | **Unterschiede - Unabhaengig** | | | |
-| | Kruskal-Wallis-Test | Ordinal | Mittel |
-| | Mehrfaktorielle ANOVA | Intervall | Niedrig |
+| | Kruskal-Wallis-Test | Ordinal | **v0.3.0 ERLEDIGT** |
+| | Mehrfaktorielle ANOVA | Intervall | Offen |
 | **Unterschiede - Verbunden** | | | |
-| | Wilcoxon-Vorzeichen-Rang-Test | Ordinal | Mittel |
-| | Vorzeichentest | Ordinal | Niedrig |
-| | Friedman-Test | Ordinal | Mittel |
+| | Wilcoxon-Vorzeichen-Rang-Test | Ordinal | **v0.3.0 ERLEDIGT** |
+| | Vorzeichentest | Ordinal | Offen |
+| | Friedman-Test | Ordinal | **v0.3.0 ERLEDIGT** |
 | **Dependenzanalyse** | | | |
-| | Binomial-Test | Nominal | Niedrig |
+| | Binomial-Test | Nominal | **v0.3.0 ERLEDIGT** |
 | **Interdependenzanalyse** | | | |
-| | Clusteranalyse | Intervall | Niedrig |
+| | Clusteranalyse | Intervall | Offen |
 
 ### 2.3 Zusammenfassung der Luecken
 
 **Aus der SPSS-Kurs-Syntax (Prioritaet HOCH):**
-1. `reliability()` - Cronbachs Alpha mit Item-Statistiken
-2. `efa()` - Explorative Faktorenanalyse (PCA, Varimax, Oblimin)
-3. `scale_index()` / `pomps()` - Skalenbildung und Normierung
-4. `linear_regression()` - Bivariate und multiple lineare Regression
-5. `logistic_regression()` - Binaere logistische Regression
+1. `reliability()` - Cronbachs Alpha mit Item-Statistiken - **v0.2.0 ERLEDIGT**
+2. `efa()` - Explorative Faktorenanalyse (PCA, Varimax, Oblimin) - **v0.2.0 ERLEDIGT**
+3. `scale_index()` / `pomps()` - Skalenbildung und Normierung - **v0.2.0 ERLEDIGT**
+4. `linear_regression()` - Bivariate und multiple lineare Regression - **v0.2.0 ERLEDIGT**
+5. `logistic_regression()` - Binaere logistische Regression - **v0.2.0 ERLEDIGT**
 6. `crosstab()` Erweiterung - 3-Wege-Tabellen (AV BY UV BY Schicht)
 
 **Aus dem Diagramm (Prioritaet MITTEL bis NIEDRIG):**
@@ -306,15 +312,15 @@ Folgende SPSS-Befehle werden **nicht** als eigene Funktionen implementiert, da s
 ### 5.1 Phasenuebersicht
 
 ```
-Phase 1: Skalenanalyse          [~4 Tage]  -> reliability(), efa(), scale_index(), pomps()
-Phase 2: Regressionsanalyse     [~4 Tage]  -> linear_regression(), logistic_regression()
-Phase 3: Erweiterungen          [~3 Tage]  -> crosstab() 3-Wege, nicht-parametrische Tests
-Phase 4: Validierung & Doku     [~2 Tage]  -> SPSS-Validierung, Vignetten, pkgdown
+Phase 1: Skalenanalyse          [ERLEDIGT]  -> reliability(), efa(), scale_index(), pomps()
+Phase 2: Regressionsanalyse     [ERLEDIGT]  -> linear_regression(), logistic_regression()
+Phase 3: Erweiterungen          [ERLEDIGT]  -> nicht-parametrische Tests (4 Funktionen)
+Phase 4: Validierung & Doku     [LAUFEND]   -> SPSS-Validierung, Vignetten, pkgdown
 ```
 
-### 5.2 Phase 1: Skalenanalyse (4 Tage)
+### 5.2 Phase 1: Skalenanalyse - **ERLEDIGT**
 
-#### Tag 1: `reliability()` - Cronbachs Alpha
+#### Tag 1: `reliability()` - Cronbachs Alpha - **ERLEDIGT**
 
 **Datei:** `R/reliability.R`
 **S3-Klasse:** `reliability`
@@ -364,7 +370,7 @@ RELIABILITY
 
 ---
 
-#### Tag 2-3: `efa()` - Explorative Faktorenanalyse
+#### Tag 2-3: `efa()` - Explorative Faktorenanalyse - **ERLEDIGT**
 
 **Datei:** `R/efa.R`
 **S3-Klasse:** `efa`
@@ -436,7 +442,7 @@ FACTOR
 
 ---
 
-#### Tag 3-4: `scale_index()` und `pomps()`
+#### Tag 3-4: `scale_index()` und `pomps()` - **ERLEDIGT**
 
 **Datei:** `R/scale_helpers.R`
 
@@ -467,9 +473,9 @@ data <- data %>% mutate(v81p = pomps(., v81, scale_min = 1, scale_max = 7))
 
 ---
 
-### 5.3 Phase 2: Regressionsanalyse (4 Tage)
+### 5.3 Phase 2: Regressionsanalyse - **ERLEDIGT**
 
-#### Tag 5-7: `linear_regression()` - Lineare Regression
+#### Tag 5-7: `linear_regression()` - Lineare Regression - **ERLEDIGT**
 
 **Datei:** `R/linear_regression.R`
 **S3-Klasse:** `linear_regression`
@@ -518,7 +524,7 @@ REGRESSION
 
 ---
 
-#### Tag 7-8: `logistic_regression()` - Logistische Regression
+#### Tag 7-8: `logistic_regression()` - Logistische Regression - **ERLEDIGT**
 
 **Datei:** `R/logistic_regression.R`
 **S3-Klasse:** `logistic_regression`
@@ -550,7 +556,7 @@ list(
 
 ---
 
-### 5.4 Phase 3: Erweiterungen (3 Tage)
+### 5.4 Phase 3: Erweiterungen - **ERLEDIGT**
 
 #### Tag 9: Entfaellt - 3-Wege-Kreuztabellen
 
@@ -563,14 +569,25 @@ list(
 > SPSS: `CROSSTABS /TABLES=pv01r BY eastwest BY sexr`
 > mariposa: `data %>% group_by(sexr) %>% crosstab(row = pv01r, col = eastwest)`
 
-#### Tag 9-10: Nicht-parametrische Tests (optional)
+#### Tag 9-10: Nicht-parametrische Tests - **ERLEDIGT (v0.3.0)**
 
-Falls zeitlich moeglich:
-- `kruskal_wallis()` - Wrapper um `stats::kruskal.test()` mit mariposa-Formatting
-- `wilcoxon_test()` - Wrapper um `stats::wilcox.test(paired = TRUE)` mit mariposa-Formatting
-- `friedman_test()` - Wrapper um `stats::friedman.test()` mit mariposa-Formatting
+Alle vier nicht-parametrischen Tests wurden implementiert, SPSS-validiert und bestehen R CMD check:
 
-Alle drei sind einfache Wrapper mit minimalem Aufwand.
+| Funktion | Datei | Tests | SPSS-Validierungen | Strategie |
+|---|---|---|---|---|
+| `kruskal_wallis()` | `R/kruskal_wallis.R` | 187 | 105 | Hybrid (Base R + genuine gewichtete Impl.) |
+| `wilcoxon_test()` | `R/wilcoxon_test.R` | 109 | 82 | Hybrid (Base R + genuine gewichtete Impl.) |
+| `friedman_test()` | `R/friedman_test.R` | 129 | 77 | Hybrid (Base R + genuine gewichtete Impl.) |
+| `binomial_test()` | `R/binomial_test.R` | 89 | 30 | Wrapper um `stats::binom.test()` |
+
+**Gesamt v0.3.0: 514 Tests, 294 SPSS-Validierungen**
+
+Alle Funktionen unterstuetzen:
+- Ungewichtete und gewichtete Analyse (SPSS-kompatible Frequenzgewichte)
+- `group_by()`-Integration
+- Multi-Variable-Support (ausser `friedman_test()` wo `...` die Messzeitpunkte sind)
+- Professionelle Print-Methoden im SPSS-Stil
+- Effektstaerken (Eta-Quadrat, r, Kendalls W)
 
 ---
 
@@ -630,16 +647,19 @@ tests/testthat/test-logistic-regression-spss-validation.R
 
 ## 6. Priorisierte Reihenfolge
 
-| # | Funktion | Strategie | Abhaengigkeit | Aufwand | Begruendung |
-|---|---|---|---|---|---|
-| 1 | `reliability()` | Genuin | keine | 1 Tag | Einfachste Funktion, hoher Nutzen, Grundlage fuer EFA |
-| 2 | `efa()` | Hybrid | `GPArotation` (Suggests) | 2 Tage | Zentrales Element des Kurses |
-| 3 | `scale_index()` / `pomps()` | Genuin | keine | 1 Tag | Bindeglied zwischen EFA und Regression |
-| 4 | `linear_regression()` | Wrapper (`lm()`) | keine | 2-3 Tage | Bivariate + multiple Regression |
-| 5 | `logistic_regression()` | Wrapper (`glm()`) | keine | 1-2 Tage | Abschluss der Kernfunktionalitaet |
-| ~~6~~ | ~~`crosstab()` 3-Wege~~ | ~~Erweiterung~~ | — | — | Entfaellt: `group_by()` + `crosstab()` genuegt |
-| 6 | Nicht-parametrische Tests | Wrapper | keine | 1-2 Tage | Nice-to-have |
-| 7 | Validierung + Doku | — | SPSS-Zugang | 2 Tage | Qualitaetssicherung |
+| # | Funktion | Strategie | Abhaengigkeit | Status |
+|---|---|---|---|---|
+| 1 | `reliability()` | Genuin | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
+| 2 | `efa()` | Hybrid | `GPArotation`, `MASS` (Suggests) | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
+| 3 | `scale_index()` / `pomps()` | Genuin | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
+| 4 | `linear_regression()` | Wrapper (`lm()`) | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
+| 5 | `logistic_regression()` | Wrapper (`glm()`) | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
+| ~~6~~ | ~~`crosstab()` 3-Wege~~ | ~~Erweiterung~~ | — | Entfaellt |
+| 7 | `kruskal_wallis()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** (187 Tests, 105 SPSS) |
+| 8 | `wilcoxon_test()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** (109 Tests, 82 SPSS) |
+| 9 | `friedman_test()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** (129 Tests, 77 SPSS) |
+| 10 | `binomial_test()` | Wrapper | keine | **v0.3.0 - ERLEDIGT** (89 Tests, 30 SPSS) |
+| 11 | Validierung + Doku | — | SPSS-Zugang | Laufend |
 
 ---
 
@@ -729,15 +749,15 @@ Die Erweiterung gilt als erfolgreich, wenn:
 
 Fuer zukuenftige Versionen:
 
-| Version | Funktionen | Prioritaet |
+| Version | Funktionen | Status |
 |---|---|---|
-| v0.2.0 | Reliability, EFA, Scale, Regression (linear + logistisch) | **AKTUELL** |
-| v0.3.0 | Kruskal-Wallis, Wilcoxon, Friedman, Binomial-Test | Mittel |
-| v0.4.0 | Mehrfaktorielle ANOVA, Kovarianzanalyse (ANCOVA) | Mittel |
-| v0.5.0 | Clusteranalyse, Diskriminanzanalyse | Niedrig |
-| v1.0.0 | CRAN-Submission, vollstaendige Dokumentation | Hoch |
+| v0.2.0 | Reliability, EFA, Scale, Regression (linear + logistisch) | **ERLEDIGT** (Branch: condescending-tesla, noch nicht in main gemergt) |
+| v0.3.0 | Kruskal-Wallis, Wilcoxon, Friedman, Binomial-Test | **ERLEDIGT** (514 Tests, 294 SPSS-Validierungen; Branch: epic-feynman) |
+| v0.4.0 | Mehrfaktorielle ANOVA, Kovarianzanalyse (ANCOVA) | Offen |
+| v0.5.0 | Clusteranalyse, Diskriminanzanalyse | Offen |
+| v1.0.0 | CRAN-Submission, vollstaendige Dokumentation | Offen |
 
 ---
 
 *Dieses Dokument wird fortlaufend aktualisiert.*
-*Zuletzt aktualisiert: 2026-02-26*
+*Zuletzt aktualisiert: 2026-03-01*
