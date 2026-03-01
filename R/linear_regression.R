@@ -1,9 +1,10 @@
-#' Linear Regression Analysis
+#' Run a Linear Regression
 #'
 #' @description
-#' Performs bivariate or multiple linear regression with SPSS-compatible output.
-#' Wraps \code{stats::lm()} and adds standardized coefficients (Beta),
-#' a formatted ANOVA table, and a model summary matching SPSS REGRESSION output.
+#' \code{linear_regression()} performs bivariate or multiple linear regression
+#' with SPSS-compatible output. Wraps \code{stats::lm()} and adds standardized
+#' coefficients (Beta), a formatted ANOVA table, and a model summary matching
+#' SPSS REGRESSION output.
 #'
 #' Supports two interface styles:
 #' \itemize{
@@ -11,8 +12,8 @@
 #'   \item \strong{SPSS-style:} \code{linear_regression(data, dependent = life_satisfaction, predictors = c(age, education))}
 #' }
 #'
-#' @param data A data frame or tibble. If grouped (via \code{dplyr::group_by()}),
-#'   separate regressions are run for each group.
+#' @param data Your survey data (a data frame or tibble). If grouped
+#'   (via \code{dplyr::group_by()}), separate regressions are run for each group.
 #' @param formula A formula specifying the model (e.g., \code{y ~ x1 + x2}).
 #'   If provided, \code{dependent} and \code{predictors} are ignored.
 #' @param dependent The dependent variable (unquoted). Used with \code{predictors}
@@ -41,6 +42,43 @@
 #' }
 #'
 #' @details
+#' ## Understanding the Results
+#'
+#' The output includes four sections matching SPSS REGRESSION output:
+#' \itemize{
+#'   \item \strong{Model Summary}: R, R-squared, Adjusted R-squared, and
+#'     Standard Error of the Estimate. R-squared tells you how much variance
+#'     in the dependent variable is explained by the predictors.
+#'   \item \strong{ANOVA}: Tests whether the overall model is significant.
+#'     A significant F-test means at least one predictor matters.
+#'   \item \strong{Coefficients}: B (unstandardized), Beta (standardized),
+#'     t-value, p-value, and confidence intervals for each predictor.
+#'   \item \strong{Descriptives}: Mean, SD, and N for all variables in the model.
+#' }
+#'
+#' Interpreting coefficients:
+#' \itemize{
+#'   \item \strong{B (unstandardized)}: For each 1-unit increase in the predictor,
+#'     the dependent variable changes by B units
+#'   \item \strong{Beta (standardized)}: Allows comparison across predictors with
+#'     different scales. Larger absolute Beta = stronger effect
+#'   \item \strong{p-value}: Values below 0.05 indicate statistically significant
+#'     predictors
+#' }
+#'
+#' ## When to Use This
+#'
+#' Use \code{linear_regression()} when:
+#' \itemize{
+#'   \item Your dependent variable is continuous (e.g., income, satisfaction score)
+#'   \item You want to predict an outcome from one or more predictors
+#'   \item You need standardized coefficients to compare predictor importance
+#' }
+#'
+#' For binary outcomes (yes/no, 0/1), use \code{\link{logistic_regression}} instead.
+#'
+#' ## Technical Details
+#'
 #' \strong{Missing Data}: Listwise deletion is used (matching SPSS REGRESSION
 #' /MISSING LISTWISE). Cases with any missing values on the dependent variable,
 #' predictors, or weights are excluded.
@@ -57,6 +95,9 @@
 #' (matching SPSS SPLIT FILE BY).
 #'
 #' @examples
+#' library(dplyr)
+#' data(survey_data)
+#'
 #' # Bivariate regression
 #' linear_regression(survey_data, life_satisfaction ~ age)
 #'
@@ -76,6 +117,14 @@
 #'   dplyr::group_by(region) |>
 #'   linear_regression(life_satisfaction ~ age)
 #'
+#' @seealso
+#' \code{\link{logistic_regression}} for binary outcome variables.
+#'
+#' \code{\link{describe}} for checking variable distributions before regression.
+#'
+#' \code{\link{pearson_cor}} for checking bivariate correlations.
+#'
+#' @family regression
 #' @export
 linear_regression <- function(data, formula = NULL,
                               dependent = NULL, predictors = NULL,
@@ -88,7 +137,7 @@ linear_regression <- function(data, formula = NULL,
   # ============================================================================
 
   if (!is.data.frame(data)) {
-    stop("'data' must be a data frame or tibble.", call. = FALSE)
+    cli_abort("{.arg data} must be a data frame or tibble.")
   }
 
   # Process weights
@@ -100,7 +149,7 @@ linear_regression <- function(data, formula = NULL,
   if (has_weights) {
     weight_name <- rlang::as_name(weights_quo)
     if (!weight_name %in% names(data)) {
-      stop(sprintf("Weight variable '%s' not found in data.", weight_name), call. = FALSE)
+      cli_abort("Weight variable {.var {weight_name}} not found in data.")
     }
     weights_vec <- data[[weight_name]]
   }
@@ -109,7 +158,7 @@ linear_regression <- function(data, formula = NULL,
   if (!is.null(formula)) {
     # Formula interface
     if (!inherits(formula, "formula")) {
-      stop("'formula' must be a formula object (e.g., y ~ x1 + x2).", call. = FALSE)
+      cli_abort("{.arg formula} must be a formula object (e.g., {.code y ~ x1 + x2}).")
     }
     model_formula <- formula
     dep_name <- as.character(formula[[2]])
@@ -120,7 +169,7 @@ linear_regression <- function(data, formula = NULL,
     pred_quo <- rlang::enquo(predictors)
 
     if (rlang::quo_is_null(dep_quo)) {
-      stop("Either 'formula' or 'dependent' must be specified.", call. = FALSE)
+      cli_abort("Either {.arg formula} or {.arg dependent} must be specified.")
     }
 
     dep_name <- rlang::as_name(dep_quo)
@@ -130,7 +179,7 @@ linear_regression <- function(data, formula = NULL,
     pred_names <- names(pred_pos)
 
     if (length(pred_names) == 0) {
-      stop("At least one predictor variable must be specified.", call. = FALSE)
+      cli_abort("At least one predictor variable must be specified.")
     }
 
     model_formula <- stats::as.formula(
@@ -142,8 +191,7 @@ linear_regression <- function(data, formula = NULL,
   all_vars <- c(dep_name, pred_names)
   missing_vars <- setdiff(all_vars, names(data))
   if (length(missing_vars) > 0) {
-    stop(sprintf("Variable(s) not found in data: %s", paste(missing_vars, collapse = ", ")),
-         call. = FALSE)
+    cli_abort("Variable(s) not found in data: {paste(missing_vars, collapse = ', ')}.")
   }
 
   # ============================================================================
@@ -222,7 +270,7 @@ linear_regression <- function(data, formula = NULL,
   n <- nrow(data_complete)
 
   if (n < length(pred_names) + 2) {
-    stop("Insufficient observations for the number of predictors.", call. = FALSE)
+    cli_abort("Insufficient observations for the number of predictors.")
   }
 
   # Convert factors to numeric (matching SPSS behavior: ordered factor -> integer codes)
@@ -531,10 +579,9 @@ print.linear_regression <- function(x, ...) {
 #' Print ungrouped linear regression result
 #' @keywords internal
 .print_lm_ungrouped <- function(x) {
-  weighted_label <- if (isTRUE(x$weighted)) "[Weighted] " else ""
-
   # Header
-  print_header(paste0(weighted_label, "Linear Regression Results"))
+  title <- get_standard_title("Linear Regression", x$weight_name, "Results")
+  print_header(title)
 
   # Formula info
   formula_str <- deparse(x$formula)
@@ -571,9 +618,8 @@ print.linear_regression <- function(x, ...) {
 #' Print grouped linear regression results
 #' @keywords internal
 .print_lm_grouped <- function(x) {
-  weighted_label <- if (isTRUE(x$weighted)) "[Weighted] " else ""
-
-  print_header(paste0(weighted_label, "Linear Regression Results"))
+  title <- get_standard_title("Linear Regression", x$weight_name, "Results")
+  print_header(title)
 
   formula_str <- deparse(x$formula)
   info <- list(

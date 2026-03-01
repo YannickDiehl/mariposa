@@ -1,9 +1,9 @@
-#' Logistic Regression Analysis
+#' Run a Logistic Regression
 #'
 #' @description
-#' Performs binary logistic regression with SPSS-compatible output.
-#' Wraps \code{stats::glm(family = binomial)} and adds odds ratios,
-#' pseudo R-squared measures, classification table, and model tests
+#' \code{logistic_regression()} performs binary logistic regression with
+#' SPSS-compatible output. Wraps \code{stats::glm(family = binomial)} and adds
+#' odds ratios, pseudo R-squared measures, classification table, and model tests
 #' matching SPSS LOGISTIC REGRESSION output.
 #'
 #' Supports two interface styles:
@@ -12,8 +12,8 @@
 #'   \item \strong{SPSS-style:} \code{logistic_regression(data, dependent = high_satisfaction, predictors = c(age, income))}
 #' }
 #'
-#' @param data A data frame or tibble. If grouped (via \code{dplyr::group_by()}),
-#'   separate regressions are run for each group.
+#' @param data Your survey data (a data frame or tibble). If grouped
+#'   (via \code{dplyr::group_by()}), separate regressions are run for each group.
 #' @param formula A formula specifying the model (e.g., \code{y ~ x1 + x2}).
 #'   If provided, \code{dependent} and \code{predictors} are ignored.
 #' @param dependent The dependent variable (unquoted). Used with \code{predictors}
@@ -42,6 +42,41 @@
 #' }
 #'
 #' @details
+#' ## Understanding the Results
+#'
+#' The output includes five sections matching SPSS LOGISTIC REGRESSION output:
+#' \itemize{
+#'   \item \strong{Omnibus Test}: Tests whether the model as a whole is significant.
+#'     A significant chi-square means the model predicts better than chance.
+#'   \item \strong{Model Summary}: -2 Log Likelihood and pseudo R-squared values.
+#'     Lower -2LL = better fit. Higher R-squared = more variance explained.
+#'   \item \strong{Hosmer-Lemeshow Test}: Goodness-of-fit test. A non-significant
+#'     result (p > 0.05) means the model fits the data well.
+#'   \item \strong{Classification Table}: How well the model classifies cases.
+#'     Shows percentage correctly predicted for each group and overall.
+#'   \item \strong{Coefficients}: B, Wald test, odds ratios (Exp(B)), and CIs.
+#' }
+#'
+#' Interpreting odds ratios (Exp(B)):
+#' \itemize{
+#'   \item \strong{Exp(B) > 1}: Predictor increases the odds of the outcome
+#'   \item \strong{Exp(B) < 1}: Predictor decreases the odds of the outcome
+#'   \item \strong{Exp(B) = 1}: Predictor has no effect on the odds
+#' }
+#'
+#' ## When to Use This
+#'
+#' Use \code{logistic_regression()} when:
+#' \itemize{
+#'   \item Your dependent variable is binary (yes/no, 0/1, pass/fail)
+#'   \item You want to predict group membership from one or more predictors
+#'   \item You need odds ratios to interpret predictor effects
+#' }
+#'
+#' For continuous outcomes, use \code{\link{linear_regression}} instead.
+#'
+#' ## Technical Details
+#'
 #' \strong{Dependent Variable}: Must be binary. Factors with exactly 2 levels
 #' are automatically converted to 0/1 (first level = 0, second level = 1).
 #' Numeric variables must contain only 0 and 1 values.
@@ -64,6 +99,9 @@
 #' (matching SPSS SPLIT FILE BY).
 #'
 #' @examples
+#' library(dplyr)
+#' data(survey_data)
+#'
 #' # Create binary DV
 #' survey_data$high_satisfaction <- ifelse(survey_data$life_satisfaction >= 4, 1, 0)
 #'
@@ -87,6 +125,12 @@
 #'   dplyr::group_by(region) |>
 #'   logistic_regression(high_satisfaction ~ age)
 #'
+#' @seealso
+#' \code{\link{linear_regression}} for continuous outcome variables.
+#'
+#' \code{\link{chi_square}} for testing associations between categorical variables.
+#'
+#' @family regression
 #' @export
 logistic_regression <- function(data, formula = NULL,
                                 dependent = NULL, predictors = NULL,
@@ -98,7 +142,7 @@ logistic_regression <- function(data, formula = NULL,
   # ============================================================================
 
   if (!is.data.frame(data)) {
-    stop("'data' must be a data frame or tibble.", call. = FALSE)
+    cli_abort("{.arg data} must be a data frame or tibble.")
   }
 
   # Process weights
@@ -110,7 +154,7 @@ logistic_regression <- function(data, formula = NULL,
   if (has_weights) {
     weight_name <- rlang::as_name(weights_quo)
     if (!weight_name %in% names(data)) {
-      stop(sprintf("Weight variable '%s' not found in data.", weight_name), call. = FALSE)
+      cli_abort("Weight variable {.var {weight_name}} not found in data.")
     }
     weights_vec <- data[[weight_name]]
   }
@@ -118,7 +162,7 @@ logistic_regression <- function(data, formula = NULL,
   # Build formula
   if (!is.null(formula)) {
     if (!inherits(formula, "formula")) {
-      stop("'formula' must be a formula object (e.g., y ~ x1 + x2).", call. = FALSE)
+      cli_abort("{.arg formula} must be a formula object (e.g., {.code y ~ x1 + x2}).")
     }
     model_formula <- formula
     dep_name <- as.character(formula[[2]])
@@ -128,7 +172,7 @@ logistic_regression <- function(data, formula = NULL,
     pred_quo <- rlang::enquo(predictors)
 
     if (rlang::quo_is_null(dep_quo)) {
-      stop("Either 'formula' or 'dependent' must be specified.", call. = FALSE)
+      cli_abort("Either {.arg formula} or {.arg dependent} must be specified.")
     }
 
     dep_name <- rlang::as_name(dep_quo)
@@ -137,7 +181,7 @@ logistic_regression <- function(data, formula = NULL,
     pred_names <- names(pred_pos)
 
     if (length(pred_names) == 0) {
-      stop("At least one predictor variable must be specified.", call. = FALSE)
+      cli_abort("At least one predictor variable must be specified.")
     }
 
     model_formula <- stats::as.formula(
@@ -149,8 +193,7 @@ logistic_regression <- function(data, formula = NULL,
   all_vars <- c(dep_name, pred_names)
   missing_vars <- setdiff(all_vars, names(data))
   if (length(missing_vars) > 0) {
-    stop(sprintf("Variable(s) not found in data: %s", paste(missing_vars, collapse = ", ")),
-         call. = FALSE)
+    cli_abort("Variable(s) not found in data: {paste(missing_vars, collapse = ', ')}.")
   }
 
   # ============================================================================
@@ -227,7 +270,7 @@ logistic_regression <- function(data, formula = NULL,
   n_actual <- nrow(data_complete)
 
   if (n_actual < length(pred_names) + 2) {
-    stop("Insufficient observations for the number of predictors.", call. = FALSE)
+    cli_abort("Insufficient observations for the number of predictors.")
   }
 
   # Convert factors to numeric for predictors
@@ -241,14 +284,14 @@ logistic_regression <- function(data, formula = NULL,
   dv <- data_complete[[dep_name]]
   if (is.factor(dv)) {
     if (nlevels(dv) != 2) {
-      stop("Dependent variable must be binary (exactly 2 levels).", call. = FALSE)
+      cli_abort("Dependent variable must be binary (exactly 2 levels).")
     }
     data_complete[[dep_name]] <- as.numeric(dv) - 1  # first level=0, second=1
     dv <- data_complete[[dep_name]]
   } else {
     unique_vals <- sort(unique(dv))
     if (!all(unique_vals %in% c(0, 1))) {
-      stop("Dependent variable must be binary (0/1).", call. = FALSE)
+      cli_abort("Dependent variable must be binary (0/1).")
     }
   }
 
@@ -501,9 +544,8 @@ print.logistic_regression <- function(x, ...) {
 #' Print ungrouped logistic regression result
 #' @keywords internal
 .print_logistic_ungrouped <- function(x) {
-  weighted_label <- if (isTRUE(x$weighted)) "[Weighted] " else ""
-
-  print_header(paste0(weighted_label, "Logistic Regression Results"))
+  title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
+  print_header(title)
 
   formula_str <- deparse(x$formula)
   info <- list(
@@ -534,9 +576,8 @@ print.logistic_regression <- function(x, ...) {
 #' Print grouped logistic regression results
 #' @keywords internal
 .print_logistic_grouped <- function(x) {
-  weighted_label <- if (isTRUE(x$weighted)) "[Weighted] " else ""
-
-  print_header(paste0(weighted_label, "Logistic Regression Results"))
+  title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
+  print_header(title)
 
   formula_str <- deparse(x$formula)
   info <- list(
