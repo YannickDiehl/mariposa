@@ -75,8 +75,9 @@ print_group_header <- function(group_values, prefix = "Group") {
   } else {
     group_str <- paste(names(group_values), "=", group_values, collapse = ", ")
   }
-  cli_text("")
-  cli_h2("{prefix}: {group_str}")
+  header_text <- paste0(prefix, ": ", group_str)
+  cat("\n", header_text, "\n", sep = "")
+  cat(paste(rep("-", nchar(header_text)), collapse = ""), "\n", sep = "")
 }
 
 #' Calculate dynamic table width
