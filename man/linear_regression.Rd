@@ -2,7 +2,7 @@
 % Please edit documentation in R/linear_regression.R
 \name{linear_regression}
 \alias{linear_regression}
-\title{Linear Regression Analysis}
+\title{Run a Linear Regression}
 \usage{
 linear_regression(
   data,
@@ -15,8 +15,8 @@ linear_regression(
 )
 }
 \arguments{
-\item{data}{A data frame or tibble. If grouped (via \code{dplyr::group_by()}),
-separate regressions are run for each group.}
+\item{data}{Your survey data (a data frame or tibble). If grouped
+(via \code{dplyr::group_by()}), separate regressions are run for each group.}
 
 \item{formula}{A formula specifying the model (e.g., \code{y ~ x1 + x2}).
 If provided, \code{dependent} and \code{predictors} are ignored.}
@@ -52,9 +52,10 @@ An object of class \code{"linear_regression"} containing:
 }
 }
 \description{
-Performs bivariate or multiple linear regression with SPSS-compatible output.
-Wraps \code{stats::lm()} and adds standardized coefficients (Beta),
-a formatted ANOVA table, and a model summary matching SPSS REGRESSION output.
+\code{linear_regression()} performs bivariate or multiple linear regression
+with SPSS-compatible output. Wraps \code{stats::lm()} and adds standardized
+coefficients (Beta), a formatted ANOVA table, and a model summary matching
+SPSS REGRESSION output.
 
 Supports two interface styles:
 \itemize{
@@ -63,6 +64,45 @@ Supports two interface styles:
 }
 }
 \details{
+\subsection{Understanding the Results}{
+
+The output includes four sections matching SPSS REGRESSION output:
+\itemize{
+\item \strong{Model Summary}: R, R-squared, Adjusted R-squared, and
+Standard Error of the Estimate. R-squared tells you how much variance
+in the dependent variable is explained by the predictors.
+\item \strong{ANOVA}: Tests whether the overall model is significant.
+A significant F-test means at least one predictor matters.
+\item \strong{Coefficients}: B (unstandardized), Beta (standardized),
+t-value, p-value, and confidence intervals for each predictor.
+\item \strong{Descriptives}: Mean, SD, and N for all variables in the model.
+}
+
+Interpreting coefficients:
+\itemize{
+\item \strong{B (unstandardized)}: For each 1-unit increase in the predictor,
+the dependent variable changes by B units
+\item \strong{Beta (standardized)}: Allows comparison across predictors with
+different scales. Larger absolute Beta = stronger effect
+\item \strong{p-value}: Values below 0.05 indicate statistically significant
+predictors
+}
+}
+
+\subsection{When to Use This}{
+
+Use \code{linear_regression()} when:
+\itemize{
+\item Your dependent variable is continuous (e.g., income, satisfaction score)
+\item You want to predict an outcome from one or more predictors
+\item You need standardized coefficients to compare predictor importance
+}
+
+For binary outcomes (yes/no, 0/1), use \code{\link{logistic_regression}} instead.
+}
+
+\subsection{Technical Details}{
+
 \strong{Missing Data}: Listwise deletion is used (matching SPSS REGRESSION
 /MISSING LISTWISE). Cases with any missing values on the dependent variable,
 predictors, or weights are excluded.
@@ -78,7 +118,11 @@ the SPSS standardized coefficient output. Not available for the intercept.
 \code{dplyr::group_by()}, a separate regression is run for each group
 (matching SPSS SPLIT FILE BY).
 }
+}
 \examples{
+library(dplyr)
+data(survey_data)
+
 # Bivariate regression
 linear_regression(survey_data, life_satisfaction ~ age)
 
@@ -99,3 +143,14 @@ survey_data |>
   linear_regression(life_satisfaction ~ age)
 
 }
+\seealso{
+\code{\link{logistic_regression}} for binary outcome variables.
+
+\code{\link{describe}} for checking variable distributions before regression.
+
+\code{\link{pearson_cor}} for checking bivariate correlations.
+
+Other regression: 
+\code{\link{logistic_regression}()}
+}
+\concept{regression}
