@@ -1,0 +1,608 @@
+﻿=========== UNWEIGHTED / UNGROUPED ===========
+
+=========== Test 1a ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean    Std. Deviation N    
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.63    1.153          2421 
+ Age in years                                    50.5832 16.99976       2421 
+
+Correlations
+
+                                                             Life satisfaction (1=dissatisfied, 5=satisfied) Age in years 
+ Pearson     Life satisfaction (1=dissatisfied, 5=satisfied) 1.000                                           -.029        
+ Correlation Age in years                                    -.029                                           1.000        
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .029(a) .001     .000              1.153                      
+a Predictors: (Constant), Age in years
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square F     Sig.    
+ 1     Regression 2.653          1    2.653       1.996 .158(b) 
+       Residual   3214.775       2419 1.329                     
+       Total      3217.428       2420                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Age in years
+
+Coefficients(a)
+
+ Model              Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                    B                Std. Error Beta                                  
+ 1     (Constant)   3.727            .074                                 50.663 .000 
+       Age in years -.002            .001       -.029                     -1.413 .158 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== Test 1b ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean Std. Deviation N    
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.66 1.144          2066 
+ Trust in government (1=none, 5=complete)        2.62 1.164          2066 
+ Trust in media (1=none, 5=complete)             2.42 1.153          2066 
+ Trust in science (1=none, 5=complete)           3.62 1.031          2066 
+
+Correlations
+
+                                   Life satisfaction     Trust in government      Trust in media (1=none,  Trust in science         
+                                   (1=dissatisfied,      (1=none, 5=complete)     5=complete)              (1=none, 5=complete)     
+                                   5=satisfied)                                                                                     
+ Pearson     Life satisfaction     1.000                 -.008                    .035                     -.020                    
+ Correlation (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in government   -.008                 1.000                    .017                     .020                     
+             (1=none, 5=complete)                                                                                                   
+             Trust in media        .035                  .017                     1.000                    .019                     
+             (1=none, 5=complete)                                                                                                   
+             Trust in science      -.020                 .020                     .019                     1.000                    
+             (1=none, 5=complete)                                                                                                   
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .041(a) .002     .000              1.144                      
+a Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in media (1=none, 5=complete), Trust in government (1=none, 5=complete)
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square F     Sig.    
+ 1     Regression 4.570          3    1.523       1.164 .322(b) 
+       Residual   2699.432       2062 1.309                     
+       Total      2704.002       2065                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in media (1=none, 5=complete), Trust in government (1=none, 5=complete)
+
+Coefficients(a)
+
+ Model                                          Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                                                B                Std. Error Beta                                  
+ 1     (Constant)                               3.675            .118                                 31.054 .000 
+       Trust in government (1=none, 5=complete) -.008            .022       -.008                     -.361  .718 
+       Trust in media (1=none, 5=complete)      .035             .022       .035                      1.598  .110 
+       Trust in science (1=none, 5=complete)    -.023            .024       -.021                     -.932  .351 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== Test 1c ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean      Std. Deviation N    
+ Monthly household income (EUR)                  3757.6832 1430.92329     2115 
+ Age in years                                    50.8274   16.99546       2115 
+ Highest educational attainment                  2.2388    1.08408        2115 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.64      1.148          2115 
+
+Correlations
+
+                                     Monthly household income    Age in years Highest educational           Life satisfaction       
+                                     (EUR)                                    attainment                    (1=dissatisfied,        
+                                                                                                            5=satisfied)            
+ Pearson     Monthly household       1.000                       -.009        .621                          .448                    
+ Correlation income (EUR)                                                                                                           
+             Age in years            -.009                       1.000        -.004                         -.014                   
+             Highest educational     .621                        -.004        1.000                         .270                    
+             attainment                                                                                                             
+             Life satisfaction       .448                        -.014        .270                          1.000                   
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .686(a) .471     .470              1041.88947                 
+a Predictors: (Constant), Life satisfaction (1=dissatisfied, 5=satisfied), Age in years, Highest educational attainment
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square   F       Sig.    
+ 1     Regression 2036941094.578 3    678980364.860 625.481 .000(b) 
+       Residual   2291561553.177 2111 1085533.659                   
+       Total      4328502647.755 2114                               
+a Dependent Variable: Monthly household income (EUR)
+b Predictors: (Constant), Life satisfaction (1=dissatisfied, 5=satisfied), Age in years, Highest educational attainment
+
+Coefficients(a)
+
+ Model                                                 Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                                                       B                Std. Error Beta                                  
+ 1     (Constant)                                      800.493          105.893                              7.559  .000 
+       Age in years                                    -.194            1.333      -.002                     -.145  .885 
+       Highest educational attainment                  711.841          21.706     .539                      32.794 .000 
+       Life satisfaction (1=dissatisfied, 5=satisfied) 377.527          20.505     .303                      18.412 .000 
+a Dependent Variable: Monthly household income (EUR)
+
+=========== Test 1d ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean    Std. Deviation N    
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.63    1.162          2017 
+ Age in years                                    50.4993 16.99852       2017 
+ Environmental concern (1=low, 5=high)           3.58    1.194          2017 
+ Political orientation (1=left, 5=right)         2.72    1.085          2017 
+ Trust in government (1=none, 5=complete)        2.62    1.165          2017 
+
+Correlations
+
+                               Life satisfaction     Age in years Environmental concern Political orientation Trust in government   
+                               (1=dissatisfied,                   (1=low, 5=high)       (1=left, 5=right)     (1=none, 5=complete)  
+                               5=satisfied)                                                                                         
+ Pearson     Life satisfaction 1.000                 -.024        .013                  -.004                 .027                  
+ Correlation (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Age in years      -.024                 1.000        .016                  -.019                 -.016                 
+             Environmental     .013                  .016         1.000                 -.590                 .063                  
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Political         -.004                 -.019        -.590                 1.000                 -.060                 
+             orientation                                                                                                            
+             (1=left, 5=right)                                                                                                      
+             Trust in          .027                  -.016        .063                  -.060                 1.000                 
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .037(a) .001     -.001             1.162                      
+a Predictors: (Constant), Trust in government (1=none, 5=complete), Age in years, Political orientation (1=left, 5=right), Environmental concern (1=low, 5=high)
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square F    Sig.    
+ 1     Regression 3.773          4    .943        .699 .593(b) 
+       Residual   2716.201       2012 1.350                    
+       Total      2719.973       2016                          
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Trust in government (1=none, 5=complete), Age in years, Political orientation (1=left, 5=right), Environmental concern (1=low, 5=high)
+
+Coefficients(a)
+
+ Model                                          Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                                                B                Std. Error Beta                                  
+ 1     (Constant)                               3.581            .187                                 19.165 .000 
+       Age in years                             -.002            .002       -.023                     -1.043 .297 
+       Environmental concern (1=low, 5=high)    .014             .027       .015                      .530   .596 
+       Political orientation (1=left, 5=right)  .006             .030       .005                      .199   .843 
+       Trust in government (1=none, 5=complete) .025             .022       .026                      1.145  .252 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== WEIGHTED / UNGROUPED ===========
+
+=========== Test 2a ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean    Std. Deviation N    
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.62    1.152          2437 
+ Age in years                                    50.5524 17.10830       2437 
+
+Correlations
+
+                                                             Life satisfaction (1=dissatisfied, 5=satisfied) Age in years 
+ Pearson     Life satisfaction (1=dissatisfied, 5=satisfied) 1.000                                           -.029        
+ Correlation Age in years                                    -.029                                           1.000        
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .029(a) .001     .000              1.152                      
+a Predictors: (Constant), Age in years
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square F     Sig.    
+ 1     Regression 2.757          1    2.757       2.078 .150(b) 
+       Residual   3230.392       2435 1.327                     
+       Total      3233.149       2436                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Age in years
+
+Coefficients(a)
+
+ Model              Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                    B                Std. Error Beta                                  
+ 1     (Constant)   3.724            .073                                 51.152 .000 
+       Age in years -.002            .001       -.029                     -1.441 .150 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== Test 2b ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean Std. Deviation N    
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.65 1.143          2080 
+ Trust in government (1=none, 5=complete)        2.63 1.164          2080 
+ Trust in media (1=none, 5=complete)             2.43 1.156          2080 
+ Trust in science (1=none, 5=complete)           3.62 1.032          2080 
+
+Correlations
+
+                                   Life satisfaction     Trust in government      Trust in media (1=none,  Trust in science         
+                                   (1=dissatisfied,      (1=none, 5=complete)     5=complete)              (1=none, 5=complete)     
+                                   5=satisfied)                                                                                     
+ Pearson     Life satisfaction     1.000                 -.003                    .034                     -.024                    
+ Correlation (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in government   -.003                 1.000                    .019                     .021                     
+             (1=none, 5=complete)                                                                                                   
+             Trust in media        .034                  .019                     1.000                    .021                     
+             (1=none, 5=complete)                                                                                                   
+             Trust in science      -.024                 .021                     .021                     1.000                    
+             (1=none, 5=complete)                                                                                                   
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .042(a) .002     .000              1.143                      
+a Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in government (1=none, 5=complete), Trust in media (1=none, 5=complete)
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square F     Sig.    
+ 1     Regression 4.808          3    1.603       1.226 .299(b) 
+       Residual   2712.928       2076 1.307                     
+       Total      2717.736       2079                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in government (1=none, 5=complete), Trust in media (1=none, 5=complete)
+
+Coefficients(a)
+
+ Model                                          Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                                                B                Std. Error Beta                                  
+ 1     (Constant)                               3.680            .118                                 31.277 .000 
+       Trust in government (1=none, 5=complete) -.003            .022       -.004                     -.161  .872 
+       Trust in media (1=none, 5=complete)      .034             .022       .034                      1.567  .117 
+       Trust in science (1=none, 5=complete)    -.027            .024       -.025                     -1.127 .260 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== Test 2c ===========
+
+Regression
+Descriptive Statistics
+
+                                                 Mean      Std. Deviation N    
+ Monthly household income (EUR)                  3747.2961 1422.77071     2130 
+ Age in years                                    50.8075   17.08223       2130 
+ Highest educational attainment                  2.2285    1.07570        2130 
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.64      1.147          2130 
+
+Correlations
+
+                                     Monthly household income    Age in years Highest educational           Life satisfaction       
+                                     (EUR)                                    attainment                    (1=dissatisfied,        
+                                                                                                            5=satisfied)            
+ Pearson     Monthly household       1.000                       -.006        .618                          .450                    
+ Correlation income (EUR)                                                                                                           
+             Age in years            -.006                       1.000        -.001                         -.013                   
+             Highest educational     .618                        -.001        1.000                         .266                    
+             attainment                                                                                                             
+             Life satisfaction       .450                        -.013        .266                          1.000                   
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+
+Model Summary
+
+ Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ 1     .686(a) .470     .469              1036.28697                 
+a Predictors: (Constant), Life satisfaction (1=dissatisfied, 5=satisfied), Age in years, Highest educational attainment
+
+ANOVA(a)
+
+ Model            Sum of Squares df   Mean Square   F       Sig.    
+ 1     Regression 2026419335.048 3    675473111.683 628.996 .000(b) 
+       Residual   2282895332.715 2126 1073890.693                   
+       Total      4309314667.763 2129                               
+a Dependent Variable: Monthly household income (EUR)
+b Predictors: (Constant), Life satisfaction (1=dissatisfied, 5=satisfied), Age in years, Highest educational attainment
+
+Coefficients(a)
+
+ Model                                                 Unstandardized Coefficients Standardized Coefficients t      Sig. 
+                                                       B                Std. Error Beta                                  
+ 1     (Constant)                                      784.981          104.720                              7.496  .000 
+       Age in years                                    -.110            1.315      -.001                     -.083  .934 
+       Highest educational attainment                  709.765          21.659     .537                      32.770 .000 
+       Life satisfaction (1=dissatisfied, 5=satisfied) 381.257          20.309     .307                      18.773 .000 
+a Dependent Variable: Monthly household income (EUR)
+
+=========== UNWEIGHTED / GROUPED ===========
+
+=========== Test 3a ===========
+
+Regression
+Descriptive Statistics
+
+ Region (East/West)                                                 Mean    Std. Deviation N    
+ East               Life satisfaction (1=dissatisfied, 5=satisfied) 3.62    1.207          465  
+                    Age in years                                    51.8860 17.43553       465  
+ West               Life satisfaction (1=dissatisfied, 5=satisfied) 3.63    1.140          1956 
+                    Age in years                                    50.2735 16.88427       1956 
+
+Correlations
+
+ Region (East/West)                                                    Life satisfaction (1=dissatisfied, 5=satisfied) Age in years 
+ East               Pearson     Life satisfaction (1=dissatisfied,     1.000                                           -.043        
+                    Correlation 5=satisfied)                                                                                        
+                                Age in years                           -.043                                           1.000        
+ West               Pearson     Life satisfaction (1=dissatisfied,     1.000                                           -.025        
+                    Correlation 5=satisfied)                                                                                        
+                                Age in years                           -.025                                           1.000        
+
+Model Summary
+
+ Region (East/West) Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ East               1     .043(a) .002     .000              1.207                      
+ West               1     .025(a) .001     .000              1.140                      
+a Predictors: (Constant), Age in years
+
+ANOVA(a)
+
+ Region (East/West) Model            Sum of Squares df   Mean Square F     Sig.    
+ East               1     Regression 1.276          1    1.276       .876  .350(b) 
+                          Residual   674.350        463  1.456                     
+                          Total      675.626        464                            
+ West               1     Regression 1.556          1    1.556       1.197 .274(b) 
+                          Residual   2540.200       1954 1.300                     
+                          Total      2541.756       1955                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Age in years
+
+Coefficients(a)
+
+ Region      Model              Unstandardized Coefficients Standardized Coefficients t      Sig. 
+ (East/West)                    B                Std. Error Beta                                  
+ East        1     (Constant)   3.775            .176                                 21.467 .000 
+                   Age in years -.003            .003       -.043                     -.936  .350 
+ West        1     (Constant)   3.714            .081                                 45.860 .000 
+                   Age in years -.002            .002       -.025                     -1.094 .274 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== Test 3b ===========
+
+Regression
+Descriptive Statistics
+
+ Region (East/West)                                                 Mean Std. Deviation N    
+ East               Life satisfaction (1=dissatisfied, 5=satisfied) 3.64 1.211          404  
+                    Trust in government (1=none, 5=complete)        2.63 1.173          404  
+                    Trust in media (1=none, 5=complete)             2.40 1.092          404  
+                    Trust in science (1=none, 5=complete)           3.65 1.014          404  
+ West               Life satisfaction (1=dissatisfied, 5=satisfied) 3.66 1.128          1662 
+                    Trust in government (1=none, 5=complete)        2.62 1.162          1662 
+                    Trust in media (1=none, 5=complete)             2.43 1.168          1662 
+                    Trust in science (1=none, 5=complete)           3.61 1.036          1662 
+
+Correlations
+
+ Region (East/West)                                Life satisfaction Trust in government  Trust in media       Trust in science     
+                                                   (1=dissatisfied,  (1=none, 5=complete) (1=none, 5=complete) (1=none, 5=complete) 
+                                                   5=satisfied)                                                                     
+ East               Pearson     Life satisfaction  1.000             -.033                -.062                -.068                
+                    Correlation (1=dissatisfied,                                                                                    
+                                5=satisfied)                                                                                        
+                                Trust in           -.033             1.000                -.010                .008                 
+                                government                                                                                          
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in media     -.062             -.010                1.000                .061                 
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in science   -.068             .008                 .061                 1.000                
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+ West               Pearson     Life satisfaction  1.000             -.001                .058                 -.008                
+                    Correlation (1=dissatisfied,                                                                                    
+                                5=satisfied)                                                                                        
+                                Trust in           -.001             1.000                .023                 .023                 
+                                government                                                                                          
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in media     .058              .023                 1.000                .010                 
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in science   -.008             .023                 .010                 1.000                
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+
+Model Summary
+
+ Region (East/West) Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ East               1     .095(a) .009     .002              1.210                      
+ West               1     .059(b) .003     .002              1.127                      
+a Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in government (1=none, 5=complete), Trust in media (1=none, 5=complete)
+b Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in media (1=none, 5=complete), Trust in government (1=none, 5=complete)
+
+ANOVA(a)
+
+ Region (East/West) Model            Sum of Squares df   Mean Square F     Sig.    
+ East               1     Regression 5.367          3    1.789       1.222 .301(b) 
+                          Residual   585.307        400  1.463                     
+                          Total      590.673        403                            
+ West               1     Regression 7.294          3    2.431       1.914 .125(c) 
+                          Residual   2105.952       1658 1.270                     
+                          Total      2113.247       1661                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in government (1=none, 5=complete), Trust in media (1=none, 5=complete)
+c Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in media (1=none, 5=complete), Trust in government (1=none, 5=complete)
+
+Coefficients(a)
+
+ Region      Model                                          Unstandardized Coefficients Standardized Coefficients t      Sig. 
+ (East/West)                                                B                Std. Error Beta                                  
+ East        1     (Constant)                               4.169            .288                                 14.467 .000 
+                   Trust in government (1=none, 5=complete) -.035            .051       -.033                     -.673  .502 
+                   Trust in media (1=none, 5=complete)      -.065            .055       -.058                     -1.169 .243 
+                   Trust in science (1=none, 5=complete)    -.077            .060       -.064                     -1.287 .199 
+ West        1     (Constant)                               3.561            .129                                 27.518 .000 
+                   Trust in government (1=none, 5=complete) -.002            .024       -.002                     -.088  .930 
+                   Trust in media (1=none, 5=complete)      .056             .024       .058                      2.375  .018 
+                   Trust in science (1=none, 5=complete)    -.009            .027       -.008                     -.337  .736 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== WEIGHTED / GROUPED ===========
+
+=========== Test 4a ===========
+
+Regression
+Descriptive Statistics
+
+ Region (East/West)                                                 Mean    Std. Deviation N    
+ East               Life satisfaction (1=dissatisfied, 5=satisfied) 3.62    1.203          488  
+                    Age in years                                    52.3065 17.61659       488  
+ West               Life satisfaction (1=dissatisfied, 5=satisfied) 3.63    1.139          1949 
+                    Age in years                                    50.1131 16.95486       1949 
+
+Correlations
+
+ Region (East/West)                                                    Life satisfaction (1=dissatisfied, 5=satisfied) Age in years 
+ East               Pearson     Life satisfaction (1=dissatisfied,     1.000                                           -.046        
+                    Correlation 5=satisfied)                                                                                        
+                                Age in years                           -.046                                           1.000        
+ West               Pearson     Life satisfaction (1=dissatisfied,     1.000                                           -.025        
+                    Correlation 5=satisfied)                                                                                        
+                                Age in years                           -.025                                           1.000        
+
+Model Summary
+
+ Region (East/West) Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ East               1     .046(a) .002     .000              1.203                      
+ West               1     .025(a) .001     .000              1.139                      
+a Predictors: (Constant), Age in years
+
+ANOVA(a)
+
+ Region (East/West) Model            Sum of Squares df   Mean Square F     Sig.    
+ East               1     Regression 1.514          1    1.514       1.045 .307(b) 
+                          Residual   703.788        486  1.448                     
+                          Total      705.302        487                            
+ West               1     Regression 1.518          1    1.518       1.170 .280(b) 
+                          Residual   2526.327       1947 1.298                     
+                          Total      2527.845       1948                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Age in years
+
+Coefficients(a)
+
+ Region      Model              Unstandardized Coefficients Standardized Coefficients t      Sig. 
+ (East/West)                    B                Std. Error Beta                                  
+ East        1     (Constant)   3.789            .171                                 22.179 .000 
+                   Age in years -.003            .003       -.046                     -1.022 .307 
+ West        1     (Constant)   3.708            .081                                 46.034 .000 
+                   Age in years -.002            .002       -.025                     -1.082 .280 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+
+=========== Test 4b ===========
+
+Regression
+Descriptive Statistics
+
+ Region (East/West)                                                 Mean Std. Deviation N    
+ East               Life satisfaction (1=dissatisfied, 5=satisfied) 3.65 1.206          424  
+                    Trust in government (1=none, 5=complete)        2.62 1.173          424  
+                    Trust in media (1=none, 5=complete)             2.40 1.093          424  
+                    Trust in science (1=none, 5=complete)           3.65 1.012          424  
+ West               Life satisfaction (1=dissatisfied, 5=satisfied) 3.65 1.127          1656 
+                    Trust in government (1=none, 5=complete)        2.63 1.162          1656 
+                    Trust in media (1=none, 5=complete)             2.43 1.171          1656 
+                    Trust in science (1=none, 5=complete)           3.61 1.037          1656 
+
+Correlations
+
+ Region (East/West)                                Life satisfaction Trust in government  Trust in media       Trust in science     
+                                                   (1=dissatisfied,  (1=none, 5=complete) (1=none, 5=complete) (1=none, 5=complete) 
+                                                   5=satisfied)                                                                     
+ East               Pearson     Life satisfaction  1.000             -.039                -.060                -.077                
+                    Correlation (1=dissatisfied,                                                                                    
+                                5=satisfied)                                                                                        
+                                Trust in           -.039             1.000                -.007                .023                 
+                                government                                                                                          
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in media     -.060             -.007                1.000                .067                 
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in science   -.077             .023                 .067                 1.000                
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+ West               Pearson     Life satisfaction  1.000             .007                 .058                 -.010                
+                    Correlation (1=dissatisfied,                                                                                    
+                                5=satisfied)                                                                                        
+                                Trust in           .007              1.000                .025                 .021                 
+                                government                                                                                          
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in media     .058              .025                 1.000                .011                 
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+                                Trust in science   -.010             .021                 .011                 1.000                
+                                (1=none,                                                                                            
+                                5=complete)                                                                                         
+
+Model Summary
+
+ Region (East/West) Model R       R Square Adjusted R Square Std. Error of the Estimate 
+ East               1     .102(a) .010     .003              1.204                      
+ West               1     .059(b) .003     .002              1.126                      
+a Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in government (1=none, 5=complete), Trust in media (1=none, 5=complete)
+b Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in media (1=none, 5=complete), Trust in government (1=none, 5=complete)
+
+ANOVA(a)
+
+ Region (East/West) Model            Sum of Squares df   Mean Square F     Sig.    
+ East               1     Regression 6.418          3    2.139       1.475 .221(b) 
+                          Residual   609.770        420  1.450                     
+                          Total      616.187        423                            
+ West               1     Regression 7.342          3    2.447       1.930 .123(c) 
+                          Residual   2094.198       1652 1.268                     
+                          Total      2101.540       1655                           
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+b Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in government (1=none, 5=complete), Trust in media (1=none, 5=complete)
+c Predictors: (Constant), Trust in science (1=none, 5=complete), Trust in media (1=none, 5=complete), Trust in government (1=none, 5=complete)
+
+Coefficients(a)
+
+ Region      Model                                          Unstandardized Coefficients Standardized Coefficients t      Sig. 
+ (East/West)                                                B                Std. Error Beta                                  
+ East        1     (Constant)                               4.215            .278                                 15.168 .000 
+                   Trust in government (1=none, 5=complete) -.039            .050       -.038                     -.784  .433 
+                   Trust in media (1=none, 5=complete)      -.062            .054       -.056                     -1.148 .252 
+                   Trust in science (1=none, 5=complete)    -.086            .058       -.072                     -1.484 .138 
+ West        1     (Constant)                               3.548            .129                                 27.398 .000 
+                   Trust in government (1=none, 5=complete) .005             .024       .005                      .216   .829 
+                   Trust in media (1=none, 5=complete)      .056             .024       .058                      2.356  .019 
+                   Trust in science (1=none, 5=complete)    -.012            .027       -.011                     -.435  .664 
+a Dependent Variable: Life satisfaction (1=dissatisfied, 5=satisfied)
+

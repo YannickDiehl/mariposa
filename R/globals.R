@@ -59,5 +59,17 @@ utils::globalVariables(c(
   "Q25", "Q50", "Q75",
 
   # Effect size fields
-  "effective_n"
+  "effective_n",
+
+  # EFA output columns
+  "component", "eigenvalue", "prc_variance", "cumulative_prc",
+  "ss_loading", "analysis_n", "missing_n",
+
+  # Linear regression output columns
+  "Term", "B", "Std.Error", "Beta", "t", "p", "CI_lower", "CI_upper",
+  "Source", "Sum_of_Squares", "Mean_Square", "F_statistic", "Sig",
+  "Std.Deviation", ".wt",
+
+  # Logistic regression output columns
+  "S.E.", "Wald", "Sig.", "Exp(B)"
 ))
