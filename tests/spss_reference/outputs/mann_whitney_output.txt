@@ -1,0 +1,522 @@
+﻿NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= life_satisfaction BY gender(1 2)                                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+                   Gender N    Mean Rank Sum of Ranks 
+ Life satisfaction Male   1149 1196.71   1375022.00   
+ (1=dissatisfied,  Female 1272 1223.91   1556809.00   
+ 5=satisfied)      Total  2421                        
+
+Test Statistics(a)
+
+                        Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Mann-Whitney U         714347.000                                      
+ Wilcoxon W             1375022.000                                     
+ Z                      -.989                                           
+ Asymp. Sig. (2-tailed) .323                                            
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= income BY gender(1 2)                                                          
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+              Gender N    Mean Rank Sum of Ranks 
+ Monthly      Male   1046 1103.31   1154058.00   
+ household    Female 1140 1084.50   1236333.00   
+ income (EUR) Total  2186                        
+
+Test Statistics(a)
+
+                        Monthly household income (EUR) 
+ Mann-Whitney U         585963.000                     
+ Wilcoxon W             1236333.000                    
+ Z                      -.696                          
+ Asymp. Sig. (2-tailed) .486                           
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= age BY gender(1 2)                                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+       Gender N    Mean Rank Sum of Ranks 
+ Age   Male   1194 1248.03   1490147.00   
+ in    Female 1306 1252.76   1636103.00   
+ years Total  2500                        
+
+Test Statistics(a)
+
+                        Age in years 
+ Mann-Whitney U         776732.000   
+ Wilcoxon W             1490147.000  
+ Z                      -.164        
+ Asymp. Sig. (2-tailed) .870         
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= life_satisfaction BY gender(1 2)                                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+                   Gender N    Mean Rank Sum of Ranks 
+ Life satisfaction Male   1149 1196.71   1375022.00   
+ (1=dissatisfied,  Female 1272 1223.91   1556809.00   
+ 5=satisfied)      Total  2421                        
+
+Test Statistics(a)
+
+                        Life satisfaction (1=dissatisfied, 5=satisfied) 
+ Mann-Whitney U         714347.000                                      
+ Wilcoxon W             1375022.000                                     
+ Z                      -.989                                           
+ Asymp. Sig. (2-tailed) .323                                            
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= income BY gender(1 2)                                                          
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+              Gender N    Mean Rank Sum of Ranks 
+ Monthly      Male   1046 1103.31   1154058.00   
+ household    Female 1140 1084.50   1236333.00   
+ income (EUR) Total  2186                        
+
+Test Statistics(a)
+
+                        Monthly household income (EUR) 
+ Mann-Whitney U         585963.000                     
+ Wilcoxon W             1236333.000                    
+ Z                      -.696                          
+ Asymp. Sig. (2-tailed) .486                           
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= age BY gender(1 2)                                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+       Gender N    Mean Rank Sum of Ranks 
+ Age   Male   1194 1248.03   1490147.00   
+ in    Female 1306 1252.76   1636103.00   
+ years Total  2500                        
+
+Test Statistics(a)
+
+                        Age in years 
+ Mann-Whitney U         776732.000   
+ Wilcoxon W             1490147.000  
+ Z                      -.164        
+ Asymp. Sig. (2-tailed) .870         
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= life_satisfaction BY gender(1 2)                                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+ Region (East/West)                   Gender N    Mean Rank Sum of Ranks 
+ East               Life satisfaction Male   228  237.05    54046.50     
+                    (1=dissatisfied,  Female 237  229.11    54298.50     
+                    5=satisfied)      Total  465                         
+ West               Life satisfaction Male   921  959.57    883762.00    
+                    (1=dissatisfied,  Female 1035 995.35    1030184.00   
+                    5=satisfied)      Total  1956                        
+
+Test Statistics(a)
+
+ Region (East/West)                        Life satisfaction (1=dissatisfied, 5=satisfied) 
+ East               Mann-Whitney U         26095.500                                       
+                    Wilcoxon W             54298.500                                       
+                    Z                      -.658                                           
+                    Asymp. Sig. (2-tailed) .510                                            
+ West               Mann-Whitney U         459181.000                                      
+                    Wilcoxon W             883762.000                                      
+                    Z                      -1.447                                          
+                    Asymp. Sig. (2-tailed) .148                                            
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= income BY gender(1 2)                                                          
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+ Region (East/West)              Gender N    Mean Rank Sum of Ranks 
+ East               Monthly      Male   207  223.46    46255.50     
+                    household    Female 222  207.11    45979.50     
+                    income (EUR) Total  429                         
+ West               Monthly      Male   839  880.58    738810.00    
+                    household    Female 918  877.55    805593.00    
+                    income (EUR) Total  1757                        
+
+Test Statistics(a)
+
+ Region (East/West)                        Monthly household income (EUR) 
+ East               Mann-Whitney U         21226.500                      
+                    Wilcoxon W             45979.500                      
+                    Z                      -1.365                         
+                    Asymp. Sig. (2-tailed) .172                           
+ West               Mann-Whitney U         383772.000                     
+                    Wilcoxon W             805593.000                     
+                    Z                      -.125                          
+                    Asymp. Sig. (2-tailed) .900                           
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= age BY gender(1 2)                                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+ Region (East/West)       Gender N    Mean Rank Sum of Ranks 
+ East               Age   Male   238  237.11    56433.00     
+                    in    Female 247  248.67    61422.00     
+                    years Total  485                         
+ West               Age   Male   956  1011.36   966859.00    
+                    in    Female 1059 1004.97   1064261.00   
+                    years Total  2015                        
+
+Test Statistics(a)
+
+ Region (East/West)                        Age in years 
+ East               Mann-Whitney U         27992.000    
+                    Wilcoxon W             56433.000    
+                    Z                      -.908        
+                    Asymp. Sig. (2-tailed) .364         
+ West               Mann-Whitney U         502991.000   
+                    Wilcoxon W             1064261.000  
+                    Z                      -.246        
+                    Asymp. Sig. (2-tailed) .805         
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= life_satisfaction BY gender(1 2)                                               
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+ Region (East/West)                   Gender N    Mean Rank Sum of Ranks 
+ East               Life satisfaction Male   228  237.05    54046.50     
+                    (1=dissatisfied,  Female 237  229.11    54298.50     
+                    5=satisfied)      Total  465                         
+ West               Life satisfaction Male   921  959.57    883762.00    
+                    (1=dissatisfied,  Female 1035 995.35    1030184.00   
+                    5=satisfied)      Total  1956                        
+
+Test Statistics(a)
+
+ Region (East/West)                        Life satisfaction (1=dissatisfied, 5=satisfied) 
+ East               Mann-Whitney U         26095.500                                       
+                    Wilcoxon W             54298.500                                       
+                    Z                      -.658                                           
+                    Asymp. Sig. (2-tailed) .510                                            
+ West               Mann-Whitney U         459181.000                                      
+                    Wilcoxon W             883762.000                                      
+                    Z                      -1.447                                          
+                    Asymp. Sig. (2-tailed) .148                                            
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= income BY gender(1 2)                                                          
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+ Region (East/West)              Gender N    Mean Rank Sum of Ranks 
+ East               Monthly      Male   207  223.46    46255.50     
+                    household    Female 222  207.11    45979.50     
+                    income (EUR) Total  429                         
+ West               Monthly      Male   839  880.58    738810.00    
+                    household    Female 918  877.55    805593.00    
+                    income (EUR) Total  1757                        
+
+Test Statistics(a)
+
+ Region (East/West)                        Monthly household income (EUR) 
+ East               Mann-Whitney U         21226.500                      
+                    Wilcoxon W             45979.500                      
+                    Z                      -1.365                         
+                    Asymp. Sig. (2-tailed) .172                           
+ West               Mann-Whitney U         383772.000                     
+                    Wilcoxon W             805593.000                     
+                    Z                      -.125                          
+                    Asymp. Sig. (2-tailed) .900                           
+a Grouping Variable: Gender
+
+NPar Tests
+Notes
+
+ Output Created                               26-FEB-2026 10:34:41                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each test are based on all cases with valid data for the variable(s)   
+                                              used in that test.                                                                    
+ Syntax                                       NPAR TESTS                                                                            
+                                               /M-W= age BY gender(1 2)                                                             
+                                               /MISSING ANALYSIS.                                                                   
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Number of Cases Allowed(a)     449389                                                                                
+a Based on availability of workspace memory.
+
+Mann-Whitney Test
+Ranks
+
+ Region (East/West)       Gender N    Mean Rank Sum of Ranks 
+ East               Age   Male   238  237.11    56433.00     
+                    in    Female 247  248.67    61422.00     
+                    years Total  485                         
+ West               Age   Male   956  1011.36   966859.00    
+                    in    Female 1059 1004.97   1064261.00   
+                    years Total  2015                        
+
+Test Statistics(a)
+
+ Region (East/West)                        Age in years 
+ East               Mann-Whitney U         27992.000    
+                    Wilcoxon W             56433.000    
+                    Z                      -.908        
+                    Asymp. Sig. (2-tailed) .364         
+ West               Mann-Whitney U         502991.000   
+                    Wilcoxon W             1064261.000  
+                    Z                      -.246        
+                    Asymp. Sig. (2-tailed) .805         
+a Grouping Variable: Gender
+

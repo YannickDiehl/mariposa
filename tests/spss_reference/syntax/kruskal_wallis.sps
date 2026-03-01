@@ -7,13 +7,16 @@
 * Weight: sampling_weight
 * Split grouping: region
 
+GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/survey_data.sav'.
+
 * Start Output Management System to save results as text
 
 OMS
-  /IF SUBTYPES=['Kruskal-Wallis Test' 'Test Statistics' 'Ranks']
+  /IF COMMANDS=['NPAR Tests']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/outputs/kruskal_wallis_output.txt'.
 
 COMPUTE original_order = $CASENUM.
+EXECUTE.
 
 * ============================================================================.
 * TEST 1: UNWEIGHTED / UNGROUPED
@@ -67,6 +70,14 @@ TITLE '=========== Test 2b ==========='.
 SUBTITLE 'Kruskal-Wallis: income by employment (weighted, ungrouped)'.
 NPAR TESTS
   /K-W=income BY employment(1,5)
+  /MISSING ANALYSIS.
+
+TITLE '=========== Test 2c ==========='.
+
+* Test 2c: trust_government by education (weighted)
+SUBTITLE 'Kruskal-Wallis: trust_government by education (weighted, ungrouped)'.
+NPAR TESTS
+  /K-W=trust_government BY education(1,4)
   /MISSING ANALYSIS.
 
 WEIGHT OFF.
