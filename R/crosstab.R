@@ -376,113 +376,123 @@ print.crosstab <- function(x, digits = 1, ...) {
   n_rows <- length(x$row_levels)
   n_cols <- length(x$col_levels)
 
-  # Prepare the display table
-  display_table <- x$table
+  # Determine percentage sub-labels for width calculation
+  pct_sub_labels <- c()
+  if (!is.null(x$row_pct))   pct_sub_labels <- c(pct_sub_labels, "  row %")
+  if (!is.null(x$col_pct))   pct_sub_labels <- c(pct_sub_labels, "  col %")
+  if (!is.null(x$total_pct)) pct_sub_labels <- c(pct_sub_labels, "  total %")
 
-  # Add row totals
-  display_table <- cbind(display_table, Total = x$row_totals)
+  # Row label column width (interior between | delimiters)
+  all_first_col <- c(display_row_levels, "Total", x$row_var, pct_sub_labels)
+  row_label_width <- max(12, max(nchar(all_first_col)) + 2)
 
-  # Add column totals row
-  col_totals_row <- c(x$col_totals, x$total)
-  display_table <- rbind(display_table, Total = col_totals_row)
+  # Data column width (interior between | delimiters)
+  max_count <- max(c(x$table, x$row_totals, x$col_totals, x$total))
+  count_chars <- nchar(sprintf("%.0f", max_count))
+  pct_chars <- digits + 5  # "100.0%" = 6 chars at digits=1
+  header_chars <- max(nchar(c(display_col_levels, "Total")))
+  data_col_width <- max(8, max(count_chars, pct_chars, header_chars) + 2)
 
-  # Format the table for printing
-  # Calculate column widths based on display labels
-  col_width <- max(10, max(nchar(display_col_levels)) + 2)
-  row_label_width <- max(12, max(nchar(display_row_levels)) + 2)
+  # --- Local helper closures ---
 
-  # Print column variable name
-  cat(pad_utf8("", row_label_width))
-  cat(x$col_var, "\n")
-
-  # Print column headers
-  cat(x$row_var, "\n")
-  cat(pad_utf8("", row_label_width))
-  for (col in display_col_levels) {
-    cat(pad_utf8(col, col_width, "right"))
+  # Horizontal line: +------------+--------+--------+
+  ct_line <- function(char = "-") {
+    parts <- c(paste(rep(char, row_label_width), collapse = ""))
+    for (k in seq_len(n_cols + 1)) {
+      parts <- c(parts, paste(rep(char, data_col_width), collapse = ""))
+    }
+    cat("+", paste(parts, collapse = "+"), "+\n", sep = "")
   }
-  cat(pad_utf8("Total", col_width, "right"))
-  cat("\n")
 
-  # Print separator
-  total_width <- row_label_width + (n_cols + 1) * col_width
-  cat(paste(rep("-", total_width), collapse = ""), "\n")
+  # Spanning header row: |            |       region             |
+  ct_spanning_row <- function(label, spanning_text) {
+    label_cell <- pad_utf8(paste0(" ", label), row_label_width)
+    span_width <- (n_cols + 1) * data_col_width + n_cols
+    text_len <- nchar(spanning_text, type = "chars")
+    left_pad <- max(1, (span_width - text_len) %/% 2)
+    centered <- paste0(paste(rep(" ", left_pad), collapse = ""), spanning_text)
+    span_cell <- pad_utf8(centered, span_width)
+    cat("|", label_cell, "|", span_cell, "|\n", sep = "")
+  }
 
-  # Print each row with counts
+  # Data row: | Label      |    800 |    300 |   1100 |
+  ct_row <- function(label, values) {
+    label_cell <- pad_utf8(paste0(" ", label), row_label_width)
+    value_cells <- vapply(values, function(v) {
+      pad_utf8(paste0(v, " "), data_col_width, "right")
+    }, character(1))
+    cat("|", label_cell, "|", paste(value_cells, collapse = "|"), "|\n", sep = "")
+  }
+
+  # Format percentage value
+  fmt_pct <- function(value) sprintf(paste0("%.", digits, "f%%"), value)
+
+  # --- Table header ---
+  ct_line()
+  ct_spanning_row("", x$col_var)
+  ct_row(x$row_var, c(display_col_levels, "Total"))
+  ct_line()
+
+  # --- Data rows ---
   for (i in seq_len(n_rows)) {
-    # Row label
-    cat(pad_utf8(display_row_levels[i], row_label_width))
+    # Count row
+    count_vals <- c(
+      vapply(seq_len(n_cols), function(j) sprintf("%.0f", x$table[i, j]), character(1)),
+      sprintf("%.0f", x$row_totals[i])
+    )
+    ct_row(display_row_levels[i], count_vals)
 
-    # Counts
-    for (j in seq_len(n_cols)) {
-      cat(sprintf("%*.0f", col_width, display_table[i, j]))
+    # Row percentage sub-row
+    if (!is.null(x$row_pct)) {
+      pct_vals <- c(
+        vapply(seq_len(n_cols), function(j) fmt_pct(x$row_pct[i, j]), character(1)),
+        fmt_pct(100)
+      )
+      ct_row("  row %", pct_vals)
     }
-    # Row total
-    cat(sprintf("%*.0f", col_width, display_table[i, n_cols + 1]))
-    cat("\n")
 
-    # Print percentages if requested
-    if (x$percentages != "none") {
-      # Row percentages
-      if (!is.null(x$row_pct)) {
-        cat(pad_utf8("", row_label_width))
-        for (j in seq_len(n_cols)) {
-          pct_val <- sprintf(paste0("%.", digits, "f%%"), x$row_pct[i, j])
-          cat(sprintf("%*s", col_width, pct_val))
-        }
-        cat(sprintf("%*s", col_width, paste0(formatC(100, format = "f", digits = digits), "%")))
-        cat("  (row %)\n")
-      }
-
-      # Column percentages
-      if (!is.null(x$col_pct)) {
-        cat(pad_utf8("", row_label_width))
-        for (j in seq_len(n_cols)) {
-          pct_val <- sprintf(paste0("%.", digits, "f%%"), x$col_pct[i, j])
-          cat(sprintf("%*s", col_width, pct_val))
-        }
-        # Row's percentage of total
-        row_of_total <- (x$row_totals[i] / x$total) * 100
-        cat(sprintf(paste0("%*.", digits, "f%%"), col_width, row_of_total))
-        cat("  (col %)\n")
-      }
-
-      # Total percentages
-      if (!is.null(x$total_pct)) {
-        cat(pad_utf8("", row_label_width))
-        for (j in seq_len(n_cols)) {
-          pct_val <- sprintf(paste0("%.", digits, "f%%"), x$total_pct[i, j])
-          cat(sprintf("%*s", col_width, pct_val))
-        }
-        # Row total percentage
-        row_total_pct <- (x$row_totals[i] / x$total) * 100
-        cat(sprintf(paste0("%*.", digits, "f%%"), col_width, row_total_pct))
-        cat("  (total %)\n")
-      }
-
-      if (i < n_rows) cat("\n")
+    # Column percentage sub-row
+    if (!is.null(x$col_pct)) {
+      row_of_total <- (x$row_totals[i] / x$total) * 100
+      pct_vals <- c(
+        vapply(seq_len(n_cols), function(j) fmt_pct(x$col_pct[i, j]), character(1)),
+        fmt_pct(row_of_total)
+      )
+      ct_row("  col %", pct_vals)
     }
+
+    # Total percentage sub-row
+    if (!is.null(x$total_pct)) {
+      row_total_pct <- (x$row_totals[i] / x$total) * 100
+      pct_vals <- c(
+        vapply(seq_len(n_cols), function(j) fmt_pct(x$total_pct[i, j]), character(1)),
+        fmt_pct(row_total_pct)
+      )
+      ct_row("  total %", pct_vals)
+    }
+
+    # Separator between row groups (= before Total)
+    if (i < n_rows) ct_line()
   }
 
-  # Print total row separator
-  cat(paste(rep("-", total_width), collapse = ""), "\n")
+  # --- Total row ---
+  ct_line("=")
+  total_vals <- c(
+    vapply(seq_len(n_cols), function(j) sprintf("%.0f", x$col_totals[j]), character(1)),
+    sprintf("%.0f", x$total)
+  )
+  ct_row("Total", total_vals)
 
-  # Print totals row
-  cat(pad_utf8("Total", row_label_width))
-  for (j in seq_len(n_cols)) {
-    cat(sprintf("%*.0f", col_width, x$col_totals[j]))
-  }
-  cat(sprintf("%*.0f", col_width, x$total))
-  cat("\n")
-
-  # Print column percentages for total row
+  # Total row's column percentage sub-row
   if (!is.null(x$col_pct)) {
-    cat(pad_utf8("", row_label_width))
-    for (j in seq_len(n_cols)) {
-      col_of_total <- (x$col_totals[j] / x$total) * 100
-      cat(sprintf(paste0("%*.", digits, "f%%"), col_width, col_of_total))
-    }
-    cat(sprintf("%*s", col_width, paste0(formatC(100, format = "f", digits = digits), "%")))
-    cat("\n")
+    pct_vals <- c(
+      vapply(seq_len(n_cols), function(j) {
+        fmt_pct((x$col_totals[j] / x$total) * 100)
+      }, character(1)),
+      fmt_pct(100)
+    )
+    ct_row("  col %", pct_vals)
   }
+
+  ct_line()
 }
