@@ -35,7 +35,7 @@ Which variance assumption fits your data best
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,8 +55,6 @@ Which variance assumption fits your data best
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
-    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -71,7 +69,7 @@ Which variance assumption fits your data best
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Compare Multiple Groups: Are Their Averages Different?</h1>
-      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/R/oneway_anova.R" class="external-link"><code>R/oneway_anova.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/R/oneway_anova.R" class="external-link"><code>R/oneway_anova.R</code></a></small>
       <div class="d-none name"><code>oneway_anova.Rd</code></div>
     </div>
 
@@ -211,18 +209,9 @@ measures of effect size for some common research designs. Psychological Methods,
 <p><code><a href="tukey_test.html">tukey_test</a></code> for post-hoc pairwise comparisons.</p>
 <p><code><a href="levene_test.html">levene_test</a></code> for testing homogeneity of variances.</p>
 <p>Other hypothesis_tests:
-<code><a href="ancova.html">ancova()</a></code>,
-<code><a href="binomial_test.html">binomial_test()</a></code>,
 <code><a href="chi_square.html">chi_square()</a></code>,
-<code><a href="chisq_gof.html">chisq_gof()</a></code>,
-<code><a href="factorial_anova.html">factorial_anova()</a></code>,
-<code><a href="fisher_test.html">fisher_test()</a></code>,
-<code><a href="friedman_test.html">friedman_test()</a></code>,
-<code><a href="kruskal_wallis.html">kruskal_wallis()</a></code>,
 <code><a href="mann_whitney.html">mann_whitney()</a></code>,
-<code><a href="mcnemar_test.html">mcnemar_test()</a></code>,
-<code><a href="t_test.html">t_test()</a></code>,
-<code><a href="wilcoxon_test.html">wilcoxon_test()</a></code></p></div>
+<code><a href="t_test.html">t_test()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -235,12 +224,11 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Null hypothesis: All group means are equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Alternative hypothesis: At least one group mean differs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -271,8 +259,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       0.077           0.076         0.076      medium</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Eta-squared: Proportion of variance explained (biased upward)</span>
@@ -286,11 +274,10 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">trust_government</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Null hypothesis: All group means are equal for each variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Alternative hypothesis: At least one group mean differs for each variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -348,8 +335,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government       0.001               0             0  negligible</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Eta-squared: Proportion of variance explained (biased upward)</span>
@@ -363,11 +350,10 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Null hypothesis: All group means are equal for each variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Alternative hypothesis: At least one group mean differs for each variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -452,8 +438,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  trust_science       0.001               0             0  negligible</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Eta-squared: Proportion of variance explained (biased upward)</span>
@@ -467,13 +453,12 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted One-Way ANOVA Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: income</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Null hypothesis: All group means are equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Alternative hypothesis: At least one group mean differs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -504,8 +489,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    income       0.387           0.386         0.386       large</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Eta-squared: Proportion of variance explained (biased upward)</span>
@@ -520,17 +505,17 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Null hypothesis: All group means are equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Alternative hypothesis: At least one group mean differs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -558,9 +543,10 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       0.043           0.037         0.037       small</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -588,8 +574,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       0.087           0.086         0.086      medium</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Eta-squared: Proportion of variance explained (biased upward)</span>
@@ -603,12 +589,11 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, var.equal <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── One-Way ANOVA Results ───────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: income</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Null hypothesis: All group means are equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Alternative hypothesis: At least one group mean differs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -639,8 +624,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    income       0.391            0.39          0.39       large</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Eta-squared: Proportion of variance explained (biased upward)</span>
@@ -656,12 +641,11 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Follow up with post-hoc tests</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -685,8 +669,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>    *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -695,11 +679,10 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># Check homogeneity of variances</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
@@ -709,8 +692,8 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable F_statistic df1  df2 p_value sig        Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction      31.634   3 2417       0 *** Variances unequal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>

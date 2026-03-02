@@ -114,8 +114,7 @@ data(survey_data)
 # Basic range
 survey_data %>% w_range(age, weights = sampling_weight)
 #> 
-#> Weighted Range Statistics
-#> -------------------------
+#> ── Weighted Range Statistics ───────────────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable weighted_range Effective_N
@@ -125,8 +124,7 @@ survey_data %>% w_range(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_range(age, income, weights = sampling_weight)
 #> 
-#> Weighted Range Statistics
-#> -------------------------
+#> ── Weighted Range Statistics ───────────────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable weighted_range Effective_N
@@ -140,8 +138,7 @@ survey_data %>% w_range(age, income, weights = sampling_weight)
 # Grouped data
 survey_data %>% group_by(region) %>% w_range(age, weights = sampling_weight)
 #> 
-#> Weighted Range Statistics
-#> -------------------------
+#> ── Weighted Range Statistics ───────────────────────────────────────────────────
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -160,8 +157,7 @@ survey_data %>% summarise(range_age = w_range(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_range(age)
 #> 
-#> Range Statistics
-#> ----------------
+#> ── Range Statistics ────────────────────────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable range    N

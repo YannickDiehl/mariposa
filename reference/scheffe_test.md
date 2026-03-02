@@ -16,9 +16,6 @@ Think of it as:
 
 ``` r
 scheffe_test(x, conf.level = 0.95, ...)
-
-# Default S3 method
-scheffe_test(x, conf.level = 0.95, ...)
 ```
 
 ## Arguments
@@ -146,9 +143,7 @@ for Tukey HSD post-hoc tests.
 for testing homogeneity of variances.
 
 Other posthoc:
-[`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
 [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md),
-[`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
 [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)
 
 ## Examples
@@ -164,12 +159,11 @@ anova_result <- survey_data %>%
 
 # Scheffe post-hoc comparisons
 anova_result %>% scheffe_test()
-#> Scheffe Post-Hoc Test Results
-#> -----------------------------
+#> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Scheffe's method
 #>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
@@ -195,7 +189,7 @@ anova_result %>% scheffe_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -209,11 +203,10 @@ anova_result_multi <- survey_data %>%
   oneway_anova(life_satisfaction, income, group = education)
 
 anova_result_multi %>% scheffe_test()
-#> Scheffe Post-Hoc Test Results
-#> -----------------------------
+#> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Scheffe's method
 #>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
@@ -260,7 +253,7 @@ anova_result_multi %>% scheffe_test()
 #> -------------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -274,13 +267,12 @@ anova_weighted <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
 anova_weighted %>% scheffe_test()
-#> Weighted Scheffe Post-Hoc Test Results
-#> --------------------------------------
+#> ── Weighted Scheffe Post-Hoc Test Results ──────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Scheffe's method
 #>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
@@ -306,7 +298,7 @@ anova_weighted %>% scheffe_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -321,17 +313,17 @@ anova_grouped <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 
 anova_grouped %>% scheffe_test()
-#> Scheffe Post-Hoc Test Results
-#> -----------------------------
+#> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Scheffe's method
 #>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
 #> 
-#> Group: region = East
-#> --------------------
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -354,8 +346,9 @@ anova_grouped %>% scheffe_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Group: region = West
-#> --------------------
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -378,7 +371,7 @@ anova_grouped %>% scheffe_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -389,12 +382,11 @@ anova_grouped %>% scheffe_test()
 
 # Custom confidence level (99%)
 anova_result %>% scheffe_test(conf.level = 0.99)
-#> Scheffe Post-Hoc Test Results
-#> -----------------------------
+#> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 99.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 99.0%
 #>   Family-wise error rate controlled using Scheffe's method
 #>   Note: Most conservative post-hoc test (widest confidence intervals)
 #> 
@@ -420,7 +412,7 @@ anova_result %>% scheffe_test(conf.level = 0.99)
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group

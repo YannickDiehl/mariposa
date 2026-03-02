@@ -203,18 +203,9 @@ for printing results.
 grouped analyses.
 
 Other hypothesis_tests:
-[`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md),
-[`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
 [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md),
-[`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
-[`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md),
-[`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md),
-[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
-[`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
 [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),
-[`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md),
-[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
-[`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
+[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
 
 ## Examples
 
@@ -226,14 +217,13 @@ data(survey_data)
 # Basic two-sample test
 survey_data %>%
   t_test(life_satisfaction, group = gender)
-#> t-Test Results
-#> --------------
+#> ── t-Test Results ──────────────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -254,7 +244,7 @@ survey_data %>%
 #>  life_satisfaction   -0.041   -0.041      -0.041  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -267,15 +257,14 @@ survey_data %>%
 # With survey weights
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
+#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -296,7 +285,7 @@ survey_data %>%
 #>  life_satisfaction   -0.043   -0.043      -0.043  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -309,15 +298,14 @@ survey_data %>%
 # Multiple variables
 survey_data %>%
   t_test(age, income, life_satisfaction, group = region, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
+#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: region
-#> - Groups compared: East vs. West
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: region
+#> • Groups compared: East vs. West
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- age ---
@@ -374,7 +362,7 @@ survey_data %>%
 #>  life_satisfaction   -0.002   -0.002      -0.002  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -387,8 +375,7 @@ survey_data %>%
 # One-sample test against a benchmark
 survey_data %>%
   t_test(life_satisfaction, mu = 5, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
+#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -400,7 +387,7 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -414,19 +401,19 @@ survey_data %>%
 survey_data %>%
   group_by(region) %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
+#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
-#> Group: region = East
-#> --------------------
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -446,8 +433,9 @@ survey_data %>%
 #>  life_satisfaction    0.058    0.058       0.058  negligible
 #> 
 #> 
-#> Group: region = West
-#> --------------------
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -467,7 +455,7 @@ survey_data %>%
 #>  life_satisfaction    -0.07    -0.07       -0.07  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -480,14 +468,13 @@ survey_data %>%
 # Equal variance assumption
 survey_data %>%
   t_test(life_satisfaction, group = gender, var.equal = TRUE)
-#> t-Test Results
-#> --------------
+#> ── t-Test Results ──────────────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -508,7 +495,7 @@ survey_data %>%
 #>  life_satisfaction   -0.041   -0.041      -0.041  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -521,14 +508,13 @@ survey_data %>%
 # One-sided test
 survey_data %>%
   t_test(income, group = gender, alternative = "greater")
-#> t-Test Results
-#> --------------
+#> ── t-Test Results ──────────────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: greater
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: greater
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
@@ -549,7 +535,7 @@ survey_data %>%
 #>    income     0.03     0.03        0.03  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -562,15 +548,14 @@ survey_data %>%
 # Using tidyselect helpers
 survey_data %>%
   t_test(starts_with("trust"), group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
+#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- trust_government ---
@@ -627,7 +612,7 @@ survey_data %>%
 #>  trust_science   -0.058   -0.058      -0.057  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
@@ -641,15 +626,14 @@ survey_data %>%
 result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 print(result)
-#> Weighted t-Test Results
-#> -----------------------
+#> ── Weighted t-Test Results ─────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
+#> • Grouping variable: gender
+#> • Groups compared: Male vs. Female
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
+#> • Alternative hypothesis: two.sided
+#> • Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -670,7 +654,7 @@ print(result)
 #>  life_satisfaction   -0.043   -0.043      -0.043  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)

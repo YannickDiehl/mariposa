@@ -17,9 +17,6 @@ The test tells you:
 ``` r
 levene_test(x, ...)
 
-# Default S3 method
-levene_test(x, ...)
-
 # S3 method for class 'data.frame'
 levene_test(x, ..., group, weights = NULL, center = c("mean", "median"))
 
@@ -166,8 +163,6 @@ for group mean comparisons.
 F-test of variance equality.
 
 Other posthoc:
-[`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
-[`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
 [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md),
 [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)
 
@@ -181,11 +176,10 @@ data(survey_data)
 # Standalone Levene test (test homogeneity of variances)
 survey_data %>% levene_test(life_satisfaction, group = region)
 #> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> - Grouping variable: region
-#> - Center: mean
+#> • Grouping variable: region
+#> • Center: mean
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -196,7 +190,7 @@ survey_data %>% levene_test(life_satisfaction, group = region)
 #>  life_satisfaction       3.164   1 2419   0.075     Variances equal
 #> ------------------------------------------------------------------ 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
@@ -205,11 +199,10 @@ survey_data %>% levene_test(life_satisfaction, group = region)
 # Multiple variables
 survey_data %>% levene_test(life_satisfaction, trust_government, group = region)
 #> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> - Grouping variable: region
-#> - Center: mean
+#> • Grouping variable: region
+#> • Center: mean
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -229,7 +222,7 @@ survey_data %>% levene_test(life_satisfaction, trust_government, group = region)
 #>  trust_government       0.145   1 2352   0.703     Variances equal
 #> ----------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
@@ -238,12 +231,11 @@ survey_data %>% levene_test(life_satisfaction, trust_government, group = region)
 # Weighted analysis
 survey_data %>% levene_test(income, group = education, weights = sampling_weight)
 #> 
-#> Weighted Levene's Test for Homogeneity of Variance 
-#> ---------------------------------------------------
+#> ── Weighted Levene's Test for Homogeneity of Variance  ─────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Center: mean
+#> • Grouping variable: education
+#> • Weights variable: sampling_weight
+#> • Center: mean
 #> 
 #> 
 #> --- income ---
@@ -254,7 +246,7 @@ survey_data %>% levene_test(income, group = education, weights = sampling_weight
 #>    income      102.05   3 2197       0 *** Variances unequal
 #> ----------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
@@ -265,11 +257,10 @@ result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 result %>% levene_test()
 #> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Center: mean
+#> • Grouping variable: education
+#> • Center: mean
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -280,7 +271,7 @@ result %>% levene_test()
 #>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
 #> -------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
@@ -294,11 +285,10 @@ survey_data %>%
   t_test(age, group = gender) %>%
   levene_test()
 #> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> - Grouping variable: gender
-#> - Center: mean
+#> • Grouping variable: gender
+#> • Center: mean
 #> 
 #> 
 #> --- age ---
@@ -309,7 +299,7 @@ survey_data %>%
 #>       age       0.534   1 2498   0.465     Variances equal
 #> --------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
@@ -321,11 +311,10 @@ survey_data %>%
 # Using mean instead of median as center
 survey_data %>% levene_test(income, group = region, center = "mean")
 #> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> - Grouping variable: region
-#> - Center: mean
+#> • Grouping variable: region
+#> • Center: mean
 #> 
 #> 
 #> --- income ---
@@ -336,7 +325,7 @@ survey_data %>% levene_test(income, group = region, center = "mean")
 #>    income       1.631   1 2184   0.202     Variances equal
 #> --------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)

@@ -152,53 +152,51 @@ data(survey_data)
 # Basic unweighted analysis
 survey_data %>% describe(age)
 #> 
-#> Descriptive Statistics
-#> ----------------------
+#> ── Descriptive Statistics ──────────────────────────────────────────────────────
 #>  Variable  Mean Median     SD Range IQR Skewness    N Missing
 #>       age 50.55     50 16.976    77  24    0.172 2500       0
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Weighted analysis
 survey_data %>% describe(age, weights = sampling_weight)
 #> 
-#> Weighted Descriptive Statistics
-#> -------------------------------
+#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #>  Variable   Mean Median     SD Range IQR Skewness Effective_N
 #>       age 50.514     50 17.084    77  25    0.159      2468.8
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Multiple variables with custom statistics
 survey_data %>% describe(age, income, life_satisfaction, 
                         weights = sampling_weight, 
                         show = c("mean", "sd", "skew"))
 #> 
-#> Weighted Descriptive Statistics
-#> -------------------------------
+#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #>           Variable     Mean       SD Skewness Effective_N
 #>                age   50.514   17.084    0.159      2468.8
 #>             income 3743.099 1423.966    0.724      2158.9
 #>  life_satisfaction    3.625    1.152   -0.498      2390.9
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Grouped analysis
 survey_data %>% 
   group_by(region) %>% 
   describe(age, weights = sampling_weight)
 #> 
-#> Weighted Descriptive Statistics
-#> -------------------------------
+#> ── Weighted Descriptive Statistics ─────────────────────────────────────────────
 #> 
-#> Group: region = East
-#> --------------------
-#> ----------------------------------------
+#> 
+#> ── Group: region = East ──
+#> 
+#> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable   Mean Median     SD Range IQR Skewness Effective_N
 #>       age 52.278     53 17.595    77  24    0.098         477
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 #> 
-#> Group: region = West
-#> --------------------
-#> ----------------------------------------
+#> 
+#> ── Group: region = West ──
+#> 
+#> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable   Mean Median     SD Range IQR Skewness Effective_N
 #>       age 50.067     49 16.927    77  24     0.17      1993.1
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 ```

@@ -136,32 +136,29 @@ data(survey_data)
 # Basic weighted quantiles (0%, 25%, 50%, 75%, 100%)
 survey_data %>% w_quantile(age, weights = sampling_weight)
 #> 
-#> Weighted Quantile Statistics
-#> ----------------------------
+#> ── Weighted Quantile Statistics ────────────────────────────────────────────────
 #>  Variable Quantile Value    N Effective_N         Weights
 #>       age      Min    18 2500      2468.8 sampling_weight
 #>       age      25%    38 2500      2468.8 sampling_weight
 #>       age      50%    50 2500      2468.8 sampling_weight
 #>       age      75%    63 2500      2468.8 sampling_weight
 #>       age      Max    95 2500      2468.8 sampling_weight
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Custom quantiles
 survey_data %>% w_quantile(income, weights = sampling_weight, probs = c(0.1, 0.5, 0.9))
 #> 
-#> Weighted Quantile Statistics
-#> ----------------------------
+#> ── Weighted Quantile Statistics ────────────────────────────────────────────────
 #>  Variable Quantile Value    N Effective_N         Weights
 #>    income      10%  2100 2186      2158.9 sampling_weight
 #>    income      50%  3500 2186      2158.9 sampling_weight
 #>    income      90%  5700 2186      2158.9 sampling_weight
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Multiple variables
 survey_data %>% w_quantile(age, income, weights = sampling_weight)
 #> 
-#> Weighted Quantile Statistics
-#> ----------------------------
+#> ── Weighted Quantile Statistics ────────────────────────────────────────────────
 #>  Variable Quantile Value    N Effective_N         Weights
 #>       age      Min    18 2500      2468.8 sampling_weight
 #>       age      25%    38 2500      2468.8 sampling_weight
@@ -173,44 +170,42 @@ survey_data %>% w_quantile(age, income, weights = sampling_weight)
 #>    income      50%  3500 2186      2158.9 sampling_weight
 #>    income      75%  4600 2186      2158.9 sampling_weight
 #>    income      Max  8000 2186      2158.9 sampling_weight
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Grouped data  
 survey_data %>% group_by(region) %>% w_quantile(age, weights = sampling_weight)
 #> 
-#> Weighted Quantile Statistics
-#> ----------------------------
+#> ── Weighted Quantile Statistics ────────────────────────────────────────────────
 #> 
 #> Group: region = East
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable Quantile Value   N Effective_N         Weights
 #>       age      Min    18 485         477 sampling_weight
 #>       age      25%    40 485         477 sampling_weight
 #>       age      50%    53 485         477 sampling_weight
 #>       age      75%    64 485         477 sampling_weight
 #>       age      Max    95 485         477 sampling_weight
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 #> 
 #> Group: region = West
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 #>  Variable Quantile Value    N Effective_N         Weights
 #>       age      Min    18 2015      1993.1 sampling_weight
 #>       age      25%    38 2015      1993.1 sampling_weight
 #>       age      50%    49 2015      1993.1 sampling_weight
 #>       age      75%    62 2015      1993.1 sampling_weight
 #>       age      Max    95 2015      1993.1 sampling_weight
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # Unweighted (for comparison)
 survey_data %>% w_quantile(age)
 #> 
-#> Quantile Statistics
-#> -------------------
+#> ── Quantile Statistics ─────────────────────────────────────────────────────────
 #>  Variable Quantile Value    N
 #>       age      Min    18 2500
 #>       age      25%    38 2500
 #>       age      50%    50 2500
 #>       age      75%    62 2500
 #>       age      Max    95 2500
-#> ----------------------------------------
+#> ────────────────────────────────────────────────────────────────────────────────
 ```

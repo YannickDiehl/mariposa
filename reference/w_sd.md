@@ -120,8 +120,7 @@ data(survey_data)
 # Basic weighted standard deviation
 survey_data %>% w_sd(age, weights = sampling_weight)
 #> 
-#> Weighted Standard Deviation Statistics
-#> --------------------------------------
+#> ── Weighted Standard Deviation Statistics ──────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable weighted_sd Effective_N
@@ -131,8 +130,7 @@ survey_data %>% w_sd(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_sd(age, income, life_satisfaction, weights = sampling_weight)
 #> 
-#> Weighted Standard Deviation Statistics
-#> --------------------------------------
+#> ── Weighted Standard Deviation Statistics ──────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable weighted_sd Effective_N
@@ -150,8 +148,7 @@ survey_data %>% w_sd(age, income, life_satisfaction, weights = sampling_weight)
 # Grouped data
 survey_data %>% group_by(region) %>% w_sd(age, weights = sampling_weight)
 #> 
-#> Weighted Standard Deviation Statistics
-#> --------------------------------------
+#> ── Weighted Standard Deviation Statistics ──────────────────────────────────────
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -170,8 +167,7 @@ survey_data %>% summarise(sd_age = w_sd(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_sd(age)
 #> 
-#> Standard Deviation Statistics
-#> -----------------------------
+#> ── Standard Deviation Statistics ───────────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable     sd    N

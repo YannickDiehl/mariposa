@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,8 +53,6 @@
     <li><a class="dropdown-item" href="articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
-    <li><a class="dropdown-item" href="articles/scale-analysis.html">Scale Analysis</a></li>
-    <li><a class="dropdown-item" href="articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul>
 </li>
@@ -80,7 +78,7 @@
 <!-- badges: start -->
 
 <p><strong>Professional statistical analysis for survey data in R.</strong></p>
-<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 44 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (4,986+ tests pass).</p>
+<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 46+ statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -92,7 +90,7 @@
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://YannickDiehl.github.io/mariposa/">mariposa</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/YannickDiehl/mariposa" class="external-link">mariposa</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load example survey data (2,500 respondents)</span></span>
@@ -108,17 +106,7 @@
 <span></span>
 <span><span class="co"># Compare groups with t-test</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Scale analysis workflow</span></span>
-<span><span class="fu"><a href="reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Regression</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="core-features">Core Features<a class="anchor" aria-label="anchor" href="#core-features"></a>
@@ -152,61 +140,34 @@
 </tr>
 <tr class="odd">
 <td><strong>ANOVA</strong></td>
-<td>
-<code><a href="reference/oneway_anova.html">oneway_anova()</a></code>, <code><a href="reference/factorial_anova.html">factorial_anova()</a></code>, <code><a href="reference/ancova.html">ancova()</a></code>
-</td>
-<td>One-way, multi-factor ANOVA, and ANCOVA with Type III SS</td>
+<td><code><a href="reference/oneway_anova.html">oneway_anova()</a></code></td>
+<td>Multiple group comparisons</td>
 </tr>
 <tr class="even">
 <td><strong>Non-parametric</strong></td>
-<td>
-<code><a href="reference/mann_whitney.html">mann_whitney()</a></code>, <code><a href="reference/kruskal_wallis.html">kruskal_wallis()</a></code>, <code><a href="reference/wilcoxon_test.html">wilcoxon_test()</a></code>, <code><a href="reference/friedman_test.html">friedman_test()</a></code>, <code><a href="reference/binomial_test.html">binomial_test()</a></code>
-</td>
+<td><code><a href="reference/mann_whitney.html">mann_whitney()</a></code></td>
 <td>Distribution-free tests</td>
 </tr>
 <tr class="odd">
-<td><strong>Exact tests</strong></td>
-<td>
-<code><a href="reference/chi_square.html">chi_square()</a></code>, <code><a href="reference/fisher_test.html">fisher_test()</a></code>, <code><a href="reference/chisq_gof.html">chisq_gof()</a></code>, <code><a href="reference/mcnemar_test.html">mcnemar_test()</a></code>
-</td>
-<td>Categorical associations and exact tests</td>
-</tr>
-<tr class="even">
 <td><strong>Correlation</strong></td>
 <td>
 <code><a href="reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="reference/spearman_rho.html">spearman_rho()</a></code>, <code><a href="reference/kendall_tau.html">kendall_tau()</a></code>
 </td>
 <td>Relationships between variables</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>Post-hoc</strong></td>
 <td>
-<code><a href="reference/tukey_test.html">tukey_test()</a></code>, <code><a href="reference/scheffe_test.html">scheffe_test()</a></code>, <code><a href="reference/levene_test.html">levene_test()</a></code>, <code><a href="reference/dunn_test.html">dunn_test()</a></code>, <code><a href="reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>
+<code><a href="reference/tukey_test.html">tukey_test()</a></code>, <code><a href="reference/scheffe_test.html">scheffe_test()</a></code>, <code><a href="reference/levene_test.html">levene_test()</a></code>
 </td>
-<td>Follow-up analyses (parametric and non-parametric)</td>
-</tr>
-<tr class="even">
-<td><strong>Scale analysis</strong></td>
-<td>
-<code><a href="reference/reliability.html">reliability()</a></code>, <code><a href="reference/efa.html">efa()</a></code>, <code><a href="reference/scale_index.html">scale_index()</a></code>, <code><a href="reference/pomps.html">pomps()</a></code>
-</td>
-<td>Cronbach’s Alpha, factor analysis, index construction</td>
+<td>Follow-up analyses</td>
 </tr>
 <tr class="odd">
-<td><strong>Regression</strong></td>
-<td>
-<code><a href="reference/linear_regression.html">linear_regression()</a></code>, <code><a href="reference/logistic_regression.html">logistic_regression()</a></code>
-</td>
-<td>Linear and logistic models with SPSS-style output</td>
+<td><strong>Chi-square</strong></td>
+<td><code><a href="reference/chi_square.html">chi_square()</a></code></td>
+<td>Categorical associations</td>
 </tr>
 <tr class="even">
-<td><strong>Effect sizes</strong></td>
-<td>
-<code><a href="reference/chi_square.html">phi()</a></code>, <code><a href="reference/chi_square.html">cramers_v()</a></code>, <code><a href="reference/chi_square.html">goodman_gamma()</a></code>
-</td>
-<td>Effect size measures for categorical data</td>
-</tr>
-<tr class="odd">
 <td><strong>Weighted stats</strong></td>
 <td>
 <code><a href="reference/w_mean.html">w_mean()</a></code>, <code><a href="reference/w_median.html">w_median()</a></code>, <code><a href="reference/w_sd.html">w_sd()</a></code>, + 8 more</td>
@@ -240,35 +201,15 @@
 <span>  <span class="fu"><a href="reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="multi-factor-anova--ancova">Multi-Factor ANOVA &amp; ANCOVA<a class="anchor" aria-label="anchor" href="#multi-factor-anova--ancova"></a>
-</h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Factorial ANOVA with Type III SS</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="reference/factorial_anova.html">factorial_anova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span>,</span>
-<span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># ANCOVA with covariate adjustment</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="reference/ancova.html">ancova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="va">gender</span>, covariate <span class="op">=</span> <span class="va">age</span>,</span>
-<span>         weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
 <h3 id="s3-post-hoc-methods">S3 Post-Hoc Methods<a class="anchor" aria-label="anchor" href="#s3-post-hoc-methods"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Parametric: ANOVA → Tukey/Scheffe</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run ANOVA, then chain post-hoc tests</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="reference/tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="op">)</span>    <span class="co"># Pairwise comparisons</span></span>
-<span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># Variance homogeneity</span></span>
-<span></span>
-<span><span class="co"># Non-parametric: Kruskal-Wallis → Dunn</span></span>
-<span><span class="va">kw_result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="reference/kruskal_wallis.html">kruskal_wallis</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">kw_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="reference/dunn_test.html">dunn_test</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># Pairwise Dunn comparisons</span></span></code></pre></div>
+<span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># Variance homogeneity</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -280,7 +221,7 @@
 T-TEST GROUPS=gender(1 2)
   /VARIABLES=satisfaction.</code></pre>
 <p><strong>mariposa:</strong></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -292,10 +233,6 @@ T-TEST GROUPS=gender(1 2)
 <a href="https://YannickDiehl.github.io/mariposa/reference/">Complete Reference</a> - All functions with examples</li>
 <li>
 <a href="https://YannickDiehl.github.io/mariposa/articles/introduction.html">Getting Started</a> - Introduction and first steps</li>
-<li>
-<a href="https://YannickDiehl.github.io/mariposa/articles/scale-analysis.html">Scale Analysis</a> - Reliability, factor analysis, and scale construction</li>
-<li>
-<a href="https://YannickDiehl.github.io/mariposa/articles/regression-analysis.html">Regression Analysis</a> - Linear and logistic regression</li>
 <li>
 <a href="https://YannickDiehl.github.io/mariposa/articles/survey-weights.html">Survey Weights Guide</a> - Working with weighted data</li>
 </ul>

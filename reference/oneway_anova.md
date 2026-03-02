@@ -177,18 +177,9 @@ for post-hoc pairwise comparisons.
 for testing homogeneity of variances.
 
 Other hypothesis_tests:
-[`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md),
-[`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
 [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md),
-[`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
-[`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md),
-[`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md),
-[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
-[`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
 [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),
-[`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md),
-[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
-[`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
+[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
 
 ## Examples
 
@@ -201,12 +192,11 @@ data(survey_data)
 survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 #> 
-#> One-Way ANOVA Results
-#> ---------------------
+#> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
@@ -238,7 +228,7 @@ survey_data %>%
 #>  life_satisfaction       0.077           0.076         0.076      medium
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -252,11 +242,10 @@ survey_data %>%
 survey_data %>%
   oneway_anova(life_satisfaction, trust_government, group = education)
 #> 
-#> One-Way ANOVA Results
-#> ---------------------
+#> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal for each variable
 #>   Alternative hypothesis: At least one group mean differs for each variable
 #> 
@@ -315,7 +304,7 @@ survey_data %>%
 #>  trust_government       0.001               0             0  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -329,11 +318,10 @@ survey_data %>%
 survey_data %>%
   oneway_anova(starts_with("trust_"), group = education)
 #> 
-#> One-Way ANOVA Results
-#> ---------------------
+#> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal for each variable
 #>   Alternative hypothesis: At least one group mean differs for each variable
 #> 
@@ -419,7 +407,7 @@ survey_data %>%
 #>  trust_science       0.001               0             0  negligible
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -433,13 +421,12 @@ survey_data %>%
 survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
 #> 
-#> Weighted One-Way ANOVA Results
-#> ------------------------------
+#> ── Weighted One-Way ANOVA Results ──────────────────────────────────────────────
 #> 
-#> - Dependent variable: income
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
+#> • Dependent variable: income
+#> • Grouping variable: education
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
@@ -471,7 +458,7 @@ survey_data %>%
 #>    income       0.387           0.386         0.386       large
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -486,17 +473,17 @@ survey_data %>%
   group_by(region) %>%
   oneway_anova(life_satisfaction, group = education)
 #> 
-#> One-Way ANOVA Results
-#> ---------------------
+#> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
 #> 
-#> Group: region = East
-#> --------------------
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -525,8 +512,9 @@ survey_data %>%
 #>  life_satisfaction       0.043           0.037         0.037       small
 #> 
 #> 
-#> Group: region = West
-#> --------------------
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -555,7 +543,7 @@ survey_data %>%
 #>  life_satisfaction       0.087           0.086         0.086      medium
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -569,12 +557,11 @@ survey_data %>%
 survey_data %>%
   oneway_anova(income, group = education, var.equal = FALSE)
 #> 
-#> One-Way ANOVA Results
-#> ---------------------
+#> ── One-Way ANOVA Results ───────────────────────────────────────────────────────
 #> 
-#> - Dependent variable: income
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Dependent variable: income
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
@@ -606,7 +593,7 @@ survey_data %>%
 #>    income       0.391            0.39          0.39       large
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
@@ -622,12 +609,11 @@ result <- survey_data %>%
 
 # Follow up with post-hoc tests
 result %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
+#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -652,7 +638,7 @@ result %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -661,11 +647,10 @@ result %>% tukey_test()
 #> - p-values are adjusted for multiple comparisons (family-wise error control)
 result %>% levene_test()  # Check homogeneity of variances
 #> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Center: mean
+#> • Grouping variable: education
+#> • Center: mean
 #> 
 #> 
 #> --- life_satisfaction ---
@@ -676,7 +661,7 @@ result %>% levene_test()  # Check homogeneity of variances
 #>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
 #> -------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)

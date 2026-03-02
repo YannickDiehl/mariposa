@@ -113,8 +113,7 @@ data(survey_data)
 # Basic weighted standard error
 survey_data %>% w_se(age, weights = sampling_weight)
 #> 
-#> Weighted Standard Error Statistics
-#> ----------------------------------
+#> ── Weighted Standard Error Statistics ──────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable weighted_se Effective_N
@@ -124,8 +123,7 @@ survey_data %>% w_se(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_se(age, income, weights = sampling_weight)
 #> 
-#> Weighted Standard Error Statistics
-#> ----------------------------------
+#> ── Weighted Standard Error Statistics ──────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable weighted_se Effective_N
@@ -139,8 +137,7 @@ survey_data %>% w_se(age, income, weights = sampling_weight)
 # Grouped data
 survey_data %>% group_by(region) %>% w_se(age, weights = sampling_weight)
 #> 
-#> Weighted Standard Error Statistics
-#> ----------------------------------
+#> ── Weighted Standard Error Statistics ──────────────────────────────────────────
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -159,8 +156,7 @@ survey_data %>% summarise(se_age = w_se(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_se(age)
 #> 
-#> Standard Error Statistics
-#> -------------------------
+#> ── Standard Error Statistics ───────────────────────────────────────────────────
 #> 
 #> --- age ---
 #>  Variable   se    N

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,8 +27,6 @@
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
-    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -43,95 +41,9 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.5.0" id="mariposa-050">mariposa 0.5.0<a class="anchor" aria-label="anchor" href="#mariposa-050"></a></h2>
-<div class="section level3">
-<h3 id="new-functions-0-5-0">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-0"></a></h3>
-<ul><li><p>Added <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code> for multi-factor between-subjects ANOVA (up to 3 factors) with Type III Sum of Squares matching SPSS UNIANOVA. Includes main effects, all interaction terms, partial eta squared, R-squared, and Levene’s test for homogeneity of variance. Full survey weight support via WLS (matching SPSS /REGWGT). Integrates with existing <code><a href="../reference/tukey_test.html">tukey_test()</a></code>, <code><a href="../reference/scheffe_test.html">scheffe_test()</a></code>, and <code><a href="../reference/levene_test.html">levene_test()</a></code> S3 generics.</p></li>
-<li><p>Added <code><a href="../reference/ancova.html">ancova()</a></code> for Analysis of Covariance — tests group differences after controlling for continuous covariates. Matches SPSS UNIANOVA with the WITH keyword. Provides ANOVA table, parameter estimates (B, SE, t, p, partial eta squared), estimated marginal means (adjusted for covariates), and Levene’s test. Supports up to 3 factors and multiple covariates with full survey weight support.</p></li>
-</ul></div>
-<div class="section level3">
-<h3 id="spss-validation-0-5-0">SPSS Validation<a class="anchor" aria-label="anchor" href="#spss-validation-0-5-0"></a></h3>
-<ul><li><p>Added 612 SPSS validation tests for <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code> across 9 scenarios: unweighted (2-factor, 3-factor, 2-factor with missing data), weighted (2-factor, 3-factor), grouped (2-factor, 3-factor), and weighted+grouped (2-factor, 3-factor).</p></li>
-<li><p>Added 579 SPSS validation tests for <code><a href="../reference/ancova.html">ancova()</a></code> across 11 scenarios: one-way ANCOVA, two-way ANCOVA, weighted, grouped, weighted+grouped, multiple covariates, and single factor with single covariate.</p></li>
-<li><p>Total test suite: 4,986 tests passing (0 failures).</p></li>
-</ul></div>
-<div class="section level3">
-<h3 id="technical-details-0-5-0">Technical Details<a class="anchor" aria-label="anchor" href="#technical-details-0-5-0"></a></h3>
-<ul><li><p>Type III Sum of Squares computed via <code>contr.sum</code> contrasts and <code><a href="https://rdrr.io/r/stats/add1.html" class="external-link">stats::drop1()</a></code> — no dependency on the <code>car</code> package.</p></li>
-<li><p>Weighted analyses use WLS (<code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">stats::lm()</a></code> with weights), matching SPSS’s /REGWGT subcommand behavior exactly.</p></li>
-<li><p>Weighted Levene’s test uses the SPSS /REGWGT algorithm: <code>z_i = sqrt(w_i) * |y_i - weighted_cell_mean_i|</code> followed by unweighted ANOVA.</p></li>
-<li><p>Corrected Model SS computed as <code>Corrected Total - Error</code> (not sum of Type III SS) to correctly handle unbalanced designs.</p></li>
-</ul><hr></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.0" id="mariposa-040">mariposa 0.4.0<a class="anchor" aria-label="anchor" href="#mariposa-040"></a></h2>
-<div class="section level3">
-<h3 id="new-functions-0-4-0">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-4-0"></a></h3>
-<ul><li><p>Added <code><a href="../reference/fisher_test.html">fisher_test()</a></code> for Fisher’s exact test of independence in contingency tables. Recommended when sample sizes are small or expected cell frequencies fall below 5 (where chi-square approximation becomes unreliable). Supports survey weights, multi-variable analysis, and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>.</p></li>
-<li><p>Added <code><a href="../reference/chisq_gof.html">chisq_gof()</a></code> for chi-square goodness-of-fit testing. Tests whether the observed frequency distribution of a categorical variable matches an expected distribution (default: equal proportions). Supports custom expected proportions, residual analysis, survey weights, and multi-variable analysis.</p></li>
-<li><p>Added <code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code> for testing changes in paired proportions between two dichotomous measurements (e.g., before/after designs). Provides both asymptotic and exact binomial p-values, 2×2 contingency tables, and continuity correction. Supports survey weights.</p></li>
-<li><p>Added <code><a href="../reference/dunn_test.html">dunn_test()</a></code> as an S3 generic for Dunn’s post-hoc pairwise comparisons following a significant Kruskal-Wallis test. Identifies which specific group pairs differ using rank-based Z-statistics with adjustable p-value correction (Bonferroni, Holm, BH, etc.). Dispatches on <code>kruskal_wallis</code> result objects.</p></li>
-<li><p>Added <code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code> as an S3 generic for pairwise Wilcoxon signed-rank post-hoc comparisons following a significant Friedman test. Identifies which measurement pairs differ with adjustable p-value correction. Dispatches on <code>friedman_test</code> result objects.</p></li>
-</ul></div>
-<div class="section level3">
-<h3 id="spss-validation-0-4-0">SPSS Validation<a class="anchor" aria-label="anchor" href="#spss-validation-0-4-0"></a></h3>
-<ul><li>Added SPSS validation tests for all 5 new functions across weighted/unweighted and grouped/ungrouped scenarios.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="improvements-0-4-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-4-0"></a></h3>
-<ul><li>Extended post-hoc analysis framework: <code><a href="../reference/dunn_test.html">dunn_test()</a></code> and <code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code> join <code><a href="../reference/tukey_test.html">tukey_test()</a></code>, <code><a href="../reference/scheffe_test.html">scheffe_test()</a></code>, and <code><a href="../reference/levene_test.html">levene_test()</a></code> as S3 generics that dispatch on their parent test result objects.</li>
-</ul><hr></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.1" id="mariposa-031">mariposa 0.3.1<a class="anchor" aria-label="anchor" href="#mariposa-031"></a></h2>
-<div class="section level3">
-<h3 id="enhancements-0-3-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-3-1"></a></h3>
-<ul><li><p><code><a href="../reference/efa.html">efa()</a></code> now supports Maximum Likelihood (ML) extraction via <code>extraction = "ml"</code>. ML extraction provides a goodness-of-fit chi-square test, initial communalities as SMC (squared multiple correlations), and uniquenesses. Uses <code><a href="https://rdrr.io/r/stats/factanal.html" class="external-link">stats::factanal()</a></code> with correlation matrix input for seamless survey weight support.</p></li>
-<li><p><code><a href="../reference/efa.html">efa()</a></code> now supports Promax rotation via <code>rotation = "promax"</code>. Like Oblimin, Promax is an oblique rotation that produces Pattern Matrix, Structure Matrix, and Factor Correlation Matrix. Uses <code><a href="https://rdrr.io/r/stats/varimax.html" class="external-link">stats::promax()</a></code> (base R, no new dependency).</p></li>
-<li><p>Internal refactoring of <code><a href="../reference/efa.html">efa()</a></code>: extraction logic separated into <code><a href="../reference/dot-efa_extract_pca.html">.efa_extract_pca()</a></code> and <code><a href="../reference/dot-efa_extract_ml.html">.efa_extract_ml()</a></code> for cleaner architecture and easier extension with future extraction methods (PAF planned).</p></li>
-</ul><hr></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0" id="mariposa-030">mariposa 0.3.0<a class="anchor" aria-label="anchor" href="#mariposa-030"></a></h2>
-<div class="section level3">
-<h3 id="new-functions-0-3-0">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-3-0"></a></h3>
-<ul><li><p>Added <code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code> for comparing 3+ independent groups on ordinal data (non-parametric alternative to one-way ANOVA). Supports survey weights, <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>, and multi-variable analysis. Effect size: Eta-squared.</p></li>
-<li><p>Added <code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code> for comparing two paired measurements without assuming normality (Wilcoxon signed-rank test). Includes rank categories (negative, positive, ties) and effect size r.</p></li>
-<li><p>Added <code><a href="../reference/friedman_test.html">friedman_test()</a></code> for comparing 3+ related measurements on ordinal data (non-parametric alternative to repeated-measures ANOVA). Effect size: Kendall’s W.</p></li>
-<li><p>Added <code><a href="../reference/binomial_test.html">binomial_test()</a></code> for testing whether an observed proportion matches an expected value (exact binomial test). Supports multiple binary variables and custom test proportions.</p></li>
-</ul></div>
-<div class="section level3">
-<h3 id="spss-validation-0-3-0">SPSS Validation<a class="anchor" aria-label="anchor" href="#spss-validation-0-3-0"></a></h3>
-<ul><li><p>Added 294 new SPSS validation tests across all 4 non-parametric functions, covering weighted/unweighted and grouped/ungrouped scenarios.</p></li>
-<li><p>Total test suite: 2,227 tests passing (0 failures, 0 skips).</p></li>
-</ul><hr></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0" id="mariposa-020">mariposa 0.2.0<a class="anchor" aria-label="anchor" href="#mariposa-020"></a></h2>
-<div class="section level3">
-<h3 id="new-functions-0-2-0">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-2-0"></a></h3>
-<ul><li><p>Added <code><a href="../reference/reliability.html">reliability()</a></code> for Cronbach’s Alpha with item statistics, including corrected item-total correlations, alpha-if-item-deleted, and inter-item correlation matrix. Genuine implementation with full survey weight support.</p></li>
-<li><p>Added <code><a href="../reference/efa.html">efa()</a></code> for Exploratory Factor Analysis with PCA extraction. Supports Varimax rotation (Base R) and Oblimin rotation (via optional <code>GPArotation</code> package). Includes KMO measure, Bartlett’s test, communalities, and sorted factor loading matrix with configurable blank threshold.</p></li>
-<li><p>Added <code><a href="../reference/scale_index.html">scale_index()</a></code> for creating mean indices across survey items, with <code>min_valid</code> parameter matching SPSS <code>MEAN.x()</code> syntax. Designed for use inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>.</p></li>
-<li><p>Added <code><a href="../reference/pomps.html">pomps()</a></code> for Percent of Maximum Possible Scores transformation, rescaling values to a 0-100 range for cross-scale comparability.</p></li>
-<li><p>Added <code><a href="../reference/linear_regression.html">linear_regression()</a></code> as a wrapper around <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">stats::lm()</a></code> with SPSS-compatible output: coefficients table (B, SE, Beta, t, p), ANOVA table, model summary (R, R-squared, adjusted R-squared), and standardized coefficients. Supports both formula and SPSS-style (dependent/predictors) interfaces.</p></li>
-<li><p>Added <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> as a wrapper around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">stats::glm()</a></code> with odds ratios, Wald statistics, pseudo-R-squared measures (Nagelkerke, Cox-Snell, McFadden), and classification table.</p></li>
-</ul></div>
-<div class="section level3">
-<h3 id="dependencies-0-2-0">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies-0-2-0"></a></h3>
-<ul><li><p>Added <code>GPArotation</code> as suggested dependency for Oblimin rotation in <code><a href="../reference/efa.html">efa()</a></code>.</p></li>
-<li><p>Added <code>MASS</code> as suggested dependency for enhanced regression diagnostics.</p></li>
-</ul></div>
-<div class="section level3">
-<h3 id="improvements-0-2-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-2-0"></a></h3>
-<ul><li><p>All 6 new functions support survey weights and grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>.</p></li>
-<li><p>All functions include comprehensive roxygen2 documentation with practical examples, “When to Use” guidance, and “Understanding the Output” sections.</p></li>
-</ul><hr></div>
-</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="mariposa-010">mariposa 0.1.0<a class="anchor" aria-label="anchor" href="#mariposa-010"></a></h2>
 <div class="section level3">

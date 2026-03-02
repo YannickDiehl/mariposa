@@ -25,7 +25,7 @@ Are there unusual patterns or outliers?
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,8 +45,6 @@ Are there unusual patterns or outliers?
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
-    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -61,7 +59,7 @@ Are there unusual patterns or outliers?
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Get to Know Your Numeric Data</h1>
-      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/R/describe.R" class="external-link"><code>R/describe.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/R/describe.R" class="external-link"><code>R/describe.R</code></a></small>
       <div class="d-none name"><code>describe.Rd</code></div>
     </div>
 
@@ -188,55 +186,53 @@ individual weighted statistics.</p>
 <span class="r-in"><span><span class="co"># Basic unweighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">describe</span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Descriptive Statistics ──────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable  Mean Median     SD Range IQR Skewness    N Missing</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       age 50.55     50 16.976    77  24    0.172 2500       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">describe</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable   Mean Median     SD Range IQR Skewness Effective_N</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       age 50.514     50 17.084    77  25    0.159      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables with custom statistics</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">describe</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, </span></span>
 <span class="r-in"><span>                        weights <span class="op">=</span> <span class="va">sampling_weight</span>, </span></span>
 <span class="r-in"><span>                        show <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"skew"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable     Mean       SD Skewness Effective_N</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                age   50.514   17.084    0.159      2468.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             income 3743.099 1423.966    0.724      2158.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction    3.625    1.152   -0.498      2390.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">describe</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Descriptive Statistics ─────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable   Mean Median     SD Range IQR Skewness Effective_N</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       age 52.278     53 17.595    77  24    0.098         477</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable   Mean Median     SD Range IQR Skewness Effective_N</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       age 50.067     49 16.927    77  24     0.17      1993.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

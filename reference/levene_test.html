@@ -23,7 +23,7 @@ When to use alternative tests that don't assume equal variance
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,8 +43,6 @@ When to use alternative tests that don't assume equal variance
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
-    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -59,7 +57,7 @@ When to use alternative tests that don't assume equal variance
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Test If Groups Vary Similarly</h1>
-      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/R/levene_test.R" class="external-link"><code>R/levene_test.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/R/levene_test.R" class="external-link"><code>R/levene_test.R</code></a></small>
       <div class="d-none name"><code>levene_test.Rd</code></div>
     </div>
 
@@ -75,9 +73,6 @@ out in similar ways.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Default S3 method</span></span>
-<span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'data.frame'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, <span class="va">group</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span></span>
@@ -202,8 +197,6 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <p><code><a href="t_test.html">t_test</a></code> for group mean comparisons.</p>
 <p><code><a href="https://rdrr.io/r/stats/var.test.html" class="external-link">var.test</a></code> for the base R F-test of variance equality.</p>
 <p>Other posthoc:
-<code><a href="dunn_test.html">dunn_test()</a></code>,
-<code><a href="pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>,
 <code><a href="scheffe_test.html">scheffe_test()</a></code>,
 <code><a href="tukey_test.html">tukey_test()</a></code></p></div>
     </div>
@@ -217,11 +210,10 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span><span class="co"># Standalone Levene test (test homogeneity of variances)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: region</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
@@ -231,8 +223,8 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable F_statistic df1  df2 p_value sig      Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       3.164   1 2419   0.075     Variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
@@ -241,11 +233,10 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">trust_government</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: region</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
@@ -264,8 +255,8 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Variable F_statistic df1  df2 p_value sig      Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government       0.145   1 2352   0.703     Variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
@@ -274,12 +265,11 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Levene's Test for Homogeneity of Variance  ─────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
@@ -289,8 +279,8 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable F_statistic df1  df2 p_value sig        Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    income      102.05   3 2197       0 *** Variances unequal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
@@ -301,11 +291,10 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
@@ -315,8 +304,8 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable F_statistic df1  df2 p_value sig        Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction      31.634   3 2417       0 *** Variances unequal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
@@ -330,11 +319,10 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span>  <span class="fu"><a href="t_test.html">t_test</a></span><span class="op">(</span><span class="va">age</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">levene_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: gender</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
@@ -344,8 +332,8 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable F_statistic df1  df2 p_value sig      Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       age       0.534   1 2498   0.465     Variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
@@ -357,11 +345,10 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span><span class="co"># Using mean instead of median as center</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">region</span>, center <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Levene's Test for Homogeneity of Variance  ──────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: region</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
@@ -371,8 +358,8 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Variable F_statistic df1  df2 p_value sig      Conclusion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    income       1.631   1 2184   0.202     Variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>

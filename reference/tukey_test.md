@@ -16,9 +16,6 @@ Think of it as:
 
 ``` r
 tukey_test(x, conf.level = 0.95, ...)
-
-# Default S3 method
-tukey_test(x, conf.level = 0.95, ...)
 ```
 
 ## Arguments
@@ -149,9 +146,7 @@ HSD function.
 for testing homogeneity of variances.
 
 Other posthoc:
-[`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
 [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md),
-[`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
 [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md)
 
 ## Examples
@@ -167,12 +162,11 @@ anova_result <- survey_data %>%
 
 # Tukey post-hoc comparisons
 anova_result %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
+#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -197,7 +191,7 @@ anova_result %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -210,13 +204,12 @@ anova_weighted <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
 anova_weighted %>% tukey_test()
-#> Weighted Tukey HSD Post-Hoc Test Results
-#> ----------------------------------------
+#> ── Weighted Tukey HSD Post-Hoc Test Results ────────────────────────────────────
 #> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
+#> • Dependent variable: life_satisfaction
+#> • Grouping variable: education
+#> • Weights variable: sampling_weight
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -241,7 +234,7 @@ anova_weighted %>% tukey_test()
 #> ------------------------------------------------------------------------------------ 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -254,11 +247,10 @@ anova_multi <- survey_data %>%
   oneway_anova(trust_government, trust_science, group = education)
 
 anova_multi %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
+#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
@@ -304,7 +296,7 @@ anova_multi %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group
@@ -318,16 +310,16 @@ anova_grouped <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 
 anova_grouped %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
+#> ── Tukey HSD Post-Hoc Test Results ─────────────────────────────────────────────
 #> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
+#> • Grouping variable: education
+#> • Confidence level: 95.0%
 #>   Family-wise error rate controlled using Tukey HSD
 #> 
 #> 
-#> Group: region = East
-#> --------------------
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -350,8 +342,9 @@ anova_grouped %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Group: region = West
-#> --------------------
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> --- life_satisfaction ---
 #> 
@@ -374,7 +367,7 @@ anova_grouped %>% tukey_test()
 #> ---------------------------------------------------------------------------------- 
 #> 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Interpretation:
 #> - Positive differences: First group > Second group

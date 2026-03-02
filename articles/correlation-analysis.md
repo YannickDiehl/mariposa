@@ -29,12 +29,6 @@ Measure the linear correlation between age and income:
 survey_data %>%
   pearson_cor(age, income)
 #> 
-#> Pearson Correlation 
-#> --------------------
-#> 
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
 #> 
 #> --- age × income ---
 #> 
@@ -44,8 +38,6 @@ survey_data %>%
 #>   95% CI: [-0.048, 0.035]
 #>   p-value: 0.7608
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -69,13 +61,6 @@ Get population-representative correlations:
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
 #> 
 #> --- age × income ---
 #> 
@@ -85,8 +70,6 @@ survey_data %>%
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -104,13 +87,6 @@ Create a correlation matrix for several variables at once:
 survey_data %>%
   pearson_cor(trust_government, trust_media, trust_science,
               weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
 #> 
 #> 
 #> Correlation Matrix:
@@ -147,9 +123,7 @@ survey_data %>%
 #>     
 #>     
 #>     
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -168,17 +142,6 @@ survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
@@ -188,9 +151,6 @@ survey_data %>%
 #>   p-value: 0.2931
 #>   Significance: ns
 #> 
-#> Group: region = West
-#> --------------------
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.019
@@ -199,8 +159,6 @@ survey_data %>%
 #>   95% CI: [-0.066, 0.028]
 #>   p-value: 0.4267
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -220,13 +178,6 @@ survey_data %>%
               conf.level = 0.95,
               weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
 #> 
 #> --- age × income ---
 #> 
@@ -236,8 +187,6 @@ survey_data %>%
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -266,14 +215,6 @@ raw values.
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern)
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
-#> 
-#> - Method: Spearman's rho (rank correlation)
-#> - Variables: political_orientation, environmental_concern
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
 #> --- political_orientation × environmental_concern ---
 #> 
 #>   Spearman's rho: ρ = -0.576
@@ -281,8 +222,6 @@ survey_data %>%
 #>   Sample size: n = 2207
 #>   p-value (2-tailed): 0.0000
 #>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: moderate negative monotonic relationship
 ```
@@ -294,15 +233,6 @@ survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                weights = sampling_weight)
 #> 
-#> Weighted Spearman's Rank Correlation Analysis 
-#> ----------------------------------------------
-#> 
-#> - Method: Spearman's rho (rank correlation)
-#> - Variables: political_orientation, environmental_concern
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
 #> --- political_orientation × environmental_concern ---
 #> 
 #>   Spearman's rho: ρ = -0.576
@@ -310,8 +240,6 @@ survey_data %>%
 #>   Sample size: n = 2207
 #>   p-value (2-tailed): 0.0000
 #>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: moderate negative monotonic relationship
 ```
@@ -323,15 +251,6 @@ survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                life_satisfaction, trust_government,
                weights = sampling_weight)
-#> 
-#> Weighted Spearman's Rank Correlation Analysis 
-#> ----------------------------------------------
-#> 
-#> - Method: Spearman's rho (rank correlation)
-#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Spearman's Rho Matrix:
@@ -382,9 +301,7 @@ survey_data %>%
 #>      environmental_concern × life_satisfaction  0.003   0.121 0.9041 2324    
 #>       environmental_concern × trust_government  0.067   3.175 0.0015 2260  **
 #>           life_satisfaction × trust_government  0.002   0.072 0.9425 2280    
-#> --------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ---------------------------------------------------------------------
 ```
 
 ## Kendall’s Tau
@@ -406,12 +323,6 @@ $\rho$, but is considered more robust.
 survey_data %>%
   kendall_tau(political_orientation, life_satisfaction)
 #> 
-#> Kendall's Tau-b Correlation 
-#> ----------------------------
-#> 
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
 #> 
 #> --- political_orientation × life_satisfaction ---
 #> 
@@ -420,8 +331,6 @@ survey_data %>%
 #>   Sample size: n = 2228
 #>   p-value (2-tailed): 0.8321
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak negative correlation
 ```
@@ -433,13 +342,6 @@ survey_data %>%
   kendall_tau(political_orientation, life_satisfaction,
               weights = sampling_weight)
 #> 
-#> Weighted Kendall's Tau-b Correlation 
-#> -------------------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
 #> 
 #> --- political_orientation × life_satisfaction ---
 #> 
@@ -448,8 +350,6 @@ survey_data %>%
 #>   Sample size: n = 2241
 #>   p-value (2-tailed): 0.7659
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak negative correlation
 ```
@@ -476,13 +376,6 @@ result <- survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 print(result)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
 #> 
 #> --- age × income ---
 #> 
@@ -492,8 +385,6 @@ print(result)
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -568,13 +459,6 @@ survey_data %>%
               life_satisfaction, trust_government,
               weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
 #> 
 #> Correlation Matrix:
 #> ------------------- 
@@ -648,9 +532,7 @@ survey_data %>%
 #>   [-0.044, 0.037] 2340    
 #>    [0.023, 0.105] 2276  **
 #>   [-0.030, 0.052] 2296    
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -667,13 +549,6 @@ survey_data %>%
   pearson_cor(income, life_satisfaction, trust_government,
               trust_media, trust_science,
               weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
 #> 
 #> 
 #> Correlation Matrix:
@@ -748,9 +623,7 @@ survey_data %>%
 #>  2242    
 #>  2271    
 #>  2286    
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -771,13 +644,6 @@ cor_matrix <- survey_data %>%
               political_orientation, environmental_concern,
               weights = sampling_weight)
 print(cor_matrix)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
 #> 
 #> 
 #> Correlation Matrix:
@@ -852,9 +718,7 @@ print(cor_matrix)
 #>   [-0.046, 0.037] 2241    
 #>   [-0.044, 0.037] 2340    
 #>  [-0.611, -0.556] 2221 ***
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> ----------------
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -880,17 +744,6 @@ survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = 0.050
@@ -900,9 +753,6 @@ survey_data %>%
 #>   p-value: 0.2931
 #>   Significance: ns
 #> 
-#> Group: region = West
-#> --------------------
-#> 
 #> --- age × income ---
 #> 
 #>   Correlation: r = -0.019
@@ -911,8 +761,6 @@ survey_data %>%
 #>   95% CI: [-0.066, 0.028]
 #>   p-value: 0.4267
 #>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation

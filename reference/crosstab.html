@@ -23,7 +23,7 @@ Whether there are patterns or associations
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,8 +43,6 @@ Whether there are patterns or associations
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
-    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -59,7 +57,7 @@ Whether there are patterns or associations
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Compare Two Categories: See How They Relate</h1>
-      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/R/crosstab.R" class="external-link"><code>R/crosstab.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/R/crosstab.R" class="external-link"><code>R/crosstab.R</code></a></small>
       <div class="d-none name"><code>crosstab.Rd</code></div>
     </div>
 
@@ -190,24 +188,21 @@ are related.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">crosstab</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |    238 |    956 |   1194 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  19.9% |  80.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |    247 |   1059 |   1306 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  18.9% |  81.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |    485 |   2015 |   2500 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             region </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   East      West     Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male               238       956      1194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  19.9%     80.1%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female             247      1059      1306</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  18.9%     81.1%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total              485      2015      2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 2500</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights and all percentages</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">crosstab</span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span>,</span></span>
@@ -215,194 +210,171 @@ are related.</p>
 <span class="r-in"><span>                         percentages <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: All percentages (row, col, total)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 2516 (weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |                                                    education                                                     |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |      Basic Secondary | Intermediate Seco... |   Academic Secondary |           University |                Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |                  402 |                  291 |                  326 |                  176 |                 1195 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |                33.6% |                24.3% |                27.3% |                14.7% |               100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %    |                47.3% |                45.4% |                50.8% |                45.7% |                47.5% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   total %  |                16.0% |                11.6% |                13.0% |                 7.0% |                47.5% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |                  447 |                  350 |                  316 |                  209 |                 1321 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |                33.8% |                26.5% |                23.9% |                15.8% |               100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %    |                52.7% |                54.6% |                49.2% |                54.3% |                52.5% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   total %  |                17.7% |                13.9% |                12.5% |                 8.3% |                52.5% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+======================+======================+======================+======================+======================+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |                  848 |                  641 |                  642 |                  385 |                 2516 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %    |                33.7% |                25.5% |                25.5% |                15.3% |               100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             education </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      Basic Secondary  Intermediate Secondary      Academic Secondary              University                   Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male                             402                     291                     326                     176                    1195</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                33.6%                   24.3%                   27.3%                   14.7%                  100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                47.3%                   45.4%                   50.8%                   45.7%                    47.5%  (col %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                16.0%                   11.6%                   13.0%                    7.0%                    47.5%  (total %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female                           447                     350                     316                     209                    1321</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                33.8%                   26.5%                   23.9%                   15.8%                  100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                52.7%                   54.6%                   49.2%                   54.3%                    52.5%  (col %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                17.7%                   13.9%                   12.5%                    8.3%                    52.5%  (total %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total                            848                     641                     642                     385                    2516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 33.7%                    25.5%                    25.5%                    15.3%                  100.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 2516 (Weighted)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">employment</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">crosstab</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Grouped Crosstabulation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Grouped Crosstabulation  ───────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: employment = Student</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 80 (weighted)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |      7 |     29 |     36 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  20.0% |  80.0% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |      4 |     40 |     44 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  10.2% |  89.8% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |     12 |     68 |     80 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: employment = Employed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: employment = Student</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 1603 (weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |    149 |    599 |    748 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  19.9% |  80.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |    172 |    683 |    855 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  20.1% |  79.9% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |    320 |   1282 |   1603 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             region </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   East      West     Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male                 7        29        36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  20.0%     80.0%    100.0%  (row %)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female               4        40        44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  10.2%     89.8%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total               12        68        80</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: employment = Unemployed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 80 (Weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: employment = Employed</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 184 (weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |     17 |     66 |     83 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  20.8% |  79.2% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |     16 |     85 |    101 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  15.5% |  84.5% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |     33 |    151 |    184 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             region </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   East      West     Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male               149       599       748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  19.9%     80.1%    100.0%  (row %)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female             172       683       855</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  20.1%     79.9%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total              320      1282      1603</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: employment = Retired</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 1603 (Weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: employment = Unemployed</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 534 (weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |     61 |    199 |    260 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  23.5% |  76.5% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |     61 |    212 |    273 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  22.5% |  77.5% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |    123 |    411 |    534 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             region </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   East      West     Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male                17        66        83</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  20.8%     79.2%    100.0%  (row %)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female              16        85       101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  15.5%     84.5%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total               33       151       184</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: employment = Other</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 184 (Weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: employment = Retired</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 115 (weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |     15 |     53 |     68 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  22.2% |  77.8% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |      6 |     41 |     47 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  13.1% |  86.9% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |     21 |     94 |    115 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             region </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   East      West     Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male                61       199       260</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  23.5%     76.5%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female              61       212       273</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  22.5%     77.5%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total              123       411       534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 534 (Weighted)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: employment = Other</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             region </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   East      West     Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Male                15        53        68</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  22.2%     77.8%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Female               6        41        47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  13.1%     86.9%    100.0%  (row %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total               21        94       115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 115 (Weighted)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Column percentages only</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">crosstab</span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, percentages <span class="op">=</span> <span class="st">"col"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: education × employment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: employment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Column percentages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +----------------------+------------+------------+------------+------------+------------+------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                      |                                 employment                                  |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +----------------------+------------+------------+------------+------------+------------+------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Basic Secondary      |          0 |        571 |         65 |        171 |         34 |        841 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %              |       0.0% |      35.7% |      35.7% |      32.6% |      29.6% |      33.6% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +----------------------+------------+------------+------------+------------+------------+------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Intermediate Seco... |          0 |        412 |         51 |        137 |         29 |        629 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %              |       0.0% |      25.8% |      28.0% |      26.1% |      25.2% |      25.2% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +----------------------+------------+------------+------------+------------+------------+------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Academic Secondary   |         44 |        366 |         44 |        145 |         32 |        631 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %              |      56.4% |      22.9% |      24.2% |      27.6% |      27.8% |      25.2% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +----------------------+------------+------------+------------+------------+------------+------------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | University           |         34 |        251 |         22 |         72 |         20 |        399 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %              |      43.6% |      15.7% |      12.1% |      13.7% |      17.4% |      16.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +======================+============+============+============+============+============+============+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total                |         78 |       1600 |        182 |        525 |        115 |       2500 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   col %              |       3.1% |      64.0% |       7.3% |      21.0% |       4.6% |     100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +----------------------+------------+------------+------------+------------+------------+------------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         employment </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> education </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                              Student    Employed  Unemployed     Retired       Other       Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Basic Secondary                    0         571          65         171          34         841</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 0.0%       35.7%       35.7%       32.6%       29.6%        33.6%  (col %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intermediate Secondary             0         412          51         137          29         629</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 0.0%       25.8%       28.0%       26.1%       25.2%        25.2%  (col %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Academic Secondary                44         366          44         145          32         631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                56.4%       22.9%       24.2%       27.6%       27.8%        25.2%  (col %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> University                        34         251          22          72          20         399</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                43.6%       15.7%       12.1%       13.7%       17.4%        16.0%  (col %)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total                             78        1600         182         525         115        2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                  3.1%        64.0%         7.3%        21.0%         4.6%      100.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 2500</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

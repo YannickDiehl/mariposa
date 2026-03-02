@@ -199,11 +199,10 @@ data(survey_data)
 survey_data %>% 
   pearson_cor(age, income)
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> ── Pearson Correlation  ────────────────────────────────────────────────────────
 #> 
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
+#> • Missing data handling: pairwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
 #> --- age × income ---
@@ -215,7 +214,7 @@ survey_data %>%
 #>   p-value: 0.7608
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -228,11 +227,10 @@ survey_data %>%
 survey_data %>% 
   pearson_cor(age, income, life_satisfaction)
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> ── Pearson Correlation  ────────────────────────────────────────────────────────
 #> 
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
+#> • Missing data handling: pairwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
 #> Correlation Matrix:
@@ -267,7 +265,7 @@ survey_data %>%
 #>  income × life_satisfaction  0.448     0.201  0.0000  [0.413, 0.482] 2115 ***
 #> ---------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -280,12 +278,11 @@ survey_data %>%
 survey_data %>% 
   pearson_cor(age, income, weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
+#> ── Weighted Pearson Correlation  ───────────────────────────────────────────────
 #> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
+#> • Weights variable: sampling_weight
+#> • Missing data handling: pairwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
 #> --- age × income ---
@@ -297,7 +294,7 @@ survey_data %>%
 #>   p-value: 0.8276
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -311,15 +308,15 @@ survey_data %>%
   group_by(region) %>% 
   pearson_cor(age, income, life_satisfaction)
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> ── Pearson Correlation  ────────────────────────────────────────────────────────
 #> 
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
+#> • Missing data handling: pairwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
-#> Group: region = East
-#> --------------------
+#> 
+#> ── Group: region = East ──
+#> 
 #> 
 #> Correlation Matrix:
 #> ------------------- 
@@ -353,8 +350,9 @@ survey_data %>%
 #>  income × life_satisfaction  0.448     0.201  0.0000  [0.367, 0.522] 410 ***
 #> ---------------- 
 #> 
-#> Group: region = West
-#> --------------------
+#> 
+#> ── Group: region = West ──
+#> 
 #> 
 #> Correlation Matrix:
 #> ------------------- 
@@ -388,7 +386,7 @@ survey_data %>%
 #>  income × life_satisfaction  0.449     0.201  0.0000  [0.410, 0.486] 1705 ***
 #> ---------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -401,12 +399,11 @@ survey_data %>%
 survey_data %>% 
   pearson_cor(where(is.numeric), weights = sampling_weight)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
+#> ── Weighted Pearson Correlation  ───────────────────────────────────────────────
 #> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
+#> • Weights variable: sampling_weight
+#> • Missing data handling: pairwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
 #> Correlation Matrix:
@@ -594,7 +591,7 @@ survey_data %>%
 #>   [-0.039, 0.041] 2414    
 #> ---------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -607,11 +604,10 @@ survey_data %>%
 survey_data %>% 
   pearson_cor(age, income, use = "listwise")
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> ── Pearson Correlation  ────────────────────────────────────────────────────────
 #> 
-#> - Missing data handling: listwise deletion
-#> - Confidence level: 95.0%
+#> • Missing data handling: listwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
 #> --- age × income ---
@@ -623,7 +619,7 @@ survey_data %>%
 #>   p-value: 0.7608
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -637,12 +633,11 @@ result <- survey_data %>%
   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
 print(result)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
+#> ── Weighted Pearson Correlation  ───────────────────────────────────────────────
 #> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
+#> • Weights variable: sampling_weight
+#> • Missing data handling: pairwise deletion
+#> • Confidence level: 95.0%
 #> 
 #> 
 #> Correlation Matrix:
@@ -677,7 +672,7 @@ print(result)
 #>  income × life_satisfaction  0.450     0.203  0.0000  [0.416, 0.483] 2130 ***
 #> ---------------- 
 #> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
