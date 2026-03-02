@@ -134,9 +134,11 @@ correlated proportions or percentages. \emph{Psychometrika}, 12(2), 153-157.
 \code{\link{wilcoxon_test}} for paired non-parametric tests on ordinal data.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
 \code{\link{chisq_gof}()},
+\code{\link{factorial_anova}()},
 \code{\link{fisher_test}()},
 \code{\link{friedman_test}()},
 \code{\link{kruskal_wallis}()},

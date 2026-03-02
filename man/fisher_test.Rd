@@ -130,9 +130,11 @@ contingency, goodness of fit and other problems of significance.
 \code{\link{mcnemar_test}} for paired proportions.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
 \code{\link{chisq_gof}()},
+\code{\link{factorial_anova}()},
 \code{\link{friedman_test}()},
 \code{\link{kruskal_wallis}()},
 \code{\link{mann_whitney}()},

@@ -1,0 +1,1062 @@
+﻿Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY education WITH age                                                 
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(education) WITH(age=MEAN)                                            
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age education.                                                               
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N   
+ Highest     1.00 Basic Secondary        735 
+ educational 2.00 Intermediate Secondary 548 
+ attainment  3.00 Academic Secondary     548 
+             4.00 University             355 
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational attainment Mean      Std. Deviation N    
+ Basic Secondary                2759.0476 786.56752      735  
+ Intermediate Secondary         3592.5182 995.63887      548  
+ Academic Secondary             4224.0876 1178.63526     548  
+ University                     5337.1831 1660.95846     355  
+ Total                          3753.9341 1432.80161     2186 
+
+Levene's Test of Equality of Error Variances(a)
+Dependent Variable Monthly household income (EUR) 
+
+ F       df1 df2  Sig. 
+ 103.953 3   2182 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source          Type III Sum of Squares df   Mean Square    F        Sig. Partial Eta Squared 
+ Corrected Model 1752821002.875(a)       4    438205250.719  349.723  .000 .391                
+ Intercept       3472400779.184          1    3472400779.184 2771.252 .000 .560                
+ age             37721.406               1    37721.406      .030     .862 .000                
+ education       1752630664.966          3    584210221.656  466.246  .000 .391                
+ Error           2732810163.640          2181 1253007.870                                      
+ Total           35290790000.000         2186                                                  
+ Corrected Total 4485631166.515          2185                                                  
+a R Squared = .391 (Adjusted R Squared = .390)
+
+Parameter Estimates
+Dependent Variable Monthly household income (EUR) 
+
+ Parameter        B         Std.   t       Sig. 95% Confidence Interval Partial Eta 
+                            Error               Lower Bound Upper Bound Squared     
+ Intercept        5349.320  91.774 58.288  .000 5169.346    5529.293    .609        
+ age              -.245     1.412  -.174   .862 -3.014      2.524       .000        
+ [education=1.00] -2577.931 72.359 -35.627 .000 -2719.830   -2436.032   .368        
+ [education=2.00] -1744.236 76.304 -22.859 .000 -1893.871   -1594.600   .193        
+ [education=3.00] -1112.550 76.328 -14.576 .000 -1262.233   -962.866    .089        
+ [education=4.00] 0(a)      .      .       .    .           .           .           
+a This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Highest educational attainment
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational    Mean        Std.   95% Confidence Interval 
+ attainment                         Error  Lower Bound Upper Bound 
+ Basic Secondary        2758.939(a) 41.294 2677.960    2839.918    
+ Intermediate Secondary 3592.634(a) 47.822 3498.852    3686.416    
+ Academic Secondary     4224.320(a) 47.836 4130.511    4318.130    
+ University             5336.870(a) 59.438 5220.309    5453.431    
+a Covariates appearing in the model are evaluated at the following values: Age in years = 50.8170.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender WITH age                                         
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(gender) WITH(age=MEAN)                                               
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age gender.                                                                  
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+             Value Label N    
+ Gender 1.00 Male        1149 
+        2.00 Female      1272 
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Mean Std. Deviation N    
+ Male   3.60 1.165          1149 
+ Female 3.65 1.142          1272 
+ Total  3.63 1.153          2421 
+
+Levene's Test of Equality of Error Variances(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ F     df1 df2  Sig. 
+ 1.306 1   2419 .253 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + gender
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source          Type III Sum of Squares df   Mean Square F        Sig. Partial Eta Squared 
+ Corrected Model 4.071(a)                2    2.036       1.532    .216 .001                
+ Intercept       3410.020                1    3410.020    2565.986 .000 .515                
+ age             2.691                   1    2.691       2.025    .155 .001                
+ gender          1.418                   1    1.418       1.067    .302 .000                
+ Error           3213.356                2418 1.329                                         
+ Total           35088.000               2421                                               
+ Corrected Total 3217.428                2420                                               
+a R Squared = .001 (Adjusted R Squared = .000)
+
+Parameter Estimates
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Parameter     B     Std.  t      Sig. 95% Confidence Interval Partial Eta 
+                     Error             Lower Bound Upper Bound Squared     
+ Intercept     3.750 .077  48.670 .000 3.599       3.902       .495        
+ age           -.002 .001  -1.423 .155 -.005       .001        .001        
+ [gender=1.00] -.048 .047  -1.033 .302 -.140       .044        .000        
+ [gender=2.00] 0(a)  .     .      .    .           .           .           
+a This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Gender
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Mean     Std.  95% Confidence Interval 
+                 Error Lower Bound Upper Bound 
+ Male   3.603(a) .034  3.536       3.669       
+ Female 3.651(a) .032  3.588       3.715       
+a Covariates appearing in the model are evaluated at the following values: Age in years = 50.5832.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY education WITH political_orientation                    
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(education) WITH(political_orientation=MEAN)                          
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=political_orientation education.                                             
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N   
+ Highest     1.00 Basic Secondary        739 
+ educational 2.00 Intermediate Secondary 573 
+ attainment  3.00 Academic Secondary     559 
+             4.00 University             357 
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Highest educational attainment Mean Std. Deviation N    
+ Basic Secondary                3.17 1.237          739  
+ Intermediate Secondary         3.71 1.115          573  
+ Academic Secondary             3.86 1.006          559  
+ University                     4.04 .975           357  
+ Total                          3.62 1.160          2228 
+
+Levene's Test of Equality of Error Variances(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ F      df1 df2  Sig. 
+ 24.350 3   2224 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + political_orientation + education
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source                Type III Sum of Squares df   Mean Square F        Sig. Partial Eta Squared 
+ Corrected Model       250.020(a)              4    62.505      50.633   .000 .083                
+ Intercept             4137.304                1    4137.304    3351.442 .000 .601                
+ political_orientation .004                    1    .004        .004     .952 .000                
+ education             250.017                 3    83.339      67.509   .000 .083                
+ Error                 2744.260                2223 1.234                                         
+ Total                 32210.000               2228                                               
+ Corrected Total       2994.280                2227                                               
+a R Squared = .083 (Adjusted R Squared = .082)
+
+Parameter Estimates
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Parameter             B     Std.  t       Sig. 95% Confidence Interval Partial Eta 
+                             Error              Lower Bound Upper Bound Squared     
+ Intercept             4.039 .082  49.128  .000 3.877       4.200       .521        
+ political_orientation .001  .022  .060    .952 -.041       .044        .000        
+ [education=1.00]      -.873 .072  -12.187 .000 -1.013      -.732       .063        
+ [education=2.00]      -.330 .075  -4.404  .000 -.477       -.183       .009        
+ [education=3.00]      -.185 .075  -2.460  .014 -.333       -.038       .003        
+ [education=4.00]      0(a)  .     .       .    .           .           .           
+a This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Highest educational attainment
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Highest educational    Mean     Std.  95% Confidence Interval 
+ attainment                      Error Lower Bound Upper Bound 
+ Basic Secondary        3.169(a) .041  3.089       3.249       
+ Intermediate Secondary 3.712(a) .046  3.621       3.803       
+ Academic Secondary     3.857(a) .047  3.765       3.949       
+ University             4.042(a) .059  3.927       4.157       
+a Covariates appearing in the model are evaluated at the following values: Political orientation (1=left, 5=right) = 2.73.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY education WITH age                                                 
+                                               /REGWGT=sampling_weight                                                              
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(education) WITH(age=MEAN)                                            
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age education.                                                               
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N   
+ Highest     1.00 Basic Secondary        735 
+ educational 2.00 Intermediate Secondary 548 
+ attainment  3.00 Academic Secondary     548 
+             4.00 University             355 
+
+Descriptive Statistics(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational attainment Mean      Std. Deviation N    
+ Basic Secondary                2759.2606 791.04390      735  
+ Intermediate Secondary         3590.2177 1003.80253     548  
+ Academic Secondary             4225.3255 1191.04073     548  
+ University                     5331.3370 1636.49099     355  
+ Total                          3743.0994 1428.82531     2186 
+a Weighted Least Squares Regression - Weighted by Weighting factor
+
+Levene's Test of Equality of Error Variances(a,b)
+Dependent Variable Monthly household income (EUR) 
+
+ F      df1 df2  Sig. 
+ 95.368 3   2182 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + education
+b Weighted Least Squares Regression - Weighted by Weighting factor
+
+Tests of Between-Subjects Effects(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Source          Type III Sum of Squares df   Mean Square    F        Sig. Partial Eta Squared 
+ Corrected Model 1726313730.354(b)       4    431578432.589  344.227  .000 .387                
+ Intercept       3522091861.884          1    3522091861.884 2809.219 .000 .563                
+ age             24217.849               1    24217.849      .019     .889 .000                
+ education       1726217469.350          3    575405823.117  458.943  .000 .387                
+ Error           2734455037.942          2181 1253762.053                                      
+ Total           35297675826.553         2186                                                  
+ Corrected Total 4460768768.296          2185                                                  
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b R Squared = .387 (Adjusted R Squared = .386)
+
+Parameter Estimates(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Parameter        B         Std.   t       Sig. 95% Confidence Interval Partial Eta 
+                            Error               Lower Bound Upper Bound Squared     
+ Intercept        5340.990  92.065 58.013  .000 5160.446    5521.534    .607        
+ age              -.195     1.400  -.139   .889 -2.941      2.551       .000        
+ [education=1.00] -2571.922 73.106 -35.181 .000 -2715.288   -2428.557   .362        
+ [education=2.00] -1740.831 76.821 -22.661 .000 -1891.481   -1590.181   .191        
+ [education=3.00] -1105.592 76.856 -14.385 .000 -1256.311   -954.873    .087        
+ [education=4.00] 0(b)      .      .       .    .           .           .           
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Highest educational attainment(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational    Mean        Std.   95% Confidence Interval 
+ attainment                         Error  Lower Bound Upper Bound 
+ Basic Secondary        2759.183(b) 41.135 2678.516    2839.850    
+ Intermediate Secondary 3590.275(b) 47.390 3497.341    3683.208    
+ Academic Secondary     4225.514(b) 47.413 4132.533    4318.494    
+ University             5331.106(b) 60.451 5212.558    5449.653    
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b Covariates appearing in the model are evaluated at the following values: Age in years = 50.7928.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender WITH age                                         
+                                               /REGWGT=sampling_weight                                                              
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(gender) WITH(age=MEAN)                                               
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age gender.                                                                  
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+             Value Label N    
+ Gender 1.00 Male        1149 
+        2.00 Female      1272 
+
+Descriptive Statistics(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Mean Std. Deviation N    
+ Male   3.60 1.165          1149 
+ Female 3.65 1.147          1272 
+ Total  3.62 1.156          2421 
+a Weighted Least Squares Regression - Weighted by Weighting factor
+
+Levene's Test of Equality of Error Variances(a,b)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ F    df1 df2  Sig. 
+ .902 1   2419 .342 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + gender
+b Weighted Least Squares Regression - Weighted by Weighting factor
+
+Tests of Between-Subjects Effects(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source          Type III Sum of Squares df   Mean Square F        Sig. Partial Eta Squared 
+ Corrected Model 4.290(b)                2    2.145       1.606    .201 .001                
+ Intercept       3468.736                1    3468.736    2597.637 .000 .518                
+ age             2.770                   1    2.770       2.074    .150 .001                
+ gender          1.534                   1    1.534       1.148    .284 .000                
+ Error           3228.859                2418 1.335                                         
+ Total           35249.294               2421                                               
+ Corrected Total 3233.149                2420                                               
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b R Squared = .001 (Adjusted R Squared = .001)
+
+Parameter Estimates(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Parameter     B     Std.  t      Sig. 95% Confidence Interval Partial Eta 
+                     Error             Lower Bound Upper Bound Squared     
+ Intercept     3.748 .076  49.072 .000 3.598       3.898       .499        
+ age           -.002 .001  -1.440 .150 -.005       .001        .001        
+ [gender=1.00] -.050 .047  -1.072 .284 -.142       .042        .000        
+ [gender=2.00] 0(b)  .     .      .    .           .           .           
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Gender(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Mean     Std.  95% Confidence Interval 
+                 Error Lower Bound Upper Bound 
+ Male   3.598(b) .034  3.531       3.665       
+ Female 3.649(b) .032  3.585       3.712       
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b Covariates appearing in the model are evaluated at the following values: Age in years = 50.5524.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY gender education WITH age                                          
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(gender*education) WITH(age=MEAN)                                     
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age gender education gender*education.                                       
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.06                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1046 
+             2.00 Female                 1140 
+ Highest     1.00 Basic Secondary        735  
+ educational 2.00 Intermediate Secondary 548  
+ attainment  3.00 Academic Secondary     548  
+             4.00 University             355  
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Highest educational attainment Mean      Std. Deviation N    
+ Male   Basic Secondary                2803.4286 774.95889      350  
+        Intermediate Secondary         3574.0891 996.64920      247  
+        Academic Secondary             4246.4539 1180.77942     282  
+        University                     5318.5629 1718.80537     167  
+        Total                          3776.0038 1430.04925     1046 
+ Female Basic Secondary                2718.7013 795.83118      385  
+        Intermediate Secondary         3607.6412 996.21354      301  
+        Academic Secondary             4200.3759 1178.11804     266  
+        University                     5353.7234 1612.26481     188  
+        Total                          3733.6842 1435.65121     1140 
+ Total  Basic Secondary                2759.0476 786.56752      735  
+        Intermediate Secondary         3592.5182 995.63887      548  
+        Academic Secondary             4224.0876 1178.63526     548  
+        University                     5337.1831 1660.95846     355  
+        Total                          3753.9341 1432.80161     2186 
+
+Levene's Test of Equality of Error Variances(a)
+Dependent Variable Monthly household income (EUR) 
+
+ F      df1 df2  Sig. 
+ 45.006 7   2178 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + gender + education + gender * education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source             Type III Sum of Squares df   Mean Square    F        Sig. Partial Eta Squared 
+ Corrected Model    1754673974.673(a)       8    219334246.834  174.844  .000 .391                
+ Intercept          3459603648.688          1    3459603648.688 2757.845 .000 .559                
+ age                21904.825               1    21904.825      .017     .895 .000                
+ gender             121746.808              1    121746.808     .097     .755 .000                
+ education          1743507542.109          3    581169180.703  463.283  .000 .390                
+ gender * education 1486565.745             3    495521.915     .395     .757 .001                
+ Error              2730957191.842          2177 1254458.977                                      
+ Total              35290790000.000         2186                                                  
+ Corrected Total    4485631166.515          2185                                                  
+a R Squared = .391 (Adjusted R Squared = .389)
+
+Parameter Estimates
+Dependent Variable Monthly household income (EUR) 
+
+ Parameter                        B         Std.    t       Sig. 95% Confidence Interval Partial Eta 
+                                            Error                Lower Bound Upper Bound Squared     
+ Intercept                        5363.034  107.875 49.715  .000 5151.485    5574.583    .532        
+ age                              -.187     1.414   -.132   .895 -2.960      2.586       .000        
+ [gender=1.00]                    -35.274   119.101 -.296   .767 -268.838    198.290     .000        
+ [gender=2.00]                    0(a)      .       .       .    .           .           .           
+ [education=1.00]                 -2634.729 99.679  -26.432 .000 -2830.205   -2439.253   .243        
+ [education=2.00]                 -1745.926 104.123 -16.768 .000 -1950.118   -1541.734   .114        
+ [education=3.00]                 -1153.000 106.750 -10.801 .000 -1362.343   -943.657    .051        
+ [education=4.00]                 0(a)      .       .       .    .           .           .           
+ [gender=1.00] * [education=1.00] 119.601   145.023 .825    .410 -164.796    403.999     .000        
+ [gender=1.00] * [education=2.00] 1.983     153.097 .013    .990 -298.250    302.215     .000        
+ [gender=1.00] * [education=3.00] 81.382    152.807 .533    .594 -218.281    381.045     .000        
+ [gender=1.00] * [education=4.00] 0(a)      .       .       .    .           .           .           
+ [gender=2.00] * [education=1.00] 0(a)      .       .       .    .           .           .           
+ [gender=2.00] * [education=2.00] 0(a)      .       .       .    .           .           .           
+ [gender=2.00] * [education=3.00] 0(a)      .       .       .    .           .           .           
+ [gender=2.00] * [education=4.00] 0(a)      .       .       .    .           .           .           
+a This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Gender * Highest educational attainment
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Highest educational    Mean        Std.   95% Confidence Interval 
+        attainment                         Error  Lower Bound Upper Bound 
+ Male   Basic Secondary        2803.136(a) 59.909 2685.652    2920.621    
+        Intermediate Secondary 3574.321(a) 71.287 3434.523    3714.119    
+        Academic Secondary     4246.646(a) 66.712 4115.819    4377.472    
+        University             5318.264(a) 86.700 5148.241    5488.287    
+ Female Basic Secondary        2718.809(a) 57.088 2606.857    2830.761    
+        Intermediate Secondary 3607.612(a) 64.558 3481.011    3734.213    
+        Academic Secondary     4200.538(a) 68.684 4065.845    4335.231    
+        University             5353.538(a) 81.698 5193.323    5513.753    
+a Covariates appearing in the model are evaluated at the following values: Age in years = 50.8170.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender region WITH age                                  
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(gender*region) WITH(age=MEAN)                                        
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age gender region gender*region.                                             
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.04                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label N    
+ Gender      1.00 Male        1149 
+             2.00 Female      1272 
+ Region      1.00 East        465  
+ (East/West) 2.00 West        1956 
+
+Descriptive Statistics
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region (East/West) Mean Std. Deviation N    
+ Male   East               3.65 1.209          228  
+        West               3.59 1.154          921  
+        Total              3.60 1.165          1149 
+ Female East               3.59 1.206          237  
+        West               3.67 1.127          1035 
+        Total              3.65 1.142          1272 
+ Total  East               3.62 1.207          465  
+        West               3.63 1.140          1956 
+        Total              3.63 1.153          2421 
+
+Levene's Test of Equality of Error Variances(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ F     df1 df2  Sig. 
+ 1.562 3   2417 .197 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + gender + region + gender * region
+
+Tests of Between-Subjects Effects
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source          Type III Sum of Squares df   Mean Square F        Sig. Partial Eta Squared 
+ Corrected Model 5.879(a)                4    1.470       1.106    .352 .002                
+ Intercept       3146.242                1    3146.242    2366.870 .000 .495                
+ age             2.567                   1    2.567       1.931    .165 .001                
+ gender          .013                    1    .013        .010     .921 .000                
+ region          .010                    1    .010        .007     .931 .000                
+ gender * region 1.789                   1    1.789       1.346    .246 .001                
+ Error           3211.549                2416 1.329                                         
+ Total           35088.000               2421                                               
+ Corrected Total 3217.428                2420                                               
+a R Squared = .002 (Adjusted R Squared = .000)
+
+Parameter Estimates
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Parameter                     B     Std.  t      Sig. 95% Confidence Interval Partial Eta 
+                                     Error             Lower Bound Upper Bound Squared     
+ Intercept                     3.762 .078  48.188 .000 3.609       3.915       .490        
+ age                           -.002 .001  -1.390 .165 -.005       .001        .001        
+ [gender=1.00]                 -.075 .052  -1.435 .151 -.177       .027        .001        
+ [gender=2.00]                 0(a)  .     .      .    .           .           .           
+ [region=1.00]                 -.074 .083  -.893  .372 -.237       .089        .000        
+ [region=2.00]                 0(a)  .     .      .    .           .           .           
+ [gender=1.00] * [region=1.00] .138  .119  1.160  .246 -.095       .372        .001        
+ [gender=1.00] * [region=2.00] 0(a)  .     .      .    .           .           .           
+ [gender=2.00] * [region=1.00] 0(a)  .     .      .    .           .           .           
+ [gender=2.00] * [region=2.00] 0(a)  .     .      .    .           .           .           
+a This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Gender * Region (East/West)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region      Mean     Std.  95% Confidence Interval 
+        (East/West)          Error Lower Bound Upper Bound 
+ Male   East        3.654(a) .076  3.504       3.804       
+        West        3.590(a) .038  3.516       3.665       
+ Female East        3.591(a) .075  3.444       3.738       
+        West        3.665(a) .036  3.595       3.735       
+a Covariates appearing in the model are evaluated at the following values: Age in years = 50.5832.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY gender education WITH age                                          
+                                               /REGWGT=sampling_weight                                                              
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(gender*education) WITH(age=MEAN)                                     
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age gender education gender*education.                                       
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.06                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N    
+ Gender      1.00 Male                   1046 
+             2.00 Female                 1140 
+ Highest     1.00 Basic Secondary        735  
+ educational 2.00 Intermediate Secondary 548  
+ attainment  3.00 Academic Secondary     548  
+             4.00 University             355  
+
+Descriptive Statistics(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Highest educational attainment Mean      Std. Deviation N    
+ Male   Basic Secondary                2801.2376 781.15116      350  
+        Intermediate Secondary         3579.2969 1000.71738     247  
+        Academic Secondary             4244.2258 1196.72201     282  
+        University                     5314.4098 1694.94091     167  
+        Total                          3766.9992 1425.83891     1046 
+ Female Basic Secondary                2721.4740 799.03345      385  
+        Intermediate Secondary         3598.9657 1007.90453     301  
+        Academic Secondary             4205.1651 1186.90520     266  
+        University                     5346.1764 1587.16986     188  
+        Total                          3721.3795 1431.83543     1140 
+ Total  Basic Secondary                2759.2606 791.04390      735  
+        Intermediate Secondary         3590.2177 1003.80253     548  
+        Academic Secondary             4225.3255 1191.04073     548  
+        University                     5331.3370 1636.49099     355  
+        Total                          3743.0994 1428.82531     2186 
+a Weighted Least Squares Regression - Weighted by Weighting factor
+
+Levene's Test of Equality of Error Variances(a,b)
+Dependent Variable Monthly household income (EUR) 
+
+ F      df1 df2  Sig. 
+ 41.256 7   2178 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + gender + education + gender * education
+b Weighted Least Squares Regression - Weighted by Weighting factor
+
+Tests of Between-Subjects Effects(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Source             Type III Sum of Squares df   Mean Square    F        Sig. Partial Eta Squared 
+ Corrected Model    1727833011.823(b)       8    215979126.478  172.044  .000 .387                
+ Intercept          3512177106.461          1    3512177106.461 2797.728 .000 .562                
+ age                15715.020               1    15715.020      .013     .911 .000                
+ gender             143752.719              1    143752.719     .115     .735 .000                
+ education          1715889821.560          3    571963273.854  455.614  .000 .386                
+ gender * education 1122625.930             3    374208.643     .298     .827 .000                
+ Error              2732935756.474          2177 1255367.826                                      
+ Total              35297675826.553         2186                                                  
+ Corrected Total    4460768768.296          2185                                                  
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b R Squared = .387 (Adjusted R Squared = .385)
+
+Parameter Estimates(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Parameter                        B         Std.    t       Sig. 95% Confidence Interval Partial Eta 
+                                            Error                Lower Bound Upper Bound Squared     
+ Intercept                        5353.997  108.387 49.397  .000 5141.445    5566.549    .528        
+ age                              -.157     1.402   -.112   .911 -2.906      2.593       .000        
+ [gender=1.00]                    -31.851   121.198 -.263   .793 -269.527    205.825     .000        
+ [gender=2.00]                    0(b)      .       .       .    .           .           .           
+ [education=1.00]                 -2624.492 100.418 -26.136 .000 -2821.417   -2427.567   .239        
+ [education=2.00]                 -1747.112 104.460 -16.725 .000 -1951.964   -1542.261   .114        
+ [education=3.00]                 -1140.755 107.307 -10.631 .000 -1351.190   -930.319    .049        
+ [education=4.00]                 0(b)      .       .       .    .           .           .           
+ [gender=1.00] * [education=1.00] 111.350   146.579 .760    .448 -176.100    398.799     .000        
+ [gender=1.00] * [education=2.00] 12.395    154.274 .080    .936 -290.145    314.935     .000        
+ [gender=1.00] * [education=3.00] 70.993    153.936 .461    .645 -230.884    372.870     .000        
+ [gender=1.00] * [education=4.00] 0(b)      .       .       .    .           .           .           
+ [gender=2.00] * [education=1.00] 0(b)      .       .       .    .           .           .           
+ [gender=2.00] * [education=2.00] 0(b)      .       .       .    .           .           .           
+ [gender=2.00] * [education=3.00] 0(b)      .       .       .    .           .           .           
+ [gender=2.00] * [education=4.00] 0(b)      .       .       .    .           .           .           
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Gender * Highest educational attainment(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Gender Highest educational    Mean        Std.   95% Confidence Interval 
+        attainment                         Error  Lower Bound Upper Bound 
+ Male   Basic Secondary        2801.036(b) 59.824 2683.718    2918.354    
+        Intermediate Secondary 3579.461(b) 71.117 3439.997    3718.925    
+        Academic Secondary     4244.417(b) 66.034 4114.920    4373.914    
+        University             5314.178(b) 88.494 5140.637    5487.720    
+ Female Basic Secondary        2721.537(b) 56.737 2610.274    2832.801    
+        Intermediate Secondary 3598.917(b) 63.638 3474.119    3723.714    
+        Academic Secondary     4205.275(b) 68.184 4071.562    4338.987    
+        University             5346.029(b) 82.845 5183.566    5508.492    
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b Covariates appearing in the model are evaluated at the following values: Age in years = 50.7928.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA life_satisfaction BY gender region WITH age                                  
+                                               /REGWGT=sampling_weight                                                              
+                                               /METHOD=SSTYPE(3)                                                                    
+                                               /INTERCEPT=INCLUDE                                                                   
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                       
+                                               /EMMEANS=TABLES(gender*region) WITH(age=MEAN)                                        
+                                               /CRITERIA=ALPHA(.05)                                                                 
+                                               /DESIGN=age gender region gender*region.                                             
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.05                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label N    
+ Gender      1.00 Male        1149 
+             2.00 Female      1272 
+ Region      1.00 East        465  
+ (East/West) 2.00 West        1956 
+
+Descriptive Statistics(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region (East/West) Mean Std. Deviation N    
+ Male   East               3.66 1.238          228  
+        West               3.58 1.147          921  
+        Total              3.60 1.165          1149 
+ Female East               3.59 1.230          237  
+        West               3.66 1.128          1035 
+        Total              3.65 1.147          1272 
+ Total  East               3.62 1.233          465  
+        West               3.63 1.137          1956 
+        Total              3.62 1.156          2421 
+a Weighted Least Squares Regression - Weighted by Weighting factor
+
+Levene's Test of Equality of Error Variances(a,b)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ F     df1 df2  Sig. 
+ 2.412 3   2417 .065 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + gender + region + gender * region
+b Weighted Least Squares Regression - Weighted by Weighting factor
+
+Tests of Between-Subjects Effects(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Source          Type III Sum of Squares df   Mean Square F        Sig. Partial Eta Squared 
+ Corrected Model 6.389(b)                4    1.597       1.196    .311 .002                
+ Intercept       3200.086                1    3200.086    2396.028 .000 .498                
+ age             2.675                   1    2.675       2.003    .157 .001                
+ gender          .016                    1    .016        .012     .912 .000                
+ region          .013                    1    .013        .010     .922 .000                
+ gender * region 2.093                   1    2.093       1.567    .211 .001                
+ Error           3226.760                2416 1.336                                         
+ Total           35249.294               2421                                               
+ Corrected Total 3233.149                2420                                               
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b R Squared = .002 (Adjusted R Squared = .000)
+
+Parameter Estimates(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Parameter                     B     Std.  t      Sig. 95% Confidence Interval Partial Eta 
+                                     Error             Lower Bound Upper Bound Squared     
+ Intercept                     3.760 .077  48.589 .000 3.608       3.911       .494        
+ age                           -.002 .001  -1.415 .157 -.005       .001        .001        
+ [gender=1.00]                 -.080 .052  -1.520 .129 -.183       .023        .001        
+ [gender=2.00]                 0(b)  .     .      .    .           .           .           
+ [region=1.00]                 -.068 .082  -.828  .408 -.228       .092        .000        
+ [region=2.00]                 0(b)  .     .      .    .           .           .           
+ [gender=1.00] * [region=1.00] .147  .117  1.252  .211 -.083       .376        .001        
+ [gender=1.00] * [region=2.00] 0(b)  .     .      .    .           .           .           
+ [gender=2.00] * [region=1.00] 0(b)  .     .      .    .           .           .           
+ [gender=2.00] * [region=2.00] 0(b)  .     .      .    .           .           .           
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Gender * Region (East/West)(a)
+Dependent Variable Life satisfaction (1=dissatisfied, 5=satisfied) 
+
+ Gender Region      Mean     Std.  95% Confidence Interval 
+        (East/West)          Error Lower Bound Upper Bound 
+ Male   East        3.661(b) .075  3.514       3.808       
+        West        3.582(b) .038  3.507       3.657       
+ Female East        3.594(b) .073  3.450       3.738       
+        West        3.662(b) .036  3.591       3.732       
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b Covariates appearing in the model are evaluated at the following values: Age in years = 50.5524.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY education WITH age political_orientation                      
+                                               /METHOD=SSTYPE(3)                                                               
+                                               /INTERCEPT=INCLUDE                                                              
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                  
+                                               /EMMEANS=TABLES(education) WITH(age=MEAN political_orientation=MEAN)            
+                                               /CRITERIA=ALPHA(.05)                                                            
+                                               /DESIGN=age political_orientation education.                                    
+                                                                                                                               
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N   
+ Highest     1.00 Basic Secondary        671 
+ educational 2.00 Intermediate Secondary 510 
+ attainment  3.00 Academic Secondary     501 
+             4.00 University             326 
+
+Descriptive Statistics
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational attainment Mean      Std. Deviation N    
+ Basic Secondary                2735.7675 777.21429      671  
+ Intermediate Secondary         3595.4902 1003.94079     510  
+ Academic Secondary             4215.5689 1173.71084     501  
+ University                     5286.5031 1668.42221     326  
+ Total                          3737.4502 1427.80834     2008 
+
+Levene's Test of Equality of Error Variances(a)
+Dependent Variable Monthly household income (EUR) 
+
+ F      df1 df2  Sig. 
+ 97.401 3   2004 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + political_orientation + education
+
+Tests of Between-Subjects Effects
+Dependent Variable Monthly household income (EUR) 
+
+ Source                Type III Sum of Squares df   Mean Square    F        Sig. Partial Eta Squared 
+ Corrected Model       1582046608.943(a)       5    316409321.789  252.422  .000 .387                
+ Intercept             1958785035.087          1    1958785035.087 1562.659 .000 .438                
+ age                   21945.241               1    21945.241      .018     .895 .000                
+ political_orientation 1712167.106             1    1712167.106    1.366    .243 .001                
+ education             1576957660.342          3    525652553.448  419.350  .000 .386                
+ Error                 2509497136.078          2002 1253495.073                                      
+ Total                 32140360000.000         2008                                                  
+ Corrected Total       4091543745.020          2007                                                  
+a R Squared = .387 (Adjusted R Squared = .385)
+
+Parameter Estimates
+Dependent Variable Monthly household income (EUR) 
+
+ Parameter             B         Std.    t       Sig. 95% Confidence Interval Partial Eta 
+                                 Error                Lower Bound Upper Bound Squared     
+ Intercept             5366.554  114.485 46.876  .000 5142.033    5591.075    .523        
+ age                   -.196     1.479   -.132   .895 -3.096      2.704       .000        
+ political_orientation -26.771   22.906  -1.169  .243 -71.693     18.151      .001        
+ [education=1.00]      -2548.205 75.621  -33.697 .000 -2696.509   -2399.900   .362        
+ [education=2.00]      -1686.928 79.501  -21.219 .000 -1842.841   -1531.015   .184        
+ [education=3.00]      -1067.765 79.794  -13.382 .000 -1224.254   -911.277    .082        
+ [education=4.00]      0(a)      .       .       .    .           .           .           
+a This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Highest educational attainment
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational    Mean        Std.   95% Confidence Interval 
+ attainment                         Error  Lower Bound Upper Bound 
+ Basic Secondary        2735.624(a) 43.231 2650.841    2820.408    
+ Intermediate Secondary 3596.901(a) 49.594 3499.640    3694.163    
+ Academic Secondary     4216.064(a) 50.054 4117.900    4314.228    
+ University             5283.829(a) 62.076 5162.090    5405.569    
+a Covariates appearing in the model are evaluated at the following values: Age in years = 50.7629, Political orientation (1=left, 5=right) = 2.72.
+
+Univariate Analysis of Variance
+Notes
+
+ Output Created                               02-MAR-2026 16:23:38                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics are based on all cases with valid data for all variables in the model.     
+ Syntax                                       UNIANOVA income BY education WITH age political_orientation                      
+                                               /REGWGT=sampling_weight                                                         
+                                               /METHOD=SSTYPE(3)                                                               
+                                               /INTERCEPT=INCLUDE                                                              
+                                               /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY PARAMETER                                  
+                                               /EMMEANS=TABLES(education) WITH(age=MEAN political_orientation=MEAN)            
+                                               /CRITERIA=ALPHA(.05)                                                            
+                                               /DESIGN=age political_orientation education.                                    
+                                                                                                                               
+ Resources     Processor Time                 00:00:00.03                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+
+Between-Subjects Factors
+
+                  Value Label            N   
+ Highest     1.00 Basic Secondary        671 
+ educational 2.00 Intermediate Secondary 510 
+ attainment  3.00 Academic Secondary     501 
+             4.00 University             326 
+
+Descriptive Statistics(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational attainment Mean      Std. Deviation N    
+ Basic Secondary                2736.8169 781.32352      671  
+ Intermediate Secondary         3592.4857 1010.96302     510  
+ Academic Secondary             4218.1950 1185.13868     501  
+ University                     5278.5537 1644.15557     326  
+ Total                          3726.8931 1422.99180     2008 
+a Weighted Least Squares Regression - Weighted by Weighting factor
+
+Levene's Test of Equality of Error Variances(a,b)
+Dependent Variable Monthly household income (EUR) 
+
+ F      df1 df2  Sig. 
+ 89.755 3   2004 .000 
+Tests the null hypothesis that the error variance of the dependent variable is equal across groups.
+a Design: Intercept + age + political_orientation + education
+b Weighted Least Squares Regression - Weighted by Weighting factor
+
+Tests of Between-Subjects Effects(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Source                Type III Sum of Squares df   Mean Square    F        Sig. Partial Eta Squared 
+ Corrected Model       1555386966.105(b)       5    311077393.221  248.257  .000 .383                
+ Intercept             1964488458.775          1    1964488458.775 1567.770 .000 .439                
+ age                   4531.335                1    4531.335       .004     .952 .000                
+ political_orientation 1467183.764             1    1467183.764    1.171    .279 .001                
+ education             1550660494.565          3    516886831.522  412.504  .000 .382                
+ Error                 2508598693.486          2002 1253046.300                                      
+ Total                 32122529623.043         2008                                                  
+ Corrected Total       4063985659.590          2007                                                  
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b R Squared = .383 (Adjusted R Squared = .381)
+
+Parameter Estimates(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Parameter             B         Std.    t       Sig. 95% Confidence Interval Partial Eta 
+                                 Error                Lower Bound Upper Bound Squared     
+ Intercept             5347.643  114.663 46.638  .000 5122.771    5572.515    .521        
+ age                   -.088     1.466   -.060   .952 -2.964      2.787       .000        
+ political_orientation -24.674   22.803  -1.082  .279 -69.394     20.045      .001        
+ [education=1.00]      -2539.314 76.386  -33.243 .000 -2689.118   -2389.510   .356        
+ [education=2.00]      -1682.339 80.021  -21.024 .000 -1839.273   -1525.405   .181        
+ [education=3.00]      -1057.492 80.349  -13.161 .000 -1215.069   -899.915    .080        
+ [education=4.00]      0(b)      .       .       .    .           .           .           
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b This parameter is set to zero because it is redundant.
+
+Estimated Marginal Means
+Highest educational attainment(a)
+Dependent Variable Monthly household income (EUR) 
+
+ Highest educational    Mean        Std.   95% Confidence Interval 
+ attainment                         Error  Lower Bound Upper Bound 
+ Basic Secondary        2736.747(b) 43.058 2652.305    2821.190    
+ Intermediate Secondary 3593.722(b) 49.123 3497.384    3690.060    
+ Academic Secondary     4218.569(b) 49.640 4121.217    4315.920    
+ University             5276.061(b) 63.118 5152.276    5399.846    
+a Weighted Least Squares Regression - Weighted by Weighting factor
+b Covariates appearing in the model are evaluated at the following values: Age in years = 50.7096, Political orientation (1=left, 5=right) = 2.72.
+
