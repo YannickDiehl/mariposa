@@ -133,9 +133,11 @@ The Annals of Mathematical Statistics, 10(3), 275-287.
 \code{\link{kruskal_wallis}} for comparing independent groups.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
 \code{\link{chisq_gof}()},
+\code{\link{factorial_anova}()},
 \code{\link{fisher_test}()},
 \code{\link{kruskal_wallis}()},
 \code{\link{mann_whitney}()},

@@ -184,9 +184,11 @@ measures of effect size for some common research designs. Psychological Methods,
 \code{\link{levene_test}} for testing homogeneity of variances.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
 \code{\link{chisq_gof}()},
+\code{\link{factorial_anova}()},
 \code{\link{fisher_test}()},
 \code{\link{friedman_test}()},
 \code{\link{kruskal_wallis}()},

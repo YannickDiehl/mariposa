@@ -156,9 +156,11 @@ in Sport Sciences, 1(21), 19-25.
 \code{\link{oneway_anova}} for parametric one-way ANOVA.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
 \code{\link{chisq_gof}()},
+\code{\link{factorial_anova}()},
 \code{\link{fisher_test}()},
 \code{\link{friedman_test}()},
 \code{\link{mann_whitney}()},
