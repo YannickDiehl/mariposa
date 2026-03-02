@@ -573,23 +573,23 @@ survey_data %>%
 #> Chi-Squared Test of Independence 
 #> ---------------------------------
 #> 
-#> - Variables: education x employment
+#> - Variables: education × employment
 #> 
 #> Observed Frequencies:
-#>                         var2
-#> var1                     Student Employed Unemployed Retired Other
-#>   Basic Secondary              0      571         65     171    34
-#>   Intermediate Secondary       0      412         51     137    29
-#>   Academic Secondary          44      366         44     145    32
-#>   University                  34      251         22      72    20
+#>                       employment
+#> education              Student Employed Unemployed Retired Other
+#>   Basic Secondary            0      571         65     171    34
+#>   Intermediate Seco...       0      412         51     137    29
+#>   Academic Secondary        44      366         44     145    32
+#>   University                34      251         22      72    20
 #> 
 #> Expected Frequencies:
-#>                         var2
-#> var1                     Student Employed Unemployed Retired  Other
-#>   Basic Secondary         26.239   538.24     61.225  176.61 38.686
-#>   Intermediate Secondary  19.625   402.56     45.791  132.09 28.934
-#>   Academic Secondary      19.687   403.84     45.937  132.51 29.026
-#>   University              12.449   255.36     29.047   83.79 18.354
+#>                       employment
+#> education              Student Employed Unemployed Retired  Other
+#>   Basic Secondary       26.239   538.24     61.225  176.61 38.686
+#>   Intermediate Seco...  19.625   402.56     45.791  132.09 28.934
+#>   Academic Secondary    19.687   403.84     45.937  132.51 29.026
+#>   University            12.449   255.36     29.047   83.79 18.354
 #> 
 #> Chi-Squared Test Results:
 #> -------------------------------------------------- 
@@ -622,24 +622,24 @@ survey_data %>%
 #> Weighted Chi-Squared Test of Independence 
 #> ------------------------------------------
 #> 
-#> - Variables: education x employment
+#> - Variables: education × employment
 #> - Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
-#>                         var2
-#> var1                     Student Employed Unemployed Retired Other
-#>   Basic Secondary              0      573         66     175    34
-#>   Intermediate Secondary       0      420         52     139    29
-#>   Academic Secondary          46      370         45     149    33
-#>   University                  34      240         21      72    20
+#>                       employment
+#> education              Student Employed Unemployed Retired Other
+#>   Basic Secondary            0      573         66     175    34
+#>   Intermediate Seco...       0      420         52     139    29
+#>   Academic Secondary        46      370         45     149    33
+#>   University                34      240         21      72    20
 #> 
 #> Expected Frequencies:
-#>                         var2
-#> var1                     Student Employed Unemployed Retired  Other
-#>   Basic Secondary         26.942  539.851     61.967 180.175 39.066
-#>   Intermediate Secondary  20.334  407.434     46.767 135.981 29.484
-#>   Academic Secondary      20.429  409.344     46.986 136.618 29.622
-#>   University              12.295  246.371     28.280  82.226 17.828
+#>                       employment
+#> education              Student Employed Unemployed Retired  Other
+#>   Basic Secondary       26.942  539.851     61.967 180.175 39.066
+#>   Intermediate Seco...  20.334  407.434     46.767 135.981 29.484
+#>   Academic Secondary    20.429  409.344     46.986 136.618 29.622
+#>   University            12.295  246.371     28.280  82.226 17.828
 #> 
 #> Chi-Squared Test Results:
 #> -------------------------------------------------- 
@@ -670,40 +670,26 @@ survey_data %>%
 #> Weighted Chi-Squared Test of Independence 
 #> ------------------------------------------
 #> 
-#> - Variables: employment x education
+#> - Variables: employment × education
 #> - Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
-#>             var2
-#> var1         Basic Secondary Intermediate Secondary Academic Secondary
-#>   Student                  0                      0                 46
-#>   Employed               573                    420                370
-#>   Unemployed              66                     52                 45
-#>   Retired                175                    139                149
-#>   Other                   34                     29                 33
-#>             var2
-#> var1         University
-#>   Student            34
-#>   Employed          240
-#>   Unemployed         21
-#>   Retired            72
-#>   Other              20
+#>             education
+#> employment   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Student                  0                    0                 46         34
+#>   Employed               573                  420                370        240
+#>   Unemployed              66                   52                 45         21
+#>   Retired                175                  139                149         72
+#>   Other                   34                   29                 33         20
 #> 
 #> Expected Frequencies:
-#>             var2
-#> var1         Basic Secondary Intermediate Secondary Academic Secondary
-#>   Student             26.942                 20.334             20.429
-#>   Employed           539.851                407.434            409.344
-#>   Unemployed          61.967                 46.767             46.986
-#>   Retired            180.175                135.981            136.618
-#>   Other               39.066                 29.484             29.622
-#>             var2
-#> var1         University
-#>   Student        12.295
-#>   Employed      246.371
-#>   Unemployed     28.280
-#>   Retired        82.226
-#>   Other          17.828
+#>             education
+#> employment   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Student             26.942               20.334             20.429     12.295
+#>   Employed           539.851              407.434            409.344    246.371
+#>   Unemployed          61.967               46.767             46.986     28.280
+#>   Retired            180.175              135.981            136.618     82.226
+#>   Other               39.066               29.484             29.622     17.828
 #> 
 #> Chi-Squared Test Results:
 #> -------------------------------------------------- 
@@ -728,12 +714,12 @@ survey_data %>%
 #> Weighted Chi-Squared Test of Independence 
 #> ------------------------------------------
 #> 
-#> - Variables: employment x gender
+#> - Variables: employment × gender
 #> - Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
-#>             var2
-#> var1         Male Female
+#>             gender
+#> employment   Male Female
 #>   Student      36     44
 #>   Employed    748    855
 #>   Unemployed   83    101
@@ -741,8 +727,8 @@ survey_data %>%
 #>   Other        68     47
 #> 
 #> Expected Frequencies:
-#>             var2
-#> var1            Male  Female
+#>             gender
+#> employment      Male  Female
 #>   Student     38.012  41.988
 #>   Employed   761.664 841.336
 #>   Unemployed  87.427  96.573

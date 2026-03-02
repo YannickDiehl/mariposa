@@ -17,6 +17,9 @@ The test tells you:
 ``` r
 levene_test(x, ...)
 
+# Default S3 method
+levene_test(x, ...)
+
 # S3 method for class 'data.frame'
 levene_test(x, ..., group, weights = NULL, center = c("mean", "median"))
 
@@ -163,6 +166,8 @@ for group mean comparisons.
 F-test of variance equality.
 
 Other posthoc:
+[`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
+[`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
 [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md),
 [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)
 

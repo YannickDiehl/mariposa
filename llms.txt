@@ -174,6 +174,10 @@ Compare groups and test for significant differences
   : Test If Two Groups Differ
 - [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
   : Compare Multiple Groups: Are Their Averages Different?
+- [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md)
+  : Compare Groups Across Multiple Factors: Factorial ANOVA
+- [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)
+  : Analysis of Covariance: ANCOVA
 - [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
   : Compare Two Groups Without Assuming Normal Data
 - [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
@@ -181,6 +185,12 @@ Compare groups and test for significant differences
   [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   : Test If Two Categories Are Related
+- [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md)
+  : Fisher's Exact Test for Small Samples
+- [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md)
+  : Chi-Square Goodness-of-Fit Test
+- [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md)
+  : McNemar's Test for Paired Proportions
 
 ## Non-Parametric Tests
 
@@ -217,6 +227,10 @@ Follow-up tests for detailed group comparisons
   : Compare All Groups More Conservatively After ANOVA
 - [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)
   : Test If Groups Vary Similarly
+- [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md)
+  : Find Which Specific Groups Differ After Kruskal-Wallis
+- [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md)
+  : Find Which Specific Measurements Differ After Friedman Test
 
 ## Scale Analysis
 
@@ -282,14 +296,24 @@ Example datasets for learning and testing
 
 Formatted output for all result types
 
+- [`print(`*`<ancova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.ancova.md)
+  : Print ANCOVA results
 - [`print(`*`<binomial_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.binomial_test.md)
   : Print method for binomial test results
 - [`print(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.chi_square.md)
   : Print method for chi_square
+- [`print(`*`<chisq_gof>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.chisq_gof.md)
+  : Print chi-square goodness-of-fit test results
 - [`print(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.crosstab.md)
   : Print method for crosstab results
 - [`print(`*`<describe>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.describe.md)
   : Print method for describe objects
+- [`print(`*`<dunn_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.dunn_test.md)
+  : Print Dunn post-hoc test results
+- [`print(`*`<factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.factorial_anova.md)
+  : Print factorial ANOVA results
+- [`print(`*`<fisher_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.fisher_test.md)
+  : Print Fisher's exact test results
 - [`print(`*`<frequency>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.frequency.md)
   : Print method for frequency objects
 - [`print(`*`<friedman_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.friedman_test.md)
@@ -302,8 +326,12 @@ Formatted output for all result types
   : Print method for Levene test results
 - [`print(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.mann_whitney.md)
   : Print method for Mann-Whitney test results
+- [`print(`*`<mcnemar_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.mcnemar_test.md)
+  : Print McNemar test results
 - [`print(`*`<oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.oneway_anova.md)
   : Print ANOVA test results
+- [`print(`*`<pairwise_wilcoxon>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.pairwise_wilcoxon.md)
+  : Print pairwise Wilcoxon post-hoc test results
 - [`print(`*`<pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.pearson_cor.md)
   : Print method for pearson_cor
 - [`print(`*`<scheffe_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.scheffe_test.md)

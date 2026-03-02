@@ -300,8 +300,8 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science)
 #> 
-#> Exploratory Factor Analysis (Varimax) Results
-#> ---------------------------------------------
+#> Exploratory Factor Analysis (PCA, Varimax) Results
+#> --------------------------------------------------
 #> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
@@ -400,8 +400,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     rotation = "varimax")
 #> 
-#> Exploratory Factor Analysis (Varimax) Results
-#> ---------------------------------------------
+#> Exploratory Factor Analysis (PCA, Varimax) Results
+#> --------------------------------------------------
 #> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
@@ -478,6 +478,269 @@ efa(survey_data,
 With oblimin, you get a Pattern Matrix (unique contributions) and
 Structure Matrix (total correlations).
 
+**Promax** is another oblique rotation, common in SPSS. Like oblimin, it
+produces Pattern and Structure matrices:
+
+``` r
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    rotation = "promax")
+#> 
+#> Exploratory Factor Analysis (PCA, Promax) Results
+#> -------------------------------------------------
+#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
+#> - Extraction: Principal Component Analysis
+#> - Rotation: Promax with Kaiser Normalization
+#> - N of Factors: 3
+#> 
+#> KMO and Bartlett's Test
+#> ---------------------------------------- 
+#>   Kaiser-Meyer-Olkin Measure:     0.505
+#>   Bartlett's Chi-Square:          932.068
+#>   df:                             15
+#>   Sig.:                           0.000
+#> 
+#> Communalities
+#> ---------------------------------------- 
+#>               variable initial extraction
+#>  political_orientation       1      0.786
+#>  environmental_concern       1      0.783
+#>      life_satisfaction       1      0.668
+#>       trust_government       1      0.347
+#>            trust_media       1      0.475
+#>          trust_science       1      0.598
+#> Extraction Method: Principal Component Analysis.
+#> 
+#> Total Variance Explained
+#> ---------------------------------------- 
+#>   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%
+#>   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%
+#>   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%
+#>   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%
+#>   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%
+#>   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%
+#> 
+#> Rotation Sums of Squared Loadings
+#> ---------------------------------------- 
+#>   PC1  SS Loading: 1.604
+#>   PC2  SS Loading: 1.065
+#>   PC3  SS Loading: 1.045
+#> 
+#> Component Matrix (unrotated)
+#> ---------------------------------------- 
+#>                           PC1     PC2     PC3
+#> political_orientation   0.885                
+#> environmental_concern  -0.885                
+#> trust_science                  -0.672        
+#> trust_government               -0.547        
+#> trust_media                    -0.524  -0.448
+#> life_satisfaction                      -0.809
+#> Extraction Method: Principal Component Analysis.
+#> 
+#> Pattern Matrix
+#> ---------------------------------------- 
+#>                           PC1     PC2     PC3
+#> political_orientation   0.888                
+#> environmental_concern  -0.886                
+#> trust_science                  -0.781        
+#> trust_government               -0.558        
+#> life_satisfaction                      -0.817
+#> trust_media                            -0.593
+#> Extraction Method: Principal Component Analysis.
+#> Rotation Method: Promax with Kaiser Normalization.
+#> 
+#> Structure Matrix
+#> ---------------------------------------- 
+#>                           PC1     PC2     PC3
+#> political_orientation   0.885                
+#> environmental_concern  -0.885                
+#> trust_science                  -0.751        
+#> trust_government               -0.571        
+#> life_satisfaction                      -0.777
+#> trust_media                            -0.635
+#> 
+#> Component Correlation Matrix
+#> ---------------------------------------- 
+#>       PC1   PC2   PC3
+#> PC1 1.000 0.055 0.024
+#> PC2 0.055 1.000 0.155
+#> PC3 0.024 0.155 1.000
+```
+
+### Choosing an Extraction Method
+
+By default,
+[`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md) uses
+PCA (Principal Component Analysis). For a true factor analysis model,
+use Maximum Likelihood:
+
+``` r
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    extraction = "ml")
+#> 
+#> Exploratory Factor Analysis (Maximum Likelihood, Varimax) Results
+#> -----------------------------------------------------------------
+#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
+#> - Extraction: Maximum Likelihood
+#> - Rotation: Varimax with Kaiser Normalization
+#> - N of Factors: 3
+#> 
+#> KMO and Bartlett's Test
+#> ---------------------------------------- 
+#>   Kaiser-Meyer-Olkin Measure:     0.505
+#>   Bartlett's Chi-Square:          932.068
+#>   df:                             15
+#>   Sig.:                           0.000
+#> 
+#> Communalities
+#> ---------------------------------------- 
+#>               variable initial extraction
+#>  political_orientation   0.346      0.616
+#>  environmental_concern   0.345      0.565
+#>      life_satisfaction   0.001      0.144
+#>       trust_government   0.005      0.018
+#>            trust_media   0.001      0.009
+#>          trust_science   0.003      0.096
+#> Extraction Method: Maximum Likelihood.
+#> 
+#> Total Variance Explained
+#> ---------------------------------------- 
+#>   Factor1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%
+#>   Factor2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%
+#>   Factor3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%
+#>   Factor4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%
+#>   Factor5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%
+#>   Factor6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%
+#> 
+#> Rotation Sums of Squared Loadings
+#> ---------------------------------------- 
+#>   Factor1  SS Loading: 1.185  Variance: 19.745%  Cumulative: 19.745%
+#>   Factor2  SS Loading: 0.149  Variance: 2.488%  Cumulative: 22.233%
+#>   Factor3  SS Loading: 0.115  Variance: 1.911%  Cumulative: 24.144%
+#> 
+#> Factor Matrix (unrotated)
+#> ---------------------------------------- 
+#>                       Factor1 Factor2 Factor3
+#> political_orientation  -0.784                
+#> environmental_concern   0.751                
+#> life_satisfaction                            
+#> trust_science                                
+#> trust_government                             
+#> trust_media                                  
+#> Extraction Method: Maximum Likelihood.
+#> 
+#> Rotated Factor Matrix
+#> ---------------------------------------- 
+#>                       Factor1 Factor2 Factor3
+#> political_orientation  -0.785                
+#> environmental_concern   0.750                
+#> life_satisfaction                            
+#> trust_science                                
+#> trust_government                             
+#> trust_media                                  
+#> Extraction Method: Maximum Likelihood.
+#> Rotation Method: Varimax with Kaiser Normalization.
+```
+
+ML extraction provides a **goodness-of-fit test** that evaluates whether
+your factor model adequately reproduces the observed correlations. A
+non-significant chi-square ($p > .05$) suggests good fit. ML also
+reports initial communalities as SMC (squared multiple correlations)
+instead of 1.0.
+
+You can combine any extraction with any rotation:
+
+``` r
+# ML extraction with Promax rotation
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    extraction = "ml", rotation = "promax")
+#> 
+#> Exploratory Factor Analysis (Maximum Likelihood, Promax) Results
+#> ----------------------------------------------------------------
+#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
+#> - Extraction: Maximum Likelihood
+#> - Rotation: Promax with Kaiser Normalization
+#> - N of Factors: 3
+#> 
+#> KMO and Bartlett's Test
+#> ---------------------------------------- 
+#>   Kaiser-Meyer-Olkin Measure:     0.505
+#>   Bartlett's Chi-Square:          932.068
+#>   df:                             15
+#>   Sig.:                           0.000
+#> 
+#> Communalities
+#> ---------------------------------------- 
+#>               variable initial extraction
+#>  political_orientation   0.346      0.616
+#>  environmental_concern   0.345      0.565
+#>      life_satisfaction   0.001      0.144
+#>       trust_government   0.005      0.018
+#>            trust_media   0.001      0.009
+#>          trust_science   0.003      0.096
+#> Extraction Method: Maximum Likelihood.
+#> 
+#> Total Variance Explained
+#> ---------------------------------------- 
+#>   Factor1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%
+#>   Factor2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%
+#>   Factor3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%
+#>   Factor4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%
+#>   Factor5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%
+#>   Factor6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%
+#> 
+#> Rotation Sums of Squared Loadings
+#> ---------------------------------------- 
+#>   Factor1  SS Loading: 1.186
+#>   Factor2  SS Loading: 0.148
+#>   Factor3  SS Loading: 0.115
+#> 
+#> Factor Matrix (unrotated)
+#> ---------------------------------------- 
+#>                       Factor1 Factor2 Factor3
+#> political_orientation  -0.784                
+#> environmental_concern   0.751                
+#> life_satisfaction                            
+#> trust_science                                
+#> trust_government                             
+#> trust_media                                  
+#> Extraction Method: Maximum Likelihood.
+#> 
+#> Pattern Matrix
+#> ---------------------------------------- 
+#>                       Factor1 Factor2 Factor3
+#> political_orientation  -0.785                
+#> environmental_concern   0.750                
+#> life_satisfaction                            
+#> trust_science                                
+#> trust_government                             
+#> trust_media                                  
+#> Extraction Method: Maximum Likelihood.
+#> Rotation Method: Promax with Kaiser Normalization.
+#> 
+#> Structure Matrix
+#> ---------------------------------------- 
+#>                       Factor1 Factor2 Factor3
+#> political_orientation  -0.784                
+#> environmental_concern   0.751                
+#> life_satisfaction                            
+#> trust_science                                
+#> trust_government                             
+#> trust_media                                  
+#> 
+#> Factor Correlation Matrix
+#> ---------------------------------------- 
+#>         Factor1 Factor2 Factor3
+#> Factor1   1.000   0.013   0.030
+#> Factor2   0.013   1.000   0.002
+#> Factor3   0.030   0.002   1.000
+```
+
 ### Fixing the Number of Factors
 
 If you have a theoretical reason for a specific number of components:
@@ -488,8 +751,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     n_factors = 2)
 #> 
-#> Exploratory Factor Analysis (Varimax) Results
-#> ---------------------------------------------
+#> Exploratory Factor Analysis (PCA, Varimax) Results
+#> --------------------------------------------------
 #> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
@@ -559,8 +822,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     weights = sampling_weight)
 #> 
-#> Weighted Exploratory Factor Analysis (Varimax) Results
-#> ------------------------------------------------------
+#> Weighted Exploratory Factor Analysis (PCA, Varimax) Results
+#> -----------------------------------------------------------
 #> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
@@ -766,8 +1029,8 @@ reliability(survey_data, trust_government, trust_media, trust_science)
 # 2. Explore factor structure
 efa(survey_data, trust_government, trust_media, trust_science)
 #> 
-#> Exploratory Factor Analysis (Unrotated) Results
-#> -----------------------------------------------
+#> Exploratory Factor Analysis (PCA, Unrotated) Results
+#> ----------------------------------------------------
 #> - Variables: trust_government, trust_media, trust_science
 #> - Extraction: Principal Component Analysis
 #> - Rotation: None

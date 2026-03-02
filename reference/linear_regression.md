@@ -23,6 +23,7 @@ linear_regression(
   dependent = NULL,
   predictors = NULL,
   weights = NULL,
+  use = c("listwise", "pairwise"),
   standardized = TRUE,
   conf.level = 0.95
 )
@@ -55,6 +56,14 @@ linear_regression(
 
   Optional survey weights (unquoted variable name). When specified,
   weighted least squares (WLS) is used, matching SPSS WEIGHT BY.
+
+- use:
+
+  How to handle missing data: `"listwise"` (default) drops any case with
+  a missing value on any variable (matching SPSS /MISSING LISTWISE).
+  `"pairwise"` computes the regression from a pairwise
+  covariance/correlation matrix, retaining more cases (matching SPSS
+  /MISSING PAIRWISE).
 
 - standardized:
 
@@ -159,9 +168,12 @@ instead.
 
 ### Technical Details
 
-**Missing Data**: Listwise deletion is used (matching SPSS REGRESSION
-/MISSING LISTWISE). Cases with any missing values on the dependent
-variable, predictors, or weights are excluded.
+**Missing Data**: By default, listwise deletion is used (matching SPSS
+REGRESSION /MISSING LISTWISE). Set `use = "pairwise"` to match SPSS
+/MISSING PAIRWISE, which computes the regression from a pairwise
+covariance matrix. Pairwise deletion retains more cases and produces
+results closer to SPSS output when data has varying patterns of
+missingness.
 
 **Weights**: When weights are specified, they are treated as frequency
 weights (matching SPSS WEIGHT BY behavior). The model is fitted using

@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -395,8 +395,8 @@ into underlying dimensions:</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (Varimax) Results</span></span>
-<span><span class="co">#&gt; ---------------------------------------------</span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
 <span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
 <span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
 <span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
@@ -495,8 +495,8 @@ simpler to interpret:</p>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    rotation <span class="op">=</span> <span class="st">"varimax"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (Varimax) Results</span></span>
-<span><span class="co">#&gt; ---------------------------------------------</span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
 <span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
 <span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
 <span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
@@ -567,20 +567,274 @@ realistic for social science:</p>
 <span>    rotation <span class="op">=</span> <span class="st">"oblimin"</span><span class="op">)</span></span></code></pre></div>
 <p>With oblimin, you get a Pattern Matrix (unique contributions) and
 Structure Matrix (total correlations).</p>
+<p><strong>Promax</strong> is another oblique rotation, common in SPSS.
+Like oblimin, it produces Pattern and Structure matrices:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
+<span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
+<span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
+<span>    rotation <span class="op">=</span> <span class="st">"promax"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Promax) Results</span></span>
+<span><span class="co">#&gt; -------------------------------------------------</span></span>
+<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
+<span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
+<span><span class="co">#&gt; - Rotation: Promax with Kaiser Normalization</span></span>
+<span><span class="co">#&gt; - N of Factors: 3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
+<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
+<span><span class="co">#&gt;   df:                             15</span></span>
+<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Communalities</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;               variable initial extraction</span></span>
+<span><span class="co">#&gt;  political_orientation       1      0.786</span></span>
+<span><span class="co">#&gt;  environmental_concern       1      0.783</span></span>
+<span><span class="co">#&gt;      life_satisfaction       1      0.668</span></span>
+<span><span class="co">#&gt;       trust_government       1      0.347</span></span>
+<span><span class="co">#&gt;            trust_media       1      0.475</span></span>
+<span><span class="co">#&gt;          trust_science       1      0.598</span></span>
+<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Total Variance Explained</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
+<span><span class="co">#&gt;   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
+<span><span class="co">#&gt;   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
+<span><span class="co">#&gt;   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
+<span><span class="co">#&gt;   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
+<span><span class="co">#&gt;   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   PC1  SS Loading: 1.604</span></span>
+<span><span class="co">#&gt;   PC2  SS Loading: 1.065</span></span>
+<span><span class="co">#&gt;   PC3  SS Loading: 1.045</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
+<span><span class="co">#&gt; political_orientation   0.885                </span></span>
+<span><span class="co">#&gt; environmental_concern  -0.885                </span></span>
+<span><span class="co">#&gt; trust_science                  -0.672        </span></span>
+<span><span class="co">#&gt; trust_government               -0.547        </span></span>
+<span><span class="co">#&gt; trust_media                    -0.524  -0.448</span></span>
+<span><span class="co">#&gt; life_satisfaction                      -0.809</span></span>
+<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Pattern Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
+<span><span class="co">#&gt; political_orientation   0.888                </span></span>
+<span><span class="co">#&gt; environmental_concern  -0.886                </span></span>
+<span><span class="co">#&gt; trust_science                  -0.781        </span></span>
+<span><span class="co">#&gt; trust_government               -0.558        </span></span>
+<span><span class="co">#&gt; life_satisfaction                      -0.817</span></span>
+<span><span class="co">#&gt; trust_media                            -0.593</span></span>
+<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
+<span><span class="co">#&gt; Rotation Method: Promax with Kaiser Normalization.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Structure Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
+<span><span class="co">#&gt; political_orientation   0.885                </span></span>
+<span><span class="co">#&gt; environmental_concern  -0.885                </span></span>
+<span><span class="co">#&gt; trust_science                  -0.751        </span></span>
+<span><span class="co">#&gt; trust_government               -0.571        </span></span>
+<span><span class="co">#&gt; life_satisfaction                      -0.777</span></span>
+<span><span class="co">#&gt; trust_media                            -0.635</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Component Correlation Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;       PC1   PC2   PC3</span></span>
+<span><span class="co">#&gt; PC1 1.000 0.055 0.024</span></span>
+<span><span class="co">#&gt; PC2 0.055 1.000 0.155</span></span>
+<span><span class="co">#&gt; PC3 0.024 0.155 1.000</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="choosing-an-extraction-method">Choosing an Extraction Method<a class="anchor" aria-label="anchor" href="#choosing-an-extraction-method"></a>
+</h3>
+<p>By default, <code><a href="../reference/efa.html">efa()</a></code> uses PCA (Principal Component
+Analysis). For a true factor analysis model, use Maximum Likelihood:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
+<span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
+<span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
+<span>    extraction <span class="op">=</span> <span class="st">"ml"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (Maximum Likelihood, Varimax) Results</span></span>
+<span><span class="co">#&gt; -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
+<span><span class="co">#&gt; - Extraction: Maximum Likelihood</span></span>
+<span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
+<span><span class="co">#&gt; - N of Factors: 3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
+<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
+<span><span class="co">#&gt;   df:                             15</span></span>
+<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Communalities</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;               variable initial extraction</span></span>
+<span><span class="co">#&gt;  political_orientation   0.346      0.616</span></span>
+<span><span class="co">#&gt;  environmental_concern   0.345      0.565</span></span>
+<span><span class="co">#&gt;      life_satisfaction   0.001      0.144</span></span>
+<span><span class="co">#&gt;       trust_government   0.005      0.018</span></span>
+<span><span class="co">#&gt;            trust_media   0.001      0.009</span></span>
+<span><span class="co">#&gt;          trust_science   0.003      0.096</span></span>
+<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Total Variance Explained</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Factor1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
+<span><span class="co">#&gt;   Factor2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
+<span><span class="co">#&gt;   Factor3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
+<span><span class="co">#&gt;   Factor4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
+<span><span class="co">#&gt;   Factor5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
+<span><span class="co">#&gt;   Factor6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Factor1  SS Loading: 1.185  Variance: 19.745%  Cumulative: 19.745%</span></span>
+<span><span class="co">#&gt;   Factor2  SS Loading: 0.149  Variance: 2.488%  Cumulative: 22.233%</span></span>
+<span><span class="co">#&gt;   Factor3  SS Loading: 0.115  Variance: 1.911%  Cumulative: 24.144%</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Factor Matrix (unrotated)</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
+<span><span class="co">#&gt; political_orientation  -0.784                </span></span>
+<span><span class="co">#&gt; environmental_concern   0.751                </span></span>
+<span><span class="co">#&gt; life_satisfaction                            </span></span>
+<span><span class="co">#&gt; trust_science                                </span></span>
+<span><span class="co">#&gt; trust_government                             </span></span>
+<span><span class="co">#&gt; trust_media                                  </span></span>
+<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Rotated Factor Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
+<span><span class="co">#&gt; political_orientation  -0.785                </span></span>
+<span><span class="co">#&gt; environmental_concern   0.750                </span></span>
+<span><span class="co">#&gt; life_satisfaction                            </span></span>
+<span><span class="co">#&gt; trust_science                                </span></span>
+<span><span class="co">#&gt; trust_government                             </span></span>
+<span><span class="co">#&gt; trust_media                                  </span></span>
+<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
+<span><span class="co">#&gt; Rotation Method: Varimax with Kaiser Normalization.</span></span></code></pre></div>
+<p>ML extraction provides a <strong>goodness-of-fit test</strong> that
+evaluates whether your factor model adequately reproduces the observed
+correlations. A non-significant chi-square
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&gt;</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p &gt; .05</annotation></semantics></math>)
+suggests good fit. ML also reports initial communalities as SMC (squared
+multiple correlations) instead of 1.0.</p>
+<p>You can combine any extraction with any rotation:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># ML extraction with Promax rotation</span></span>
+<span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
+<span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
+<span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
+<span>    extraction <span class="op">=</span> <span class="st">"ml"</span>, rotation <span class="op">=</span> <span class="st">"promax"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (Maximum Likelihood, Promax) Results</span></span>
+<span><span class="co">#&gt; ----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
+<span><span class="co">#&gt; - Extraction: Maximum Likelihood</span></span>
+<span><span class="co">#&gt; - Rotation: Promax with Kaiser Normalization</span></span>
+<span><span class="co">#&gt; - N of Factors: 3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
+<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
+<span><span class="co">#&gt;   df:                             15</span></span>
+<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Communalities</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;               variable initial extraction</span></span>
+<span><span class="co">#&gt;  political_orientation   0.346      0.616</span></span>
+<span><span class="co">#&gt;  environmental_concern   0.345      0.565</span></span>
+<span><span class="co">#&gt;      life_satisfaction   0.001      0.144</span></span>
+<span><span class="co">#&gt;       trust_government   0.005      0.018</span></span>
+<span><span class="co">#&gt;            trust_media   0.001      0.009</span></span>
+<span><span class="co">#&gt;          trust_science   0.003      0.096</span></span>
+<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Total Variance Explained</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Factor1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
+<span><span class="co">#&gt;   Factor2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
+<span><span class="co">#&gt;   Factor3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
+<span><span class="co">#&gt;   Factor4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
+<span><span class="co">#&gt;   Factor5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
+<span><span class="co">#&gt;   Factor6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;   Factor1  SS Loading: 1.186</span></span>
+<span><span class="co">#&gt;   Factor2  SS Loading: 0.148</span></span>
+<span><span class="co">#&gt;   Factor3  SS Loading: 0.115</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Factor Matrix (unrotated)</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
+<span><span class="co">#&gt; political_orientation  -0.784                </span></span>
+<span><span class="co">#&gt; environmental_concern   0.751                </span></span>
+<span><span class="co">#&gt; life_satisfaction                            </span></span>
+<span><span class="co">#&gt; trust_science                                </span></span>
+<span><span class="co">#&gt; trust_government                             </span></span>
+<span><span class="co">#&gt; trust_media                                  </span></span>
+<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Pattern Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
+<span><span class="co">#&gt; political_orientation  -0.785                </span></span>
+<span><span class="co">#&gt; environmental_concern   0.750                </span></span>
+<span><span class="co">#&gt; life_satisfaction                            </span></span>
+<span><span class="co">#&gt; trust_science                                </span></span>
+<span><span class="co">#&gt; trust_government                             </span></span>
+<span><span class="co">#&gt; trust_media                                  </span></span>
+<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
+<span><span class="co">#&gt; Rotation Method: Promax with Kaiser Normalization.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Structure Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
+<span><span class="co">#&gt; political_orientation  -0.784                </span></span>
+<span><span class="co">#&gt; environmental_concern   0.751                </span></span>
+<span><span class="co">#&gt; life_satisfaction                            </span></span>
+<span><span class="co">#&gt; trust_science                                </span></span>
+<span><span class="co">#&gt; trust_government                             </span></span>
+<span><span class="co">#&gt; trust_media                                  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Factor Correlation Matrix</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;         Factor1 Factor2 Factor3</span></span>
+<span><span class="co">#&gt; Factor1   1.000   0.013   0.030</span></span>
+<span><span class="co">#&gt; Factor2   0.013   1.000   0.002</span></span>
+<span><span class="co">#&gt; Factor3   0.030   0.002   1.000</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="fixing-the-number-of-factors">Fixing the Number of Factors<a class="anchor" aria-label="anchor" href="#fixing-the-number-of-factors"></a>
 </h3>
 <p>If you have a theoretical reason for a specific number of
 components:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    n_factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (Varimax) Results</span></span>
-<span><span class="co">#&gt; ---------------------------------------------</span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
 <span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
 <span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
 <span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
@@ -644,14 +898,14 @@ components:</p>
 <div class="section level3">
 <h3 id="with-survey-weights-1">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights-1"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Exploratory Factor Analysis (Varimax) Results</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------</span></span>
+<span><span class="co">#&gt; Weighted Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
+<span><span class="co">#&gt; -----------------------------------------------------------</span></span>
 <span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
 <span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
 <span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
@@ -722,7 +976,7 @@ components:</p>
 <h3 id="scale_index-mean-indices">scale_index(): Mean Indices<a class="anchor" aria-label="anchor" href="#scale_index-mean-indices"></a>
 </h3>
 <p>After confirming reliability, create a mean index:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -741,7 +995,7 @@ computing the row-wise mean across items.</p>
 <div class="section level3">
 <h3 id="using-tidyselect-1">Using tidyselect<a class="anchor" aria-label="anchor" href="#using-tidyselect-1"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust2 <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -750,7 +1004,7 @@ computing the row-wise mean across items.</p>
 </h3>
 <p>The <code><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick()</a></code> function works with both <code>%&gt;%</code>
 and <code>|&gt;</code> pipes:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust3 <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
@@ -761,7 +1015,7 @@ and <code>|&gt;</code> pipes:</p>
 </h3>
 <p>Require a minimum number of valid responses per respondent, matching
 SPSS <code>MEAN.2()</code> syntax:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust_strict <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span></span>
 <span>    <span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
@@ -775,7 +1029,7 @@ SPSS <code>MEAN.2()</code> syntax:</p>
 </h3>
 <p>Transform scores to a common 0-100 scale for cross-scale
 comparison:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>trust_pomps <span class="op">=</span> <span class="fu"><a href="../reference/pomps.html">pomps</a></span><span class="op">(</span><span class="va">m_trust</span>, scale_min <span class="op">=</span> <span class="fl">1</span>, scale_max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -793,7 +1047,7 @@ Always specify the theoretical scale range for consistent results.</p>
 <div class="section level3">
 <h3 id="multiple-variables-at-once">Multiple Variables at Once<a class="anchor" aria-label="anchor" href="#multiple-variables-at-once"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span>,</span>
@@ -806,7 +1060,7 @@ Always specify the theoretical scale range for consistent results.</p>
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
 <p>A typical scale analysis workflow from start to finish:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Check reliability</span></span>
 <span><span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -851,8 +1105,8 @@ Always specify the theoretical scale range for consistent results.</p>
 <span><span class="co"># 2. Explore factor structure</span></span>
 <span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (Unrotated) Results</span></span>
-<span><span class="co">#&gt; -----------------------------------------------</span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Unrotated) Results</span></span>
+<span><span class="co">#&gt; ----------------------------------------------------</span></span>
 <span><span class="co">#&gt; - Variables: trust_government, trust_media, trust_science</span></span>
 <span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
 <span><span class="co">#&gt; - Rotation: None</span></span>

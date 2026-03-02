@@ -11,6 +11,7 @@ Core linear regression computation
   dep_name,
   pred_names,
   weights_vec,
+  use,
   standardized,
   conf.level
 )

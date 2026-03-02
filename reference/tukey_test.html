@@ -23,7 +23,7 @@ A way to make all possible comparisons while controlling error rates
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,7 +74,10 @@ pinpoints where the differences lie.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tukey_test</span><span class="op">(</span><span class="va">x</span>, conf.level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tukey_test</span><span class="op">(</span><span class="va">x</span>, conf.level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Default S3 method</span></span>
+<span><span class="fu">tukey_test</span><span class="op">(</span><span class="va">x</span>, conf.level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -174,7 +177,9 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <p><code><a href="https://rdrr.io/r/stats/TukeyHSD.html" class="external-link">TukeyHSD</a></code> for the base R Tukey HSD function.</p>
 <p><code><a href="levene_test.html">levene_test</a></code> for testing homogeneity of variances.</p>
 <p>Other posthoc:
+<code><a href="dunn_test.html">dunn_test()</a></code>,
 <code><a href="levene_test.html">levene_test()</a></code>,
+<code><a href="pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>,
 <code><a href="scheffe_test.html">scheffe_test()</a></code></p></div>
     </div>
 

@@ -158,10 +158,15 @@ for comparing exactly two groups.
 for parametric one-way ANOVA.
 
 Other hypothesis_tests:
+[`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md),
 [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
 [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md),
+[`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
+[`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md),
+[`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md),
 [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
 [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),
+[`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md),
 [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
 [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
 [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)

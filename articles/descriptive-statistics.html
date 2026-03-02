@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -390,27 +390,30 @@ non-response is meaningful.</p>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------- </span></span>
+<span><span class="co">#&gt; - Row variable: education</span></span>
+<span><span class="co">#&gt; - Column variable: employment</span></span>
+<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
+<span><span class="co">#&gt; - N (valid): 2500</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                         employment </span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Basic Secondary                    0         571          65         171          34         841</span></span>
-<span><span class="co">#&gt;                                 0.0%       67.9%        7.7%       20.3%        4.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Intermediate Secondary             0         412          51         137          29         629</span></span>
-<span><span class="co">#&gt;                                 0.0%       65.5%        8.1%       21.8%        4.6%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Academic Secondary                44         366          44         145          32         631</span></span>
-<span><span class="co">#&gt;                                 7.0%       58.0%        7.0%       23.0%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; University                        34         251          22          72          20         399</span></span>
-<span><span class="co">#&gt;                                 8.5%       62.9%        5.5%       18.0%        5.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Total                             78        1600         182         525         115        2500</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; N = 2500</span></span></code></pre></div>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
+<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Basic Secondary      |          0 |        571 |         65 |        171 |         34 |        841 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      67.9% |       7.7% |      20.3% |       4.0% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Intermediate Seco... |          0 |        412 |         51 |        137 |         29 |        629 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      65.5% |       8.1% |      21.8% |       4.6% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Academic Secondary   |         44 |        366 |         44 |        145 |         32 |        631 |</span></span>
+<span><span class="co">#&gt; |   row %              |       7.0% |      58.0% |       7.0% |      23.0% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | University           |         34 |        251 |         22 |         72 |         20 |        399 |</span></span>
+<span><span class="co">#&gt; |   row %              |       8.5% |      62.9% |       5.5% |      18.0% |       5.0% |     100.0% |</span></span>
+<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
+<span><span class="co">#&gt; | Total                |         78 |       1600 |        182 |        525 |        115 |       2500 |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="understanding-the-output-1">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output-1"></a>
@@ -441,27 +444,31 @@ level?”</p>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------- </span></span>
+<span><span class="co">#&gt; - Row variable: education</span></span>
+<span><span class="co">#&gt; - Column variable: employment</span></span>
+<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (valid): 2516 (weighted)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                         employment </span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Basic Secondary                    0         573          66         175          34         848</span></span>
-<span><span class="co">#&gt;                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Intermediate Secondary             0         420          52         139          29         641</span></span>
-<span><span class="co">#&gt;                                 0.0%       65.6%        8.1%       21.7%        4.6%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Academic Secondary                46         370          45         149          33         642</span></span>
-<span><span class="co">#&gt;                                 7.2%       57.6%        7.0%       23.1%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; University                        34         240          21          72          20         385</span></span>
-<span><span class="co">#&gt;                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Total                             80        1603         184         534         115        2516</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; N = 2516 (Weighted)</span></span></code></pre></div>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
+<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |</span></span>
+<span><span class="co">#&gt; |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | University           |         34 |        240 |         21 |         72 |         20 |        385 |</span></span>
+<span><span class="co">#&gt; |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
+<span><span class="co">#&gt; | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="grouped-crosstabs">Grouped Crosstabs<a class="anchor" aria-label="anchor" href="#grouped-crosstabs"></a>
@@ -480,54 +487,62 @@ level?”</p>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------- </span></span>
+<span><span class="co">#&gt; - Row variable: education</span></span>
+<span><span class="co">#&gt; - Column variable: employment</span></span>
+<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (valid): 509 (weighted)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                         employment </span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Basic Secondary                    0         112          11          39          12         175</span></span>
-<span><span class="co">#&gt;                                 0.0%       64.1%        6.6%       22.4%        6.9%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Intermediate Secondary             0          83          13          29           4         129</span></span>
-<span><span class="co">#&gt;                                 0.0%       64.7%        9.8%       22.4%        3.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Academic Secondary                 6          72           8          35           1         123</span></span>
-<span><span class="co">#&gt;                                 5.2%       58.5%        6.5%       28.9%        0.9%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; University                         5          53           1          19           4          82</span></span>
-<span><span class="co">#&gt;                                 6.4%       64.3%        1.2%       23.2%        4.9%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Total                             12         320          33         123          21         509</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; N = 509 (Weighted)</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
+<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Basic Secondary      |          0 |        112 |         11 |         39 |         12 |        175 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      64.1% |       6.6% |      22.4% |       6.9% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Intermediate Seco... |          0 |         83 |         13 |         29 |          4 |        129 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      64.7% |       9.8% |      22.4% |       3.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Academic Secondary   |          6 |         72 |          8 |         35 |          1 |        123 |</span></span>
+<span><span class="co">#&gt; |   row %              |       5.2% |      58.5% |       6.5% |      28.9% |       0.9% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | University           |          5 |         53 |          1 |         19 |          4 |         82 |</span></span>
+<span><span class="co">#&gt; |   row %              |       6.4% |      64.3% |       1.2% |      23.2% |       4.9% |     100.0% |</span></span>
+<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
+<span><span class="co">#&gt; | Total                |         12 |        320 |         33 |        123 |         21 |        509 |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = West</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------- </span></span>
+<span><span class="co">#&gt; - Row variable: education</span></span>
+<span><span class="co">#&gt; - Column variable: employment</span></span>
+<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (valid): 2007 (weighted)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                         employment </span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Basic Secondary                    0         461          55         136          21         673</span></span>
-<span><span class="co">#&gt;                                 0.0%       68.5%        8.2%       20.1%        3.2%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Intermediate Secondary             0         337          40         110          26         512</span></span>
-<span><span class="co">#&gt;                                 0.0%       65.8%        7.7%       21.5%        5.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Academic Secondary                40         298          37         113          31         519</span></span>
-<span><span class="co">#&gt;                                 7.7%       57.4%        7.1%       21.8%        6.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; University                        28         187          20          52          16         303</span></span>
-<span><span class="co">#&gt;                                 9.4%       61.7%        6.5%       17.3%        5.2%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Total                             68        1282         151         411          94        2007</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; N = 2007 (Weighted)</span></span></code></pre></div>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
+<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Basic Secondary      |          0 |        461 |         55 |        136 |         21 |        673 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      68.5% |       8.2% |      20.1% |       3.2% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Intermediate Seco... |          0 |        337 |         40 |        110 |         26 |        512 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      65.8% |       7.7% |      21.5% |       5.0% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Academic Secondary   |         40 |        298 |         37 |        113 |         31 |        519 |</span></span>
+<span><span class="co">#&gt; |   row %              |       7.7% |      57.4% |       7.1% |      21.8% |       6.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | University           |         28 |        187 |         20 |         52 |         16 |        303 |</span></span>
+<span><span class="co">#&gt; |   row %              |       9.4% |      61.7% |       6.5% |      17.3% |       5.2% |     100.0% |</span></span>
+<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
+<span><span class="co">#&gt; | Total                |         68 |       1282 |        151 |        411 |         94 |       2007 |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -652,27 +667,31 @@ percentages</li>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------- </span></span>
+<span><span class="co">#&gt; - Row variable: education</span></span>
+<span><span class="co">#&gt; - Column variable: employment</span></span>
+<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (valid): 2516 (weighted)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                         employment </span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Basic Secondary                    0         573          66         175          34         848</span></span>
-<span><span class="co">#&gt;                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Intermediate Secondary             0         420          52         139          29         641</span></span>
-<span><span class="co">#&gt;                                 0.0%       65.6%        8.1%       21.7%        4.6%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Academic Secondary                46         370          45         149          33         642</span></span>
-<span><span class="co">#&gt;                                 7.2%       57.6%        7.0%       23.1%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; University                        34         240          21          72          20         385</span></span>
-<span><span class="co">#&gt;                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Total                             80        1603         184         534         115        2516</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; N = 2516 (Weighted)</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
+<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |</span></span>
+<span><span class="co">#&gt; |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | University           |         34 |        240 |         21 |         72 |         20 |        385 |</span></span>
+<span><span class="co">#&gt; |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
+<span><span class="co">#&gt; | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
 <span></span>
 <span><span class="co"># 4. Regional comparisons</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>

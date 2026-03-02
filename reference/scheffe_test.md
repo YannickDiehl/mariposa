@@ -16,6 +16,9 @@ Think of it as:
 
 ``` r
 scheffe_test(x, conf.level = 0.95, ...)
+
+# Default S3 method
+scheffe_test(x, conf.level = 0.95, ...)
 ```
 
 ## Arguments
@@ -143,7 +146,9 @@ for Tukey HSD post-hoc tests.
 for testing homogeneity of variances.
 
 Other posthoc:
+[`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
 [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md),
+[`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
 [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)
 
 ## Examples

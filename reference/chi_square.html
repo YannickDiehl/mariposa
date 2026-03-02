@@ -23,7 +23,7 @@ What patterns exist in your data
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,10 +172,15 @@ University Press.</p>
 <p><code><a href="crosstab.html">crosstab</a></code> for detailed cross-tabulation tables.</p>
 <p><code><a href="frequency.html">frequency</a></code> for single-variable frequency tables.</p>
 <p>Other hypothesis_tests:
+<code><a href="ancova.html">ancova()</a></code>,
 <code><a href="binomial_test.html">binomial_test()</a></code>,
+<code><a href="chisq_gof.html">chisq_gof()</a></code>,
+<code><a href="factorial_anova.html">factorial_anova()</a></code>,
+<code><a href="fisher_test.html">fisher_test()</a></code>,
 <code><a href="friedman_test.html">friedman_test()</a></code>,
 <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code>,
 <code><a href="mann_whitney.html">mann_whitney()</a></code>,
+<code><a href="mcnemar_test.html">mcnemar_test()</a></code>,
 <code><a href="oneway_anova.html">oneway_anova()</a></code>,
 <code><a href="t_test.html">t_test()</a></code>,
 <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code></p></div>
@@ -193,17 +198,17 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender x region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender × region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1     East West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   East West</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male    238  956</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female  247 1059</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1        East     West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender      East     West</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male   231.636  962.364</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female 253.364 1052.636</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -230,20 +235,20 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Chi-Squared Test of Independence </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender x education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender × education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1     Basic Secondary Intermediate Secondary Academic Secondary University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male               402                    291                326        176</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female             447                    350                316        209</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Seco... Academic Secondary University</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male               402                  291                326        176</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female             447                  350                316        209</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1     Basic Secondary Intermediate Secondary Academic Secondary University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male           403.081                304.329            304.803    182.787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female         445.919                336.671            337.197    202.213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Seco... Academic Secondary University</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male           403.081              304.329            304.803    182.787</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female         445.919              336.671            337.197    202.213</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test Results:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
@@ -270,15 +275,15 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Variables tested: gender x employment </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables tested: gender × employment </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Grouped by: region </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1     Student Employed Unemployed Retired Other</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         employment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Student Employed Unemployed Retired Other</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male         7      145         16      55    15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female       4      166         15      56     6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -301,8 +306,8 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1     Student Employed Unemployed Retired Other</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         employment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Student Employed Unemployed Retired Other</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male        29      605         68     201    53</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female      38      684         83     213    41</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -329,18 +334,18 @@ University Press.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender x region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender × region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Continuity correction: Yates' correction applied</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1     East West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   East West</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male    238  956</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female  247 1059</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected Frequencies:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         var2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> var1        East     West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender      East     West</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male   231.636  962.364</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female 253.364 1052.636</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

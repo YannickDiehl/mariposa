@@ -16,6 +16,9 @@ Think of it as:
 
 ``` r
 tukey_test(x, conf.level = 0.95, ...)
+
+# Default S3 method
+tukey_test(x, conf.level = 0.95, ...)
 ```
 
 ## Arguments
@@ -146,7 +149,9 @@ HSD function.
 for testing homogeneity of variances.
 
 Other posthoc:
+[`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
 [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md),
+[`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
 [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md)
 
 ## Examples

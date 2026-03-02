@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -354,27 +354,31 @@ decrease</li>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; --------------------------------------- </span></span>
+<span><span class="co">#&gt; - Row variable: education</span></span>
+<span><span class="co">#&gt; - Column variable: employment</span></span>
+<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (valid): 2516 (weighted)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                         employment </span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;                              Student    Employed  Unemployed     Retired       Other       Total</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Basic Secondary                    0         573          66         175          34         848</span></span>
-<span><span class="co">#&gt;                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Intermediate Secondary             0         420          52         139          29         641</span></span>
-<span><span class="co">#&gt;                                 0.0%       65.6%        8.1%       21.7%        4.6%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Academic Secondary                46         370          45         149          33         642</span></span>
-<span><span class="co">#&gt;                                 7.2%       57.6%        7.0%       23.1%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; University                        34         240          21          72          20         385</span></span>
-<span><span class="co">#&gt;                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; Total                             80        1603         184         534         115        2516</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; N = 2516 (Weighted)</span></span></code></pre></div>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
+<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |</span></span>
+<span><span class="co">#&gt; |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |</span></span>
+<span><span class="co">#&gt; |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
+<span><span class="co">#&gt; | University           |         34 |        240 |         21 |         72 |         20 |        385 |</span></span>
+<span><span class="co">#&gt; |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |</span></span>
+<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
+<span><span class="co">#&gt; | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |</span></span>
+<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
