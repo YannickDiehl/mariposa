@@ -455,7 +455,7 @@ print.frequency <- function(x, digits = 3, ...) {
   # Helper functions for formatting
   format_num <- function(x, width = 6) sprintf(paste0("%-", width, ".2f"), ifelse(is.na(x), NA, x))
   format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
-  format_str <- function(x, width) sprintf(paste0("%-", width, "s"), substr(as.character(x), 1, width))
+  format_str <- function(x, width) pad_utf8(substr(as.character(x), 1, width), width)
   
   print_line <- function(widths) {
     cat("+", paste(sapply(widths, function(w) paste(rep("-", w), collapse = "")), collapse = "+"), "+\n", sep = "")

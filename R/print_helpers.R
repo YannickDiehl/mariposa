@@ -77,6 +77,28 @@ print_group_header <- function(group_values, prefix = "Group") {
   cat(paste(rep("-", nchar(header_text)), collapse = ""), "\n", sep = "")
 }
 
+#' UTF-8 safe left-pad a string to a given display width
+#'
+#' \code{sprintf} counts bytes instead of display characters for multi-byte
+#' UTF-8 strings (e.g. umlauts), causing misaligned columns. This helper
+#' compensates by adding the byte/character difference to the target width.
+#'
+#' @param text Character scalar to pad
+#' @param width Target display width
+#' @param align "left" for left-aligned (default), "right" for right-aligned
+#' @return Padded character string
+#' @keywords internal
+pad_utf8 <- function(text, width, align = "left") {
+  text <- as.character(text)
+  extra <- nchar(text, type = "bytes") - nchar(text, type = "chars")
+  adjusted_width <- width + extra
+  if (align == "left") {
+    sprintf(paste0("%-", adjusted_width, "s"), text)
+  } else {
+    sprintf(paste0("%", adjusted_width, "s"), text)
+  }
+}
+
 #' Calculate dynamic table width
 #' @param df Data frame to be printed
 #' @param min_width Minimum table width
@@ -142,7 +164,7 @@ print_test_parameters <- function(params) {
 #' @param label Optional label
 #' @keywords internal
 format_variable_name <- function(var, label = NULL) {
-  if (!is.null(label) && label != "" && label != var) {
+  if (!is.null(label) && !is.na(label) && label != "" && label != var) {
     sprintf("%s (%s)", var, label)
   } else {
     var
