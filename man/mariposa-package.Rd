@@ -13,6 +13,7 @@ Professional statistical analysis of survey data with full support for survey we
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://YannickDiehl.github.io/mariposa/}
   \item \url{https://github.com/YannickDiehl/mariposa}
   \item Report bugs at \url{https://github.com/YannickDiehl/mariposa/issues}
 }

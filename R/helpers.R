@@ -132,6 +132,97 @@ NULL
   sum(weights, na.rm = TRUE)^2 / sum(weights^2, na.rm = TRUE)
 }
 
+# Value Label Functions
+# --------------------
+
+#' Get value labels for a variable
+#' @param x The data vector (factor or haven-labelled)
+#' @param freq_names Values to look up labels for
+#' @return Character vector of labels (or empty strings if no labels)
+#' @keywords internal
+get_value_labels <- function(x, freq_names) {
+  if (is.factor(x)) {
+    factor_levels <- levels(x)
+    ifelse(is.na(freq_names), NA, factor_levels[match(freq_names, factor_levels)] %||% as.character(freq_names))
+  } else if (!is.null(attr(x, "labels"))) {
+    value_labels <- attr(x, "labels")
+    ifelse(is.na(freq_names), NA, names(value_labels)[match(freq_names, value_labels)] %||% as.character(freq_names))
+  } else {
+    # For variables without value labels, return empty strings instead of duplicating values
+    rep("", length(freq_names))
+  }
+}
+
+#' Build a named vector mapping raw values to display labels
+#' @param x The original data vector (factor or haven-labelled)
+#' @return Named character vector (names = raw values as strings, values = display labels).
+#'   Returns NULL if no meaningful labels exist.
+#' @keywords internal
+.build_label_map <- function(x) {
+  if (is.factor(x)) {
+    lvls <- levels(x)
+    # Check if levels are just sequential numbers (not meaningful)
+    numeric_levels <- suppressWarnings(as.numeric(lvls))
+    if (all(!is.na(numeric_levels) & numeric_levels == seq_along(lvls))) {
+      return(NULL)
+    }
+    # Factor levels are the labels; map level string to itself
+    result <- stats::setNames(lvls, lvls)
+    return(result)
+  }
+  if (!is.null(attr(x, "labels"))) {
+    value_labels <- attr(x, "labels")
+    # Map: names are the raw numeric values (as strings), values are the label text
+    result <- stats::setNames(names(value_labels), as.character(value_labels))
+    return(result)
+  }
+  return(NULL)
+}
+
+#' Truncate labels that exceed a maximum width
+#' @param labels Character vector of labels
+#' @param max_width Maximum character width
+#' @return Character vector with truncated labels
+#' @keywords internal
+.truncate_labels <- function(labels, max_width = 20) {
+  ifelse(nchar(labels) > max_width,
+         paste0(substr(labels, 1, max_width - 3), "..."),
+         labels)
+}
+
+#' Apply label map to a set of level names and truncate
+#' @param levels Character vector of raw level names
+#' @param label_map Named character vector from .build_label_map(), or NULL
+#' @param max_width Maximum character width for truncation
+#' @return Character vector of display labels
+#' @keywords internal
+.apply_labels <- function(levels, label_map, max_width = 20) {
+  if (is.null(label_map)) return(levels)
+  mapped <- label_map[levels]
+  display <- ifelse(is.na(mapped), levels, mapped)
+  .truncate_labels(display, max_width)
+}
+
+#' Relabel a matrix's dimnames using label maps
+#' @param mat A matrix with dimnames
+#' @param label_maps Named list of label maps (one per dimension)
+#' @param max_width Maximum character width for truncation
+#' @return Matrix with relabelled dimnames
+#' @keywords internal
+.relabel_matrix <- function(mat, label_maps, max_width = 20) {
+  if (is.null(mat) || is.null(label_maps)) return(mat)
+  dn <- dimnames(mat)
+  for (i in seq_along(dn)) {
+    dim_name <- names(dn)[i]
+    lm <- label_maps[[dim_name]]
+    if (!is.null(lm)) {
+      dn[[i]] <- .apply_labels(dn[[i]], lm, max_width)
+    }
+  }
+  dimnames(mat) <- dn
+  mat
+}
+
 # Statistical Computation Helpers
 # -------------------------------
 

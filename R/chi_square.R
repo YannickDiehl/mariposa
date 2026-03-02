@@ -112,6 +112,13 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     cli_abort("Exactly two variables must be specified for {.fn chi_square}.")
   }
 
+  # Build label maps for display (before any subsetting)
+  label_maps <- stats::setNames(
+    list(.build_label_map(data[[var_names[1]]]),
+         .build_label_map(data[[var_names[2]]])),
+    var_names
+  )
+
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
   w_name <- weights_info$name
@@ -141,9 +148,10 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
           # Unweighted test
           tbl <- table(var1, var2)
         }
-        
+        names(dimnames(tbl)) <- var_names
+
         test_result <- chisq.test(tbl, correct = correct)
-        
+
         # Create results entry
         data.frame(
           group_info,
@@ -189,9 +197,10 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
       # Unweighted test
       tbl <- table(var1, var2)
     }
-    
+    names(dimnames(tbl)) <- var_names
+
     test_result <- chisq.test(tbl, correct = correct)
-    
+
     # Create results dataframe
     results_df <- data.frame(
       chi_squared = as.numeric(test_result$statistic),
@@ -328,7 +337,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     weights = w_name,
     correct = correct,
     is_grouped = is_grouped,
-    groups = group_vars
+    groups = group_vars,
+    label_maps = label_maps
   )
   
   class(result) <- "chi_square"
@@ -448,72 +458,79 @@ print.chi_square <- function(x, digits = 3, ...) {
     # Simple test display using standardized helpers
     cat("\n")
     test_info <- list(
-      "Variables" = paste(x$variables[1], "x", x$variables[2]),
+      "Variables" = paste(x$variables[1], "\u00d7", x$variables[2]),
       "Weights variable" = x$weights,
       "Continuity correction" = if (x$correct) "Yates' correction applied" else NULL
     )
     print_info_section(test_info)
     cat("\n")
-    
+
+    # Apply value labels to observed/expected matrices for display
+    obs_display <- .relabel_matrix(x$results$observed[[1]], x$label_maps)
+    exp_display <- .relabel_matrix(x$results$expected[[1]], x$label_maps)
+
     # Print observed frequencies
     cat("Observed Frequencies:\n")
-    print(x$results$observed[[1]])
-    
+    print(obs_display)
+
     # Print expected frequencies
     cat("\nExpected Frequencies:\n")
-    print(round(x$results$expected[[1]], digits))
-    
+    print(round(exp_display, digits))
+
     # Print chi-squared results
     results_table <- data.frame(
       Chi_squared = round(x$results$chi_squared[1], digits),
       df = x$results$df[1],
-      p_value = ifelse(x$results$p_value[1] < 0.001, 
+      p_value = ifelse(x$results$p_value[1] < 0.001,
                      "<.001", round(x$results$p_value[1], digits)),
       sig = as.character(sig[1])
     )
-    
+
     cat("\nChi-Squared Test Results:\n")
     border_width <- paste(rep("-", 50), collapse = "")
     cat(border_width, "\n")
     print(results_table, row.names = FALSE)
     cat(border_width, "\n")
-    
+
     .print_chi_effect_sizes(x$results, 1, digits)
-    
+
   } else {
     # Grouped tests
-    cat("\nVariables tested:", paste(x$variables, collapse = " x "), "\n")
+    cat("\nVariables tested:", paste(x$variables, collapse = " \u00d7 "), "\n")
     cat("Grouped by:", paste(x$groups, collapse = ", "), "\n")
-    
+
     # Create a unified table with all results
     results_table <- x$results
-    
+
     # Print results for each group
     for (i in seq_len(nrow(results_table))) {
       # Print group header using standardized helper
       group_values <- results_table[i, x$groups, drop = FALSE]
       print_group_header(group_values)
       cat("\n")  # Blank line
-      
+
+      # Apply value labels to observed matrix for display
+      obs_display <- .relabel_matrix(results_table$observed[[i]], x$label_maps)
+
       # Print observed frequencies
       cat("Observed Frequencies:\n")
-      print(results_table$observed[[i]])
-      
+      print(obs_display)
+
       # Print test results
       test_results <- data.frame(
         Chi_squared = round(results_table$chi_squared[i], digits),
         df = results_table$df[i],
-        p_value = ifelse(results_table$p_value[i] < 0.001, 
+        p_value = ifelse(results_table$p_value[i] < 0.001,
                        "<.001", round(results_table$p_value[i], digits)),
         sig = as.character(sig[i])
       )
-      
+
       cat("\nChi-Squared Test Results:\n")
       border_width <- paste(rep("-", 50), collapse = "")
       cat(border_width, "\n")
       print(test_results, row.names = FALSE)
       cat(border_width, "\n")
-      
+
       .print_chi_effect_sizes(results_table, i, digits)
     }
   }
