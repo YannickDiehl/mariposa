@@ -61,8 +61,13 @@ reference:
   contents:
   - t_test
   - oneway_anova
+  - factorial_anova
+  - ancova
   - mann_whitney
   - chi_square
+  - fisher_test
+  - chisq_gof
+  - mcnemar_test
 
 - title: "Non-Parametric Tests"
   desc: "Distribution-free tests for ordinal and nominal data"
@@ -85,6 +90,8 @@ reference:
   - tukey_test
   - scheffe_test
   - levene_test
+  - dunn_test
+  - pairwise_wilcoxon
 
 - title: "Scale Analysis"
   desc: "Factor analysis, reliability, and scale construction"

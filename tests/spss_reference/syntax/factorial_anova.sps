@@ -4,8 +4,13 @@
 * Purpose: Validate factorial_anova() function against SPSS UNIANOVA procedure
 * DVs: life_satisfaction, income, trust_government
 * Factors: gender (2 levels), region (2 levels), education (4 levels)
-* Weight: sampling_weight
+* Weight: sampling_weight (via /REGWGT for proper WLS weighting)
 * Note: No SPLIT FILE used -- instead, 3-way ANOVA replaces grouped scenario
+*
+* IMPORTANT: UNIANOVA requires /REGWGT for WLS weighting, NOT WEIGHT BY.
+* WEIGHT BY applies frequency replication weighting, which does not produce
+* proper WLS estimates in the GLM framework. /REGWGT applies diagonal
+* weight matrix W in the WLS estimation: (X'WX)^-1 X'Wy.
 
 GET FILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data/survey_data.sav'.
 
@@ -58,18 +63,17 @@ UNIANOVA trust_government BY gender region
   /DESIGN=gender region gender*region.
 
 * ============================================================================.
-* TEST 2: WEIGHTED - TWO-WAY DESIGNS
+* TEST 2: WEIGHTED - TWO-WAY DESIGNS (via /REGWGT for WLS)
 * ============================================================================.
 
 TITLE '=========== WEIGHTED / TWO-WAY ANOVA ==========='.
-
-WEIGHT BY sampling_weight.
 
 TITLE '=========== Test 2a ==========='.
 
 * Test 2a: 2x2 ANOVA - life_satisfaction by gender * region (weighted)
 SUBTITLE 'Factorial ANOVA: life_satisfaction BY gender * region (weighted, 2x2)'.
 UNIANOVA life_satisfaction BY gender region
+  /REGWGT=sampling_weight
   /METHOD=SSTYPE(3)
   /INTERCEPT=INCLUDE
   /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
@@ -81,13 +85,12 @@ TITLE '=========== Test 2b ==========='.
 * Test 2b: 2x4 ANOVA - income by gender * education (weighted)
 SUBTITLE 'Factorial ANOVA: income BY gender * education (weighted, 2x4)'.
 UNIANOVA income BY gender education
+  /REGWGT=sampling_weight
   /METHOD=SSTYPE(3)
   /INTERCEPT=INCLUDE
   /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
   /CRITERIA=ALPHA(.05)
   /DESIGN=gender education gender*education.
-
-WEIGHT OFF.
 
 * ============================================================================.
 * TEST 3: UNWEIGHTED - THREE-WAY DESIGN (replaces grouped scenario)
@@ -98,8 +101,6 @@ TITLE '=========== UNWEIGHTED / THREE-WAY ANOVA ==========='.
 TITLE '=========== Test 3a ==========='.
 
 * Test 3a: 2x2x4 ANOVA - life_satisfaction by gender * region * education
-* Note: Three-way ANOVA replaces SPLIT FILE grouping for factorial designs.
-* This provides main effects, 2-way interactions, and 3-way interaction.
 SUBTITLE 'Factorial ANOVA: life_satisfaction BY gender * region * education (unweighted, 2x2x4)'.
 UNIANOVA life_satisfaction BY gender region education
   /METHOD=SSTYPE(3)
@@ -111,8 +112,6 @@ UNIANOVA life_satisfaction BY gender region education
 TITLE '=========== Test 3b ==========='.
 
 * Test 3b: 2x2x4 ANOVA - income by gender * region * education
-* Note: Second DV for three-way design to validate interaction computation
-* with a metric DV that shows stronger effects.
 SUBTITLE 'Factorial ANOVA: income BY gender * region * education (unweighted, 2x2x4)'.
 UNIANOVA income BY gender region education
   /METHOD=SSTYPE(3)
@@ -122,18 +121,17 @@ UNIANOVA income BY gender region education
   /DESIGN=gender region education gender*region gender*education region*education gender*region*education.
 
 * ============================================================================.
-* TEST 4: WEIGHTED - THREE-WAY DESIGN
+* TEST 4: WEIGHTED - THREE-WAY DESIGN (via /REGWGT for WLS)
 * ============================================================================.
 
 TITLE '=========== WEIGHTED / THREE-WAY ANOVA ==========='.
-
-WEIGHT BY sampling_weight.
 
 TITLE '=========== Test 4a ==========='.
 
 * Test 4a: 2x2x4 ANOVA - life_satisfaction by gender * region * education (weighted)
 SUBTITLE 'Factorial ANOVA: life_satisfaction BY gender * region * education (weighted, 2x2x4)'.
 UNIANOVA life_satisfaction BY gender region education
+  /REGWGT=sampling_weight
   /METHOD=SSTYPE(3)
   /INTERCEPT=INCLUDE
   /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
@@ -145,13 +143,13 @@ TITLE '=========== Test 4b ==========='.
 * Test 4b: 2x2x4 ANOVA - income by gender * region * education (weighted)
 SUBTITLE 'Factorial ANOVA: income BY gender * region * education (weighted, 2x2x4)'.
 UNIANOVA income BY gender region education
+  /REGWGT=sampling_weight
   /METHOD=SSTYPE(3)
   /INTERCEPT=INCLUDE
   /PRINT=DESCRIPTIVE ETASQ HOMOGENEITY
   /CRITERIA=ALPHA(.05)
   /DESIGN=gender region education gender*region gender*education region*education gender*region*education.
 
-WEIGHT OFF.
 SORT CASES BY original_order.
 
 OMSEND.
@@ -198,44 +196,17 @@ EXECUTE.
 *   - Standard Deviations: +/-0.01
 *   - Levene F: +/-0.001
 *   - N (unweighted): exact match
-*   - N (weighted): +/-1
 *
-* Important SPSS Behavior:
-*   - SSTYPE(3) = Type III Sum of Squares (standard for unbalanced designs)
-*     Type III SS tests each effect after adjusting for all other effects
-*   - ETASQ prints Partial Eta Squared (not Eta Squared)
-*     Partial Eta Sq = SS_effect / (SS_effect + SS_error)
-*   - HOMOGENEITY prints Levene's test for each DV
-*   - DESIGN statement explicitly specifies the model terms
-*   - For 2x2: DESIGN = A B A*B
-*   - For 2x4: DESIGN = A B A*B
-*   - For 2x2x4: DESIGN = A B C A*B A*C B*C A*B*C
-*   - Unbalanced designs are common with survey data (unequal cell sizes)
-*   - WEIGHT BY applies weighted least squares
+* WEIGHTING NOTE:
+*   - /REGWGT applies WLS (weighted least squares) in the GLM framework
+*   - This is the correct approach for analytical/survey weights
+*   - WEIGHT BY would apply frequency weighting (case replication),
+*     which is not appropriate for continuous survey weights in GLM
+*   - R equivalent: aov(dv ~ factors, weights = w) or lm(..., weights = w)
+*   - Both use the diagonal weight matrix approach
 *
 * Design-Specific Notes:
 *   - 2x2 (gender * region): Simple interaction test
 *   - 2x4 (gender * education): Larger design, more interaction df
 *   - 2x2x4 (gender * region * education): Full factorial, many cells
-*     Some cells may have small N, affecting stability
-*
-* Weighted Analyses:
-*   - WEIGHT BY applies WLS (weighted least squares) estimation
-*   - Cell means and SDs are weighted
-*   - SS values differ from unweighted analysis
-*   - F statistics and p-values adjust for differential weighting
-*   - Levene's test also uses weighted observations
-*
-* Comparison to R:
-*   - R's aov() / car::Anova() provide Type III SS with car package
-*   - Base R aov() uses Type I SS by default (sequential)
-*   - For SPSS compatibility, must use Type III SS
-*   - Partial Eta Squared must be manually computed from SS values
-*   - Levene's test via car::leveneTest() or manual implementation
-*
-* Why no SPLIT FILE:
-*   - Factorial ANOVA inherently handles multiple factors
-*   - SPLIT FILE would create a redundant additional factor
-*   - Instead, three-way ANOVA incorporates the grouping variable (region)
-*     as a proper factor with interaction terms
 * ============================================================================.

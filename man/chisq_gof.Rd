@@ -138,8 +138,10 @@ can be reasonably supposed to have arisen from random sampling.
 \code{\link{binomial_test}} for testing a single proportion.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
+\code{\link{factorial_anova}()},
 \code{\link{fisher_test}()},
 \code{\link{friedman_test}()},
 \code{\link{kruskal_wallis}()},

@@ -206,9 +206,11 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.
 \code{\link[dplyr]{group_by}} for grouped analyses.
 
 Other hypothesis_tests: 
+\code{\link{ancova}()},
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
 \code{\link{chisq_gof}()},
+\code{\link{factorial_anova}()},
 \code{\link{fisher_test}()},
 \code{\link{friedman_test}()},
 \code{\link{kruskal_wallis}()},

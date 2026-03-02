@@ -1,3 +1,93 @@
+# mariposa 0.5.0
+
+## New Functions
+
+* Added `factorial_anova()` for multi-factor between-subjects ANOVA (up to 3
+  factors) with Type III Sum of Squares matching SPSS UNIANOVA. Includes main
+  effects, all interaction terms, partial eta squared, R-squared, and Levene's
+  test for homogeneity of variance. Full survey weight support via WLS
+  (matching SPSS /REGWGT). Integrates with existing `tukey_test()`,
+  `scheffe_test()`, and `levene_test()` S3 generics.
+
+* Added `ancova()` for Analysis of Covariance — tests group differences after
+  controlling for continuous covariates. Matches SPSS UNIANOVA with the WITH
+  keyword. Provides ANOVA table, parameter estimates (B, SE, t, p, partial eta
+  squared), estimated marginal means (adjusted for covariates), and Levene's
+  test. Supports up to 3 factors and multiple covariates with full survey
+  weight support.
+
+## SPSS Validation
+
+* Added 612 SPSS validation tests for `factorial_anova()` across 9 scenarios:
+  unweighted (2-factor, 3-factor, 2-factor with missing data), weighted
+  (2-factor, 3-factor), grouped (2-factor, 3-factor), and weighted+grouped
+  (2-factor, 3-factor).
+
+* Added 579 SPSS validation tests for `ancova()` across 11 scenarios:
+  one-way ANCOVA, two-way ANCOVA, weighted, grouped, weighted+grouped,
+  multiple covariates, and single factor with single covariate.
+
+* Total test suite: 4,986 tests passing (0 failures).
+
+## Technical Details
+
+* Type III Sum of Squares computed via `contr.sum` contrasts and `stats::drop1()`
+  — no dependency on the `car` package.
+
+* Weighted analyses use WLS (`stats::lm()` with weights), matching SPSS's
+  /REGWGT subcommand behavior exactly.
+
+* Weighted Levene's test uses the SPSS /REGWGT algorithm:
+  `z_i = sqrt(w_i) * |y_i - weighted_cell_mean_i|` followed by unweighted ANOVA.
+
+* Corrected Model SS computed as `Corrected Total - Error` (not sum of Type III
+  SS) to correctly handle unbalanced designs.
+
+---
+
+# mariposa 0.4.0
+
+## New Functions
+
+* Added `fisher_test()` for Fisher's exact test of independence in contingency
+  tables. Recommended when sample sizes are small or expected cell frequencies
+  fall below 5 (where chi-square approximation becomes unreliable). Supports
+  survey weights, multi-variable analysis, and `group_by()`.
+
+* Added `chisq_gof()` for chi-square goodness-of-fit testing. Tests whether
+  the observed frequency distribution of a categorical variable matches an
+  expected distribution (default: equal proportions). Supports custom expected
+  proportions, residual analysis, survey weights, and multi-variable analysis.
+
+* Added `mcnemar_test()` for testing changes in paired proportions between two
+  dichotomous measurements (e.g., before/after designs). Provides both
+  asymptotic and exact binomial p-values, 2×2 contingency tables, and
+  continuity correction. Supports survey weights.
+
+* Added `dunn_test()` as an S3 generic for Dunn's post-hoc pairwise
+  comparisons following a significant Kruskal-Wallis test. Identifies which
+  specific group pairs differ using rank-based Z-statistics with adjustable
+  p-value correction (Bonferroni, Holm, BH, etc.). Dispatches on
+  `kruskal_wallis` result objects.
+
+* Added `pairwise_wilcoxon()` as an S3 generic for pairwise Wilcoxon
+  signed-rank post-hoc comparisons following a significant Friedman test.
+  Identifies which measurement pairs differ with adjustable p-value correction.
+  Dispatches on `friedman_test` result objects.
+
+## SPSS Validation
+
+* Added SPSS validation tests for all 5 new functions across
+  weighted/unweighted and grouped/ungrouped scenarios.
+
+## Improvements
+
+* Extended post-hoc analysis framework: `dunn_test()` and `pairwise_wilcoxon()`
+  join `tukey_test()`, `scheffe_test()`, and `levene_test()` as S3 generics
+  that dispatch on their parent test result objects.
+
+---
+
 # mariposa 0.3.1
 
 ## Enhancements

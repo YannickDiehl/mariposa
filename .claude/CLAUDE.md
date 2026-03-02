@@ -6,11 +6,11 @@ mariposa is a comprehensive R package for professional statistical analysis of s
 
 ### Package Purpose
 - **Primary Goal**: Provide SPSS-compatible statistical analysis for survey researchers migrating from SPSS to R
-- **Key Differentiator**: 100% validated results matching SPSS output (2,227+ tests pass)
+- **Key Differentiator**: 100% validated results matching SPSS output (4,986+ tests pass)
 - **Target Users**: Survey researchers, data scientists, statistical analysts working with complex survey designs
 
 ### Core Capabilities
-- 37 exported functions across 9 categories
+- 44 exported functions across 11 categories
 - Full survey weight support with 11 specialized `w_*` functions
 - Tidyverse integration (dplyr, tidyselect, group_by support)
 - S3 generics system for extensible post-hoc analysis
@@ -32,12 +32,19 @@ mariposa/
 │   ├── wilcoxon_test.R         # Wilcoxon signed-rank test (v0.3.0)
 │   ├── friedman_test.R         # Friedman test (v0.3.0)
 │   ├── binomial_test.R         # Binomial test (v0.3.0)
+│   ├── fisher_test.R           # Fisher's exact test (v0.4.0)
+│   ├── chisq_gof.R             # Chi-square goodness-of-fit (v0.4.0)
+│   ├── mcnemar_test.R          # McNemar's test (v0.4.0)
 │   ├── pearson_cor.R           # Pearson correlation
 │   ├── spearman_rho.R          # Spearman correlation
 │   ├── kendall_tau.R           # Kendall's tau
 │   ├── tukey_test.R            # Post-hoc Tukey HSD
 │   ├── scheffe_test.R          # Post-hoc Scheffe test
 │   ├── levene_test.R           # Homogeneity of variance
+│   ├── dunn_test.R             # Dunn's post-hoc test (v0.4.0)
+│   ├── pairwise_wilcoxon.R     # Pairwise Wilcoxon post-hoc (v0.4.0)
+│   ├── factorial_anova.R       # Factorial ANOVA (v0.5.0)
+│   ├── ancova.R                # ANCOVA (v0.5.0)
 │   ├── reliability.R           # Cronbach's Alpha (v0.2.0)
 │   ├── efa.R                   # Exploratory Factor Analysis (v0.2.0)
 │   ├── scale_helpers.R         # scale_index() and pomps() (v0.2.0)
@@ -264,11 +271,16 @@ tukey_test(result)  # Works automatically
 - `frequency()` - Categorical frequency tables
 - `crosstab()` - Cross-tabulations with percentages
 
-### 2. Hypothesis Testing (4 functions)
+### 2. Hypothesis Testing (9 functions)
 - `t_test()` - Independent/paired t-tests
 - `oneway_anova()` - One-way ANOVA
+- `factorial_anova()` - Multi-factor ANOVA with Type III SS (v0.5.0)
+- `ancova()` - Analysis of Covariance with estimated marginal means (v0.5.0)
 - `mann_whitney()` - Mann-Whitney U test
 - `chi_square()` - Independence tests
+- `fisher_test()` - Fisher's exact test for small samples (v0.4.0)
+- `chisq_gof()` - Chi-square goodness-of-fit test (v0.4.0)
+- `mcnemar_test()` - McNemar's test for paired proportions (v0.4.0)
 
 ### 3. Non-Parametric Tests (4 functions, v0.3.0)
 - `kruskal_wallis()` - Kruskal-Wallis H test (3+ independent groups)
@@ -281,10 +293,12 @@ tukey_test(result)  # Works automatically
 - `spearman_rho()` - Rank correlation
 - `kendall_tau()` - Ordinal correlation
 
-### 5. Post-Hoc Analysis (3 S3 generics)
+### 5. Post-Hoc Analysis (5 S3 generics)
 - `tukey_test()` - Tukey HSD comparisons
 - `scheffe_test()` - Scheffe comparisons
 - `levene_test()` - Variance homogeneity
+- `dunn_test()` - Dunn's post-hoc for Kruskal-Wallis (v0.4.0)
+- `pairwise_wilcoxon()` - Pairwise Wilcoxon post-hoc for Friedman (v0.4.0)
 
 ### 6. Scale Analysis (4 functions, v0.2.0)
 - `reliability()` - Cronbach's Alpha with item statistics
@@ -384,7 +398,10 @@ trace(.validate_weights, browser)
 - **0.1.0**: Initial release with 27 exported functions, full SPSS validation (83/83 tests)
 - **0.2.0**: Scale analysis (reliability, EFA, scale_index, pomps) + regression (linear, logistic) - 6 new functions
 - **0.3.0**: Non-parametric tests (kruskal_wallis, wilcoxon_test, friedman_test, binomial_test) - 4 new functions, 294 SPSS validations
-- Future: Factorial ANOVA, cluster analysis
+- **0.3.1**: EFA enhancements (ML extraction, Promax rotation)
+- **0.4.0**: Exact tests (fisher_test, chisq_gof, mcnemar_test) + post-hoc generics (dunn_test, pairwise_wilcoxon) - 5 new functions
+- **0.5.0**: Factorial ANOVA + ANCOVA with Type III SS, WLS weights, estimated marginal means - 2 new functions, 1,191 SPSS validations (4,986 total)
+- Future: Cluster analysis, repeated-measures ANOVA
 
 ---
 
