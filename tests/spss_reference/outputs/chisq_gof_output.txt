@@ -1,0 +1,473 @@
+﻿NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=gender.                                                                       
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Gender
+
+        Observed N Expected N Residual 
+ Male   1194       1250.0     -56.0    
+ Female 1306       1250.0     56.0     
+ Total  2500                           
+
+Test Statistics
+
+             Gender   
+ Chi-Square  5.018(a) 
+ df          1        
+ Asymp. Sig. .025     
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 1250.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=education.                                                                    
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Highest educational attainment
+
+                        Observed N Expected N Residual 
+ Basic Secondary        841        625.0      216.0    
+ Intermediate Secondary 629        625.0      4.0      
+ Academic Secondary     631        625.0      6.0      
+ University             399        625.0      -226.0   
+ Total                  2500                           
+
+Test Statistics
+
+             Highest educational attainment 
+ Chi-Square  156.454(a)                     
+ df          3                              
+ Asymp. Sig. .000                           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 625.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=region.                                                                       
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Region (East/West)
+
+       Observed N Expected N Residual 
+ East  485        1250.0     -765.0   
+ West  2015       1250.0     765.0    
+ Total 2500                           
+
+Test Statistics
+
+             Region (East/West) 
+ Chi-Square  936.360(a)         
+ df          1                  
+ Asymp. Sig. .000               
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 1250.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=employment.                                                                   
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Employment status
+
+            Observed N Expected N Residual 
+ Student    78         500.0      -422.0   
+ Employed   1600       500.0      1100.0   
+ Unemployed 182        500.0      -318.0   
+ Retired    525        500.0      25.0     
+ Other      115        500.0      -385.0   
+ Total      2500                           
+
+Test Statistics
+
+             Employment status 
+ Chi-Square  3276.116(a)       
+ df          4                 
+ Asymp. Sig. .000              
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 500.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=interview_mode.                                                               
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Interview mode
+
+              Observed N Expected N Residual 
+ Face-to-face 1485       833.3      651.7    
+ Telephone    655        833.3      -178.3   
+ Online       360        833.3      -473.3   
+ Total        2500                           
+
+Test Statistics
+
+             Interview mode 
+ Chi-Square  816.620(a)     
+ df          2              
+ Asymp. Sig. .000           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 833.3.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=interview_mode                                                                
+                                           /EXPECTED=5 3 2.                                                                         
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Interview mode
+
+              Observed N Expected N Residual 
+ Face-to-face 1485       1250.0     235.0    
+ Telephone    655        750.0      -95.0    
+ Online       360        500.0      -140.0   
+ Total        2500                           
+
+Test Statistics
+
+             Interview mode 
+ Chi-Square  95.413(a)      
+ df          2              
+ Asymp. Sig. .000           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 500.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         Weighting factor                                                                          
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=gender.                                                                       
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Gender
+
+        Observed N Expected N Residual 
+ Male   1194       1250.0     -56.0    
+ Female 1306       1250.0     56.0     
+ Total  2500                           
+
+Test Statistics
+
+             Gender   
+ Chi-Square  5.018(a) 
+ df          1        
+ Asymp. Sig. .025     
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 1250.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:13                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         Weighting factor                                                                          
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=education.                                                                    
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:01.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Highest educational attainment
+
+                        Observed N Expected N Residual 
+ Basic Secondary        841        625.0      216.0    
+ Intermediate Secondary 629        625.0      4.0      
+ Academic Secondary     631        625.0      6.0      
+ University             399        625.0      -226.0   
+ Total                  2500                           
+
+Test Statistics
+
+             Highest educational attainment 
+ Chi-Square  156.454(a)                     
+ df          3                              
+ Asymp. Sig. .000                           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 625.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:14                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         Weighting factor                                                                          
+           Split File                     <none>                                                                                    
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=interview_mode                                                                
+                                           /EXPECTED=5 3 2.                                                                         
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Interview mode
+
+              Observed N Expected N Residual 
+ Face-to-face 1485       1250.0     235.0    
+ Telephone    655        750.0      -95.0    
+ Online       360        500.0      -140.0   
+ Total        2500                           
+
+Test Statistics
+
+             Interview mode 
+ Chi-Square  95.413(a)      
+ df          2              
+ Asymp. Sig. .000           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 500.0.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:14                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     Region (East/West)                                                                        
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=education.                                                                    
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Highest educational attainment
+
+ Region (East/West)                        Observed N Expected N Residual 
+ East               Basic Secondary        170        121.3      48.8     
+                    Intermediate Secondary 121        121.3      -.3      
+                    Academic Secondary     115        121.3      -6.3     
+                    University             79         121.3      -42.3    
+                    Total                  485                            
+ West               Basic Secondary        671        503.8      167.3    
+                    Intermediate Secondary 508        503.8      4.3      
+                    Academic Secondary     516        503.8      12.3     
+                    University             320        503.8      -183.8   
+                    Total                  2015                           
+
+Test Statistics
+
+ Region (East/West)             Highest educational attainment 
+ East               Chi-Square  34.645(a)                      
+                    df          3                              
+                    Asymp. Sig. .000                           
+ West               Chi-Square  122.888(b)                     
+                    df          3                              
+                    Asymp. Sig. .000                           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 121.3.
+b 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 503.8.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:14                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         <none>                                                                                    
+           Split File                     Region (East/West)                                                                        
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=gender.                                                                       
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Gender
+
+ Region (East/West)        Observed N Expected N Residual 
+ East               Male   238        242.5      -4.5     
+                    Female 247        242.5      4.5      
+                    Total  485                            
+ West               Male   956        1007.5     -51.5    
+                    Female 1059       1007.5     51.5     
+                    Total  2015                           
+
+Test Statistics
+
+ Region (East/West)             Gender   
+ East               Chi-Square  .167(a)  
+                    df          1        
+                    Asymp. Sig. .683     
+ West               Chi-Square  5.265(b) 
+                    df          1        
+                    Asymp. Sig. .022     
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 242.5.
+b 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 1007.5.
+
+NPar Tests
+Notes
+
+ Output Created                           01-MAR-2026 22:07:14                                                                      
+ Comments                                                                                                                           
+ Input     Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/data 
+                                          /survey_data.sav                                                                          
+           Filter                         <none>                                                                                    
+           Weight                         Weighting factor                                                                          
+           Split File                     Region (East/West)                                                                        
+           N of Rows in Working Data File 2500                                                                                      
+ Syntax                                   NPAR TESTS                                                                                
+                                           /CHISQUARE=education.                                                                    
+                                                                                                                                    
+ Resources Processor Time                 00:00:00.01                                                                               
+           Elapsed Time                   00:00:00.00                                                                               
+           Number of Cases Allowed(a)     786432                                                                                    
+a Based on availability of workspace memory.
+
+Chi-Square Test
+Frequencies
+Highest educational attainment
+
+ Region (East/West)                        Observed N Expected N Residual 
+ East               Basic Secondary        170        121.3      48.8     
+                    Intermediate Secondary 121        121.3      -.3      
+                    Academic Secondary     115        121.3      -6.3     
+                    University             79         121.3      -42.3    
+                    Total                  485                            
+ West               Basic Secondary        671        503.8      167.3    
+                    Intermediate Secondary 508        503.8      4.3      
+                    Academic Secondary     516        503.8      12.3     
+                    University             320        503.8      -183.8   
+                    Total                  2015                           
+
+Test Statistics
+
+ Region (East/West)             Highest educational attainment 
+ East               Chi-Square  34.645(a)                      
+                    df          3                              
+                    Asymp. Sig. .000                           
+ West               Chi-Square  122.888(b)                     
+                    df          3                              
+                    Asymp. Sig. .000                           
+a 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 121.3.
+b 0 cells (.0%) have expected frequencies less than 5. The minimum expected cell frequency is 503.8.
+

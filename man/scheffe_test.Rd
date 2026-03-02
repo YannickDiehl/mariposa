@@ -2,9 +2,12 @@
 % Please edit documentation in R/scheffe_test.R
 \name{scheffe_test}
 \alias{scheffe_test}
+\alias{scheffe_test.default}
 \title{Compare All Groups More Conservatively After ANOVA}
 \usage{
 scheffe_test(x, conf.level = 0.95, ...)
+
+\method{scheffe_test}{default}(x, conf.level = 0.95, ...)
 }
 \arguments{
 \item{x}{ANOVA results from \code{oneway_anova()}}
@@ -152,7 +155,9 @@ Scheffe, H. (1959). The Analysis of Variance. New York: Wiley.
 \code{\link{levene_test}} for testing homogeneity of variances.
 
 Other posthoc: 
+\code{\link{dunn_test}()},
 \code{\link{levene_test}()},
+\code{\link{pairwise_wilcoxon}()},
 \code{\link{tukey_test}()}
 }
 \concept{posthoc}
