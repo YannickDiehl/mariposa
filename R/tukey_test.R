@@ -396,7 +396,54 @@ print.tukey_test <- function(x, digits = 3, ...) {
   weights_name <- x$weights
   test_type <- get_standard_title("Tukey HSD Post-Hoc Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
-  
+
+  # --- Factorial ANOVA post-hoc: results grouped by Factor column -----------
+  if (isTRUE(x$is_factorial)) {
+    cat("\n")
+    test_info <- list(
+      "Dependent variable" = x$call_info$dv,
+      "Factors" = x$group,
+      "Weights variable" = x$weights
+    )
+    print_info_section(test_info)
+    test_params <- list(conf.level = x$conf.level)
+    print_test_parameters(test_params)
+    cat("  Family-wise error rate controlled using Tukey HSD\n\n")
+
+    x$results$sig <- sapply(x$results$p_adjusted, add_significance_stars)
+
+    for (fct in unique(x$results$Factor)) {
+      cat(sprintf("\n--- Factor: %s ---\n\n", fct))
+      fct_results <- x$results[x$results$Factor == fct, ]
+      display_table <- fct_results[, c("Comparison", "Estimate", "conf_low",
+                                       "conf_high", "p_adjusted", "sig")]
+      names(display_table) <- c("Comparison", "Difference", "Lower CI",
+                                "Upper CI", "p-value", "Sig")
+      display_table$Difference <- round(display_table$Difference, digits)
+      display_table$`Lower CI` <- round(display_table$`Lower CI`, digits)
+      display_table$`Upper CI` <- round(display_table$`Upper CI`, digits)
+      display_table$`p-value` <- ifelse(display_table$`p-value` < 0.001,
+                                        "<.001",
+                                        round(display_table$`p-value`, digits))
+      col_widths <- sapply(names(display_table), function(col) {
+        max(nchar(as.character(display_table[[col]])), nchar(col), na.rm = TRUE)
+      })
+      total_width <- sum(col_widths) + length(col_widths) - 1
+      border_width <- paste(rep("-", total_width), collapse = "")
+      cat(border_width, "\n")
+      print(display_table, row.names = FALSE)
+      cat(border_width, "\n")
+    }
+
+    print_significance_legend()
+    cat("\nInterpretation:\n")
+    cat("- Positive differences: First group > Second group\n")
+    cat("- Negative differences: First group < Second group\n")
+    cat("- Confidence intervals not containing 0 indicate significant differences\n")
+    cat("- p-values are adjusted for multiple comparisons (family-wise error control)\n")
+    return(invisible(x))
+  }
+
   # Print basic info using standardized helpers
   cat("\n")
   test_info <- list(

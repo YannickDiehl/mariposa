@@ -24,14 +24,35 @@ data(survey_data)
 
 ## Overview
 
-Statistical tests help you determine whether differences between groups are real or just due to random chance. This guide covers the main tests available in mariposa:
+Statistical tests help you determine whether differences between groups are real or just due to random chance. This guide covers all hypothesis tests available in mariposa:
+
+### Parametric Tests
 
 | Test | Use when... |
 |------|-------------|
 | `t_test()` | Comparing means between **two** groups |
 | `oneway_anova()` | Comparing means across **three or more** groups |
+| `factorial_anova()` | Testing effects of **multiple factors** simultaneously |
+| `ancova()` | Comparing groups while **controlling for a covariate** |
+
+### Non-Parametric Tests
+
+| Test | Use when... |
+|------|-------------|
+| `mann_whitney()` | Two-group comparison with **non-normal** data |
+| `kruskal_wallis()` | Three or more groups with **non-normal** data |
+| `wilcoxon_test()` | **Paired** comparison with non-normal data |
+| `friedman_test()` | **Repeated measures** with non-normal data |
+| `binomial_test()` | Testing whether a **proportion** differs from expected |
+
+### Categorical Tests
+
+| Test | Use when... |
+|------|-------------|
 | `chi_square()` | Testing relationships between **categorical** variables |
-| `mann_whitney()` | Non-parametric alternative when data is not normally distributed |
+| `fisher_test()` | Like chi-square but for **small samples** |
+| `chisq_gof()` | Testing if observed frequencies match **expected** proportions |
+| `mcnemar_test()` | Comparing **paired proportions** (before/after) |
 
 ## t-Tests
 
@@ -193,6 +214,158 @@ survey_data %>%
                weights = sampling_weight)
 ```
 
+## Factorial ANOVA
+
+### When to Use
+
+Use `factorial_anova()` when you want to test the effects of **two or more factors** on a continuous outcome variable. It answers questions like: "Does income differ by gender, education, and their interaction?"
+
+### Two-Way ANOVA
+
+```{r}
+survey_data %>%
+  factorial_anova(dv = income, between = c(gender, education))
+```
+
+The output includes Type III sums of squares, main effects for each factor, interaction effects, partial eta-squared, and descriptive statistics per cell.
+
+### With Survey Weights
+
+```{r}
+survey_data %>%
+  factorial_anova(dv = life_satisfaction, between = c(gender, region),
+                  weights = sampling_weight)
+```
+
+Weighted factorial ANOVA uses WLS (Weighted Least Squares) estimation, matching SPSS UNIANOVA results.
+
+## ANCOVA
+
+### When to Use
+
+Use `ancova()` when you want to compare groups on a continuous outcome while **controlling for** (adjusting for) a covariate. For example: "Does income differ by education, after controlling for age?"
+
+### Basic ANCOVA
+
+```{r}
+survey_data %>%
+  ancova(dv = income, between = education, covariate = age)
+```
+
+The output shows the covariate effect, the factor effect after adjustment, and estimated marginal means (group means adjusted for the covariate).
+
+### With Survey Weights
+
+```{r}
+survey_data %>%
+  ancova(dv = income, between = education, covariate = age,
+         weights = sampling_weight)
+```
+
+## Non-Parametric Tests
+
+### Kruskal-Wallis Test
+
+The non-parametric alternative to one-way ANOVA. Compare three or more independent groups when data is not normally distributed:
+
+```{r}
+survey_data %>%
+  kruskal_wallis(life_satisfaction, group = education)
+```
+
+When the result is significant, use Dunn's post-hoc test to find which groups differ:
+
+```{r}
+kw_result <- survey_data %>%
+  kruskal_wallis(life_satisfaction, group = education)
+
+kw_result %>% dunn_test()
+```
+
+### Wilcoxon Signed-Rank Test
+
+The non-parametric alternative to the paired t-test. Compare two related measurements:
+
+```{r}
+data(longitudinal_data_wide)
+
+longitudinal_data_wide %>%
+  wilcoxon_test(score_T1, score_T2)
+```
+
+### Friedman Test
+
+The non-parametric alternative to repeated-measures ANOVA. Compare three or more related measurements:
+
+```{r}
+longitudinal_data_wide %>%
+  friedman_test(score_T1, score_T2, score_T3)
+```
+
+When significant, use pairwise Wilcoxon post-hoc tests:
+
+```{r}
+friedman_result <- longitudinal_data_wide %>%
+  friedman_test(score_T1, score_T2, score_T3)
+
+friedman_result %>% pairwise_wilcoxon()
+```
+
+### Binomial Test
+
+Test whether an observed proportion differs from an expected value:
+
+```{r}
+survey_data %>%
+  binomial_test(gender)
+```
+
+## Exact and Goodness-of-Fit Tests
+
+### Fisher's Exact Test
+
+Use instead of chi-square when sample sizes are small or expected cell frequencies are below 5:
+
+```{r}
+# Create a small subsample
+small_sample <- survey_data %>% slice_sample(n = 30)
+
+small_sample %>%
+  fisher_test(gender, region)
+```
+
+### Chi-Square Goodness-of-Fit
+
+Test whether observed frequencies match expected proportions. For example, does the education distribution match the general population?
+
+```{r}
+survey_data %>%
+  chisq_gof(education)
+```
+
+You can also specify expected proportions:
+
+```{r}
+survey_data %>%
+  chisq_gof(education, expected = c(0.30, 0.25, 0.25, 0.20))
+```
+
+### McNemar's Test
+
+Test whether proportions change between two paired measurements (e.g., before and after an intervention). Requires two dichotomous variables measured on the same subjects:
+
+```{r, eval = FALSE}
+# Example with dichotomized trust variables
+test_data <- survey_data %>%
+  mutate(
+    trust_gov_high = ifelse(trust_government > 3, 1, 0),
+    trust_media_high = ifelse(trust_media > 3, 1, 0)
+  )
+
+test_data %>%
+  mcnemar_test(var1 = trust_gov_high, var2 = trust_media_high)
+```
+
 ## Interpreting Results
 
 ### Understanding p-values
@@ -247,19 +420,35 @@ levene_test(anova_result)
 
 ## Best Practices
 
-1. **Check assumptions first.** Inspect skewness and kurtosis before choosing a test. For non-normal data, consider `mann_whitney()`.
-2. **Use appropriate tests.** Normal data with equal variances: t-test/ANOVA. Non-normal or ordinal: Mann-Whitney. Categorical: chi-square.
-3. **Report completely.** Always include the test statistic, degrees of freedom, p-value, effect size, and confidence intervals.
-4. **Watch for multiple comparisons.** Running many tests inflates the chance of false positives. Consider Bonferroni correction or pre-register your hypotheses.
-5. **Significance is not importance.** A statistically significant result with a negligible effect size may not be practically relevant.
+1. **Check assumptions first.** Inspect skewness and kurtosis before choosing a test. For non-normal data, consider `mann_whitney()` or `kruskal_wallis()`.
+2. **Use appropriate tests.** Normal data: t-test/ANOVA. Non-normal or ordinal: Mann-Whitney/Kruskal-Wallis. Categorical: chi-square or Fisher's exact test. Small samples: use exact tests.
+3. **Use post-hoc tests.** After a significant omnibus test, use `tukey_test()` for ANOVA, `dunn_test()` for Kruskal-Wallis, or `pairwise_wilcoxon()` for Friedman.
+4. **Report completely.** Always include the test statistic, degrees of freedom, p-value, effect size, and confidence intervals.
+5. **Watch for multiple comparisons.** Running many tests inflates the chance of false positives. Post-hoc tests handle this automatically with Bonferroni correction.
+6. **Significance is not importance.** A statistically significant result with a negligible effect size may not be practically relevant.
 
 ## Summary
 
-1. **`t_test()`** compares means between two groups --- use it for questions like "Do men and women differ?"
-2. **`oneway_anova()`** extends this to three or more groups, with post-hoc tests to identify which groups differ
-3. **`chi_square()`** tests whether categorical variables are related
-4. **`mann_whitney()`** is the non-parametric alternative when assumptions are not met
-5. Always report **effect sizes** alongside p-values
+### Parametric Tests
+1. **`t_test()`** compares means between two groups
+2. **`oneway_anova()`** extends this to three or more groups, with `tukey_test()` and `scheffe_test()` for post-hoc analysis
+3. **`factorial_anova()`** tests effects of multiple factors and their interactions
+4. **`ancova()`** compares groups while controlling for a covariate
+
+### Non-Parametric Tests
+5. **`mann_whitney()`** is the non-parametric alternative to the t-test
+6. **`kruskal_wallis()`** is the non-parametric alternative to ANOVA, with `dunn_test()` for post-hoc analysis
+7. **`wilcoxon_test()`** is the non-parametric alternative to the paired t-test
+8. **`friedman_test()`** is the non-parametric alternative to repeated-measures ANOVA, with `pairwise_wilcoxon()` for post-hoc analysis
+9. **`binomial_test()`** tests proportions against expected values
+
+### Categorical Tests
+10. **`chi_square()`** tests whether categorical variables are related
+11. **`fisher_test()`** is the exact alternative for small samples
+12. **`chisq_gof()`** tests whether observed frequencies match expected proportions
+13. **`mcnemar_test()`** compares paired proportions
+
+Always report **effect sizes** alongside p-values
 
 ## Next Steps
 
