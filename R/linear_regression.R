@@ -22,6 +22,11 @@
 #'   Used with \code{dependent} when no formula is given.
 #' @param weights Optional survey weights (unquoted variable name). When
 #'   specified, weighted least squares (WLS) is used, matching SPSS WEIGHT BY.
+#' @param use How to handle missing data: \code{"listwise"} (default) drops any
+#'   case with a missing value on any variable (matching SPSS /MISSING LISTWISE).
+#'   \code{"pairwise"} computes the regression from a pairwise
+#'   covariance/correlation matrix, retaining more cases (matching SPSS
+#'   /MISSING PAIRWISE).
 #' @param standardized Logical. If \code{TRUE} (default), standardized
 #'   coefficients (Beta) are calculated and included in the output.
 #' @param conf.level Confidence level for coefficient intervals (default 0.95).
@@ -79,9 +84,11 @@
 #'
 #' ## Technical Details
 #'
-#' \strong{Missing Data}: Listwise deletion is used (matching SPSS REGRESSION
-#' /MISSING LISTWISE). Cases with any missing values on the dependent variable,
-#' predictors, or weights are excluded.
+#' \strong{Missing Data}: By default, listwise deletion is used (matching SPSS
+#' REGRESSION /MISSING LISTWISE). Set \code{use = "pairwise"} to match SPSS
+#' /MISSING PAIRWISE, which computes the regression from a pairwise
+#' covariance matrix. Pairwise deletion retains more cases and produces
+#' results closer to SPSS output when data has varying patterns of missingness.
 #'
 #' \strong{Weights}: When weights are specified, they are treated as frequency
 #' weights (matching SPSS WEIGHT BY behavior). The model is fitted using weighted
@@ -129,6 +136,7 @@
 linear_regression <- function(data, formula = NULL,
                               dependent = NULL, predictors = NULL,
                               weights = NULL,
+                              use = c("listwise", "pairwise"),
                               standardized = TRUE,
                               conf.level = 0.95) {
 
@@ -139,6 +147,8 @@ linear_regression <- function(data, formula = NULL,
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame or tibble.")
   }
+
+  use <- match.arg(use)
 
   # Process weights
   weights_quo <- rlang::enquo(weights)
@@ -210,7 +220,7 @@ linear_regression <- function(data, formula = NULL,
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
 
       result <- .lm_core(grp_data, model_formula, dep_name, pred_names,
-                         grp_weights, standardized, conf.level)
+                         grp_weights, use, standardized, conf.level)
       gv <- as.list(group_keys[i, , drop = FALSE])
       gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
       result$group_values <- gv
@@ -225,6 +235,7 @@ linear_regression <- function(data, formula = NULL,
         predictor_names = pred_names,
         weighted = has_weights,
         weight_name = weight_name,
+        use = use,
         is_grouped = TRUE,
         group_vars = group_vars,
         standardized = standardized,
@@ -234,12 +245,13 @@ linear_regression <- function(data, formula = NULL,
     )
   } else {
     result <- .lm_core(data, model_formula, dep_name, pred_names,
-                       weights_vec, standardized, conf.level)
+                       weights_vec, use, standardized, conf.level)
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
     result$weighted <- has_weights
     result$weight_name <- weight_name
+    result$use <- use
     result$is_grouped <- FALSE
     result$standardized <- standardized
     result$conf.level <- conf.level
@@ -256,7 +268,13 @@ linear_regression <- function(data, formula = NULL,
 #' Core linear regression computation
 #' @keywords internal
 .lm_core <- function(data, formula, dep_name, pred_names, weights_vec,
-                     standardized, conf.level) {
+                     use, standardized, conf.level) {
+
+  # Dispatch to pairwise implementation if requested
+  if (use == "pairwise") {
+    return(.lm_core_pairwise(data, dep_name, pred_names, weights_vec,
+                             standardized, conf.level))
+  }
 
   all_vars <- c(dep_name, pred_names)
 
@@ -443,6 +461,242 @@ linear_regression <- function(data, formula = NULL,
 
 
 # ============================================================================
+# PAIRWISE MISSING: CORE COMPUTATION
+# ============================================================================
+
+#' Core pairwise regression computation (matching SPSS /MISSING PAIRWISE)
+#' @keywords internal
+.lm_core_pairwise <- function(data, dep_name, pred_names, weights_vec,
+                               standardized, conf.level) {
+
+  all_vars <- c(dep_name, pred_names)
+  k <- length(pred_names)
+  p <- length(all_vars)
+  has_weights <- !is.null(weights_vec)
+
+  # Convert factors to numeric (matching SPSS behavior)
+  for (v in all_vars) {
+    if (is.factor(data[[v]])) {
+      data[[v]] <- as.numeric(data[[v]])
+    }
+  }
+
+  # --------------------------------------------------------------------------
+  # Step 1: Individual variable statistics (all available cases per variable)
+  # --------------------------------------------------------------------------
+
+  var_mean <- var_sd <- var_n <- numeric(p)
+  names(var_mean) <- names(var_sd) <- names(var_n) <- all_vars
+
+  for (v in all_vars) {
+    x <- data[[v]]
+    valid <- !is.na(x)
+    if (has_weights) {
+      valid <- valid & !is.na(weights_vec) & weights_vec > 0
+      w <- weights_vec[valid]
+      xv <- x[valid]
+      m <- stats::weighted.mean(xv, w)
+      n_w <- sum(w)
+      s <- sqrt(sum(w * (xv - m)^2) / (n_w - 1))
+    } else {
+      xv <- x[valid]
+      m <- mean(xv)
+      n_w <- length(xv)
+      s <- stats::sd(xv)
+    }
+    var_mean[v] <- m
+    var_sd[v] <- s
+    var_n[v] <- n_w
+  }
+
+  # --------------------------------------------------------------------------
+  # Step 2: Pairwise correlation matrix and N matrix
+  # --------------------------------------------------------------------------
+
+  cor_mat <- matrix(1, p, p, dimnames = list(all_vars, all_vars))
+  n_mat <- matrix(0, p, p, dimnames = list(all_vars, all_vars))
+
+  for (i in seq_len(p)) {
+    n_mat[i, i] <- var_n[all_vars[i]]
+    if (i < p) {
+      for (j in (i + 1):p) {
+        vi <- all_vars[i]
+        vj <- all_vars[j]
+        xi <- data[[vi]]
+        xj <- data[[vj]]
+        valid <- !is.na(xi) & !is.na(xj)
+        if (has_weights) {
+          valid <- valid & !is.na(weights_vec) & weights_vec > 0
+          w <- weights_vec[valid]
+          xiv <- xi[valid]
+          xjv <- xj[valid]
+          n_w <- sum(w)
+          mi <- stats::weighted.mean(xiv, w)
+          mj <- stats::weighted.mean(xjv, w)
+          cov_ij <- sum(w * (xiv - mi) * (xjv - mj)) / (n_w - 1)
+          si <- sqrt(sum(w * (xiv - mi)^2) / (n_w - 1))
+          sj <- sqrt(sum(w * (xjv - mj)^2) / (n_w - 1))
+          r <- cov_ij / (si * sj)
+        } else {
+          xiv <- xi[valid]
+          xjv <- xj[valid]
+          n_w <- sum(valid)
+          r <- stats::cor(xiv, xjv)
+        }
+        cor_mat[i, j] <- cor_mat[j, i] <- r
+        n_mat[i, j] <- n_mat[j, i] <- n_w
+      }
+    }
+  }
+
+  # --------------------------------------------------------------------------
+  # Step 3: Regression from correlation matrix
+  # --------------------------------------------------------------------------
+
+  R_XX <- cor_mat[pred_names, pred_names, drop = FALSE]
+  R_XY <- cor_mat[pred_names, dep_name]
+
+  # Standardized coefficients: Beta = solve(R_XX) %*% R_XY
+  Beta <- as.vector(solve(R_XX) %*% R_XY)
+  names(Beta) <- pred_names
+
+  # R-squared
+  R_sq <- as.numeric(crossprod(Beta, R_XY))
+  R_mult <- sqrt(R_sq)
+
+  # --------------------------------------------------------------------------
+  # Step 4: Effective N and degrees of freedom
+  # --------------------------------------------------------------------------
+
+  N_eff <- round(min(n_mat[all_vars, all_vars]))
+  df_reg <- k
+  df_res <- N_eff - k - 1
+  df_tot <- N_eff - 1
+
+  if (df_res < 1) {
+    cli_abort("Insufficient pairwise observations for the number of predictors.")
+  }
+
+  adj_R_sq <- 1 - (1 - R_sq) * df_tot / df_res
+
+  # --------------------------------------------------------------------------
+  # Step 5: Unstandardized coefficients
+  # --------------------------------------------------------------------------
+
+  sd_y <- var_sd[dep_name]
+  sd_x <- var_sd[pred_names]
+  mean_y <- var_mean[dep_name]
+  mean_x <- var_mean[pred_names]
+
+  B <- Beta * sd_y / sd_x
+  B0 <- mean_y - sum(B * mean_x)
+
+  # --------------------------------------------------------------------------
+  # Step 6: ANOVA
+  # --------------------------------------------------------------------------
+
+  SS_tot <- sd_y^2 * df_tot
+  SS_reg <- R_sq * SS_tot
+  SS_res <- (1 - R_sq) * SS_tot
+
+  MS_reg <- SS_reg / df_reg
+  MS_res <- SS_res / df_res
+
+  F_stat <- MS_reg / MS_res
+  F_p <- stats::pf(F_stat, df_reg, df_res, lower.tail = FALSE)
+
+  sigma <- sqrt(MS_res)
+
+  # --------------------------------------------------------------------------
+  # Step 7: Standard errors via Z'WZ matrix (augmented with intercept)
+  # --------------------------------------------------------------------------
+  # Z'WZ = [[N, N*mean_x'], [N*mean_x, (N-1)*Cov_XX + N*outer(mean_x)]]
+  # where Cov_XX = diag(sd_x) %*% R_XX %*% diag(sd_x)
+
+  D <- diag(sd_x, nrow = k, ncol = k)
+  Cov_XX <- D %*% R_XX %*% D
+
+  ZWZ <- matrix(0, k + 1, k + 1)
+  ZWZ[1, 1] <- N_eff
+  ZWZ[1, 2:(k + 1)] <- N_eff * mean_x
+  ZWZ[2:(k + 1), 1] <- N_eff * mean_x
+  ZWZ[2:(k + 1), 2:(k + 1)] <- df_tot * Cov_XX + N_eff * outer(mean_x, mean_x)
+
+  Var_all <- MS_res * solve(ZWZ)
+  SE_all <- sqrt(diag(Var_all))
+
+  SE_B0 <- SE_all[1]
+  SE_B <- SE_all[2:(k + 1)]
+
+  # t-values and p-values
+  t_B0 <- B0 / SE_B0
+  t_B <- B / SE_B
+  p_B0 <- 2 * stats::pt(abs(t_B0), df_res, lower.tail = FALSE)
+  p_B <- 2 * stats::pt(abs(t_B), df_res, lower.tail = FALSE)
+
+  # Confidence intervals
+  alpha <- 1 - conf.level
+  t_crit <- stats::qt(1 - alpha / 2, df_res)
+
+  # Pre-compute to avoid tibble column name collision with variable 'B'
+  all_B <- c(B0, B)
+  all_SE <- c(SE_B0, SE_B)
+  all_Beta <- c(NA_real_, if (standardized) Beta else rep(NA_real_, k))
+  all_t <- c(t_B0, t_B)
+  all_p <- c(p_B0, p_B)
+  all_CI_lower <- all_B - t_crit * all_SE
+  all_CI_upper <- all_B + t_crit * all_SE
+
+  # --------------------------------------------------------------------------
+  # Step 8: Build output (same structure as listwise for print compatibility)
+  # --------------------------------------------------------------------------
+
+  coef_table <- tibble::tibble(
+    Term = c("(Intercept)", pred_names),
+    B = all_B,
+    Std.Error = all_SE,
+    Beta = all_Beta,
+    t = all_t,
+    p = all_p,
+    CI_lower = all_CI_lower,
+    CI_upper = all_CI_upper
+  )
+
+  model_stats <- list(
+    R = R_mult,
+    R_squared = R_sq,
+    adj_R_squared = adj_R_sq,
+    std_error = sigma
+  )
+
+  anova_table <- tibble::tibble(
+    Source = c("Regression", "Residual", "Total"),
+    Sum_of_Squares = c(SS_reg, SS_res, SS_tot),
+    df = as.integer(c(df_reg, df_res, df_tot)),
+    Mean_Square = c(MS_reg, MS_res, NA_real_),
+    F_statistic = c(F_stat, NA_real_, NA_real_),
+    Sig = c(F_p, NA_real_, NA_real_)
+  )
+
+  descriptives <- tibble::tibble(
+    Variable = all_vars,
+    Mean = var_mean[all_vars],
+    Std.Deviation = var_sd[all_vars],
+    N = round(var_n[all_vars])
+  )
+
+  list(
+    coefficients = coef_table,
+    model_summary = model_stats,
+    anova = anova_table,
+    descriptives = descriptives,
+    model = NULL,
+    n = N_eff
+  )
+}
+
+
+# ============================================================================
 # HELPER: DESCRIPTIVE STATISTICS
 # ============================================================================
 
@@ -592,6 +846,9 @@ print.linear_regression <- function(x, ...) {
   )
   if (isTRUE(x$weighted)) {
     info[["Weights"]] <- x$weight_name
+  }
+  if (identical(x$use, "pairwise")) {
+    info[["Missing"]] <- "Pairwise deletion"
   }
   print_info_section(info)
 
