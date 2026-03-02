@@ -530,6 +530,13 @@ logistic_regression <- function(data, formula = NULL,
 # PRINT METHOD
 # ============================================================================
 
+#' Print Logistic Regression Results
+#'
+#' @param x An object of class \code{"logistic_regression"}.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
 #' @export
 print.logistic_regression <- function(x, ...) {
   if (isTRUE(x$is_grouped)) {
