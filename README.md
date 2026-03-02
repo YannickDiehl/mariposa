@@ -4,7 +4,7 @@
 [![R-CMD-check](https://github.com/YannickDiehl/mariposa/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/YannickDiehl/mariposa/actions/workflows/R-CMD-check.yaml)
 [![test-coverage](https://github.com/YannickDiehl/mariposa/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/YannickDiehl/mariposa/actions/workflows/test-coverage.yaml)
 [![Codecov test coverage](https://codecov.io/gh/YannickDiehl/mariposa/branch/main/graph/badge.svg)](https://app.codecov.io/gh/YannickDiehl/mariposa?branch=main)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#maturing)
 <!-- badges: end -->
 
 **Professional statistical analysis for survey data in R.**
