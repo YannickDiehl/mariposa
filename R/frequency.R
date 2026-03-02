@@ -173,19 +173,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
   ), class = "frequency")
 }
 
-# Helper function: Get value labels
-get_value_labels <- function(x, freq_names) {
-  if (is.factor(x)) {
-    factor_levels <- levels(x)
-    ifelse(is.na(freq_names), NA, factor_levels[match(freq_names, factor_levels)] %||% as.character(freq_names))
-  } else if (!is.null(attr(x, "labels"))) {
-    value_labels <- attr(x, "labels")
-    ifelse(is.na(freq_names), NA, names(value_labels)[match(freq_names, value_labels)] %||% as.character(freq_names))
-  } else {
-    # For variables without value labels, return empty strings instead of duplicating values
-    rep("", length(freq_names))
-  }
-}
+# Note: get_value_labels() moved to helpers.R for shared use across the package
 
 # Helper function: Adjust rounded frequencies using largest remainder method
 # Ensures sum of rounded frequencies equals the rounded sum

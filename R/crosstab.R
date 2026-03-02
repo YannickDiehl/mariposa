@@ -125,6 +125,10 @@ crosstab.data.frame <- function(data, row, col,
     cli_abort("Column variable {.var {col_var}} not found in data.")
   }
 
+  # Build label maps before any subsetting (preserves attributes)
+  row_label_map <- .build_label_map(data[[row_var]])
+  col_label_map <- .build_label_map(data[[col_var]])
+
   # Extract variables
   row_data <- data[[row_var]]
   col_data <- data[[col_var]]
@@ -221,6 +225,8 @@ crosstab.data.frame <- function(data, row, col,
     col_var = col_var,
     row_levels = rownames(tab_matrix),
     col_levels = colnames(tab_matrix),
+    row_label_map = row_label_map,
+    col_label_map = col_label_map,
     weights_var = weights_var,
     percentages = percentages,
     n_valid = grand_total,
@@ -311,7 +317,7 @@ print.crosstab <- function(x, digits = 1, ...) {
 
   if (x$is_grouped) {
     # Print grouped results using standardized header
-    title <- get_standard_title("Grouped Crosstabulation", x$weights, "")
+    title <- get_standard_title("Grouped Crosstabulation", x$weights_var, "")
     print_header(title)
     cat("\n")
 
@@ -338,8 +344,33 @@ print.crosstab <- function(x, digits = 1, ...) {
 .print_single_crosstab <- function(x, digits = 1) {
 
   # Header
-  cat("\nCrosstabulation: ", x$row_var, " \u00d7 ", x$col_var, "\n", sep = "")
-  cat(paste(rep("-", 50), collapse = ""), "\n\n")
+  title <- paste0("Crosstabulation: ", x$row_var, " \u00d7 ", x$col_var)
+  cat("\n", title, "\n", sep = "")
+  cat(paste(rep("-", nchar(title)), collapse = ""), "\n")
+
+  # Info section
+  pct_label <- switch(x$percentages,
+    "row" = "Row percentages",
+    "col" = "Column percentages",
+    "total" = "Total percentages",
+    "all" = "All percentages (row, col, total)",
+    "none" = "Counts only"
+  )
+  n_label <- if (x$is_weighted) sprintf("%.0f (weighted)", x$n_valid) else sprintf("%.0f", x$n_valid)
+  test_info <- list(
+    "Row variable" = x$row_var,
+    "Column variable" = x$col_var,
+    "Percentages" = pct_label,
+    "Weights variable" = x$weights_var,
+    "N (valid)" = n_label,
+    "Missing" = if (x$n_missing > 0) sprintf("%.0f", x$n_missing) else NULL
+  )
+  print_info_section(test_info)
+  cat("\n")
+
+  # Apply value labels if available
+  display_row_levels <- .apply_labels(x$row_levels, x$row_label_map)
+  display_col_levels <- .apply_labels(x$col_levels, x$col_label_map)
 
   # Get dimensions
   n_rows <- length(x$row_levels)
@@ -356,9 +387,9 @@ print.crosstab <- function(x, digits = 1, ...) {
   display_table <- rbind(display_table, Total = col_totals_row)
 
   # Format the table for printing
-  # First, print column headers
-  col_width <- max(10, max(nchar(x$col_levels)) + 2)
-  row_label_width <- max(12, max(nchar(x$row_levels)) + 2)
+  # Calculate column widths based on display labels
+  col_width <- max(10, max(nchar(display_col_levels)) + 2)
+  row_label_width <- max(12, max(nchar(display_row_levels)) + 2)
 
   # Print column variable name
   cat(sprintf("%-*s", row_label_width, ""))
@@ -367,7 +398,7 @@ print.crosstab <- function(x, digits = 1, ...) {
   # Print column headers
   cat(x$row_var, "\n")
   cat(sprintf("%-*s", row_label_width, ""))
-  for (col in x$col_levels) {
+  for (col in display_col_levels) {
     cat(sprintf("%*s", col_width, col))
   }
   cat(sprintf("%*s", col_width, "Total"))
@@ -380,7 +411,7 @@ print.crosstab <- function(x, digits = 1, ...) {
   # Print each row with counts
   for (i in seq_len(n_rows)) {
     # Row label
-    cat(sprintf("%-*s", row_label_width, x$row_levels[i]))
+    cat(sprintf("%-*s", row_label_width, display_row_levels[i]))
 
     # Counts
     for (j in seq_len(n_cols)) {
@@ -453,17 +484,5 @@ print.crosstab <- function(x, digits = 1, ...) {
     }
     cat(sprintf("%*s", col_width, paste0(formatC(100, format = "f", digits = digits), "%")))
     cat("\n")
-  }
-
-  # Footer
-  cat("\n")
-  if (x$is_weighted) {
-    cat(sprintf("N = %.0f (Weighted)\n", x$n_valid))
-  } else {
-    cat(sprintf("N = %.0f\n", x$n_valid))
-  }
-
-  if (x$n_missing > 0) {
-    cat(sprintf("Missing cases: %.0f\n", x$n_missing))
   }
 }
