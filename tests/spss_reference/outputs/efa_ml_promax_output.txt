@@ -1,7 +1,7 @@
 ﻿Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:10                                                                  
+ Output Created                               02-MAR-2026 12:24:27                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -20,13 +20,17 @@ Notes
                                                /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
-                                               /EXTRACTION PC                                   
+                                               /EXTRACTION ML                                   
                                                /ROTATION VARIMAX                                
                                                /METHOD=CORRELATION.                             
                                                                                                 
  Resources     Processor Time                 00:00:00.04                                                                           
                Elapsed Time                   00:00:00.00                                                                           
                Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
 
 Descriptive Statistics
 
@@ -94,69 +98,555 @@ KMO and Bartlett's Test
                                df                 15      
                                Sig.               .000    
 
-Communalities
+Communalities(a)
 
                                                  Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .786       
- Environmental concern (1=low, 5=high)           1.000   .783       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .668       
- Trust in government (1=none, 5=complete)        1.000   .347       
- Trust in media (1=none, 5=complete)             1.000   .475       
- Trust in science (1=none, 5=complete)           1.000   .598       
-Extraction Method: Principal Component Analysis.
+ Political orientation (1=left, 5=right)         .346    .608       
+ Environmental concern (1=low, 5=high)           .345    .573       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .001    .100       
+ Trust in government (1=none, 5=complete)        .005    .017       
+ Trust in media (1=none, 5=complete)             .001    .010       
+ Trust in science (1=none, 5=complete)           .003    .105       
+Extraction Method: Maximum Likelihood.
+a One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
 
 Total Variance Explained
 
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.600 26.666        26.666       1.600    26.666        26.666       1.598  26.635        26.635       
- 2         1.041 17.358        44.024       1.041    17.358        44.024       1.039  17.324        43.959       
- 3         1.017 16.955        60.979       1.017    16.955        60.979       1.021  17.020        60.979       
- 4         .980  16.334        77.313                                                                             
- 5         .949  15.814        93.127                                                                             
- 6         .412  6.873         100.000                                                                            
-Extraction Method: Principal Component Analysis.
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
+ 1      1.600 26.666        26.666       1.184    19.740        19.740       1.184  19.732        19.732       
+ 2      1.041 17.358        44.024       .125     2.080         21.819       .122   2.038         21.770       
+ 3      1.017 16.955        60.979       .104     1.731         23.550       .107   1.780         23.550       
+ 4      .980  16.334        77.313                                                                             
+ 5      .949  15.814        93.127                                                                             
+ 6      .412  6.873         100.000                                                                            
+Extraction Method: Maximum Likelihood.
 
-Component Matrix(a)
+Factor Matrix(a)
 
-                                                 Component       
-                                                 1     2    3    
- Political orientation (1=left, 5=right)         -.885           
- Environmental concern (1=low, 5=high)           .885            
- Trust in science (1=none, 5=complete)                 .672      
- Trust in government (1=none, 5=complete)              .547      
- Trust in media (1=none, 5=complete)                   .524 .448 
- Life satisfaction (1=dissatisfied, 5=satisfied)            .809 
-Extraction Method: Principal Component Analysis.
-a 3 components extracted.
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.779     
+ Environmental concern (1=low, 5=high)           .756      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+ Trust in media (1=none, 5=complete)                       
+Extraction Method: Maximum Likelihood.
+a Attempted to extract 3 factors. More than 25 iterations required. (Convergence=.008). Extraction was terminated.
 
-Rotated Component Matrix(a)
+Rotated Factor Matrix(a)
 
-                                                 Component       
-                                                 1     2    3    
- Political orientation (1=left, 5=right)         -.887           
- Environmental concern (1=low, 5=high)           .884            
- Trust in science (1=none, 5=complete)                 .762      
- Trust in government (1=none, 5=complete)              .566      
- Life satisfaction (1=dissatisfied, 5=satisfied)            .789 
- Trust in media (1=none, 5=complete)                        .620 
-Extraction Method: Principal Component Analysis. 
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.779     
+ Environmental concern (1=low, 5=high)           .755      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Trust in media (1=none, 5=complete)                       
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+Extraction Method: Maximum Likelihood. 
  Rotation Method: Varimax with Kaiser Normalization.
 a Rotation converged in 4 iterations.
 
-Component Transformation Matrix
+Factor Transformation Matrix
 
- Component 1     2     3    
- 1         .998  .057  .007 
- 2         -.055 .915  .400 
- 3         .017  -.399 .917 
-Extraction Method: Principal Component Analysis.  
+ Factor 1     2    3     
+ 1      1.000 .019 -.006 
+ 2      -.020 .929 -.369 
+ 3      -.002 .369 .929  
+Extraction Method: Maximum Likelihood.  
  Rotation Method: Varimax with Kaiser Normalization. 
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:10                                                                  
+ Output Created                               02-MAR-2026 12:24:27                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
+ Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
+                                              cases with valid data for that pair. The factor analysis is based on these            
+                                              correlations.                                                                         
+ Syntax                                       FACTOR                                            
+                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
+                                               trust_government trust_media trust_science       
+                                               /MISSING PAIRWISE                                
+                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
+                                               /FORMAT SORT BLANK(.40)                          
+                                               /CRITERIA MINEIGEN(1) ITERATE(25)                
+                                               /EXTRACTION ML                                   
+                                               /ROTATION PROMAX                                 
+                                               /METHOD=CORRELATION.                             
+                                                                                                
+ Resources     Processor Time                 00:00:00.05                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
+
+Descriptive Statistics
+
+                                                 Mean Std. Deviation Analysis N Missing N 
+ Political orientation (1=left, 5=right)         2.72 1.086          2299       201       
+ Environmental concern (1=low, 5=high)           3.57 1.194          2400       100       
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.63 1.153          2421       79        
+ Trust in government (1=none, 5=complete)        2.62 1.163          2354       146       
+ Trust in media (1=none, 5=complete)             2.45 1.163          2367       133       
+ Trust in science (1=none, 5=complete)           3.64 1.028          2398       102       
+
+Correlation Matrix
+
+                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
+                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
+                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
+                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
+ Correlation Political        1.000            -.587            -.001            -.055            .002              .038            
+             orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    -.587            1.000            -.004            .061             .004              -.012           
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             -.001            -.004            1.000            .006             .021              -.014           
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         -.055            .061             .006             1.000            .009              .030            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .002             .004             .021             .009             1.000             .021            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .038             -.012            -.014            .030             .021              1.000           
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+ Sig.        Political                         .000             .481             .005             .454              .037            
+ (1-tailed)  orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    .000                              .431             .002             .429              .281            
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             .481             .431                              .380             .156              .246            
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         .005             .002             .380                              .337              .075            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .454             .429             .156             .337                               .156            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .037             .281             .246             .075             .156                              
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+
+KMO and Bartlett's Test
+
+ Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
+ Bartlett's Test of Sphericity Approx. Chi-Square 932.068 
+                               df                 15      
+                               Sig.               .000    
+
+Communalities(a)
+
+                                                 Initial Extraction 
+ Political orientation (1=left, 5=right)         .346    .608       
+ Environmental concern (1=low, 5=high)           .345    .573       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .001    .100       
+ Trust in government (1=none, 5=complete)        .005    .017       
+ Trust in media (1=none, 5=complete)             .001    .010       
+ Trust in science (1=none, 5=complete)           .003    .105       
+Extraction Method: Maximum Likelihood.
+a One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
+
+Total Variance Explained
+
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(a) 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
+ 1      1.600 26.666        26.666       1.184    19.740        19.740       1.184                                
+ 2      1.041 17.358        44.024       .125     2.080         21.819       .132                                 
+ 3      1.017 16.955        60.979       .104     1.731         23.550       .108                                 
+ 4      .980  16.334        77.313                                                                                
+ 5      .949  15.814        93.127                                                                                
+ 6      .412  6.873         100.000                                                                               
+Extraction Method: Maximum Likelihood.
+a When factors are correlated, sums of squared loadings cannot be added to obtain a total variance.
+
+Factor Matrix(a)
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.779     
+ Environmental concern (1=low, 5=high)           .756      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+ Trust in media (1=none, 5=complete)                       
+Extraction Method: Maximum Likelihood.
+a Attempted to extract 3 factors. More than 25 iterations required. (Convergence=.008). Extraction was terminated.
+
+Pattern Matrix(a)
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.775     
+ Environmental concern (1=low, 5=high)           .760      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Trust in media (1=none, 5=complete)                       
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+Extraction Method: Maximum Likelihood. 
+ Rotation Method: Promax with Kaiser Normalization.
+a Rotation converged in 4 iterations.
+
+Structure Matrix
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.779     
+ Environmental concern (1=low, 5=high)           .756      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Trust in media (1=none, 5=complete)                       
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+Extraction Method: Maximum Likelihood. 
+ Rotation Method: Promax with Kaiser Normalization.
+
+Factor Correlation Matrix
+
+ Factor 1     2     3     
+ 1      1.000 -.093 .009  
+ 2      -.093 1.000 -.133 
+ 3      .009  -.133 1.000 
+Extraction Method: Maximum Likelihood.  
+ Rotation Method: Promax with Kaiser Normalization. 
+
+Factor Analysis
+Notes
+
+ Output Created                               02-MAR-2026 12:24:27                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
+ Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
+                                              cases with valid data for that pair. The factor analysis is based on these            
+                                              correlations.                                                                         
+ Syntax                                       FACTOR                                            
+                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
+                                               trust_government trust_media trust_science       
+                                               /MISSING PAIRWISE                                
+                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
+                                               /FORMAT SORT BLANK(.40)                          
+                                               /CRITERIA MINEIGEN(1) ITERATE(25)                
+                                               /EXTRACTION ML                                   
+                                               /ROTATION OBLIMIN                                
+                                               /METHOD=CORRELATION.                             
+                                                                                                
+ Resources     Processor Time                 00:00:00.04                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
+
+Descriptive Statistics
+
+                                                 Mean Std. Deviation Analysis N Missing N 
+ Political orientation (1=left, 5=right)         2.72 1.086          2299       201       
+ Environmental concern (1=low, 5=high)           3.57 1.194          2400       100       
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.63 1.153          2421       79        
+ Trust in government (1=none, 5=complete)        2.62 1.163          2354       146       
+ Trust in media (1=none, 5=complete)             2.45 1.163          2367       133       
+ Trust in science (1=none, 5=complete)           3.64 1.028          2398       102       
+
+Correlation Matrix
+
+                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
+                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
+                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
+                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
+ Correlation Political        1.000            -.587            -.001            -.055            .002              .038            
+             orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    -.587            1.000            -.004            .061             .004              -.012           
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             -.001            -.004            1.000            .006             .021              -.014           
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         -.055            .061             .006             1.000            .009              .030            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .002             .004             .021             .009             1.000             .021            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .038             -.012            -.014            .030             .021              1.000           
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+ Sig.        Political                         .000             .481             .005             .454              .037            
+ (1-tailed)  orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    .000                              .431             .002             .429              .281            
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             .481             .431                              .380             .156              .246            
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         .005             .002             .380                              .337              .075            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .454             .429             .156             .337                               .156            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .037             .281             .246             .075             .156                              
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+
+KMO and Bartlett's Test
+
+ Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
+ Bartlett's Test of Sphericity Approx. Chi-Square 932.068 
+                               df                 15      
+                               Sig.               .000    
+
+Communalities(a)
+
+                                                 Initial Extraction 
+ Political orientation (1=left, 5=right)         .346    .608       
+ Environmental concern (1=low, 5=high)           .345    .573       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .001    .100       
+ Trust in government (1=none, 5=complete)        .005    .017       
+ Trust in media (1=none, 5=complete)             .001    .010       
+ Trust in science (1=none, 5=complete)           .003    .105       
+Extraction Method: Maximum Likelihood.
+a One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
+
+Total Variance Explained
+
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(a) 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
+ 1      1.600 26.666        26.666       1.184    19.740        19.740       1.181                                
+ 2      1.041 17.358        44.024       .125     2.080         21.819       .124                                 
+ 3      1.017 16.955        60.979       .104     1.731         23.550       .106                                 
+ 4      .980  16.334        77.313                                                                                
+ 5      .949  15.814        93.127                                                                                
+ 6      .412  6.873         100.000                                                                               
+Extraction Method: Maximum Likelihood.
+a When factors are correlated, sums of squared loadings cannot be added to obtain a total variance.
+
+Factor Matrix(a)
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.779     
+ Environmental concern (1=low, 5=high)           .756      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+ Trust in media (1=none, 5=complete)                       
+Extraction Method: Maximum Likelihood.
+a Attempted to extract 3 factors. More than 25 iterations required. (Convergence=.008). Extraction was terminated.
+
+Pattern Matrix(a)
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.784     
+ Environmental concern (1=low, 5=high)           .757      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Trust in media (1=none, 5=complete)                       
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+Extraction Method: Maximum Likelihood. 
+ Rotation Method: Oblimin with Kaiser Normalization.
+a Rotation converged in 6 iterations.
+
+Structure Matrix
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.776     
+ Environmental concern (1=low, 5=high)           .756      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Trust in media (1=none, 5=complete)                       
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+Extraction Method: Maximum Likelihood. 
+ Rotation Method: Oblimin with Kaiser Normalization.
+
+Factor Correlation Matrix
+
+ Factor 1     2     3     
+ 1      1.000 .104  .059  
+ 2      .104  1.000 .176  
+ 3      .059  .176  1.000 
+Extraction Method: Maximum Likelihood.  
+ Rotation Method: Oblimin with Kaiser Normalization. 
+
+Factor Analysis
+Notes
+
+ Output Created                               02-MAR-2026 12:24:27                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
+ Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
+                                              cases with valid data for that pair. The factor analysis is based on these            
+                                              correlations.                                                                         
+ Syntax                                       FACTOR                                            
+                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
+                                               trust_government trust_media trust_science       
+                                               /MISSING PAIRWISE                                
+                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION 
+                                               /FORMAT SORT BLANK(.40)                          
+                                               /CRITERIA MINEIGEN(1) ITERATE(25)                
+                                               /EXTRACTION ML                                   
+                                               /ROTATION NOROTATE                               
+                                               /METHOD=CORRELATION.                             
+                                                                                                
+ Resources     Processor Time                 00:00:00.04                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
+
+Descriptive Statistics
+
+                                                 Mean Std. Deviation Analysis N Missing N 
+ Political orientation (1=left, 5=right)         2.72 1.086          2299       201       
+ Environmental concern (1=low, 5=high)           3.57 1.194          2400       100       
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.63 1.153          2421       79        
+ Trust in government (1=none, 5=complete)        2.62 1.163          2354       146       
+ Trust in media (1=none, 5=complete)             2.45 1.163          2367       133       
+ Trust in science (1=none, 5=complete)           3.64 1.028          2398       102       
+
+Correlation Matrix
+
+                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
+                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
+                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
+                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
+ Correlation Political        1.000            -.587            -.001            -.055            .002              .038            
+             orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    -.587            1.000            -.004            .061             .004              -.012           
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             -.001            -.004            1.000            .006             .021              -.014           
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         -.055            .061             .006             1.000            .009              .030            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .002             .004             .021             .009             1.000             .021            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .038             -.012            -.014            .030             .021              1.000           
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+ Sig.        Political                         .000             .481             .005             .454              .037            
+ (1-tailed)  orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    .000                              .431             .002             .429              .281            
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             .481             .431                              .380             .156              .246            
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         .005             .002             .380                              .337              .075            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .454             .429             .156             .337                               .156            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .037             .281             .246             .075             .156                              
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+
+KMO and Bartlett's Test
+
+ Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
+ Bartlett's Test of Sphericity Approx. Chi-Square 932.068 
+                               df                 15      
+                               Sig.               .000    
+
+Communalities(a)
+
+                                                 Initial Extraction 
+ Political orientation (1=left, 5=right)         .346    .608       
+ Environmental concern (1=low, 5=high)           .345    .573       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .001    .100       
+ Trust in government (1=none, 5=complete)        .005    .017       
+ Trust in media (1=none, 5=complete)             .001    .010       
+ Trust in science (1=none, 5=complete)           .003    .105       
+Extraction Method: Maximum Likelihood.
+a One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
+
+Total Variance Explained
+
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % 
+ 1      1.600 26.666        26.666       1.184    19.740        19.740       
+ 2      1.041 17.358        44.024       .125     2.080         21.819       
+ 3      1.017 16.955        60.979       .104     1.731         23.550       
+ 4      .980  16.334        77.313                                           
+ 5      .949  15.814        93.127                                           
+ 6      .412  6.873         100.000                                          
+Extraction Method: Maximum Likelihood.
+
+Factor Matrix(a)
+
+                                                 Factor    
+                                                 1     2 3 
+ Political orientation (1=left, 5=right)         -.779     
+ Environmental concern (1=low, 5=high)           .756      
+ Trust in science (1=none, 5=complete)                     
+ Trust in government (1=none, 5=complete)                  
+ Life satisfaction (1=dissatisfied, 5=satisfied)           
+ Trust in media (1=none, 5=complete)                       
+Extraction Method: Maximum Likelihood.
+a Attempted to extract 3 factors. More than 25 iterations required. (Convergence=.008). Extraction was terminated.
+
+Factor Analysis
+Notes
+
+ Output Created                               02-MAR-2026 12:24:27                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -176,7 +666,7 @@ Notes
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
                                                /EXTRACTION PC                                   
-                                               /ROTATION OBLIMIN                                
+                                               /ROTATION PROMAX                                 
                                                /METHOD=CORRELATION.                             
                                                                                                 
  Resources     Processor Time                 00:00:00.04                                                                           
@@ -265,8 +755,8 @@ Total Variance Explained
  Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(a) 
            Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
  1         1.600 26.666        26.666       1.600    26.666        26.666       1.599                                
- 2         1.041 17.358        44.024       1.041    17.358        44.024       1.041                                
- 3         1.017 16.955        60.979       1.017    16.955        60.979       1.022                                
+ 2         1.041 17.358        44.024       1.041    17.358        44.024       1.039                                
+ 3         1.017 16.955        60.979       1.017    16.955        60.979       1.021                                
  4         .980  16.334        77.313                                                                                
  5         .949  15.814        93.127                                                                                
  6         .412  6.873         100.000                                                                               
@@ -291,327 +781,41 @@ Pattern Matrix(a)
                                                  Component       
                                                  1     2    3    
  Political orientation (1=left, 5=right)         -.887           
- Environmental concern (1=low, 5=high)           .884            
- Trust in science (1=none, 5=complete)                 .769      
- Trust in government (1=none, 5=complete)              .561      
- Life satisfaction (1=dissatisfied, 5=satisfied)            .797 
- Trust in media (1=none, 5=complete)                        .613 
+ Environmental concern (1=low, 5=high)           .885            
+ Trust in science (1=none, 5=complete)                 .763      
+ Trust in government (1=none, 5=complete)              .565      
+ Life satisfaction (1=dissatisfied, 5=satisfied)            .789 
+ Trust in media (1=none, 5=complete)                        .621 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
-a Rotation converged in 6 iterations.
+ Rotation Method: Promax with Kaiser Normalization.
+a Rotation converged in 4 iterations.
 
 Structure Matrix
 
                                                  Component       
                                                  1     2    3    
- Political orientation (1=left, 5=right)         -.886           
+ Political orientation (1=left, 5=right)         -.887           
  Environmental concern (1=low, 5=high)           .884            
- Trust in science (1=none, 5=complete)                 .757      
- Trust in government (1=none, 5=complete)              .571      
- Life satisfaction (1=dissatisfied, 5=satisfied)            .781 
- Trust in media (1=none, 5=complete)                        .630 
+ Trust in science (1=none, 5=complete)                 .764      
+ Trust in government (1=none, 5=complete)              .564      
+ Life satisfaction (1=dissatisfied, 5=satisfied)            .791 
+ Trust in media (1=none, 5=complete)                        .617 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 
 Component Correlation Matrix
 
  Component 1     2     3     
- 1         1.000 .041  .024  
- 2         .041  1.000 .063  
- 3         .024  .063  1.000 
+ 1         1.000 -.002 .020  
+ 2         -.002 1.000 -.012 
+ 3         .020  -.012 1.000 
 Extraction Method: Principal Component Analysis.  
- Rotation Method: Oblimin with Kaiser Normalization. 
+ Rotation Method: Promax with Kaiser Normalization. 
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:11                                                                  
- Comments                                                                                                                           
- Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
-                                              data/survey_data.sav                                                                  
-               Filter                         <none>                                                                                
-               Weight                         <none>                                                                                
-               Split File                     <none>                                                                                
-               N of Rows in Working Data File 2500                                                                                  
- Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
- Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
-                                              cases with valid data for that pair. The factor analysis is based on these            
-                                              correlations.                                                                         
- Syntax                                       FACTOR                                            
-                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
-                                               trust_government trust_media trust_science       
-                                               /MISSING PAIRWISE                                
-                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION 
-                                               /FORMAT SORT BLANK(.40)                          
-                                               /CRITERIA MINEIGEN(1) ITERATE(25)                
-                                               /EXTRACTION PC                                   
-                                               /ROTATION NOROTATE                               
-                                               /METHOD=CORRELATION.                             
-                                                                                                
- Resources     Processor Time                 00:00:00.04                                                                           
-               Elapsed Time                   00:00:00.00                                                                           
-               Maximum Memory Required        5704 (5.570K) bytes                                                                   
-
-Descriptive Statistics
-
-                                                 Mean Std. Deviation Analysis N Missing N 
- Political orientation (1=left, 5=right)         2.72 1.086          2299       201       
- Environmental concern (1=low, 5=high)           3.57 1.194          2400       100       
- Life satisfaction (1=dissatisfied, 5=satisfied) 3.63 1.153          2421       79        
- Trust in government (1=none, 5=complete)        2.62 1.163          2354       146       
- Trust in media (1=none, 5=complete)             2.45 1.163          2367       133       
- Trust in science (1=none, 5=complete)           3.64 1.028          2398       102       
-
-Correlation Matrix
-
-                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
-                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
-                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
-                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
- Correlation Political        1.000            -.587            -.001            -.055            .002              .038            
-             orientation                                                                                                            
-             (1=left,                                                                                                               
-             5=right)                                                                                                               
-             Environmental    -.587            1.000            -.004            .061             .004              -.012           
-             concern (1=low,                                                                                                        
-             5=high)                                                                                                                
-             Life             -.001            -.004            1.000            .006             .021              -.014           
-             satisfaction                                                                                                           
-             (1=dissatisfied,                                                                                                       
-             5=satisfied)                                                                                                           
-             Trust in         -.055            .061             .006             1.000            .009              .030            
-             government                                                                                                             
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in media   .002             .004             .021             .009             1.000             .021            
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in science .038             -.012            -.014            .030             .021              1.000           
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
- Sig.        Political                         .000             .481             .005             .454              .037            
- (1-tailed)  orientation                                                                                                            
-             (1=left,                                                                                                               
-             5=right)                                                                                                               
-             Environmental    .000                              .431             .002             .429              .281            
-             concern (1=low,                                                                                                        
-             5=high)                                                                                                                
-             Life             .481             .431                              .380             .156              .246            
-             satisfaction                                                                                                           
-             (1=dissatisfied,                                                                                                       
-             5=satisfied)                                                                                                           
-             Trust in         .005             .002             .380                              .337              .075            
-             government                                                                                                             
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in media   .454             .429             .156             .337                               .156            
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in science .037             .281             .246             .075             .156                              
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-
-KMO and Bartlett's Test
-
- Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
- Bartlett's Test of Sphericity Approx. Chi-Square 932.068 
-                               df                 15      
-                               Sig.               .000    
-
-Communalities
-
-                                                 Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .786       
- Environmental concern (1=low, 5=high)           1.000   .783       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .668       
- Trust in government (1=none, 5=complete)        1.000   .347       
- Trust in media (1=none, 5=complete)             1.000   .475       
- Trust in science (1=none, 5=complete)           1.000   .598       
-Extraction Method: Principal Component Analysis.
-
-Total Variance Explained
-
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % 
- 1         1.600 26.666        26.666       1.600    26.666        26.666       
- 2         1.041 17.358        44.024       1.041    17.358        44.024       
- 3         1.017 16.955        60.979       1.017    16.955        60.979       
- 4         .980  16.334        77.313                                           
- 5         .949  15.814        93.127                                           
- 6         .412  6.873         100.000                                          
-Extraction Method: Principal Component Analysis.
-
-Component Matrix(a)
-
-                                                 Component       
-                                                 1     2    3    
- Political orientation (1=left, 5=right)         -.885           
- Environmental concern (1=low, 5=high)           .885            
- Trust in science (1=none, 5=complete)                 .672      
- Trust in government (1=none, 5=complete)              .547      
- Trust in media (1=none, 5=complete)                   .524 .448 
- Life satisfaction (1=dissatisfied, 5=satisfied)            .809 
-Extraction Method: Principal Component Analysis.
-a 3 components extracted.
-
-Factor Analysis
-Notes
-
- Output Created                               02-MAR-2026 12:24:11                                                                  
- Comments                                                                                                                           
- Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
-                                              data/survey_data.sav                                                                  
-               Filter                         <none>                                                                                
-               Weight                         <none>                                                                                
-               Split File                     <none>                                                                                
-               N of Rows in Working Data File 2500                                                                                  
- Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
- Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
-                                              cases with valid data for that pair. The factor analysis is based on these            
-                                              correlations.                                                                         
- Syntax                                       FACTOR                                            
-                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
-                                               trust_government trust_media trust_science       
-                                               /MISSING PAIRWISE                                
-                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
-                                               /FORMAT SORT BLANK(.40)                          
-                                               /CRITERIA FACTORS(2) ITERATE(25)                 
-                                               /EXTRACTION PC                                   
-                                               /ROTATION VARIMAX                                
-                                               /METHOD=CORRELATION.                             
-                                                                                                
- Resources     Processor Time                 00:00:00.04                                                                           
-               Elapsed Time                   00:00:00.00                                                                           
-               Maximum Memory Required        5704 (5.570K) bytes                                                                   
-
-Descriptive Statistics
-
-                                                 Mean Std. Deviation Analysis N Missing N 
- Political orientation (1=left, 5=right)         2.72 1.086          2299       201       
- Environmental concern (1=low, 5=high)           3.57 1.194          2400       100       
- Life satisfaction (1=dissatisfied, 5=satisfied) 3.63 1.153          2421       79        
- Trust in government (1=none, 5=complete)        2.62 1.163          2354       146       
- Trust in media (1=none, 5=complete)             2.45 1.163          2367       133       
- Trust in science (1=none, 5=complete)           3.64 1.028          2398       102       
-
-Correlation Matrix
-
-                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
-                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
-                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
-                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
- Correlation Political        1.000            -.587            -.001            -.055            .002              .038            
-             orientation                                                                                                            
-             (1=left,                                                                                                               
-             5=right)                                                                                                               
-             Environmental    -.587            1.000            -.004            .061             .004              -.012           
-             concern (1=low,                                                                                                        
-             5=high)                                                                                                                
-             Life             -.001            -.004            1.000            .006             .021              -.014           
-             satisfaction                                                                                                           
-             (1=dissatisfied,                                                                                                       
-             5=satisfied)                                                                                                           
-             Trust in         -.055            .061             .006             1.000            .009              .030            
-             government                                                                                                             
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in media   .002             .004             .021             .009             1.000             .021            
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in science .038             -.012            -.014            .030             .021              1.000           
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
- Sig.        Political                         .000             .481             .005             .454              .037            
- (1-tailed)  orientation                                                                                                            
-             (1=left,                                                                                                               
-             5=right)                                                                                                               
-             Environmental    .000                              .431             .002             .429              .281            
-             concern (1=low,                                                                                                        
-             5=high)                                                                                                                
-             Life             .481             .431                              .380             .156              .246            
-             satisfaction                                                                                                           
-             (1=dissatisfied,                                                                                                       
-             5=satisfied)                                                                                                           
-             Trust in         .005             .002             .380                              .337              .075            
-             government                                                                                                             
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in media   .454             .429             .156             .337                               .156            
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in science .037             .281             .246             .075             .156                              
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-
-KMO and Bartlett's Test
-
- Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
- Bartlett's Test of Sphericity Approx. Chi-Square 932.068 
-                               df                 15      
-                               Sig.               .000    
-
-Communalities
-
-                                                 Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .786       
- Environmental concern (1=low, 5=high)           1.000   .783       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .014       
- Trust in government (1=none, 5=complete)        1.000   .327       
- Trust in media (1=none, 5=complete)             1.000   .275       
- Trust in science (1=none, 5=complete)           1.000   .456       
-Extraction Method: Principal Component Analysis.
-
-Total Variance Explained
-
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.600 26.666        26.666       1.600    26.666        26.666       1.599  26.655        26.655       
- 2         1.041 17.358        44.024       1.041    17.358        44.024       1.042  17.369        44.024       
- 3         1.017 16.955        60.979                                                                             
- 4         .980  16.334        77.313                                                                             
- 5         .949  15.814        93.127                                                                             
- 6         .412  6.873         100.000                                                                            
-Extraction Method: Principal Component Analysis.
-
-Component Matrix(a)
-
-                                                 Component  
-                                                 1     2    
- Political orientation (1=left, 5=right)         -.885      
- Environmental concern (1=low, 5=high)           .885       
- Trust in science (1=none, 5=complete)                 .672 
- Trust in government (1=none, 5=complete)              .547 
- Trust in media (1=none, 5=complete)                   .524 
- Life satisfaction (1=dissatisfied, 5=satisfied)            
-Extraction Method: Principal Component Analysis.
-a 2 components extracted.
-
-Rotated Component Matrix(a)
-
-                                                 Component  
-                                                 1     2    
- Political orientation (1=left, 5=right)         -.887      
- Environmental concern (1=low, 5=high)           .885       
- Trust in science (1=none, 5=complete)                 .669 
- Trust in government (1=none, 5=complete)              .552 
- Trust in media (1=none, 5=complete)                   .524 
- Life satisfaction (1=dissatisfied, 5=satisfied)            
-Extraction Method: Principal Component Analysis. 
- Rotation Method: Varimax with Kaiser Normalization.
-a Rotation converged in 3 iterations.
-
-Component Transformation Matrix
-
- Component 1     2    
- 1         .999  .034 
- 2         -.034 .999 
-Extraction Method: Principal Component Analysis.  
- Rotation Method: Varimax with Kaiser Normalization. 
-
-Factor Analysis
-Notes
-
- Output Created                               02-MAR-2026 12:24:11                                                                  
+ Output Created                               02-MAR-2026 12:24:27                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -630,13 +834,17 @@ Notes
                                                /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
-                                               /EXTRACTION PC                                   
+                                               /EXTRACTION ML                                   
                                                /ROTATION VARIMAX                                
                                                /METHOD=CORRELATION.                             
                                                                                                 
- Resources     Processor Time                 00:00:00.05                                                                           
+ Resources     Processor Time                 00:00:00.06                                                                           
                Elapsed Time                   00:00:00.00                                                                           
                Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
 
 Descriptive Statistics
 
@@ -704,69 +912,244 @@ KMO and Bartlett's Test
                                df                 15      
                                Sig.               .000    
 
-Communalities
+Communalities(a)
 
                                                  Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .784       
- Environmental concern (1=low, 5=high)           1.000   .782       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .712       
- Trust in government (1=none, 5=complete)        1.000   .332       
- Trust in media (1=none, 5=complete)             1.000   .442       
- Trust in science (1=none, 5=complete)           1.000   .610       
-Extraction Method: Principal Component Analysis.
+ Political orientation (1=left, 5=right)         .343    .611       
+ Environmental concern (1=low, 5=high)           .343    .566       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .001    .172       
+ Trust in government (1=none, 5=complete)        .006    .021       
+ Trust in media (1=none, 5=complete)             .001    .010       
+ Trust in science (1=none, 5=complete)           .004    .087       
+Extraction Method: Maximum Likelihood.
+a One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
 
 Total Variance Explained
 
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.599 26.644        26.644       1.599    26.644        26.644       1.597  26.615        26.615       
- 2         1.045 17.412        44.056       1.045    17.412        44.056       1.044  17.396        44.011       
- 3         1.018 16.964        61.021       1.018    16.964        61.021       1.021  17.010        61.021       
- 4         .980  16.329        77.349                                                                             
- 5         .944  15.735        93.085                                                                             
- 6         .415  6.915         100.000                                                                            
-Extraction Method: Principal Component Analysis.
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
+ 1      1.599 26.644        26.644       1.181    19.682        19.682       1.181  19.678        19.678       
+ 2      1.045 17.412        44.056       .177     2.958         22.640       .177   2.957         22.635       
+ 3      1.018 16.964        61.021       .109     1.820         24.460       .110   1.826         24.460       
+ 4      .980  16.329        77.349                                                                             
+ 5      .944  15.735        93.085                                                                             
+ 6      .415  6.915         100.000                                                                            
+Extraction Method: Maximum Likelihood.
 
-Component Matrix(a)
+Factor Matrix(a)
 
-                                                 Component        
-                                                 1     2    3     
- Political orientation (1=left, 5=right)         -.884            
- Environmental concern (1=low, 5=high)           .884             
- Trust in science (1=none, 5=complete)                 .663 -.406 
- Trust in government (1=none, 5=complete)              .547       
- Trust in media (1=none, 5=complete)                   .542       
- Life satisfaction (1=dissatisfied, 5=satisfied)            .838  
-Extraction Method: Principal Component Analysis.
-a 3 components extracted.
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.781        
+ Environmental concern (1=low, 5=high)           .751         
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .412   
+ Trust in science (1=none, 5=complete)                        
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+Extraction Method: Maximum Likelihood.
+a Attempted to extract 3 factors. More than 25 iterations required. (Convergence=.004). Extraction was terminated.
 
-Rotated Component Matrix(a)
+Rotated Factor Matrix(a)
 
-                                                 Component       
-                                                 1     2    3    
- Political orientation (1=left, 5=right)         -.885           
- Environmental concern (1=low, 5=high)           .883            
- Trust in science (1=none, 5=complete)                 .752      
- Trust in government (1=none, 5=complete)              .541      
- Life satisfaction (1=dissatisfied, 5=satisfied)            .828 
- Trust in media (1=none, 5=complete)                        .534 
-Extraction Method: Principal Component Analysis. 
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.781        
+ Environmental concern (1=low, 5=high)           .750         
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .414   
+ Trust in science (1=none, 5=complete)                        
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+Extraction Method: Maximum Likelihood. 
  Rotation Method: Varimax with Kaiser Normalization.
 a Rotation converged in 4 iterations.
 
-Component Transformation Matrix
+Factor Transformation Matrix
 
- Component 1     2     3    
- 1         .998  .054  .016 
- 2         -.056 .949  .310 
- 3         .002  -.311 .950 
-Extraction Method: Principal Component Analysis.  
+ Factor 1     2    3     
+ 1      1.000 .001 .012  
+ 2      -.001 .999 -.032 
+ 3      -.013 .032 .999  
+Extraction Method: Maximum Likelihood.  
  Rotation Method: Varimax with Kaiser Normalization. 
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:11                                                                  
+ Output Created                               02-MAR-2026 12:24:27                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
+ Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
+                                              cases with valid data for that pair. The factor analysis is based on these            
+                                              correlations.                                                                         
+ Syntax                                       FACTOR                                            
+                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
+                                               trust_government trust_media trust_science       
+                                               /MISSING PAIRWISE                                
+                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
+                                               /FORMAT SORT BLANK(.40)                          
+                                               /CRITERIA MINEIGEN(1) ITERATE(25)                
+                                               /EXTRACTION ML                                   
+                                               /ROTATION PROMAX                                 
+                                               /METHOD=CORRELATION.                             
+                                                                                                
+ Resources     Processor Time                 00:00:00.05                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
+
+Descriptive Statistics
+
+                                                 Mean Std. Deviation Analysis N Missing N 
+ Political orientation (1=left, 5=right)         2.72 1.088          2312       204       
+ Environmental concern (1=low, 5=high)           3.58 1.192          2416       100       
+ Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.152          2437       79        
+ Trust in government (1=none, 5=complete)        2.62 1.164          2371       145       
+ Trust in media (1=none, 5=complete)             2.46 1.166          2382       134       
+ Trust in science (1=none, 5=complete)           3.64 1.027          2414       103       
+
+Correlation Matrix
+
+                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
+                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
+                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
+                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
+ Correlation Political        1.000            -.584            -.004            -.057            .004              .040            
+             orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    -.584            1.000            -.003            .064             .002              -.014           
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             -.004            -.003            1.000            .011             .020              -.019           
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         -.057            .064             .011             1.000            .012              .031            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .004             .002             .020             .012             1.000             .024            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .040             -.014            -.019            .031             .024              1.000           
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+ Sig.        Political                         .000             .418             .004             .418              .029            
+ (1-tailed)  orientation                                                                                                            
+             (1=left,                                                                                                               
+             5=right)                                                                                                               
+             Environmental    .000                              .433             .001             .454              .254            
+             concern (1=low,                                                                                                        
+             5=high)                                                                                                                
+             Life             .418             .433                              .302             .165              .185            
+             satisfaction                                                                                                           
+             (1=dissatisfied,                                                                                                       
+             5=satisfied)                                                                                                           
+             Trust in         .004             .001             .302                              .291              .073            
+             government                                                                                                             
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in media   .418             .454             .165             .291                               .129            
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+             Trust in science .029             .254             .185             .073             .129                              
+             (1=none,                                                                                                               
+             5=complete)                                                                                                            
+
+KMO and Bartlett's Test
+
+ Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
+ Bartlett's Test of Sphericity Approx. Chi-Square 930.012 
+                               df                 15      
+                               Sig.               .000    
+
+Communalities(a)
+
+                                                 Initial Extraction 
+ Political orientation (1=left, 5=right)         .343    .611       
+ Environmental concern (1=low, 5=high)           .343    .566       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .001    .172       
+ Trust in government (1=none, 5=complete)        .006    .021       
+ Trust in media (1=none, 5=complete)             .001    .010       
+ Trust in science (1=none, 5=complete)           .004    .087       
+Extraction Method: Maximum Likelihood.
+a One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
+
+Total Variance Explained
+
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(a) 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
+ 1      1.599 26.644        26.644       1.181    19.682        19.682       1.181                                
+ 2      1.045 17.412        44.056       .177     2.958         22.640       .178                                 
+ 3      1.018 16.964        61.021       .109     1.820         24.460       .119                                 
+ 4      .980  16.329        77.349                                                                                
+ 5      .944  15.735        93.085                                                                                
+ 6      .415  6.915         100.000                                                                               
+Extraction Method: Maximum Likelihood.
+a When factors are correlated, sums of squared loadings cannot be added to obtain a total variance.
+
+Factor Matrix(a)
+
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.781        
+ Environmental concern (1=low, 5=high)           .751         
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .412   
+ Trust in science (1=none, 5=complete)                        
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+Extraction Method: Maximum Likelihood.
+a Attempted to extract 3 factors. More than 25 iterations required. (Convergence=.004). Extraction was terminated.
+
+Pattern Matrix(a)
+
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.777        
+ Environmental concern (1=low, 5=high)           .755         
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .416   
+ Trust in science (1=none, 5=complete)                        
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+Extraction Method: Maximum Likelihood. 
+ Rotation Method: Promax with Kaiser Normalization.
+a Rotation converged in 4 iterations.
+
+Structure Matrix
+
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.781        
+ Environmental concern (1=low, 5=high)           .751         
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .414   
+ Trust in science (1=none, 5=complete)                        
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+Extraction Method: Maximum Likelihood. 
+ Rotation Method: Promax with Kaiser Normalization.
+
+Factor Correlation Matrix
+
+ Factor 1     2     3     
+ 1      1.000 .018  -.087 
+ 2      .018  1.000 -.114 
+ 3      -.087 -.114 1.000 
+Extraction Method: Maximum Likelihood.  
+ Rotation Method: Promax with Kaiser Normalization. 
+
+Factor Analysis
+Notes
+
+ Output Created                               02-MAR-2026 12:24:27                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -786,7 +1169,7 @@ Notes
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
                                                /EXTRACTION PC                                   
-                                               /ROTATION OBLIMIN                                
+                                               /ROTATION PROMAX                                 
                                                /METHOD=CORRELATION.                             
                                                                                                 
  Resources     Processor Time                 00:00:00.06                                                                           
@@ -875,8 +1258,8 @@ Total Variance Explained
  Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(a) 
            Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
  1         1.599 26.644        26.644       1.599    26.644        26.644       1.598                                
- 2         1.045 17.412        44.056       1.045    17.412        44.056       1.045                                
- 3         1.018 16.964        61.021       1.018    16.964        61.021       1.022                                
+ 2         1.045 17.412        44.056       1.045    17.412        44.056       1.043                                
+ 3         1.018 16.964        61.021       1.018    16.964        61.021       1.021                                
  4         .980  16.329        77.349                                                                                
  5         .944  15.735        93.085                                                                                
  6         .415  6.915         100.000                                                                               
@@ -901,14 +1284,14 @@ Pattern Matrix(a)
                                                  Component       
                                                  1     2    3    
  Political orientation (1=left, 5=right)         -.886           
- Environmental concern (1=low, 5=high)           .883            
- Trust in science (1=none, 5=complete)                 .764      
- Trust in government (1=none, 5=complete)              .534      
- Life satisfaction (1=dissatisfied, 5=satisfied)            .837 
- Trust in media (1=none, 5=complete)                        .521 
+ Environmental concern (1=low, 5=high)           .884            
+ Trust in science (1=none, 5=complete)                 .752      
+ Trust in government (1=none, 5=complete)              .541      
+ Life satisfaction (1=dissatisfied, 5=satisfied)            .828 
+ Trust in media (1=none, 5=complete)                        .536 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
-a Rotation converged in 9 iterations.
+ Rotation Method: Promax with Kaiser Normalization.
+a Rotation converged in 4 iterations.
 
 Structure Matrix
 
@@ -916,180 +1299,26 @@ Structure Matrix
                                                  1     2    3    
  Political orientation (1=left, 5=right)         -.885           
  Environmental concern (1=low, 5=high)           .883            
- Trust in science (1=none, 5=complete)                 .743      
- Trust in government (1=none, 5=complete)              .548      
- Life satisfaction (1=dissatisfied, 5=satisfied)            .819 
- Trust in media (1=none, 5=complete)                   .414 .550 
+ Trust in science (1=none, 5=complete)                 .754      
+ Trust in government (1=none, 5=complete)              .538      
+ Life satisfaction (1=dissatisfied, 5=satisfied)            .828 
+ Trust in media (1=none, 5=complete)                        .532 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 
 Component Correlation Matrix
 
  Component 1     2     3     
- 1         1.000 .035  .040  
- 2         .035  1.000 .083  
- 3         .040  .083  1.000 
+ 1         1.000 -.009 .035  
+ 2         -.009 1.000 -.007 
+ 3         .035  -.007 1.000 
 Extraction Method: Principal Component Analysis.  
- Rotation Method: Oblimin with Kaiser Normalization. 
+ Rotation Method: Promax with Kaiser Normalization. 
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:11                                                                  
- Comments                                                                                                                           
- Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
-                                              data/survey_data.sav                                                                  
-               Filter                         <none>                                                                                
-               Weight                         Weighting factor                                                                      
-               Split File                     <none>                                                                                
-               N of Rows in Working Data File 2500                                                                                  
- Missing Value Definition of Missing          MISSING=EXCLUDE: User-defined missing values are treated as missing.                  
- Handling      Cases Used                     PAIRWISE: Correlation coefficients for each pair of variables are based on all the    
-                                              cases with valid data for that pair. The factor analysis is based on these            
-                                              correlations.                                                                         
- Syntax                                       FACTOR                                            
-                                               /VARIABLES political_orientation environmental_concern life_satisfaction 
-                                               trust_government trust_media trust_science       
-                                               /MISSING PAIRWISE                                
-                                               /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
-                                               /FORMAT SORT BLANK(.40)                          
-                                               /CRITERIA FACTORS(2) ITERATE(25)                 
-                                               /EXTRACTION PC                                   
-                                               /ROTATION VARIMAX                                
-                                               /METHOD=CORRELATION.                             
-                                                                                                
- Resources     Processor Time                 00:00:00.05                                                                           
-               Elapsed Time                   00:00:00.00                                                                           
-               Maximum Memory Required        5704 (5.570K) bytes                                                                   
-
-Descriptive Statistics
-
-                                                 Mean Std. Deviation Analysis N Missing N 
- Political orientation (1=left, 5=right)         2.72 1.088          2312       204       
- Environmental concern (1=low, 5=high)           3.58 1.192          2416       100       
- Life satisfaction (1=dissatisfied, 5=satisfied) 3.62 1.152          2437       79        
- Trust in government (1=none, 5=complete)        2.62 1.164          2371       145       
- Trust in media (1=none, 5=complete)             2.46 1.166          2382       134       
- Trust in science (1=none, 5=complete)           3.64 1.027          2414       103       
-
-Correlation Matrix
-
-                              Political        Environmental    Life             Trust in         Trust in media    Trust in        
-                              orientation      concern (1=low,  satisfaction     government       (1=none,          science         
-                              (1=left,         5=high)          (1=dissatisfied, (1=none,         5=complete)       (1=none,        
-                              5=right)                          5=satisfied)     5=complete)                        5=complete)     
- Correlation Political        1.000            -.584            -.004            -.057            .004              .040            
-             orientation                                                                                                            
-             (1=left,                                                                                                               
-             5=right)                                                                                                               
-             Environmental    -.584            1.000            -.003            .064             .002              -.014           
-             concern (1=low,                                                                                                        
-             5=high)                                                                                                                
-             Life             -.004            -.003            1.000            .011             .020              -.019           
-             satisfaction                                                                                                           
-             (1=dissatisfied,                                                                                                       
-             5=satisfied)                                                                                                           
-             Trust in         -.057            .064             .011             1.000            .012              .031            
-             government                                                                                                             
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in media   .004             .002             .020             .012             1.000             .024            
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in science .040             -.014            -.019            .031             .024              1.000           
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
- Sig.        Political                         .000             .418             .004             .418              .029            
- (1-tailed)  orientation                                                                                                            
-             (1=left,                                                                                                               
-             5=right)                                                                                                               
-             Environmental    .000                              .433             .001             .454              .254            
-             concern (1=low,                                                                                                        
-             5=high)                                                                                                                
-             Life             .418             .433                              .302             .165              .185            
-             satisfaction                                                                                                           
-             (1=dissatisfied,                                                                                                       
-             5=satisfied)                                                                                                           
-             Trust in         .004             .001             .302                              .291              .073            
-             government                                                                                                             
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in media   .418             .454             .165             .291                               .129            
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-             Trust in science .029             .254             .185             .073             .129                              
-             (1=none,                                                                                                               
-             5=complete)                                                                                                            
-
-KMO and Bartlett's Test
-
- Kaiser-Meyer-Olkin Measure of Sampling Adequacy. .505    
- Bartlett's Test of Sphericity Approx. Chi-Square 930.012 
-                               df                 15      
-                               Sig.               .000    
-
-Communalities
-
-                                                 Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .784       
- Environmental concern (1=low, 5=high)           1.000   .781       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .010       
- Trust in government (1=none, 5=complete)        1.000   .330       
- Trust in media (1=none, 5=complete)             1.000   .294       
- Trust in science (1=none, 5=complete)           1.000   .445       
-Extraction Method: Principal Component Analysis.
-
-Total Variance Explained
-
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.599 26.644        26.644       1.599    26.644        26.644       1.598  26.627        26.627       
- 2         1.045 17.412        44.056       1.045    17.412        44.056       1.046  17.429        44.056       
- 3         1.018 16.964        61.021                                                                             
- 4         .980  16.329        77.349                                                                             
- 5         .944  15.735        93.085                                                                             
- 6         .415  6.915         100.000                                                                            
-Extraction Method: Principal Component Analysis.
-
-Component Matrix(a)
-
-                                                 Component  
-                                                 1     2    
- Political orientation (1=left, 5=right)         -.884      
- Environmental concern (1=low, 5=high)           .884       
- Trust in science (1=none, 5=complete)                 .663 
- Trust in government (1=none, 5=complete)              .547 
- Trust in media (1=none, 5=complete)                   .542 
- Life satisfaction (1=dissatisfied, 5=satisfied)            
-Extraction Method: Principal Component Analysis.
-a 2 components extracted.
-
-Rotated Component Matrix(a)
-
-                                                 Component  
-                                                 1     2    
- Political orientation (1=left, 5=right)         -.885      
- Environmental concern (1=low, 5=high)           .883       
- Trust in science (1=none, 5=complete)                 .660 
- Trust in government (1=none, 5=complete)              .554 
- Trust in media (1=none, 5=complete)                   .541 
- Life satisfaction (1=dissatisfied, 5=satisfied)            
-Extraction Method: Principal Component Analysis. 
- Rotation Method: Varimax with Kaiser Normalization.
-a Rotation converged in 3 iterations.
-
-Component Transformation Matrix
-
- Component 1     2    
- 1         .999  .043 
- 2         -.043 .999 
-Extraction Method: Principal Component Analysis.  
- Rotation Method: Varimax with Kaiser Normalization. 
-
-Factor Analysis
-Notes
-
- Output Created                               02-MAR-2026 12:24:13                                                                  
+ Output Created                               02-MAR-2026 12:24:27                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -1108,13 +1337,18 @@ Notes
                                                /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
-                                               /EXTRACTION PC                                   
+                                               /EXTRACTION ML                                   
                                                /ROTATION VARIMAX                                
                                                /METHOD=CORRELATION.                             
                                                                                                 
- Resources     Processor Time                 00:00:00.07                                                                           
+ Resources     Processor Time                 00:00:00.06                                                                           
                Elapsed Time                   00:00:00.00                                                                           
                Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ For split file Region (East/West) = East, The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
+ For split file Region (East/West) = West, The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
 
 Region (East/West) = East
 Descriptive Statistics(a)
@@ -1186,69 +1420,36 @@ KMO and Bartlett's Test(a)
                                Sig.               .000    
 a Region (East/West) = East
 
-Communalities(a)
+Communalities(a,b)
 
-                                                 Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .803       
- Environmental concern (1=low, 5=high)           1.000   .801       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .324       
- Trust in government (1=none, 5=complete)        1.000   .939       
- Trust in media (1=none, 5=complete)             1.000   .473       
- Trust in science (1=none, 5=complete)           1.000   .388       
-Extraction Method: Principal Component Analysis.
+                                                 Initial 
+ Political orientation (1=left, 5=right)         .376    
+ Environmental concern (1=low, 5=high)           .374    
+ Life satisfaction (1=dissatisfied, 5=satisfied) .006    
+ Trust in government (1=none, 5=complete)        .006    
+ Trust in media (1=none, 5=complete)             .028    
+ Trust in science (1=none, 5=complete)           .009    
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = East
+b One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
 
 Total Variance Explained(a)
 
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.607 26.786        26.786       1.607    26.786        26.786       1.603  26.712        26.712       
- 2         1.115 18.582        45.368       1.115    18.582        45.368       1.118  18.641        45.353       
- 3         1.007 16.779        62.147       1.007    16.779        62.147       1.008  16.794        62.147       
- 4         .956  15.938        78.085                                                                             
- 5         .933  15.549        93.634                                                                             
- 6         .382  6.366         100.000                                                                            
-Extraction Method: Principal Component Analysis.
+ Factor Initial Eigenvalues              
+        Total % of Variance Cumulative % 
+ 1      1.607 26.786        26.786       
+ 2      1.115 18.582        45.368       
+ 3      1.007 16.779        62.147       
+ 4      .956  15.938        78.085       
+ 5      .933  15.549        93.634       
+ 6      .382  6.366         100.000      
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = East
 
-Component Matrix(a,b)
-
-                                                 Component        
-                                                 1     2     3    
- Political orientation (1=left, 5=right)         .894             
- Environmental concern (1=low, 5=high)           -.889            
- Trust in media (1=none, 5=complete)                   .664       
- Trust in science (1=none, 5=complete)                 .585       
- Life satisfaction (1=dissatisfied, 5=satisfied)       -.566      
- Trust in government (1=none, 5=complete)                    .968 
-Extraction Method: Principal Component Analysis.
+Factor Matrix(a,b)
+____
 a Region (East/West) = East
-b 3 components extracted.
-
-Rotated Component Matrix(a,b)
-
-                                                 Component        
-                                                 1     2     3    
- Political orientation (1=left, 5=right)         .895             
- Environmental concern (1=low, 5=high)           -.894            
- Trust in media (1=none, 5=complete)                   .673       
- Trust in science (1=none, 5=complete)                 .584       
- Life satisfaction (1=dissatisfied, 5=satisfied)       -.567      
- Trust in government (1=none, 5=complete)                    .969 
-Extraction Method: Principal Component Analysis. 
- Rotation Method: Varimax with Kaiser Normalization.
-a Region (East/West) = East
-b Rotation converged in 3 iterations.
-
-Component Transformation Matrix(a)
-
- Component 1     2     3     
- 1         .996  .086  -.037 
- 2         -.085 .996  .030  
- 3         .039  -.027 .999  
-Extraction Method: Principal Component Analysis.  
- Rotation Method: Varimax with Kaiser Normalization. 
-a Region (East/West) = East
+b Attempted to extract 3 factors. In iteration 25, no local minimum was found. Extraction was terminated.
 
 Region (East/West) = West
 Descriptive Statistics(a)
@@ -1320,74 +1521,75 @@ KMO and Bartlett's Test(a)
                                Sig.               .000    
 a Region (East/West) = West
 
-Communalities(a)
+Communalities(a,b)
 
                                                  Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .786       
- Environmental concern (1=low, 5=high)           1.000   .777       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .554       
- Trust in government (1=none, 5=complete)        1.000   .428       
- Trust in media (1=none, 5=complete)             1.000   .499       
- Trust in science (1=none, 5=complete)           1.000   .633       
-Extraction Method: Principal Component Analysis.
+ Political orientation (1=left, 5=right)         .344    .638       
+ Environmental concern (1=low, 5=high)           .342    .539       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .002    .023       
+ Trust in government (1=none, 5=complete)        .008    .012       
+ Trust in media (1=none, 5=complete)             .002    .072       
+ Trust in science (1=none, 5=complete)           .004    .999       
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = West
+b One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
 
 Total Variance Explained(a)
 
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.601 26.684        26.684       1.601    26.684        26.684       1.598  26.629        26.629       
- 2         1.050 17.498        44.182       1.050    17.498        44.182       1.042  17.371        44.000       
- 3         1.026 17.105        61.288       1.026    17.105        61.288       1.037  17.288        61.288       
- 4         .960  16.003        77.291                                                                             
- 5         .948  15.797        93.088                                                                             
- 6         .415  6.912         100.000                                                                            
-Extraction Method: Principal Component Analysis.
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
+ 1      1.601 26.684        26.684       1.002    16.708        16.708       1.179  19.656        19.656       
+ 2      1.050 17.498        44.182       1.181    19.688        36.396       1.004  16.727        36.383       
+ 3      1.026 17.105        61.288       .100     1.665         38.061       .101   1.677         38.061       
+ 4      .960  16.003        77.291                                                                             
+ 5      .948  15.797        93.088                                                                             
+ 6      .415  6.912         100.000                                                                            
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = West
 
-Component Matrix(a,b)
+Factor Matrix(a,b)
 
-                                                 Component        
-                                                 1     2    3     
- Political orientation (1=left, 5=right)         -.884            
- Environmental concern (1=low, 5=high)           .880             
- Trust in media (1=none, 5=complete)                   .641       
- Life satisfaction (1=dissatisfied, 5=satisfied)       .542 -.510 
- Trust in science (1=none, 5=complete)                      .689  
- Trust in government (1=none, 5=complete)              .432 .449  
-Extraction Method: Principal Component Analysis.
+                                                 Factor       
+                                                 1    2     3 
+ Trust in science (1=none, 5=complete)           .999         
+ Political orientation (1=left, 5=right)              -.797   
+ Environmental concern (1=low, 5=high)                .733    
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+ Life satisfaction (1=dissatisfied, 5=satisfied)              
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = West
-b 3 components extracted.
+b 3 factors extracted. 25 iterations required.
 
-Rotated Component Matrix(a,b)
+Rotated Factor Matrix(a,b)
 
-                                                 Component       
-                                                 1     2    3    
- Political orientation (1=left, 5=right)         -.886           
- Environmental concern (1=low, 5=high)           .880            
- Life satisfaction (1=dissatisfied, 5=satisfied)       .737      
- Trust in media (1=none, 5=complete)                   .694      
- Trust in science (1=none, 5=complete)                      .782 
- Trust in government (1=none, 5=complete)                   .629 
-Extraction Method: Principal Component Analysis. 
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.797        
+ Environmental concern (1=low, 5=high)           .732         
+ Trust in government (1=none, 5=complete)                     
+ Trust in science (1=none, 5=complete)                 .999   
+ Trust in media (1=none, 5=complete)                          
+ Life satisfaction (1=dissatisfied, 5=satisfied)              
+Extraction Method: Maximum Likelihood. 
  Rotation Method: Varimax with Kaiser Normalization.
 a Region (East/West) = West
 b Rotation converged in 4 iterations.
 
-Component Transformation Matrix(a)
+Factor Transformation Matrix(a)
 
- Component 1     2     3    
- 1         .997  .021  .074 
- 2         -.060 .816  .575 
- 3         -.048 -.578 .814 
-Extraction Method: Principal Component Analysis.  
+ Factor 1     2     3     
+ 1      .015  1.000 -.007 
+ 2      1.000 -.015 -.025 
+ 3      .025  .006  1.000 
+Extraction Method: Maximum Likelihood.  
  Rotation Method: Varimax with Kaiser Normalization. 
 a Region (East/West) = West
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:13                                                                  
+ Output Created                               02-MAR-2026 12:24:28                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -1407,7 +1609,7 @@ Notes
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
                                                /EXTRACTION PC                                   
-                                               /ROTATION OBLIMIN                                
+                                               /ROTATION PROMAX                                 
                                                /METHOD=CORRELATION.                             
                                                                                                 
  Resources     Processor Time                 00:00:00.07                                                                           
@@ -1530,12 +1732,12 @@ Pattern Matrix(a,b)
                                                  1     2     3    
  Political orientation (1=left, 5=right)         .894             
  Environmental concern (1=low, 5=high)           -.894            
- Trust in media (1=none, 5=complete)                   .675       
- Trust in science (1=none, 5=complete)                 .581       
+ Trust in media (1=none, 5=complete)                   .673       
+ Trust in science (1=none, 5=complete)                 .583       
  Life satisfaction (1=dissatisfied, 5=satisfied)       -.568      
  Trust in government (1=none, 5=complete)                    .969 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = East
 b Rotation converged in 3 iterations.
 
@@ -1545,22 +1747,22 @@ Structure Matrix(a)
                                                  1     2     3    
  Political orientation (1=left, 5=right)         .895             
  Environmental concern (1=low, 5=high)           -.893            
- Trust in media (1=none, 5=complete)                   .672       
+ Trust in media (1=none, 5=complete)                   .673       
  Trust in science (1=none, 5=complete)                 .586       
  Life satisfaction (1=dissatisfied, 5=satisfied)       -.566      
  Trust in government (1=none, 5=complete)                    .969 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = East
 
 Component Correlation Matrix(a)
 
  Component 1     2     3     
- 1         1.000 .027  -.005 
- 2         .027  1.000 .022  
- 3         -.005 .022  1.000 
+ 1         1.000 .037  -.015 
+ 2         .037  1.000 .006  
+ 3         -.015 .006  1.000 
 Extraction Method: Principal Component Analysis.  
- Rotation Method: Oblimin with Kaiser Normalization. 
+ Rotation Method: Promax with Kaiser Normalization. 
 a Region (East/West) = East
 
 Region (East/West) = West
@@ -1649,9 +1851,9 @@ Total Variance Explained(a)
 
  Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(b) 
            Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
- 1         1.601 26.684        26.684       1.601    26.684        26.684       1.600                                
+ 1         1.601 26.684        26.684       1.601    26.684        26.684       1.599                                
  2         1.050 17.498        44.182       1.050    17.498        44.182       1.043                                
- 3         1.026 17.105        61.288       1.026    17.105        61.288       1.040                                
+ 3         1.026 17.105        61.288       1.026    17.105        61.288       1.037                                
  4         .960  16.003        77.291                                                                                
  5         .948  15.797        93.088                                                                                
  6         .415  6.912         100.000                                                                               
@@ -1677,16 +1879,16 @@ Pattern Matrix(a,b)
 
                                                  Component       
                                                  1     2    3    
- Political orientation (1=left, 5=right)         -.887           
+ Political orientation (1=left, 5=right)         -.886           
  Environmental concern (1=low, 5=high)           .881            
- Life satisfaction (1=dissatisfied, 5=satisfied)       .740      
- Trust in media (1=none, 5=complete)                   .693      
- Trust in science (1=none, 5=complete)                      .788 
- Trust in government (1=none, 5=complete)                   .624 
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .737      
+ Trust in media (1=none, 5=complete)                   .695      
+ Trust in science (1=none, 5=complete)                      .785 
+ Trust in government (1=none, 5=complete)                   .626 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = West
-b Rotation converged in 5 iterations.
+b Rotation converged in 4 iterations.
 
 Structure Matrix(a)
 
@@ -1694,28 +1896,28 @@ Structure Matrix(a)
                                                  1     2    3    
  Political orientation (1=left, 5=right)         -.886           
  Environmental concern (1=low, 5=high)           .881            
- Life satisfaction (1=dissatisfied, 5=satisfied)       .735      
- Trust in media (1=none, 5=complete)                   .697      
- Trust in science (1=none, 5=complete)                      .777 
- Trust in government (1=none, 5=complete)                   .634 
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .737      
+ Trust in media (1=none, 5=complete)                   .695      
+ Trust in science (1=none, 5=complete)                      .783 
+ Trust in government (1=none, 5=complete)                   .629 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = West
 
 Component Correlation Matrix(a)
 
  Component 1     2     3     
- 1         1.000 .033  .052  
- 2         .033  1.000 .035  
- 3         .052  .035  1.000 
+ 1         1.000 .028  .016  
+ 2         .028  1.000 -.001 
+ 3         .016  -.001 1.000 
 Extraction Method: Principal Component Analysis.  
- Rotation Method: Oblimin with Kaiser Normalization. 
+ Rotation Method: Promax with Kaiser Normalization. 
 a Region (East/West) = West
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:13                                                                  
+ Output Created                               02-MAR-2026 12:24:28                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -1734,13 +1936,18 @@ Notes
                                                /PRINT UNIVARIATE INITIAL KMO CORRELATION SIG EXTRACTION ROTATION 
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
-                                               /EXTRACTION PC                                   
+                                               /EXTRACTION ML                                   
                                                /ROTATION VARIMAX                                
                                                /METHOD=CORRELATION.                             
                                                                                                 
  Resources     Processor Time                 00:00:00.08                                                                           
                Elapsed Time                   00:00:00.00                                                                           
                Maximum Memory Required        5704 (5.570K) bytes                                                                   
+
+Warnings
+
+ For split file Region (East/West) = East, The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
+ For split file Region (East/West) = West, The number of degrees of freedom (0) is not positive. Factor analysis may not be appropriate. 
 
 Region (East/West) = East
 Descriptive Statistics(a)
@@ -1812,67 +2019,68 @@ KMO and Bartlett's Test(a)
                                Sig.               .000    
 a Region (East/West) = East
 
-Communalities(a)
+Communalities(a,b)
 
                                                  Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .803       
- Environmental concern (1=low, 5=high)           1.000   .801       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .316       
- Trust in government (1=none, 5=complete)        1.000   .928       
- Trust in media (1=none, 5=complete)             1.000   .475       
- Trust in science (1=none, 5=complete)           1.000   .419       
-Extraction Method: Principal Component Analysis.
+ Political orientation (1=left, 5=right)         .375    .870       
+ Environmental concern (1=low, 5=high)           .373    .427       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .006    .004       
+ Trust in government (1=none, 5=complete)        .008    .999       
+ Trust in media (1=none, 5=complete)             .030    .999       
+ Trust in science (1=none, 5=complete)           .012    .007       
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = East
+b One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
 
 Total Variance Explained(a)
 
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.608 26.793        26.793       1.608    26.793        26.793       1.602  26.699        26.699       
- 2         1.128 18.797        45.590       1.128    18.797        45.590       1.130  18.832        45.530       
- 3         1.008 16.792        62.382       1.008    16.792        62.382       1.011  16.851        62.382       
- 4         .952  15.865        78.247                                                                             
- 5         .923  15.382        93.630                                                                             
- 6         .382  6.370         100.000                                                                            
-Extraction Method: Principal Component Analysis.
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
+ 1      1.608 26.793        26.793       1.019    16.986        16.986       1.288  21.462        21.462       
+ 2      1.128 18.797        45.590       1.002    16.697        33.683       1.015  16.912        38.374       
+ 3      1.008 16.792        62.382       1.285    21.411        55.094       1.003  16.721        55.094       
+ 4      .952  15.865        78.247                                                                             
+ 5      .923  15.382        93.630                                                                             
+ 6      .382  6.370         100.000                                                                            
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = East
 
-Component Matrix(a,b)
+Factor Matrix(a,b)
 
-                                                 Component        
-                                                 1     2     3    
- Political orientation (1=left, 5=right)         .893             
- Environmental concern (1=low, 5=high)           -.888            
- Trust in media (1=none, 5=complete)                   .635       
- Trust in science (1=none, 5=complete)                 .625       
- Life satisfaction (1=dissatisfied, 5=satisfied)       -.551      
- Trust in government (1=none, 5=complete)                    .953 
-Extraction Method: Principal Component Analysis.
+                                                 Factor           
+                                                 1     2    3     
+ Trust in media (1=none, 5=complete)             .713  .701       
+ Trust in government (1=none, 5=complete)        -.711 .703       
+ Trust in science (1=none, 5=complete)                            
+ Life satisfaction (1=dissatisfied, 5=satisfied)                  
+ Political orientation (1=left, 5=right)                    .928  
+ Environmental concern (1=low, 5=high)                      -.651 
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = East
-b 3 components extracted.
+b 3 factors extracted. 10 iterations required.
 
-Rotated Component Matrix(a,b)
+Rotated Factor Matrix(a,b)
 
-                                                 Component        
-                                                 1     2     3    
- Political orientation (1=left, 5=right)         .894             
- Environmental concern (1=low, 5=high)           -.894            
- Trust in media (1=none, 5=complete)                   .671       
- Trust in science (1=none, 5=complete)                 .601       
- Life satisfaction (1=dissatisfied, 5=satisfied)       -.561      
- Trust in government (1=none, 5=complete)                    .963 
-Extraction Method: Principal Component Analysis. 
+                                                 Factor          
+                                                 1     2    3    
+ Political orientation (1=left, 5=right)         .929            
+ Environmental concern (1=low, 5=high)           -.651           
+ Trust in media (1=none, 5=complete)                   .996      
+ Trust in science (1=none, 5=complete)                           
+ Life satisfaction (1=dissatisfied, 5=satisfied)                 
+ Trust in government (1=none, 5=complete)                   .997 
+Extraction Method: Maximum Likelihood. 
  Rotation Method: Varimax with Kaiser Normalization.
 a Region (East/West) = East
-b Rotation converged in 4 iterations.
+b Rotation converged in 3 iterations.
 
-Component Transformation Matrix(a)
+Factor Transformation Matrix(a)
 
- Component 1     2     3     
- 1         .995  .096  -.041 
- 2         -.089 .985  .145  
- 3         .054  -.141 .989  
-Extraction Method: Principal Component Analysis.  
+ Factor 1     2     3     
+ 1      .028  .652  -.758 
+ 2      -.003 .758  .652  
+ 3      1.000 -.016 .023  
+Extraction Method: Maximum Likelihood.  
  Rotation Method: Varimax with Kaiser Normalization. 
 a Region (East/West) = East
 
@@ -1946,74 +2154,75 @@ KMO and Bartlett's Test(a)
                                Sig.               .000    
 a Region (East/West) = West
 
-Communalities(a)
+Communalities(a,b)
 
                                                  Initial Extraction 
- Political orientation (1=left, 5=right)         1.000   .783       
- Environmental concern (1=low, 5=high)           1.000   .775       
- Life satisfaction (1=dissatisfied, 5=satisfied) 1.000   .560       
- Trust in government (1=none, 5=complete)        1.000   .413       
- Trust in media (1=none, 5=complete)             1.000   .474       
- Trust in science (1=none, 5=complete)           1.000   .669       
-Extraction Method: Principal Component Analysis.
+ Political orientation (1=left, 5=right)         .340    .615       
+ Environmental concern (1=low, 5=high)           .338    .555       
+ Life satisfaction (1=dissatisfied, 5=satisfied) .002    .030       
+ Trust in government (1=none, 5=complete)        .008    .016       
+ Trust in media (1=none, 5=complete)             .002    .054       
+ Trust in science (1=none, 5=complete)           .004    .999       
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = West
+b One or more communalitiy estimates greater than 1 were encountered during iterations. The resulting solution should be interpreted with caution.
 
 Total Variance Explained(a)
 
- Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
-           Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
- 1         1.600 26.661        26.661       1.600    26.661        26.661       1.596  26.606        26.606       
- 2         1.052 17.540        44.200       1.052    17.540        44.200       1.044  17.394        43.999       
- 3         1.023 17.045        61.245       1.023    17.045        61.245       1.035  17.246        61.245       
- 4         .963  16.043        77.288                                                                             
- 5         .945  15.748        93.036                                                                             
- 6         .418  6.964         100.000                                                                            
-Extraction Method: Principal Component Analysis.
+ Factor Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings 
+        Total % of Variance Cumulative % Total    % of Variance Cumulative % Total  % of Variance Cumulative % 
+ 1      1.600 26.661        26.661       1.003    16.710        16.710       1.174  19.563        19.563       
+ 2      1.052 17.540        44.200       1.174    19.560        36.270       1.002  16.707        36.270       
+ 3      1.023 17.045        61.245       .093     1.546         37.816       .093   1.547         37.816       
+ 4      .963  16.043        77.288                                                                             
+ 5      .945  15.748        93.036                                                                             
+ 6      .418  6.964         100.000                                                                            
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = West
 
-Component Matrix(a,b)
+Factor Matrix(a,b)
 
-                                                 Component        
-                                                 1     2    3     
- Political orientation (1=left, 5=right)         -.883            
- Environmental concern (1=low, 5=high)           .878             
- Trust in media (1=none, 5=complete)                   .638       
- Life satisfaction (1=dissatisfied, 5=satisfied)       .557 -.500 
- Trust in government (1=none, 5=complete)              .454 .405  
- Trust in science (1=none, 5=complete)                      .736  
-Extraction Method: Principal Component Analysis.
+                                                 Factor       
+                                                 1    2     3 
+ Trust in science (1=none, 5=complete)           .999         
+ Political orientation (1=left, 5=right)              -.782   
+ Environmental concern (1=low, 5=high)                .743    
+ Trust in government (1=none, 5=complete)                     
+ Trust in media (1=none, 5=complete)                          
+ Life satisfaction (1=dissatisfied, 5=satisfied)              
+Extraction Method: Maximum Likelihood.
 a Region (East/West) = West
-b 3 components extracted.
+b 3 factors extracted. 8 iterations required.
 
-Rotated Component Matrix(a,b)
+Rotated Factor Matrix(a,b)
 
-                                                 Component       
-                                                 1     2    3    
- Political orientation (1=left, 5=right)         -.885           
- Environmental concern (1=low, 5=high)           .879            
- Life satisfaction (1=dissatisfied, 5=satisfied)       .741      
- Trust in media (1=none, 5=complete)                   .673      
- Trust in science (1=none, 5=complete)                      .799 
- Trust in government (1=none, 5=complete)                   .602 
-Extraction Method: Principal Component Analysis. 
+                                                 Factor       
+                                                 1     2    3 
+ Political orientation (1=left, 5=right)         -.782        
+ Environmental concern (1=low, 5=high)           .743         
+ Trust in government (1=none, 5=complete)                     
+ Trust in science (1=none, 5=complete)                 .999   
+ Trust in media (1=none, 5=complete)                          
+ Life satisfaction (1=dissatisfied, 5=satisfied)              
+Extraction Method: Maximum Likelihood. 
  Rotation Method: Varimax with Kaiser Normalization.
 a Region (East/West) = West
-b Rotation converged in 4 iterations.
+b Rotation converged in 3 iterations.
 
-Component Transformation Matrix(a)
+Factor Transformation Matrix(a)
 
- Component 1     2     3    
- 1         .997  .030  .071 
- 2         -.065 .829  .556 
- 3         -.042 -.559 .828 
-Extraction Method: Principal Component Analysis.  
+ Factor 1     2     3     
+ 1      -.002 1.000 .002  
+ 2      1.000 .002  -.001 
+ 3      .001  -.002 1.000 
+Extraction Method: Maximum Likelihood.  
  Rotation Method: Varimax with Kaiser Normalization. 
 a Region (East/West) = West
 
 Factor Analysis
 Notes
 
- Output Created                               02-MAR-2026 12:24:13                                                                  
+ Output Created                               02-MAR-2026 12:24:28                                                                  
  Comments                                                                                                                           
  Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
                                               data/survey_data.sav                                                                  
@@ -2033,7 +2242,7 @@ Notes
                                                /FORMAT SORT BLANK(.40)                          
                                                /CRITERIA MINEIGEN(1) ITERATE(25)                
                                                /EXTRACTION PC                                   
-                                               /ROTATION OBLIMIN                                
+                                               /ROTATION PROMAX                                 
                                                /METHOD=CORRELATION.                             
                                                                                                 
  Resources     Processor Time                 00:00:00.09                                                                           
@@ -2127,7 +2336,7 @@ Total Variance Explained(a)
  Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(b) 
            Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
  1         1.608 26.793        26.793       1.608    26.793        26.793       1.604                                
- 2         1.128 18.797        45.590       1.128    18.797        45.590       1.132                                
+ 2         1.128 18.797        45.590       1.128    18.797        45.590       1.133                                
  3         1.008 16.792        62.382       1.008    16.792        62.382       1.012                                
  4         .952  15.865        78.247                                                                                
  5         .923  15.382        93.630                                                                                
@@ -2154,14 +2363,14 @@ Pattern Matrix(a,b)
 
                                                  Component        
                                                  1     2     3    
- Political orientation (1=left, 5=right)         .894             
  Environmental concern (1=low, 5=high)           -.894            
- Trust in media (1=none, 5=complete)                   .673       
- Trust in science (1=none, 5=complete)                 .598       
+ Political orientation (1=left, 5=right)         .894             
+ Trust in media (1=none, 5=complete)                   .672       
+ Trust in science (1=none, 5=complete)                 .600       
  Life satisfaction (1=dissatisfied, 5=satisfied)       -.562      
  Trust in government (1=none, 5=complete)                    .964 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = East
 b Rotation converged in 4 iterations.
 
@@ -2172,21 +2381,21 @@ Structure Matrix(a)
  Political orientation (1=left, 5=right)         .895             
  Environmental concern (1=low, 5=high)           -.893            
  Trust in media (1=none, 5=complete)                   .669       
- Trust in science (1=none, 5=complete)                 .605       
+ Trust in science (1=none, 5=complete)                 .606       
  Life satisfaction (1=dissatisfied, 5=satisfied)       -.560      
  Trust in government (1=none, 5=complete)                    .963 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = East
 
 Component Correlation Matrix(a)
 
  Component 1     2     3     
- 1         1.000 .029  -.012 
- 2         .029  1.000 .027  
- 3         -.012 .027  1.000 
+ 1         1.000 .041  -.019 
+ 2         .041  1.000 .022  
+ 3         -.019 .022  1.000 
 Extraction Method: Principal Component Analysis.  
- Rotation Method: Oblimin with Kaiser Normalization. 
+ Rotation Method: Promax with Kaiser Normalization. 
 a Region (East/West) = East
 
 Region (East/West) = West
@@ -2275,9 +2484,9 @@ Total Variance Explained(a)
 
  Component Initial Eigenvalues              Extraction Sums of Squared Loadings Rotation Sums of Squared Loadings(b) 
            Total % of Variance Cumulative % Total    % of Variance Cumulative % Total                                
- 1         1.600 26.661        26.661       1.600    26.661        26.661       1.599                                
- 2         1.052 17.540        44.200       1.052    17.540        44.200       1.046                                
- 3         1.023 17.045        61.245       1.023    17.045        61.245       1.038                                
+ 1         1.600 26.661        26.661       1.600    26.661        26.661       1.598                                
+ 2         1.052 17.540        44.200       1.052    17.540        44.200       1.045                                
+ 3         1.023 17.045        61.245       1.023    17.045        61.245       1.034                                
  4         .963  16.043        77.288                                                                                
  5         .945  15.748        93.036                                                                                
  6         .418  6.964         100.000                                                                               
@@ -2303,38 +2512,38 @@ Pattern Matrix(a,b)
 
                                                  Component       
                                                  1     2    3    
- Political orientation (1=left, 5=right)         -.886           
- Environmental concern (1=low, 5=high)           .880            
- Life satisfaction (1=dissatisfied, 5=satisfied)       .746      
- Trust in media (1=none, 5=complete)                   .671      
- Trust in science (1=none, 5=complete)                      .808 
- Trust in government (1=none, 5=complete)                   .594 
+ Political orientation (1=left, 5=right)         -.885           
+ Environmental concern (1=low, 5=high)           .881            
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .741      
+ Trust in media (1=none, 5=complete)                   .675      
+ Trust in science (1=none, 5=complete)                      .802 
+ Trust in government (1=none, 5=complete)                   .598 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = West
-b Rotation converged in 5 iterations.
+b Rotation converged in 4 iterations.
 
 Structure Matrix(a)
 
                                                  Component       
                                                  1     2    3    
- Political orientation (1=left, 5=right)         -.884           
+ Political orientation (1=left, 5=right)         -.885           
  Environmental concern (1=low, 5=high)           .879            
- Life satisfaction (1=dissatisfied, 5=satisfied)       .737      
- Trust in media (1=none, 5=complete)                   .677      
- Trust in science (1=none, 5=complete)                      .793 
- Trust in government (1=none, 5=complete)                   .610 
+ Life satisfaction (1=dissatisfied, 5=satisfied)       .740      
+ Trust in media (1=none, 5=complete)                   .674      
+ Trust in science (1=none, 5=complete)                      .801 
+ Trust in government (1=none, 5=complete)                   .599 
 Extraction Method: Principal Component Analysis. 
- Rotation Method: Oblimin with Kaiser Normalization.
+ Rotation Method: Promax with Kaiser Normalization.
 a Region (East/West) = West
 
 Component Correlation Matrix(a)
 
  Component 1     2     3     
- 1         1.000 .049  .056  
- 2         .049  1.000 .056  
- 3         .056  .056  1.000 
+ 1         1.000 .045  .012  
+ 2         .045  1.000 -.006 
+ 3         .012  -.006 1.000 
 Extraction Method: Principal Component Analysis.  
- Rotation Method: Oblimin with Kaiser Normalization. 
+ Rotation Method: Promax with Kaiser Normalization. 
 a Region (East/West) = West
 

@@ -27,10 +27,12 @@ or tidyselect helpers like \code{starts_with("trust")}.}
 the Kaiser criterion (eigenvalue > 1).}
 
 \item{rotation}{Rotation method: \code{"varimax"} (default, orthogonal),
-\code{"oblimin"} (oblique, allows correlated factors), or \code{"none"}.}
+\code{"oblimin"} (oblique, allows correlated factors),
+\code{"promax"} (oblique, power-based), or \code{"none"}.}
 
-\item{extraction}{Extraction method. Currently only \code{"pca"} (Principal
-Component Analysis) is supported.}
+\item{extraction}{Extraction method: \code{"pca"} (default, Principal
+Component Analysis) or \code{"ml"} (Maximum Likelihood, enables
+goodness-of-fit testing, assumes multivariate normality).}
 
 \item{weights}{Optional survey weights for population-representative results.}
 
@@ -60,23 +62,28 @@ An \code{efa} result object containing:
 \item{extraction}{Extraction method used}
 \item{n_factors}{Number of components extracted}
 \item{correlation_matrix}{Correlation matrix used for analysis}
-\item{pattern_matrix}{Pattern matrix (oblimin only, NULL otherwise)}
-\item{structure_matrix}{Structure matrix (oblimin only, NULL otherwise)}
-\item{factor_correlations}{Factor correlation matrix (oblimin only, NULL otherwise)}
+\item{initial_communalities}{Initial communalities (1.0 for PCA, SMC for ML)}
+\item{goodness_of_fit}{Goodness-of-fit test (ML only): chi_sq, df, p_value. NULL for PCA.}
+\item{uniquenesses}{Unique variances per variable (ML only, NULL for PCA)}
+\item{pattern_matrix}{Pattern matrix (oblimin/promax only, NULL otherwise)}
+\item{structure_matrix}{Structure matrix (oblimin/promax only, NULL otherwise)}
+\item{factor_correlations}{Factor correlation matrix (oblimin/promax only, NULL otherwise)}
 \item{variables}{Character vector of variable names}
 \item{weights}{Weights variable name or NULL}
 \item{n}{Sample size}
+\item{col_prefix}{Column name prefix: \code{"PC"} for PCA, \code{"Factor"} for ML}
 \item{sort}{Whether loadings are sorted}
 \item{blank}{Suppression threshold}
 }
 }
 \description{
-\code{efa()} performs Exploratory Factor Analysis (EFA) using Principal
-Component Analysis (PCA) to discover underlying patterns in your survey items.
-This is the R equivalent of SPSS's \code{FACTOR /EXTRACTION PC /ROTATION VARIMAX}.
+\code{efa()} performs Exploratory Factor Analysis (EFA) to discover underlying
+patterns in your survey items. Supports both Principal Component Analysis (PCA)
+and Maximum Likelihood (ML) extraction. This is the R equivalent of SPSS's
+\code{FACTOR} procedure.
 
 For example, if you have 6 items measuring different attitudes, EFA can reveal
-whether they group into 2-3 underlying dimensions (components).
+whether they group into 2-3 underlying dimensions (factors or components).
 }
 \details{
 \subsection{Understanding the Results}{
@@ -110,6 +117,17 @@ the extracted components. Low communalities (< 0.40) suggest the item
 doesn't fit well with the others.
 }
 
+\subsection{Choosing an Extraction Method}{
+
+\itemize{
+\item \strong{PCA} (default): Extracts components explaining maximum total
+variance. Simple and robust. Does not assume normality.
+\item \strong{ML}: Extracts factors explaining shared variance only. Assumes
+multivariate normality. Provides a goodness-of-fit test to evaluate model
+fit. A non-significant chi-square (p > .05) suggests adequate fit.
+}
+}
+
 \subsection{Choosing a Rotation}{
 
 \itemize{
@@ -118,6 +136,9 @@ Produces simpler, easier-to-interpret results.
 \item \strong{Oblimin}: Allows factors to be correlated.
 More realistic for social science data. Produces both a Pattern Matrix
 (unique contributions) and Structure Matrix (total correlations).
+\item \strong{Promax}: Oblique rotation based on a power transformation
+of Varimax results. Like Oblimin, produces Pattern and Structure matrices.
+Common alternative to Oblimin in SPSS.
 \item \strong{None}: No rotation. Rarely useful for interpretation.
 }
 }
@@ -136,6 +157,18 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
     rotation = "oblimin")
+
+# Maximum Likelihood extraction
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    extraction = "ml")
+
+# Promax rotation (oblique)
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    rotation = "promax")
 
 # Fix number of factors
 efa(survey_data,
