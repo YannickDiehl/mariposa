@@ -392,16 +392,16 @@ print.crosstab <- function(x, digits = 1, ...) {
   row_label_width <- max(12, max(nchar(display_row_levels)) + 2)
 
   # Print column variable name
-  cat(sprintf("%-*s", row_label_width, ""))
+  cat(pad_utf8("", row_label_width))
   cat(x$col_var, "\n")
 
   # Print column headers
   cat(x$row_var, "\n")
-  cat(sprintf("%-*s", row_label_width, ""))
+  cat(pad_utf8("", row_label_width))
   for (col in display_col_levels) {
-    cat(sprintf("%*s", col_width, col))
+    cat(pad_utf8(col, col_width, "right"))
   }
-  cat(sprintf("%*s", col_width, "Total"))
+  cat(pad_utf8("Total", col_width, "right"))
   cat("\n")
 
   # Print separator
@@ -411,7 +411,7 @@ print.crosstab <- function(x, digits = 1, ...) {
   # Print each row with counts
   for (i in seq_len(n_rows)) {
     # Row label
-    cat(sprintf("%-*s", row_label_width, display_row_levels[i]))
+    cat(pad_utf8(display_row_levels[i], row_label_width))
 
     # Counts
     for (j in seq_len(n_cols)) {
@@ -425,7 +425,7 @@ print.crosstab <- function(x, digits = 1, ...) {
     if (x$percentages != "none") {
       # Row percentages
       if (!is.null(x$row_pct)) {
-        cat(sprintf("%-*s", row_label_width, ""))
+        cat(pad_utf8("", row_label_width))
         for (j in seq_len(n_cols)) {
           pct_val <- sprintf(paste0("%.", digits, "f%%"), x$row_pct[i, j])
           cat(sprintf("%*s", col_width, pct_val))
@@ -436,7 +436,7 @@ print.crosstab <- function(x, digits = 1, ...) {
 
       # Column percentages
       if (!is.null(x$col_pct)) {
-        cat(sprintf("%-*s", row_label_width, ""))
+        cat(pad_utf8("", row_label_width))
         for (j in seq_len(n_cols)) {
           pct_val <- sprintf(paste0("%.", digits, "f%%"), x$col_pct[i, j])
           cat(sprintf("%*s", col_width, pct_val))
@@ -449,7 +449,7 @@ print.crosstab <- function(x, digits = 1, ...) {
 
       # Total percentages
       if (!is.null(x$total_pct)) {
-        cat(sprintf("%-*s", row_label_width, ""))
+        cat(pad_utf8("", row_label_width))
         for (j in seq_len(n_cols)) {
           pct_val <- sprintf(paste0("%.", digits, "f%%"), x$total_pct[i, j])
           cat(sprintf("%*s", col_width, pct_val))
@@ -468,7 +468,7 @@ print.crosstab <- function(x, digits = 1, ...) {
   cat(paste(rep("-", total_width), collapse = ""), "\n")
 
   # Print totals row
-  cat(sprintf("%-*s", row_label_width, "Total"))
+  cat(pad_utf8("Total", row_label_width))
   for (j in seq_len(n_cols)) {
     cat(sprintf("%*.0f", col_width, x$col_totals[j]))
   }
@@ -477,7 +477,7 @@ print.crosstab <- function(x, digits = 1, ...) {
 
   # Print column percentages for total row
   if (!is.null(x$col_pct)) {
-    cat(sprintf("%-*s", row_label_width, ""))
+    cat(pad_utf8("", row_label_width))
     for (j in seq_len(n_cols)) {
       col_of_total <- (x$col_totals[j] / x$total) * 100
       cat(sprintf(paste0("%*.", digits, "f%%"), col_width, col_of_total))
