@@ -688,9 +688,9 @@ efa(survey_data,
 #>                           PC1     PC2     PC3
 #> political_orientation   0.884                
 #> environmental_concern  -0.884                
-#> trust_science                  -0.663   0.406
-#> trust_government               -0.547        
-#> trust_media                    -0.542        
+#> trust_science                   0.663   0.406
+#> trust_government                0.547        
+#> trust_media                     0.542        
 #> life_satisfaction                      -0.838
 #> Extraction Method: Principal Component Analysis.
 #> 
@@ -699,8 +699,8 @@ efa(survey_data,
 #>                           PC1     PC2     PC3
 #> political_orientation   0.885                
 #> environmental_concern  -0.883                
-#> trust_science                  -0.752        
-#> trust_government               -0.542        
+#> trust_science                   0.752        
+#> trust_government                0.542        
 #> life_satisfaction                      -0.828
 #> trust_media                            -0.534
 #> Extraction Method: Principal Component Analysis.
