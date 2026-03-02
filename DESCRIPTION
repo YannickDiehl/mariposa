@@ -33,7 +33,8 @@ Suggests:
     haven (>= 2.4.0),
     survey,
     GPArotation,
-    MASS
+    MASS,
+    PMCMRplus
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)

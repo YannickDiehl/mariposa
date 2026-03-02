@@ -2,9 +2,12 @@
 % Please edit documentation in R/tukey_test.R
 \name{tukey_test}
 \alias{tukey_test}
+\alias{tukey_test.default}
 \title{Find Which Specific Groups Differ After ANOVA}
 \usage{
 tukey_test(x, conf.level = 0.95, ...)
+
+\method{tukey_test}{default}(x, conf.level = 0.95, ...)
 }
 \arguments{
 \item{x}{ANOVA results from \code{oneway_anova()}}
@@ -151,7 +154,9 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.
 \code{\link{levene_test}} for testing homogeneity of variances.
 
 Other posthoc: 
+\code{\link{dunn_test}()},
 \code{\link{levene_test}()},
+\code{\link{pairwise_wilcoxon}()},
 \code{\link{scheffe_test}()}
 }
 \concept{posthoc}

@@ -2,6 +2,7 @@
 ## Erweiterung des Funktionsumfangs auf Basis der SPSS-Kurs-Syntax
 
 **Erstellt:** 2026-02-26
+**Zuletzt aktualisiert:** 2026-03-01
 **Autor:** Yannick Diehl / Claude
 **Basis:** SPSS-Syntax "Statistik mit SPSS" (WS 25/26, Uni Marburg, A. Heyder)
 **Referenzdiagramm:** Methodentaxonomie "Art der Analyse"
@@ -12,22 +13,19 @@
 
 ### 1.1 Aktueller Funktionsumfang (v0.1.0)
 
-mariposa umfasst aktuell **27 exportierte Funktionen** in 6 Kategorien:
+mariposa umfasst aktuell **37 exportierte Funktionen** in 9 Kategorien:
 
 | Kategorie | Funktionen | Anzahl |
 |---|---|---|
 | Deskriptive Statistik | `describe()`, `frequency()`, `crosstab()` | 3 |
 | Hypothesentests | `t_test()`, `oneway_anova()`, `mann_whitney()`, `chi_square()` | 4 |
+| Nicht-parametrische Tests | `kruskal_wallis()`, `wilcoxon_test()`, `friedman_test()`, `binomial_test()` | 4 |
 | Korrelationsanalyse | `pearson_cor()`, `spearman_rho()`, `kendall_tau()` | 3 |
 | Post-Hoc Analyse | `tukey_test()`, `scheffe_test()`, `levene_test()` | 3 |
+| Skalenanalyse | `reliability()`, `efa()`, `scale_index()`, `pomps()` | 4 |
+| Regressionsanalyse | `linear_regression()`, `logistic_regression()` | 2 |
 | Gewichtete Statistiken | `w_mean()`, `w_median()`, `w_sd()`, `w_var()`, `w_se()`, `w_iqr()`, `w_range()`, `w_quantile()`, `w_modus()`, `w_skew()`, `w_kurtosis()` | 11 |
 | Effektstaerke-Hilfsfunktionen | `phi()`, `cramers_v()`, `goodman_gamma()` | 3 |
-
-**Zusaetzlich vorhanden** (in CLAUDE.md erwaehnt, nicht in der aktuellen Analyse bestaetigt):
-- `rm_t_test()` - Repeated-Measures t-Test
-- `rm_anova_test()` - Repeated-Measures ANOVA
-- `emmeans()` - Estimated Marginal Means
-- `mauchly_test()` - Spharizitaetstest
 
 ### 1.2 Aktuelle Dependencies
 
@@ -37,10 +35,9 @@ mariposa umfasst aktuell **27 exportierte Funktionen** in 6 Kategorien:
 ### 1.3 Validierungsstatus
 
 **v0.1.0:** 83/83 SPSS-Validierungstests bestanden.
-**v0.2.0:** 6 neue Funktionen (reliability, efa, scale_index, pomps, linear_regression, logistic_regression) - SPSS-validiert (Branch: condescending-tesla).
+**v0.2.0:** 6 neue Funktionen (reliability, efa, scale_index, pomps, linear_regression, logistic_regression) - SPSS-validiert.
 **v0.3.0:** 294 neue SPSS-Validierungen (Kruskal-Wallis, Wilcoxon, Friedman, Binomial).
-**Gesamt (v0.3.0 Branch): 2227 Tests bestanden (0 Fehler, 0 Skips).**
-**Gesamt (v0.2.0 Branch): 2613 Tests bestanden (laut Commit-Nachricht).**
+**Gesamt (v0.3.0): 2.227+ Tests bestanden (0 Fehler, 0 Skips).**
 
 Toleranzen:
 - Counts: Exakt (0)
@@ -85,39 +82,51 @@ Die SPSS-Syntax deckt folgende Verfahren ab:
 
 ### 2.2 Methodentaxonomie-Diagramm vs. mariposa
 
-Das Referenzdiagramm "Art der Analyse" zeigt den vollstaendigen Methodenkanon. Folgende Verfahren fehlen **zusaetzlich** zur SPSS-Syntax:
+Das Referenzdiagramm "Art der Analyse" zeigt den vollstaendigen Methodenkanon:
 
 | Kategorie | Verfahren | Skalenniveau | Status |
 |---|---|---|---|
 | **Unterschiede - Unabhaengig** | | | |
 | | Kruskal-Wallis-Test | Ordinal | **v0.3.0 ERLEDIGT** |
+| | Dunn-Test (Post-Hoc fuer KW) | Ordinal | **v0.4.0 GEPLANT** |
 | | Mehrfaktorielle ANOVA | Intervall | Offen |
 | **Unterschiede - Verbunden** | | | |
 | | Wilcoxon-Vorzeichen-Rang-Test | Ordinal | **v0.3.0 ERLEDIGT** |
-| | Vorzeichentest | Ordinal | Offen |
+| | Pairwise Wilcoxon (Post-Hoc fuer Friedman) | Ordinal | **v0.4.0 GEPLANT** |
 | | Friedman-Test | Ordinal | **v0.3.0 ERLEDIGT** |
 | **Dependenzanalyse** | | | |
 | | Binomial-Test | Nominal | **v0.3.0 ERLEDIGT** |
+| | Fisher's Exact Test | Nominal | **v0.4.0 GEPLANT** |
+| | McNemar-Test | Nominal | **v0.4.0 GEPLANT** |
+| | Chi-Quadrat Goodness-of-Fit | Nominal | **v0.4.0 GEPLANT** |
 | **Interdependenzanalyse** | | | |
 | | Clusteranalyse | Intervall | Offen |
 
 ### 2.3 Zusammenfassung der Luecken
 
-**Aus der SPSS-Kurs-Syntax (Prioritaet HOCH):**
-1. `reliability()` - Cronbachs Alpha mit Item-Statistiken - **v0.2.0 ERLEDIGT**
-2. `efa()` - Explorative Faktorenanalyse (PCA, Varimax, Oblimin) - **v0.2.0 ERLEDIGT**
-3. `scale_index()` / `pomps()` - Skalenbildung und Normierung - **v0.2.0 ERLEDIGT**
-4. `linear_regression()` - Bivariate und multiple lineare Regression - **v0.2.0 ERLEDIGT**
-5. `logistic_regression()` - Binaere logistische Regression - **v0.2.0 ERLEDIGT**
-6. `crosstab()` Erweiterung - 3-Wege-Tabellen (AV BY UV BY Schicht)
+**v0.2.0 - Skalenanalyse & Regression (ERLEDIGT):**
+1. ~~`reliability()` - Cronbachs Alpha~~ **ERLEDIGT**
+2. ~~`efa()` - Explorative Faktorenanalyse~~ **ERLEDIGT**
+3. ~~`scale_index()` / `pomps()` - Skalenbildung~~ **ERLEDIGT**
+4. ~~`linear_regression()` - Lineare Regression~~ **ERLEDIGT**
+5. ~~`logistic_regression()` - Logistische Regression~~ **ERLEDIGT**
 
-**Aus dem Diagramm (Prioritaet MITTEL bis NIEDRIG):**
-7. `kruskal_wallis()` - Nicht-parametrische ANOVA-Alternative
-8. `wilcoxon_test()` - Nicht-parametrischer verbundener Test
-9. `friedman_test()` - Nicht-parametrische RM-ANOVA-Alternative
-10. `binomial_test()` - Test auf Proportionen
-11. Mehrfaktorielle ANOVA
-12. Clusteranalyse
+**v0.3.0 - Nicht-parametrische Tests (ERLEDIGT):**
+6. ~~`kruskal_wallis()` - K+ unabhaengige Gruppen~~ **ERLEDIGT**
+7. ~~`wilcoxon_test()` - Verbundene Stichproben~~ **ERLEDIGT**
+8. ~~`friedman_test()` - K+ verbundene Messungen~~ **ERLEDIGT**
+9. ~~`binomial_test()` - Proportionen~~ **ERLEDIGT**
+
+**v0.4.0 - Post-Hoc-Oekosystem & Ergaenzungstests (GEPLANT):**
+10. ~~`dunn_test()` - Post-Hoc fuer Kruskal-Wallis~~ **ERLEDIGT**
+11. ~~`pairwise_wilcoxon()` - Post-Hoc fuer Friedman~~ **ERLEDIGT**
+12. ~~`fisher_test()` - Exakter Test bei kleinen Zellen~~ **ERLEDIGT**
+13. ~~`mcnemar_test()` - Abhaengige Proportionen~~ **ERLEDIGT**
+14. ~~`chisq_gof()` - Goodness-of-Fit Ein-Stichproben-Test~~ **ERLEDIGT**
+
+**Langfristig (v0.5.0+):**
+15. Mehrfaktorielle ANOVA / ANCOVA
+16. Clusteranalyse / Diskriminanzanalyse
 
 ---
 
@@ -315,7 +324,8 @@ Folgende SPSS-Befehle werden **nicht** als eigene Funktionen implementiert, da s
 Phase 1: Skalenanalyse          [ERLEDIGT]  -> reliability(), efa(), scale_index(), pomps()
 Phase 2: Regressionsanalyse     [ERLEDIGT]  -> linear_regression(), logistic_regression()
 Phase 3: Erweiterungen          [ERLEDIGT]  -> nicht-parametrische Tests (4 Funktionen)
-Phase 4: Validierung & Doku     [LAUFEND]   -> SPSS-Validierung, Vignetten, pkgdown
+Phase 4: Validierung & Doku     [ERLEDIGT]  -> SPSS-Validierung, Vignetten, pkgdown
+Phase 5: Post-Hoc & Ergaenz.    [OFFEN]     -> dunn_test(), pairwise Wilcoxon, Fisher, McNemar, GoF-Chi2
 ```
 
 ### 5.2 Phase 1: Skalenanalyse - **ERLEDIGT**
@@ -591,57 +601,148 @@ Alle Funktionen unterstuetzen:
 
 ---
 
-### 5.5 Phase 4: Validierung und Dokumentation (2 Tage)
+### 5.5 Phase 4: Validierung und Dokumentation - **ERLEDIGT**
 
-#### Tag 12: SPSS-Validierung
+Alle Dokumentations-Updates fuer v0.3.0 abgeschlossen:
 
-**Neue Testdateien:**
+**Aktualisierte Dateien:**
+- `DESCRIPTION` - Version 0.3.0, 37 Funktionen, pkgdown-URL
+- `NEWS.md` - Eintraege fuer v0.2.0 und v0.3.0
+- `README.md` - Erweiterte Funktionstabelle, neue Beispiele
+- `_pkgdown.yml` - Neue Referenz-Sektionen (Scale Analysis, Regression, Non-Parametric)
+- `.claude/CLAUDE.md` - Korrigierte Funktionslisten, aktualisierte Version History
+
+**Neue Dateien:**
+- `vignettes/scale-analysis.Rmd` - Reliability, EFA, scale_index, pomps
+- `vignettes/regression-analysis.Rmd` - Lineare und logistische Regression
+
+**pkgdown-Site:** Erfolgreich gebaut und deployed.
+
+---
+
+### 5.6 Phase 5: Post-Hoc-Oekosystem und Ergaenzungstests (v0.4.0)
+
+#### Gap-Analyse: Nicht-parametrische Post-Hoc-Luecke
+
+Der parametrische Analysepfad ist komplett:
 ```
-tests/testthat/test-reliability-spss-validation.R
-tests/testthat/test-efa-spss-validation.R
-tests/testthat/test-linear-regression-spss-validation.R
-tests/testthat/test-logistic-regression-spss-validation.R
+oneway_anova() → tukey_test() / scheffe_test()   ✓ Post-Hoc
+oneway_anova() → levene_test()                    ✓ Annahme-Check
+t_test()       → levene_test()                    ✓ Annahme-Check
 ```
 
-**Validierungsszenarien (pro Funktion):**
-1. Ungewichtet, ungruppiert
-2. Gewichtet, ungruppiert
-3. Ungewichtet, gruppiert (wo sinnvoll)
-4. Gewichtet, gruppiert (wo sinnvoll)
-
-**Toleranzen (wie bestehend):**
-- Koeffizienten: +/- 0.001
-- Teststatistiken: +/- 0.00001
-- P-Werte: +/- 0.0001
-- R^2: +/- 0.001
-- Faktorladungen: +/- 0.001
-
-#### Tag 13: Dokumentation
-
-**Neue/aktualisierte Dateien:**
-1. `vignettes/scale-analysis.Rmd` - Faktorenanalyse und Reliabilitaet
-2. `vignettes/regression-analysis.Rmd` - Lineare und logistische Regression
-3. `vignettes/spss-translation-guide.Rmd` - SPSS-zu-R Uebersetzungshilfe
-4. `_pkgdown.yml` - Neue Referenz-Sektionen
-5. `NEWS.md` - Changelog
-6. `DESCRIPTION` - Version 0.2.0, ggf. neue Suggests
-
-**Neue pkgdown-Sektionen:**
-```yaml
-- title: "Scale Analysis"
-  desc: "Factor analysis, reliability, and scale construction"
-  contents:
-  - efa
-  - reliability
-  - scale_index
-  - pomps
-
-- title: "Regression Analysis"
-  desc: "Linear and logistic regression with SPSS-compatible output"
-  contents:
-  - linear_regression
-  - logistic_regression
+Der nicht-parametrische Pfad endet nach dem Omnibus-Test:
 ```
+kruskal_wallis() → ???   (kein Dunn-Test, keine pairwise Mann-Whitney)
+friedman_test()  → ???   (keine pairwise Wilcoxon-Vergleiche)
+```
+
+#### 5.6.1 `dunn_test()` - Post-Hoc fuer Kruskal-Wallis - **ERLEDIGT**
+
+**Datei:** `R/dunn_test.R`
+**S3-Klasse:** `dunn_test`
+**S3-Dispatch:** `dunn_test.kruskal_wallis`
+**Print-Methode:** `print.dunn_test`
+
+**Begruendung:**
+- Nicht-parametrisches Aequivalent zu Tukey/Scheffe
+- SPSS bietet "Pairwise Comparisons" nach signifikantem Kruskal-Wallis automatisch an
+- Ohne `dunn_test()` muessen User manuell paarweise Mann-Whitney-Tests mit Bonferroni-Korrektur durchfuehren
+
+**Strategie:** Genuine Implementierung
+- Dunn's Test basiert auf Rangdifferenzen und Z-Statistiken
+- P-Wert-Korrektur: Bonferroni (Standard), Holm, Benjamini-Hochberg
+- Keine neue Dependency noetig
+
+**Funktionssignatur:**
+```r
+dunn_test <- function(x, ...) UseMethod("dunn_test")
+
+dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...)
+```
+
+**Rueckgabeobjekt:**
+```r
+list(
+  comparisons = tibble,      # Gruppe1, Gruppe2, Z, p, p_adj, Signifikanz
+  p_adjust_method = character,
+  n_comparisons = integer,
+  variable = character,
+  group = character,
+  n = integer
+)
+```
+
+**SPSS-Referenz:**
+```
+NPAR TESTS /K-W = AV BY UV(1,3)
+  → "Pairwise Comparisons" → Dunn-Bonferroni
+```
+
+**Workflow:**
+```r
+result <- kruskal_wallis(data, score, group = treatment)
+result %>% dunn_test()                          # Standard: Bonferroni
+result %>% dunn_test(p_adjust = "holm")         # Alternative Korrektur
+```
+
+#### 5.6.2 Pairwise Wilcoxon nach Friedman - **ERLEDIGT**
+
+**Option A:** Eigene `pairwise_wilcoxon()` S3-Methode auf `friedman_test`
+**Option B:** `dunn_test.friedman_test` (Nemenyi-Test als Friedman-Post-Hoc)
+
+**Empfehlung:** Option A - passt besser zur SPSS-Logik ("Pairwise Comparisons" nach Friedman verwendet Wilcoxon mit Bonferroni)
+
+**Funktionssignatur (Option A):**
+```r
+pairwise_wilcoxon <- function(x, ...) UseMethod("pairwise_wilcoxon")
+
+pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...)
+```
+
+**Workflow:**
+```r
+result <- friedman_test(data, score_T1, score_T2, score_T3)
+result %>% pairwise_wilcoxon()
+```
+
+#### 5.6.3 `fisher_test()` - Exakter Test **ERLEDIGT**
+
+**Datei:** `R/fisher_test.R`
+**Strategie:** Wrapper um `stats::fisher.test()`
+**Tests:** 16 PASS (test-fisher-test-spss-validation.R)
+
+#### 5.6.4 `mcnemar_test()` - Abhaengige Proportionen **ERLEDIGT**
+
+**Datei:** `R/mcnemar_test.R`
+**Strategie:** Manuelle Implementierung mit exaktem Binomialtest
+**Tests:** 19 PASS (test-mcnemar-test-spss-validation.R)
+
+#### 5.6.5 `chisq_gof()` - Chi-Quadrat Goodness-of-Fit **ERLEDIGT**
+
+**Datei:** `R/chisq_gof.R`
+**Strategie:** Eigene Implementierung mit Einzel-Stichproben-Logik, Multi-Variable-Support, Custom Expected Proportions
+**Tests:** 53 PASS (test-chisq-gof-spss-validation.R)
+
+#### 5.6.6 UX-Fix: Konsistente S3-Fehlermeldungen (Prioritaet NIEDRIG)
+
+`levene_test()` auf `mann_whitney` gibt eine hilfreiche Fehlermeldung.
+Aber auf `kruskal_wallis`, `wilcoxon_test` oder `friedman_test` kommt ein generischer S3-Dispatch-Fehler.
+
+**Fix:** `levene_test.kruskal_wallis`, `levene_test.wilcoxon_test`, `levene_test.friedman_test` als informative Fehlermethoden analog zu `levene_test.mann_whitney`.
+
+---
+
+#### 5.6.7 Priorisierte Reihenfolge Phase 5
+
+| # | Funktion | Strategie | Prioritaet | Abhaengigkeit |
+|---|---|---|---|---|
+| 1 | `dunn_test()` | Genuin + S3 auf `kruskal_wallis` | **HOCH** | **ERLEDIGT** |
+| 2 | `pairwise_wilcoxon()` | Genuin + S3 auf `friedman_test` | **HOCH** | **ERLEDIGT** |
+| 3 | `fisher_test()` | Wrapper (`fisher.test()`) | MITTEL | **ERLEDIGT** |
+| 4 | `mcnemar_test()` | Wrapper (`mcnemar.test()`) | MITTEL | **ERLEDIGT** |
+| 5 | `chisq_gof()` | Wrapper (`chisq.test()`) | MITTEL | **ERLEDIGT** |
+| 6 | S3-Fehlermethoden | Fix | NIEDRIG | **ERLEDIGT** |
 
 ---
 
@@ -649,17 +750,23 @@ tests/testthat/test-logistic-regression-spss-validation.R
 
 | # | Funktion | Strategie | Abhaengigkeit | Status |
 |---|---|---|---|---|
-| 1 | `reliability()` | Genuin | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
-| 2 | `efa()` | Hybrid | `GPArotation`, `MASS` (Suggests) | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
-| 3 | `scale_index()` / `pomps()` | Genuin | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
-| 4 | `linear_regression()` | Wrapper (`lm()`) | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
-| 5 | `logistic_regression()` | Wrapper (`glm()`) | keine | **v0.2.0 - ERLEDIGT** (Branch: condescending-tesla) |
+| 1 | `reliability()` | Genuin | keine | **v0.2.0 - ERLEDIGT** |
+| 2 | `efa()` | Hybrid | `GPArotation`, `MASS` (Suggests) | **v0.2.0 - ERLEDIGT** |
+| 3 | `scale_index()` / `pomps()` | Genuin | keine | **v0.2.0 - ERLEDIGT** |
+| 4 | `linear_regression()` | Wrapper (`lm()`) | keine | **v0.2.0 - ERLEDIGT** |
+| 5 | `logistic_regression()` | Wrapper (`glm()`) | keine | **v0.2.0 - ERLEDIGT** |
 | ~~6~~ | ~~`crosstab()` 3-Wege~~ | ~~Erweiterung~~ | — | Entfaellt |
-| 7 | `kruskal_wallis()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** (187 Tests, 105 SPSS) |
-| 8 | `wilcoxon_test()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** (109 Tests, 82 SPSS) |
-| 9 | `friedman_test()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** (129 Tests, 77 SPSS) |
-| 10 | `binomial_test()` | Wrapper | keine | **v0.3.0 - ERLEDIGT** (89 Tests, 30 SPSS) |
-| 11 | Validierung + Doku | — | SPSS-Zugang | Laufend |
+| 7 | `kruskal_wallis()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** |
+| 8 | `wilcoxon_test()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** |
+| 9 | `friedman_test()` | Hybrid | keine | **v0.3.0 - ERLEDIGT** |
+| 10 | `binomial_test()` | Wrapper | keine | **v0.3.0 - ERLEDIGT** |
+| 11 | Validierung + Doku | — | — | **v0.3.0 - ERLEDIGT** |
+| 12 | `dunn_test()` | Genuin + S3 | keine | **v0.4.0 - ERLEDIGT** |
+| 13 | `pairwise_wilcoxon()` | Genuin + S3 | keine | **v0.4.0 - ERLEDIGT** |
+| 14 | `fisher_test()` | Wrapper (`fisher.test()`) | keine | **v0.4.0 - ERLEDIGT** |
+| 15 | `mcnemar_test()` | Wrapper (`mcnemar.test()`) | keine | **v0.4.0 - ERLEDIGT** |
+| 16 | `chisq_gof()` | Wrapper (`chisq.test()`) | keine | **v0.4.0 - ERLEDIGT** |
+| 17 | S3-Fehlermethoden (UX) | Fix | keine | **v0.4.0 - ERLEDIGT** |
 
 ---
 
@@ -733,15 +840,26 @@ S3method(print, logistic_regression)
 
 ## 9. Erfolgskriterien
 
-Die Erweiterung gilt als erfolgreich, wenn:
+### v0.2.0 + v0.3.0 (ERFUELLT)
 
-1. **Funktionalitaet**: Alle 5 neuen Kernfunktionen sind implementiert und exportiert
-2. **SPSS-Kompatibilitaet**: Ergebnisse stimmen innerhalb der Toleranzen mit SPSS ueberein
-3. **Tests**: Mindestens 20 neue SPSS-Validierungstests bestehen
-4. **Dokumentation**: Alle Funktionen haben roxygen2-Dokumentation mit Beispielen
-5. **Konsistenz**: Neue Funktionen fuegen sich nahtlos in das bestehende API-Design ein
-6. **Dependencies**: Maximal 1 neue optionale Dependency (`GPArotation`)
-7. **Vignetten**: Mindestens 2 neue Vignetten (Skalenanalyse, Regression)
+1. **Funktionalitaet**: 10 neue Funktionen implementiert und exportiert (37 gesamt) ✓
+2. **SPSS-Kompatibilitaet**: 2.227+ Tests bestehen innerhalb der Toleranzen ✓
+3. **Tests**: 294 neue SPSS-Validierungen (v0.3.0) ✓
+4. **Dokumentation**: Alle Funktionen mit roxygen2-Doku und Beispielen ✓
+5. **Konsistenz**: Alle Funktionen folgen konsistenten API-Patterns ✓
+6. **Dependencies**: 2 optionale Suggests (`GPArotation`, `MASS`) ✓
+7. **Vignetten**: 2 neue Vignetten (scale-analysis, regression-analysis) ✓
+8. **pkgdown**: Vollstaendige Referenz-Site mit allen 37 Funktionen ✓
+
+### v0.4.0 (IN BEARBEITUNG)
+
+1. **Funktionalitaet**: 5 neue Funktionen + S3-Fehlermethoden
+2. **Post-Hoc-Oekosystem**: Nicht-parametrischer Pfad komplett (KW → Dunn, Friedman → pairwise Wilcoxon)
+3. **SPSS-Kompatibilitaet**: SPSS-Validierung fuer alle neuen Funktionen
+4. **Konsistenz**: S3-Dispatch-Kette analog zum parametrischen Pfad
+
+**Zusaetzliche Verbesserungen (v0.4.0):**
+- `linear_regression()`: Neuer Parameter `use = c("listwise", "pairwise")` fuer SPSS-kompatible Pairwise Deletion (analog SPSS `/MISSING PAIRWISE`). Regression wird ueber paarweise Kovarianzmatrix berechnet.
 
 ---
 
@@ -751,10 +869,11 @@ Fuer zukuenftige Versionen:
 
 | Version | Funktionen | Status |
 |---|---|---|
-| v0.2.0 | Reliability, EFA, Scale, Regression (linear + logistisch) | **ERLEDIGT** (Branch: condescending-tesla, noch nicht in main gemergt) |
-| v0.3.0 | Kruskal-Wallis, Wilcoxon, Friedman, Binomial-Test | **ERLEDIGT** (514 Tests, 294 SPSS-Validierungen; Branch: epic-feynman) |
-| v0.4.0 | Mehrfaktorielle ANOVA, Kovarianzanalyse (ANCOVA) | Offen |
-| v0.5.0 | Clusteranalyse, Diskriminanzanalyse | Offen |
+| v0.2.0 | Reliability, EFA, Scale, Regression (linear + logistisch) | **ERLEDIGT** |
+| v0.3.0 | Kruskal-Wallis, Wilcoxon, Friedman, Binomial-Test + Doku-Update | **ERLEDIGT** (37 Funktionen, 2.227+ Tests) |
+| v0.4.0 | Post-Hoc-Oekosystem: `dunn_test()`, `pairwise_wilcoxon()`, `fisher_test()`, `mcnemar_test()`, `chisq_gof()` | **ERLEDIGT** (42 Funktionen, 3.491+ Tests) |
+| v0.5.0 | Mehrfaktorielle ANOVA, Kovarianzanalyse (ANCOVA) | Offen |
+| v0.6.0 | Clusteranalyse, Diskriminanzanalyse | Offen |
 | v1.0.0 | CRAN-Submission, vollstaendige Dokumentation | Offen |
 
 ---

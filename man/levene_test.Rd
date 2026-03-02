@@ -2,6 +2,7 @@
 % Please edit documentation in R/levene_test.R
 \name{levene_test}
 \alias{levene_test}
+\alias{levene_test.default}
 \alias{levene_test.data.frame}
 \alias{levene_test.oneway_anova}
 \alias{levene_test.t_test}
@@ -10,6 +11,8 @@
 \title{Test If Groups Vary Similarly}
 \usage{
 levene_test(x, ...)
+
+\method{levene_test}{default}(x, ...)
 
 \method{levene_test}{data.frame}(x, ..., group, weights = NULL, center = c("mean", "median"))
 
@@ -161,6 +164,8 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 \code{\link[stats]{var.test}} for the base R F-test of variance equality.
 
 Other posthoc: 
+\code{\link{dunn_test}()},
+\code{\link{pairwise_wilcoxon}()},
 \code{\link{scheffe_test}()},
 \code{\link{tukey_test}()}
 }

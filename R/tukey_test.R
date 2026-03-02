@@ -124,6 +124,17 @@ tukey_test <- function(x, conf.level = 0.95, ...) {
   UseMethod("tukey_test")
 }
 
+#' @rdname tukey_test
+#' @export
+tukey_test.default <- function(x, conf.level = 0.95, ...) {
+  cls <- paste(class(x), collapse = "/")
+  cli_abort(c(
+    "{.fn tukey_test} is not available for objects of class {.cls {cls}}.",
+    "i" = "Tukey HSD requires results from {.fn oneway_anova}.",
+    "i" = "Example: {.code oneway_anova(data, dv, group) |> tukey_test()}"
+  ))
+}
+
 #' @export
 tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   

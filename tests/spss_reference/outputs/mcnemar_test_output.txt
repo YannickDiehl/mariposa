@@ -1,0 +1,402 @@
+﻿Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_media_high                                           
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+                                                      Cases                                 
+                                                      Valid        Missing     Total        
+                                                      N    Percent N   Percent N    Percent 
+ Trust Government High (>=4) * Trust Media High (>=4) 2227 89.1%   273 10.9%   2500 100.0%  
+
+Trust Government High (>=4) * Trust Media High (>=4) Crosstabulation
+ Count 
+
+                       Trust Media High (>=4) Total 
+                       Low               High       
+ Trust Government Low  1342              338  1680  
+ High (>=4)       High 448               99   547   
+ Total                 1790              437  2227  
+
+Chi-Square Tests
+
+                  Value Exact Sig. (2-sided) 
+ McNemar Test           .000(a)              
+ N of Valid Cases 2227                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_sci_high                                             
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+                                                        Cases                                 
+                                                        Valid        Missing     Total        
+                                                        N    Percent N   Percent N    Percent 
+ Trust Government High (>=4) * Trust Science High (>=4) 2255 90.2%   245 9.8%    2500 100.0%  
+
+Trust Government High (>=4) * Trust Science High (>=4) Crosstabulation
+ Count 
+
+                       Trust Science High (>=4) Total 
+                       Low                 High       
+ Trust Government Low  675                 1016 1691  
+ High (>=4)       High 203                 361  564   
+ Total                 878                 1377 2255  
+
+Chi-Square Tests
+
+                  Value Exact Sig. (2-sided) 
+ McNemar Test           .000(a)              
+ N of Valid Cases 2255                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_media_high BY trust_sci_high                                           
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+                                                   Cases                                 
+                                                   Valid        Missing     Total        
+                                                   N    Percent N   Percent N    Percent 
+ Trust Media High (>=4) * Trust Science High (>=4) 2272 90.9%   228 9.1%    2500 100.0%  
+
+Trust Media High (>=4) * Trust Science High (>=4) Crosstabulation
+ Count 
+
+                       Trust Science High (>=4) Total 
+                       Low                 High       
+ Trust Media High Low  701                 1128 1829  
+ (>=4)            High 169                 274  443   
+ Total                 870                 1402 2272  
+
+Chi-Square Tests
+
+                  Value Exact Sig. (2-sided) 
+ McNemar Test           .000(a)              
+ N of Valid Cases 2272                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_media_high                                           
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+                                                      Cases                                         
+                                                      Valid        Missing         Total            
+                                                      N    Percent N       Percent N        Percent 
+ Trust Government High (>=4) * Trust Media High (>=4) 2244 89.2%   272.092 10.8%   2516.092 100.0%  
+
+Trust Government High (>=4) * Trust Media High (>=4) Crosstabulation
+ Count 
+
+                       Trust Media High (>=4) Total 
+                       Low               High       
+ Trust Government Low  1351              342  1693  
+ High (>=4)       High 449               102  551   
+ Total                 1800              444  2244  
+
+Chi-Square Tests
+
+                  Value Exact Sig. (2-sided) 
+ McNemar Test           .000(a)              
+ N of Valid Cases 2244                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     <none>                                                                                
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_sci_high                                             
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.01                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+                                                        Cases                                         
+                                                        Valid        Missing         Total            
+                                                        N    Percent N       Percent N        Percent 
+ Trust Government High (>=4) * Trust Science High (>=4) 2272 90.3%   244.092 9.7%    2516.092 100.0%  
+
+Trust Government High (>=4) * Trust Science High (>=4) Crosstabulation
+ Count 
+
+                       Trust Science High (>=4) Total 
+                       Low                 High       
+ Trust Government Low  681                 1024 1705  
+ High (>=4)       High 203                 364  567   
+ Total                 884                 1388 2272  
+
+Chi-Square Tests
+
+                  Value Exact Sig. (2-sided) 
+ McNemar Test           .000(a)              
+ N of Valid Cases 2272                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_media_high                                           
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.02                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+ Region                                                           Cases                                 
+ (East/West)                                                      Valid        Missing     Total        
+                                                                  N    Percent N   Percent N    Percent 
+ East        Trust Government High (>=4) * Trust Media High (>=4) 435  89.7%   50  10.3%   485  100.0%  
+ West        Trust Government High (>=4) * Trust Media High (>=4) 1792 88.9%   223 11.1%   2015 100.0%  
+
+Trust Government High (>=4) * Trust Media High (>=4) Crosstabulation
+ Count 
+
+ Region                            Trust Media High (>=4) Total 
+ (East/West)                       Low               High       
+ East        Trust Government Low  264               60   324   
+             High (>=4)       High 97                14   111   
+             Total                 361               74   435   
+ West        Trust Government Low  1078              278  1356  
+             High (>=4)       High 351               85   436   
+             Total                 1429              363  1792  
+
+Chi-Square Tests
+
+ Region (East/West)                  Value Exact Sig. (2-sided) 
+ East               McNemar Test           .004(a)              
+                    N of Valid Cases 435                        
+ West               McNemar Test           .004(a)              
+                    N of Valid Cases 1792                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         <none>                                                                                
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_sci_high                                             
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.02                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+ Region                                                             Cases                                 
+ (East/West)                                                        Valid        Missing     Total        
+                                                                    N    Percent N   Percent N    Percent 
+ East        Trust Government High (>=4) * Trust Science High (>=4) 444  91.5%   41  8.5%    485  100.0%  
+ West        Trust Government High (>=4) * Trust Science High (>=4) 1811 89.9%   204 10.1%   2015 100.0%  
+
+Trust Government High (>=4) * Trust Science High (>=4) Crosstabulation
+ Count 
+
+ Region                            Trust Science High (>=4) Total 
+ (East/West)                       Low                 High       
+ East        Trust Government Low  130                 202  332   
+             High (>=4)       High 44                  68   112   
+             Total                 174                 270  444   
+ West        Trust Government Low  545                 814  1359  
+             High (>=4)       High 159                 293  452   
+             Total                 704                 1107 1811  
+
+Chi-Square Tests
+
+ Region (East/West)                  Value Exact Sig. (2-sided) 
+ East               McNemar Test           .000(a)              
+                    N of Valid Cases 444                        
+ West               McNemar Test           .000(a)              
+                    N of Valid Cases 1811                       
+a Binomial distribution used.
+
+Crosstabs
+Notes
+
+ Output Created                               01-MAR-2026 22:08:28                                                                  
+ Comments                                                                                                                           
+ Input         Data                           /Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/ 
+                                              data/survey_data.sav                                                                  
+               Filter                         <none>                                                                                
+               Weight                         Weighting factor                                                                      
+               Split File                     Region (East/West)                                                                    
+               N of Rows in Working Data File 2500                                                                                  
+ Missing Value Definition of Missing          User-defined missing values are treated as missing.                                   
+ Handling      Cases Used                     Statistics for each table are based on all the cases with valid data in the specified 
+                                              range(s) for all variables in each table.                                             
+ Syntax                                       CROSSTABS                                                                             
+                                               /TABLES=trust_gov_high BY trust_media_high                                           
+                                               /FORMAT=AVALUE TABLES                                                                
+                                               /STATISTICS=MCNEMAR                                                                  
+                                               /CELLS=COUNT.                                                                        
+                                                                                                                                    
+ Resources     Processor Time                 00:00:00.02                                                                           
+               Elapsed Time                   00:00:00.00                                                                           
+               Dimensions Requested           2                                                                                     
+               Cells Available                524245                                                                                
+
+Case Processing Summary
+
+ Region                                                           Cases                                         
+ (East/West)                                                      Valid        Missing         Total            
+                                                                  N    Percent N       Percent N        Percent 
+ East        Trust Government High (>=4) * Trust Media High (>=4) 458  90.0%   51.032  10.0%   509.032  100.0%  
+ West        Trust Government High (>=4) * Trust Media High (>=4) 1786 89.0%   221.060 11.0%   2007.060 100.0%  
+
+Trust Government High (>=4) * Trust Media High (>=4) Crosstabulation
+ Count 
+
+ Region                            Trust Media High (>=4) Total 
+ (East/West)                       Low               High       
+ East        Trust Government Low  278               64   342   
+             High (>=4)       High 101               15   116   
+             Total                 379               79   458   
+ West        Trust Government Low  1073              278  1351  
+             High (>=4)       High 348               87   435   
+             Total                 1421              365  1786  
+
+Chi-Square Tests
+
+ Region (East/West)                  Value Exact Sig. (2-sided) 
+ East               McNemar Test           .005(a)              
+                    N of Valid Cases 458                        
+ West               McNemar Test           .006(a)              
+                    N of Valid Cases 1786                       
+a Binomial distribution used.
+

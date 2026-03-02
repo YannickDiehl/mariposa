@@ -1,0 +1,342 @@
+﻿=========== TEST 1a: gender x region (2x2, unweighted) ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+                                           Region (East/West) Total  
+                                           East        West          
+ Gender Male   Count                       238         956    1194   
+               Expected Count              231.6       962.4  1194.0 
+               % within Gender             19.9%       80.1%  100.0% 
+               % within Region (East/West) 49.1%       47.4%  47.8%  
+               % of Total                  9.5%        38.2%  47.8%  
+        Female Count                       247         1059   1306   
+               Expected Count              253.4       1052.6 1306.0 
+               % within Gender             18.9%       81.1%  100.0% 
+               % within Region (East/West) 50.9%       52.6%  52.2%  
+               % of Total                  9.9%        42.4%  52.2%  
+ Total         Count                       485         2015   2500   
+               Expected Count              485.0       2015.0 2500.0 
+               % within Gender             19.4%       80.6%  100.0% 
+               % within Region (East/West) 100.0%      100.0% 100.0% 
+               % of Total                  19.4%       80.6%  100.0% 
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ Pearson Chi-Square           .415(a) 1  .519                                                                        
+ Continuity Correction(b)     .353    1  .553                                                                        
+ Likelihood Ratio             .415    1  .519                                                                        
+ Fisher's Exact Test                                                       .544                 .276                 
+ Linear-by-Linear Association .415    1  .519                                                                        
+ N of Valid Cases             2500                                                                                   
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 231.64.
+b Computed only for a 2x2 table
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .013  .519                     
+ Nominal    Cramer's V .013  .519                     
+ N of Valid Cases      2500                           
+
+=========== TEST 1b: gender x interview_mode (2x3, unweighted) ===========
+
+Crosstabs
+Gender * Interview mode Crosstabulation
+
+                                       Interview mode                Total  
+                                       Face-to-face Telephone Online        
+ Gender Male   Count                   720          307       167    1194   
+               Expected Count          709.2        312.8     171.9  1194.0 
+               % within Gender         60.3%        25.7%     14.0%  100.0% 
+               % within Interview mode 48.5%        46.9%     46.4%  47.8%  
+               % of Total              28.8%        12.3%     6.7%   47.8%  
+        Female Count                   765          348       193    1306   
+               Expected Count          775.8        342.2     188.1  1306.0 
+               % within Gender         58.6%        26.6%     14.8%  100.0% 
+               % within Interview mode 51.5%        53.1%     53.6%  52.2%  
+               % of Total              30.6%        13.9%     7.7%   52.2%  
+ Total         Count                   1485         655       360    2500   
+               Expected Count          1485.0       655.0     360.0  2500.0 
+               % within Gender         59.4%        26.2%     14.4%  100.0% 
+               % within Interview mode 100.0%       100.0%    100.0% 100.0% 
+               % of Total              59.4%        26.2%     14.4%  100.0% 
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) 
+ Pearson Chi-Square           .792(a) 2  .673                              
+ Likelihood Ratio             .792    2  .673                              
+ Linear-by-Linear Association .738    1  .390                              
+ N of Valid Cases             2500                                         
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 171.94.
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .018  .673                     
+ Nominal    Cramer's V .018  .673                     
+ N of Valid Cases      2500                           
+
+=========== TEST 1c: Small sample subset ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+                                           Region (East/West) Total  
+                                           East        West          
+ Gender Male   Count                       4           18     22     
+               Expected Count              4.8         17.2   22.0   
+               % within Gender             18.2%       81.8%  100.0% 
+               % within Region (East/West) 36.4%       46.2%  44.0%  
+               % of Total                  8.0%        36.0%  44.0%  
+        Female Count                       7           21     28     
+               Expected Count              6.2         21.8   28.0   
+               % within Gender             25.0%       75.0%  100.0% 
+               % within Region (East/West) 63.6%       53.8%  56.0%  
+               % of Total                  14.0%       42.0%  56.0%  
+ Total         Count                       11          39     50     
+               Expected Count              11.0        39.0   50.0   
+               % within Gender             22.0%       78.0%  100.0% 
+               % within Region (East/West) 100.0%      100.0% 100.0% 
+               % of Total                  22.0%       78.0%  100.0% 
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ Pearson Chi-Square           .334(a) 1  .563                                                                        
+ Continuity Correction(b)     .055    1  .815                                                                        
+ Likelihood Ratio             .338    1  .561                                                                        
+ Fisher's Exact Test                                                       .734                 .411                 
+ Linear-by-Linear Association .327    1  .567                                                                        
+ N of Valid Cases             50                                                                                     
+a 1 cells (25.0%) have expected count less than 5. The minimum expected count is 4.84.
+b Computed only for a 2x2 table
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        -.082 .563                     
+ Nominal    Cramer's V .082  .563                     
+ N of Valid Cases      50                             
+
+=========== TEST 2a: gender x region (2x2, weighted) ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+                                           Region (East/West) Total  
+                                           East        West          
+ Gender Male   Count                       249         945    1194   
+               Expected Count              241.6       952.4  1194.0 
+               % within Gender             20.9%       79.1%  100.0% 
+               % within Region (East/West) 48.9%       47.1%  47.5%  
+               % of Total                  9.9%        37.6%  47.5%  
+        Female Count                       260         1062   1322   
+               Expected Count              267.4       1054.6 1322.0 
+               % within Gender             19.7%       80.3%  100.0% 
+               % within Region (East/West) 51.1%       52.9%  52.5%  
+               % of Total                  10.3%       42.2%  52.5%  
+ Total         Count                       509         2007   2516   
+               Expected Count              509.0       2007.0 2516.0 
+               % within Gender             20.2%       79.8%  100.0% 
+               % within Region (East/West) 100.0%      100.0% 100.0% 
+               % of Total                  20.2%       79.8%  100.0% 
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ Pearson Chi-Square           .548(a) 1  .459                                                                        
+ Continuity Correction(b)     .477    1  .490                                                                        
+ Likelihood Ratio             .548    1  .459                                                                        
+ Fisher's Exact Test                                                       .487                 .245                 
+ Linear-by-Linear Association .548    1  .459                                                                        
+ N of Valid Cases             2516                                                                                   
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 241.55.
+b Computed only for a 2x2 table
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .015  .459                     
+ Nominal    Cramer's V .015  .459                     
+ N of Valid Cases      2516                           
+
+=========== TEST 2b: gender x interview_mode (2x3, weighted) ===========
+
+Crosstabs
+Gender * Interview mode Crosstabulation
+
+                                       Interview mode                Total  
+                                       Face-to-face Telephone Online        
+ Gender Male   Count                   719          308       167    1194   
+               Expected Count          709.9        312.3     171.8  1194.0 
+               % within Gender         60.2%        25.8%     14.0%  100.0% 
+               % within Interview mode 48.1%        46.8%     46.1%  47.5%  
+               % of Total              28.6%        12.2%     6.6%   47.5%  
+        Female Count                   777          350       195    1322   
+               Expected Count          786.1        345.7     190.2  1322.0 
+               % within Gender         58.8%        26.5%     14.8%  100.0% 
+               % within Interview mode 51.9%        53.2%     53.9%  52.5%  
+               % of Total              30.9%        13.9%     7.8%   52.5%  
+ Total         Count                   1496         658       362    2516   
+               Expected Count          1496.0       658.0     362.0  2516.0 
+               % within Gender         59.5%        26.2%     14.4%  100.0% 
+               % within Interview mode 100.0%       100.0%    100.0% 100.0% 
+               % of Total              59.5%        26.2%     14.4%  100.0% 
+
+Chi-Square Tests
+
+                              Value   df Asymptotic Significance (2-sided) 
+ Pearson Chi-Square           .585(a) 2  .746                              
+ Likelihood Ratio             .585    2  .746                              
+ Linear-by-Linear Association .571    1  .450                              
+ N of Valid Cases             2516                                         
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 171.79.
+
+Symmetric Measures
+
+                       Value Approximate Significance 
+ Nominal by Phi        .015  .746                     
+ Nominal    Cramer's V .015  .746                     
+ N of Valid Cases      2516                           
+
+=========== TEST 3: gender x region, grouped by education ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+ Highest educational                                           Region (East/West) Total  
+ attainment                                                    East        West          
+ Basic Secondary     Gender Male   Count                       82          319    401    
+                                   Expected Count              81.1        319.9  401.0  
+                                   % within Gender             20.4%       79.6%  100.0% 
+                                   % within Region (East/West) 48.2%       47.5%  47.7%  
+                                   % of Total                  9.8%        37.9%  47.7%  
+                            Female Count                       88          352    440    
+                                   Expected Count              88.9        351.1  440.0  
+                                   % within Gender             20.0%       80.0%  100.0% 
+                                   % within Region (East/West) 51.8%       52.5%  52.3%  
+                                   % of Total                  10.5%       41.9%  52.3%  
+                     Total         Count                       170         671    841    
+                                   Expected Count              170.0       671.0  841.0  
+                                   % within Gender             20.2%       79.8%  100.0% 
+                                   % within Region (East/West) 100.0%      100.0% 100.0% 
+                                   % of Total                  20.2%       79.8%  100.0% 
+ University          Gender Male   Count                       37          147    184    
+                                   Expected Count              36.4        147.6  184.0  
+                                   % within Gender             20.1%       79.9%  100.0% 
+                                   % within Region (East/West) 46.8%       45.9%  46.1%  
+                                   % of Total                  9.3%        36.8%  46.1%  
+                            Female Count                       42          173    215    
+                                   Expected Count              42.6        172.4  215.0  
+                                   % within Gender             19.5%       80.5%  100.0% 
+                                   % within Region (East/West) 53.2%       54.1%  53.9%  
+                                   % of Total                  10.5%       43.4%  53.9%  
+                     Total         Count                       79          320    399    
+                                   Expected Count              79.0        320.0  399.0  
+                                   % within Gender             19.8%       80.2%  100.0% 
+                                   % within Region (East/West) 100.0%      100.0% 100.0% 
+                                   % of Total                  19.8%       80.2%  100.0% 
+
+Chi-Square Tests
+
+ Highest educational                                      Value   df Asymptotic           Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ attainment                                                          Significance                                                   
+                                                                     (2-sided)                                                      
+ Basic Secondary             Pearson Chi-Square           .026(a) 1  .871                                                           
+                             Continuity Correction(c)     .006    1  .939                                                           
+                             Likelihood Ratio             .026    1  .871                                                           
+                             Fisher's Exact Test                                          .932                 .469                 
+                             Linear-by-Linear Association .026    1  .871                                                           
+                             N of Valid Cases             841                                                                       
+ University                  Pearson Chi-Square           .021(b) 1  .886                                                           
+                             Continuity Correction(c)     .000    1  .986                                                           
+                             Likelihood Ratio             .021    1  .886                                                           
+                             Fisher's Exact Test                                          .900                 .492                 
+                             Linear-by-Linear Association .021    1  .886                                                           
+                             N of Valid Cases             399                                                                       
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 81.06.
+b 0 cells (.0%) have expected count less than 5. The minimum expected count is 36.43.
+c Computed only for a 2x2 table
+
+Symmetric Measures
+
+ Highest educational attainment                       Value Approximate Significance 
+ Basic Secondary                Nominal by Phi        .006  .871                     
+                                Nominal    Cramer's V .006  .871                     
+                                N of Valid Cases      841                            
+ University                     Nominal by Phi        .007  .886                     
+                                Nominal    Cramer's V .007  .886                     
+                                N of Valid Cases      399                            
+
+=========== TEST 4: gender x region, weighted, grouped by education ===========
+
+Crosstabs
+Gender * Region (East/West) Crosstabulation
+
+ Highest educational                                           Region (East/West) Total  
+ attainment                                                    East        West          
+ Basic Secondary     Gender Male   Count                       83          318    401    
+                                   Expected Count              82.8        318.2  401.0  
+                                   % within Gender             20.7%       79.3%  100.0% 
+                                   % within Region (East/West) 47.4%       47.3%  47.3%  
+                                   % of Total                  9.8%        37.5%  47.3%  
+                            Female Count                       92          355    447    
+                                   Expected Count              92.2        354.8  447.0  
+                                   % within Gender             20.6%       79.4%  100.0% 
+                                   % within Region (East/West) 52.6%       52.7%  52.7%  
+                                   % of Total                  10.8%       41.9%  52.7%  
+                     Total         Count                       175         673    848    
+                                   Expected Count              175.0       673.0  848.0  
+                                   % within Gender             20.6%       79.4%  100.0% 
+                                   % within Region (East/West) 100.0%      100.0% 100.0% 
+                                   % of Total                  20.6%       79.4%  100.0% 
+ University          Gender Male   Count                       39          137    176    
+                                   Expected Count              37.5        138.5  176.0  
+                                   % within Gender             22.2%       77.8%  100.0% 
+                                   % within Region (East/West) 47.6%       45.2%  45.7%  
+                                   % of Total                  10.1%       35.6%  45.7%  
+                            Female Count                       43          166    209    
+                                   Expected Count              44.5        164.5  209.0  
+                                   % within Gender             20.6%       79.4%  100.0% 
+                                   % within Region (East/West) 52.4%       54.8%  54.3%  
+                                   % of Total                  11.2%       43.1%  54.3%  
+                     Total         Count                       82          303    385    
+                                   Expected Count              82.0        303.0  385.0  
+                                   % within Gender             21.3%       78.7%  100.0% 
+                                   % within Region (East/West) 100.0%      100.0% 100.0% 
+                                   % of Total                  21.3%       78.7%  100.0% 
+
+Chi-Square Tests
+
+ Highest educational                                      Value   df Asymptotic           Exact Sig. (2-sided) Exact Sig. (1-sided) 
+ attainment                                                          Significance                                                   
+                                                                     (2-sided)                                                      
+ Basic Secondary             Pearson Chi-Square           .002(a) 1  .967                                                           
+                             Continuity Correction(c)     .000    1  1.000                                                          
+                             Likelihood Ratio             .002    1  .967                                                           
+                             Fisher's Exact Test                                          1.000                .517                 
+                             Linear-by-Linear Association .002    1  .967                                                           
+                             N of Valid Cases             848                                                                       
+ University                  Pearson Chi-Square           .143(b) 1  .705                                                           
+                             Continuity Correction(c)     .064    1  .800                                                           
+                             Likelihood Ratio             .143    1  .705                                                           
+                             Fisher's Exact Test                                          .710                 .399                 
+                             Linear-by-Linear Association .143    1  .706                                                           
+                             N of Valid Cases             385                                                                       
+a 0 cells (.0%) have expected count less than 5. The minimum expected count is 82.75.
+b 0 cells (.0%) have expected count less than 5. The minimum expected count is 37.49.
+c Computed only for a 2x2 table
+
+Symmetric Measures
+
+ Highest educational attainment                       Value Approximate Significance 
+ Basic Secondary                Nominal by Phi        .001  .967                     
+                                Nominal    Cramer's V .001  .967                     
+                                N of Valid Cases      848                            
+ University                     Nominal by Phi        .019  .705                     
+                                Nominal    Cramer's V .019  .705                     
+                                N of Valid Cases      385                            
+
