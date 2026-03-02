@@ -71,6 +71,9 @@ statistics.
 # Weighted mean
 w_mean(survey_data, income, weights = sampling_weight)
 #> 
+#> Weighted Mean Statistics
+#> ------------------------
+#> 
 #> --- income ---
 #>  Variable weighted_mean Effective_N
 #>    income      3743.099      2158.9
@@ -78,12 +81,18 @@ w_mean(survey_data, income, weights = sampling_weight)
 # Weighted median
 w_median(survey_data, income, weights = sampling_weight)
 #> 
+#> Weighted Median Statistics
+#> --------------------------
+#> 
 #> --- income ---
 #>  Variable weighted_median Effective_N
 #>    income            3500      2158.9
 
 # Weighted mode (most common value)
 w_modus(survey_data, education, weights = sampling_weight)
+#> 
+#> Weighted Mode Statistics
+#> ------------------------
 #> # A tibble: 1 × 3
 #>   Variable  weighted_mode   effective_n
 #>   <chr>     <ord>                 <dbl>
@@ -96,6 +105,9 @@ w_modus(survey_data, education, weights = sampling_weight)
 # Weighted standard deviation
 w_sd(survey_data, income, weights = sampling_weight)
 #> 
+#> Weighted Standard Deviation Statistics
+#> --------------------------------------
+#> 
 #> --- income ---
 #>  Variable weighted_sd Effective_N
 #>    income    1423.966      2158.9
@@ -103,12 +115,18 @@ w_sd(survey_data, income, weights = sampling_weight)
 # Weighted variance
 w_var(survey_data, income, weights = sampling_weight)
 #> 
+#> Weighted Variance Statistics
+#> ----------------------------
+#> 
 #> --- income ---
 #>  Variable weighted_var Effective_N
 #>    income      2027678      2158.9
 
 # Weighted interquartile range
 w_iqr(survey_data, income, weights = sampling_weight)
+#> 
+#> Weighted Interquartile Range Statistics
+#> ---------------------------------------
 #> 
 #> --- income ---
 #>  Variable weighted_iqr Effective_N
@@ -121,12 +139,18 @@ w_iqr(survey_data, income, weights = sampling_weight)
 # Weighted skewness
 w_skew(survey_data, income, weights = sampling_weight)
 #> 
+#> Weighted Skewness Statistics
+#> ----------------------------
+#> 
 #> --- income ---
 #>  Variable weighted_skew Effective_N
 #>    income         0.725      2158.9
 
 # Weighted kurtosis
 w_kurtosis(survey_data, income, weights = sampling_weight)
+#> 
+#> Weighted Excess Kurtosis Statistics
+#> -----------------------------------
 #> 
 #> --- income ---
 #>  Variable weighted_kurtosis Effective_N
@@ -140,13 +164,20 @@ w_kurtosis(survey_data, income, weights = sampling_weight)
 w_quantile(survey_data, income,
            probs = c(0.25, 0.5, 0.75),
            weights = sampling_weight)
+#> 
+#> Weighted Quantile Statistics
+#> ----------------------------
 #>  Variable Quantile Value    N Effective_N         Weights
 #>    income      25%  2700 2186      2158.9 sampling_weight
 #>    income      50%  3500 2186      2158.9 sampling_weight
 #>    income      75%  4600 2186      2158.9 sampling_weight
+#> ----------------------------------------
 
 # Weighted standard error
 w_se(survey_data, income, weights = sampling_weight)
+#> 
+#> Weighted Standard Error Statistics
+#> ----------------------------------
 #> 
 #> --- income ---
 #>  Variable weighted_se Effective_N
@@ -189,6 +220,15 @@ All main analysis functions support the `weights` argument:
 ``` r
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
+#> Weighted t-Test Results
+#> -----------------------
+#> 
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
@@ -208,6 +248,9 @@ survey_data %>%
 #>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>    income    0.032    0.032       0.032  negligible
 #> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)
 #> - Hedges' g: bias-corrected Cohen's d (preferred)
@@ -223,6 +266,14 @@ survey_data %>%
 survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
+#> 
+#> Weighted One-Way ANOVA Results
+#> ------------------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
 #>   Null hypothesis: All group means are equal
 #>   Alternative hypothesis: At least one group mean differs
 #> 
@@ -253,6 +304,9 @@ survey_data %>%
 #>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
 #>  life_satisfaction       0.075           0.073         0.073      medium
 #> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
 #> Effect Size Interpretation:
 #> - Eta-squared: Proportion of variance explained (biased upward)
 #> - Epsilon-squared: Less biased than eta-squared
@@ -268,21 +322,27 @@ survey_data %>%
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
 #> 
+#> Weighted Chi-Squared Test of Independence 
+#> ------------------------------------------
+#> 
+#> - Variables: education × employment
+#> - Weights variable: sampling_weight
+#> 
 #> Observed Frequencies:
-#>                         var2
-#> var1                     Student Employed Unemployed Retired Other
-#>   Basic Secondary              0      573         66     175    34
-#>   Intermediate Secondary       0      420         52     139    29
-#>   Academic Secondary          46      370         45     149    33
-#>   University                  34      240         21      72    20
+#>                       employment
+#> education              Student Employed Unemployed Retired Other
+#>   Basic Secondary            0      573         66     175    34
+#>   Intermediate Seco...       0      420         52     139    29
+#>   Academic Secondary        46      370         45     149    33
+#>   University                34      240         21      72    20
 #> 
 #> Expected Frequencies:
-#>                         var2
-#> var1                     Student Employed Unemployed Retired  Other
-#>   Basic Secondary         26.942  539.851     61.967 180.175 39.066
-#>   Intermediate Secondary  20.334  407.434     46.767 135.981 29.484
-#>   Academic Secondary      20.429  409.344     46.986 136.618 29.622
-#>   University              12.295  246.371     28.280  82.226 17.828
+#>                       employment
+#> education              Student Employed Unemployed Retired  Other
+#>   Basic Secondary       26.942  539.851     61.967 180.175 39.066
+#>   Intermediate Seco...  20.334  407.434     46.767 135.981 29.484
+#>   Academic Secondary    20.429  409.344     46.986 136.618 29.622
+#>   University            12.295  246.371     28.280  82.226 17.828
 #> 
 #> Chi-Squared Test Results:
 #> -------------------------------------------------- 
@@ -298,6 +358,8 @@ survey_data %>%
 #> ---------------------------------------------------------------------- 
 #> Table size: 4×5 | N = 2518
 #> Note: Phi coefficient only shown for 2x2 tables
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 ### Weighted Correlations
@@ -305,6 +367,13 @@ survey_data %>%
 ``` r
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
+#> 
+#> Weighted Pearson Correlation 
+#> -----------------------------
+#> 
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Confidence level: 95.0%
 #> 
 #> 
 #> --- age × income ---
@@ -315,6 +384,8 @@ survey_data %>%
 #>   95% CI: [-0.046, 0.037]
 #>   p-value: 0.8276
 #>   Significance: ns
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Correlation Strength Interpretation:
 #>   |r| < 0.30:        Weak correlation
@@ -334,14 +405,27 @@ survey_data %>%
   group_by(region) %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
+#> Group: region = East
+#> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   52.278     53   17.595    77   24    0.098       477.0
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> ----------------------------------------
+#> 
+#> Group: region = West
+#> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.067     49   16.927    77   24    0.170      1993.1
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
+#> ----------------------------------------
 ```
 
 ## Diagnosing Weight Issues
@@ -474,14 +558,36 @@ for (var in vars_to_check) {
 survey_data %>%
   group_by(region) %>%
   describe(income, weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
+#> Group: region = East
+#> --------------------
+#> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#> ----------------------------------------
+#> 
+#> Group: region = West
+#> --------------------
+#> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#> ----------------------------------------
 
 # 4. Weighted hypothesis test
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
+#> Weighted t-Test Results
+#> -----------------------
+#> 
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
@@ -500,6 +606,9 @@ survey_data %>%
 #> ------------ 
 #>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
 #>    income    0.032    0.032       0.032  negligible
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation:
 #> - Cohen's d: pooled standard deviation (classic)

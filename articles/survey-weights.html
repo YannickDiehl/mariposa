@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,8 @@
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
+    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul>
 </li>
@@ -73,14 +75,14 @@
       <img src="../logo.png" class="logo" alt=""><h1>Working with Survey Weights</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/vignettes/survey-weights.Rmd" class="external-link"><code>vignettes/survey-weights.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/vignettes/survey-weights.Rmd" class="external-link"><code>vignettes/survey-weights.Rmd</code></a></small>
       <div class="d-none name"><code>survey-weights.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/YannickDiehl/mariposa" class="external-link">mariposa</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://YannickDiehl.github.io/mariposa/">mariposa</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
@@ -150,6 +152,9 @@ individual weighted statistics.</p>
 <code class="sourceCode R"><span><span class="co"># Weighted mean</span></span>
 <span><span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Mean Statistics</span></span>
+<span><span class="co">#&gt; ------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_mean Effective_N</span></span>
 <span><span class="co">#&gt;    income      3743.099      2158.9</span></span>
@@ -157,12 +162,18 @@ individual weighted statistics.</p>
 <span><span class="co"># Weighted median</span></span>
 <span><span class="fu"><a href="../reference/w_median.html">w_median</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Median Statistics</span></span>
+<span><span class="co">#&gt; --------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_median Effective_N</span></span>
 <span><span class="co">#&gt;    income            3500      2158.9</span></span>
 <span></span>
 <span><span class="co"># Weighted mode (most common value)</span></span>
 <span><span class="fu"><a href="../reference/w_modus.html">w_modus</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Mode Statistics</span></span>
+<span><span class="co">#&gt; ------------------------</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
 <span><span class="co">#&gt;   Variable  weighted_mode   effective_n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -175,6 +186,9 @@ individual weighted statistics.</p>
 <code class="sourceCode R"><span><span class="co"># Weighted standard deviation</span></span>
 <span><span class="fu"><a href="../reference/w_sd.html">w_sd</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Standard Deviation Statistics</span></span>
+<span><span class="co">#&gt; --------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_sd Effective_N</span></span>
 <span><span class="co">#&gt;    income    1423.966      2158.9</span></span>
@@ -182,12 +196,18 @@ individual weighted statistics.</p>
 <span><span class="co"># Weighted variance</span></span>
 <span><span class="fu"><a href="../reference/w_var.html">w_var</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Variance Statistics</span></span>
+<span><span class="co">#&gt; ----------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_var Effective_N</span></span>
 <span><span class="co">#&gt;    income      2027678      2158.9</span></span>
 <span></span>
 <span><span class="co"># Weighted interquartile range</span></span>
 <span><span class="fu"><a href="../reference/w_iqr.html">w_iqr</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Interquartile Range Statistics</span></span>
+<span><span class="co">#&gt; ---------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_iqr Effective_N</span></span>
@@ -200,12 +220,18 @@ individual weighted statistics.</p>
 <code class="sourceCode R"><span><span class="co"># Weighted skewness</span></span>
 <span><span class="fu"><a href="../reference/w_skew.html">w_skew</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Skewness Statistics</span></span>
+<span><span class="co">#&gt; ----------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_skew Effective_N</span></span>
 <span><span class="co">#&gt;    income         0.725      2158.9</span></span>
 <span></span>
 <span><span class="co"># Weighted kurtosis</span></span>
 <span><span class="fu"><a href="../reference/w_kurtosis.html">w_kurtosis</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Excess Kurtosis Statistics</span></span>
+<span><span class="co">#&gt; -----------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_kurtosis Effective_N</span></span>
@@ -219,13 +245,20 @@ individual weighted statistics.</p>
 <span><span class="fu"><a href="../reference/w_quantile.html">w_quantile</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>,</span>
 <span>           probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Quantile Statistics</span></span>
+<span><span class="co">#&gt; ----------------------------</span></span>
 <span><span class="co">#&gt;  Variable Quantile Value    N Effective_N         Weights</span></span>
 <span><span class="co">#&gt;    income      25%  2700 2186      2158.9 sampling_weight</span></span>
 <span><span class="co">#&gt;    income      50%  3500 2186      2158.9 sampling_weight</span></span>
 <span><span class="co">#&gt;    income      75%  4600 2186      2158.9 sampling_weight</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
 <span></span>
 <span><span class="co"># Weighted standard error</span></span>
 <span><span class="fu"><a href="../reference/w_se.html">w_se</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Standard Error Statistics</span></span>
+<span><span class="co">#&gt; ----------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
 <span><span class="co">#&gt;  Variable weighted_se Effective_N</span></span>
@@ -270,6 +303,15 @@ argument:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Weighted t-Test Results</span></span>
+<span><span class="co">#&gt; -----------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Grouping variable: gender</span></span>
+<span><span class="co">#&gt; - Groups compared: Male vs. Female</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
+<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
@@ -289,6 +331,9 @@ argument:</p>
 <span><span class="co">#&gt;  Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
 <span><span class="co">#&gt;    income    0.032    0.032       0.032  negligible</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation:</span></span>
 <span><span class="co">#&gt; - Cohen's d: pooled standard deviation (classic)</span></span>
 <span><span class="co">#&gt; - Hedges' g: bias-corrected Cohen's d (preferred)</span></span>
@@ -304,6 +349,14 @@ argument:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted One-Way ANOVA Results</span></span>
+<span><span class="co">#&gt; ------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
+<span><span class="co">#&gt; - Grouping variable: education</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt;   Null hypothesis: All group means are equal</span></span>
 <span><span class="co">#&gt;   Alternative hypothesis: At least one group mean differs</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -334,6 +387,9 @@ argument:</p>
 <span><span class="co">#&gt;           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span></span>
 <span><span class="co">#&gt;  life_satisfaction       0.075           0.073         0.073      medium</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation:</span></span>
 <span><span class="co">#&gt; - Eta-squared: Proportion of variance explained (biased upward)</span></span>
 <span><span class="co">#&gt; - Epsilon-squared: Less biased than eta-squared</span></span>
@@ -349,21 +405,27 @@ argument:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chi_square.html">chi_square</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Chi-Squared Test of Independence </span></span>
+<span><span class="co">#&gt; ------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Variables: education × employment</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Observed Frequencies:</span></span>
-<span><span class="co">#&gt;                         var2</span></span>
-<span><span class="co">#&gt; var1                     Student Employed Unemployed Retired Other</span></span>
-<span><span class="co">#&gt;   Basic Secondary              0      573         66     175    34</span></span>
-<span><span class="co">#&gt;   Intermediate Secondary       0      420         52     139    29</span></span>
-<span><span class="co">#&gt;   Academic Secondary          46      370         45     149    33</span></span>
-<span><span class="co">#&gt;   University                  34      240         21      72    20</span></span>
+<span><span class="co">#&gt;                       employment</span></span>
+<span><span class="co">#&gt; education              Student Employed Unemployed Retired Other</span></span>
+<span><span class="co">#&gt;   Basic Secondary            0      573         66     175    34</span></span>
+<span><span class="co">#&gt;   Intermediate Seco...       0      420         52     139    29</span></span>
+<span><span class="co">#&gt;   Academic Secondary        46      370         45     149    33</span></span>
+<span><span class="co">#&gt;   University                34      240         21      72    20</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Expected Frequencies:</span></span>
-<span><span class="co">#&gt;                         var2</span></span>
-<span><span class="co">#&gt; var1                     Student Employed Unemployed Retired  Other</span></span>
-<span><span class="co">#&gt;   Basic Secondary         26.942  539.851     61.967 180.175 39.066</span></span>
-<span><span class="co">#&gt;   Intermediate Secondary  20.334  407.434     46.767 135.981 29.484</span></span>
-<span><span class="co">#&gt;   Academic Secondary      20.429  409.344     46.986 136.618 29.622</span></span>
-<span><span class="co">#&gt;   University              12.295  246.371     28.280  82.226 17.828</span></span>
+<span><span class="co">#&gt;                       employment</span></span>
+<span><span class="co">#&gt; education              Student Employed Unemployed Retired  Other</span></span>
+<span><span class="co">#&gt;   Basic Secondary       26.942  539.851     61.967 180.175 39.066</span></span>
+<span><span class="co">#&gt;   Intermediate Seco...  20.334  407.434     46.767 135.981 29.484</span></span>
+<span><span class="co">#&gt;   Academic Secondary    20.429  409.344     46.986 136.618 29.622</span></span>
+<span><span class="co">#&gt;   University            12.295  246.371     28.280  82.226 17.828</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Chi-Squared Test Results:</span></span>
 <span><span class="co">#&gt; -------------------------------------------------- </span></span>
@@ -378,7 +440,9 @@ argument:</p>
 <span><span class="co">#&gt;       Gamma -0.062   0.122               Weak</span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; Table size: 4×5 | N = 2518</span></span>
-<span><span class="co">#&gt; Note: Phi coefficient only shown for 2x2 tables</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: Phi coefficient only shown for 2x2 tables</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="weighted-correlations">Weighted Correlations<a class="anchor" aria-label="anchor" href="#weighted-correlations"></a>
@@ -386,6 +450,13 @@ argument:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
+<span><span class="co">#&gt; -----------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - Missing data handling: pairwise deletion</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- age × income ---</span></span>
@@ -396,6 +467,8 @@ argument:</p>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   p-value: 0.8276</span></span>
 <span><span class="co">#&gt;   Significance: ns</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
 <span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
@@ -414,14 +487,27 @@ argument:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
+<span><span class="co">#&gt; -------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;                age   52.278     53   17.595    77   24    0.098       477.0</span></span>
 <span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;                age   50.067     49   16.927    77   24    0.170      1993.1</span></span>
 <span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
-<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span></code></pre></div>
+<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="diagnosing-weight-issues">Diagnosing Weight Issues<a class="anchor" aria-label="anchor" href="#diagnosing-weight-issues"></a>
@@ -560,14 +646,36 @@ weights inflates standard errors and reduces power.</li>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
+<span><span class="co">#&gt; -------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
 <span></span>
 <span><span class="co"># 4. Weighted hypothesis test</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Weighted t-Test Results</span></span>
+<span><span class="co">#&gt; -----------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Grouping variable: gender</span></span>
+<span><span class="co">#&gt; - Groups compared: Male vs. Female</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
+<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
@@ -586,6 +694,9 @@ weights inflates standard errors and reduces power.</li>
 <span><span class="co">#&gt; ------------ </span></span>
 <span><span class="co">#&gt;  Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
 <span><span class="co">#&gt;    income    0.032    0.032       0.032  negligible</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Size Interpretation:</span></span>
 <span><span class="co">#&gt; - Cohen's d: pooled standard deviation (classic)</span></span>

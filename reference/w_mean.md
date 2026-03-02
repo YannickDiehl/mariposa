@@ -104,7 +104,8 @@ data(survey_data)
 # Basic weighted usage
 survey_data %>% w_mean(age, weights = sampling_weight)
 #> 
-#> ── Weighted Mean Statistics ────────────────────────────────────────────────────
+#> Weighted Mean Statistics
+#> ------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_mean Effective_N
@@ -114,7 +115,8 @@ survey_data %>% w_mean(age, weights = sampling_weight)
 # Multiple variables
 survey_data %>% w_mean(age, income, life_satisfaction, weights = sampling_weight)
 #> 
-#> ── Weighted Mean Statistics ────────────────────────────────────────────────────
+#> Weighted Mean Statistics
+#> ------------------------
 #> 
 #> --- age ---
 #>  Variable weighted_mean Effective_N
@@ -132,7 +134,8 @@ survey_data %>% w_mean(age, income, life_satisfaction, weights = sampling_weight
 # Grouped data
 survey_data %>% group_by(region) %>% w_mean(age, weights = sampling_weight)
 #> 
-#> ── Weighted Mean Statistics ────────────────────────────────────────────────────
+#> Weighted Mean Statistics
+#> ------------------------
 #> 
 #> Group: region = East
 #> Warning: Unknown or uninitialised column: `Variable`.
@@ -151,7 +154,8 @@ survey_data %>% summarise(mean_age = w_mean(age, weights = sampling_weight))
 # Unweighted (for comparison)
 survey_data %>% w_mean(age)
 #> 
-#> ── Mean Statistics ─────────────────────────────────────────────────────────────
+#> Mean Statistics
+#> ---------------
 #> 
 #> --- age ---
 #>  Variable  mean    N

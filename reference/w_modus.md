@@ -122,7 +122,8 @@ data(survey_data)
 # Basic weighted mode (most frequent value)
 survey_data %>% w_modus(gender, weights = sampling_weight)
 #> 
-#> ── Weighted Mode Statistics ────────────────────────────────────────────────────
+#> Weighted Mode Statistics
+#> ------------------------
 #> # A tibble: 1 × 3
 #>   Variable weighted_mode effective_n
 #>   <chr>    <fct>               <dbl>
@@ -132,7 +133,8 @@ survey_data %>% w_modus(gender, weights = sampling_weight)
 # Multiple variables (works best with categorical/discrete data)
 survey_data %>% w_modus(gender, region, weights = sampling_weight)
 #> 
-#> ── Weighted Mode Statistics ────────────────────────────────────────────────────
+#> Weighted Mode Statistics
+#> ------------------------
 #> # A tibble: 2 × 3
 #>   Variable weighted_mode effective_n
 #>   <chr>    <chr>               <dbl>
@@ -143,7 +145,8 @@ survey_data %>% w_modus(gender, region, weights = sampling_weight)
 # Grouped data
 survey_data %>% group_by(region) %>% w_modus(gender, weights = sampling_weight)
 #> 
-#> ── Weighted Mode Statistics ────────────────────────────────────────────────────
+#> Weighted Mode Statistics
+#> ------------------------
 #> 
 #> Group: region = East
 #> # A tibble: 1 × 2
@@ -168,7 +171,8 @@ survey_data %>% summarise(mode_gender = w_modus(gender, weights = sampling_weigh
 # Unweighted (for comparison)
 survey_data %>% w_modus(gender)
 #> 
-#> ── Mode Statistics ─────────────────────────────────────────────────────────────
+#> Mode Statistics
+#> ---------------
 #> # A tibble: 1 × 3
 #>   Variable mode       n
 #>   <chr>    <chr>  <dbl>

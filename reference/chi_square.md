@@ -137,41 +137,43 @@ for detailed cross-tabulation tables.
 for single-variable frequency tables.
 
 Other hypothesis_tests:
+[`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md),
+[`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
+[`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
+[`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md),
+[`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md),
+[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
+[`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
 [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),
+[`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md),
 [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
-[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
+[`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
 
 ## Examples
 
 ``` r
 # Load required packages and data
 library(dplyr)
-#> 
-#> Attaching package: ‘dplyr’
-#> The following objects are masked from ‘package:stats’:
-#> 
-#>     filter, lag
-#> The following objects are masked from ‘package:base’:
-#> 
-#>     intersect, setdiff, setequal, union
 data(survey_data)
 
 # Basic chi-squared test for independence
 survey_data %>% chi_square(gender, region)
 #> 
-#> ── Chi-Squared Test of Independence  ───────────────────────────────────────────
+#> Chi-Squared Test of Independence 
+#> ---------------------------------
 #> 
-#> • Variables: gender x region
+#> - Variables: gender × region
 #> 
 #> Observed Frequencies:
-#>         var2
-#> var1     East West
+#>         region
+#> gender   East West
 #>   Male    238  956
 #>   Female  247 1059
 #> 
 #> Expected Frequencies:
-#>         var2
-#> var1        East     West
+#>         region
+#> gender      East     West
 #>   Male   231.636  962.364
 #>   Female 253.364 1052.636
 #> 
@@ -190,27 +192,28 @@ survey_data %>% chi_square(gender, region)
 #> ---------------------------------------------------------------------- 
 #> Table size: 2×2 | N = 2500
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # With weights
 survey_data %>% chi_square(gender, education, weights = sampling_weight)
 #> 
-#> ── Weighted Chi-Squared Test of Independence  ──────────────────────────────────
+#> Weighted Chi-Squared Test of Independence 
+#> ------------------------------------------
 #> 
-#> • Variables: gender x education
-#> • Weights variable: sampling_weight
+#> - Variables: gender × education
+#> - Weights variable: sampling_weight
 #> 
 #> Observed Frequencies:
-#>         var2
-#> var1     Basic Secondary Intermediate Secondary Academic Secondary University
-#>   Male               402                    291                326        176
-#>   Female             447                    350                316        209
+#>         education
+#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Male               402                  291                326        176
+#>   Female             447                  350                316        209
 #> 
 #> Expected Frequencies:
-#>         var2
-#> var1     Basic Secondary Intermediate Secondary Academic Secondary University
-#>   Male           403.081                304.329            304.803    182.787
-#>   Female         445.919                336.671            337.197    202.213
+#>         education
+#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Male           403.081              304.329            304.803    182.787
+#>   Female         445.919              336.671            337.197    202.213
 #> 
 #> Chi-Squared Test Results:
 #> -------------------------------------------------- 
@@ -227,25 +230,25 @@ survey_data %>% chi_square(gender, education, weights = sampling_weight)
 #> Table size: 2×4 | N = 2517
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Grouped analysis
 survey_data %>% 
   group_by(region) %>% 
   chi_square(gender, employment)
 #> 
-#> ── Chi-Squared Test of Independence  ───────────────────────────────────────────
+#> Chi-Squared Test of Independence 
+#> ---------------------------------
 #> 
-#> Variables tested: gender x employment 
+#> Variables tested: gender × employment 
 #> Grouped by: region 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> Observed Frequencies:
-#>         var2
-#> var1     Student Employed Unemployed Retired Other
+#>         employment
+#> gender   Student Employed Unemployed Retired Other
 #>   Male         7      145         16      55    15
 #>   Female       4      166         15      56     6
 #> 
@@ -264,13 +267,12 @@ survey_data %>%
 #> Table size: 2×5 | N = 485
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Observed Frequencies:
-#>         var2
-#> var1     Student Employed Unemployed Retired Other
+#>         employment
+#> gender   Student Employed Unemployed Retired Other
 #>   Male        29      605         68     201    53
 #>   Female      38      684         83     213    41
 #> 
@@ -289,25 +291,26 @@ survey_data %>%
 #> Table size: 2×5 | N = 2015
 #> Note: Phi coefficient only shown for 2x2 tables
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # With continuity correction
 survey_data %>% chi_square(gender, region, correct = TRUE)
 #> 
-#> ── Chi-Squared Test of Independence  ───────────────────────────────────────────
+#> Chi-Squared Test of Independence 
+#> ---------------------------------
 #> 
-#> • Variables: gender x region
-#> • Continuity correction: Yates' correction applied
+#> - Variables: gender × region
+#> - Continuity correction: Yates' correction applied
 #> 
 #> Observed Frequencies:
-#>         var2
-#> var1     East West
+#>         region
+#> gender   East West
 #>   Male    238  956
 #>   Female  247 1059
 #> 
 #> Expected Frequencies:
-#>         var2
-#> var1        East     West
+#>         region
+#> gender      East     West
 #>   Male   231.636  962.364
 #>   Female 253.364 1052.636
 #> 
@@ -326,5 +329,5 @@ survey_data %>% chi_square(gender, region, correct = TRUE)
 #> ---------------------------------------------------------------------- 
 #> Table size: 2×2 | N = 2500
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

@@ -142,7 +142,8 @@ data(survey_data)
 # Basic categorical analysis
 survey_data %>% frequency(gender)
 #> 
-#> ── Frequency Analysis Results ──────────────────────────────────────────────────
+#> Frequency Analysis Results
+#> --------------------------
 #> 
 #> gender (Gender)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
@@ -158,7 +159,8 @@ survey_data %>% frequency(gender)
 # Multiple variables with weights
 survey_data %>% frequency(gender, region, weights = sampling_weight)
 #> 
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> gender (Gender)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -187,13 +189,13 @@ survey_data %>%
   group_by(region) %>% 
   frequency(gender, weights = sampling_weight)
 #> 
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> gender (Gender)
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> # total N=509 valid N=509 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -204,9 +206,8 @@ survey_data %>%
 #> +------+--------------------+--------+--------+--------+--------+
 #> 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> # total N=2007 valid N=2007 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -220,7 +221,8 @@ survey_data %>%
 # Education levels with sorting
 survey_data %>% frequency(education, sort.frq = "desc")
 #> 
-#> ── Frequency Analysis Results ──────────────────────────────────────────────────
+#> Frequency Analysis Results
+#> --------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
@@ -239,7 +241,8 @@ survey_data %>% frequency(education, sort.frq = "desc")
 survey_data %>% frequency(employment, weights = sampling_weight, 
                          show.na = TRUE, show.sum = TRUE)
 #> 
-#> ── Weighted Frequency Analysis Results ─────────────────────────────────────────
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> employment (Employment status)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA

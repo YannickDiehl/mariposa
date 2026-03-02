@@ -23,7 +23,7 @@ Insurance against finding differences that aren't real
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,8 @@ Insurance against finding differences that aren't real
     <li><a class="dropdown-item" href="../articles/correlation-analysis.html">Correlation Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Advanced Topics</h6></li>
+    <li><a class="dropdown-item" href="../articles/scale-analysis.html">Scale Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/regression-analysis.html">Regression Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/survey-weights.html">Working with Survey Weights</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -57,7 +59,7 @@ Insurance against finding differences that aren't real
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Compare All Groups More Conservatively After ANOVA</h1>
-      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/v0.1.0/R/scheffe_test.R" class="external-link"><code>R/scheffe_test.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/R/scheffe_test.R" class="external-link"><code>R/scheffe_test.R</code></a></small>
       <div class="d-none name"><code>scheffe_test.Rd</code></div>
     </div>
 
@@ -72,7 +74,10 @@ avoiding false positives.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scheffe_test</span><span class="op">(</span><span class="va">x</span>, conf.level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scheffe_test</span><span class="op">(</span><span class="va">x</span>, conf.level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Default S3 method</span></span>
+<span><span class="fu">scheffe_test</span><span class="op">(</span><span class="va">x</span>, conf.level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -170,7 +175,9 @@ Biometrika, 40(1-2), 87-110.</p>
 <p><code><a href="tukey_test.html">tukey_test</a></code> for Tukey HSD post-hoc tests.</p>
 <p><code><a href="levene_test.html">levene_test</a></code> for testing homogeneity of variances.</p>
 <p>Other posthoc:
+<code><a href="dunn_test.html">dunn_test()</a></code>,
 <code><a href="levene_test.html">levene_test()</a></code>,
+<code><a href="pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>,
 <code><a href="tukey_test.html">tukey_test()</a></code></p></div>
     </div>
 
@@ -186,11 +193,12 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Scheffe post-hoc comparisons</span></span></span>
 <span class="r-in"><span><span class="va">anova_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">scheffe_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Scheffe Post-Hoc Test Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Scheffe's method</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: Most conservative post-hoc test (widest confidence intervals)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -215,8 +223,8 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    0.067    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -230,10 +238,11 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_result_multi</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">scheffe_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Scheffe Post-Hoc Test Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Scheffe's method</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: Most conservative post-hoc test (widest confidence intervals)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -279,8 +288,8 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;.001 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -294,12 +303,13 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_weighted</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">scheffe_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Weighted Scheffe Post-Hoc Test Results ──────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Scheffe Post-Hoc Test Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Weights variable: sampling_weight</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Scheffe's method</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: Most conservative post-hoc test (widest confidence intervals)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -324,8 +334,8 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    0.079    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -340,17 +350,17 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_grouped</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">scheffe_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Scheffe Post-Hoc Test Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Scheffe's method</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: Most conservative post-hoc test (widest confidence intervals)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = East</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -372,10 +382,9 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    0.943    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Group: region = West</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -397,8 +406,8 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    0.062    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
@@ -409,11 +418,12 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom confidence level (99%)</span></span></span>
 <span class="r-in"><span><span class="va">anova_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">scheffe_test</span><span class="op">(</span>conf.level <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Scheffe Post-Hoc Test Results ───────────────────────────────────────────────</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Scheffe Post-Hoc Test Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Dependent variable: life_satisfaction</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Grouping variable: education</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Confidence level: 99.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 99.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Scheffe's method</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: Most conservative post-hoc test (widest confidence intervals)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -438,8 +448,8 @@ Biometrika, 40(1-2), 87-110.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    0.067    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Signif. codes: 0 <span style="font-weight: bold;">***</span> 0.001 <span style="font-weight: bold;">**</span> 0.01 <span style="font-weight: bold;">*</span> 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>

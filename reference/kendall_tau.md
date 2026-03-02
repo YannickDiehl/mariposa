@@ -154,10 +154,11 @@ data(survey_data)
 survey_data %>%
   kendall_tau(life_satisfaction, political_orientation)
 #> 
-#> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────
+#> Kendall's Tau-b Correlation 
+#> ----------------------------
 #> 
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> --- life_satisfaction × political_orientation ---
@@ -168,7 +169,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8321
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak negative correlation
 
@@ -176,10 +177,11 @@ survey_data %>%
 survey_data %>%
   kendall_tau(life_satisfaction, political_orientation, trust_media)
 #> 
-#> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────
+#> Kendall's Tau-b Correlation 
+#> ----------------------------
 #> 
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Kendall's Tau-b Matrix:
@@ -214,17 +216,18 @@ survey_data %>%
 #>        political_orientation × trust_media  0.003  0.148 0.8823 2177    
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Weighted correlations
 survey_data %>%
   kendall_tau(age, income, weights = sampling_weight)
 #> 
-#> ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────
+#> Weighted Kendall's Tau-b Correlation 
+#> -------------------------------------
 #> 
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> --- age × income ---
@@ -235,7 +238,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8397
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak positive correlation
 
@@ -244,15 +247,15 @@ survey_data %>%
   group_by(region) %>%
   kendall_tau(age, income, life_satisfaction)
 #> 
-#> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────
+#> Kendall's Tau-b Correlation 
+#> ----------------------------
 #> 
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
-#> 
-#> ── Group: region = East ──
-#> 
+#> Group: region = East
+#> --------------------
 #> 
 #> Kendall's Tau-b Matrix:
 #> ----------------------- 
@@ -286,9 +289,8 @@ survey_data %>%
 #>  income × life_satisfaction  0.338  9.099 0.0000 410 ***
 #> --------------------------------------------------------------------- 
 #> 
-#> 
-#> ── Group: region = West ──
-#> 
+#> Group: region = West
+#> --------------------
 #> 
 #> Kendall's Tau-b Matrix:
 #> ----------------------- 
@@ -322,17 +324,18 @@ survey_data %>%
 #>  income × life_satisfaction  0.357 19.639 0.0000 1705 ***
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Using tidyselect helpers for ordinal variables
 survey_data %>%
   kendall_tau(starts_with("trust"), weights = sampling_weight)
 #> 
-#> ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────
+#> Weighted Kendall's Tau-b Correlation 
+#> -------------------------------------
 #> 
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Kendall's Tau-b Matrix:
@@ -367,16 +370,17 @@ survey_data %>%
 #>       trust_media × trust_science 0.013 0.927 0.3537 2286    
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
 # Listwise deletion for missing data
 survey_data %>%
   kendall_tau(age, income, use = "listwise")
 #> 
-#> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────
+#> Kendall's Tau-b Correlation 
+#> ----------------------------
 #> 
-#> • Missing data handling: listwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Missing data handling: listwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> --- age × income ---
@@ -387,7 +391,7 @@ survey_data %>%
 #>   p-value (2-tailed): 0.8667
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak positive correlation
 
@@ -395,10 +399,11 @@ survey_data %>%
 survey_data %>%
   kendall_tau(age, income, alternative = "greater")
 #> 
-#> ── Kendall's Tau-b Correlation  ────────────────────────────────────────────────
+#> Kendall's Tau-b Correlation 
+#> ----------------------------
 #> 
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: greater
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: greater
 #> 
 #> 
 #> --- age × income ---
@@ -409,7 +414,7 @@ survey_data %>%
 #>   p-value (1-tailed): 0.4334
 #>   Significance: ns
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation: weak positive correlation
 
@@ -419,11 +424,12 @@ result <- survey_data %>%
               weights = sampling_weight)
 print(result)
 #> 
-#> ── Weighted Kendall's Tau-b Correlation  ───────────────────────────────────────
+#> Weighted Kendall's Tau-b Correlation 
+#> -------------------------------------
 #> 
-#> • Weights variable: sampling_weight
-#> • Missing data handling: pairwise deletion
-#> • Alternative hypothesis: two.sided
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Kendall's Tau-b Matrix:
@@ -458,5 +464,5 @@ print(result)
 #>        political_orientation × trust_media  0.003  0.238 0.8118 2190    
 #> --------------------------------------------------------------------- 
 #> 
-#> Signif. codes: 0 *** 0.001 ** 0.01 * 0.05
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

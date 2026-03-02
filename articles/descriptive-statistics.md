@@ -29,8 +29,12 @@ The simplest way to get descriptive statistics:
 
 ``` r
 survey_data %>% describe(age)
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable  Mean Median     SD Range IQR Skewness    N Missing
 #>       age 50.55     50 16.976    77  24    0.172 2500       0
+#> ----------------------------------------
 ```
 
 This gives you the mean ($\bar{x}$), median, standard deviation (*SD*),
@@ -43,10 +47,14 @@ Analyze several variables together:
 ``` r
 survey_data %>%
   describe(age, income, life_satisfaction)
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness    N Missing
 #>                age   50.550     50   16.976    77   24    0.172 2500       0
 #>             income 3753.934   3500 1432.802  7200 1900    0.730 2186     314
 #>  life_satisfaction    3.628      4    1.153     4    2   -0.501 2421      79
+#> ----------------------------------------
 ```
 
 ### With Survey Weights
@@ -57,10 +65,14 @@ To get population-representative statistics, add the `weights` argument:
 survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
 #>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
 #>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#> ----------------------------------------
 ```
 
 The weighted results better represent your target population by
@@ -75,12 +87,25 @@ Compare statistics across groups using
 survey_data %>%
   group_by(region) %>%
   describe(age, income, weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
+#> Group: region = East
+#> --------------------
+#> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   52.278     53   17.595    77   24    0.098       477.0
 #>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#> ----------------------------------------
+#> 
+#> Group: region = West
+#> --------------------
+#> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.067     49   16.927    77   24    0.170      1993.1
 #>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#> ----------------------------------------
 ```
 
 ### Customizing Output
@@ -91,17 +116,25 @@ Choose which statistics to display with the `show` argument:
 # Just the essentials
 survey_data %>%
   describe(age, income, show = c("mean", "sd", "range"))
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable     Mean       SD Range    N Missing
 #>       age   50.550   16.976    77 2500       0
 #>    income 3753.934 1432.802  7200 2186     314
+#> ----------------------------------------
 
 # Everything available
 survey_data %>%
   describe(age, show = "all")
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable  Mean Median     SD   SE Range IQR Skewness Kurtosis Variance Mode
 #>       age 50.55     50 16.976 0.34    77  24    0.172   -0.364  288.185   18
 #>  Q25 Q50 Q75    N Missing
 #>   38  50  62 2500       0
+#> ----------------------------------------
 ```
 
 ## Frequency Tables
@@ -114,6 +147,9 @@ For categorical variables, use
 ``` r
 survey_data %>%
   frequency(education)
+#> 
+#> Frequency Analysis Results
+#> --------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
@@ -147,6 +183,9 @@ meaningful.
 survey_data %>%
   frequency(education, weights = sampling_weight)
 #> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
 #> 
@@ -168,6 +207,9 @@ Analyze several categorical variables at once:
 survey_data %>%
   frequency(education, employment, region,
             weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -216,7 +258,13 @@ survey_data %>%
   group_by(gender) %>%
   frequency(education, weights = sampling_weight)
 #> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
 #> education (Highest educational attainment)
+#> 
+#> Group: gender = Male
+#> --------------------
 #> # total N=1195 valid N=1195 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -227,6 +275,10 @@ survey_data %>%
 #> |Academ|Academic Secondary  |326     |27.31   |27.31   |85.27   |
 #> |Univer|University          |176     |14.73   |14.73   |100.00  |
 #> +------+--------------------+--------+--------+--------+--------+
+#> 
+#> 
+#> Group: gender = Female
+#> ----------------------
 #> # total N=1321 valid N=1321 mean=NA sd=NA skewness=NA
 #> 
 #> +------+--------------------+--------+--------+--------+--------+
@@ -250,27 +302,30 @@ survey_data %>%
   crosstab(education, employment)
 #> 
 #> Crosstabulation: education × employment
-#> -------------------------------------------------- 
+#> --------------------------------------- 
+#> - Row variable: education
+#> - Column variable: employment
+#> - Percentages: Row percentages
+#> - N (valid): 2500
 #> 
-#>                         employment 
-#> education 
-#>                              Student    Employed  Unemployed     Retired       Other       Total
-#> ------------------------------------------------------------------------------------------------ 
-#> Basic Secondary                    0         571          65         171          34         841
-#>                                 0.0%       67.9%        7.7%       20.3%        4.0%      100.0%  (row %)
-#> 
-#> Intermediate Secondary             0         412          51         137          29         629
-#>                                 0.0%       65.5%        8.1%       21.8%        4.6%      100.0%  (row %)
-#> 
-#> Academic Secondary                44         366          44         145          32         631
-#>                                 7.0%       58.0%        7.0%       23.0%        5.1%      100.0%  (row %)
-#> 
-#> University                        34         251          22          72          20         399
-#>                                 8.5%       62.9%        5.5%       18.0%        5.0%      100.0%  (row %)
-#> ------------------------------------------------------------------------------------------------ 
-#> Total                             78        1600         182         525         115        2500
-#> 
-#> N = 2500
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> |                      |                                 employment                                  |
+#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Basic Secondary      |          0 |        571 |         65 |        171 |         34 |        841 |
+#> |   row %              |       0.0% |      67.9% |       7.7% |      20.3% |       4.0% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Intermediate Seco... |          0 |        412 |         51 |        137 |         29 |        629 |
+#> |   row %              |       0.0% |      65.5% |       8.1% |      21.8% |       4.6% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Academic Secondary   |         44 |        366 |         44 |        145 |         32 |        631 |
+#> |   row %              |       7.0% |      58.0% |       7.0% |      23.0% |       5.1% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | University           |         34 |        251 |         22 |         72 |         20 |        399 |
+#> |   row %              |       8.5% |      62.9% |       5.5% |      18.0% |       5.0% |     100.0% |
+#> +======================+============+============+============+============+============+============+
+#> | Total                |         78 |       1600 |        182 |        525 |        115 |       2500 |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
 ```
 
 ### Understanding the Output
@@ -294,27 +349,31 @@ survey_data %>%
   crosstab(education, employment, weights = sampling_weight)
 #> 
 #> Crosstabulation: education × employment
-#> -------------------------------------------------- 
+#> --------------------------------------- 
+#> - Row variable: education
+#> - Column variable: employment
+#> - Percentages: Row percentages
+#> - Weights variable: sampling_weight
+#> - N (valid): 2516 (weighted)
 #> 
-#>                         employment 
-#> education 
-#>                              Student    Employed  Unemployed     Retired       Other       Total
-#> ------------------------------------------------------------------------------------------------ 
-#> Basic Secondary                    0         573          66         175          34         848
-#>                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)
-#> 
-#> Intermediate Secondary             0         420          52         139          29         641
-#>                                 0.0%       65.6%        8.1%       21.7%        4.6%      100.0%  (row %)
-#> 
-#> Academic Secondary                46         370          45         149          33         642
-#>                                 7.2%       57.6%        7.0%       23.1%        5.1%      100.0%  (row %)
-#> 
-#> University                        34         240          21          72          20         385
-#>                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)
-#> ------------------------------------------------------------------------------------------------ 
-#> Total                             80        1603         184         534         115        2516
-#> 
-#> N = 2516 (Weighted)
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> |                      |                                 employment                                  |
+#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |
+#> |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |
+#> |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |
+#> |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | University           |         34 |        240 |         21 |         72 |         20 |        385 |
+#> |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |
+#> +======================+============+============+============+============+============+============+
+#> | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
 ```
 
 ### Grouped Crosstabs
@@ -326,51 +385,70 @@ survey_data %>%
   group_by(region) %>%
   crosstab(education, employment, weights = sampling_weight)
 #> 
-#> Crosstabulation: education × employment
-#> -------------------------------------------------- 
+#> Weighted Grouped Crosstabulation 
+#> ---------------------------------
 #> 
-#>                         employment 
-#> education 
-#>                              Student    Employed  Unemployed     Retired       Other       Total
-#> ------------------------------------------------------------------------------------------------ 
-#> Basic Secondary                    0         112          11          39          12         175
-#>                                 0.0%       64.1%        6.6%       22.4%        6.9%      100.0%  (row %)
 #> 
-#> Intermediate Secondary             0          83          13          29           4         129
-#>                                 0.0%       64.7%        9.8%       22.4%        3.1%      100.0%  (row %)
-#> 
-#> Academic Secondary                 6          72           8          35           1         123
-#>                                 5.2%       58.5%        6.5%       28.9%        0.9%      100.0%  (row %)
-#> 
-#> University                         5          53           1          19           4          82
-#>                                 6.4%       64.3%        1.2%       23.2%        4.9%      100.0%  (row %)
-#> ------------------------------------------------------------------------------------------------ 
-#> Total                             12         320          33         123          21         509
-#> 
-#> N = 509 (Weighted)
+#> Group: region = East
+#> --------------------
 #> 
 #> Crosstabulation: education × employment
-#> -------------------------------------------------- 
+#> --------------------------------------- 
+#> - Row variable: education
+#> - Column variable: employment
+#> - Percentages: Row percentages
+#> - Weights variable: sampling_weight
+#> - N (valid): 509 (weighted)
 #> 
-#>                         employment 
-#> education 
-#>                              Student    Employed  Unemployed     Retired       Other       Total
-#> ------------------------------------------------------------------------------------------------ 
-#> Basic Secondary                    0         461          55         136          21         673
-#>                                 0.0%       68.5%        8.2%       20.1%        3.2%      100.0%  (row %)
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> |                      |                                 employment                                  |
+#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Basic Secondary      |          0 |        112 |         11 |         39 |         12 |        175 |
+#> |   row %              |       0.0% |      64.1% |       6.6% |      22.4% |       6.9% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Intermediate Seco... |          0 |         83 |         13 |         29 |          4 |        129 |
+#> |   row %              |       0.0% |      64.7% |       9.8% |      22.4% |       3.1% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Academic Secondary   |          6 |         72 |          8 |         35 |          1 |        123 |
+#> |   row %              |       5.2% |      58.5% |       6.5% |      28.9% |       0.9% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | University           |          5 |         53 |          1 |         19 |          4 |         82 |
+#> |   row %              |       6.4% |      64.3% |       1.2% |      23.2% |       4.9% |     100.0% |
+#> +======================+============+============+============+============+============+============+
+#> | Total                |         12 |        320 |         33 |        123 |         21 |        509 |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
 #> 
-#> Intermediate Secondary             0         337          40         110          26         512
-#>                                 0.0%       65.8%        7.7%       21.5%        5.0%      100.0%  (row %)
 #> 
-#> Academic Secondary                40         298          37         113          31         519
-#>                                 7.7%       57.4%        7.1%       21.8%        6.1%      100.0%  (row %)
+#> Group: region = West
+#> --------------------
 #> 
-#> University                        28         187          20          52          16         303
-#>                                 9.4%       61.7%        6.5%       17.3%        5.2%      100.0%  (row %)
-#> ------------------------------------------------------------------------------------------------ 
-#> Total                             68        1282         151         411          94        2007
+#> Crosstabulation: education × employment
+#> --------------------------------------- 
+#> - Row variable: education
+#> - Column variable: employment
+#> - Percentages: Row percentages
+#> - Weights variable: sampling_weight
+#> - N (valid): 2007 (weighted)
 #> 
-#> N = 2007 (Weighted)
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> |                      |                                 employment                                  |
+#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Basic Secondary      |          0 |        461 |         55 |        136 |         21 |        673 |
+#> |   row %              |       0.0% |      68.5% |       8.2% |      20.1% |       3.2% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Intermediate Seco... |          0 |        337 |         40 |        110 |         26 |        512 |
+#> |   row %              |       0.0% |      65.8% |       7.7% |      21.5% |       5.0% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Academic Secondary   |         40 |        298 |         37 |        113 |         31 |        519 |
+#> |   row %              |       7.7% |      57.4% |       7.1% |      21.8% |       6.1% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | University           |         28 |        187 |         20 |         52 |         16 |        303 |
+#> |   row %              |       9.4% |      61.7% |       6.5% |      17.3% |       5.2% |     100.0% |
+#> +======================+============+============+============+============+============+============+
+#> | Total                |         68 |       1282 |        151 |        411 |         94 |       2007 |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
 ```
 
 ## Practical Tips
@@ -382,12 +460,16 @@ Start with basic descriptives to spot potential issues:
 ``` r
 survey_data %>%
   describe(age, income, show = "all")
+#> 
+#> Descriptive Statistics
+#> ----------------------
 #>  Variable     Mean Median       SD     SE Range  IQR Skewness Kurtosis
 #>       age   50.550     50   16.976  0.340    77   24    0.172   -0.364
 #>    income 3753.934   3500 1432.802 30.645  7200 1900    0.730    0.376
 #>     Variance Mode  Q25  Q50  Q75    N Missing
 #>      288.185   18   38   50   62 2500       0
 #>  2052920.442 3200 2700 3500 4600 2186     314
+#> ----------------------------------------
 ```
 
 Look for:
@@ -430,15 +512,22 @@ survey_data %>%
   describe(age, income, life_satisfaction,
            weights = sampling_weight,
            show = "short")
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
 #>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
 #>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#> ----------------------------------------
 
 # 2. Key distributions
 survey_data %>%
   frequency(education, employment,
             weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
 #> 
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
@@ -472,39 +561,56 @@ survey_data %>%
            weights = sampling_weight)
 #> 
 #> Crosstabulation: education × employment
-#> -------------------------------------------------- 
+#> --------------------------------------- 
+#> - Row variable: education
+#> - Column variable: employment
+#> - Percentages: Row percentages
+#> - Weights variable: sampling_weight
+#> - N (valid): 2516 (weighted)
 #> 
-#>                         employment 
-#> education 
-#>                              Student    Employed  Unemployed     Retired       Other       Total
-#> ------------------------------------------------------------------------------------------------ 
-#> Basic Secondary                    0         573          66         175          34         848
-#>                                 0.0%       67.6%        7.8%       20.6%        4.0%      100.0%  (row %)
-#> 
-#> Intermediate Secondary             0         420          52         139          29         641
-#>                                 0.0%       65.6%        8.1%       21.7%        4.6%      100.0%  (row %)
-#> 
-#> Academic Secondary                46         370          45         149          33         642
-#>                                 7.2%       57.6%        7.0%       23.1%        5.1%      100.0%  (row %)
-#> 
-#> University                        34         240          21          72          20         385
-#>                                 8.7%       62.2%        5.4%       18.6%        5.1%      100.0%  (row %)
-#> ------------------------------------------------------------------------------------------------ 
-#> Total                             80        1603         184         534         115        2516
-#> 
-#> N = 2516 (Weighted)
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> |                      |                                 employment                                  |
+#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |
+#> |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |
+#> |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |
+#> |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> | University           |         34 |        240 |         21 |         72 |         20 |        385 |
+#> |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |
+#> +======================+============+============+============+============+============+============+
+#> | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |
+#> +----------------------+------------+------------+------------+------------+------------+------------+
 
 # 4. Regional comparisons
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction,
            weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
+#> Group: region = East
+#> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
 #>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> ----------------------------------------
+#> 
+#> Group: region = West
+#> --------------------
+#> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
+#> ----------------------------------------
 ```
 
 ## Summary
