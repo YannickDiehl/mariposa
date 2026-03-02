@@ -89,8 +89,11 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>Statistical tests help you determine whether differences between
-groups are real or just due to random chance. This guide covers the main
-tests available in mariposa:</p>
+groups are real or just due to random chance. This guide covers all
+hypothesis tests available in mariposa:</p>
+<div class="section level3">
+<h3 id="parametric-tests">Parametric Tests<a class="anchor" aria-label="anchor" href="#parametric-tests"></a>
+</h3>
 <table class="table">
 <colgroup>
 <col width="31%">
@@ -110,17 +113,93 @@ tests available in mariposa:</p>
 <td>Comparing means across <strong>three or more</strong> groups</td>
 </tr>
 <tr class="odd">
+<td><code><a href="../reference/factorial_anova.html">factorial_anova()</a></code></td>
+<td>Testing effects of <strong>multiple factors</strong>
+simultaneously</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/ancova.html">ancova()</a></code></td>
+<td>Comparing groups while <strong>controlling for a
+covariate</strong>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="non-parametric-tests">Non-Parametric Tests<a class="anchor" aria-label="anchor" href="#non-parametric-tests"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="31%">
+<col width="68%">
+</colgroup>
+<thead><tr class="header">
+<th>Test</th>
+<th>Use when…</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/mann_whitney.html">mann_whitney()</a></code></td>
+<td>Two-group comparison with <strong>non-normal</strong> data</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code></td>
+<td>Three or more groups with <strong>non-normal</strong> data</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code></td>
+<td>
+<strong>Paired</strong> comparison with non-normal data</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/friedman_test.html">friedman_test()</a></code></td>
+<td>
+<strong>Repeated measures</strong> with non-normal data</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/binomial_test.html">binomial_test()</a></code></td>
+<td>Testing whether a <strong>proportion</strong> differs from
+expected</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="categorical-tests">Categorical Tests<a class="anchor" aria-label="anchor" href="#categorical-tests"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="31%">
+<col width="68%">
+</colgroup>
+<thead><tr class="header">
+<th>Test</th>
+<th>Use when…</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
 <td><code><a href="../reference/chi_square.html">chi_square()</a></code></td>
 <td>Testing relationships between <strong>categorical</strong>
 variables</td>
 </tr>
 <tr class="even">
-<td><code><a href="../reference/mann_whitney.html">mann_whitney()</a></code></td>
-<td>Non-parametric alternative when data is not normally
-distributed</td>
+<td><code><a href="../reference/fisher_test.html">fisher_test()</a></code></td>
+<td>Like chi-square but for <strong>small samples</strong>
+</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/chisq_gof.html">chisq_gof()</a></code></td>
+<td>Testing if observed frequencies match <strong>expected</strong>
+proportions</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code></td>
+<td>Comparing <strong>paired proportions</strong> (before/after)</td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 <div class="section level2">
 <h2 id="t-tests">t-Tests<a class="anchor" aria-label="anchor" href="#t-tests"></a>
@@ -958,6 +1037,616 @@ test) when:</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="factorial-anova">Factorial ANOVA<a class="anchor" aria-label="anchor" href="#factorial-anova"></a>
+</h2>
+<div class="section level3">
+<h3 id="when-to-use-1">When to Use<a class="anchor" aria-label="anchor" href="#when-to-use-1"></a>
+</h3>
+<p>Use <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code> when you want to test the effects
+of <strong>two or more factors</strong> on a continuous outcome
+variable. It answers questions like: “Does income differ by gender,
+education, and their interaction?”</p>
+</div>
+<div class="section level3">
+<h3 id="two-way-anova">Two-Way ANOVA<a class="anchor" aria-label="anchor" href="#two-way-anova"></a>
+</h3>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/factorial_anova.html">factorial_anova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Factorial ANOVA (2-Way ANOVA) Results</span></span>
+<span><span class="co">#&gt; -------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Dependent variable: income</span></span>
+<span><span class="co">#&gt; - Factors: gender x education</span></span>
+<span><span class="co">#&gt; - Type III Sum of Squares: Type 3</span></span>
+<span><span class="co">#&gt; - N (complete cases): 2186</span></span>
+<span><span class="co">#&gt; - Missing: 314</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Tests of Between-Subjects Effects</span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt;  Source             Type III SS  df   Mean Square  F         Sig. </span></span>
+<span><span class="co">#&gt;  Corrected Model    1.754652e+09    7 2.506646e+08   199.909 &lt;.001</span></span>
+<span><span class="co">#&gt;  Intercept          3.221261e+10    1 3.221261e+10 25690.075 &lt;.001</span></span>
+<span><span class="co">#&gt;  gender             1.226376e+05    1 1.226376e+05     0.098 0.755</span></span>
+<span><span class="co">#&gt;  education          1.743618e+09    3 5.812059e+08   463.521 &lt;.001</span></span>
+<span><span class="co">#&gt;  gender * education 1.499441e+06    3 4.998136e+05     0.399 0.754</span></span>
+<span><span class="co">#&gt;  Error              2.730979e+09 2178 1.253893e+06                </span></span>
+<span><span class="co">#&gt;  Total              3.529079e+10 2186                             </span></span>
+<span><span class="co">#&gt;  Corrected Total    4.485631e+09 2185                             </span></span>
+<span><span class="co">#&gt;  Partial Eta Sq    </span></span>
+<span><span class="co">#&gt;  0.391          ***</span></span>
+<span><span class="co">#&gt;  0.922          ***</span></span>
+<span><span class="co">#&gt;  0.000             </span></span>
+<span><span class="co">#&gt;  0.390          ***</span></span>
+<span><span class="co">#&gt;  0.001             </span></span>
+<span><span class="co">#&gt;                    </span></span>
+<span><span class="co">#&gt;                    </span></span>
+<span><span class="co">#&gt;                    </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt; R Squared = 0.391 (Adjusted R Squared = 0.389)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Descriptive Statistics</span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  gender education              Mean    Std. Deviation N  </span></span>
+<span><span class="co">#&gt;  Male   Basic Secondary        2803.43  774.959       350</span></span>
+<span><span class="co">#&gt;  Male   Intermediate Secondary 3574.09  996.649       247</span></span>
+<span><span class="co">#&gt;  Male   Academic Secondary     4246.45 1180.779       282</span></span>
+<span><span class="co">#&gt;  Male   University             5318.56 1718.805       167</span></span>
+<span><span class="co">#&gt;  Female Basic Secondary        2718.70  795.831       385</span></span>
+<span><span class="co">#&gt;  Female Intermediate Secondary 3607.64  996.214       301</span></span>
+<span><span class="co">#&gt;  Female Academic Secondary     4200.38 1178.118       266</span></span>
+<span><span class="co">#&gt;  Female University             5353.72 1612.265       188</span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Levene's Test of Equality of Error Variances</span></span>
+<span><span class="co">#&gt;   F(7, 2178) = 44.988, p = &lt;.001</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>The output includes Type III sums of squares, main effects for each
+factor, interaction effects, partial eta-squared, and descriptive
+statistics per cell.</p>
+</div>
+<div class="section level3">
+<h3 id="with-survey-weights-3">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights-3"></a>
+</h3>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/factorial_anova.html">factorial_anova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">life_satisfaction</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span>,</span>
+<span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Factorial ANOVA (2-Way ANOVA) Results</span></span>
+<span><span class="co">#&gt; ----------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
+<span><span class="co">#&gt; - Factors: gender x region</span></span>
+<span><span class="co">#&gt; - Type III Sum of Squares: Type 3</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (complete cases): 2421</span></span>
+<span><span class="co">#&gt; - Missing: 79</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Tests of Between-Subjects Effects</span></span>
+<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  Source          Type III SS df   Mean Square F         Sig.  Partial Eta Sq</span></span>
+<span><span class="co">#&gt;  Corrected Model     3.714      3     1.238       0.927 0.427 0.001         </span></span>
+<span><span class="co">#&gt;  Intercept       20468.612      1 20468.612   15319.285 &lt;.001 0.864         </span></span>
+<span><span class="co">#&gt;  gender              0.010      1     0.010       0.008 0.930 0.000         </span></span>
+<span><span class="co">#&gt;  region              0.001      1     0.001       0.001 0.979 0.000         </span></span>
+<span><span class="co">#&gt;  gender * region     2.194      1     2.194       1.642 0.200 0.001         </span></span>
+<span><span class="co">#&gt;  Error            3229.435   2417     1.336                                 </span></span>
+<span><span class="co">#&gt;  Total           35249.294   2421                                           </span></span>
+<span><span class="co">#&gt;  Corrected Total  3233.149   2420                                           </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; R Squared = 0.001 (Adjusted R Squared = 0.000)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Descriptive Statistics</span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  gender region Mean Std. Deviation N   </span></span>
+<span><span class="co">#&gt;  Male   East   3.66 1.207           228</span></span>
+<span><span class="co">#&gt;  Male   West   3.58 1.152           921</span></span>
+<span><span class="co">#&gt;  Female East   3.59 1.197           237</span></span>
+<span><span class="co">#&gt;  Female West   3.66 1.126          1035</span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; Note: Means and SDs are weighted (WLS)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Levene's Test of Equality of Error Variances</span></span>
+<span><span class="co">#&gt;   F(3, 2417) = 2.470, p = 0.060</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>Weighted factorial ANOVA uses WLS (Weighted Least Squares)
+estimation, matching SPSS UNIANOVA results.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="ancova">ANCOVA<a class="anchor" aria-label="anchor" href="#ancova"></a>
+</h2>
+<div class="section level3">
+<h3 id="when-to-use-2">When to Use<a class="anchor" aria-label="anchor" href="#when-to-use-2"></a>
+</h3>
+<p>Use <code><a href="../reference/ancova.html">ancova()</a></code> when you want to compare groups on a
+continuous outcome while <strong>controlling for</strong> (adjusting
+for) a covariate. For example: “Does income differ by education, after
+controlling for age?”</p>
+</div>
+<div class="section level3">
+<h3 id="basic-ancova">Basic ANCOVA<a class="anchor" aria-label="anchor" href="#basic-ancova"></a>
+</h3>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/ancova.html">ancova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="va">education</span>, covariate <span class="op">=</span> <span class="va">age</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ANCOVA (One-Way ANCOVA) Results</span></span>
+<span><span class="co">#&gt; -------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Dependent variable: income</span></span>
+<span><span class="co">#&gt; - Factor(s): education</span></span>
+<span><span class="co">#&gt; - Covariate(s): age</span></span>
+<span><span class="co">#&gt; - Type III Sum of Squares: Type 3</span></span>
+<span><span class="co">#&gt; - N (complete cases): 2186</span></span>
+<span><span class="co">#&gt; - Missing: 314</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Tests of Between-Subjects Effects</span></span>
+<span><span class="co">#&gt; ----------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  Source          Type III SS  df   Mean Square  F        Sig.  Partial Eta Sq</span></span>
+<span><span class="co">#&gt;  Corrected Model 1.752821e+09    4 4.382053e+08  349.723 &lt;.001 0.391         </span></span>
+<span><span class="co">#&gt;  Intercept       3.472401e+09    1 3.472401e+09 2771.252 &lt;.001 0.560         </span></span>
+<span><span class="co">#&gt;  age             3.772141e+04    1 3.772141e+04    0.030 0.862 0.000         </span></span>
+<span><span class="co">#&gt;  education       1.752631e+09    3 5.842102e+08  466.246 &lt;.001 0.391         </span></span>
+<span><span class="co">#&gt;  Error           2.732810e+09 2181 1.253008e+06                              </span></span>
+<span><span class="co">#&gt;  Total           3.529079e+10 2186                                           </span></span>
+<span><span class="co">#&gt;  Corrected Total 4.485631e+09 2185                                           </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; ----------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; R Squared = 0.391 (Adjusted R Squared = 0.390)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Parameter Estimates</span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  Parameter   B        Std. Error t      Sig.  Lower Bound Upper Bound</span></span>
+<span><span class="co">#&gt;  (Intercept) 3990.641 75.806     52.643 &lt;.001 3841.981    4139.301   </span></span>
+<span><span class="co">#&gt;  age           -0.245  1.412     -0.174 0.862   -3.014       2.524   </span></span>
+<span><span class="co">#&gt;  education.L 1870.578 50.838     36.795 &lt;.001 1770.881    1970.274   </span></span>
+<span><span class="co">#&gt;  education.Q  139.427 49.566      2.813 0.005   42.226     236.629   </span></span>
+<span><span class="co">#&gt;  education.C  152.695 48.167      3.170 0.002   58.236     247.154   </span></span>
+<span><span class="co">#&gt;  Partial Eta Sq</span></span>
+<span><span class="co">#&gt;  0.560         </span></span>
+<span><span class="co">#&gt;  0.000         </span></span>
+<span><span class="co">#&gt;  0.383         </span></span>
+<span><span class="co">#&gt;  0.004         </span></span>
+<span><span class="co">#&gt;  0.005         </span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated Marginal Means</span></span>
+<span><span class="co">#&gt; (Evaluated at covariate means)</span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  education              Mean     Std. Error Lower Bound Upper Bound</span></span>
+<span><span class="co">#&gt;  Basic Secondary        2758.939 41.294     2677.960    2839.918   </span></span>
+<span><span class="co">#&gt;  Intermediate Secondary 3592.634 47.822     3498.852    3686.416   </span></span>
+<span><span class="co">#&gt;  Academic Secondary     4224.320 47.836     4130.511    4318.130   </span></span>
+<span><span class="co">#&gt;  University             5336.870 59.438     5220.309    5453.431   </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Levene's Test of Equality of Error Variances</span></span>
+<span><span class="co">#&gt;   F(3, 2182) = 103.901, p = &lt;.001</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>The output shows the covariate effect, the factor effect after
+adjustment, and estimated marginal means (group means adjusted for the
+covariate).</p>
+</div>
+<div class="section level3">
+<h3 id="with-survey-weights-4">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights-4"></a>
+</h3>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/ancova.html">ancova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="va">education</span>, covariate <span class="op">=</span> <span class="va">age</span>,</span>
+<span>         weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted ANCOVA (One-Way ANCOVA) Results</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Dependent variable: income</span></span>
+<span><span class="co">#&gt; - Factor(s): education</span></span>
+<span><span class="co">#&gt; - Covariate(s): age</span></span>
+<span><span class="co">#&gt; - Type III Sum of Squares: Type 3</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - N (complete cases): 2186</span></span>
+<span><span class="co">#&gt; - Missing: 314</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Tests of Between-Subjects Effects</span></span>
+<span><span class="co">#&gt; ----------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  Source          Type III SS  df   Mean Square  F        Sig.  Partial Eta Sq</span></span>
+<span><span class="co">#&gt;  Corrected Model 1.726314e+09    4 4.315784e+08  344.227 &lt;.001 0.387         </span></span>
+<span><span class="co">#&gt;  Intercept       3.522092e+09    1 3.522092e+09 2809.219 &lt;.001 0.563         </span></span>
+<span><span class="co">#&gt;  age             2.421785e+04    1 2.421785e+04    0.019 0.889 0.000         </span></span>
+<span><span class="co">#&gt;  education       1.726217e+09    3 5.754058e+08  458.943 &lt;.001 0.387         </span></span>
+<span><span class="co">#&gt;  Error           2.734455e+09 2181 1.253762e+06                              </span></span>
+<span><span class="co">#&gt;  Total           3.529768e+10 2186                                           </span></span>
+<span><span class="co">#&gt;  Corrected Total 4.460769e+09 2185                                           </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;  ***</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; ----------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; R Squared = 0.387 (Adjusted R Squared = 0.386)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Parameter Estimates</span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  Parameter   B        Std. Error t      Sig.  Lower Bound Upper Bound</span></span>
+<span><span class="co">#&gt;  (Intercept) 3986.404 75.212     53.002 &lt;.001 3838.909    4133.899   </span></span>
+<span><span class="co">#&gt;  age           -0.195  1.400     -0.139 0.889   -2.941       2.551   </span></span>
+<span><span class="co">#&gt;  education.L 1867.342 51.277     36.417 &lt;.001 1766.784    1967.899   </span></span>
+<span><span class="co">#&gt;  education.Q  137.250 49.626      2.766 0.006   39.931     234.570   </span></span>
+<span><span class="co">#&gt;  education.C  148.968 47.846      3.113 0.002   55.139     242.797   </span></span>
+<span><span class="co">#&gt;  Partial Eta Sq</span></span>
+<span><span class="co">#&gt;  0.563         </span></span>
+<span><span class="co">#&gt;  0.000         </span></span>
+<span><span class="co">#&gt;  0.378         </span></span>
+<span><span class="co">#&gt;  0.003         </span></span>
+<span><span class="co">#&gt;  0.004         </span></span>
+<span><span class="co">#&gt; --------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated Marginal Means</span></span>
+<span><span class="co">#&gt; (Evaluated at covariate means)</span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;  education              Mean     Std. Error Lower Bound Upper Bound</span></span>
+<span><span class="co">#&gt;  Basic Secondary        2759.183 41.135     2678.516    2839.850   </span></span>
+<span><span class="co">#&gt;  Intermediate Secondary 3590.275 47.390     3497.341    3683.208   </span></span>
+<span><span class="co">#&gt;  Academic Secondary     4225.514 47.413     4132.533    4318.494   </span></span>
+<span><span class="co">#&gt;  University             5331.106 60.451     5212.558    5449.653   </span></span>
+<span><span class="co">#&gt; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Levene's Test of Equality of Error Variances</span></span>
+<span><span class="co">#&gt;   F(3, 2182) = 95.327, p = &lt;.001</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="non-parametric-tests-1">Non-Parametric Tests<a class="anchor" aria-label="anchor" href="#non-parametric-tests-1"></a>
+</h2>
+<div class="section level3">
+<h3 id="kruskal-wallis-test">Kruskal-Wallis Test<a class="anchor" aria-label="anchor" href="#kruskal-wallis-test"></a>
+</h3>
+<p>The non-parametric alternative to one-way ANOVA. Compare three or
+more independent groups when data is not normally distributed:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/kruskal_wallis.html">kruskal_wallis</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Kruskal-Wallis Test Results</span></span>
+<span><span class="co">#&gt; ---------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Grouping variable: education</span></span>
+<span><span class="co">#&gt; - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Ranks:</span></span>
+<span><span class="co">#&gt;   --------------------------------------</span></span>
+<span><span class="co">#&gt;                     Group    N Mean Rank</span></span>
+<span><span class="co">#&gt;           Basic Secondary  809    974.29</span></span>
+<span><span class="co">#&gt;    Intermediate Secondary  618   1250.73</span></span>
+<span><span class="co">#&gt;        Academic Secondary  607   1329.56</span></span>
+<span><span class="co">#&gt;                University  387   1456.42</span></span>
+<span><span class="co">#&gt;                     Total 2421        NA</span></span>
+<span><span class="co">#&gt;   --------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Test Statistics:</span></span>
+<span><span class="co">#&gt;   --------------------------------------------</span></span>
+<span><span class="co">#&gt;    Kruskal-Wallis H df p value Eta-squared sig</span></span>
+<span><span class="co">#&gt;             171.178  3       0       0.071 ***</span></span>
+<span><span class="co">#&gt;   --------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect Size Interpretation (Eta-squared):</span></span>
+<span><span class="co">#&gt; - Small effect: 0.01 - 0.06</span></span>
+<span><span class="co">#&gt; - Medium effect: 0.06 - 0.14</span></span>
+<span><span class="co">#&gt; - Large effect: &gt; 0.14</span></span></code></pre></div>
+<p>When the result is significant, use Dunn’s post-hoc test to find
+which groups differ:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">kw_result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/kruskal_wallis.html">kruskal_wallis</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">kw_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/dunn_test.html">dunn_test</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Dunn Post-Hoc Test (Bonferroni) Results</span></span>
+<span><span class="co">#&gt; ---------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
+<span><span class="co">#&gt; - Grouping variable: education</span></span>
+<span><span class="co">#&gt; - P-value adjustment: Bonferroni</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span></span>
+<span><span class="co">#&gt;         Basic Secondary Intermediate Secondary  -7.402     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;         Basic Secondary     Academic Secondary  -9.465     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;         Basic Secondary             University -11.159     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.291     </span></span>
+<span><span class="co">#&gt;  Intermediate Secondary             University  -4.539     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;      Academic Secondary             University  -2.790     0.005   0.032   * </span></span>
+<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Interpretation:</span></span>
+<span><span class="co">#&gt; - Positive Z: First group has higher mean rank</span></span>
+<span><span class="co">#&gt; - Negative Z: First group has lower mean rank</span></span>
+<span><span class="co">#&gt; - p-values are adjusted for multiple comparisons</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="wilcoxon-signed-rank-test">Wilcoxon Signed-Rank Test<a class="anchor" aria-label="anchor" href="#wilcoxon-signed-rank-test"></a>
+</h3>
+<p>The non-parametric alternative to the paired t-test. Compare two
+related measurements:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">longitudinal_data_wide</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/wilcoxon_test.html">wilcoxon_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Wilcoxon Signed-Rank Test Results</span></span>
+<span><span class="co">#&gt; ---------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Pair: score_T2 vs score_T1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Ranks:</span></span>
+<span><span class="co">#&gt;   ------------------------------------------</span></span>
+<span><span class="co">#&gt;                     N Mean Rank Sum of Ranks</span></span>
+<span><span class="co">#&gt;    Negative Ranks  27     40.19         1085</span></span>
+<span><span class="co">#&gt;    Positive Ranks  78     57.44         4480</span></span>
+<span><span class="co">#&gt;              Ties   0        NA           NA</span></span>
+<span><span class="co">#&gt;             Total 105        NA           NA</span></span>
+<span><span class="co">#&gt;   ------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   a score_T2 &lt; score_T1</span></span>
+<span><span class="co">#&gt;   b score_T2 &gt; score_T1</span></span>
+<span><span class="co">#&gt;   c score_T2 = score_T1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Test Statistics:</span></span>
+<span><span class="co">#&gt;   ---------------------------</span></span>
+<span><span class="co">#&gt;        Z p value Effect r sig</span></span>
+<span><span class="co">#&gt;    5.427       0     0.53 ***</span></span>
+<span><span class="co">#&gt;   ---------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect Size Interpretation (r):</span></span>
+<span><span class="co">#&gt; - Small effect: 0.1 - 0.3</span></span>
+<span><span class="co">#&gt; - Medium effect: 0.3 - 0.5</span></span>
+<span><span class="co">#&gt; - Large effect: &gt; 0.5</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="friedman-test">Friedman Test<a class="anchor" aria-label="anchor" href="#friedman-test"></a>
+</h3>
+<p>The non-parametric alternative to repeated-measures ANOVA. Compare
+three or more related measurements:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/friedman_test.html">friedman_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span>, <span class="va">score_T3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Friedman Test Results</span></span>
+<span><span class="co">#&gt; ---------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Variables: score_T1, score_T2, score_T3</span></span>
+<span><span class="co">#&gt; - Number of conditions: 3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Ranks:</span></span>
+<span><span class="co">#&gt;   -------------------</span></span>
+<span><span class="co">#&gt;    Variable Mean Rank</span></span>
+<span><span class="co">#&gt;    score_T1      1.48</span></span>
+<span><span class="co">#&gt;    score_T2      2.04</span></span>
+<span><span class="co">#&gt;    score_T3      2.48</span></span>
+<span><span class="co">#&gt;   -------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Test Statistics:</span></span>
+<span><span class="co">#&gt;   -----------------------------------------</span></span>
+<span><span class="co">#&gt;     N Chi-Square df p value Kendall's W sig</span></span>
+<span><span class="co">#&gt;    94     47.255  2       0       0.251 ***</span></span>
+<span><span class="co">#&gt;   -----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect Size Interpretation (Kendall's W):</span></span>
+<span><span class="co">#&gt; - Weak agreement: 0.1 - 0.3</span></span>
+<span><span class="co">#&gt; - Moderate agreement: 0.3 - 0.5</span></span>
+<span><span class="co">#&gt; - Strong agreement: &gt; 0.5</span></span></code></pre></div>
+<p>When significant, use pairwise Wilcoxon post-hoc tests:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">friedman_result</span> <span class="op">&lt;-</span> <span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/friedman_test.html">friedman_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span>, <span class="va">score_T3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">friedman_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results</span></span>
+<span><span class="co">#&gt; ----------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Variables: score_T1, score_T2, score_T3</span></span>
+<span><span class="co">#&gt; - P-value adjustment: Bonferroni</span></span>
+<span><span class="co">#&gt; - Number of comparisons: 3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ---------------------------------------------- </span></span>
+<span><span class="co">#&gt;     Var 1    Var 2     Z p (unadj) p (adj) Sig </span></span>
+<span><span class="co">#&gt;  score_T1 score_T2 5.427     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;  score_T1 score_T3 6.132     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;  score_T2 score_T3 4.413     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt; ---------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Interpretation:</span></span>
+<span><span class="co">#&gt; - Positive Z: First variable tends to have higher values</span></span>
+<span><span class="co">#&gt; - Negative Z: Second variable tends to have higher values</span></span>
+<span><span class="co">#&gt; - p-values are adjusted for multiple comparisons</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="binomial-test">Binomial Test<a class="anchor" aria-label="anchor" href="#binomial-test"></a>
+</h3>
+<p>Test whether an observed proportion differs from an expected
+value:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/binomial_test.html">binomial_test</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Binomial Test Results</span></span>
+<span><span class="co">#&gt; ---------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Test proportion: 0.5</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Categories:</span></span>
+<span><span class="co">#&gt;   ------------------------------------</span></span>
+<span><span class="co">#&gt;                       N Observed Prop.</span></span>
+<span><span class="co">#&gt;      Group 1: Male 1194          0.478</span></span>
+<span><span class="co">#&gt;    Group 2: Female 1306          0.522</span></span>
+<span><span class="co">#&gt;              Total 2500          1.000</span></span>
+<span><span class="co">#&gt;   ------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Test Statistics:</span></span>
+<span><span class="co">#&gt;   -----------------------------------------</span></span>
+<span><span class="co">#&gt;    Test Prop. p value CI lower CI upper sig</span></span>
+<span><span class="co">#&gt;           0.5   0.026    0.458    0.497   *</span></span>
+<span><span class="co">#&gt;   -----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="exact-and-goodness-of-fit-tests">Exact and Goodness-of-Fit Tests<a class="anchor" aria-label="anchor" href="#exact-and-goodness-of-fit-tests"></a>
+</h2>
+<div class="section level3">
+<h3 id="fishers-exact-test">Fisher’s Exact Test<a class="anchor" aria-label="anchor" href="#fishers-exact-test"></a>
+</h3>
+<p>Use instead of chi-square when sample sizes are small or expected
+cell frequencies are below 5:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create a small subsample</span></span>
+<span><span class="va">small_sample</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">small_sample</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/fisher_test.html">fisher_test</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Fisher's Exact Test Results</span></span>
+<span><span class="co">#&gt; ---------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Row variable: gender</span></span>
+<span><span class="co">#&gt; - Column variable: region</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Contingency Table:</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;         cc</span></span>
+<span><span class="co">#&gt; r        East West</span></span>
+<span><span class="co">#&gt;   Male      3    9</span></span>
+<span><span class="co">#&gt;   Female    4   14</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test Results:</span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt;                              Method p-value  N Sig </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data  1.0000 30     </span></span>
+<span><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="chi-square-goodness-of-fit">Chi-Square Goodness-of-Fit<a class="anchor" aria-label="anchor" href="#chi-square-goodness-of-fit"></a>
+</h3>
+<p>Test whether observed frequencies match expected proportions. For
+example, does the education distribution match the general
+population?</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/chisq_gof.html">chisq_gof</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test Results</span></span>
+<span><span class="co">#&gt; ---------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Variables: education</span></span>
+<span><span class="co">#&gt; - Expected: Equal proportions</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   education - Frequency Table:</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                  category observed expected residual</span></span>
+<span><span class="co">#&gt;           Basic Secondary      841      625      216</span></span>
+<span><span class="co">#&gt;    Intermediate Secondary      629      625        4</span></span>
+<span><span class="co">#&gt;        Academic Secondary      631      625        6</span></span>
+<span><span class="co">#&gt;                University      399      625     -226</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ----------------------------------------- </span></span>
+<span><span class="co">#&gt;   Variable Chi-Square df p-value    N Sig </span></span>
+<span><span class="co">#&gt;  education    156.454  3   &lt;.001 2500 *** </span></span>
+<span><span class="co">#&gt; ----------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>You can also specify expected proportions:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/chisq_gof.html">chisq_gof</a></span><span class="op">(</span><span class="va">education</span>, expected <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.30</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>, <span class="fl">0.20</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test Results</span></span>
+<span><span class="co">#&gt; ---------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Variables: education</span></span>
+<span><span class="co">#&gt; - Expected: 0.3, 0.25, 0.25, 0.2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   education - Frequency Table:</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                  category observed expected residual</span></span>
+<span><span class="co">#&gt;           Basic Secondary      841      750       91</span></span>
+<span><span class="co">#&gt;    Intermediate Secondary      629      625        4</span></span>
+<span><span class="co">#&gt;        Academic Secondary      631      625        6</span></span>
+<span><span class="co">#&gt;                University      399      500     -101</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ----------------------------------------- </span></span>
+<span><span class="co">#&gt;   Variable Chi-Square df p-value    N Sig </span></span>
+<span><span class="co">#&gt;  education     31.527  3   &lt;.001 2500 *** </span></span>
+<span><span class="co">#&gt; ----------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="mcnemars-test">McNemar’s Test<a class="anchor" aria-label="anchor" href="#mcnemars-test"></a>
+</h3>
+<p>Test whether proportions change between two paired measurements
+(e.g., before and after an intervention). Requires two dichotomous
+variables measured on the same subjects:</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example with dichotomized trust variables</span></span>
+<span><span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    trust_gov_high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">trust_government</span> <span class="op">&gt;</span> <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    trust_media_high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">trust_media</span> <span class="op">&gt;</span> <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">test_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/mcnemar_test.html">mcnemar_test</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="va">trust_gov_high</span>, var2 <span class="op">=</span> <span class="va">trust_media_high</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
 <h2 id="interpreting-results">Interpreting Results<a class="anchor" aria-label="anchor" href="#interpreting-results"></a>
 </h2>
 <div class="section level3">
@@ -980,7 +1669,7 @@ chance, given the sample size.</p>
 </h3>
 <p>With large samples, even tiny differences can be statistically
 significant. Always check effect sizes:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
@@ -1056,7 +1745,7 @@ as fundamentally different</li>
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
 <p>A typical hypothesis testing workflow:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Descriptive overview</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -1223,19 +1912,24 @@ as fundamentally different</li>
 <li>
 <strong>Check assumptions first.</strong> Inspect skewness and
 kurtosis before choosing a test. For non-normal data, consider
-<code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>.</li>
+<code><a href="../reference/mann_whitney.html">mann_whitney()</a></code> or <code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code>.</li>
 <li>
-<strong>Use appropriate tests.</strong> Normal data with equal
-variances: t-test/ANOVA. Non-normal or ordinal: Mann-Whitney.
-Categorical: chi-square.</li>
+<strong>Use appropriate tests.</strong> Normal data: t-test/ANOVA.
+Non-normal or ordinal: Mann-Whitney/Kruskal-Wallis. Categorical:
+chi-square or Fisher’s exact test. Small samples: use exact tests.</li>
+<li>
+<strong>Use post-hoc tests.</strong> After a significant omnibus
+test, use <code><a href="../reference/tukey_test.html">tukey_test()</a></code> for ANOVA, <code><a href="../reference/dunn_test.html">dunn_test()</a></code>
+for Kruskal-Wallis, or <code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code> for
+Friedman.</li>
 <li>
 <strong>Report completely.</strong> Always include the test
 statistic, degrees of freedom, p-value, effect size, and confidence
 intervals.</li>
 <li>
 <strong>Watch for multiple comparisons.</strong> Running many tests
-inflates the chance of false positives. Consider Bonferroni correction
-or pre-register your hypotheses.</li>
+inflates the chance of false positives. Post-hoc tests handle this
+automatically with Bonferroni correction.</li>
 <li>
 <strong>Significance is not importance.</strong> A statistically
 significant result with a negligible effect size may not be practically
@@ -1245,21 +1939,67 @@ relevant.</li>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
+<div class="section level3">
+<h3 id="parametric-tests-1">Parametric Tests<a class="anchor" aria-label="anchor" href="#parametric-tests-1"></a>
+</h3>
 <ol style="list-style-type: decimal">
 <li>
 <strong><code><a href="../reference/t_test.html">t_test()</a></code></strong> compares means between two
-groups — use it for questions like “Do men and women differ?”</li>
+groups</li>
 <li>
 <strong><code><a href="../reference/oneway_anova.html">oneway_anova()</a></code></strong> extends this to three
-or more groups, with post-hoc tests to identify which groups differ</li>
+or more groups, with <code><a href="../reference/tukey_test.html">tukey_test()</a></code> and
+<code><a href="../reference/scheffe_test.html">scheffe_test()</a></code> for post-hoc analysis</li>
+<li>
+<strong><code><a href="../reference/factorial_anova.html">factorial_anova()</a></code></strong> tests effects of
+multiple factors and their interactions</li>
+<li>
+<strong><code><a href="../reference/ancova.html">ancova()</a></code></strong> compares groups while
+controlling for a covariate</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="non-parametric-tests-2">Non-Parametric Tests<a class="anchor" aria-label="anchor" href="#non-parametric-tests-2"></a>
+</h3>
+<ol start="5" style="list-style-type: decimal">
+<li>
+<strong><code><a href="../reference/mann_whitney.html">mann_whitney()</a></code></strong> is the non-parametric
+alternative to the t-test</li>
+<li>
+<strong><code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code></strong> is the non-parametric
+alternative to ANOVA, with <code><a href="../reference/dunn_test.html">dunn_test()</a></code> for post-hoc
+analysis</li>
+<li>
+<strong><code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code></strong> is the non-parametric
+alternative to the paired t-test</li>
+<li>
+<strong><code><a href="../reference/friedman_test.html">friedman_test()</a></code></strong> is the non-parametric
+alternative to repeated-measures ANOVA, with
+<code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code> for post-hoc analysis</li>
+<li>
+<strong><code><a href="../reference/binomial_test.html">binomial_test()</a></code></strong> tests proportions
+against expected values</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="categorical-tests-1">Categorical Tests<a class="anchor" aria-label="anchor" href="#categorical-tests-1"></a>
+</h3>
+<ol start="10" style="list-style-type: decimal">
 <li>
 <strong><code><a href="../reference/chi_square.html">chi_square()</a></code></strong> tests whether categorical
 variables are related</li>
 <li>
-<strong><code><a href="../reference/mann_whitney.html">mann_whitney()</a></code></strong> is the non-parametric
-alternative when assumptions are not met</li>
-<li>Always report <strong>effect sizes</strong> alongside p-values</li>
+<strong><code><a href="../reference/fisher_test.html">fisher_test()</a></code></strong> is the exact alternative
+for small samples</li>
+<li>
+<strong><code><a href="../reference/chisq_gof.html">chisq_gof()</a></code></strong> tests whether observed
+frequencies match expected proportions</li>
+<li>
+<strong><code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code></strong> compares paired
+proportions</li>
 </ol>
+<p>Always report <strong>effect sizes</strong> alongside p-values</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>

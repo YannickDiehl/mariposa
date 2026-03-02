@@ -169,6 +169,10 @@ Formatted output for all result types
   : Print method for Kruskal-Wallis test results
 - [`print(`*`<levene_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.levene_test.md)
   : Print method for Levene test results
+- [`print(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.linear_regression.md)
+  : Print Linear Regression Results
+- [`print(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.logistic_regression.md)
+  : Print Logistic Regression Results
 - [`print(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.mann_whitney.md)
   : Print method for Mann-Whitney test results
 - [`print(`*`<mcnemar_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/print.mcnemar_test.md)

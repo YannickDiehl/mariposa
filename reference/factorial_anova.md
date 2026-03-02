@@ -371,7 +371,45 @@ result %>% tukey_test()
 #> Tukey HSD Post-Hoc Test Results
 #> -------------------------------
 #> 
-#> Error in !x$is_grouped: invalid argument type
+#> - Dependent variable: income
+#> - Factors: gender x education
+#> - Confidence level: 95.0%
+#>   Family-wise error rate controlled using Tukey HSD
+#> 
+#> 
+#> --- Factor: gender ---
+#> 
+#> ---------------------------------------------------- 
+#>   Comparison Difference Lower CI Upper CI p-value Sig
+#>  Female-Male     -42.32 -162.639   77.999    0.49    
+#> ---------------------------------------------------- 
+#> 
+#> --- Factor: education ---
+#> 
+#> ---------------------------------------------------------------------------------- 
+#>                                 Comparison Difference Lower CI Upper CI p-value
+#>     Intermediate Secondary-Basic Secondary    833.471  671.079  995.862   <.001
+#>         Academic Secondary-Basic Secondary   1465.040 1302.648 1627.432   <.001
+#>                 University-Basic Secondary   2578.135 2392.167 2764.104   <.001
+#>  Academic Secondary-Intermediate Secondary    631.569  457.746  805.393   <.001
+#>          University-Intermediate Secondary   1744.665 1548.634 1940.695   <.001
+#>              University-Academic Secondary   1113.096  917.065 1309.126   <.001
+#>  Sig
+#>  ***
+#>  ***
+#>  ***
+#>  ***
+#>  ***
+#>  ***
+#> ---------------------------------------------------------------------------------- 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Interpretation:
+#> - Positive differences: First group > Second group
+#> - Negative differences: First group < Second group
+#> - Confidence intervals not containing 0 indicate significant differences
+#> - p-values are adjusted for multiple comparisons (family-wise error control)
 result %>% levene_test()
 #> 
 #> Levene's Test for Homogeneity of Variance 

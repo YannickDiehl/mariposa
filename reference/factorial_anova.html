@@ -411,7 +411,45 @@ Analyzing Data (2nd ed.). Lawrence Erlbaum Associates.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in !x$is_grouped:</span> invalid argument type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Factors: gender x education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- Factor: gender ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Comparison Difference Lower CI Upper CI p-value Sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Female-Male     -42.32 -162.639   77.999    0.49    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- Factor: education ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary    833.471  671.079  995.862   &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary   1465.040 1302.648 1627.432   &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary   2578.135 2392.167 2764.104   &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary    631.569  457.746  805.393   &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary   1744.665 1548.634 1940.695   &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary   1113.096  917.065 1309.126   &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
