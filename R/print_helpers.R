@@ -90,6 +90,7 @@ print_group_header <- function(group_values, prefix = "Group") {
 #' @keywords internal
 pad_utf8 <- function(text, width, align = "left") {
   text <- as.character(text)
+  if (is.na(text)) text <- "NA"
   extra <- nchar(text, type = "bytes") - nchar(text, type = "chars")
   adjusted_width <- width + extra
   if (align == "left") {
