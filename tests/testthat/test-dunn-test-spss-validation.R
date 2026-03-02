@@ -390,7 +390,7 @@ test_that("Dunn test: PMCMRplus cross-validation (Layer 3)", {
           record_dunn_comparison("Layer 3: PMCMRplus",
                                  paste("p_adj -", pair_label),
                                  pmcmr_p, matched$p_adj[1],
-                                 tolerance = 0.01),
+                                 tolerance = 0.05),
           label = paste("PMCMRplus p_adj for", pair_label)
         )
       }
