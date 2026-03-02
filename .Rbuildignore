@@ -18,3 +18,4 @@
 ^mariposa_.*\.tar\.gz$
 ^doc$
 ^Meta$
+^tests/spss_reference$
