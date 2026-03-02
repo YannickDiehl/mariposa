@@ -259,7 +259,8 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
     variables = var_names,
     weights = w_name,
     is_grouped = is_grouped,
-    conf.level = conf.level
+    conf.level = conf.level,
+    data = data[, unique(c(var_names, w_name, grp_vars)), drop = FALSE]
   )
 
   class(result) <- "friedman_test"

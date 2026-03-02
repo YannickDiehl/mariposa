@@ -119,6 +119,17 @@ levene_test <- function(x, ...) {
 
 #' @rdname levene_test
 #' @export
+levene_test.default <- function(x, ...) {
+  cls <- paste(class(x), collapse = "/")
+  cli_abort(c(
+    "{.fn levene_test} is not available for objects of class {.cls {cls}}.",
+    "i" = "Levene's test works with {.fn oneway_anova}, {.fn t_test}, or directly on a data frame.",
+    "i" = "Example: {.code oneway_anova(data, dv, group) |> levene_test()}"
+  ))
+}
+
+#' @rdname levene_test
+#' @export
 levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("mean", "median")) {
   
   # Input validation

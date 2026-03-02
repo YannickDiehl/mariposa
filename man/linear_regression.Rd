@@ -10,6 +10,7 @@ linear_regression(
   dependent = NULL,
   predictors = NULL,
   weights = NULL,
+  use = c("listwise", "pairwise"),
   standardized = TRUE,
   conf.level = 0.95
 )
@@ -29,6 +30,12 @@ Used with \code{dependent} when no formula is given.}
 
 \item{weights}{Optional survey weights (unquoted variable name). When
 specified, weighted least squares (WLS) is used, matching SPSS WEIGHT BY.}
+
+\item{use}{How to handle missing data: \code{"listwise"} (default) drops any
+case with a missing value on any variable (matching SPSS /MISSING LISTWISE).
+\code{"pairwise"} computes the regression from a pairwise
+covariance/correlation matrix, retaining more cases (matching SPSS
+/MISSING PAIRWISE).}
 
 \item{standardized}{Logical. If \code{TRUE} (default), standardized
 coefficients (Beta) are calculated and included in the output.}
@@ -103,9 +110,11 @@ For binary outcomes (yes/no, 0/1), use \code{\link{logistic_regression}} instead
 
 \subsection{Technical Details}{
 
-\strong{Missing Data}: Listwise deletion is used (matching SPSS REGRESSION
-/MISSING LISTWISE). Cases with any missing values on the dependent variable,
-predictors, or weights are excluded.
+\strong{Missing Data}: By default, listwise deletion is used (matching SPSS
+REGRESSION /MISSING LISTWISE). Set \code{use = "pairwise"} to match SPSS
+/MISSING PAIRWISE, which computes the regression from a pairwise
+covariance matrix. Pairwise deletion retains more cases and produces
+results closer to SPSS output when data has varying patterns of missingness.
 
 \strong{Weights}: When weights are specified, they are treated as frequency
 weights (matching SPSS WEIGHT BY behavior). The model is fitted using weighted

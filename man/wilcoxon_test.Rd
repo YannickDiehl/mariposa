@@ -130,9 +130,12 @@ Psychology: General, 141(1), 2.
 Other hypothesis_tests: 
 \code{\link{binomial_test}()},
 \code{\link{chi_square}()},
+\code{\link{chisq_gof}()},
+\code{\link{fisher_test}()},
 \code{\link{friedman_test}()},
 \code{\link{kruskal_wallis}()},
 \code{\link{mann_whitney}()},
+\code{\link{mcnemar_test}()},
 \code{\link{oneway_anova}()},
 \code{\link{t_test}()}
 }
