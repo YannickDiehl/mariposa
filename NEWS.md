@@ -1,3 +1,22 @@
+# mariposa 0.3.1
+
+## Enhancements
+
+* `efa()` now supports Maximum Likelihood (ML) extraction via `extraction = "ml"`.
+  ML extraction provides a goodness-of-fit chi-square test, initial communalities
+  as SMC (squared multiple correlations), and uniquenesses. Uses `stats::factanal()`
+  with correlation matrix input for seamless survey weight support.
+
+* `efa()` now supports Promax rotation via `rotation = "promax"`. Like Oblimin,
+  Promax is an oblique rotation that produces Pattern Matrix, Structure Matrix,
+  and Factor Correlation Matrix. Uses `stats::promax()` (base R, no new dependency).
+
+* Internal refactoring of `efa()`: extraction logic separated into
+  `.efa_extract_pca()` and `.efa_extract_ml()` for cleaner architecture and
+  easier extension with future extraction methods (PAF planned).
+
+---
+
 # mariposa 0.3.0
 
 ## New Functions
