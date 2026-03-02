@@ -150,6 +150,38 @@ efa(survey_data,
 
 With oblimin, you get a Pattern Matrix (unique contributions) and Structure Matrix (total correlations).
 
+**Promax** is another oblique rotation, common in SPSS. Like oblimin, it produces Pattern and Structure matrices:
+
+```{r}
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    rotation = "promax")
+```
+
+### Choosing an Extraction Method
+
+By default, `efa()` uses PCA (Principal Component Analysis). For a true factor analysis model, use Maximum Likelihood:
+
+```{r}
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    extraction = "ml")
+```
+
+ML extraction provides a **goodness-of-fit test** that evaluates whether your factor model adequately reproduces the observed correlations. A non-significant chi-square ($p > .05$) suggests good fit. ML also reports initial communalities as SMC (squared multiple correlations) instead of 1.0.
+
+You can combine any extraction with any rotation:
+
+```{r}
+# ML extraction with Promax rotation
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    extraction = "ml", rotation = "promax")
+```
+
 ### Fixing the Number of Factors
 
 If you have a theoretical reason for a specific number of components:
