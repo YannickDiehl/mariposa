@@ -819,6 +819,13 @@ linear_regression <- function(data, formula = NULL,
 # PRINT METHOD
 # ============================================================================
 
+#' Print Linear Regression Results
+#'
+#' @param x An object of class \code{"linear_regression"}.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
 #' @export
 print.linear_regression <- function(x, ...) {
   if (isTRUE(x$is_grouped)) {

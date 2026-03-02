@@ -328,7 +328,11 @@ test_that("McNemar test: contingency table matches SPSS", {
   result <- test_data %>%
     mcnemar_test(var1 = trust_gov_high, var2 = trust_media_high)
 
-  # Validate the 2x2 table cells if available
+  # Verify result has expected structure
+
+  expect_s3_class(result, "mcnemar_test")
+
+  # Validate the 2x2 table cells if SPSS reference values available
   if ("table" %in% names(result) && !is.na(spss_values$test_1a$cell_a)) {
     tbl <- result$table
     expect_equal(tbl[1, 1], spss_values$test_1a$cell_a, tolerance = 0)

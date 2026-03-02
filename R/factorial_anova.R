@@ -816,7 +816,10 @@ tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
       results = results_df,
       conf.level = conf.level,
       call_info = info,
-      is_factorial = TRUE
+      is_factorial = TRUE,
+      is_grouped = FALSE,
+      weights = info$weight_name,
+      group = paste(info$factors, collapse = " x ")
     ),
     class = "tukey_test"
   )
@@ -913,7 +916,10 @@ scheffe_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
       results = results_df,
       conf.level = conf.level,
       call_info = info,
-      is_factorial = TRUE
+      is_factorial = TRUE,
+      is_grouped = FALSE,
+      weights = info$weight_name,
+      group = paste(info$factors, collapse = " x ")
     ),
     class = "scheffe_test"
   )
