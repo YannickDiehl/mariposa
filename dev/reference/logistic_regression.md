@@ -1,0 +1,521 @@
+# Run a Logistic Regression
+
+`logistic_regression()` performs binary logistic regression with
+SPSS-compatible output. Wraps `stats::glm(family = binomial)` and adds
+odds ratios, pseudo R-squared measures, classification table, and model
+tests matching SPSS LOGISTIC REGRESSION output.
+
+Supports two interface styles:
+
+- **Formula interface:**
+  `logistic_regression(data, high_satisfaction ~ age + income)`
+
+- **SPSS-style:**
+  `logistic_regression(data, dependent = high_satisfaction, predictors = c(age, income))`
+
+## Usage
+
+``` r
+logistic_regression(
+  data,
+  formula = NULL,
+  dependent = NULL,
+  predictors = NULL,
+  weights = NULL,
+  conf.level = 0.95
+)
+```
+
+## Arguments
+
+- data:
+
+  Your survey data (a data frame or tibble). If grouped (via
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)),
+  separate regressions are run for each group.
+
+- formula:
+
+  A formula specifying the model (e.g., `y ~ x1 + x2`). If provided,
+  `dependent` and `predictors` are ignored.
+
+- dependent:
+
+  The dependent variable (unquoted). Used with `predictors` when no
+  formula is given. Must be binary (0/1 or two-level factor).
+
+- predictors:
+
+  Predictor variable(s) (unquoted, supports tidyselect). Used with
+  `dependent` when no formula is given.
+
+- weights:
+
+  Optional survey weights (unquoted variable name). When specified,
+  weighted maximum likelihood estimation is used, matching SPSS WEIGHT
+  BY behavior.
+
+- conf.level:
+
+  Confidence level for odds ratio intervals (default 0.95).
+
+## Value
+
+An object of class `"logistic_regression"` containing:
+
+- coefficients:
+
+  Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper
+
+- model_summary:
+
+  List with minus2LL, cox_snell_r2, nagelkerke_r2, mcfadden_r2
+
+- omnibus_test:
+
+  List with chi_sq, df, p for overall model test
+
+- classification:
+
+  List with table, overall_pct, pct_correct_0, pct_correct_1
+
+- hosmer_lemeshow:
+
+  List with chi_sq, df, p (goodness-of-fit test)
+
+- model:
+
+  The underlying `glm` object
+
+- formula:
+
+  The formula used
+
+- n:
+
+  Sample size (listwise complete cases)
+
+- dependent:
+
+  Name of the dependent variable
+
+- predictor_names:
+
+  Names of predictor variables
+
+- weighted:
+
+  Logical indicating whether weights were used
+
+- weight_name:
+
+  Name of the weight variable (or NULL)
+
+## Details
+
+### Understanding the Results
+
+The output includes five sections matching SPSS LOGISTIC REGRESSION
+output:
+
+- **Omnibus Test**: Tests whether the model as a whole is significant. A
+  significant chi-square means the model predicts better than chance.
+
+- **Model Summary**: -2 Log Likelihood and pseudo R-squared values.
+  Lower -2LL = better fit. Higher R-squared = more variance explained.
+
+- **Hosmer-Lemeshow Test**: Goodness-of-fit test. A non-significant
+  result (p \> 0.05) means the model fits the data well.
+
+- **Classification Table**: How well the model classifies cases. Shows
+  percentage correctly predicted for each group and overall.
+
+- **Coefficients**: B, Wald test, odds ratios (Exp(B)), and CIs.
+
+Interpreting odds ratios (Exp(B)):
+
+- **Exp(B) \> 1**: Predictor increases the odds of the outcome
+
+- **Exp(B) \< 1**: Predictor decreases the odds of the outcome
+
+- **Exp(B) = 1**: Predictor has no effect on the odds
+
+### When to Use This
+
+Use `logistic_regression()` when:
+
+- Your dependent variable is binary (yes/no, 0/1, pass/fail)
+
+- You want to predict group membership from one or more predictors
+
+- You need odds ratios to interpret predictor effects
+
+For continuous outcomes, use
+[`linear_regression`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md)
+instead.
+
+### Technical Details
+
+**Dependent Variable**: Must be binary. Factors with exactly 2 levels
+are automatically converted to 0/1 (first level = 0, second level = 1).
+Numeric variables must contain only 0 and 1 values.
+
+**Missing Data**: Listwise deletion is used (matching SPSS LOGISTIC
+REGRESSION default behavior).
+
+**Weights**: When weights are specified, they are treated as frequency
+weights (matching SPSS WEIGHT BY behavior).
+
+**Pseudo R-squared**: Three measures are reported:
+
+- Cox & Snell R-squared (bounded below 1)
+
+- Nagelkerke R-squared (adjusted to reach 1)
+
+- McFadden R-squared (1 - LL_model/LL_null)
+
+**Grouped Analysis**: When `data` is grouped via
+[`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
+a separate regression is run for each group (matching SPSS SPLIT FILE
+BY).
+
+## See also
+
+[`linear_regression`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md)
+for continuous outcome variables.
+
+[`chi_square`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md)
+for testing associations between categorical variables.
+
+Other regression:
+[`linear_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md)
+
+## Examples
+
+``` r
+library(dplyr)
+data(survey_data)
+
+# Create binary DV
+survey_data$high_satisfaction <- ifelse(survey_data$life_satisfaction >= 4, 1, 0)
+
+# Bivariate logistic regression
+logistic_regression(survey_data, high_satisfaction ~ age)
+#> 
+#> Logistic Regression Results
+#> ---------------------------
+#> - Formula: high_satisfaction ~ age
+#> - Method: ENTER
+#> - N: 2421
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                       0.283     1      0.595 
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                  3298.239
+#>   Cox & Snell R Square                  0.000
+#>   Nagelkerke R Square                   0.000
+#>   McFadden R Square                     0.000
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                               9.742     8      0.284
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                             0       1024            0.0
+#>   1                             0       1397          100.0
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   57.7
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)              0.376     0.129     8.449    1    0.004      1.456                     **
+#>   age                     -0.001     0.002     0.283    1    0.595      0.999     0.994     1.003 
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+
+# Multiple logistic regression
+logistic_regression(survey_data, high_satisfaction ~ age + income + education)
+#> 
+#> Logistic Regression Results
+#> ---------------------------
+#> - Formula: high_satisfaction ~ age + income + education
+#> - Method: ENTER
+#> - N: 2115
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                     357.461     3      0.000 ***
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                  2519.981
+#>   Cox & Snell R Square                  0.156
+#>   Nagelkerke R Square                   0.209
+#>   McFadden R Square                     0.124
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                             150.723     8      0.000
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                           507        381           57.1
+#>   1                           287        940           76.6
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   68.4
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)             -2.248     0.213   111.344    1    0.000      0.106                     ***
+#>   age                      0.001     0.003     0.175    1    0.676      1.001     0.996     1.007 
+#>   income                   0.001     0.000   195.056    1    0.000      1.001     1.001     1.001 ***
+#>   education               -0.009     0.055     0.029    1    0.865      0.991     0.890     1.103 
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+
+# SPSS-style interface
+logistic_regression(survey_data,
+                    dependent = high_satisfaction,
+                    predictors = c(age, income))
+#> 
+#> Logistic Regression Results
+#> ---------------------------
+#> - Formula: high_satisfaction ~ age + income
+#> - Method: ENTER
+#> - N: 2115
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                     357.432     2      0.000 ***
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                  2520.010
+#>   Cox & Snell R Square                  0.155
+#>   Nagelkerke R Square                   0.209
+#>   McFadden R Square                     0.124
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                             150.764     8      0.000
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                           508        380           57.2
+#>   1                           289        938           76.4
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   68.4
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***
+#>   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 
+#>   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+
+# Weighted logistic regression
+logistic_regression(survey_data, high_satisfaction ~ age,
+                    weights = sampling_weight)
+#> 
+#> Weighted Logistic Regression Results
+#> ------------------------------------
+#> - Formula: high_satisfaction ~ age
+#> - Method: ENTER
+#> - N: 2437
+#> - Weights: sampling_weight
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                       0.283     1      0.595 
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                  3298.256
+#>   Cox & Snell R Square                  0.000
+#>   Nagelkerke R Square                   0.000
+#>   McFadden R Square                     0.000
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                               9.761     8      0.282
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                             0       1034            0.0
+#>   1                             0       1403          100.0
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   57.6
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)              0.371     0.128     8.414    1    0.004      1.450                     **
+#>   age                     -0.001     0.002     0.297    1    0.586      0.999     0.994     1.003 
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+
+# Grouped by region
+survey_data |>
+  dplyr::group_by(region) |>
+  logistic_regression(high_satisfaction ~ age)
+#> 
+#> Logistic Regression Results
+#> ---------------------------
+#> - Formula: high_satisfaction ~ age
+#> - Method: ENTER
+#> - Grouped by: region
+#> 
+#> 
+#> Group: region = East
+#> --------------------
+#>   N: 465
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                       0.738     1      0.390 
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                   631.079
+#>   Cox & Snell R Square                  0.002
+#>   Nagelkerke R Square                   0.002
+#>   McFadden R Square                     0.001
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                              13.006     8      0.112
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                             0        194            0.0
+#>   1                             0        271          100.0
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   58.3
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)              0.576     0.297     3.755    1    0.053      1.778                     
+#>   age                     -0.005     0.005     0.737    1    0.391      0.995     0.985     1.006 
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> 
+#> Group: region = West
+#> --------------------
+#>   N: 1956
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                       0.031     1      0.860 
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                  2666.595
+#>   Cox & Snell R Square                  0.000
+#>   Nagelkerke R Square                   0.000
+#>   McFadden R Square                     0.000
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                               8.374     8      0.398
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                             0        830            0.0
+#>   1                             0       1126          100.0
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   57.6
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)              0.329     0.144     5.237    1    0.022      1.390                     *
+#>   age                     -0.000     0.003     0.031    1    0.860      1.000     0.994     1.005 
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+```

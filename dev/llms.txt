@@ -1,0 +1,398 @@
+# mariposa
+
+**Professional statistical analysis for survey data in R.**
+
+mariposa (*Marburg Initiative for Political and Social Analysis*)
+provides 44 statistical functions for analyzing survey data. All
+functions support survey weights, grouped analysis via
+[`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
+and produce publication-ready output. Results are validated against SPSS
+v29 for full reproducibility (4,986+ tests pass).
+
+## Installation
+
+``` r
+# Install from GitHub
+devtools::install_github("YannickDiehl/mariposa")
+```
+
+## Quick Start
+
+``` r
+library(mariposa)
+library(dplyr)
+
+# Load example survey data (2,500 respondents)
+data(survey_data)
+
+# Descriptive statistics with survey weights
+survey_data %>%
+  describe(age, income, life_satisfaction, weights = sampling_weight)
+
+# Frequency table
+survey_data %>%
+  frequency(education, weights = sampling_weight)
+
+# Compare groups with t-test
+survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+
+# Scale analysis workflow
+reliability(survey_data, trust_government, trust_media, trust_science)
+
+survey_data <- survey_data %>%
+  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+
+# Regression
+survey_data %>%
+  linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
+```
+
+## Core Features
+
+### Statistical Functions
+
+| Category           | Functions                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Purpose                                                  |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| **Descriptive**    | [`describe()`](https://YannickDiehl.github.io/mariposa/dev/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/dev/reference/crosstab.md)                                                                                                                                                                                                                       | Summaries and distributions                              |
+| **T-Tests**        | [`t_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/t_test.md)                                                                                                                                                                                                                                                                                                                                                                                                   | Mean comparisons (independent, paired, one-sample)       |
+| **ANOVA**          | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md), [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/factorial_anova.md), [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md)                                                                                                                                                                                                       | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
+| **Non-parametric** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/dev/reference/mann_whitney.md), [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/dev/reference/kruskal_wallis.md), [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/wilcoxon_test.md), [`friedman_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/friedman_test.md), [`binomial_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/binomial_test.md) | Distribution-free tests                                  |
+| **Exact tests**    | [`chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md), [`fisher_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/fisher_test.md), [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/dev/reference/chisq_gof.md), [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/mcnemar_test.md)                                                                                                                  | Categorical associations and exact tests                 |
+| **Correlation**    | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md), [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/dev/reference/spearman_rho.md), [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/dev/reference/kendall_tau.md)                                                                                                                                                                                                     | Relationships between variables                          |
+| **Post-hoc**       | [`tukey_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/tukey_test.md), [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/scheffe_test.md), [`levene_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/levene_test.md), [`dunn_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/dunn_test.md), [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/dev/reference/pairwise_wilcoxon.md)             | Follow-up analyses (parametric and non-parametric)       |
+| **Scale analysis** | [`reliability()`](https://YannickDiehl.github.io/mariposa/dev/reference/reliability.md), [`efa()`](https://YannickDiehl.github.io/mariposa/dev/reference/efa.md), [`scale_index()`](https://YannickDiehl.github.io/mariposa/dev/reference/scale_index.md), [`pomps()`](https://YannickDiehl.github.io/mariposa/dev/reference/pomps.md)                                                                                                                                          | Cronbach’s Alpha, factor analysis, index construction    |
+| **Regression**     | [`linear_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md), [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/logistic_regression.md)                                                                                                                                                                                                                                                                    | Linear and logistic models with SPSS-style output        |
+| **Effect sizes**   | [`phi()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md), [`cramers_v()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md), [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md)                                                                                                                                                                                                                  | Effect size measures for categorical data                |
+| **Weighted stats** | [`w_mean()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_mean.md), [`w_median()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_median.md), [`w_sd()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_sd.md), + 8 more                                                                                                                                                                                                                           | Individual weighted statistics                           |
+
+### Survey Weights Built-In
+
+Every function handles survey weights correctly:
+
+``` r
+# Weighted mean, median, SD
+survey_data %>%
+  w_mean(age, income, weights = sampling_weight)
+
+# Grouped weighted analysis
+survey_data %>%
+  group_by(region) %>%
+  describe(satisfaction, weights = sampling_weight)
+```
+
+### Tidyverse Integration
+
+Full support for pipes and grouped operations:
+
+``` r
+survey_data %>%
+  filter(age >= 18) %>%
+  group_by(region) %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+```
+
+### Multi-Factor ANOVA & ANCOVA
+
+``` r
+# Factorial ANOVA with Type III SS
+survey_data %>%
+  factorial_anova(dv = income, between = c(gender, education),
+                  weights = sampling_weight)
+
+# ANCOVA with covariate adjustment
+survey_data %>%
+  ancova(dv = income, between = gender, covariate = age,
+         weights = sampling_weight)
+```
+
+### S3 Post-Hoc Methods
+
+``` r
+# Parametric: ANOVA → Tukey/Scheffe
+result <- survey_data %>%
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+
+result %>% tukey_test()    # Pairwise comparisons
+result %>% levene_test()   # Variance homogeneity
+
+# Non-parametric: Kruskal-Wallis → Dunn
+kw_result <- survey_data %>%
+  kruskal_wallis(life_satisfaction, group = education)
+
+kw_result %>% dunn_test()  # Pairwise Dunn comparisons
+```
+
+## SPSS Compatibility
+
+Every function is validated against SPSS v29 across four scenarios:
+weighted/unweighted and grouped/ungrouped. If you’re migrating from
+SPSS, your results will match:
+
+**SPSS:**
+
+``` spss
+WEIGHT BY sampling_weight.
+T-TEST GROUPS=gender(1 2)
+  /VARIABLES=satisfaction.
+```
+
+**mariposa:**
+
+``` r
+survey_data %>%
+  t_test(satisfaction, group = gender, weights = sampling_weight)
+```
+
+## Documentation
+
+- [Complete
+  Reference](https://YannickDiehl.github.io/mariposa/reference/) - All
+  functions with examples
+- [Getting
+  Started](https://YannickDiehl.github.io/mariposa/articles/introduction.html) -
+  Introduction and first steps
+- [Scale
+  Analysis](https://YannickDiehl.github.io/mariposa/articles/scale-analysis.html) -
+  Reliability, factor analysis, and scale construction
+- [Regression
+  Analysis](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.html) -
+  Linear and logistic regression
+- [Survey Weights
+  Guide](https://YannickDiehl.github.io/mariposa/articles/survey-weights.html) -
+  Working with weighted data
+
+## Support
+
+- [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug
+  reports and feature requests
+- [GitHub
+  Discussions](https://github.com/YannickDiehl/mariposa/discussions) -
+  Questions and ideas
+
+## License
+
+MIT - Yannick Diehl
+
+# Package index
+
+## Descriptive Statistics
+
+Summarize and explore your survey data
+
+- [`describe()`](https://YannickDiehl.github.io/mariposa/dev/reference/describe.md)
+  : Get to Know Your Numeric Data
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
+  : Count How Many People Chose Each Option
+- [`crosstab()`](https://YannickDiehl.github.io/mariposa/dev/reference/crosstab.md)
+  : Compare Two Categories: See How They Relate
+
+## Hypothesis Testing
+
+Compare groups and test for significant differences
+
+- [`t_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/t_test.md)
+  : Test If Two Groups Differ
+- [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md)
+  : Compare Multiple Groups: Are Their Averages Different?
+- [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/factorial_anova.md)
+  : Compare Groups Across Multiple Factors: Factorial ANOVA
+- [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md)
+  : Analysis of Covariance: ANCOVA
+- [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/dev/reference/mann_whitney.md)
+  : Compare Two Groups Without Assuming Normal Data
+- [`chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md)
+  [`phi()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md)
+  [`cramers_v()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md)
+  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md)
+  : Test If Two Categories Are Related
+- [`fisher_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/fisher_test.md)
+  : Fisher's Exact Test for Small Samples
+- [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/dev/reference/chisq_gof.md)
+  : Chi-Square Goodness-of-Fit Test
+- [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/mcnemar_test.md)
+  : McNemar's Test for Paired Proportions
+
+## Non-Parametric Tests
+
+Distribution-free tests for ordinal and nominal data
+
+- [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/dev/reference/kruskal_wallis.md)
+  : Compare Multiple Groups Without Assuming Normal Data
+- [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/wilcoxon_test.md)
+  : Compare Two Related Measurements Without Assuming Normality
+- [`friedman_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/friedman_test.md)
+  : Compare Three or More Related Measurements Without Assuming
+  Normality
+- [`binomial_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/binomial_test.md)
+  : Test Whether a Proportion Matches an Expected Value
+
+## Correlation Analysis
+
+Measure relationships between variables
+
+- [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md)
+  : Measure How Strongly Variables Are Related
+- [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/dev/reference/spearman_rho.md)
+  : Spearman's Rank Correlation Analysis
+- [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/dev/reference/kendall_tau.md)
+  : Kendall's Tau Correlation Analysis
+
+## Post-Hoc Analysis
+
+Follow-up tests for detailed group comparisons
+
+- [`tukey_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/tukey_test.md)
+  : Find Which Specific Groups Differ After ANOVA
+- [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/scheffe_test.md)
+  : Compare All Groups More Conservatively After ANOVA
+- [`levene_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/levene_test.md)
+  : Test If Groups Vary Similarly
+- [`dunn_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/dunn_test.md)
+  : Find Which Specific Groups Differ After Kruskal-Wallis
+- [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/dev/reference/pairwise_wilcoxon.md)
+  : Find Which Specific Measurements Differ After Friedman Test
+
+## Scale Analysis
+
+Factor analysis, reliability, and scale construction
+
+- [`reliability()`](https://YannickDiehl.github.io/mariposa/dev/reference/reliability.md)
+  : Check How Reliably Your Scale Measures a Concept
+- [`efa()`](https://YannickDiehl.github.io/mariposa/dev/reference/efa.md)
+  : Explore the Structure Behind Your Survey Items
+- [`scale_index()`](https://YannickDiehl.github.io/mariposa/dev/reference/scale_index.md)
+  : Create a Mean Index Across Items
+- [`pomps()`](https://YannickDiehl.github.io/mariposa/dev/reference/pomps.md)
+  : Transform Scores to Percent of Maximum Possible (POMPS)
+
+## Regression Analysis
+
+Linear and logistic regression with SPSS-compatible output
+
+- [`linear_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md)
+  : Run a Linear Regression
+- [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/logistic_regression.md)
+  : Run a Logistic Regression
+
+## Weighted Statistics
+
+Individual weighted statistics for survey data
+
+- [`w_mean()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_mean.md)
+  : Calculate Population-Representative Averages
+- [`w_median()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_median.md)
+  : Find the Population-Representative Middle Value
+- [`w_sd()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_sd.md)
+  : Calculate Population-Representative Standard Deviations
+- [`w_var()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_var.md)
+  : Calculate Population-Representative Variance
+- [`w_se()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_se.md)
+  : Calculate Population-Representative Standard Errors
+- [`w_iqr()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_iqr.md)
+  : Measure Population-Representative Spread (IQR)
+- [`w_range()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_range.md)
+  : Find the Range of Your Data
+- [`w_quantile()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_quantile.md)
+  : Calculate Population-Representative Percentiles
+- [`w_modus()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_modus.md)
+  : Find the Most Common Value in Your Population
+- [`w_skew()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_skew.md)
+  : Measure Population-Representative Skewness
+- [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/dev/reference/w_kurtosis.md)
+  : Measure Population-Representative Kurtosis
+
+## Datasets
+
+Example datasets for learning and testing
+
+- [`survey_data`](https://YannickDiehl.github.io/mariposa/dev/reference/survey_data.md)
+  : Social Survey Data (Synthetic)
+- [`longitudinal_data`](https://YannickDiehl.github.io/mariposa/dev/reference/longitudinal_data.md)
+  : Longitudinal Study Data (Synthetic)
+- [`longitudinal_data_wide`](https://YannickDiehl.github.io/mariposa/dev/reference/longitudinal_data_wide.md)
+  : Longitudinal Study Data - Wide Format (Synthetic)
+
+## Print Methods
+
+Formatted output for all result types
+
+- [`print(`*`<ancova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.ancova.md)
+  : Print ANCOVA results
+- [`print(`*`<binomial_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.binomial_test.md)
+  : Print method for binomial test results
+- [`print(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.chi_square.md)
+  : Print method for chi_square
+- [`print(`*`<chisq_gof>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.chisq_gof.md)
+  : Print chi-square goodness-of-fit test results
+- [`print(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.crosstab.md)
+  : Print method for crosstab results
+- [`print(`*`<describe>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.describe.md)
+  : Print method for describe objects
+- [`print(`*`<dunn_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.dunn_test.md)
+  : Print Dunn post-hoc test results
+- [`print(`*`<factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.factorial_anova.md)
+  : Print factorial ANOVA results
+- [`print(`*`<fisher_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.fisher_test.md)
+  : Print Fisher's exact test results
+- [`print(`*`<frequency>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.frequency.md)
+  : Print method for frequency objects
+- [`print(`*`<friedman_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.friedman_test.md)
+  : Print method for Friedman test results
+- [`print(`*`<kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.kendall_tau.md)
+  : Print method for kendall_tau
+- [`print(`*`<kruskal_wallis>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.kruskal_wallis.md)
+  : Print method for Kruskal-Wallis test results
+- [`print(`*`<levene_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.levene_test.md)
+  : Print method for Levene test results
+- [`print(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.linear_regression.md)
+  : Print Linear Regression Results
+- [`print(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.logistic_regression.md)
+  : Print Logistic Regression Results
+- [`print(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.mann_whitney.md)
+  : Print method for Mann-Whitney test results
+- [`print(`*`<mcnemar_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.mcnemar_test.md)
+  : Print McNemar test results
+- [`print(`*`<oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.oneway_anova.md)
+  : Print ANOVA test results
+- [`print(`*`<pairwise_wilcoxon>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.pairwise_wilcoxon.md)
+  : Print pairwise Wilcoxon post-hoc test results
+- [`print(`*`<pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.pearson_cor.md)
+  : Print method for pearson_cor
+- [`print(`*`<scheffe_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.scheffe_test.md)
+  : Print Scheffe test results
+- [`print(`*`<spearman_rho>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.spearman_rho.md)
+  : Print method for spearman_rho
+- [`print(`*`<t_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.t_test.md)
+  : Print t-test results
+- [`print(`*`<tukey_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.tukey_test.md)
+  : Print Tukey HSD test results
+- [`print(`*`<w_modus>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.w_modus.md)
+  : Print method for w_modus objects
+- [`print(`*`<wilcoxon_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.wilcoxon_test.md)
+  : Print method for Wilcoxon signed-rank test results
+
+# Articles
+
+### Getting Started
+
+- [Introduction to
+  mariposa](https://YannickDiehl.github.io/mariposa/dev/articles/introduction.md):
+
+### Core Analysis
+
+- [Descriptive Statistics and
+  Frequencies](https://YannickDiehl.github.io/mariposa/dev/articles/descriptive-statistics.md):
+- [Comparing Groups and Testing
+  Hypotheses](https://YannickDiehl.github.io/mariposa/dev/articles/hypothesis-testing.md):
+- [Understanding Relationships: Correlation
+  Analysis](https://YannickDiehl.github.io/mariposa/dev/articles/correlation-analysis.md):
+
+### Advanced Topics
+
+- [Scale
+  Analysis](https://YannickDiehl.github.io/mariposa/dev/articles/scale-analysis.md):
+- [Regression
+  Analysis](https://YannickDiehl.github.io/mariposa/dev/articles/regression-analysis.md):
+- [Working with Survey
+  Weights](https://YannickDiehl.github.io/mariposa/dev/articles/survey-weights.md):

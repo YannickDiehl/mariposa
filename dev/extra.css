@@ -1,0 +1,26 @@
+/* Custom CSS for mariposa pkgdown site */
+/* Color palette inspired by the Marburg hex logo:
+   - Dark teal (#2c3e50) for headings and accents
+   - Soft gold (#d4a843) for highlights
+   - Slate blue (#5d7b93) for secondary elements
+*/
+
+/* Use pkgdown defaults for logo (float: right, 120px on home).
+   No overrides needed — the built-in styling matches sjmisc layout. */
+
+/* Badge spacing */
+.section.level1 > p:first-of-type {
+  margin-top: 15px;
+}
+
+/* Code block styling */
+pre {
+  border-left: 3px solid #d4a843;
+  border-radius: 4px;
+}
+
+/* Section heading separators — only for content sections, not page-header */
+.section.level2 > h2 {
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.4em;
+}
