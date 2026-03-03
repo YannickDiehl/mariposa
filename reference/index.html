@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -435,9 +435,9 @@
         </dt>
         <dd>Longitudinal Study Data - Wide Format (Synthetic)</dd>
       </dl></div><div class="section level2">
-      <h2 id="print-methods">Print Methods<a class="anchor" aria-label="anchor" href="#print-methods"></a></h2>
+      <h2 id="print-summary-methods">Print &amp; Summary Methods<a class="anchor" aria-label="anchor" href="#print-summary-methods"></a></h2>
 
-      <div class="section-desc"><p>Formatted output for all result types</p></div>
+      <div class="section-desc"><p>Compact and detailed output for all result types</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -449,7 +449,7 @@
           <code><a href="print.ancova.html">print(<i>&lt;ancova&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print ANCOVA results</dd>
+        <dd>Print ANCOVA results (compact)</dd>
 
         <dt>
 
@@ -463,7 +463,7 @@
           <code><a href="print.chi_square.html">print(<i>&lt;chi_square&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for chi_square</dd>
+        <dd>Print chi-squared test results (compact)</dd>
 
         <dt>
 
@@ -495,10 +495,17 @@
 
         <dt>
 
+          <code><a href="print.efa.html">print(<i>&lt;efa&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print EFA results (compact)</dd>
+
+        <dt>
+
           <code><a href="print.factorial_anova.html">print(<i>&lt;factorial_anova&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print factorial ANOVA results</dd>
+        <dd>Print factorial ANOVA results (compact)</dd>
 
         <dt>
 
@@ -526,7 +533,7 @@
           <code><a href="print.kendall_tau.html">print(<i>&lt;kendall_tau&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for kendall_tau</dd>
+        <dd>Print Kendall's tau results (compact)</dd>
 
         <dt>
 
@@ -547,21 +554,21 @@
           <code><a href="print.linear_regression.html">print(<i>&lt;linear_regression&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print Linear Regression Results</dd>
+        <dd>Print linear regression results (compact)</dd>
 
         <dt>
 
           <code><a href="print.logistic_regression.html">print(<i>&lt;logistic_regression&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print Logistic Regression Results</dd>
+        <dd>Print logistic regression results (compact)</dd>
 
         <dt>
 
           <code><a href="print.mann_whitney.html">print(<i>&lt;mann_whitney&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for Mann-Whitney test results</dd>
+        <dd>Print Mann-Whitney test results (compact)</dd>
 
         <dt>
 
@@ -575,7 +582,7 @@
           <code><a href="print.oneway_anova.html">print(<i>&lt;oneway_anova&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print ANOVA test results</dd>
+        <dd>Print ANOVA test results (compact)</dd>
 
         <dt>
 
@@ -589,7 +596,14 @@
           <code><a href="print.pearson_cor.html">print(<i>&lt;pearson_cor&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for pearson_cor</dd>
+        <dd>Print Pearson correlation results (compact)</dd>
+
+        <dt>
+
+          <code><a href="print.reliability.html">print(<i>&lt;reliability&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print reliability results (compact)</dd>
 
         <dt>
 
@@ -603,14 +617,105 @@
           <code><a href="print.spearman_rho.html">print(<i>&lt;spearman_rho&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for spearman_rho</dd>
+        <dd>Print Spearman correlation results (compact)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.ancova.html">print(<i>&lt;summary.ancova&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of ANCOVA results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.chi_square.html">print(<i>&lt;summary.chi_square&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of chi-squared test results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.efa.html">print(<i>&lt;summary.efa&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of EFA results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.factorial_anova.html">print(<i>&lt;summary.factorial_anova&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of factorial ANOVA results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.kendall_tau.html">print(<i>&lt;summary.kendall_tau&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of Kendall's tau correlation results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.linear_regression.html">print(<i>&lt;summary.linear_regression&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of linear regression results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.logistic_regression.html">print(<i>&lt;summary.logistic_regression&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of logistic regression results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.mann_whitney.html">print(<i>&lt;summary.mann_whitney&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of Mann-Whitney test results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.oneway_anova.html">print(<i>&lt;summary.oneway_anova&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of one-way ANOVA results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.pearson_cor.html">print(<i>&lt;summary.pearson_cor&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of Pearson correlation results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.reliability.html">print(<i>&lt;summary.reliability&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of reliability analysis results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.spearman_rho.html">print(<i>&lt;summary.spearman_rho&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of Spearman correlation results (detailed output)</dd>
+
+        <dt>
+
+          <code><a href="print.summary.t_test.html">print(<i>&lt;summary.t_test&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print summary of t-test results (detailed output)</dd>
 
         <dt>
 
           <code><a href="print.t_test.html">print(<i>&lt;t_test&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print t-test results</dd>
+        <dd>Print t-test results (compact)</dd>
 
         <dt>
 
@@ -632,6 +737,97 @@
 
         </dt>
         <dd>Print method for Wilcoxon signed-rank test results</dd>
+
+        <dt>
+
+          <code><a href="summary.ancova.html">summary(<i>&lt;ancova&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for ANCOVA results</dd>
+
+        <dt>
+
+          <code><a href="summary.chi_square.html">summary(<i>&lt;chi_square&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for chi-squared test results</dd>
+
+        <dt>
+
+          <code><a href="summary.efa.html">summary(<i>&lt;efa&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summarize an exploratory factor analysis</dd>
+
+        <dt>
+
+          <code><a href="summary.factorial_anova.html">summary(<i>&lt;factorial_anova&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for factorial ANOVA results</dd>
+
+        <dt>
+
+          <code><a href="summary.kendall_tau.html">summary(<i>&lt;kendall_tau&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for Kendall's tau correlation results</dd>
+
+        <dt>
+
+          <code><a href="summary.linear_regression.html">summary(<i>&lt;linear_regression&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for linear regression results</dd>
+
+        <dt>
+
+          <code><a href="summary.logistic_regression.html">summary(<i>&lt;logistic_regression&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for logistic regression results</dd>
+
+        <dt>
+
+          <code><a href="summary.mann_whitney.html">summary(<i>&lt;mann_whitney&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for Mann-Whitney test results</dd>
+
+        <dt>
+
+          <code><a href="summary.oneway_anova.html">summary(<i>&lt;oneway_anova&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for one-way ANOVA results</dd>
+
+        <dt>
+
+          <code><a href="summary.pearson_cor.html">summary(<i>&lt;pearson_cor&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for Pearson correlation results</dd>
+
+        <dt>
+
+          <code><a href="summary.reliability.html">summary(<i>&lt;reliability&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summarize a reliability analysis</dd>
+
+        <dt>
+
+          <code><a href="summary.spearman_rho.html">summary(<i>&lt;spearman_rho&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for Spearman correlation results</dd>
+
+        <dt>
+
+          <code><a href="summary.t_test.html">summary(<i>&lt;t_test&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summary method for t-test results</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

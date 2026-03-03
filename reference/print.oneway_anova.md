@@ -1,8 +1,11 @@
-# Print ANOVA test results
+# Print ANOVA test results (compact)
 
-Print method for objects of class `"oneway_anova"`. Provides a formatted
-display of ANOVA results including descriptive statistics, ANOVA tables,
-assumption tests, and effect sizes.
+Compact print method for objects of class `"oneway_anova"`. Shows a
+one-line summary per variable with F statistic, p-value, effect size,
+and sample size.
+
+For the full detailed output, use
+[`summary()`](https://rdrr.io/r/base/summary.html).
 
 ## Usage
 
@@ -20,39 +23,69 @@ print(x, digits = 3, ...)
 
 - digits:
 
-  Number of decimal places to display (default: 3) for numeric values.
-  Default is `3`.
+  Number of decimal places to display (default: 3).
 
 - ...:
 
-  Additional arguments passed to
-  [`print`](https://rdrr.io/r/base/print.html). Currently unused.
+  Additional arguments (not used).
 
 ## Value
 
 Invisibly returns the input object `x`.
 
-## Details
+## Examples
 
-The print method displays:
-
-- Descriptive statistics by group (means, standard deviations, sample
-  sizes)
-
-- Complete ANOVA table (Sum of Squares, degrees of freedom, F-statistic,
-  p-value)
-
-- Welch's robust test for unequal variances
-
-- Effect sizes (Eta-squared, Epsilon-squared, Omega-squared) with
-  interpretation
-
-- Significance indicators (\* p \< 0.05, \*\* p \< 0.01, \*\*\* p \<
-  0.001)
-
-For grouped analyses (when data is grouped with
-[`group_by`](https://dplyr.tidyverse.org/reference/group_by.html)),
-results are displayed separately for each group combination.
-
-For weighted analyses, both actual sample sizes and effective sample
-sizes (weighted n) are displayed.
+``` r
+result <- oneway_anova(survey_data, life_satisfaction,
+                       group = education)
+result              # compact one-line overview
+#> One-Way ANOVA: life_satisfaction by education
+#>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
+summary(result)     # full detailed output
+#> One-Way ANOVA Results
+#> ---------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#> Descriptive Statistics by Group:
+#>   Basic Secondary: mean = 3.204, sd = 1.243, n = 809
+#>   Intermediate Secondary: mean = 3.701, sd = 1.112, n = 618
+#>   Academic Secondary: mean = 3.853, sd = 0.998, n = 607
+#>   University: mean = 4.047, sd = 0.957, n = 387
+#> 
+#> ANOVA Results:
+#> -------------------------------------------------------------------------------- 
+#>          Source Sum_Squares   df Mean_Square      F p_value sig
+#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>   Within Groups    2970.080 2417       1.229                   
+#>           Total    3217.428 2420                               
+#> -------------------------------------------------------------------------------- 
+#> 
+#> Assumption Tests:
+#> ---------------- 
+#>  Assumption Statistic df1  df2 p_value sig
+#>       Welch    64.489   3 1229   <.001 ***
+#> 
+#> Effect Sizes:
+#> ------------ 
+#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
+#>  life_satisfaction       0.077           0.076         0.076      medium
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Effect Size Interpretation:
+#> - Eta-squared: Proportion of variance explained (biased upward)
+#> - Epsilon-squared: Less biased than eta-squared
+#> - Omega-squared: Unbiased estimate (preferred for publication)
+#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
+#> 
+#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+```

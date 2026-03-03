@@ -169,8 +169,8 @@ survey_data %>%
 #> 
 #> - Pair: trust_media vs trust_government
 #> 
-#> ── trust_media - trust_government ──────────────────────────────────────────────
-#> 
+#> trust_media - trust_government
+#> ------------------------------
 #>   Ranks:
 #>   -------------------------------------------
 #>                      N Mean Rank Sum of Ranks
@@ -209,8 +209,8 @@ survey_data %>%
 #> - Pair: trust_media vs trust_government
 #> - Weights variable: sampling_weight
 #> 
-#> ── trust_media - trust_government ──────────────────────────────────────────────
-#> 
+#> trust_media - trust_government
+#> ------------------------------
 #>   Ranks:
 #>   -------------------------------------------
 #>                      N Mean Rank Sum of Ranks
@@ -253,8 +253,8 @@ survey_data %>%
 #> Group: region = East
 #> --------------------
 #> 
-#> ── trust_media - trust_government ──────────────────────────────────────────────
-#> 
+#> trust_media - trust_government
+#> ------------------------------
 #>   Ranks:
 #>   ------------------------------------------
 #>                     N Mean Rank Sum of Ranks
@@ -278,8 +278,8 @@ survey_data %>%
 #> Group: region = West
 #> --------------------
 #> 
-#> ── trust_media - trust_government ──────────────────────────────────────────────
-#> 
+#> trust_media - trust_government
+#> ------------------------------
 #>   Ranks:
 #>   -------------------------------------------
 #>                      N Mean Rank Sum of Ranks

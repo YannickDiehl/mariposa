@@ -188,8 +188,8 @@ survey_data %>%
 #> - Grouping variable: education
 #> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
-#> 
+#> life_satisfaction
+#> -----------------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -225,8 +225,8 @@ survey_data %>%
 #> - Grouping variable: education
 #> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
-#> 
+#> life_satisfaction
+#> -----------------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -243,8 +243,8 @@ survey_data %>%
 #>             171.178  3       0       0.071 ***
 #>   --------------------------------------------
 #> 
-#> ── income ──────────────────────────────────────────────────────────────────────
-#> 
+#> income
+#> ------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -261,8 +261,8 @@ survey_data %>%
 #>             814.174  3       0       0.373 ***
 #>   --------------------------------------------
 #> 
-#> ── trust_government ────────────────────────────────────────────────────────────
-#> 
+#> trust_government
+#> ----------------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -297,8 +297,8 @@ survey_data %>%
 #> - Grouping variable: education
 #> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
 #> 
-#> ── trust_government ────────────────────────────────────────────────────────────
-#> 
+#> trust_government
+#> ----------------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -315,8 +315,8 @@ survey_data %>%
 #>               1.235  3   0.745       0.001    
 #>   --------------------------------------------
 #> 
-#> ── trust_media ─────────────────────────────────────────────────────────────────
-#> 
+#> trust_media
+#> -----------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -333,8 +333,8 @@ survey_data %>%
 #>               2.709  3   0.439       0.001    
 #>   --------------------------------------------
 #> 
-#> ── trust_science ───────────────────────────────────────────────────────────────
-#> 
+#> trust_science
+#> -------------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -371,8 +371,8 @@ survey_data %>%
 #> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
 #> - Weights variable: sampling_weight
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
-#> 
+#> life_satisfaction
+#> -----------------
 #>   Ranks:
 #>   ----------------------------------------
 #>                     Group      N Mean Rank
@@ -413,8 +413,8 @@ survey_data %>%
 #> Group: region = East
 #> --------------------
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
-#> 
+#> life_satisfaction
+#> -----------------
 #>   Ranks:
 #>   -------------------------------------
 #>                     Group   N Mean Rank
@@ -435,8 +435,8 @@ survey_data %>%
 #> Group: region = West
 #> --------------------
 #> 
-#> ── life_satisfaction ───────────────────────────────────────────────────────────
-#> 
+#> life_satisfaction
+#> -----------------
 #>   Ranks:
 #>   --------------------------------------
 #>                     Group    N Mean Rank
@@ -471,8 +471,8 @@ survey_data %>%
 #> - Grouping variable: employment
 #> - Groups: Student, Employed, Unemployed, Retired, Other
 #> 
-#> ── income ──────────────────────────────────────────────────────────────────────
-#> 
+#> income
+#> ------
 #>   Ranks:
 #>   --------------------------
 #>         Group    N Mean Rank

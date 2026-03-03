@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,44 +138,8 @@ indices</li>
 same concept consistently:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------</span></span>
-<span><span class="co">#&gt; - Items: trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - N of Items: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Cronbach's Alpha:              0.047</span></span>
-<span><span class="co">#&gt;   Alpha (standardized):          0.048</span></span>
-<span><span class="co">#&gt;   N of Items:                    3</span></span>
-<span><span class="co">#&gt;   N (listwise):                  2135</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item  mean    sd    n</span></span>
-<span><span class="co">#&gt;  trust_government 2.621 1.162 2135</span></span>
-<span><span class="co">#&gt;       trust_media 2.430 1.156 2135</span></span>
-<span><span class="co">#&gt;     trust_science 3.624 1.034 2135</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Inter-Item Correlation Matrix:</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt;                  trust_government trust_media trust_science</span></span>
-<span><span class="co">#&gt; trust_government            1.000       0.014         0.020</span></span>
-<span><span class="co">#&gt; trust_media                 0.014       1.000         0.015</span></span>
-<span><span class="co">#&gt; trust_science               0.020       0.015         1.000</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item-Total Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item scale_mean_deleted scale_var_deleted corrected_r</span></span>
-<span><span class="co">#&gt;  trust_government               6.05             2.440       0.024</span></span>
-<span><span class="co">#&gt;       trust_media               6.25             2.467       0.020</span></span>
-<span><span class="co">#&gt;     trust_science               5.05             2.723       0.025</span></span>
-<span><span class="co">#&gt;  alpha_deleted</span></span>
-<span><span class="co">#&gt;          0.029</span></span>
-<span><span class="co">#&gt;          0.040</span></span>
-<span><span class="co">#&gt;          0.027</span></span></code></pre></div>
+<span><span class="co">#&gt; Reliability Analysis: 3 items</span></span>
+<span><span class="co">#&gt;   Cronbach's Alpha = 0.047 (Poor), N = 2135</span></span></code></pre></div>
 <p>The output shows Cronbach’s Alpha, item-total correlations, and
 alpha-if-item-deleted – matching SPSS RELIABILITY output.</p>
 </div>
@@ -208,45 +172,8 @@ the scale.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>            weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Reliability Analysis Results</span></span>
-<span><span class="co">#&gt; -------------------------------------</span></span>
-<span><span class="co">#&gt; - Items: trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - N of Items: 3</span></span>
-<span><span class="co">#&gt; - Weights: sampling_weight</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Cronbach's Alpha:              0.052</span></span>
-<span><span class="co">#&gt;   Alpha (standardized):          0.053</span></span>
-<span><span class="co">#&gt;   N of Items:                    3</span></span>
-<span><span class="co">#&gt;   N (listwise):                  2150.20 (weighted)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item  mean    sd      n</span></span>
-<span><span class="co">#&gt;  trust_government 2.621 1.162 2150.2</span></span>
-<span><span class="co">#&gt;       trust_media 2.434 1.158 2150.2</span></span>
-<span><span class="co">#&gt;     trust_science 3.624 1.033 2150.2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Inter-Item Correlation Matrix:</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt;                  trust_government trust_media trust_science</span></span>
-<span><span class="co">#&gt; trust_government            1.000       0.017         0.021</span></span>
-<span><span class="co">#&gt; trust_media                 0.017       1.000         0.017</span></span>
-<span><span class="co">#&gt; trust_science               0.021       0.017         1.000</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item-Total Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item scale_mean_deleted scale_var_deleted corrected_r</span></span>
-<span><span class="co">#&gt;  trust_government               6.06             2.451       0.026</span></span>
-<span><span class="co">#&gt;       trust_media               6.25             2.469       0.023</span></span>
-<span><span class="co">#&gt;     trust_science               5.05             2.737       0.027</span></span>
-<span><span class="co">#&gt;  alpha_deleted</span></span>
-<span><span class="co">#&gt;          0.033</span></span>
-<span><span class="co">#&gt;          0.041</span></span>
-<span><span class="co">#&gt;          0.033</span></span></code></pre></div>
+<span><span class="co">#&gt; Reliability Analysis: 3 items [Weighted]</span></span>
+<span><span class="co">#&gt;   Cronbach's Alpha = 0.052 (Poor), N = 2150</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-tidyselect">Using tidyselect<a class="anchor" aria-label="anchor" href="#using-tidyselect"></a>
@@ -254,44 +181,8 @@ the scale.</p>
 <p>When your items share a naming pattern, select them efficiently:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------</span></span>
-<span><span class="co">#&gt; - Items: trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - N of Items: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Cronbach's Alpha:              0.047</span></span>
-<span><span class="co">#&gt;   Alpha (standardized):          0.048</span></span>
-<span><span class="co">#&gt;   N of Items:                    3</span></span>
-<span><span class="co">#&gt;   N (listwise):                  2135</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item  mean    sd    n</span></span>
-<span><span class="co">#&gt;  trust_government 2.621 1.162 2135</span></span>
-<span><span class="co">#&gt;       trust_media 2.430 1.156 2135</span></span>
-<span><span class="co">#&gt;     trust_science 3.624 1.034 2135</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Inter-Item Correlation Matrix:</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt;                  trust_government trust_media trust_science</span></span>
-<span><span class="co">#&gt; trust_government            1.000       0.014         0.020</span></span>
-<span><span class="co">#&gt; trust_media                 0.014       1.000         0.015</span></span>
-<span><span class="co">#&gt; trust_science               0.020       0.015         1.000</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item-Total Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item scale_mean_deleted scale_var_deleted corrected_r</span></span>
-<span><span class="co">#&gt;  trust_government               6.05             2.440       0.024</span></span>
-<span><span class="co">#&gt;       trust_media               6.25             2.467       0.020</span></span>
-<span><span class="co">#&gt;     trust_science               5.05             2.723       0.025</span></span>
-<span><span class="co">#&gt;  alpha_deleted</span></span>
-<span><span class="co">#&gt;          0.029</span></span>
-<span><span class="co">#&gt;          0.040</span></span>
-<span><span class="co">#&gt;          0.027</span></span></code></pre></div>
+<span><span class="co">#&gt; Reliability Analysis: 3 items</span></span>
+<span><span class="co">#&gt;   Cronbach's Alpha = 0.047 (Poor), N = 2135</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
@@ -301,85 +192,12 @@ the scale.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Analysis Results</span></span>
-<span><span class="co">#&gt; ----------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = 1</span></span>
-<span><span class="co">#&gt; -----------------</span></span>
-<span><span class="co">#&gt; - Items: trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - N of Items: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Cronbach's Alpha:              0.037</span></span>
-<span><span class="co">#&gt;   Alpha (standardized):          0.042</span></span>
-<span><span class="co">#&gt;   N of Items:                    3</span></span>
-<span><span class="co">#&gt;   N (listwise):                  422</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item  mean    sd   n</span></span>
-<span><span class="co">#&gt;  trust_government 2.618 1.165 422</span></span>
-<span><span class="co">#&gt;       trust_media 2.396 1.091 422</span></span>
-<span><span class="co">#&gt;     trust_science 3.661 1.009 422</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Inter-Item Correlation Matrix:</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt;                  trust_government trust_media trust_science</span></span>
-<span><span class="co">#&gt; trust_government            1.000      -0.017         0.001</span></span>
-<span><span class="co">#&gt; trust_media                -0.017       1.000         0.060</span></span>
-<span><span class="co">#&gt; trust_science               0.001       0.060         1.000</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item-Total Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item scale_mean_deleted scale_var_deleted corrected_r</span></span>
-<span><span class="co">#&gt;  trust_government               6.06             2.339      -0.012</span></span>
-<span><span class="co">#&gt;       trust_media               6.28             2.378       0.026</span></span>
-<span><span class="co">#&gt;     trust_science               5.01             2.503       0.042</span></span>
-<span><span class="co">#&gt;  alpha_deleted</span></span>
-<span><span class="co">#&gt;          0.112</span></span>
-<span><span class="co">#&gt;          0.002</span></span>
-<span><span class="co">#&gt;         -0.035</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = 2</span></span>
-<span><span class="co">#&gt; -----------------</span></span>
-<span><span class="co">#&gt; - Items: trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - N of Items: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Reliability Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Cronbach's Alpha:              0.050</span></span>
-<span><span class="co">#&gt;   Alpha (standardized):          0.050</span></span>
-<span><span class="co">#&gt;   N of Items:                    3</span></span>
-<span><span class="co">#&gt;   N (listwise):                  1713</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item  mean    sd    n</span></span>
-<span><span class="co">#&gt;  trust_government 2.622 1.161 1713</span></span>
-<span><span class="co">#&gt;       trust_media 2.438 1.172 1713</span></span>
-<span><span class="co">#&gt;     trust_science 3.615 1.040 1713</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Inter-Item Correlation Matrix:</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt;                  trust_government trust_media trust_science</span></span>
-<span><span class="co">#&gt; trust_government            1.000       0.021         0.025</span></span>
-<span><span class="co">#&gt; trust_media                 0.021       1.000         0.005</span></span>
-<span><span class="co">#&gt; trust_science               0.025       0.005         1.000</span></span>
-<span><span class="co">#&gt; ------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Item-Total Statistics</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;              item scale_mean_deleted scale_var_deleted corrected_r</span></span>
-<span><span class="co">#&gt;  trust_government               6.05             2.467       0.032</span></span>
-<span><span class="co">#&gt;       trust_media               6.24             2.491       0.019</span></span>
-<span><span class="co">#&gt;     trust_science               5.06             2.779       0.021</span></span>
-<span><span class="co">#&gt;  alpha_deleted</span></span>
-<span><span class="co">#&gt;          0.010</span></span>
-<span><span class="co">#&gt;          0.049</span></span>
-<span><span class="co">#&gt;          0.041</span></span></code></pre></div>
+<span><span class="co">#&gt; [region = 1]</span></span>
+<span><span class="co">#&gt; Reliability Analysis: 3 items</span></span>
+<span><span class="co">#&gt;   Cronbach's Alpha = 0.037 (Poor), N = 422</span></span>
+<span><span class="co">#&gt; [region = 2]</span></span>
+<span><span class="co">#&gt; Reliability Analysis: 3 items</span></span>
+<span><span class="co">#&gt;   Cronbach's Alpha = 0.050 (Poor), N = 1713</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -394,69 +212,8 @@ into underlying dimensions:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
-<span><span class="co">#&gt; --------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
-<span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation       1      0.786</span></span>
-<span><span class="co">#&gt;  environmental_concern       1      0.783</span></span>
-<span><span class="co">#&gt;      life_satisfaction       1      0.668</span></span>
-<span><span class="co">#&gt;       trust_government       1      0.347</span></span>
-<span><span class="co">#&gt;            trust_media       1      0.475</span></span>
-<span><span class="co">#&gt;          trust_science       1      0.598</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
-<span><span class="co">#&gt;   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt;   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt;   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
-<span><span class="co">#&gt;   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
-<span><span class="co">#&gt;   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  SS Loading: 1.598  Variance: 26.634%  Cumulative: 26.634%</span></span>
-<span><span class="co">#&gt;   PC2  SS Loading: 1.039  Variance: 17.325%  Cumulative: 43.959%</span></span>
-<span><span class="co">#&gt;   PC3  SS Loading: 1.021  Variance: 17.020%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.885                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.885                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.672        </span></span>
-<span><span class="co">#&gt; trust_government               -0.547        </span></span>
-<span><span class="co">#&gt; trust_media                    -0.524  -0.448</span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.809</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotated Component Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.887                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.884                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.762        </span></span>
-<span><span class="co">#&gt; trust_government               -0.566        </span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.789</span></span>
-<span><span class="co">#&gt; trust_media                            -0.620</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; Rotation Method: Varimax with Kaiser Normalization.</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 61.0%</span></span></code></pre></div>
 <p>The output includes KMO measure, Bartlett’s test, eigenvalues, and
 the rotated component matrix – matching SPSS FACTOR output.</p>
 </div>
@@ -494,69 +251,8 @@ simpler to interpret:</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    rotation <span class="op">=</span> <span class="st">"varimax"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
-<span><span class="co">#&gt; --------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
-<span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation       1      0.786</span></span>
-<span><span class="co">#&gt;  environmental_concern       1      0.783</span></span>
-<span><span class="co">#&gt;      life_satisfaction       1      0.668</span></span>
-<span><span class="co">#&gt;       trust_government       1      0.347</span></span>
-<span><span class="co">#&gt;            trust_media       1      0.475</span></span>
-<span><span class="co">#&gt;          trust_science       1      0.598</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
-<span><span class="co">#&gt;   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt;   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt;   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
-<span><span class="co">#&gt;   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
-<span><span class="co">#&gt;   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  SS Loading: 1.598  Variance: 26.634%  Cumulative: 26.634%</span></span>
-<span><span class="co">#&gt;   PC2  SS Loading: 1.039  Variance: 17.325%  Cumulative: 43.959%</span></span>
-<span><span class="co">#&gt;   PC3  SS Loading: 1.021  Variance: 17.020%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.885                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.885                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.672        </span></span>
-<span><span class="co">#&gt; trust_government               -0.547        </span></span>
-<span><span class="co">#&gt; trust_media                    -0.524  -0.448</span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.809</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotated Component Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.887                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.884                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.762        </span></span>
-<span><span class="co">#&gt; trust_government               -0.566        </span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.789</span></span>
-<span><span class="co">#&gt; trust_media                            -0.620</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; Rotation Method: Varimax with Kaiser Normalization.</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 61.0%</span></span></code></pre></div>
 <p><strong>Oblimin</strong> allows correlated factors – often more
 realistic for social science:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -574,86 +270,8 @@ Like oblimin, it produces Pattern and Structure matrices:</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    rotation <span class="op">=</span> <span class="st">"promax"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Promax) Results</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
-<span><span class="co">#&gt; - Rotation: Promax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation       1      0.786</span></span>
-<span><span class="co">#&gt;  environmental_concern       1      0.783</span></span>
-<span><span class="co">#&gt;      life_satisfaction       1      0.668</span></span>
-<span><span class="co">#&gt;       trust_government       1      0.347</span></span>
-<span><span class="co">#&gt;            trust_media       1      0.475</span></span>
-<span><span class="co">#&gt;          trust_science       1      0.598</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
-<span><span class="co">#&gt;   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt;   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt;   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
-<span><span class="co">#&gt;   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
-<span><span class="co">#&gt;   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  SS Loading: 1.604</span></span>
-<span><span class="co">#&gt;   PC2  SS Loading: 1.065</span></span>
-<span><span class="co">#&gt;   PC3  SS Loading: 1.045</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.885                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.885                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.672        </span></span>
-<span><span class="co">#&gt; trust_government               -0.547        </span></span>
-<span><span class="co">#&gt; trust_media                    -0.524  -0.448</span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.809</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Pattern Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.888                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.886                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.781        </span></span>
-<span><span class="co">#&gt; trust_government               -0.558        </span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.817</span></span>
-<span><span class="co">#&gt; trust_media                            -0.593</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; Rotation Method: Promax with Kaiser Normalization.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Structure Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.885                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.885                </span></span>
-<span><span class="co">#&gt; trust_science                  -0.751        </span></span>
-<span><span class="co">#&gt; trust_government               -0.571        </span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.777</span></span>
-<span><span class="co">#&gt; trust_media                            -0.635</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Component Correlation Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;       PC1   PC2   PC3</span></span>
-<span><span class="co">#&gt; PC1 1.000 0.055 0.024</span></span>
-<span><span class="co">#&gt; PC2 0.055 1.000 0.155</span></span>
-<span><span class="co">#&gt; PC3 0.024 0.155 1.000</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 3 components (PCA/Promax)</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 61.0%</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="choosing-an-extraction-method">Choosing an Extraction Method<a class="anchor" aria-label="anchor" href="#choosing-an-extraction-method"></a>
@@ -665,69 +283,8 @@ Analysis). For a true factor analysis model, use Maximum Likelihood:</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    extraction <span class="op">=</span> <span class="st">"ml"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (Maximum Likelihood, Varimax) Results</span></span>
-<span><span class="co">#&gt; -----------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Maximum Likelihood</span></span>
-<span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation   0.346      0.616</span></span>
-<span><span class="co">#&gt;  environmental_concern   0.345      0.565</span></span>
-<span><span class="co">#&gt;      life_satisfaction   0.001      0.144</span></span>
-<span><span class="co">#&gt;       trust_government   0.005      0.018</span></span>
-<span><span class="co">#&gt;            trust_media   0.001      0.009</span></span>
-<span><span class="co">#&gt;          trust_science   0.003      0.096</span></span>
-<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Factor1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
-<span><span class="co">#&gt;   Factor2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt;   Factor3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt;   Factor4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
-<span><span class="co">#&gt;   Factor5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
-<span><span class="co">#&gt;   Factor6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Factor1  SS Loading: 1.185  Variance: 19.745%  Cumulative: 19.745%</span></span>
-<span><span class="co">#&gt;   Factor2  SS Loading: 0.149  Variance: 2.488%  Cumulative: 22.233%</span></span>
-<span><span class="co">#&gt;   Factor3  SS Loading: 0.115  Variance: 1.911%  Cumulative: 24.144%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Factor Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
-<span><span class="co">#&gt; political_orientation  -0.784                </span></span>
-<span><span class="co">#&gt; environmental_concern   0.751                </span></span>
-<span><span class="co">#&gt; life_satisfaction                            </span></span>
-<span><span class="co">#&gt; trust_science                                </span></span>
-<span><span class="co">#&gt; trust_government                             </span></span>
-<span><span class="co">#&gt; trust_media                                  </span></span>
-<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotated Factor Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
-<span><span class="co">#&gt; political_orientation  -0.785                </span></span>
-<span><span class="co">#&gt; environmental_concern   0.750                </span></span>
-<span><span class="co">#&gt; life_satisfaction                            </span></span>
-<span><span class="co">#&gt; trust_science                                </span></span>
-<span><span class="co">#&gt; trust_government                             </span></span>
-<span><span class="co">#&gt; trust_media                                  </span></span>
-<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
-<span><span class="co">#&gt; Rotation Method: Varimax with Kaiser Normalization.</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 3 components (ML/Varimax)</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 61.0%</span></span></code></pre></div>
 <p>ML extraction provides a <strong>goodness-of-fit test</strong> that
 evaluates whether your factor model adequately reproduces the observed
 correlations. A non-significant chi-square
@@ -741,86 +298,8 @@ multiple correlations) instead of 1.0.</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    extraction <span class="op">=</span> <span class="st">"ml"</span>, rotation <span class="op">=</span> <span class="st">"promax"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (Maximum Likelihood, Promax) Results</span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Maximum Likelihood</span></span>
-<span><span class="co">#&gt; - Rotation: Promax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation   0.346      0.616</span></span>
-<span><span class="co">#&gt;  environmental_concern   0.345      0.565</span></span>
-<span><span class="co">#&gt;      life_satisfaction   0.001      0.144</span></span>
-<span><span class="co">#&gt;       trust_government   0.005      0.018</span></span>
-<span><span class="co">#&gt;            trust_media   0.001      0.009</span></span>
-<span><span class="co">#&gt;          trust_science   0.003      0.096</span></span>
-<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Factor1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
-<span><span class="co">#&gt;   Factor2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt;   Factor3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt;   Factor4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
-<span><span class="co">#&gt;   Factor5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
-<span><span class="co">#&gt;   Factor6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Factor1  SS Loading: 1.186</span></span>
-<span><span class="co">#&gt;   Factor2  SS Loading: 0.148</span></span>
-<span><span class="co">#&gt;   Factor3  SS Loading: 0.115</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Factor Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
-<span><span class="co">#&gt; political_orientation  -0.784                </span></span>
-<span><span class="co">#&gt; environmental_concern   0.751                </span></span>
-<span><span class="co">#&gt; life_satisfaction                            </span></span>
-<span><span class="co">#&gt; trust_science                                </span></span>
-<span><span class="co">#&gt; trust_government                             </span></span>
-<span><span class="co">#&gt; trust_media                                  </span></span>
-<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Pattern Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
-<span><span class="co">#&gt; political_orientation  -0.785                </span></span>
-<span><span class="co">#&gt; environmental_concern   0.750                </span></span>
-<span><span class="co">#&gt; life_satisfaction                            </span></span>
-<span><span class="co">#&gt; trust_science                                </span></span>
-<span><span class="co">#&gt; trust_government                             </span></span>
-<span><span class="co">#&gt; trust_media                                  </span></span>
-<span><span class="co">#&gt; Extraction Method: Maximum Likelihood.</span></span>
-<span><span class="co">#&gt; Rotation Method: Promax with Kaiser Normalization.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Structure Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                       Factor1 Factor2 Factor3</span></span>
-<span><span class="co">#&gt; political_orientation  -0.784                </span></span>
-<span><span class="co">#&gt; environmental_concern   0.751                </span></span>
-<span><span class="co">#&gt; life_satisfaction                            </span></span>
-<span><span class="co">#&gt; trust_science                                </span></span>
-<span><span class="co">#&gt; trust_government                             </span></span>
-<span><span class="co">#&gt; trust_media                                  </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Factor Correlation Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;         Factor1 Factor2 Factor3</span></span>
-<span><span class="co">#&gt; Factor1   1.000   0.013   0.030</span></span>
-<span><span class="co">#&gt; Factor2   0.013   1.000   0.002</span></span>
-<span><span class="co">#&gt; Factor3   0.030   0.002   1.000</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 3 components (ML/Promax)</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 61.0%</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="fixing-the-number-of-factors">Fixing the Number of Factors<a class="anchor" aria-label="anchor" href="#fixing-the-number-of-factors"></a>
@@ -832,68 +311,8 @@ components:</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    n_factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
-<span><span class="co">#&gt; --------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
-<span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          932.068</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation       1      0.786</span></span>
-<span><span class="co">#&gt;  environmental_concern       1      0.783</span></span>
-<span><span class="co">#&gt;      life_satisfaction       1      0.014</span></span>
-<span><span class="co">#&gt;       trust_government       1      0.327</span></span>
-<span><span class="co">#&gt;            trust_media       1      0.275</span></span>
-<span><span class="co">#&gt;          trust_science       1      0.456</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%</span></span>
-<span><span class="co">#&gt;   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt;   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%</span></span>
-<span><span class="co">#&gt;   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%</span></span>
-<span><span class="co">#&gt;   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%</span></span>
-<span><span class="co">#&gt;   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  SS Loading: 1.599  Variance: 26.653%  Cumulative: 26.653%</span></span>
-<span><span class="co">#&gt;   PC2  SS Loading: 1.042  Variance: 17.371%  Cumulative: 44.024%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2</span></span>
-<span><span class="co">#&gt; political_orientation   0.885        </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.885        </span></span>
-<span><span class="co">#&gt; trust_science                  -0.672</span></span>
-<span><span class="co">#&gt; trust_government               -0.547</span></span>
-<span><span class="co">#&gt; trust_media                    -0.524</span></span>
-<span><span class="co">#&gt; life_satisfaction                    </span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotated Component Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2</span></span>
-<span><span class="co">#&gt; political_orientation   0.887        </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.885        </span></span>
-<span><span class="co">#&gt; trust_science                  -0.669</span></span>
-<span><span class="co">#&gt; trust_government               -0.552</span></span>
-<span><span class="co">#&gt; trust_media                    -0.524</span></span>
-<span><span class="co">#&gt; life_satisfaction                    </span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; Rotation Method: Varimax with Kaiser Normalization.</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 2 components (PCA/Varimax)</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 44.0%</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="with-survey-weights-1">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights-1"></a>
@@ -903,70 +322,8 @@ components:</p>
 <span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span>
 <span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Exploratory Factor Analysis (PCA, Varimax) Results</span></span>
-<span><span class="co">#&gt; -----------------------------------------------------------</span></span>
-<span><span class="co">#&gt; - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science</span></span>
-<span><span class="co">#&gt; - Extraction: Principal Component Analysis</span></span>
-<span><span class="co">#&gt; - Rotation: Varimax with Kaiser Normalization</span></span>
-<span><span class="co">#&gt; - N of Factors: 3</span></span>
-<span><span class="co">#&gt; - Weights: sampling_weight</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; KMO and Bartlett's Test</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   Kaiser-Meyer-Olkin Measure:     0.505</span></span>
-<span><span class="co">#&gt;   Bartlett's Chi-Square:          930.012</span></span>
-<span><span class="co">#&gt;   df:                             15</span></span>
-<span><span class="co">#&gt;   Sig.:                           0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;               variable initial extraction</span></span>
-<span><span class="co">#&gt;  political_orientation       1      0.784</span></span>
-<span><span class="co">#&gt;  environmental_concern       1      0.782</span></span>
-<span><span class="co">#&gt;      life_satisfaction       1      0.712</span></span>
-<span><span class="co">#&gt;       trust_government       1      0.332</span></span>
-<span><span class="co">#&gt;            trust_media       1      0.442</span></span>
-<span><span class="co">#&gt;          trust_science       1      0.610</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Total Variance Explained</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  Eigenvalue: 1.599  Variance: 26.644%  Cumulative: 26.644%</span></span>
-<span><span class="co">#&gt;   PC2  Eigenvalue: 1.045  Variance: 17.412%  Cumulative: 44.056%</span></span>
-<span><span class="co">#&gt;   PC3  Eigenvalue: 1.018  Variance: 16.964%  Cumulative: 61.021%</span></span>
-<span><span class="co">#&gt;   PC4  Eigenvalue: 0.980  Variance: 16.329%  Cumulative: 77.349%</span></span>
-<span><span class="co">#&gt;   PC5  Eigenvalue: 0.944  Variance: 15.735%  Cumulative: 93.085%</span></span>
-<span><span class="co">#&gt;   PC6  Eigenvalue: 0.415  Variance: 6.915%  Cumulative: 100.000%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotation Sums of Squared Loadings</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;   PC1  SS Loading: 1.597  Variance: 26.614%  Cumulative: 26.614%</span></span>
-<span><span class="co">#&gt;   PC2  SS Loading: 1.044  Variance: 17.396%  Cumulative: 44.011%</span></span>
-<span><span class="co">#&gt;   PC3  SS Loading: 1.021  Variance: 17.010%  Cumulative: 61.021%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.884                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.884                </span></span>
-<span><span class="co">#&gt; trust_science                   0.663   0.406</span></span>
-<span><span class="co">#&gt; trust_government                0.547        </span></span>
-<span><span class="co">#&gt; trust_media                     0.542        </span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.838</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Rotated Component Matrix</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;                           PC1     PC2     PC3</span></span>
-<span><span class="co">#&gt; political_orientation   0.885                </span></span>
-<span><span class="co">#&gt; environmental_concern  -0.883                </span></span>
-<span><span class="co">#&gt; trust_science                   0.752        </span></span>
-<span><span class="co">#&gt; trust_government                0.542        </span></span>
-<span><span class="co">#&gt; life_satisfaction                      -0.828</span></span>
-<span><span class="co">#&gt; trust_media                            -0.534</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; Rotation Method: Varimax with Kaiser Normalization.</span></span></code></pre></div>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax) [Weighted]</span></span>
+<span><span class="co">#&gt;   KMO = 0.505 (Miserable), Variance explained: 61.0%</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -1062,7 +419,11 @@ Always specify the theoretical scale range for consistent results.</p>
 <p>A typical scale analysis workflow from start to finish:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Check reliability</span></span>
-<span><span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
+<span><span class="va">rel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
+<span><span class="va">rel</span>                <span class="co"># compact: Alpha + interpretation</span></span>
+<span><span class="co">#&gt; Reliability Analysis: 3 items</span></span>
+<span><span class="co">#&gt;   Cronbach's Alpha = 0.047 (Poor), N = 2135</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">rel</span><span class="op">)</span>       <span class="co"># detailed: item statistics, inter-item correlations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Reliability Analysis Results</span></span>
 <span><span class="co">#&gt; ----------------------------</span></span>
@@ -1103,7 +464,11 @@ Always specify the theoretical scale range for consistent results.</p>
 <span><span class="co">#&gt;          0.027</span></span>
 <span></span>
 <span><span class="co"># 2. Explore factor structure</span></span>
-<span><span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
+<span><span class="va">efa_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efa.html">efa</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
+<span><span class="va">efa_result</span>         <span class="co"># compact: KMO + variance explained</span></span>
+<span><span class="co">#&gt; Exploratory Factor Analysis: 3 items, 1 component (PCA/Unrotated)</span></span>
+<span><span class="co">#&gt;   KMO = 0.506 (Miserable), Variance explained: 34.7%</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efa_result</span>, communalities <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># detailed, skip communalities</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Exploratory Factor Analysis (PCA, Unrotated) Results</span></span>
 <span><span class="co">#&gt; ----------------------------------------------------</span></span>
@@ -1119,14 +484,6 @@ Always specify the theoretical scale range for consistent results.</p>
 <span><span class="co">#&gt;   df:                             3</span></span>
 <span><span class="co">#&gt;   Sig.:                           0.361</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Communalities</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;          variable initial extraction</span></span>
-<span><span class="co">#&gt;  trust_government       1      0.356</span></span>
-<span><span class="co">#&gt;       trust_media       1      0.225</span></span>
-<span><span class="co">#&gt;     trust_science       1      0.460</span></span>
-<span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Total Variance Explained</span></span>
 <span><span class="co">#&gt; ---------------------------------------- </span></span>
 <span><span class="co">#&gt;   PC1  Eigenvalue: 1.042  Variance: 34.719%  Cumulative: 34.719%</span></span>
@@ -1136,9 +493,9 @@ Always specify the theoretical scale range for consistent results.</p>
 <span><span class="co">#&gt; Component Matrix (unrotated)</span></span>
 <span><span class="co">#&gt; ---------------------------------------- </span></span>
 <span><span class="co">#&gt;                      PC1</span></span>
-<span><span class="co">#&gt; trust_science      0.678</span></span>
-<span><span class="co">#&gt; trust_government   0.597</span></span>
-<span><span class="co">#&gt; trust_media        0.475</span></span>
+<span><span class="co">#&gt; trust_science     -0.678</span></span>
+<span><span class="co">#&gt; trust_government  -0.597</span></span>
+<span><span class="co">#&gt; trust_media       -0.475</span></span>
 <span><span class="co">#&gt; Extraction Method: Principal Component Analysis.</span></span>
 <span></span>
 <span><span class="co"># 3. Create mean index (Alpha was acceptable)</span></span>
@@ -1152,44 +509,8 @@ Always specify the theoretical scale range for consistent results.</p>
 <span><span class="co"># 5. Use in further analyses</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">m_trust</span>, group <span class="op">=</span> <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted t-Test Results</span></span>
-<span><span class="co">#&gt; -----------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Grouping variable: region</span></span>
-<span><span class="co">#&gt; - Groups compared: East vs. West</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
-<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- m_trust ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   East: mean = 2.905, n = 509.0</span></span>
-<span><span class="co">#&gt;   West: mean = 2.919, n = 2007.0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted t-test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -0.400 2514.000   0.689    -0.014 [-0.082, 0.054]    </span></span>
-<span><span class="co">#&gt;  Unequal variances -0.406  799.225   0.685    -0.014 [-0.081, 0.053]    </span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;  Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
-<span><span class="co">#&gt;   m_trust    -0.02    -0.02       -0.02  negligible</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation:</span></span>
-<span><span class="co">#&gt; - Cohen's d: pooled standard deviation (classic)</span></span>
-<span><span class="co">#&gt; - Hedges' g: bias-corrected Cohen's d (preferred)</span></span>
-<span><span class="co">#&gt; - Glass' Delta: control group standard deviation only</span></span>
-<span><span class="co">#&gt; - Small effect: |effect| ~ 0.2</span></span>
-<span><span class="co">#&gt; - Medium effect: |effect| ~ 0.5</span></span>
-<span><span class="co">#&gt; - Large effect: |effect| ~ 0.8</span></span></code></pre></div>
+<span><span class="co">#&gt; t-Test: m_trust by region [Weighted]</span></span>
+<span><span class="co">#&gt;   t(799.2) = -0.406, p = 0.685 , g = -0.020 (negligible), N = 2516</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="practical-tips">Practical Tips<a class="anchor" aria-label="anchor" href="#practical-tips"></a>

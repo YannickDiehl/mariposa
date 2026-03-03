@@ -220,44 +220,8 @@ All main analysis functions support the `weights` argument:
 ``` r
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
-#> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
-#> 
-#> 
-#> --- income ---
-#> 
-#>   Male: mean = 3766.999, n = 1048.0
-#>   Female: mean = 3721.379, n = 1153.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff           conf_int sig
-#>    Equal variances  0.751 2199.000   0.453     45.62 [-73.570, 164.809]    
-#>  Unequal variances  0.751 2178.884   0.453     45.62 [-73.574, 164.813]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>    income    0.032    0.032       0.032  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Cohen's d: pooled standard deviation (classic)
-#> - Hedges' g: bias-corrected Cohen's d (preferred)
-#> - Glass' Delta: control group standard deviation only
-#> - Small effect: |effect| ~ 0.2
-#> - Medium effect: |effect| ~ 0.5
-#> - Large effect: |effect| ~ 0.8
+#> t-Test: income by gender [Weighted]
+#>   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
 ```
 
 ### Weighted ANOVA
@@ -266,54 +230,8 @@ survey_data %>%
 survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
-#> 
-#> Weighted One-Way ANOVA Results
-#> ------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal
-#>   Alternative hypothesis: At least one group mean differs
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.208, sd = 1.243, n = 815.7
-#>   Intermediate Secondary: mean = 3.698, sd = 1.109, n = 629.6
-#>   Academic Secondary: mean = 3.851, sd = 0.996, n = 618.2
-#>   University: mean = 4.040, sd = 0.961, n = 373.2
-#> 
-#> Weighted ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001   1
-#>   Within Groups    2992.019 2433        1.23                   
-#>           Total    3233.149 2436                               
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    62.636   3 1216   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.075           0.073         0.073      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+#> One-Way ANOVA: life_satisfaction by education [Weighted]
+#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
 ### Weighted Chi-square
@@ -321,45 +239,8 @@ survey_data %>%
 ``` r
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
-#> 
-#> Weighted Chi-Squared Test of Independence 
-#> ------------------------------------------
-#> 
-#> - Variables: education × employment
-#> - Weights variable: sampling_weight
-#> 
-#> Observed Frequencies:
-#>                       employment
-#> education              Student Employed Unemployed Retired Other
-#>   Basic Secondary            0      573         66     175    34
-#>   Intermediate Seco...       0      420         52     139    29
-#>   Academic Secondary        46      370         45     149    33
-#>   University                34      240         21      72    20
-#> 
-#> Expected Frequencies:
-#>                       employment
-#> education              Student Employed Unemployed Retired  Other
-#>   Basic Secondary       26.942  539.851     61.967 180.175 39.066
-#>   Intermediate Seco...  20.334  407.434     46.767 135.981 29.484
-#>   Academic Secondary    20.429  409.344     46.986 136.618 29.622
-#>   University            12.295  246.371     28.280  82.226 17.828
-#> 
-#> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>      130.696 12   <.001 ***
-#> -------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure  Value p_value sig Interpretation
-#>  Cramer's V  0.132   <.001 ***          Small
-#>       Gamma -0.062   0.122               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 4×5 | N = 2518
-#> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Squared Test: education × employment [Weighted]
+#>   chi2(12) = 130.696, p < 0.001 ***, V = 0.132 (small), N = 2518
 ```
 
 ### Weighted Correlations
@@ -367,32 +248,8 @@ survey_data %>%
 ``` r
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.005
-#>   Effect size: r²: 0.000
-#>   Sample size: n = 2201
-#>   95% CI: [-0.046, 0.037]
-#>   p-value: 0.8276
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.005, p = 0.828 , N = 2201
 ```
 
 ## Grouped Analysis with Weights
@@ -579,44 +436,8 @@ survey_data %>%
 # 4. Weighted hypothesis test
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
-#> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
-#> 
-#> 
-#> --- income ---
-#> 
-#>   Male: mean = 3766.999, n = 1048.0
-#>   Female: mean = 3721.379, n = 1153.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff           conf_int sig
-#>    Equal variances  0.751 2199.000   0.453     45.62 [-73.570, 164.809]    
-#>  Unequal variances  0.751 2178.884   0.453     45.62 [-73.574, 164.813]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>  Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>    income    0.032    0.032       0.032  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Cohen's d: pooled standard deviation (classic)
-#> - Hedges' g: bias-corrected Cohen's d (preferred)
-#> - Glass' Delta: control group standard deviation only
-#> - Small effect: |effect| ~ 0.2
-#> - Medium effect: |effect| ~ 0.5
-#> - Large effect: |effect| ~ 0.8
+#> t-Test: income by gender [Weighted]
+#>   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
 ```
 
 ## Summary

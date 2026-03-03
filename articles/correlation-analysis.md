@@ -28,31 +28,8 @@ Measure the linear correlation between age and income:
 ``` r
 survey_data %>%
   pearson_cor(age, income)
-#> 
-#> Pearson Correlation 
-#> --------------------
-#> 
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.007
-#>   Effect size: r²: 0.000
-#>   Sample size: n = 2186
-#>   95% CI: [-0.048, 0.035]
-#>   p-value: 0.7608
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: age x income
+#>   r = -0.007, p = 0.761 , N = 2186
 ```
 
 Interpretation of *r*:
@@ -68,32 +45,8 @@ Get population-representative correlations:
 ``` r
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.005
-#>   Effect size: r²: 0.000
-#>   Sample size: n = 2201
-#>   95% CI: [-0.046, 0.037]
-#>   p-value: 0.8276
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.005, p = 0.828 , N = 2201
 ```
 
 ### Multiple Variables
@@ -104,59 +57,11 @@ Create a correlation matrix for several variables at once:
 survey_data %>%
   pearson_cor(trust_government, trust_media, trust_science,
               weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Correlation Matrix:
-#> ------------------- 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.012         0.031
-#> trust_media                 0.012       1.000         0.024
-#> trust_science               0.031       0.024         1.000
-#> ------------------- 
-#> 
-#> Significance Matrix (p-values):
-#> ------------------------------- 
-#>                  trust_government trust_media trust_science
-#> trust_government           0.0000      0.5823        0.1452
-#> trust_media                0.5823      0.0000        0.2586
-#> trust_science              0.1452      0.2586        0.0000
-#> ------------------------------- 
-#> 
-#> Sample Size Matrix:
-#> ------------------- 
-#>                  trust_government trust_media trust_science
-#> trust_government             2371        2242          2271
-#> trust_media                  2242        2382          2286
-#> trust_science                2271        2286          2414
-#> ------------------- 
-#> 
-#> Pairwise Results:
-#> ---------------- 
-#>                     Variable_Pair     r r_squared p_value           CI_95    n
-#>    trust_government × trust_media 0.012     0.000  0.5823 [-0.030, 0.053] 2242
-#>  trust_government × trust_science 0.031     0.001  0.1452 [-0.011, 0.072] 2271
-#>       trust_media × trust_science 0.024     0.001  0.2586 [-0.017, 0.065] 2286
-#>  sig
-#>     
-#>     
-#>     
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: 3 variables [Weighted]
+#>   trust_government x trust_media: r = 0.012, p = 0.582  
+#>   trust_government x trust_science: r = 0.031, p = 0.145  
+#>   trust_media x trust_science:   r = 0.024, p = 0.259  
+#>   0/3 pairs significant (p < .05), N = 2242
 ```
 
 ### Grouped Analysis
@@ -167,47 +72,12 @@ Calculate correlations within subgroups:
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = 0.050
-#>   Effect size: r-squared: 0.002
-#>   Sample size: n = 449
-#>   95% CI: [-0.043, 0.142]
-#>   p-value: 0.2931
-#>   Significance: ns
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.019
-#>   Effect size: r-squared: 0.000
-#>   Sample size: n = 1751
-#>   95% CI: [-0.066, 0.028]
-#>   p-value: 0.4267
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> [region = 1]
+#> Pearson Correlation: age x income [Weighted]
+#>   r = 0.050, p = 0.293 , N = 449
+#> [region = 2]
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.019, p = 0.427 , N = 1751
 ```
 
 ### Confidence Intervals
@@ -219,32 +89,8 @@ survey_data %>%
   pearson_cor(age, income,
               conf.level = 0.95,
               weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.005
-#>   Effect size: r²: 0.000
-#>   Sample size: n = 2201
-#>   95% CI: [-0.046, 0.037]
-#>   p-value: 0.8276
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.005, p = 0.828 , N = 2201
 ```
 
 ## Spearman Correlation
@@ -265,26 +111,8 @@ raw values.
 ``` r
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern)
-#> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
-#> 
-#> - Method: Spearman's rho (rank correlation)
-#> - Variables: political_orientation, environmental_concern
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
-#> --- political_orientation × environmental_concern ---
-#> 
-#>   Spearman's rho: ρ = -0.576
-#>   t-statistic: -33.093
-#>   Sample size: n = 2207
-#>   p-value (2-tailed): 0.0000
-#>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation: moderate negative monotonic relationship
+#> Spearman Correlation: political_orientation x environmental_concern
+#>   rho = -0.576, p < 0.001 ***, N = 2207
 ```
 
 ### With Weights
@@ -293,27 +121,8 @@ survey_data %>%
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                weights = sampling_weight)
-#> 
-#> Weighted Spearman's Rank Correlation Analysis 
-#> ----------------------------------------------
-#> 
-#> - Method: Spearman's rho (rank correlation)
-#> - Variables: political_orientation, environmental_concern
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
-#> --- political_orientation × environmental_concern ---
-#> 
-#>   Spearman's rho: ρ = -0.576
-#>   t-statistic: -33.093
-#>   Sample size: n = 2207
-#>   p-value (2-tailed): 0.0000
-#>   Significance: ***
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation: moderate negative monotonic relationship
+#> Spearman Correlation: political_orientation x environmental_concern [Weighted]
+#>   rho = -0.576, p < 0.001 ***, N = 2207
 ```
 
 ### Multiple Variables
@@ -323,68 +132,14 @@ survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                life_satisfaction, trust_government,
                weights = sampling_weight)
-#> 
-#> Weighted Spearman's Rank Correlation Analysis 
-#> ----------------------------------------------
-#> 
-#> - Method: Spearman's rho (rank correlation)
-#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
-#> 
-#> Spearman's Rho Matrix:
-#> --------------------------------------------------------------------- 
-#>               Variable political_orientation environmental_concern
-#>  political_orientation                 1.000                -0.576
-#>  environmental_concern                -0.576                 1.000
-#>      life_satisfaction                -0.004                 0.003
-#>       trust_government                -0.055                 0.067
-#>  life_satisfaction trust_government
-#>             -0.004           -0.055
-#>              0.003            0.067
-#>              1.000            0.002
-#>              0.002            1.000
-#> 
-#> Significance Matrix (p-values, 2-tailed):
-#> --------------------------------------------------------------------- 
-#>               Variable political_orientation environmental_concern
-#>  political_orientation                   -                  0.0000
-#>  environmental_concern                0.0000                   -  
-#>      life_satisfaction                0.8334                0.9041
-#>       trust_government                0.0110                0.0015
-#>  life_satisfaction trust_government
-#>             0.8334           0.0110
-#>             0.9041           0.0015
-#>                -             0.9425
-#>             0.9425              -  
-#> 
-#> Sample Size Matrix:
-#> --------------------------------------------------------------------- 
-#>               Variable political_orientation environmental_concern
-#>  political_orientation                  2299                  2207
-#>  environmental_concern                  2207                  2400
-#>      life_satisfaction                  2228                  2324
-#>       trust_government                  2168                  2260
-#>  life_satisfaction trust_government
-#>               2228             2168
-#>               2324             2260
-#>               2421             2280
-#>               2280             2354
-#> 
-#> Pairwise Results:
-#> --------------------------------------------------------------------- 
-#>                                           Pair    rho       t      p    n sig
-#>  political_orientation × environmental_concern -0.576 -33.093 0.0000 2207 ***
-#>      political_orientation × life_satisfaction -0.004  -0.210 0.8334 2228    
-#>       political_orientation × trust_government -0.055  -2.545 0.0110 2168   *
-#>      environmental_concern × life_satisfaction  0.003   0.121 0.9041 2324    
-#>       environmental_concern × trust_government  0.067   3.175 0.0015 2260  **
-#>           life_satisfaction × trust_government  0.002   0.072 0.9425 2280    
-#> --------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Spearman Correlation: 4 variables [Weighted]
+#>   political_orientation x environmental_concern: rho = -0.576, p < 0.001 *** 
+#>   political_orientation x life_satisfaction: rho = -0.004, p = 0.833  
+#>   political_orientation x trust_government: rho = -0.055, p = 0.011 * 
+#>   environmental_concern x life_satisfaction: rho = 0.003, p = 0.904  
+#>   environmental_concern x trust_government: rho = 0.067, p = 0.002 ** 
+#>   life_satisfaction x trust_government: rho = 0.002, p = 0.942  
+#>   3/6 pairs significant (p < .05), N = 2207
 ```
 
 ## Kendall’s Tau
@@ -405,25 +160,8 @@ $\rho$, but is considered more robust.
 ``` r
 survey_data %>%
   kendall_tau(political_orientation, life_satisfaction)
-#> 
-#> Kendall's Tau-b Correlation 
-#> ----------------------------
-#> 
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
-#> 
-#> --- political_orientation × life_satisfaction ---
-#> 
-#>   Kendall's tau-b: τ = -0.004
-#>   z-score: -0.212
-#>   Sample size: n = 2228
-#>   p-value (2-tailed): 0.8321
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation: weak negative correlation
+#> Kendall's Tau: political_orientation x life_satisfaction
+#>   tau = -0.004, p = 0.832 , N = 2228
 ```
 
 ### With Weights
@@ -432,26 +170,8 @@ survey_data %>%
 survey_data %>%
   kendall_tau(political_orientation, life_satisfaction,
               weights = sampling_weight)
-#> 
-#> Weighted Kendall's Tau-b Correlation 
-#> -------------------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Alternative hypothesis: two.sided
-#> 
-#> 
-#> --- political_orientation × life_satisfaction ---
-#> 
-#>   Kendall's tau-b: τ = -0.004
-#>   z-score: -0.298
-#>   Sample size: n = 2241
-#>   p-value (2-tailed): 0.7659
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation: weak negative correlation
+#> Kendall's Tau: political_orientation x life_satisfaction [Weighted]
+#>   tau = -0.004, p = 0.766 , N = 2241
 ```
 
 ## Interpreting Correlations
@@ -474,7 +194,10 @@ Check the p-value alongside the correlation coefficient:
 ``` r
 result <- survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
-print(result)
+result             # compact overview
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.005, p = 0.828 , N = 2201
+summary(result)    # detailed output with confidence intervals
 #> 
 #> Weighted Pearson Correlation 
 #> -----------------------------
@@ -484,23 +207,13 @@ print(result)
 #> - Confidence level: 95.0%
 #> 
 #> 
-#> --- age × income ---
-#> 
 #>   Correlation: r = -0.005
-#>   Effect size: r²: 0.000
-#>   Sample size: n = 2201
+#>   p-value: p = 0.828 
+#>   N = 2201
 #>   95% CI: [-0.046, 0.037]
-#>   p-value: 0.8276
-#>   Significance: ns
+#>   r-squared: 0.000
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
 ```
 
 A significant p-value ($p < 0.05$) means the correlation is unlikely to
@@ -567,97 +280,18 @@ survey_data %>%
   pearson_cor(age, political_orientation, environmental_concern,
               life_satisfaction, trust_government,
               weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Correlation Matrix:
-#> ------------------- 
-#>                           age political_orientation environmental_concern
-#> age                     1.000                -0.029                 0.024
-#> political_orientation  -0.029                 1.000                -0.584
-#> environmental_concern   0.024                -0.584                 1.000
-#> life_satisfaction      -0.029                -0.004                -0.003
-#> trust_government        0.005                -0.057                 0.064
-#>                       life_satisfaction trust_government
-#> age                              -0.029            0.005
-#> political_orientation            -0.004           -0.057
-#> environmental_concern            -0.003            0.064
-#> life_satisfaction                 1.000            0.011
-#> trust_government                  0.011            1.000
-#> ------------------- 
-#> 
-#> Significance Matrix (p-values):
-#> ------------------------------- 
-#>                           age political_orientation environmental_concern
-#> age                    0.0000                0.1678                0.2435
-#> political_orientation  0.1678                0.0000                0.0000
-#> environmental_concern  0.2435                0.0000                0.0000
-#> life_satisfaction      0.1496                0.8361                0.8658
-#> trust_government       0.8037                0.0076                0.0021
-#>                       life_satisfaction trust_government
-#> age                              0.1496           0.8037
-#> political_orientation            0.8361           0.0076
-#> environmental_concern            0.8658           0.0021
-#> life_satisfaction                0.0000           0.6045
-#> trust_government                 0.6045           0.0000
-#> ------------------------------- 
-#> 
-#> Sample Size Matrix:
-#> ------------------- 
-#>                         age political_orientation environmental_concern
-#> age                    2516                  2312                  2416
-#> political_orientation  2312                  2312                  2221
-#> environmental_concern  2416                  2221                  2416
-#> life_satisfaction      2437                  2241                  2340
-#> trust_government       2371                  2182                  2276
-#>                       life_satisfaction trust_government
-#> age                                2437             2371
-#> political_orientation              2241             2182
-#> environmental_concern              2340             2276
-#> life_satisfaction                  2437             2296
-#> trust_government                   2296             2371
-#> ------------------- 
-#> 
-#> Pairwise Results:
-#> ---------------- 
-#>                                  Variable_Pair      r r_squared p_value
-#>                    age × political_orientation -0.029     0.001  0.1678
-#>                    age × environmental_concern  0.024     0.001  0.2435
-#>                        age × life_satisfaction -0.029     0.001  0.1496
-#>                         age × trust_government  0.005     0.000  0.8037
-#>  political_orientation × environmental_concern -0.584     0.341  0.0000
-#>      political_orientation × life_satisfaction -0.004     0.000  0.8361
-#>       political_orientation × trust_government -0.057     0.003  0.0076
-#>      environmental_concern × life_satisfaction -0.003     0.000  0.8658
-#>       environmental_concern × trust_government  0.064     0.004  0.0021
-#>           life_satisfaction × trust_government  0.011     0.000  0.6045
-#>             CI_95    n sig
-#>   [-0.069, 0.012] 2312    
-#>   [-0.016, 0.064] 2416    
-#>   [-0.069, 0.011] 2437    
-#>   [-0.035, 0.045] 2371    
-#>  [-0.611, -0.556] 2221 ***
-#>   [-0.046, 0.037] 2241    
-#>  [-0.099, -0.015] 2182  **
-#>   [-0.044, 0.037] 2340    
-#>    [0.023, 0.105] 2276  **
-#>   [-0.030, 0.052] 2296    
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: 5 variables [Weighted]
+#>   age x political_orientation:   r = -0.029, p = 0.168  
+#>   age x environmental_concern:   r = 0.024, p = 0.244  
+#>   age x life_satisfaction:       r = -0.029, p = 0.150  
+#>   age x trust_government:        r = 0.005, p = 0.804  
+#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 *** 
+#>   political_orientation x life_satisfaction: r = -0.004, p = 0.836  
+#>   political_orientation x trust_government: r = -0.057, p = 0.008 ** 
+#>   environmental_concern x life_satisfaction: r = -0.003, p = 0.866  
+#>   environmental_concern x trust_government: r = 0.064, p = 0.002 ** 
+#>   life_satisfaction x trust_government: r = 0.011, p = 0.604  
+#>   3/10 pairs significant (p < .05), N = 2312
 ```
 
 ### Income Effects
@@ -667,97 +301,18 @@ survey_data %>%
   pearson_cor(income, life_satisfaction, trust_government,
               trust_media, trust_science,
               weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Correlation Matrix:
-#> ------------------- 
-#>                    income life_satisfaction trust_government trust_media
-#> income              1.000             0.450           -0.001      -0.011
-#> life_satisfaction   0.450             1.000            0.011       0.020
-#> trust_government   -0.001             0.011            1.000       0.012
-#> trust_media        -0.011             0.020            0.012       1.000
-#> trust_science      -0.024            -0.019            0.031       0.024
-#>                   trust_science
-#> income                   -0.024
-#> life_satisfaction        -0.019
-#> trust_government          0.031
-#> trust_media               0.024
-#> trust_science             1.000
-#> ------------------- 
-#> 
-#> Significance Matrix (p-values):
-#> ------------------------------- 
-#>                    income life_satisfaction trust_government trust_media
-#> income             0.0000            0.0000           0.9755      0.6292
-#> life_satisfaction  0.0000            0.0000           0.6045      0.3299
-#> trust_government   0.9755            0.6045           0.0000      0.5823
-#> trust_media        0.6292            0.3299           0.5823      0.0000
-#> trust_science      0.2698            0.3708           0.1452      0.2586
-#>                   trust_science
-#> income                   0.2698
-#> life_satisfaction        0.3708
-#> trust_government         0.1452
-#> trust_media              0.2586
-#> trust_science            0.0000
-#> ------------------------------- 
-#> 
-#> Sample Size Matrix:
-#> ------------------- 
-#>                   income life_satisfaction trust_government trust_media
-#> income              2201              2130             2076        2090
-#> life_satisfaction   2130              2437             2296        2305
-#> trust_government    2076              2296             2371        2242
-#> trust_media         2090              2305             2242        2382
-#> trust_science       2112              2336             2271        2286
-#>                   trust_science
-#> income                     2112
-#> life_satisfaction          2336
-#> trust_government           2271
-#> trust_media                2286
-#> trust_science              2414
-#> ------------------- 
-#> 
-#> Pairwise Results:
-#> ---------------- 
-#>                         Variable_Pair      r r_squared p_value           CI_95
-#>            income × life_satisfaction  0.450     0.203  0.0000  [0.416, 0.483]
-#>             income × trust_government -0.001     0.000  0.9755 [-0.044, 0.042]
-#>                  income × trust_media -0.011     0.000  0.6292 [-0.053, 0.032]
-#>                income × trust_science -0.024     0.001  0.2698 [-0.067, 0.019]
-#>  life_satisfaction × trust_government  0.011     0.000  0.6045 [-0.030, 0.052]
-#>       life_satisfaction × trust_media  0.020     0.000  0.3299 [-0.021, 0.061]
-#>     life_satisfaction × trust_science -0.019     0.000  0.3708 [-0.059, 0.022]
-#>        trust_government × trust_media  0.012     0.000  0.5823 [-0.030, 0.053]
-#>      trust_government × trust_science  0.031     0.001  0.1452 [-0.011, 0.072]
-#>           trust_media × trust_science  0.024     0.001  0.2586 [-0.017, 0.065]
-#>     n sig
-#>  2130 ***
-#>  2076    
-#>  2090    
-#>  2112    
-#>  2296    
-#>  2305    
-#>  2336    
-#>  2242    
-#>  2271    
-#>  2286    
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: 5 variables [Weighted]
+#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
+#>   income x trust_government:     r = -0.001, p = 0.975  
+#>   income x trust_media:          r = -0.011, p = 0.629  
+#>   income x trust_science:        r = -0.024, p = 0.270  
+#>   life_satisfaction x trust_government: r = 0.011, p = 0.604  
+#>   life_satisfaction x trust_media: r = 0.020, p = 0.330  
+#>   life_satisfaction x trust_science: r = -0.019, p = 0.371  
+#>   trust_government x trust_media: r = 0.012, p = 0.582  
+#>   trust_government x trust_science: r = 0.031, p = 0.145  
+#>   trust_media x trust_science:   r = 0.024, p = 0.259  
+#>   1/10 pairs significant (p < .05), N = 2130
 ```
 
 ## Complete Example
@@ -771,97 +326,18 @@ cor_matrix <- survey_data %>%
               political_orientation, environmental_concern,
               weights = sampling_weight)
 print(cor_matrix)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Correlation Matrix:
-#> ------------------- 
-#>                           age  income life_satisfaction political_orientation
-#> age                     1.000  -0.005            -0.029                -0.029
-#> income                 -0.005   1.000             0.450                -0.034
-#> life_satisfaction      -0.029   0.450             1.000                -0.004
-#> political_orientation  -0.029  -0.034            -0.004                 1.000
-#> environmental_concern   0.024   0.015            -0.003                -0.584
-#>                       environmental_concern
-#> age                                   0.024
-#> income                                0.015
-#> life_satisfaction                    -0.003
-#> political_orientation                -0.584
-#> environmental_concern                 1.000
-#> ------------------- 
-#> 
-#> Significance Matrix (p-values):
-#> ------------------------------- 
-#>                           age  income life_satisfaction political_orientation
-#> age                    0.0000  0.8276            0.1496                0.1678
-#> income                 0.8276  0.0000            0.0000                0.1255
-#> life_satisfaction      0.1496  0.0000            0.0000                0.8361
-#> political_orientation  0.1678  0.1255            0.8361                0.0000
-#> environmental_concern  0.2435  0.5026            0.8658                0.0000
-#>                       environmental_concern
-#> age                                  0.2435
-#> income                               0.5026
-#> life_satisfaction                    0.8658
-#> political_orientation                0.0000
-#> environmental_concern                0.0000
-#> ------------------------------- 
-#> 
-#> Sample Size Matrix:
-#> ------------------- 
-#>                         age income life_satisfaction political_orientation
-#> age                    2516   2201              2437                  2312
-#> income                 2201   2201              2130                  2020
-#> life_satisfaction      2437   2130              2437                  2241
-#> political_orientation  2312   2020              2241                  2312
-#> environmental_concern  2416   2112              2340                  2221
-#>                       environmental_concern
-#> age                                    2416
-#> income                                 2112
-#> life_satisfaction                      2340
-#> political_orientation                  2221
-#> environmental_concern                  2416
-#> ------------------- 
-#> 
-#> Pairwise Results:
-#> ---------------- 
-#>                                  Variable_Pair      r r_squared p_value
-#>                                   age × income -0.005     0.000  0.8276
-#>                        age × life_satisfaction -0.029     0.001  0.1496
-#>                    age × political_orientation -0.029     0.001  0.1678
-#>                    age × environmental_concern  0.024     0.001  0.2435
-#>                     income × life_satisfaction  0.450     0.203  0.0000
-#>                 income × political_orientation -0.034     0.001  0.1255
-#>                 income × environmental_concern  0.015     0.000  0.5026
-#>      life_satisfaction × political_orientation -0.004     0.000  0.8361
-#>      life_satisfaction × environmental_concern -0.003     0.000  0.8658
-#>  political_orientation × environmental_concern -0.584     0.341  0.0000
-#>             CI_95    n sig
-#>   [-0.046, 0.037] 2201    
-#>   [-0.069, 0.011] 2437    
-#>   [-0.069, 0.012] 2312    
-#>   [-0.016, 0.064] 2416    
-#>    [0.416, 0.483] 2130 ***
-#>   [-0.078, 0.010] 2020    
-#>   [-0.028, 0.057] 2112    
-#>   [-0.046, 0.037] 2241    
-#>   [-0.044, 0.037] 2340    
-#>  [-0.611, -0.556] 2221 ***
-#> ---------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: 5 variables [Weighted]
+#>   age x income:                  r = -0.005, p = 0.828  
+#>   age x life_satisfaction:       r = -0.029, p = 0.150  
+#>   age x political_orientation:   r = -0.029, p = 0.168  
+#>   age x environmental_concern:   r = 0.024, p = 0.244  
+#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
+#>   income x political_orientation: r = -0.034, p = 0.125  
+#>   income x environmental_concern: r = 0.015, p = 0.503  
+#>   life_satisfaction x political_orientation: r = -0.004, p = 0.836  
+#>   life_satisfaction x environmental_concern: r = -0.003, p = 0.866  
+#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 *** 
+#>   2/10 pairs significant (p < .05), N = 2201
 
 # 2. Focus on significant correlations
 significant_cors <- cor_matrix$correlations %>%
@@ -879,47 +355,12 @@ print(significant_cors)
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = 0.050
-#>   Effect size: r-squared: 0.002
-#>   Sample size: n = 449
-#>   95% CI: [-0.043, 0.142]
-#>   p-value: 0.2931
-#>   Significance: ns
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.019
-#>   Effect size: r-squared: 0.000
-#>   Sample size: n = 1751
-#>   95% CI: [-0.066, 0.028]
-#>   p-value: 0.4267
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> [region = 1]
+#> Pearson Correlation: age x income [Weighted]
+#>   r = 0.050, p = 0.293 , N = 449
+#> [region = 2]
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.019, p = 0.427 , N = 1751
 ```
 
 ## Reporting Results

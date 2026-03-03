@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,47 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.1" id="mariposa-051">mariposa 0.5.1<a class="anchor" aria-label="anchor" href="#mariposa-051"></a></h2>
+<div class="section level3">
+<h3 id="three-layer-output-system-0-5-1">Three-Layer Output System<a class="anchor" aria-label="anchor" href="#three-layer-output-system-0-5-1"></a></h3>
+<ul><li>
+<p>All 13 analysis functions now support <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for detailed SPSS-style output with toggleable sections. The three-layer pattern works as follows:</p>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> — compact one-line overview (default when typing the object name)</li>
+<li>
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> — builds a detailed summary object with boolean section toggles</li>
+<li>
+<code>print.summary()</code> — renders the full verbose output with all requested sections</li>
+</ul></li>
+<li><p>Supported functions: <code><a href="../reference/t_test.html">t_test()</a></code>, <code><a href="../reference/oneway_anova.html">oneway_anova()</a></code>, <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code>, <code><a href="../reference/ancova.html">ancova()</a></code>, <code><a href="../reference/chi_square.html">chi_square()</a></code>, <code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>, <code><a href="../reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="../reference/spearman_rho.html">spearman_rho()</a></code>, <code><a href="../reference/kendall_tau.html">kendall_tau()</a></code>, <code><a href="../reference/reliability.html">reliability()</a></code>, <code><a href="../reference/efa.html">efa()</a></code>, <code><a href="../reference/linear_regression.html">linear_regression()</a></code>, <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code>.</p></li>
+<li><p>Each <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method accepts boolean parameters to control which output sections are displayed (e.g., <code>summary(result, effect_sizes = FALSE)</code> or <code>summary(result, descriptives = FALSE)</code>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="internal-helpers-0-5-1">Internal Helpers<a class="anchor" aria-label="anchor" href="#internal-helpers-0-5-1"></a></h3>
+<ul><li>Added <code><a href="../reference/build_summary_object.html">build_summary_object()</a></code> and <code><a href="../reference/format_p_compact.html">format_p_compact()</a></code> in <code>R/summary_helpers.R</code> as shared infrastructure for all summary methods.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-5-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-5-1"></a></h3>
+<ul><li>
+<p>Complete Roxygen2 documentation for all 39 S3 methods (13 print + 13 summary</p>
+<ul><li>13 print.summary), each with <code>@description</code>, <code>@param</code>, <code>@return</code>, <code>@examples</code>, and <code>@seealso</code>.</li>
+</ul></li>
+<li><p>All 13 main function <code>@examples</code> now demonstrate the three-layer output pattern (<code>result</code>, <code>summary(result)</code>, <code>summary(result, toggle = FALSE)</code>).</p></li>
+<li><p>Added <code><a href="../reference/print.reliability.html">print.reliability()</a></code> and <code><a href="../reference/print.efa.html">print.efa()</a></code> documentation (previously undocumented).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-5-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
+<ul><li><p>Fixed <code><a href="../reference/print.chi_square.html">print.chi_square()</a></code> Roxygen2 tag (<code>@keywords internal</code> replaced with correct <code>@method print chi_square</code>).</p></li>
+<li><p>Fixed example syntax errors in <code><a href="../reference/ancova.html">ancova()</a></code> and <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code> (formula syntax replaced with correct <code>dv</code>/<code>between</code> interface).</p></li>
+<li><p>Fixed incorrect variable name <code>education_level</code> in examples (corrected to <code>education</code>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="tests-0-5-1">Tests<a class="anchor" aria-label="anchor" href="#tests-0-5-1"></a></h3>
+<ul><li><p>Added <code>test-summary-methods.R</code> with tests for all 13 summary methods.</p></li>
+<li><p>Updated <code>test-print-methods.R</code> to reflect the new three-layer structure.</p></li>
+</ul><hr></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="mariposa-050">mariposa 0.5.0<a class="anchor" aria-label="anchor" href="#mariposa-050"></a></h2>
 <div class="section level3">

@@ -35,7 +35,7 @@ Which group has higher average ranks
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -142,7 +142,8 @@ treatment/control). Must have exactly two groups.</p></dd>
     <p>Test results showing whether groups differ, including:</p><ul><li><p>U and W statistics (test statistics)</p></li>
 <li><p>Z-score and p-value (are groups different?)</p></li>
 <li><p>Effect size r (how big is the difference?)</p></li>
-<li><p>Rank means for each group (which group is higher?)</p></li>
+<li><p>Rank means for each group (which group is higher?)
+Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -212,6 +213,7 @@ Biometrika, 100(4), 831-842.</p>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test</a></code> for the base R Wilcoxon test function.</p>
 <p><code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">svyranktest</a></code> for survey-weighted rank tests.</p>
 <p><code><a href="t_test.html">t_test</a></code> for parametric t-tests.</p>
+<p><code><a href="summary.mann_whitney.html">summary.mann_whitney</a></code> for detailed output with toggleable sections.</p>
 <p>Other hypothesis_tests:
 <code><a href="ancova.html">ancova()</a></code>,
 <code><a href="binomial_test.html">binomial_test()</a></code>,
@@ -236,320 +238,65 @@ Biometrika, 100(4), 831-842.</p>
 <span class="r-in"><span><span class="co"># Basic Mann-Whitney test (non-parametric comparison)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">age</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: Male vs. Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1248.0, n = 1194.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1252.8, n = 1306.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 776,732 1,490,147 -0.164    0.87    0.003    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: age by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 776,732, Z = -0.164, p = 0.870 , r = 0.003 (negligible), N = 2500</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: East vs. West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1304.9, n = 485.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1237.4, n = 2015.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W     Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 462,234 2,493,354 -1.85   0.064    0.037    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1099.7, n = 429.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1092.0, n = 1757.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 374,226 1,918,630 -0.226   0.821    0.005    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1215.7, n = 465.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1209.9, n = 1956.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 452,568 2,366,514 -0.168   0.867    0.003    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: age by region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 462,234, Z = -1.850, p = 0.064 , r = 0.037 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: income by region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 374,226, Z = -0.226, p = 0.821 , r = 0.005 (negligible), N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 452,568, Z = -0.168, p = 0.867 , r = 0.003 (negligible), N = 2421</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: Male vs. Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_government ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1166.5, n = 1123.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1187.6, n = 1231.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 678,806 1,309,932 -0.775   0.438    0.016    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_media ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1150.9, n = 1129.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1214.2, n = 1238.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W     Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 661,523 1,299,408 -2.32    0.02    0.048   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_science ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1182.1, n = 1142.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1215.3, n = 1256.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 697,309 1,349,962 -1.234   0.217    0.025    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: trust_government by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 678,806, Z = -0.775, p = 0.438 , r = 0.016 (negligible), N = 2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: trust_media by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 661,523, Z = -2.320, p = 0.020 *, r = 0.048 (negligible), N = 2367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: trust_science by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 697,309, Z = -1.234, p = 0.217 , r = 0.025 (negligible), N = 2398</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: East vs. West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1115.0, n = 449.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1096.8, n = 1751.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 386,321 1,920,975 -0.536   0.592    0.011    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> U and W are descriptive statistics derived from weighted ranks.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: income by region [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 386,321, Z = -0.536, p = 0.592 , r = 0.011 (negligible), N = 2201</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate tests for each education level)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: Male vs. Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: education = Basic Secondary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 404.7, n = 382.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 405.3, n = 427.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test      U       W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 81,439 154,592 -0.036   0.971    0.001    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: education = Intermediate Secondary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 301.9, n = 281.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 315.8, n = 337.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test      U      W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 45,218 84,839 -1.001   0.317     0.04    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: education = Academic Secondary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 304.9, n = 305.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 303.1, n = 302.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test      U      W     Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 45,788 91,540 -0.13   0.897    0.005    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: education = University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 186.7, n = 181.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 200.4, n = 206.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test      U      W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 17,319 33,790 -1.281     0.2    0.065    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 81,439, Z = -0.036, p = 0.971 , r = 0.001 (negligible), N = 809</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 45,218, Z = -1.001, p = 0.317 , r = 0.040 (negligible), N = 618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 45,788, Z = -0.130, p = 0.897 , r = 0.005 (negligible), N = 607</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 17,319, Z = -1.281, p = 0.200 , r = 0.065 (negligible), N = 387</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One-sided test</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: East vs. West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: greater</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   East: rank mean = 1215.7, n = 465.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   West: rank mean = 1209.9, n = 1956.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 452,568 2,366,514 -0.168   0.433    0.003    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 452,568, Z = -0.168, p = 0.433 , r = 0.003 (negligible), N = 2421</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Store results for further analysis</span></span></span>
+<span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: income by gender [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 592,273, Z = -0.755, p = 0.450 , r = 0.016 (negligible), N = 2201</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -580,9 +327,39 @@ Biometrika, 100(4), 831-842.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Negligible effect: |r| &lt; 0.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, effect_sizes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide effect sizes</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: Male vs. Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1111.3, n = 1047.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1090.7, n = 1153.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> U and W are descriptive statistics derived from weighted ranks.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

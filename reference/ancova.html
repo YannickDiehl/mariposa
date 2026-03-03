@@ -37,7 +37,7 @@ Estimated marginal means (group means adjusted for covariates)
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -155,7 +155,8 @@ Type III is recommended for unbalanced designs.</p></dd>
 <dd><p>List with metadata (dv, factors, covariates, weighted, etc.)</p></dd>
 
 
-</dl></div>
+</dl><p>Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
@@ -200,6 +201,7 @@ controlling for the covariate. This is the primary test of interest.</p>
     <div class="dont-index"><p><code><a href="factorial_anova.html">factorial_anova</a></code> for ANOVA without covariates.</p>
 <p><code><a href="linear_regression.html">linear_regression</a></code> for regression analysis.</p>
 <p><code><a href="oneway_anova.html">oneway_anova</a></code> for single-factor ANOVA.</p>
+<p><code><a href="summary.ancova.html">summary.ancova</a></code> for detailed output with toggleable sections.</p>
 <p>Other hypothesis_tests:
 <code><a href="binomial_test.html">binomial_test()</a></code>,
 <code><a href="chi_square.html">chi_square()</a></code>,
@@ -232,7 +234,37 @@ controlling for the covariate. This is the primary test of interest.</p>
 <span class="r-in"><span><span class="co"># One-way ANCOVA: income by education, controlling for age</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">ancova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span>, covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ANCOVA: income by education, covariate: age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age (covariate): F(1, 2181) = 0.030, p = 0.862 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education:       F(3, 2181) = 466.246, p &lt; 0.001 ***, eta2p = 0.391, N = 2186</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Two-way ANCOVA with weights</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">ancova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>         covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ANCOVA: income by gender, education, covariate: age [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age (covariate):  F(1, 2177) = 0.013, p = 0.911 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 2177) = 0.115, p = 0.735 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education:        F(3, 2177) = 455.614, p &lt; 0.001 ***, eta2p = 0.386</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 2177) = 0.298, p = 0.827 , eta2p = 0.000, N = 2186</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Multiple covariates</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">ancova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>         covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">political_orientation</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ANCOVA: income by education, covariate: age, political_orientation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age (covariate):                   F(1, 2002) = 0.018, p = 0.895 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation (covariate): F(1, 2002) = 1.366, p = 0.243 , eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education:                         F(3, 2002) = 419.350, p &lt; 0.001 ***, eta2p = 0.386, N = 2008</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">ancova</span><span class="op">(</span><span class="va">survey_data</span>, dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                 covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact overview</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ANCOVA: income by education, covariate: age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age (covariate): F(1, 2181) = 0.030, p = 0.862 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education:       F(3, 2181) = 466.246, p &lt; 0.001 ***, eta2p = 0.391, N = 2186</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ANCOVA (One-Way ANCOVA) Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -294,159 +326,56 @@ controlling for the covariate. This is the primary test of interest.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 2182) = 103.901, p = &lt;.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Two-way ANCOVA with weights</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">ancova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>         covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted ANCOVA (2-Way ANCOVA) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Factor(s): gender x education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Covariate(s): age</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Type III Sum of Squares: Type 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (complete cases): 2186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: 314</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tests of Between-Subjects Effects</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Source             Type III SS  df   Mean Square  F        Sig. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Model    1.727833e+09    8 2.159791e+08  172.044 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intercept          3.512177e+09    1 3.512177e+09 2797.728 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  age                1.571502e+04    1 1.571502e+04    0.013 0.911</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender             1.437527e+05    1 1.437527e+05    0.115 0.735</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education          1.715890e+09    3 5.719633e+08  455.614 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender * education 1.122626e+06    3 3.742086e+05    0.298 0.827</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Error              2.732936e+09 2177 1.255368e+06               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Total              3.529768e+10 2186                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Total    4.460769e+09 2185                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Partial Eta Sq    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.387          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.562          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.386          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> R Squared = 0.387 (Adjusted R Squared = 0.385)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Parameter Estimates</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Parameter           B        Std. Error t      Sig.  Lower Bound Upper Bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  (Intercept)         3984.324 75.327     52.894 &lt;.001 3836.603    4132.045   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  age                   -0.157  1.402     -0.112 0.911   -2.906       2.593   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender1                8.417 24.873      0.338 0.735  -40.360      57.194   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education.L         1865.352 51.415     36.280 &lt;.001 1764.525    1966.179   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education.Q          138.678 49.789      2.785 0.005   41.039     236.317   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education.C          147.993 48.027      3.081 0.002   53.809     242.178   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender1:education.L  -30.796 51.414     -0.599 0.549 -131.621      70.029   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender1:education.Q    6.990 49.766      0.140 0.888  -90.604     104.584   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender1:education.C  -32.104 48.024     -0.668 0.504 -126.282      62.074   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Partial Eta Sq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.562         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.377         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.004         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.004         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Estimated Marginal Means</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Evaluated at covariate means)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender education              Mean     Std. Error Lower Bound Upper Bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Basic Secondary        2801.036 59.824     2683.718    2918.354   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Intermediate Secondary 3579.461 71.117     3439.997    3718.925   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Academic Secondary     4244.417 66.034     4114.920    4373.914   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   University             5314.178 88.494     5140.637    5487.720   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Basic Secondary        2721.537 56.737     2610.274    2832.801   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Intermediate Secondary 3598.917 63.638     3474.119    3723.714   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Academic Secondary     4205.275 68.184     4071.562    4338.987   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female University             5346.029 82.845     5183.566    5508.492   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test of Equality of Error Variances</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(7, 2178) = 41.244, p = &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Multiple covariates</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">ancova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>         covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">political_orientation</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, marginal_means <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide estimated marginal means</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ANCOVA (One-Way ANCOVA) Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Factor(s): education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Covariate(s): age, political_orientation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Covariate(s): age</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Type III Sum of Squares: Type 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N (complete cases): 2008</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: 492</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - N (complete cases): 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: 314</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tests of Between-Subjects Effects</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Source                Type III SS  df   Mean Square  F        Sig. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Model       1.582047e+09    5 3.164093e+08  252.422 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intercept             1.958785e+09    1 1.958785e+09 1562.659 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  age                   2.194524e+04    1 2.194524e+04    0.018 0.895</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  political_orientation 1.712167e+06    1 1.712167e+06    1.366 0.243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education             1.576958e+09    3 5.256526e+08  419.350 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Error                 2.509497e+09 2002 1.253495e+06               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Total                 3.214036e+10 2008                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Total       4.091544e+09 2007                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Partial Eta Sq    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.387          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.438          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.001             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.386          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> R Squared = 0.387 (Adjusted R Squared = 0.385)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Source          Type III SS  df   Mean Square  F        Sig.  Partial Eta Sq</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Model 1.752821e+09    4 4.382053e+08  349.723 &lt;.001 0.391         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Intercept       3.472401e+09    1 3.472401e+09 2771.252 &lt;.001 0.560         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  age             3.772141e+04    1 3.772141e+04    0.030 0.862 0.000         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  education       1.752631e+09    3 5.842102e+08  466.246 &lt;.001 0.391         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Error           2.732810e+09 2181 1.253008e+06                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Total           3.529079e+10 2186                                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Total 4.485631e+09 2185                                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> R Squared = 0.391 (Adjusted R Squared = 0.390)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameter Estimates</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Parameter             B        Std. Error t      Sig.  Lower Bound Upper Bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  (Intercept)           4040.829 102.221    39.530 &lt;.001 3840.359    4241.299   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  age                     -0.196   1.479    -0.132 0.895   -3.096       2.704   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  political_orientation  -26.771  22.906    -1.169 0.243  -71.693      18.151   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education.L           1847.837  53.119    34.787 &lt;.001 1743.662    1952.011   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education.Q            103.244  51.756     1.995 0.046    1.744     204.745   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education.C            154.449  50.186     3.078 0.002   56.027     252.871   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Parameter   B        Std. Error t      Sig.  Lower Bound Upper Bound</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  (Intercept) 3990.641 75.806     52.643 &lt;.001 3841.981    4139.301   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  age           -0.245  1.412     -0.174 0.862   -3.014       2.524   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  education.L 1870.578 50.838     36.795 &lt;.001 1770.881    1970.274   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  education.Q  139.427 49.566      2.813 0.005   42.226     236.629   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  education.C  152.695 48.167      3.170 0.002   58.236     247.154   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Partial Eta Sq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.438         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.560         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0.000         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.001         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.377         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.002         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.383         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.004         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0.005         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Estimated Marginal Means</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Evaluated at covariate means)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education              Mean     Std. Error Lower Bound Upper Bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Basic Secondary        2735.624 43.231     2650.841    2820.408   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary 3596.901 49.594     3499.640    3694.163   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary     4216.064 50.054     4117.900    4314.228   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  University             5283.829 62.076     5162.090    5405.569   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test of Equality of Error Variances</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 2004) = 97.179, p = &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 2182) = 103.901, p = &lt;.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
