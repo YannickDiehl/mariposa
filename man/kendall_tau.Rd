@@ -106,6 +106,15 @@ survey_data \%>\%
 survey_data \%>\%
   kendall_tau(age, income, weights = sampling_weight)
 
+# Listwise deletion for missing data
+survey_data \%>\%
+  kendall_tau(age, income, use = "listwise")
+
+# One-tailed test
+survey_data \%>\%
+  kendall_tau(age, income, alternative = "greater")
+
+\donttest{
 # Grouped correlations
 survey_data \%>\%
   group_by(region) \%>\%
@@ -115,14 +124,6 @@ survey_data \%>\%
 survey_data \%>\%
   kendall_tau(starts_with("trust"), weights = sampling_weight)
 
-# Listwise deletion for missing data
-survey_data \%>\%
-  kendall_tau(age, income, use = "listwise")
-
-# One-tailed test
-survey_data \%>\%
-  kendall_tau(age, income, alternative = "greater")
-
 # --- Three-layer output ---
 result <- survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation, trust_media,
@@ -130,6 +131,7 @@ result <- survey_data \%>\%
 result              # compact one-line overview
 summary(result)     # full correlation, p-value, and N matrices
 summary(result, pvalue_matrix = FALSE)  # hide p-values
+}
 
 }
 \references{

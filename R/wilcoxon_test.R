@@ -403,6 +403,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 #' @param x A wilcoxon_test object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 #' @method print wilcoxon_test
 print.wilcoxon_test <- function(x, digits = 3, ...) {

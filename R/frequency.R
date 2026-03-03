@@ -450,6 +450,7 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #'
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 print.frequency <- function(x, digits = 3, ...) {
   # Helper functions for formatting

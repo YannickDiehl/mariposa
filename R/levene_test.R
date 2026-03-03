@@ -765,6 +765,7 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
 #' @param x A levene_test object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 #' @method print levene_test
 print.levene_test <- function(x, digits = 3, ...) {

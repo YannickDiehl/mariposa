@@ -354,6 +354,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 #' @param x A binomial_test object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 #' @method print binomial_test
 print.binomial_test <- function(x, digits = 3, ...) {
