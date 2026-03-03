@@ -17,7 +17,7 @@ correlations, it uses survey-weighted rank calculations."><meta property="og:ima
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +118,8 @@ correlation or more for a correlation matrix. You can use helpers like
     <p>Correlation results showing rank-based relationships between variables,
 including the tau-b coefficient, p-value, z-score, and sample size for each
 pair. For multiple variables, correlation, significance, and sample size
-matrices are also provided.</p>
+matrices are also provided.
+Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -167,6 +168,7 @@ John Wiley &amp; Sons.</p>
 implementation.</p>
 <p><code><a href="spearman_rho.html">spearman_rho</a></code> for Spearman's rank correlation.</p>
 <p><code><a href="pearson_cor.html">pearson_cor</a></code> for Pearson correlation analysis.</p>
+<p><code><a href="summary.kendall_tau.html">summary.kendall_tau</a></code> for detailed output with toggleable sections.</p>
 <p>Other correlation:
 <code><a href="pearson_cor.html">pearson_cor()</a></code>,
 <code><a href="spearman_rho.html">spearman_rho()</a></code></p></div>
@@ -181,276 +183,74 @@ implementation.</p>
 <span class="r-in"><span><span class="co"># Basic correlation between two variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction × political_orientation ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = -0.004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: -0.212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8321</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak negative correlation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: life_satisfaction x political_orientation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tau = -0.004, p = 0.832 , N = 2228</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Correlation matrix for multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span>, <span class="va">trust_media</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction political_orientation trust_media</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                 1.000                -0.004       0.023</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation            -0.004                 1.000       0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                       0.023                 0.003       1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values, 2-tailed):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction political_orientation trust_media</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                0.0000                0.8321      0.1751</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation            0.8321                0.0000      0.8823</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                      0.1751                0.8823      0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction political_orientation trust_media</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                  2421                  2228        2291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation              2228                  2299        2177</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                        2291                  2177        2367</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                       Pair  tau_b      z      p    n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction × political_orientation -0.004 -0.212 0.8321 2228    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            life_satisfaction × trust_media  0.023  1.356 0.1751 2291    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        political_orientation × trust_media  0.003  0.148 0.8823 2177    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: 3 variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x political_orientation: tau = -0.004, p = 0.832  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x trust_media: tau = 0.023, p = 0.175  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x trust_media: tau = 0.003, p = 0.882  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0/3 pairs significant (p &lt; .05), N = 2228</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted correlations</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = 0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: 0.202</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8397</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak positive correlation</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Grouped correlations</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                 1.000   0.040            -0.030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income              0.040   1.000             0.338</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  -0.030   0.338             1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values, 2-tailed):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                0.0000  0.2272            0.3799</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             0.2272  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  0.3799  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    age income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                485    429               465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             429    429               410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  465    410               465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Pair  tau_b      z      p   n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                age × income  0.040  1.208 0.2272 429    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.030 -0.878 0.3799 465    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.338  9.099 0.0000 410 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                 1.000  -0.006            -0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             -0.006   1.000             0.357</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  -0.015   0.357             1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values, 2-tailed):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                0.0000  0.7257            0.3766</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             0.7257  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  0.3766  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     age income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                2015   1757              1956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             1757   1757              1705</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  1956   1705              1956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Pair  tau_b      z      p    n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                age × income -0.006 -0.351 0.7257 1757    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.015 -0.884 0.3766 1956    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.357 19.639 0.0000 1705 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Using tidyselect helpers for ordinal variables</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.007         0.021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.007       1.000         0.013</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.021       0.013         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values, 2-tailed):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government           0.0000      0.6405        0.1429</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                0.6405      0.0000        0.3537</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science              0.1429      0.3537        0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government             2371        2242          2271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                  2242        2382          2286</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science                2271        2286          2414</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                              Pair tau_b     z      p    n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    trust_government × trust_media 0.007 0.467 0.6405 2242    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government × trust_science 0.021 1.465 0.1429 2271    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media × trust_science 0.013 0.927 0.3537 2286    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: age x income [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tau = 0.003, p = 0.840 , N = 2201</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Listwise deletion for missing data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, use <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: listwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = 0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: 0.168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (2-tailed): 0.8667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak positive correlation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: age x income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tau = 0.002, p = 0.867 , N = 2186</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One-tailed test</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: greater</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: τ = 0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: 0.168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value (1-tailed): 0.4334</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation: weak positive correlation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: age x income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tau = 0.002, p = 0.433 , N = 2186</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Store results for further analysis</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># Grouped correlations</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: 3 variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  tau = 0.040, p = 0.227  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       tau = -0.030, p = 0.380  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    tau = 0.338, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1/3 pairs significant (p &lt; .05), N = 429</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: 3 variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  tau = -0.006, p = 0.726  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       tau = -0.015, p = 0.377  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    tau = 0.357, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1/3 pairs significant (p &lt; .05), N = 1757</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using tidyselect helpers for ordinal variables</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: 3 variables [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_media: tau = 0.007, p = 0.640  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_science: tau = 0.021, p = 0.143  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media x trust_science:   tau = 0.013, p = 0.354  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0/3 pairs significant (p &lt; .05), N = 2242</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kendall_tau</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">political_orientation</span>, <span class="va">trust_media</span>,</span></span>
 <span class="r-in"><span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: 3 variables [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x political_orientation: tau = -0.004, p = 0.766  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x trust_media: tau = 0.021, p = 0.132  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x trust_media: tau = 0.003, p = 0.812  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0/3 pairs significant (p &lt; .05), N = 2241</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full correlation, p-value, and N matrices</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
@@ -493,6 +293,42 @@ implementation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, pvalue_matrix <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide p-values</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kendall's Tau-b Correlation </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Matrix:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction political_orientation trust_media</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                 1.000                -0.004       0.021</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation            -0.004                 1.000       0.003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                       0.021                 0.003       1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction political_orientation trust_media</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                  2437                  2241        2305</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation              2241                  2312        2190</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                        2305                  2190        2382</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                       Pair  tau_b      z      p    n sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction × political_orientation -0.004 -0.298 0.7659 2241    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            life_satisfaction × trust_media  0.021  1.505 0.1323 2305    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        political_orientation × trust_media  0.003  0.238 0.8118 2190    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

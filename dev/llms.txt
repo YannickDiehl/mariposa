@@ -34,18 +34,30 @@ survey_data %>%
   frequency(education, weights = sampling_weight)
 
 # Compare groups with t-test
-survey_data %>%
+result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
+result              # compact one-line overview
+
+summary(result)     # full SPSS-style output with all details
+
 # Scale analysis workflow
-reliability(survey_data, trust_government, trust_media, trust_science)
+rel <- reliability(survey_data, trust_government, trust_media, trust_science)
+
+rel                 # compact: Alpha + interpretation
+
+summary(rel)        # detailed: item statistics, inter-item correlations
 
 survey_data <- survey_data %>%
   mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
 
 # Regression
-survey_data %>%
+lm_result <- survey_data %>%
   linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
+
+lm_result           # compact: R-squared + significant predictors
+
+summary(lm_result)  # detailed: coefficients, ANOVA table, diagnostics
 ```
 
 ## Core Features
@@ -122,6 +134,30 @@ kw_result <- survey_data %>%
 
 kw_result %>% dunn_test()  # Pairwise Dunn comparisons
 ```
+
+### Flexible Output: Compact & Detailed
+
+Every analysis function provides two output levels. Typing the result
+name prints a compact one-line summary. Calling
+[`summary()`](https://rdrr.io/r/base/summary.html) produces the full
+SPSS-style output with all details. You can toggle individual sections
+on or off:
+
+``` r
+result <- t_test(survey_data, life_satisfaction, group = gender)
+result              # compact one-line summary
+summary(result)     # full detailed output
+summary(result, effect_sizes = FALSE)  # hide effect sizes
+```
+
+This works for all 13 analysis functions —
+[`t_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/t_test.md),
+[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md),
+[`chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md),
+[`pearson_cor()`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md),
+[`reliability()`](https://YannickDiehl.github.io/mariposa/dev/reference/reliability.md),
+[`linear_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md),
+and more.
 
 ## SPSS Compatibility
 
@@ -313,16 +349,16 @@ Example datasets for learning and testing
 - [`longitudinal_data_wide`](https://YannickDiehl.github.io/mariposa/dev/reference/longitudinal_data_wide.md)
   : Longitudinal Study Data - Wide Format (Synthetic)
 
-## Print Methods
+## Print & Summary Methods
 
-Formatted output for all result types
+Compact and detailed output for all result types
 
 - [`print(`*`<ancova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.ancova.md)
-  : Print ANCOVA results
+  : Print ANCOVA results (compact)
 - [`print(`*`<binomial_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.binomial_test.md)
   : Print method for binomial test results
 - [`print(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.chi_square.md)
-  : Print method for chi_square
+  : Print chi-squared test results (compact)
 - [`print(`*`<chisq_gof>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.chisq_gof.md)
   : Print chi-square goodness-of-fit test results
 - [`print(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.crosstab.md)
@@ -331,8 +367,10 @@ Formatted output for all result types
   : Print method for describe objects
 - [`print(`*`<dunn_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.dunn_test.md)
   : Print Dunn post-hoc test results
+- [`print(`*`<efa>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.efa.md)
+  : Print EFA results (compact)
 - [`print(`*`<factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.factorial_anova.md)
-  : Print factorial ANOVA results
+  : Print factorial ANOVA results (compact)
 - [`print(`*`<fisher_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.fisher_test.md)
   : Print Fisher's exact test results
 - [`print(`*`<frequency>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.frequency.md)
@@ -340,37 +378,91 @@ Formatted output for all result types
 - [`print(`*`<friedman_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.friedman_test.md)
   : Print method for Friedman test results
 - [`print(`*`<kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.kendall_tau.md)
-  : Print method for kendall_tau
+  : Print Kendall's tau results (compact)
 - [`print(`*`<kruskal_wallis>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.kruskal_wallis.md)
   : Print method for Kruskal-Wallis test results
 - [`print(`*`<levene_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.levene_test.md)
   : Print method for Levene test results
 - [`print(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.linear_regression.md)
-  : Print Linear Regression Results
+  : Print linear regression results (compact)
 - [`print(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.logistic_regression.md)
-  : Print Logistic Regression Results
+  : Print logistic regression results (compact)
 - [`print(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.mann_whitney.md)
-  : Print method for Mann-Whitney test results
+  : Print Mann-Whitney test results (compact)
 - [`print(`*`<mcnemar_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.mcnemar_test.md)
   : Print McNemar test results
 - [`print(`*`<oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.oneway_anova.md)
-  : Print ANOVA test results
+  : Print ANOVA test results (compact)
 - [`print(`*`<pairwise_wilcoxon>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.pairwise_wilcoxon.md)
   : Print pairwise Wilcoxon post-hoc test results
 - [`print(`*`<pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.pearson_cor.md)
-  : Print method for pearson_cor
+  : Print Pearson correlation results (compact)
+- [`print(`*`<reliability>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.reliability.md)
+  : Print reliability results (compact)
 - [`print(`*`<scheffe_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.scheffe_test.md)
   : Print Scheffe test results
 - [`print(`*`<spearman_rho>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.spearman_rho.md)
-  : Print method for spearman_rho
+  : Print Spearman correlation results (compact)
+- [`print(`*`<summary.ancova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.ancova.md)
+  : Print summary of ANCOVA results (detailed output)
+- [`print(`*`<summary.chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.chi_square.md)
+  : Print summary of chi-squared test results (detailed output)
+- [`print(`*`<summary.efa>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.efa.md)
+  : Print summary of EFA results (detailed output)
+- [`print(`*`<summary.factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.factorial_anova.md)
+  : Print summary of factorial ANOVA results (detailed output)
+- [`print(`*`<summary.kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.kendall_tau.md)
+  : Print summary of Kendall's tau correlation results (detailed output)
+- [`print(`*`<summary.linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.linear_regression.md)
+  : Print summary of linear regression results (detailed output)
+- [`print(`*`<summary.logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.logistic_regression.md)
+  : Print summary of logistic regression results (detailed output)
+- [`print(`*`<summary.mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.mann_whitney.md)
+  : Print summary of Mann-Whitney test results (detailed output)
+- [`print(`*`<summary.oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.oneway_anova.md)
+  : Print summary of one-way ANOVA results (detailed output)
+- [`print(`*`<summary.pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.pearson_cor.md)
+  : Print summary of Pearson correlation results (detailed output)
+- [`print(`*`<summary.reliability>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.reliability.md)
+  : Print summary of reliability analysis results (detailed output)
+- [`print(`*`<summary.spearman_rho>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.spearman_rho.md)
+  : Print summary of Spearman correlation results (detailed output)
+- [`print(`*`<summary.t_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.t_test.md)
+  : Print summary of t-test results (detailed output)
 - [`print(`*`<t_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.t_test.md)
-  : Print t-test results
+  : Print t-test results (compact)
 - [`print(`*`<tukey_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.tukey_test.md)
   : Print Tukey HSD test results
 - [`print(`*`<w_modus>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.w_modus.md)
   : Print method for w_modus objects
 - [`print(`*`<wilcoxon_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.wilcoxon_test.md)
   : Print method for Wilcoxon signed-rank test results
+- [`summary(`*`<ancova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.ancova.md)
+  : Summary method for ANCOVA results
+- [`summary(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.chi_square.md)
+  : Summary method for chi-squared test results
+- [`summary(`*`<efa>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.efa.md)
+  : Summarize an exploratory factor analysis
+- [`summary(`*`<factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.factorial_anova.md)
+  : Summary method for factorial ANOVA results
+- [`summary(`*`<kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.kendall_tau.md)
+  : Summary method for Kendall's tau correlation results
+- [`summary(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.linear_regression.md)
+  : Summary method for linear regression results
+- [`summary(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.logistic_regression.md)
+  : Summary method for logistic regression results
+- [`summary(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.mann_whitney.md)
+  : Summary method for Mann-Whitney test results
+- [`summary(`*`<oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.oneway_anova.md)
+  : Summary method for one-way ANOVA results
+- [`summary(`*`<pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.pearson_cor.md)
+  : Summary method for Pearson correlation results
+- [`summary(`*`<reliability>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.reliability.md)
+  : Summarize a reliability analysis
+- [`summary(`*`<spearman_rho>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.spearman_rho.md)
+  : Summary method for Spearman correlation results
+- [`summary(`*`<t_test>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.t_test.md)
+  : Summary method for t-test results
 
 # Articles
 

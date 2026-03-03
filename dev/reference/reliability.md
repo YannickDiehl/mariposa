@@ -66,6 +66,9 @@ A reliability result object containing:
 
   Sample size (listwise)
 
+Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
+SPSS-style output with toggleable sections.
+
 ## Details
 
 ### Understanding the Results
@@ -117,6 +120,9 @@ for creating mean indices after checking reliability.
 [`pearson_cor`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md)
 for bivariate correlations.
 
+[`summary.reliability`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.reliability.md)
+for detailed output with toggleable sections.
+
 Other scale:
 [`efa()`](https://YannickDiehl.github.io/mariposa/dev/reference/efa.md),
 [`pomps()`](https://YannickDiehl.github.io/mariposa/dev/reference/pomps.md),
@@ -130,210 +136,104 @@ data(survey_data)
 
 # Check reliability of trust items
 reliability(survey_data, trust_government, trust_media, trust_science)
-#> 
-#> Reliability Analysis Results
-#> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
-#> - N of Items: 3
-#> 
-#> Reliability Statistics
-#> ---------------------------------------- 
-#>   Cronbach's Alpha:              0.047
-#>   Alpha (standardized):          0.048
-#>   N of Items:                    3
-#>   N (listwise):                  2135
-#> 
-#> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
-#> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> ------------------------------ 
-#> 
-#> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#> Reliability Analysis: 3 items
+#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
 
 # With survey weights
 reliability(survey_data, trust_government, trust_media, trust_science,
             weights = sampling_weight)
-#> 
-#> Weighted Reliability Analysis Results
-#> -------------------------------------
-#> - Items: trust_government, trust_media, trust_science
-#> - N of Items: 3
-#> - Weights: sampling_weight
-#> 
-#> Reliability Statistics
-#> ---------------------------------------- 
-#>   Cronbach's Alpha:              0.052
-#>   Alpha (standardized):          0.053
-#>   N of Items:                    3
-#>   N (listwise):                  2150.20 (weighted)
-#> 
-#> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd      n
-#>  trust_government 2.621 1.162 2150.2
-#>       trust_media 2.434 1.158 2150.2
-#>     trust_science 3.624 1.033 2150.2
-#> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.017         0.021
-#> trust_media                 0.017       1.000         0.017
-#> trust_science               0.021       0.017         1.000
-#> ------------------------------ 
-#> 
-#> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.06             2.451       0.026
-#>       trust_media               6.25             2.469       0.023
-#>     trust_science               5.05             2.737       0.027
-#>  alpha_deleted
-#>          0.033
-#>          0.041
-#>          0.033
+#> Reliability Analysis: 3 items [Weighted]
+#>   Cronbach's Alpha = 0.052 (Poor), N = 2150
 
 # Using tidyselect helpers
 reliability(survey_data, starts_with("trust"))
-#> 
-#> Reliability Analysis Results
-#> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
-#> - N of Items: 3
-#> 
-#> Reliability Statistics
-#> ---------------------------------------- 
-#>   Cronbach's Alpha:              0.047
-#>   Alpha (standardized):          0.048
-#>   N of Items:                    3
-#>   N (listwise):                  2135
-#> 
-#> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
-#> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> ------------------------------ 
-#> 
-#> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#> Reliability Analysis: 3 items
+#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
 
 # Grouped by region
 survey_data %>%
   group_by(region) %>%
   reliability(trust_government, trust_media, trust_science)
+#> [region = 1]
+#> Reliability Analysis: 3 items
+#>   Cronbach's Alpha = 0.037 (Poor), N = 422
+#> [region = 2]
+#> Reliability Analysis: 3 items
+#>   Cronbach's Alpha = 0.050 (Poor), N = 1713
+
+# --- Three-layer output ---
+result <- reliability(survey_data, trust_government, trust_media, trust_science)
+result              # compact one-line overview
+#> Reliability Analysis: 3 items
+#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
+summary(result)     # full detailed output with all sections
 #> 
 #> Reliability Analysis Results
 #> ----------------------------
-#> 
-#> Group: region = 1
-#> -----------------
 #> - Items: trust_government, trust_media, trust_science
 #> - N of Items: 3
 #> 
 #> Reliability Statistics
 #> ---------------------------------------- 
-#>   Cronbach's Alpha:              0.037
-#>   Alpha (standardized):          0.042
+#>   Cronbach's Alpha:              0.047
+#>   Alpha (standardized):          0.048
 #>   N of Items:                    3
-#>   N (listwise):                  422
-#> 
-#> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd   n
-#>  trust_government 2.618 1.165 422
-#>       trust_media 2.396 1.091 422
-#>     trust_science 3.661 1.009 422
-#> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000      -0.017         0.001
-#> trust_media                -0.017       1.000         0.060
-#> trust_science               0.001       0.060         1.000
-#> ------------------------------ 
-#> 
-#> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.06             2.339      -0.012
-#>       trust_media               6.28             2.378       0.026
-#>     trust_science               5.01             2.503       0.042
-#>  alpha_deleted
-#>          0.112
-#>          0.002
-#>         -0.035
-#> 
-#> Group: region = 2
-#> -----------------
-#> - Items: trust_government, trust_media, trust_science
-#> - N of Items: 3
-#> 
-#> Reliability Statistics
-#> ---------------------------------------- 
-#>   Cronbach's Alpha:              0.050
-#>   Alpha (standardized):          0.050
-#>   N of Items:                    3
-#>   N (listwise):                  1713
+#>   N (listwise):                  2135
 #> 
 #> Item Statistics
 #> ---------------------------------------- 
 #>              item  mean    sd    n
-#>  trust_government 2.622 1.161 1713
-#>       trust_media 2.438 1.172 1713
-#>     trust_science 3.615 1.040 1713
+#>  trust_government 2.621 1.162 2135
+#>       trust_media 2.430 1.156 2135
+#>     trust_science 3.624 1.034 2135
 #> 
 #> Inter-Item Correlation Matrix:
 #> ------------------------------ 
 #>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.021         0.025
-#> trust_media                 0.021       1.000         0.005
-#> trust_science               0.025       0.005         1.000
+#> trust_government            1.000       0.014         0.020
+#> trust_media                 0.014       1.000         0.015
+#> trust_science               0.020       0.015         1.000
 #> ------------------------------ 
 #> 
 #> Item-Total Statistics
 #> ---------------------------------------- 
 #>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.467       0.032
-#>       trust_media               6.24             2.491       0.019
-#>     trust_science               5.06             2.779       0.021
+#>  trust_government               6.05             2.440       0.024
+#>       trust_media               6.25             2.467       0.020
+#>     trust_science               5.05             2.723       0.025
 #>  alpha_deleted
-#>          0.010
-#>          0.049
-#>          0.041
+#>          0.029
+#>          0.040
+#>          0.027
+summary(result, inter_item_correlations = FALSE)  # hide correlations
+#> 
+#> Reliability Analysis Results
+#> ----------------------------
+#> - Items: trust_government, trust_media, trust_science
+#> - N of Items: 3
+#> 
+#> Reliability Statistics
+#> ---------------------------------------- 
+#>   Cronbach's Alpha:              0.047
+#>   Alpha (standardized):          0.048
+#>   N of Items:                    3
+#>   N (listwise):                  2135
+#> 
+#> Item Statistics
+#> ---------------------------------------- 
+#>              item  mean    sd    n
+#>  trust_government 2.621 1.162 2135
+#>       trust_media 2.430 1.156 2135
+#>     trust_science 3.624 1.034 2135
+#> 
+#> Item-Total Statistics
+#> ---------------------------------------- 
+#>              item scale_mean_deleted scale_var_deleted corrected_r
+#>  trust_government               6.05             2.440       0.024
+#>       trust_media               6.25             2.467       0.020
+#>     trust_science               5.05             2.723       0.025
+#>  alpha_deleted
+#>          0.029
+#>          0.040
+#>          0.027
 ```

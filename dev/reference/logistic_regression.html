@@ -23,7 +23,7 @@ SPSS-style: logistic_regression(data, dependent = high_satisfaction, predictors 
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -157,7 +157,8 @@ SPSS WEIGHT BY behavior.</p></dd>
 <dd><p>Name of the weight variable (or NULL)</p></dd>
 
 
-</dl></div>
+</dl><p>Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
@@ -213,6 +214,7 @@ weights (matching SPSS WEIGHT BY behavior).</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="linear_regression.html">linear_regression</a></code> for continuous outcome variables.</p>
 <p><code><a href="chi_square.html">chi_square</a></code> for testing associations between categorical variables.</p>
+<p><code><a href="summary.logistic_regression.html">summary.logistic_regression</a></code> for detailed output with toggleable sections.</p>
 <p>Other regression:
 <code><a href="linear_regression.html">linear_regression()</a></code></p></div>
     </div>
@@ -227,114 +229,41 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Bivariate logistic regression</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: high_satisfaction ~ age</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: ENTER</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2421</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Omnibus Tests of Model Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model                       0.283     1      0.595 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -2 Log Likelihood                  3298.239</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cox &amp; Snell R Square                  0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R Square                   0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   McFadden R Square                     0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hosmer and Lemeshow Test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               9.742     8      0.284</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                             0       1024            0.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                             0       1397          100.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   57.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)              0.376     0.129     8.449    1    0.004      1.456                     **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                     -0.001     0.002     0.283    1    0.595      0.999     0.994     1.003 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.000, chi2(1) = 0.28, p = 0.595 , Accuracy = 57.7%, N = 2421</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple logistic regression</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: high_satisfaction ~ age + income + education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: ENTER</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Omnibus Tests of Model Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model                     357.461     3      0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -2 Log Likelihood                  2519.981</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cox &amp; Snell R Square                  0.156</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R Square                   0.209</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   McFadden R Square                     0.124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hosmer and Lemeshow Test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                             150.723     8      0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                           507        381           57.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                           287        940           76.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   68.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)             -2.248     0.213   111.344    1    0.000      0.106                     ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                      0.001     0.003     0.175    1    0.676      1.001     0.996     1.007 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                   0.001     0.000   195.056    1    0.000      1.001     1.001     1.001 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   education               -0.009     0.055     0.029    1    0.865      0.991     0.890     1.103 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + income + education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.209, chi2(3) = 357.46, p &lt; 0.001 ***, Accuracy = 68.4%, N = 2115</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># SPSS-style interface</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
 <span class="r-in"><span>                    dependent <span class="op">=</span> <span class="va">high_satisfaction</span>,</span></span>
 <span class="r-in"><span>                    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p &lt; 0.001 ***, Accuracy = 68.4%, N = 2115</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Weighted logistic regression</span></span></span>
+<span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span>,</span></span>
+<span class="r-in"><span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.000, chi2(1) = 0.28, p = 0.595 , Accuracy = 57.6%, N = 2437</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Grouped by region</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">logistic_regression</span><span class="op">(</span><span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age [Grouped: region]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   region = East: Nagelkerke R2 = 0.002, chi2(1) = 0.74, p = 0.390 , Accuracy = 58.3%, N = 465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   region = West: Nagelkerke R2 = 0.000, chi2(1) = 0.03, p = 0.860 , Accuracy = 57.6%, N = 1956</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p &lt; 0.001 ***, Accuracy = 68.4%, N = 2115</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed SPSS-style output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
@@ -385,97 +314,34 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Weighted logistic regression</span></span></span>
-<span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span>,</span></span>
-<span class="r-in"><span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Logistic Regression Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: high_satisfaction ~ age</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Method: ENTER</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2437</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Omnibus Tests of Model Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model                       0.283     1      0.595 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -2 Log Likelihood                  3298.256</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cox &amp; Snell R Square                  0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R Square                   0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   McFadden R Square                     0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hosmer and Lemeshow Test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               9.761     8      0.282</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                             0       1034            0.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                             0       1403          100.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   57.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)              0.371     0.128     8.414    1    0.004      1.450                     **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                     -0.001     0.002     0.297    1    0.586      0.999     0.994     1.003 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Grouped by region</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">logistic_regression</span><span class="op">(</span><span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, classification_table <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide classification</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: high_satisfaction ~ age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: high_satisfaction ~ age + income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Method: ENTER</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouped by: region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N: 465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2115</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Omnibus Tests of Model Coefficients</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model                       0.738     1      0.390 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Model                     357.432     2      0.000 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -2 Log Likelihood                   631.079</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cox &amp; Snell R Square                  0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R Square                   0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   McFadden R Square                     0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -2 Log Likelihood                  2520.010</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cox &amp; Snell R Square                  0.155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R Square                   0.209</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   McFadden R Square                     0.124</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Hosmer and Lemeshow Test</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                              13.006     8      0.112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                             150.764     8      0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
@@ -483,64 +349,19 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                             0        194            0.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                             0        271          100.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0                           508        380           57.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1                           289        938           76.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   58.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)              0.576     0.297     3.755    1    0.053      1.778                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                     -0.005     0.005     0.737    1    0.391      0.995     0.985     1.006 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N: 1956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Omnibus Tests of Model Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model                       0.031     1      0.860 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -2 Log Likelihood                  2666.595</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cox &amp; Snell R Square                  0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R Square                   0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   McFadden R Square                     0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hosmer and Lemeshow Test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          Chi-square    df       Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               8.374     8      0.398</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                             0        830            0.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                             0       1126          100.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   57.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   68.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)              0.329     0.144     5.237    1    0.022      1.390                     *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                     -0.000     0.003     0.031    1    0.860      1.000     0.994     1.005 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>

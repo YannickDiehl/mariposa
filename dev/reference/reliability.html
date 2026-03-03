@@ -17,7 +17,7 @@ tells you whether these items consistently measure the same concept."><meta prop
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,7 +117,8 @@ Uses listwise deletion (only complete cases across all items).</p></dd>
 <dd><p>Sample size (listwise)</p></dd>
 
 
-</dl></div>
+</dl><p>Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
@@ -153,6 +154,7 @@ Uses listwise deletion (only complete cases across all items).</p></dd>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="scale_index.html">scale_index</a></code> for creating mean indices after checking reliability.</p>
 <p><code><a href="pearson_cor.html">pearson_cor</a></code> for bivariate correlations.</p>
+<p><code><a href="summary.reliability.html">summary.reliability</a></code> for detailed output with toggleable sections.</p>
 <p>Other scale:
 <code><a href="efa.html">efa()</a></code>,
 <code><a href="pomps.html">pomps()</a></code>,
@@ -166,212 +168,106 @@ Uses listwise deletion (only complete cases across all items).</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Check reliability of trust items</span></span></span>
 <span class="r-in"><span><span class="fu">reliability</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.047</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.048</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N of Items:                    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd    n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.621 1.162 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.430 1.156 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.624 1.034 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.014         0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.014       1.000         0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.020       0.015         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.05             2.440       0.024</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.25             2.467       0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.05             2.723       0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.029</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.027</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.047 (Poor), N = 2135</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With survey weights</span></span></span>
 <span class="r-in"><span><span class="fu">reliability</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span></span>
 <span class="r-in"><span>            weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Reliability Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.053</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N of Items:                    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  2150.20 (weighted)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd      n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.621 1.162 2150.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.434 1.158 2150.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.624 1.033 2150.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.017         0.021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.017       1.000         0.017</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.021       0.017         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.06             2.451       0.026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.25             2.469       0.023</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.05             2.737       0.027</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.033</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.041</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.033</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.052 (Poor), N = 2150</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="fu">reliability</span><span class="op">(</span><span class="va">survey_data</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.047</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.048</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N of Items:                    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd    n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.621 1.162 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.430 1.156 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.624 1.034 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.014         0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.014       1.000         0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.020       0.015         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.05             2.440       0.024</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.25             2.467       0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.05             2.723       0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.029</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.027</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.047 (Poor), N = 2135</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped by region</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">reliability</span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.037 (Poor), N = 422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.050 (Poor), N = 1713</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">reliability</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.047 (Poor), N = 2135</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.037</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.047</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.048</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   N of Items:                    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  422</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd   n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.618 1.165 422</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.396 1.091 422</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.661 1.009 422</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000      -0.017         0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                -0.017       1.000         0.060</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.001       0.060         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.06             2.339      -0.012</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.28             2.378       0.026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.01             2.503       0.042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.112</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         -0.035</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N of Items:                    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  1713</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  2135</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd    n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.622 1.161 1713</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.438 1.172 1713</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.615 1.040 1713</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.621 1.162 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.430 1.156 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.624 1.034 2135</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.021         0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.021       1.000         0.005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.025       0.005         1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.014         0.020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.014       1.000         0.015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.020       0.015         1.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.05             2.467       0.032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.24             2.491       0.019</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.06             2.779       0.021</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.05             2.440       0.024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.25             2.467       0.020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.05             2.723       0.025</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.010</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.049</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.041</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.040</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.027</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, inter_item_correlations <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide correlations</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha:              0.047</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Alpha (standardized):          0.048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   N of Items:                    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd    n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.621 1.162 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.430 1.156 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.624 1.034 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.05             2.440       0.024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.25             2.467       0.020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.05             2.723       0.025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.040</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.027</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

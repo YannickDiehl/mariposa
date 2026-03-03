@@ -50,7 +50,9 @@ Test results showing whether the variables are related, including:
 
 - Observed vs expected frequencies
 
-- Effect sizes to measure relationship strength
+- Effect sizes to measure relationship strength Use
+  [`summary()`](https://rdrr.io/r/base/summary.html) for the full
+  SPSS-style output with toggleable sections.
 
 ## Details
 
@@ -136,6 +138,9 @@ for detailed cross-tabulation tables.
 [`frequency`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
 for single-variable frequency tables.
 
+[`summary.chi_square`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.chi_square.md)
+for detailed output with toggleable sections.
+
 Other hypothesis_tests:
 [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md),
 [`binomial_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/binomial_test.md),
@@ -159,175 +164,103 @@ data(survey_data)
 
 # Basic chi-squared test for independence
 survey_data %>% chi_square(gender, region)
-#> 
-#> Chi-Squared Test of Independence 
-#> ---------------------------------
-#> 
-#> - Variables: gender × region
-#> 
-#> Observed Frequencies:
-#>         region
-#> gender   East West
-#>   Male    238  956
-#>   Female  247 1059
-#> 
-#> Expected Frequencies:
-#>         region
-#> gender      East     West
-#>   Male   231.636  962.364
-#>   Female 253.364 1052.636
-#> 
-#> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>        0.415  1   0.519    
-#> -------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure Value p_value sig Interpretation
-#>  Cramer's V 0.013   0.519            Neglig.
-#>         Phi 0.013   0.519            Neglig.
-#>       Gamma 0.033   0.659               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 2×2 | N = 2500
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Squared Test: gender × region
+#>   chi2(1) = 0.415, p = 0.519 , V = 0.013 (neglig.), N = 2500
 
 # With weights
 survey_data %>% chi_square(gender, education, weights = sampling_weight)
-#> 
-#> Weighted Chi-Squared Test of Independence 
-#> ------------------------------------------
-#> 
-#> - Variables: gender × education
-#> - Weights variable: sampling_weight
-#> 
-#> Observed Frequencies:
-#>         education
-#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
-#>   Male               402                  291                326        176
-#>   Female             447                  350                316        209
-#> 
-#> Expected Frequencies:
-#>         education
-#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
-#>   Male           403.081              304.329            304.803    182.787
-#>   Female         445.919              336.671            337.197    202.213
-#> 
-#> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>        4.403  3   0.221    
-#> -------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure  Value p_value sig Interpretation
-#>  Cramer's V  0.042   0.221            Neglig.
-#>       Gamma -0.011   0.795               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 2×4 | N = 2517
-#> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Squared Test: gender × education [Weighted]
+#>   chi2(3) = 4.403, p = 0.221 , V = 0.042 (neglig.), N = 2517
 
 # Grouped analysis
 survey_data %>% 
   group_by(region) %>% 
   chi_square(gender, employment)
-#> 
-#> Chi-Squared Test of Independence 
-#> ---------------------------------
-#> 
-#> Variables tested: gender × employment 
-#> Grouped by: region 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> Observed Frequencies:
-#>         employment
-#> gender   Student Employed Unemployed Retired Other
-#>   Male         7      145         16      55    15
-#>   Female       4      166         15      56     6
-#> 
-#> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>         5.97  4   0.201    
-#> -------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure  Value p_value sig Interpretation
-#>  Cramer's V  0.111   0.201              Small
-#>       Gamma -0.093   0.468               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 2×5 | N = 485
-#> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> Observed Frequencies:
-#>         employment
-#> gender   Student Employed Unemployed Retired Other
-#>   Male        29      605         68     201    53
-#>   Female      38      684         83     213    41
-#> 
-#> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>        4.166  4   0.384    
-#> -------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure  Value p_value sig Interpretation
-#>  Cramer's V  0.045   0.384            Neglig.
-#>       Gamma -0.053   0.381               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 2×5 | N = 2015
-#> Note: Phi coefficient only shown for 2x2 tables
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> [region = 1]
+#> Chi-Squared Test: gender × employment
+#>   chi2(4) = 5.970, p = 0.201 , V = 0.111 (small), N = 485
+#> [region = 2]
+#> Chi-Squared Test: gender × employment
+#>   chi2(4) = 4.166, p = 0.384 , V = 0.045 (neglig.), N = 2015
 
 # With continuity correction
 survey_data %>% chi_square(gender, region, correct = TRUE)
+#> Chi-Squared Test: gender × region
+#>   chi2(1) = 0.353, p = 0.553 , V = 0.012 (neglig.), N = 2500
+
+# --- Three-layer output ---
+result <- chi_square(survey_data, gender, education)
+result              # compact one-line overview
+#> Chi-Squared Test: gender × education
+#>   chi2(3) = 3.470, p = 0.325 , V = 0.037 (neglig.), N = 2500
+summary(result)     # full detailed output with all sections
 #> 
 #> Chi-Squared Test of Independence 
 #> ---------------------------------
 #> 
-#> - Variables: gender × region
-#> - Continuity correction: Yates' correction applied
+#> - Variables: gender × education
 #> 
 #> Observed Frequencies:
-#>         region
-#> gender   East West
-#>   Male    238  956
-#>   Female  247 1059
+#>         education
+#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Male               401                  289                320        184
+#>   Female             440                  340                311        215
 #> 
 #> Expected Frequencies:
-#>         region
-#> gender      East     West
-#>   Male   231.636  962.364
-#>   Female 253.364 1052.636
+#>         education
+#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Male           401.662               300.41            301.366    190.562
+#>   Female         439.338               328.59            329.634    208.438
 #> 
 #> Chi-Squared Test Results:
 #> -------------------------------------------------- 
 #>  Chi_squared df p_value sig
-#>        0.353  1   0.553    
+#>         3.47  3   0.325    
 #> -------------------------------------------------- 
 #> 
 #> Effect Sizes:
 #> ---------------------------------------------------------------------- 
-#>     Measure Value p_value sig Interpretation
-#>  Cramer's V 0.012   0.553            Neglig.
-#>         Phi 0.012   0.553            Neglig.
-#>       Gamma 0.033   0.659               Weak
+#>     Measure  Value p_value sig Interpretation
+#>  Cramer's V  0.037   0.325            Neglig.
+#>       Gamma -0.008   0.850               Weak
 #> ---------------------------------------------------------------------- 
-#> Table size: 2×2 | N = 2500
+#> Table size: 2×4 | N = 2500
+#> Note: Phi coefficient only shown for 2x2 tables
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+summary(result, cross_tabulation = FALSE)  # hide cross-tabulation
+#> 
+#> Chi-Squared Test of Independence 
+#> ---------------------------------
+#> 
+#> - Variables: gender × education
+#> 
+#> Observed Frequencies:
+#>         education
+#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Male               401                  289                320        184
+#>   Female             440                  340                311        215
+#> 
+#> Expected Frequencies:
+#>         education
+#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
+#>   Male           401.662               300.41            301.366    190.562
+#>   Female         439.338               328.59            329.634    208.438
+#> 
+#> Chi-Squared Test Results:
+#> -------------------------------------------------- 
+#>  Chi_squared df p_value sig
+#>         3.47  3   0.325    
+#> -------------------------------------------------- 
+#> 
+#> Effect Sizes:
+#> ---------------------------------------------------------------------- 
+#>     Measure  Value p_value sig Interpretation
+#>  Cramer's V  0.037   0.325            Neglig.
+#>       Gamma -0.008   0.850               Weak
+#> ---------------------------------------------------------------------- 
+#> Table size: 2×4 | N = 2500
+#> Note: Phi coefficient only shown for 2x2 tables
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

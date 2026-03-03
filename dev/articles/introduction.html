@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -198,44 +198,8 @@ percentage they represent, and cumulative percentages.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted t-Test Results</span></span>
-<span><span class="co">#&gt; -----------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Grouping variable: gender</span></span>
-<span><span class="co">#&gt; - Groups compared: Male vs. Female</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
-<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Male: mean = 3.598, n = 1149.0</span></span>
-<span><span class="co">#&gt;   Female: mean = 3.648, n = 1287.0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted t-test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    </span></span>
-<span><span class="co">#&gt;  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    </span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;           Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
-<span><span class="co">#&gt;  life_satisfaction   -0.043   -0.043      -0.043  negligible</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation:</span></span>
-<span><span class="co">#&gt; - Cohen's d: pooled standard deviation (classic)</span></span>
-<span><span class="co">#&gt; - Hedges' g: bias-corrected Cohen's d (preferred)</span></span>
-<span><span class="co">#&gt; - Glass' Delta: control group standard deviation only</span></span>
-<span><span class="co">#&gt; - Small effect: |effect| ~ 0.2</span></span>
-<span><span class="co">#&gt; - Medium effect: |effect| ~ 0.5</span></span>
-<span><span class="co">#&gt; - Large effect: |effect| ~ 0.8</span></span></code></pre></div>
+<span><span class="co">#&gt; t-Test: life_satisfaction by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span></span></code></pre></div>
 <p>If the p-value is below 0.05, the difference is statistically
 significant. But always check the effect size too — a significant result
 with a tiny effect might not be practically meaningful.</p>
@@ -248,54 +212,8 @@ with a tiny effect might not be practically meaningful.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted One-Way ANOVA Results</span></span>
-<span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt;   Null hypothesis: All group means are equal</span></span>
-<span><span class="co">#&gt;   Alternative hypothesis: At least one group mean differs</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics by Group:</span></span>
-<span><span class="co">#&gt;   Basic Secondary: mean = 3.208, sd = 1.243, n = 815.7</span></span>
-<span><span class="co">#&gt;   Intermediate Secondary: mean = 3.698, sd = 1.109, n = 629.6</span></span>
-<span><span class="co">#&gt;   Academic Secondary: mean = 3.851, sd = 0.996, n = 618.2</span></span>
-<span><span class="co">#&gt;   University: mean = 4.040, sd = 0.961, n = 373.2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted ANOVA Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;          Source Sum_Squares   df Mean_Square      F p_value sig</span></span>
-<span><span class="co">#&gt;  Between Groups     241.130    3      80.377 65.359   &lt;.001   1</span></span>
-<span><span class="co">#&gt;   Within Groups    2992.019 2433        1.23                   </span></span>
-<span><span class="co">#&gt;           Total    3233.149 2436                               </span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Assumption Tests:</span></span>
-<span><span class="co">#&gt; ---------------- </span></span>
-<span><span class="co">#&gt;  Assumption Statistic df1  df2 p_value sig</span></span>
-<span><span class="co">#&gt;       Welch    62.636   3 1216   &lt;.001 ***</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span></span>
-<span><span class="co">#&gt;  life_satisfaction       0.075           0.073         0.073      medium</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation:</span></span>
-<span><span class="co">#&gt; - Eta-squared: Proportion of variance explained (biased upward)</span></span>
-<span><span class="co">#&gt; - Epsilon-squared: Less biased than eta-squared</span></span>
-<span><span class="co">#&gt; - Omega-squared: Unbiased estimate (preferred for publication)</span></span>
-<span><span class="co">#&gt; - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Post-hoc tests: Use tukey_test() for pairwise comparisons</span></span></code></pre></div>
+<span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
+<span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -309,32 +227,8 @@ association:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; -----------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Missing data handling: pairwise deletion</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- age × income ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Correlation: r = -0.005</span></span>
-<span><span class="co">#&gt;   Effect size: r²: 0.000</span></span>
-<span><span class="co">#&gt;   Sample size: n = 2201</span></span>
-<span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
-<span><span class="co">#&gt;   p-value: 0.8276</span></span>
-<span><span class="co">#&gt;   Significance: ns</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Correlation Strength Interpretation:</span></span>
-<span><span class="co">#&gt;   |r| &lt; 0.30:        Weak correlation</span></span>
-<span><span class="co">#&gt;   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span></span>
-<span><span class="co">#&gt;   |r| ≥ 0.70:        Strong correlation</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; r² represents the proportion of variance explained</span></span></code></pre></div>
+<span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
+<span><span class="co">#&gt;   r = -0.005, p = 0.828 , N = 2201</span></span></code></pre></div>
 <ul>
 <li>
 <strong>r &gt; 0</strong>: As one variable increases, the other
@@ -422,80 +316,12 @@ subgroups:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>         group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted t-Test Results</span></span>
-<span><span class="co">#&gt; -----------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Grouping variable: gender</span></span>
-<span><span class="co">#&gt; - Groups compared: Male vs. Female</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
-<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- trust_government ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Male: mean = 2.603, n = 1124.0</span></span>
-<span><span class="co">#&gt;   Female: mean = 2.636, n = 1247.0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted t-test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -0.683 2369.000   0.495    -0.033 [-0.127, 0.061]    </span></span>
-<span><span class="co">#&gt;  Unequal variances -0.682 2322.704   0.495    -0.033 [-0.127, 0.061]    </span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;          Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
-<span><span class="co">#&gt;  trust_government   -0.028   -0.028      -0.028  negligible</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- trust_media ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Male: mean = 2.400, n = 1128.0</span></span>
-<span><span class="co">#&gt;   Female: mean = 2.505, n = 1254.0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted t-test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff         conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -2.197 2380.000   0.028    -0.105 [-0.199, -0.011]   *</span></span>
-<span><span class="co">#&gt;  Unequal variances -2.196 2350.189   0.028    -0.105 [-0.199, -0.011]   *</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;     Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
-<span><span class="co">#&gt;  trust_media    -0.09    -0.09       -0.09  negligible</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- trust_science ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Male: mean = 3.610, n = 1143.0</span></span>
-<span><span class="co">#&gt;   Female: mean = 3.669, n = 1271.0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted t-test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;         Assumption t_stat      df p_value mean_diff        conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -1.424 2412.00   0.155     -0.06 [-0.142, 0.022]    </span></span>
-<span><span class="co">#&gt;  Unequal variances -1.421 2360.95   0.156     -0.06 [-0.142, 0.023]    </span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;       Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
-<span><span class="co">#&gt;  trust_science   -0.058   -0.058      -0.057  negligible</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation:</span></span>
-<span><span class="co">#&gt; - Cohen's d: pooled standard deviation (classic)</span></span>
-<span><span class="co">#&gt; - Hedges' g: bias-corrected Cohen's d (preferred)</span></span>
-<span><span class="co">#&gt; - Glass' Delta: control group standard deviation only</span></span>
-<span><span class="co">#&gt; - Small effect: |effect| ~ 0.2</span></span>
-<span><span class="co">#&gt; - Medium effect: |effect| ~ 0.5</span></span>
-<span><span class="co">#&gt; - Large effect: |effect| ~ 0.8</span></span></code></pre></div>
+<span><span class="co">#&gt; t-Test: trust_government by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371</span></span>
+<span><span class="co">#&gt; t-Test: trust_media by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382</span></span>
+<span><span class="co">#&gt; t-Test: trust_science by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -573,8 +399,10 @@ misleading.</p>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="va">result</span>                                  <span class="co"># compact overview</span></span>
+<span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
+<span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, descriptives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>   <span class="co"># detailed output, skip descriptives</span></span>
 <span><span class="co">#&gt; Weighted One-Way ANOVA Results</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -588,11 +416,6 @@ misleading.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics by Group:</span></span>
-<span><span class="co">#&gt;   Basic Secondary: mean = 3.208, sd = 1.243, n = 815.7</span></span>
-<span><span class="co">#&gt;   Intermediate Secondary: mean = 3.698, sd = 1.109, n = 629.6</span></span>
-<span><span class="co">#&gt;   Academic Secondary: mean = 3.851, sd = 0.996, n = 618.2</span></span>
-<span><span class="co">#&gt;   University: mean = 4.040, sd = 0.961, n = 373.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted ANOVA Results:</span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>

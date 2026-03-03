@@ -112,44 +112,8 @@ Want to know if men and women differ in life satisfaction? Use
 ``` r
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
-#> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#>   Male: mean = 3.598, n = 1149.0
-#>   Female: mean = 3.648, n = 1287.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction   -0.043   -0.043      -0.043  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Cohen's d: pooled standard deviation (classic)
-#> - Hedges' g: bias-corrected Cohen's d (preferred)
-#> - Glass' Delta: control group standard deviation only
-#> - Small effect: |effect| ~ 0.2
-#> - Medium effect: |effect| ~ 0.5
-#> - Large effect: |effect| ~ 0.8
+#> t-Test: life_satisfaction by gender [Weighted]
+#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 ```
 
 If the p-value is below 0.05, the difference is statistically
@@ -164,54 +128,8 @@ When comparing more than two groups, use
 ``` r
 survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
-#> 
-#> Weighted One-Way ANOVA Results
-#> ------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal
-#>   Alternative hypothesis: At least one group mean differs
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.208, sd = 1.243, n = 815.7
-#>   Intermediate Secondary: mean = 3.698, sd = 1.109, n = 629.6
-#>   Academic Secondary: mean = 3.851, sd = 0.996, n = 618.2
-#>   University: mean = 4.040, sd = 0.961, n = 373.2
-#> 
-#> Weighted ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001   1
-#>   Within Groups    2992.019 2433        1.23                   
-#>           Total    3233.149 2436                               
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    62.636   3 1216   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.075           0.073         0.073      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+#> One-Way ANOVA: life_satisfaction by education [Weighted]
+#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
 ## Finding Relationships
@@ -223,32 +141,8 @@ Are age and income related? Pearson’s *r* measures linear association:
 ``` r
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> --- age × income ---
-#> 
-#>   Correlation: r = -0.005
-#>   Effect size: r²: 0.000
-#>   Sample size: n = 2201
-#>   95% CI: [-0.046, 0.037]
-#>   p-value: 0.8276
-#>   Significance: ns
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Correlation Strength Interpretation:
-#>   |r| < 0.30:        Weak correlation
-#>   0.30 ≤ |r| < 0.70: Moderate correlation
-#>   |r| ≥ 0.70:        Strong correlation
-#> 
-#> r² represents the proportion of variance explained
+#> Pearson Correlation: age x income [Weighted]
+#>   r = -0.005, p = 0.828 , N = 2201
 ```
 
 - **r \> 0**: As one variable increases, the other tends to increase
@@ -331,80 +225,12 @@ Test several variables simultaneously:
 survey_data %>%
   t_test(trust_government, trust_media, trust_science,
          group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
-#> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
-#> 
-#> 
-#> --- trust_government ---
-#> 
-#>   Male: mean = 2.603, n = 1124.0
-#>   Female: mean = 2.636, n = 1247.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -0.683 2369.000   0.495    -0.033 [-0.127, 0.061]    
-#>  Unequal variances -0.682 2322.704   0.495    -0.033 [-0.127, 0.061]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>          Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  trust_government   -0.028   -0.028      -0.028  negligible
-#> 
-#> 
-#> --- trust_media ---
-#> 
-#>   Male: mean = 2.400, n = 1128.0
-#>   Female: mean = 2.505, n = 1254.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff         conf_int sig
-#>    Equal variances -2.197 2380.000   0.028    -0.105 [-0.199, -0.011]   *
-#>  Unequal variances -2.196 2350.189   0.028    -0.105 [-0.199, -0.011]   *
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>     Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  trust_media    -0.09    -0.09       -0.09  negligible
-#> 
-#> 
-#> --- trust_science ---
-#> 
-#>   Male: mean = 3.610, n = 1143.0
-#>   Female: mean = 3.669, n = 1271.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat      df p_value mean_diff        conf_int sig
-#>    Equal variances -1.424 2412.00   0.155     -0.06 [-0.142, 0.022]    
-#>  Unequal variances -1.421 2360.95   0.156     -0.06 [-0.142, 0.023]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>       Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  trust_science   -0.058   -0.058      -0.057  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Cohen's d: pooled standard deviation (classic)
-#> - Hedges' g: bias-corrected Cohen's d (preferred)
-#> - Glass' Delta: control group standard deviation only
-#> - Small effect: |effect| ~ 0.2
-#> - Medium effect: |effect| ~ 0.5
-#> - Large effect: |effect| ~ 0.8
+#> t-Test: trust_government by gender [Weighted]
+#>   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371
+#> t-Test: trust_media by gender [Weighted]
+#>   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
+#> t-Test: trust_science by gender [Weighted]
+#>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414
 ```
 
 ## Why Weights Matter
@@ -484,8 +310,10 @@ survey_data %>%
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
-print(result)
-#> 
+result                                  # compact overview
+#> One-Way ANOVA: life_satisfaction by education [Weighted]
+#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+summary(result, descriptives = FALSE)   # detailed output, skip descriptives
 #> Weighted One-Way ANOVA Results
 #> ------------------------------
 #> 
@@ -499,11 +327,6 @@ print(result)
 #> 
 #> --- life_satisfaction ---
 #> 
-#> Weighted Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.208, sd = 1.243, n = 815.7
-#>   Intermediate Secondary: mean = 3.698, sd = 1.109, n = 629.6
-#>   Academic Secondary: mean = 3.851, sd = 0.996, n = 618.2
-#>   University: mean = 4.040, sd = 0.961, n = 373.2
 #> 
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 

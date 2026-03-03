@@ -122,6 +122,9 @@ An object of class `"linear_regression"` containing:
 
   Name of the weight variable (or NULL)
 
+Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
+SPSS-style output with toggleable sections.
+
 ## Details
 
 ### Understanding the Results
@@ -199,6 +202,9 @@ for checking variable distributions before regression.
 [`pearson_cor`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md)
 for checking bivariate correlations.
 
+[`summary.linear_regression`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.linear_regression.md)
+for detailed output with toggleable sections.
+
 Other regression:
 [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/logistic_regression.md)
 
@@ -210,224 +216,106 @@ data(survey_data)
 
 # Bivariate regression
 linear_regression(survey_data, life_satisfaction ~ age)
-#> 
-#> Linear Regression Results
-#> -------------------------
-#> - Formula: life_satisfaction ~ age
-#> - Method: ENTER (all predictors)
-#> - N: 2421
-#> 
-#>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.029
-#>   R Square                       0.001
-#>   Adjusted R Square              0.000
-#>   Std. Error of Estimate         1.153
-#>   ------------------------------------------------------------
-#> 
-#>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression                2.653     1            2.653      1.996    0.158 
-#>   Residual               3214.775  2419            1.329                     
-#>   Total                  3217.428  2420                                      
-#>   ------------------------------------------------------------------------------
-#> 
-#>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    3.727      0.074              50.663    0.000 ***
-#>   age                           -0.002      0.001   -0.029     -1.413    0.158 
-#>   ----------------------------------------------------------------------------------------
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Linear Regression: life_satisfaction ~ age
+#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421
 
 # Multiple regression
 linear_regression(survey_data, income ~ age + education + life_satisfaction)
-#> 
-#> Linear Regression Results
-#> -------------------------
-#> - Formula: income ~ age + education + life_satisfaction
-#> - Method: ENTER (all predictors)
-#> - N: 2115
-#> 
-#>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.686
-#>   R Square                       0.471
-#>   Adjusted R Square              0.470
-#>   Std. Error of Estimate      1041.889
-#>   ------------------------------------------------------------
-#> 
-#>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression       2036941094.578     3    678980364.859    625.481    0.000 ***
-#>   Residual         2291561553.177  2111      1085533.659                     
-#>   Total            4328502647.754  2114                                      
-#>   ------------------------------------------------------------------------------
-#> 
-#>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                  800.493    105.893               7.559    0.000 ***
-#>   age                           -0.194      1.333   -0.002     -0.145    0.885 
-#>   education                    711.841     21.706    0.539     32.794    0.000 ***
-#>   life_satisfaction            377.527     20.505    0.303     18.412    0.000 ***
-#>   ----------------------------------------------------------------------------------------
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Linear Regression: income ~ age + education + life_satisfaction
+#>   R2 = 0.471, adj.R2 = 0.470, F(3, 2111) = 625.48, p < 0.001 ***, N = 2115
 
 # SPSS-style interface
 linear_regression(survey_data,
                   dependent = life_satisfaction,
                   predictors = c(trust_government, trust_media, trust_science))
-#> 
-#> Linear Regression Results
-#> -------------------------
-#> - Formula: life_satisfaction ~ trust_government + trust_media + trust_science
-#> - Method: ENTER (all predictors)
-#> - N: 2066
-#> 
-#>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.041
-#>   R Square                       0.002
-#>   Adjusted R Square              0.000
-#>   Std. Error of Estimate         1.144
-#>   ------------------------------------------------------------
-#> 
-#>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression                4.570     3            1.523      1.164    0.322 
-#>   Residual               2699.432  2062            1.309                     
-#>   Total                  2704.002  2065                                      
-#>   ------------------------------------------------------------------------------
-#> 
-#>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    3.675      0.118              31.054    0.000 ***
-#>   trust_government              -0.008      0.022   -0.008     -0.361    0.718 
-#>   trust_media                    0.035      0.022    0.035      1.598    0.110 
-#>   trust_science                 -0.023      0.024   -0.021     -0.932    0.351 
-#>   ----------------------------------------------------------------------------------------
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Linear Regression: life_satisfaction ~ trust_government + trust_media + trust_science
+#>   R2 = 0.002, adj.R2 = 0.000, F(3, 2062) = 1.16, p = 0.322 , N = 2066
 
 # Weighted regression
 linear_regression(survey_data, life_satisfaction ~ age, weights = sampling_weight)
-#> 
-#> Weighted Linear Regression Results
-#> ----------------------------------
-#> - Formula: life_satisfaction ~ age
-#> - Method: ENTER (all predictors)
-#> - N: 2437
-#> - Weights: sampling_weight
-#> 
-#>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.029
-#>   R Square                       0.001
-#>   Adjusted R Square              0.000
-#>   Std. Error of Estimate         1.152
-#>   ------------------------------------------------------------
-#> 
-#>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression                2.757     1            2.757      2.078    0.150 
-#>   Residual               3230.392  2435            1.327                     
-#>   Total                  3233.149  2436                                      
-#>   ------------------------------------------------------------------------------
-#> 
-#>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    3.724      0.073              51.156    0.000 ***
-#>   age                           -0.002      0.001   -0.029     -1.441    0.150 
-#>   ----------------------------------------------------------------------------------------
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Linear Regression: life_satisfaction ~ age [Weighted]
+#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2435) = 2.08, p = 0.150 , N = 2437
 
 # Grouped by region
 survey_data |>
   dplyr::group_by(region) |>
   linear_regression(life_satisfaction ~ age)
+#> Linear Regression: life_satisfaction ~ age [Grouped: region]
+#>   region = East: R2 = 0.002, adj.R2 = -0.000, F(1, 463) = 0.88, p = 0.350 , N = 465
+#>   region = West: R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274 , N = 1956
+
+# --- Three-layer output ---
+result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+result              # compact one-line overview
+#> Linear Regression: life_satisfaction ~ age + income
+#>   R2 = 0.201, adj.R2 = 0.200, F(2, 2112) = 265.60, p < 0.001 ***, N = 2115
+summary(result)     # full detailed SPSS-style output
 #> 
 #> Linear Regression Results
 #> -------------------------
-#> - Formula: life_satisfaction ~ age
+#> - Formula: life_satisfaction ~ age + income
 #> - Method: ENTER (all predictors)
-#> - Grouped by: region
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#>   N: 465
+#> - N: 2115
 #> 
 #>   Model Summary
 #>   ------------------------------------------------------------
-#>   R                              0.043
-#>   R Square                       0.002
-#>   Adjusted R Square             -0.000
-#>   Std. Error of Estimate         1.207
+#>   R                              0.448
+#>   R Square                       0.201
+#>   Adjusted R Square              0.200
+#>   Std. Error of Estimate         1.026
 #>   ------------------------------------------------------------
 #> 
 #>   ANOVA
 #>   ------------------------------------------------------------------------------
 #>   Source           Sum of Squares    df      Mean Square          F     Sig.
 #>   ------------------------------------------------------------------------------
-#>   Regression                1.276     1            1.276      0.876    0.350 
-#>   Residual                674.350   463            1.456                     
-#>   Total                   675.626   464                                      
+#>   Regression              559.609     2          279.804    265.598    0.000 ***
+#>   Residual               2224.965  2112            1.053                     
+#>   Total                  2784.574  2114                                      
 #>   ------------------------------------------------------------------------------
 #> 
 #>   Coefficients
 #>   ----------------------------------------------------------------------------------------
 #>   Term                               B  Std.Error     Beta          t     Sig. 
 #>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    3.775      0.176              21.467    0.000 ***
-#>   age                           -0.003      0.003   -0.043     -0.936    0.350 
+#>   (Intercept)                    2.321      0.092              25.237    0.000 ***
+#>   age                           -0.001      0.001   -0.010     -0.508    0.611 
+#>   income                         0.000      0.000    0.448     23.037    0.000 ***
 #>   ----------------------------------------------------------------------------------------
 #> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+summary(result, collinearity = FALSE)  # hide VIF/Tolerance
 #> 
-#> Group: region = West
-#> --------------------
-#>   N: 1956
+#> Linear Regression Results
+#> -------------------------
+#> - Formula: life_satisfaction ~ age + income
+#> - Method: ENTER (all predictors)
+#> - N: 2115
 #> 
 #>   Model Summary
 #>   ------------------------------------------------------------
-#>   R                              0.025
-#>   R Square                       0.001
-#>   Adjusted R Square              0.000
-#>   Std. Error of Estimate         1.140
+#>   R                              0.448
+#>   R Square                       0.201
+#>   Adjusted R Square              0.200
+#>   Std. Error of Estimate         1.026
 #>   ------------------------------------------------------------
 #> 
 #>   ANOVA
 #>   ------------------------------------------------------------------------------
 #>   Source           Sum of Squares    df      Mean Square          F     Sig.
 #>   ------------------------------------------------------------------------------
-#>   Regression                1.556     1            1.556      1.197    0.274 
-#>   Residual               2540.200  1954            1.300                     
-#>   Total                  2541.756  1955                                      
+#>   Regression              559.609     2          279.804    265.598    0.000 ***
+#>   Residual               2224.965  2112            1.053                     
+#>   Total                  2784.574  2114                                      
 #>   ------------------------------------------------------------------------------
 #> 
 #>   Coefficients
 #>   ----------------------------------------------------------------------------------------
 #>   Term                               B  Std.Error     Beta          t     Sig. 
 #>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    3.714      0.081              45.860    0.000 ***
-#>   age                           -0.002      0.002   -0.025     -1.094    0.274 
+#>   (Intercept)                    2.321      0.092              25.237    0.000 ***
+#>   age                           -0.001      0.001   -0.010     -0.508    0.611 
+#>   income                         0.000      0.000    0.448     23.037    0.000 ***
 #>   ----------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05

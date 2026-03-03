@@ -165,66 +165,10 @@ survey_data %>% frequency(education, region, weights = sampling_weight)
 survey_data %>%
   group_by(region) %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> Weighted t-Test Results
-#> -----------------------
-#> 
-#> - Grouping variable: gender
-#> - Groups compared: Male vs. Female
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#>   Male: mean = 3.659, n = 239.0
-#>   Female: mean = 3.589, n = 249.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat      df p_value mean_diff        conf_int sig
-#>    Equal variances  0.641 486.000   0.522      0.07 [-0.144, 0.284]    
-#>  Unequal variances  0.641 484.867   0.522      0.07 [-0.144, 0.284]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction    0.058    0.058       0.058  negligible
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#>   Male: mean = 3.583, n = 911.0
-#>   Female: mean = 3.663, n = 1038.0
-#> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat      df p_value mean_diff        conf_int sig
-#>    Equal variances -1.551 1947.00   0.121     -0.08 [-0.182, 0.021]    
-#>  Unequal variances -1.548 1901.97   0.122     -0.08 [-0.182, 0.021]    
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction    -0.07    -0.07       -0.07  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Cohen's d: pooled standard deviation (classic)
-#> - Hedges' g: bias-corrected Cohen's d (preferred)
-#> - Glass' Delta: control group standard deviation only
-#> - Small effect: |effect| ~ 0.2
-#> - Medium effect: |effect| ~ 0.5
-#> - Large effect: |effect| ~ 0.8
+#> [region = 1]
+#> t-Test: life_satisfaction by gender [Weighted]
+#>   t(484.9) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488
+#> [region = 2]
+#> t-Test: life_satisfaction by gender [Weighted]
+#>   t(1902.0) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949
 ```

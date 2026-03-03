@@ -23,7 +23,7 @@ Significance: Whether the relationship is real or could be due to chance
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,7 +126,8 @@ correlation or more for a correlation matrix.</p></dd>
     <p>Correlation results showing relationships between variables, including:</p><ul><li><p>Correlation coefficient (r): Strength and direction of relationship</p></li>
 <li><p>P-value: Whether the relationship is statistically significant</p></li>
 <li><p>Confidence interval: Range of plausible correlation values</p></li>
-<li><p>Sample size: Number of observations used</p></li>
+<li><p>Sample size: Number of observations used
+Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -193,6 +194,7 @@ correlation coefficient in samples from an indefinitely large population.
 <p><code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">cor.test</a></code> for correlation significance testing.</p>
 <p><code><a href="spearman_rho.html">spearman_rho</a></code> for rank-based correlation (robust to outliers).</p>
 <p><code><a href="kendall_tau.html">kendall_tau</a></code> for ordinal correlation.</p>
+<p><code><a href="summary.pearson_cor.html">summary.pearson_cor</a></code> for detailed output with toggleable sections.</p>
 <p>Other correlation:
 <code><a href="kendall_tau.html">kendall_tau()</a></code>,
 <code><a href="spearman_rho.html">spearman_rho()</a></code></p></div>
@@ -207,444 +209,108 @@ correlation coefficient in samples from an indefinitely large population.
 <span class="r-in"><span><span class="co"># Basic correlation between two variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Correlation: r = -0.007</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Effect size: r²: 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   95% CI: [-0.048, 0.035]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value: 0.7608</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: age x income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r = -0.007, p = 0.761 , N = 2186</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Correlation matrix for multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                 1.000  -0.007            -0.029</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             -0.007   1.000             0.448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  -0.029   0.448             1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                0.0000  0.7608            0.1578</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             0.7608  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  0.1578  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     age income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                2500   2186              2421</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             2186   2186              2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  2421   2115              2421</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               Variable_Pair      r r_squared p_value           CI_95    n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                age × income -0.007     0.000  0.7608 [-0.048, 0.035] 2186    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.029     0.001  0.1578 [-0.068, 0.011] 2421    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.448     0.201  0.0000  [0.413, 0.482] 2115 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: 3 variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  r = -0.007, p = 0.761  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       r = -0.029, p = 0.158  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    r = 0.448, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1/3 pairs significant (p &lt; .05), N = 2186</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted correlations</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Correlation: r = -0.005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Effect size: r²: 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   95% CI: [-0.046, 0.037]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value: 0.8276</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: age x income [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r = -0.005, p = 0.828 , N = 2201</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped correlations</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                 1.000   0.039            -0.043</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income              0.039   1.000             0.448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  -0.043   0.448             1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                0.0000  0.4154            0.3498</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             0.4154  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  0.3498  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    age income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                485    429               465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             429    429               410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  465    410               465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               Variable_Pair      r r_squared p_value           CI_95   n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                age × income  0.039     0.002  0.4154 [-0.055, 0.134] 429    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.043     0.002  0.3498 [-0.134, 0.048] 465    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.448     0.201  0.0000  [0.367, 0.522] 410 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                 1.000  -0.018            -0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             -0.018   1.000             0.449</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  -0.025   0.449             1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                0.0000  0.4615            0.2741</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             0.4615  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  0.2741  0.0000            0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     age income life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                2015   1757              1956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income             1757   1757              1705</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  1956   1705              1956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               Variable_Pair      r r_squared p_value           CI_95    n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                age × income -0.018     0.000  0.4615 [-0.064, 0.029] 1757    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.025     0.001  0.2741 [-0.069, 0.020] 1956    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.449     0.201  0.0000  [0.410, 0.486] 1705 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: 3 variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  r = 0.039, p = 0.415  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       r = -0.043, p = 0.350  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    r = 0.448, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1/3 pairs significant (p &lt; .05), N = 429</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: 3 variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  r = -0.018, p = 0.462  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       r = -0.025, p = 0.274  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    r = 0.449, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1/3 pairs significant (p &lt; .05), N = 1757</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                           id    age income political_orientation environmental_concern</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                      1.00   0.01   0.03                 -0.02                 -0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                     0.01   1.00   0.00                 -0.03                  0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                  0.03   0.00   1.00                 -0.03                  0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation  -0.02  -0.03  -0.03                  1.00                 -0.58</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern  -0.01   0.02   0.01                 -0.58                  1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction       0.01  -0.03   0.45                  0.00                  0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government        0.02   0.01   0.00                 -0.06                  0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media            -0.01   0.00  -0.01                  0.00                  0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science           0.02   0.00  -0.02                  0.04                 -0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight        -0.02  -0.01  -0.04                  0.01                  0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction trust_government trust_media trust_science sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                                 0.01             0.02       -0.01          0.02           -0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                               -0.03             0.01        0.00          0.00           -0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                             0.45             0.00       -0.01         -0.02           -0.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation              0.00            -0.06        0.00          0.04            0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern              0.00             0.06        0.00         -0.01            0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                  1.00             0.01        0.02         -0.02           -0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government                   0.01             1.00        0.01          0.03           -0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                        0.02             0.01        1.00          0.02            0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science                     -0.02             0.03        0.02          1.00            0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight                   -0.02            -0.01        0.02          0.00            1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Significance Matrix (p-values):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                            id     age  income political_orientation environmental_concern</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                     0.0000  0.6478  0.2058                0.2714                0.7634</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                    0.6478  0.0000  0.8276                0.1678                0.2435</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                 0.2058  0.8276  0.0000                0.1255                0.5026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation  0.2714  0.1678  0.1255                0.0000                0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern  0.7634  0.2435  0.5026                0.0000                0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction      0.5871  0.1496  0.0000                0.8361                0.8658</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government       0.3105  0.8037  0.9755                0.0076                0.0021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media            0.7139  0.8202  0.6292                0.8354                0.9074</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science          0.4392  0.9021  0.2698                0.0586                0.5073</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight        0.4360  0.6454  0.0582                0.5897                0.3279</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       life_satisfaction trust_government trust_media trust_science sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                               0.5871           0.3105      0.7139        0.4392          0.4360</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                              0.1496           0.8037      0.8202        0.9021          0.6454</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                           0.0000           0.9755      0.6292        0.2698          0.0582</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation            0.8361           0.0076      0.8354        0.0586          0.5897</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern            0.8658           0.0021      0.9074        0.5073          0.3279</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                0.0000           0.6045      0.3299        0.3708          0.3592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government                 0.6045           0.0000      0.5823        0.1452          0.6789</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                      0.3299           0.5823      0.0000        0.2586          0.2814</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science                    0.3708           0.1452      0.2586        0.0000          0.9607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight                  0.3592           0.6789      0.2814        0.9607          0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          id   age income political_orientation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                     2516  2516   2201                  2312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                    2516  2516   2201                  2312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                 2201  2201   2201                  2020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation  2312  2312   2020                  2312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern  2416  2416   2112                  2221</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction      2437  2437   2130                  2241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government       2371  2371   2076                  2182</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media            2382  2382   2090                  2190</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science          2414  2414   2112                  2215</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight        2516  2516   2201                  2312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       environmental_concern life_satisfaction trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                                     2416              2437             2371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                                    2416              2437             2371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                                 2112              2130             2076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation                  2221              2241             2182</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern                  2416              2340             2276</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction                      2340              2437             2296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government                       2276              2296             2371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                            2288              2305             2242</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science                          2316              2336             2271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight                        2416              2437             2371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       trust_media trust_science sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id                           2382          2414            2516</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age                          2382          2414            2516</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income                       2090          2112            2201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> political_orientation        2190          2215            2312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> environmental_concern        2288          2316            2416</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction            2305          2336            2437</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government             2242          2271            2371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                  2382          2286            2382</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science                2286          2414            2414</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sampling_weight              2382          2414            2516</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                  Variable_Pair      r r_squared p_value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                       id × age  0.009     0.000  0.6478</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                    id × income  0.027     0.001  0.2058</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     id × political_orientation -0.023     0.001  0.2714</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     id × environmental_concern -0.006     0.000  0.7634</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         id × life_satisfaction  0.011     0.000  0.5871</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          id × trust_government  0.021     0.000  0.3105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               id × trust_media -0.008     0.000  0.7139</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                             id × trust_science  0.016     0.000  0.4392</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                           id × sampling_weight -0.016     0.000  0.4360</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   age × income -0.005     0.000  0.8276</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    age × political_orientation -0.029     0.001  0.1678</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    age × environmental_concern  0.024     0.001  0.2435</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        age × life_satisfaction -0.029     0.001  0.1496</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         age × trust_government  0.005     0.000  0.8037</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                              age × trust_media  0.005     0.000  0.8202</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                            age × trust_science  0.003     0.000  0.9021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          age × sampling_weight -0.009     0.000  0.6454</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 income × political_orientation -0.034     0.001  0.1255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 income × environmental_concern  0.015     0.000  0.5026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     income × life_satisfaction  0.450     0.203  0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      income × trust_government -0.001     0.000  0.9755</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                           income × trust_media -0.011     0.000  0.6292</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         income × trust_science -0.024     0.001  0.2698</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       income × sampling_weight -0.040     0.002  0.0582</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  political_orientation × environmental_concern -0.584     0.341  0.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      political_orientation × life_satisfaction -0.004     0.000  0.8361</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       political_orientation × trust_government -0.057     0.003  0.0076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            political_orientation × trust_media  0.004     0.000  0.8354</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          political_orientation × trust_science  0.040     0.002  0.0586</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        political_orientation × sampling_weight  0.011     0.000  0.5897</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      environmental_concern × life_satisfaction -0.003     0.000  0.8658</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       environmental_concern × trust_government  0.064     0.004  0.0021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            environmental_concern × trust_media  0.002     0.000  0.9074</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          environmental_concern × trust_science -0.014     0.000  0.5073</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        environmental_concern × sampling_weight  0.020     0.000  0.3279</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           life_satisfaction × trust_government  0.011     0.000  0.6045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                life_satisfaction × trust_media  0.020     0.000  0.3299</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              life_satisfaction × trust_science -0.019     0.000  0.3708</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            life_satisfaction × sampling_weight -0.019     0.000  0.3592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 trust_government × trust_media  0.012     0.000  0.5823</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               trust_government × trust_science  0.031     0.001  0.1452</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             trust_government × sampling_weight -0.009     0.000  0.6789</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    trust_media × trust_science  0.024     0.001  0.2586</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_media × sampling_weight  0.022     0.000  0.2814</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                trust_science × sampling_weight  0.001     0.000  0.9607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             CI_95    n sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.030, 0.048] 2516    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.015, 0.069] 2201    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.064, 0.018] 2312    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.046, 0.034] 2416    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.029, 0.051] 2437    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.019, 0.061] 2371    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.048, 0.033] 2382    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.024, 0.056] 2414    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.055, 0.024] 2516    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.046, 0.037] 2201    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.069, 0.012] 2312    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.016, 0.064] 2416    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.069, 0.011] 2437    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.035, 0.045] 2371    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.036, 0.045] 2382    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.037, 0.042] 2414    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.048, 0.030] 2516    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.078, 0.010] 2020    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.028, 0.057] 2112    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    [0.416, 0.483] 2130 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.044, 0.042] 2076    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.053, 0.032] 2090    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.067, 0.019] 2112    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.082, 0.001] 2201    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [-0.611, -0.556] 2221 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.046, 0.037] 2241    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [-0.099, -0.015] 2182  **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.037, 0.046] 2190    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.001, 0.082] 2215    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.030, 0.052] 2312    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.044, 0.037] 2340    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    [0.023, 0.105] 2276  **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.039, 0.043] 2288    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.054, 0.027] 2316    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.020, 0.060] 2416    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.030, 0.052] 2296    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.021, 0.061] 2305    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.059, 0.022] 2336    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.058, 0.021] 2437    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.030, 0.053] 2242    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.011, 0.072] 2271    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.049, 0.032] 2371    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.017, 0.065] 2286    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.018, 0.062] 2382    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [-0.039, 0.041] 2414    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: 10 variables [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x age:                      r = 0.009, p = 0.648  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x income:                   r = 0.027, p = 0.206  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x political_orientation:    r = -0.023, p = 0.271  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x environmental_concern:    r = -0.006, p = 0.763  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x life_satisfaction:        r = 0.011, p = 0.587  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x trust_government:         r = 0.021, p = 0.310  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x trust_media:              r = -0.008, p = 0.714  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x trust_science:            r = 0.016, p = 0.439  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id x sampling_weight:          r = -0.016, p = 0.436  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  r = -0.005, p = 0.828  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x political_orientation:   r = -0.029, p = 0.168  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x environmental_concern:   r = 0.024, p = 0.244  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       r = -0.029, p = 0.150  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x trust_government:        r = 0.005, p = 0.804  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x trust_media:             r = 0.005, p = 0.820  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x trust_science:           r = 0.003, p = 0.902  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x sampling_weight:         r = -0.009, p = 0.645  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x political_orientation: r = -0.034, p = 0.125  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x environmental_concern: r = 0.015, p = 0.503  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    r = 0.450, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x trust_government:     r = -0.001, p = 0.975  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x trust_media:          r = -0.011, p = 0.629  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x trust_science:        r = -0.024, p = 0.270  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x sampling_weight:      r = -0.040, p = 0.058  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x environmental_concern: r = -0.584, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x life_satisfaction: r = -0.004, p = 0.836  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x trust_government: r = -0.057, p = 0.008 ** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x trust_media: r = 0.004, p = 0.835  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x trust_science: r = 0.040, p = 0.059  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   political_orientation x sampling_weight: r = 0.011, p = 0.590  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   environmental_concern x life_satisfaction: r = -0.003, p = 0.866  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   environmental_concern x trust_government: r = 0.064, p = 0.002 ** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   environmental_concern x trust_media: r = 0.002, p = 0.907  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   environmental_concern x trust_science: r = -0.014, p = 0.507  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   environmental_concern x sampling_weight: r = 0.020, p = 0.328  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x trust_government: r = 0.011, p = 0.604  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x trust_media: r = 0.020, p = 0.330  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x trust_science: r = -0.019, p = 0.371  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction x sampling_weight: r = -0.019, p = 0.359  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_media: r = 0.012, p = 0.582  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_science: r = 0.031, p = 0.145  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x sampling_weight: r = -0.009, p = 0.679  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media x trust_science:   r = 0.024, p = 0.259  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media x sampling_weight: r = 0.022, p = 0.281  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_science x sampling_weight: r = 0.001, p = 0.961  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4/45 pairs significant (p &lt; .05), N = 2516</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Listwise deletion for missing data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, use <span class="op">=</span> <span class="st">"listwise"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: listwise deletion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age × income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Correlation: r = -0.007</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Effect size: r²: 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Sample size: n = 2186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   95% CI: [-0.048, 0.035]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value: 0.7608</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance: ns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: age x income</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   r = -0.007, p = 0.761 , N = 2186</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Store results for further analysis</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">pearson_cor</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Correlation: 3 variables [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x income:                  r = -0.005, p = 0.828  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age x life_satisfaction:       r = -0.029, p = 0.150  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income x life_satisfaction:    r = 0.450, p &lt; 0.001 *** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1/3 pairs significant (p &lt; .05), N = 2201</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full correlation, p-value, and N matrices</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
@@ -687,13 +353,41 @@ correlation coefficient in samples from an indefinitely large population.
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, pvalue_matrix <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide p-values</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Strength Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| &lt; 0.30:        Weak correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.30 ≤ |r| &lt; 0.70: Moderate correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |r| ≥ 0.70:        Strong correlation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pearson Correlation </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> r² represents the proportion of variance explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Missing data handling: pairwise deletion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Correlation Matrix:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       age  income life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> age                 1.000  -0.005            -0.029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> income             -0.005   1.000             0.450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  -0.029   0.450             1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Sample Size Matrix:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     age income life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> age                2516   2201              2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> income             2201   2201              2130</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction  2437   2130              2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               Variable_Pair      r r_squared p_value           CI_95    n sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                age × income -0.005     0.000  0.8276 [-0.046, 0.037] 2201    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     age × life_satisfaction -0.029     0.001  0.1496 [-0.069, 0.011] 2437    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  income × life_satisfaction  0.450     0.203  0.0000  [0.416, 0.483] 2130 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -34,18 +34,30 @@ survey_data %>%
   frequency(education, weights = sampling_weight)
 
 # Compare groups with t-test
-survey_data %>%
+result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
+result              # compact one-line overview
+
+summary(result)     # full SPSS-style output with all details
+
 # Scale analysis workflow
-reliability(survey_data, trust_government, trust_media, trust_science)
+rel <- reliability(survey_data, trust_government, trust_media, trust_science)
+
+rel                 # compact: Alpha + interpretation
+
+summary(rel)        # detailed: item statistics, inter-item correlations
 
 survey_data <- survey_data %>%
   mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
 
 # Regression
-survey_data %>%
+lm_result <- survey_data %>%
   linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
+
+lm_result           # compact: R-squared + significant predictors
+
+summary(lm_result)  # detailed: coefficients, ANOVA table, diagnostics
 ```
 
 ## Core Features
@@ -122,6 +134,30 @@ kw_result <- survey_data %>%
 
 kw_result %>% dunn_test()  # Pairwise Dunn comparisons
 ```
+
+### Flexible Output: Compact & Detailed
+
+Every analysis function provides two output levels. Typing the result
+name prints a compact one-line summary. Calling
+[`summary()`](https://rdrr.io/r/base/summary.html) produces the full
+SPSS-style output with all details. You can toggle individual sections
+on or off:
+
+``` r
+result <- t_test(survey_data, life_satisfaction, group = gender)
+result              # compact one-line summary
+summary(result)     # full detailed output
+summary(result, effect_sizes = FALSE)  # hide effect sizes
+```
+
+This works for all 13 analysis functions —
+[`t_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/t_test.md),
+[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md),
+[`chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md),
+[`pearson_cor()`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md),
+[`reliability()`](https://YannickDiehl.github.io/mariposa/dev/reference/reliability.md),
+[`linear_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md),
+and more.
 
 ## SPSS Compatibility
 

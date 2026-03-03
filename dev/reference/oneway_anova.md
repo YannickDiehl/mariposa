@@ -75,7 +75,9 @@ ANOVA results showing whether groups differ, including:
 
 - Group statistics (means and standard deviations)
 
-- Both standard and Welch ANOVA results
+- Both standard and Welch ANOVA results Use
+  [`summary()`](https://rdrr.io/r/base/summary.html) for the full
+  SPSS-style output with toggleable sections.
 
 ## Details
 
@@ -176,6 +178,9 @@ for post-hoc pairwise comparisons.
 [`levene_test`](https://YannickDiehl.github.io/mariposa/dev/reference/levene_test.md)
 for testing homogeneity of variances.
 
+[`summary.oneway_anova`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.oneway_anova.md)
+for detailed output with toggleable sections.
+
 Other hypothesis_tests:
 [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md),
 [`binomial_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/binomial_test.md),
@@ -200,421 +205,49 @@ data(survey_data)
 # Basic one-way ANOVA (comparing across education levels)
 survey_data %>%
   oneway_anova(life_satisfaction, group = education)
-#> 
-#> One-Way ANOVA Results
-#> ---------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal
-#>   Alternative hypothesis: At least one group mean differs
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.204, sd = 1.243, n = 809
-#>   Intermediate Secondary: mean = 3.701, sd = 1.112, n = 618
-#>   Academic Secondary: mean = 3.853, sd = 0.998, n = 607
-#>   University: mean = 4.047, sd = 0.957, n = 387
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001   1
-#>   Within Groups    2970.080 2417       1.229                   
-#>           Total    3217.428 2420                               
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    64.489   3 1229   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.077           0.076         0.076      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+#> One-Way ANOVA: life_satisfaction by education
+#>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
 
 # Multiple dependent variables
 survey_data %>%
   oneway_anova(life_satisfaction, trust_government, group = education)
-#> 
-#> One-Way ANOVA Results
-#> ---------------------
-#> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal for each variable
-#>   Alternative hypothesis: At least one group mean differs for each variable
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.204, sd = 1.243, n = 809
-#>   Intermediate Secondary: mean = 3.701, sd = 1.112, n = 618
-#>   Academic Secondary: mean = 3.853, sd = 0.998, n = 607
-#>   University: mean = 4.047, sd = 0.957, n = 387
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001   1
-#>   Within Groups    2970.080 2417       1.229                   
-#>           Total    3217.428 2420                               
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    64.489   3 1229   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.077           0.076         0.076      medium
-#> 
-#> 
-#> --- trust_government ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 2.647, sd = 1.149, n = 791
-#>   Intermediate Secondary: mean = 2.581, sd = 1.175, n = 592
-#>   Academic Secondary: mean = 2.610, sd = 1.183, n = 595
-#>   University: mean = 2.644, sd = 1.146, n = 376
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       1.753    3       0.584 0.431   0.731   4
-#>   Within Groups    3182.484 2350       1.354                  
-#>           Total    3184.237 2353                              
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch     0.431   3 1156   0.731    
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>          Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  trust_government       0.001               0             0  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons on each variable
+#> One-Way ANOVA: life_satisfaction by education
+#>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
+#> One-Way ANOVA: trust_government by education
+#>   F(3, 2350) = 0.431, p = 0.731 , eta2 = 0.001 (negligible), N = 2354
 
 # Using tidyselect helpers
 survey_data %>%
   oneway_anova(starts_with("trust_"), group = education)
-#> 
-#> One-Way ANOVA Results
-#> ---------------------
-#> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal for each variable
-#>   Alternative hypothesis: At least one group mean differs for each variable
-#> 
-#> 
-#> --- trust_government ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 2.647, sd = 1.149, n = 791
-#>   Intermediate Secondary: mean = 2.581, sd = 1.175, n = 592
-#>   Academic Secondary: mean = 2.610, sd = 1.183, n = 595
-#>   University: mean = 2.644, sd = 1.146, n = 376
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       1.753    3       0.584 0.431   0.731   4
-#>   Within Groups    3182.484 2350       1.354                  
-#>           Total    3184.237 2353                              
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch     0.431   3 1156   0.731    
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>          Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  trust_government       0.001               0             0  negligible
-#> 
-#> 
-#> --- trust_media ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 2.443, sd = 1.163, n = 797
-#>   Intermediate Secondary: mean = 2.500, sd = 1.188, n = 594
-#>   Academic Secondary: mean = 2.464, sd = 1.149, n = 599
-#>   University: mean = 2.377, sd = 1.149, n = 377
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       3.662    3       1.221 0.902   0.439   4
-#>   Within Groups    3198.645 2363       1.354                  
-#>           Total    3202.308 2366                              
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch     0.901   3 1162    0.44    
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>     Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  trust_media       0.001               0             0  negligible
-#> 
-#> 
-#> --- trust_science ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.638, sd = 1.051, n = 807
-#>   Intermediate Secondary: mean = 3.610, sd = 1.005, n = 610
-#>   Academic Secondary: mean = 3.687, sd = 1.040, n = 597
-#>   University: mean = 3.628, sd = 0.996, n = 384
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square     F p_value sig
-#>  Between Groups       1.918    3       0.639 0.605   0.612   4
-#>   Within Groups    2529.658 2394       1.057                  
-#>           Total    2531.576 2397                              
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch     0.605   3 1186   0.612    
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>       Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  trust_science       0.001               0             0  negligible
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons on each variable
+#> One-Way ANOVA: trust_government by education
+#>   F(3, 2350) = 0.431, p = 0.731 , eta2 = 0.001 (negligible), N = 2354
+#> One-Way ANOVA: trust_media by education
+#>   F(3, 2363) = 0.902, p = 0.439 , eta2 = 0.001 (negligible), N = 2367
+#> One-Way ANOVA: trust_science by education
+#>   F(3, 2394) = 0.605, p = 0.612 , eta2 = 0.001 (negligible), N = 2398
 
 # Weighted analysis
 survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
-#> 
-#> Weighted One-Way ANOVA Results
-#> ------------------------------
-#> 
-#> - Dependent variable: income
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal
-#>   Alternative hypothesis: At least one group mean differs
-#> 
-#> 
-#> --- income ---
-#> 
-#> Weighted Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 2759.261, sd = 787.243, n = 741.1
-#>   Intermediate Secondary: mean = 3590.218, sd = 993.577, n = 558.3
-#>   Academic Secondary: mean = 4225.325, sd = 1179.065, n = 558.2
-#>   University: mean = 5331.337, sd = 1661.679, n = 343.3
-#> 
-#> Weighted ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df   Mean_Square       F p_value sig
-#>  Between Groups  1726289513    3 575429837.501 462.325   <.001   1
-#>   Within Groups  2734479256 2197   1244642.356                    
-#>           Total  4460768768 2200                                  
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1 df2 p_value sig
-#>       Welch   413.705   3 970   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>  Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>    income       0.387           0.386         0.386       large
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+#> One-Way ANOVA: income by education [Weighted]
+#>   F(3, 2197) = 462.325, p < 0.001 ***, eta2 = 0.387 (large), N = 2201
 
 # Grouped analysis (separate ANOVA for each region)
 survey_data %>%
   group_by(region) %>%
   oneway_anova(life_satisfaction, group = education)
-#> 
-#> One-Way ANOVA Results
-#> ---------------------
-#> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal
-#>   Alternative hypothesis: At least one group mean differs
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.304, sd = 1.337, n = 161
-#>   Intermediate Secondary: mean = 3.639, sd = 1.140, n = 119
-#>   Academic Secondary: mean = 3.836, sd = 1.088, n = 110
-#>   University: mean = 3.947, sd = 1.025, n = 75
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares  df Mean_Square    F p_value sig
-#>  Between Groups      29.235   3       9.745 6.95   <.001   1
-#>   Within Groups     646.390 461       1.402                 
-#>           Total     675.626 464                             
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1 df2 p_value sig
-#>       Welch     6.682   3 233   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.043           0.037         0.037       small
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.179, sd = 1.219, n = 648
-#>   Intermediate Secondary: mean = 3.715, sd = 1.106, n = 499
-#>   Academic Secondary: mean = 3.857, sd = 0.978, n = 497
-#>   University: mean = 4.071, sd = 0.939, n = 312
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     221.625    3      73.875 62.153   <.001   1
-#>   Within Groups    2320.132 1952       1.189                   
-#>           Total    2541.756 1955                               
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1 df2 p_value sig
-#>       Welch    59.852   3 993   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.087           0.086         0.086      medium
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons on each variable within each group
+#> [region = 1]
+#> One-Way ANOVA: life_satisfaction by education
+#>   F(3, 461) = 6.950, p < 0.001 ***, eta2 = 0.043 (small), N = 465
+#> [region = 2]
+#> One-Way ANOVA: life_satisfaction by education
+#>   F(3, 1952) = 62.153, p < 0.001 ***, eta2 = 0.087 (medium), N = 1956
 
 # Unequal variances (Welch's ANOVA)
 survey_data %>%
   oneway_anova(income, group = education, var.equal = FALSE)
-#> 
-#> One-Way ANOVA Results
-#> ---------------------
-#> 
-#> - Dependent variable: income
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Null hypothesis: All group means are equal
-#>   Alternative hypothesis: At least one group mean differs
-#> 
-#> 
-#> --- income ---
-#> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 2759.048, sd = 786.568, n = 735
-#>   Intermediate Secondary: mean = 3592.518, sd = 995.639, n = 548
-#>   Academic Secondary: mean = 4224.088, sd = 1178.635, n = 548
-#>   University: mean = 5337.183, sd = 1660.958, n = 355
-#> 
-#> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df   Mean_Square       F p_value sig
-#>  Between Groups  1752783281    3 584261093.823 466.494   <.001   1
-#>   Within Groups  2732847885 2182    1252450.91                    
-#>           Total  4485631167 2185                                  
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1 df2 p_value sig
-#>       Welch    418.25   3 978   <.001 ***
-#> 
-#> Effect Sizes:
-#> ------------ 
-#>  Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>    income       0.391            0.39          0.39       large
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation:
-#> - Eta-squared: Proportion of variance explained (biased upward)
-#> - Epsilon-squared: Less biased than eta-squared
-#> - Omega-squared: Unbiased estimate (preferred for publication)
-#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
-#> 
-#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+#> One-Way ANOVA: income by education
+#>   F(3, 2182) = 466.494, p < 0.001 ***, eta2 = 0.391 (large), N = 2186
 
 # Store results for post-hoc analysis
 result <- survey_data %>%
@@ -685,5 +318,97 @@ result %>% levene_test()  # Check homogeneity of variances
 #> Recommendation based on Levene test:
 #> - Use Welch's t-test (unequal variances)
 
-# Note: For repeated measures ANOVA, use rm_anova_test() function instead
+# --- Three-layer output ---
+result              # compact one-line overview
+#> One-Way ANOVA: life_satisfaction by education
+#>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
+summary(result)     # full detailed output with all sections
+#> One-Way ANOVA Results
+#> ---------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#> Descriptive Statistics by Group:
+#>   Basic Secondary: mean = 3.204, sd = 1.243, n = 809
+#>   Intermediate Secondary: mean = 3.701, sd = 1.112, n = 618
+#>   Academic Secondary: mean = 3.853, sd = 0.998, n = 607
+#>   University: mean = 4.047, sd = 0.957, n = 387
+#> 
+#> ANOVA Results:
+#> -------------------------------------------------------------------------------- 
+#>          Source Sum_Squares   df Mean_Square      F p_value sig
+#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>   Within Groups    2970.080 2417       1.229                   
+#>           Total    3217.428 2420                               
+#> -------------------------------------------------------------------------------- 
+#> 
+#> Assumption Tests:
+#> ---------------- 
+#>  Assumption Statistic df1  df2 p_value sig
+#>       Welch    64.489   3 1229   <.001 ***
+#> 
+#> Effect Sizes:
+#> ------------ 
+#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
+#>  life_satisfaction       0.077           0.076         0.076      medium
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Effect Size Interpretation:
+#> - Eta-squared: Proportion of variance explained (biased upward)
+#> - Epsilon-squared: Less biased than eta-squared
+#> - Omega-squared: Unbiased estimate (preferred for publication)
+#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
+#> 
+#> Post-hoc tests: Use tukey_test() for pairwise comparisons
+summary(result, descriptives = FALSE)  # hide group statistics
+#> One-Way ANOVA Results
+#> ---------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - Confidence level: 95.0%
+#>   Null hypothesis: All group means are equal
+#>   Alternative hypothesis: At least one group mean differs
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#> 
+#> ANOVA Results:
+#> -------------------------------------------------------------------------------- 
+#>          Source Sum_Squares   df Mean_Square      F p_value sig
+#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>   Within Groups    2970.080 2417       1.229                   
+#>           Total    3217.428 2420                               
+#> -------------------------------------------------------------------------------- 
+#> 
+#> Assumption Tests:
+#> ---------------- 
+#>  Assumption Statistic df1  df2 p_value sig
+#>       Welch    64.489   3 1229   <.001 ***
+#> 
+#> Effect Sizes:
+#> ------------ 
+#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
+#>  life_satisfaction       0.077           0.076         0.076      medium
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Effect Size Interpretation:
+#> - Eta-squared: Proportion of variance explained (biased upward)
+#> - Epsilon-squared: Less biased than eta-squared
+#> - Omega-squared: Unbiased estimate (preferred for publication)
+#> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
+#> 
+#> Post-hoc tests: Use tukey_test() for pairwise comparisons
 ```

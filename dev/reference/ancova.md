@@ -96,6 +96,9 @@ An object of class `"ancova"` containing:
 
   List with metadata (dv, factors, covariates, weighted, etc.)
 
+Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
+SPSS-style output with toggleable sections.
+
 ## Details
 
 ### Understanding the Results
@@ -154,6 +157,9 @@ for regression analysis.
 [`oneway_anova`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md)
 for single-factor ANOVA.
 
+[`summary.ancova`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.ancova.md)
+for detailed output with toggleable sections.
+
 Other hypothesis_tests:
 [`binomial_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/binomial_test.md),
 [`chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md),
@@ -186,7 +192,37 @@ data(survey_data)
 # One-way ANCOVA: income by education, controlling for age
 survey_data %>%
   ancova(dv = income, between = c(education), covariate = c(age))
-#> 
+#> ANCOVA: income by education, covariate: age
+#>   age (covariate): F(1, 2181) = 0.030, p = 0.862 , eta2p = 0.000
+#>   education:       F(3, 2181) = 466.246, p < 0.001 ***, eta2p = 0.391, N = 2186
+
+# Two-way ANCOVA with weights
+survey_data %>%
+  ancova(dv = income, between = c(gender, education),
+         covariate = c(age), weights = sampling_weight)
+#> ANCOVA: income by gender, education, covariate: age [Weighted]
+#>   age (covariate):  F(1, 2177) = 0.013, p = 0.911 , eta2p = 0.000
+#>   gender:           F(1, 2177) = 0.115, p = 0.735 , eta2p = 0.000
+#>   education:        F(3, 2177) = 455.614, p < 0.001 ***, eta2p = 0.386
+#>   gender:education: F(3, 2177) = 0.298, p = 0.827 , eta2p = 0.000, N = 2186
+
+# Multiple covariates
+survey_data %>%
+  ancova(dv = income, between = c(education),
+         covariate = c(age, political_orientation))
+#> ANCOVA: income by education, covariate: age, political_orientation
+#>   age (covariate):                   F(1, 2002) = 0.018, p = 0.895 , eta2p = 0.000
+#>   political_orientation (covariate): F(1, 2002) = 1.366, p = 0.243 , eta2p = 0.001
+#>   education:                         F(3, 2002) = 419.350, p < 0.001 ***, eta2p = 0.386, N = 2008
+
+# --- Three-layer output ---
+result <- ancova(survey_data, dv = income, between = c(education),
+                 covariate = c(age))
+result              # compact overview
+#> ANCOVA: income by education, covariate: age
+#>   age (covariate): F(1, 2181) = 0.030, p = 0.862 , eta2p = 0.000
+#>   education:       F(3, 2181) = 466.246, p < 0.001 ***, eta2p = 0.391, N = 2186
+summary(result)     # full detailed output with all sections
 #> ANCOVA (One-Way ANCOVA) Results
 #> -------------------------------
 #> 
@@ -248,159 +284,56 @@ survey_data %>%
 #>   F(3, 2182) = 103.901, p = <.001
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-
-# Two-way ANCOVA with weights
-survey_data %>%
-  ancova(dv = income, between = c(gender, education),
-         covariate = c(age), weights = sampling_weight)
-#> 
-#> Weighted ANCOVA (2-Way ANCOVA) Results
-#> --------------------------------------
-#> 
-#> - Dependent variable: income
-#> - Factor(s): gender x education
-#> - Covariate(s): age
-#> - Type III Sum of Squares: Type 3
-#> - Weights variable: sampling_weight
-#> - N (complete cases): 2186
-#> - Missing: 314
-#> 
-#> Tests of Between-Subjects Effects
-#> ----------------------------------------------------------------- 
-#>  Source             Type III SS  df   Mean Square  F        Sig. 
-#>  Corrected Model    1.727833e+09    8 2.159791e+08  172.044 <.001
-#>  Intercept          3.512177e+09    1 3.512177e+09 2797.728 <.001
-#>  age                1.571502e+04    1 1.571502e+04    0.013 0.911
-#>  gender             1.437527e+05    1 1.437527e+05    0.115 0.735
-#>  education          1.715890e+09    3 5.719633e+08  455.614 <.001
-#>  gender * education 1.122626e+06    3 3.742086e+05    0.298 0.827
-#>  Error              2.732936e+09 2177 1.255368e+06               
-#>  Total              3.529768e+10 2186                            
-#>  Corrected Total    4.460769e+09 2185                            
-#>  Partial Eta Sq    
-#>  0.387          ***
-#>  0.562          ***
-#>  0.000             
-#>  0.000             
-#>  0.386          ***
-#>  0.000             
-#>                    
-#>                    
-#>                    
-#> ----------------------------------------------------------------- 
-#> R Squared = 0.387 (Adjusted R Squared = 0.385)
-#> 
-#> Parameter Estimates
-#> ----------------------------------------------------------------------------- 
-#>  Parameter           B        Std. Error t      Sig.  Lower Bound Upper Bound
-#>  (Intercept)         3984.324 75.327     52.894 <.001 3836.603    4132.045   
-#>  age                   -0.157  1.402     -0.112 0.911   -2.906       2.593   
-#>  gender1                8.417 24.873      0.338 0.735  -40.360      57.194   
-#>  education.L         1865.352 51.415     36.280 <.001 1764.525    1966.179   
-#>  education.Q          138.678 49.789      2.785 0.005   41.039     236.317   
-#>  education.C          147.993 48.027      3.081 0.002   53.809     242.178   
-#>  gender1:education.L  -30.796 51.414     -0.599 0.549 -131.621      70.029   
-#>  gender1:education.Q    6.990 49.766      0.140 0.888  -90.604     104.584   
-#>  gender1:education.C  -32.104 48.024     -0.668 0.504 -126.282      62.074   
-#>  Partial Eta Sq
-#>  0.562         
-#>  0.000         
-#>  0.000         
-#>  0.377         
-#>  0.004         
-#>  0.004         
-#>  0.000         
-#>  0.000         
-#>  0.000         
-#> ----------------------------------------------------------------------------- 
-#> 
-#> Estimated Marginal Means
-#> (Evaluated at covariate means)
-#> -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#>  gender education              Mean     Std. Error Lower Bound Upper Bound
-#>  Male   Basic Secondary        2801.036 59.824     2683.718    2918.354   
-#>  Male   Intermediate Secondary 3579.461 71.117     3439.997    3718.925   
-#>  Male   Academic Secondary     4244.417 66.034     4114.920    4373.914   
-#>  Male   University             5314.178 88.494     5140.637    5487.720   
-#>  Female Basic Secondary        2721.537 56.737     2610.274    2832.801   
-#>  Female Intermediate Secondary 3598.917 63.638     3474.119    3723.714   
-#>  Female Academic Secondary     4205.275 68.184     4071.562    4338.987   
-#>  Female University             5346.029 82.845     5183.566    5508.492   
-#> -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#> 
-#> Levene's Test of Equality of Error Variances
-#>   F(7, 2178) = 41.244, p = <.001
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-
-# Multiple covariates
-survey_data %>%
-  ancova(dv = income, between = c(education),
-         covariate = c(age, political_orientation))
-#> 
+summary(result, marginal_means = FALSE)  # hide estimated marginal means
 #> ANCOVA (One-Way ANCOVA) Results
 #> -------------------------------
 #> 
 #> - Dependent variable: income
 #> - Factor(s): education
-#> - Covariate(s): age, political_orientation
+#> - Covariate(s): age
 #> - Type III Sum of Squares: Type 3
-#> - N (complete cases): 2008
-#> - Missing: 492
+#> - N (complete cases): 2186
+#> - Missing: 314
 #> 
 #> Tests of Between-Subjects Effects
-#> -------------------------------------------------------------------- 
-#>  Source                Type III SS  df   Mean Square  F        Sig. 
-#>  Corrected Model       1.582047e+09    5 3.164093e+08  252.422 <.001
-#>  Intercept             1.958785e+09    1 1.958785e+09 1562.659 <.001
-#>  age                   2.194524e+04    1 2.194524e+04    0.018 0.895
-#>  political_orientation 1.712167e+06    1 1.712167e+06    1.366 0.243
-#>  education             1.576958e+09    3 5.256526e+08  419.350 <.001
-#>  Error                 2.509497e+09 2002 1.253495e+06               
-#>  Total                 3.214036e+10 2008                            
-#>  Corrected Total       4.091544e+09 2007                            
-#>  Partial Eta Sq    
-#>  0.387          ***
-#>  0.438          ***
-#>  0.000             
-#>  0.001             
-#>  0.386          ***
-#>                    
-#>                    
-#>                    
-#> -------------------------------------------------------------------- 
-#> R Squared = 0.387 (Adjusted R Squared = 0.385)
+#> ----------------------------------------------------------------------------- 
+#>  Source          Type III SS  df   Mean Square  F        Sig.  Partial Eta Sq
+#>  Corrected Model 1.752821e+09    4 4.382053e+08  349.723 <.001 0.391         
+#>  Intercept       3.472401e+09    1 3.472401e+09 2771.252 <.001 0.560         
+#>  age             3.772141e+04    1 3.772141e+04    0.030 0.862 0.000         
+#>  education       1.752631e+09    3 5.842102e+08  466.246 <.001 0.391         
+#>  Error           2.732810e+09 2181 1.253008e+06                              
+#>  Total           3.529079e+10 2186                                           
+#>  Corrected Total 4.485631e+09 2185                                           
+#>     
+#>  ***
+#>  ***
+#>     
+#>  ***
+#>     
+#>     
+#>     
+#> ----------------------------------------------------------------------------- 
+#> R Squared = 0.391 (Adjusted R Squared = 0.390)
 #> 
 #> Parameter Estimates
-#> ------------------------------------------------------------------------------- 
-#>  Parameter             B        Std. Error t      Sig.  Lower Bound Upper Bound
-#>  (Intercept)           4040.829 102.221    39.530 <.001 3840.359    4241.299   
-#>  age                     -0.196   1.479    -0.132 0.895   -3.096       2.704   
-#>  political_orientation  -26.771  22.906    -1.169 0.243  -71.693      18.151   
-#>  education.L           1847.837  53.119    34.787 <.001 1743.662    1952.011   
-#>  education.Q            103.244  51.756     1.995 0.046    1.744     204.745   
-#>  education.C            154.449  50.186     3.078 0.002   56.027     252.871   
+#> --------------------------------------------------------------------- 
+#>  Parameter   B        Std. Error t      Sig.  Lower Bound Upper Bound
+#>  (Intercept) 3990.641 75.806     52.643 <.001 3841.981    4139.301   
+#>  age           -0.245  1.412     -0.174 0.862   -3.014       2.524   
+#>  education.L 1870.578 50.838     36.795 <.001 1770.881    1970.274   
+#>  education.Q  139.427 49.566      2.813 0.005   42.226     236.629   
+#>  education.C  152.695 48.167      3.170 0.002   58.236     247.154   
 #>  Partial Eta Sq
-#>  0.438         
+#>  0.560         
 #>  0.000         
-#>  0.001         
-#>  0.377         
-#>  0.002         
+#>  0.383         
+#>  0.004         
 #>  0.005         
-#> ------------------------------------------------------------------------------- 
-#> 
-#> Estimated Marginal Means
-#> (Evaluated at covariate means)
-#> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#>  education              Mean     Std. Error Lower Bound Upper Bound
-#>  Basic Secondary        2735.624 43.231     2650.841    2820.408   
-#>  Intermediate Secondary 3596.901 49.594     3499.640    3694.163   
-#>  Academic Secondary     4216.064 50.054     4117.900    4314.228   
-#>  University             5283.829 62.076     5162.090    5405.569   
-#> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+#> --------------------------------------------------------------------- 
 #> 
 #> Levene's Test of Equality of Error Variances
-#>   F(3, 2004) = 97.179, p = <.001
+#>   F(3, 2182) = 103.901, p = <.001
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

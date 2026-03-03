@@ -1,5 +1,93 @@
 # Changelog
 
+## mariposa 0.5.1
+
+### Three-Layer Output System
+
+- All 13 analysis functions now support
+  [`summary()`](https://rdrr.io/r/base/summary.html) for detailed
+  SPSS-style output with toggleable sections. The three-layer pattern
+  works as follows:
+
+  - [`print()`](https://rdrr.io/r/base/print.html) — compact one-line
+    overview (default when typing the object name)
+  - [`summary()`](https://rdrr.io/r/base/summary.html) — builds a
+    detailed summary object with boolean section toggles
+  - `print.summary()` — renders the full verbose output with all
+    requested sections
+
+- Supported functions:
+  [`t_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/t_test.md),
+  [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md),
+  [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/factorial_anova.md),
+  [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md),
+  [`chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/chi_square.md),
+  [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/dev/reference/mann_whitney.md),
+  [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/dev/reference/pearson_cor.md),
+  [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/dev/reference/spearman_rho.md),
+  [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/dev/reference/kendall_tau.md),
+  [`reliability()`](https://YannickDiehl.github.io/mariposa/dev/reference/reliability.md),
+  [`efa()`](https://YannickDiehl.github.io/mariposa/dev/reference/efa.md),
+  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/linear_regression.md),
+  [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/dev/reference/logistic_regression.md).
+
+- Each [`summary()`](https://rdrr.io/r/base/summary.html) method accepts
+  boolean parameters to control which output sections are displayed
+  (e.g., `summary(result, effect_sizes = FALSE)` or
+  `summary(result, descriptives = FALSE)`).
+
+### Internal Helpers
+
+- Added
+  [`build_summary_object()`](https://YannickDiehl.github.io/mariposa/dev/reference/build_summary_object.md)
+  and
+  [`format_p_compact()`](https://YannickDiehl.github.io/mariposa/dev/reference/format_p_compact.md)
+  in `R/summary_helpers.R` as shared infrastructure for all summary
+  methods.
+
+### Documentation
+
+- Complete Roxygen2 documentation for all 39 S3 methods (13 print + 13
+  summary
+
+  - 13 print.summary), each with `@description`, `@param`, `@return`,
+    `@examples`, and `@seealso`.
+
+- All 13 main function `@examples` now demonstrate the three-layer
+  output pattern (`result`, `summary(result)`,
+  `summary(result, toggle = FALSE)`).
+
+- Added
+  [`print.reliability()`](https://YannickDiehl.github.io/mariposa/dev/reference/print.reliability.md)
+  and
+  [`print.efa()`](https://YannickDiehl.github.io/mariposa/dev/reference/print.efa.md)
+  documentation (previously undocumented).
+
+### Bug Fixes
+
+- Fixed
+  [`print.chi_square()`](https://YannickDiehl.github.io/mariposa/dev/reference/print.chi_square.md)
+  Roxygen2 tag (`@keywords internal` replaced with correct
+  `@method print chi_square`).
+
+- Fixed example syntax errors in
+  [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md)
+  and
+  [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/factorial_anova.md)
+  (formula syntax replaced with correct `dv`/`between` interface).
+
+- Fixed incorrect variable name `education_level` in examples (corrected
+  to `education`).
+
+### Tests
+
+- Added `test-summary-methods.R` with tests for all 13 summary methods.
+
+- Updated `test-print-methods.R` to reflect the new three-layer
+  structure.
+
+------------------------------------------------------------------------
+
 ## mariposa 0.5.0
 
 ### New Functions
