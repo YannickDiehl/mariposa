@@ -298,8 +298,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 # Helper: print a single variable's binomial test block
 #' @keywords internal
 .print_bt_block <- function(var_name, row_data, weights, digits) {
-  cli_rule(var_name)
-  cat("\n")
+  print_header(var_name, newline_before = FALSE)
 
   # Category table
   cat("  Categories:\n")
