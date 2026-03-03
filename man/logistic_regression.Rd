@@ -48,6 +48,7 @@ An object of class \code{"logistic_regression"} containing:
 \item{weighted}{Logical indicating whether weights were used}
 \item{weight_name}{Name of the weight variable (or NULL)}
 }
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 \code{logistic_regression()} performs binary logistic regression with
@@ -148,11 +149,19 @@ survey_data |>
   dplyr::group_by(region) |>
   logistic_regression(high_satisfaction ~ age)
 
+# --- Three-layer output ---
+result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+result              # compact one-line overview
+summary(result)     # full detailed SPSS-style output
+summary(result, classification_table = FALSE)  # hide classification
+
 }
 \seealso{
 \code{\link{linear_regression}} for continuous outcome variables.
 
 \code{\link{chi_square}} for testing associations between categorical variables.
+
+\code{\link{summary.logistic_regression}} for detailed output with toggleable sections.
 
 Other regression: 
 \code{\link{linear_regression}()}

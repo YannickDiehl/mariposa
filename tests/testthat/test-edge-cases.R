@@ -349,12 +349,14 @@ test_that("pomps transforms to 0-100 range", {
 # ===========================================================================
 # 17. Correlation functions: single-pair vs matrix paths
 # ===========================================================================
-test_that("pearson_cor single pair has interpretation", {
+test_that("pearson_cor single pair has correlation in output", {
   result <- pearson_cor(survey_data, age, income)
   expect_s3_class(result, "pearson_cor")
   output <- capture.output(print(result))
-  expect_true(any(grepl("Interpretation", output, fixed = TRUE) |
-                    grepl("strength", output, ignore.case = TRUE)))
+  expect_true(any(grepl("r =", output, fixed = TRUE)))
+  # Verbose details available via summary()
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(any(grepl("CI", summary_output, fixed = TRUE)))
 })
 
 test_that("spearman_rho matrix with 4+ vars", {
@@ -362,7 +364,10 @@ test_that("spearman_rho matrix with 4+ vars", {
                          political_orientation)
   expect_s3_class(result, "spearman_rho")
   output <- capture.output(print(result))
-  expect_true(any(grepl("Matrix", output, fixed = TRUE)))
+  expect_true(any(grepl("rho =", output, fixed = TRUE)))
+  # Verbose matrix available via summary()
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Matrix", summary_output, fixed = TRUE)))
 })
 
 test_that("kendall_tau weighted single pair", {

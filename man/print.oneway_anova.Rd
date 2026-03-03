@@ -2,39 +2,31 @@
 % Please edit documentation in R/oneway_anova.R
 \name{print.oneway_anova}
 \alias{print.oneway_anova}
-\title{Print ANOVA test results}
+\title{Print ANOVA test results (compact)}
 \usage{
 \method{print}{oneway_anova}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"oneway_anova"} returned by \code{\link{oneway_anova}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)
-for numeric values. Default is \code{3}.}
+\item{digits}{Number of decimal places to display (default: 3).}
 
-\item{...}{Additional arguments passed to \code{\link[base]{print}}. Currently unused.}
+\item{...}{Additional arguments (not used).}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for objects of class \code{"oneway_anova"}. Provides a
-formatted display of ANOVA results including descriptive statistics, ANOVA
-tables, assumption tests, and effect sizes.
-}
-\details{
-The print method displays:
-\itemize{
-\item Descriptive statistics by group (means, standard deviations, sample sizes)
-\item Complete ANOVA table (Sum of Squares, degrees of freedom, F-statistic, p-value)
-\item Welch's robust test for unequal variances
-\item Effect sizes (Eta-squared, Epsilon-squared, Omega-squared) with interpretation
-\item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-}
+Compact print method for objects of class \code{"oneway_anova"}.
+Shows a one-line summary per variable with F statistic, p-value,
+effect size, and sample size.
 
-For grouped analyses (when data is grouped with \code{\link[dplyr]{group_by}}),
-results are displayed separately for each group combination.
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- oneway_anova(survey_data, life_satisfaction,
+                       group = education)
+result              # compact one-line overview
+summary(result)     # full detailed output
 
-For weighted analyses, both actual sample sizes and effective sample sizes
-(weighted n) are displayed.
 }

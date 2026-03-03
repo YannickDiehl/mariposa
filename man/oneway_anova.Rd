@@ -39,6 +39,7 @@ ANOVA results showing whether groups differ, including:
 \item Effect sizes (how much do groups matter?)
 \item Group statistics (means and standard deviations)
 \item Both standard and Welch ANOVA results
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 }
 \description{
@@ -161,7 +162,10 @@ result <- survey_data \%>\%
 result \%>\% tukey_test()
 result \%>\% levene_test()  # Check homogeneity of variances
 
-# Note: For repeated measures ANOVA, use rm_anova_test() function instead
+# --- Three-layer output ---
+result              # compact one-line overview
+summary(result)     # full detailed output with all sections
+summary(result, descriptives = FALSE)  # hide group statistics
 
 }
 \references{
@@ -182,6 +186,8 @@ measures of effect size for some common research designs. Psychological Methods,
 \code{\link{tukey_test}} for post-hoc pairwise comparisons.
 
 \code{\link{levene_test}} for testing homogeneity of variances.
+
+\code{\link{summary.oneway_anova}} for detailed output with toggleable sections.
 
 Other hypothesis_tests: 
 \code{\link{ancova}()},

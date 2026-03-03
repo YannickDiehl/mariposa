@@ -2,18 +2,28 @@
 % Please edit documentation in R/linear_regression.R
 \name{print.linear_regression}
 \alias{print.linear_regression}
-\title{Print Linear Regression Results}
+\title{Print linear regression results (compact)}
 \usage{
 \method{print}{linear_regression}(x, ...)
 }
 \arguments{
-\item{x}{An object of class \code{"linear_regression"}.}
+\item{x}{An object of class \code{"linear_regression"} returned by
+\code{\link{linear_regression}}.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{...}{Additional arguments (not used).}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print Linear Regression Results
+Compact print method for objects of class \code{"linear_regression"}.
+Shows R-squared, adjusted R-squared, F statistic, and p-value.
+
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

@@ -798,7 +798,9 @@ test_that("print.factorial_anova produces output without errors", {
                             between = c(gender, region))
 
   expect_output(print(result), "Factorial ANOVA")
-  expect_output(print(result), "Tests of Between-Subjects Effects")
-  expect_output(print(result), "Descriptive Statistics")
-  expect_output(print(result), "Levene")
+  expect_output(print(result), "eta2p")
+  # Verbose sections available via summary()
+  expect_output(print(summary(result)), "Tests of Between-Subjects Effects")
+  expect_output(print(summary(result)), "Descriptive Statistics")
+  expect_output(print(summary(result)), "Levene")
 })

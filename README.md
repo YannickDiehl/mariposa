@@ -125,6 +125,19 @@ kw_result <- survey_data %>%
 kw_result %>% dunn_test()  # Pairwise Dunn comparisons
 ```
 
+### Flexible Output: Compact & Detailed
+
+Every analysis function provides two output levels. Typing the result name prints a compact one-line summary. Calling `summary()` produces the full SPSS-style output with all details. You can toggle individual sections on or off:
+
+```r
+result <- t_test(survey_data, life_satisfaction, group = gender)
+result              # compact one-line summary
+summary(result)     # full detailed output
+summary(result, effect_sizes = FALSE)  # hide effect sizes
+```
+
+This works for all 13 analysis functions — `t_test()`, `oneway_anova()`, `chi_square()`, `pearson_cor()`, `reliability()`, `linear_regression()`, and more.
+
 ## SPSS Compatibility
 
 Every function is validated against SPSS v29 across four scenarios: weighted/unweighted and grouped/ungrouped. If you're migrating from SPSS, your results will match:
