@@ -3,11 +3,11 @@
 **Professional statistical analysis for survey data in R.**
 
 mariposa (*Marburg Initiative for Political and Social Analysis*)
-provides 44 statistical functions for analyzing survey data. All
+provides 46 statistical functions for analyzing survey data. All
 functions support survey weights, grouped analysis via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
 and produce publication-ready output. Results are validated against SPSS
-v29 for full reproducibility (4,986+ tests pass).
+v29 for full reproducibility (6,200+ tests pass).
 
 ## Installation
 
@@ -25,6 +25,9 @@ library(dplyr)
 # Load example survey data (2,500 respondents)
 data(survey_data)
 
+# Interactive HTML codebook in RStudio Viewer
+codebook(survey_data)
+
 # Descriptive statistics with survey weights
 survey_data %>%
   describe(age, income, life_satisfaction, weights = sampling_weight)
@@ -34,30 +37,25 @@ survey_data %>%
   frequency(education, weights = sampling_weight)
 
 # Compare groups with t-test
-result <- survey_data %>%
+survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
-result              # compact one-line overview
-
-summary(result)     # full SPSS-style output with all details
+# Detailed SPSS-style output with summary()
+survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight) %>%
+  summary()
 
 # Scale analysis workflow
-rel <- reliability(survey_data, trust_government, trust_media, trust_science)
-
-rel                 # compact: Alpha + interpretation
-
-summary(rel)        # detailed: item statistics, inter-item correlations
+reliability(survey_data, trust_government, trust_media, trust_science) %>%
+  summary()    # item statistics, inter-item correlations
 
 survey_data <- survey_data %>%
   mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
 
 # Regression
-lm_result <- survey_data %>%
-  linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
-
-lm_result           # compact: R-squared + significant predictors
-
-summary(lm_result)  # detailed: coefficients, ANOVA table, diagnostics
+survey_data %>%
+  linear_regression(life_satisfaction ~ age + income, weights = sampling_weight) %>%
+  summary()    # coefficients, ANOVA table, diagnostics
 ```
 
 ## Core Features
@@ -66,7 +64,7 @@ summary(lm_result)  # detailed: coefficients, ANOVA table, diagnostics
 
 | Category           | Functions                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Purpose                                                  |
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| **Descriptive**    | [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)                                                                                                                                                                                                               | Summaries and distributions                              |
+| **Descriptive**    | [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md), [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)                                                                                                                                | Summaries, distributions, and data dictionaries          |
 | **T-Tests**        | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)                                                                                                                                                                                                                                                                                                                                                                                   | Mean comparisons (independent, paired, one-sample)       |
 | **ANOVA**          | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md), [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md), [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)                                                                                                                                                                                               | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
 | **Non-parametric** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md), [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md), [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md), [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md), [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md) | Distribution-free tests                                  |
@@ -144,10 +142,19 @@ SPSS-style output with all details. You can toggle individual sections
 on or off:
 
 ``` r
-result <- t_test(survey_data, life_satisfaction, group = gender)
-result              # compact one-line summary
-summary(result)     # full detailed output
-summary(result, effect_sizes = FALSE)  # hide effect sizes
+# Compact one-line summary (default)
+survey_data %>%
+  t_test(life_satisfaction, group = gender)
+
+# Full detailed output
+survey_data %>%
+  t_test(life_satisfaction, group = gender) %>%
+  summary()
+
+# Toggle individual sections
+survey_data %>%
+  t_test(life_satisfaction, group = gender) %>%
+  summary(effect_sizes = FALSE)
 ```
 
 This works for all 13 analysis functions —

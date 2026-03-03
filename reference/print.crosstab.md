@@ -22,3 +22,7 @@ print(x, digits = 1, ...)
 - ...:
 
   Additional arguments (currently unused)
+
+## Value
+
+Invisibly returns the input object `x`.

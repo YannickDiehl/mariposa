@@ -272,13 +272,15 @@ efa(survey_data,
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
 #>   KMO = 0.505 (Miserable), Variance explained: 61.0%
 
-# With Oblimin rotation (allows correlated factors)
+# With Oblimin rotation (requires GPArotation package)
+# \donttest{
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
     rotation = "oblimin")
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Oblimin)
 #>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+# }
 
 # Maximum Likelihood extraction
 efa(survey_data,

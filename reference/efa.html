@@ -17,7 +17,7 @@ whether they group into 2-3 underlying dimensions (factors or components)."><met
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -288,13 +288,15 @@ Common alternative to Oblimin in SPSS.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   KMO = 0.505 (Miserable), Variance explained: 61.0%</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With Oblimin rotation (allows correlated factors)</span></span></span>
+<span class="r-in"><span><span class="co"># With Oblimin rotation (requires GPArotation package)</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">efa</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
 <span class="r-in"><span>    <span class="va">political_orientation</span>, <span class="va">environmental_concern</span>, <span class="va">life_satisfaction</span>,</span></span>
 <span class="r-in"><span>    <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span></span>
 <span class="r-in"><span>    rotation <span class="op">=</span> <span class="st">"oblimin"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Exploratory Factor Analysis: 6 items, 3 components (PCA/Oblimin)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   KMO = 0.505 (Miserable), Variance explained: 61.0%</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Maximum Likelihood extraction</span></span></span>
 <span class="r-in"><span><span class="fu">efa</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>

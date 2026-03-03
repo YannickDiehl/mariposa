@@ -176,6 +176,19 @@ survey_data %>%
 #> Kendall's Tau: age x income [Weighted]
 #>   tau = 0.003, p = 0.840 , N = 2201
 
+# Listwise deletion for missing data
+survey_data %>%
+  kendall_tau(age, income, use = "listwise")
+#> Kendall's Tau: age x income
+#>   tau = 0.002, p = 0.867 , N = 2186
+
+# One-tailed test
+survey_data %>%
+  kendall_tau(age, income, alternative = "greater")
+#> Kendall's Tau: age x income
+#>   tau = 0.002, p = 0.433 , N = 2186
+
+# \donttest{
 # Grouped correlations
 survey_data %>%
   group_by(region) %>%
@@ -201,18 +214,6 @@ survey_data %>%
 #>   trust_government x trust_science: tau = 0.021, p = 0.143  
 #>   trust_media x trust_science:   tau = 0.013, p = 0.354  
 #>   0/3 pairs significant (p < .05), N = 2242
-
-# Listwise deletion for missing data
-survey_data %>%
-  kendall_tau(age, income, use = "listwise")
-#> Kendall's Tau: age x income
-#>   tau = 0.002, p = 0.867 , N = 2186
-
-# One-tailed test
-survey_data %>%
-  kendall_tau(age, income, alternative = "greater")
-#> Kendall's Tau: age x income
-#>   tau = 0.002, p = 0.433 , N = 2186
 
 # --- Three-layer output ---
 result <- survey_data %>%
@@ -302,4 +303,5 @@ summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> --------------------------------------------------------------------- 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+# }
 ```

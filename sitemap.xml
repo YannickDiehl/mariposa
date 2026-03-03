@@ -18,6 +18,7 @@
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/build_summary_object.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/chi_square.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/chisq_gof.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/codebook.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/crosstab.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/describe.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-alpha_interpretation.html</loc></url>
@@ -30,6 +31,8 @@
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-calculate_grouped_stats.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-calculate_ungrouped_stats.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-calculate_variable_stats.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-classify_type.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-codebook_to_html.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-compute_bartlett.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-compute_estimated_marginal_means.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-compute_factorial_descriptives.html</loc></url>
@@ -46,6 +49,7 @@
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-efa_pairwise_cor.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-effective_n.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-evaluate_weights.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-extract_var_metadata.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-get_t_test_border.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-glm_core.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/dot-hosmer_lemeshow_test.html</loc></url>
@@ -148,6 +152,7 @@
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.binomial_test.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.chi_square.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.chisq_gof.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/print.codebook.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.crosstab.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.describe.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.dunn_test.html</loc></url>
@@ -171,6 +176,7 @@
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.spearman_rho.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.summary.ancova.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.summary.chi_square.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/print.summary.codebook.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.summary.efa.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.summary.factorial_anova.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/print.summary.kendall_tau.html</loc></url>
@@ -199,6 +205,7 @@
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/spearman_rho.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/summary.ancova.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/summary.chi_square.html</loc></url>
+<url><loc>https://YannickDiehl.github.io/mariposa/reference/summary.codebook.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/summary.efa.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/summary.factorial_anova.html</loc></url>
 <url><loc>https://YannickDiehl.github.io/mariposa/reference/summary.kendall_tau.html</loc></url>
