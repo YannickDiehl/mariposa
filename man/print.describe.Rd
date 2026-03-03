@@ -13,6 +13,9 @@
 
 \item{...}{Additional arguments (currently unused)}
 }
+\value{
+Invisibly returns the input object \code{x}.
+}
 \description{
 Prints formatted descriptive statistics with professional layout.
 Automatically adjusts output based on whether analysis was weighted or unweighted.

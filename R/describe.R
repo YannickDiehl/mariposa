@@ -606,6 +606,7 @@ describe <- function(data, ..., weights = NULL,
 #' @param x A describe object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (currently unused)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 print.describe <- function(x, digits = 3, ...) {
 

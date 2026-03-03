@@ -312,6 +312,7 @@ crosstab.grouped_df <- function(data, row, col,
 #' @param x A crosstab result object
 #' @param digits Number of decimal places for percentages (default: 1)
 #' @param ... Additional arguments (currently unused)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 print.crosstab <- function(x, digits = 1, ...) {
 

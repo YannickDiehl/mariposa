@@ -123,11 +123,13 @@
 #'     political_orientation, environmental_concern, life_satisfaction,
 #'     trust_government, trust_media, trust_science)
 #'
-#' # With Oblimin rotation (allows correlated factors)
+#' # With Oblimin rotation (requires GPArotation package)
+#' \donttest{
 #' efa(survey_data,
 #'     political_orientation, environmental_concern, life_satisfaction,
 #'     trust_government, trust_media, trust_science,
 #'     rotation = "oblimin")
+#' }
 #'
 #' # Maximum Likelihood extraction
 #' efa(survey_data,
