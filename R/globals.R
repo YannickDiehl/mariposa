@@ -71,5 +71,10 @@ utils::globalVariables(c(
   "Std.Deviation", ".wt",
 
   # Logistic regression output columns
-  "S.E.", "Wald", "Sig.", "Exp(B)"
+  "S.E.", "Wald", "Sig.", "Exp(B)",
+
+  # Codebook output columns
+  "position", "type_short", "n_valid", "n_missing",
+  "n_unique", "empirical_values", "is_range", "value_labels",
+  "n_labels", "truncated"
 ))

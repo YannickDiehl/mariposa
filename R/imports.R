@@ -11,6 +11,7 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble tibble as_tibble
 #' @importFrom stats var sd median quantile IQR na.omit complete.cases TukeyHSD aov as.formula ave binom.test chisq.test confint cor fisher.test friedman.test kruskal.test lm oneway.test p.adjust pchisq pf pnorm pt ptukey qf qnorm qt qtukey t.test weighted.mean wilcox.test xtabs
+#' @importFrom htmltools tags tagList save_html HTML
 #' @importFrom utils head tail str capture.output combn
 NULL
 
