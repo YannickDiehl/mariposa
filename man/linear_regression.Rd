@@ -57,6 +57,7 @@ An object of class \code{"linear_regression"} containing:
 \item{weighted}{Logical indicating whether weights were used}
 \item{weight_name}{Name of the weight variable (or NULL)}
 }
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 \code{linear_regression()} performs bivariate or multiple linear regression
@@ -151,6 +152,12 @@ survey_data |>
   dplyr::group_by(region) |>
   linear_regression(life_satisfaction ~ age)
 
+# --- Three-layer output ---
+result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+result              # compact one-line overview
+summary(result)     # full detailed SPSS-style output
+summary(result, collinearity = FALSE)  # hide VIF/Tolerance
+
 }
 \seealso{
 \code{\link{logistic_regression}} for binary outcome variables.
@@ -158,6 +165,8 @@ survey_data |>
 \code{\link{describe}} for checking variable distributions before regression.
 
 \code{\link{pearson_cor}} for checking bivariate correlations.
+
+\code{\link{summary.linear_regression}} for detailed output with toggleable sections.
 
 Other regression: 
 \code{\link{logistic_regression}()}

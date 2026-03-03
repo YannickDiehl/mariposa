@@ -2,36 +2,30 @@
 % Please edit documentation in R/t_test.R
 \name{print.t_test}
 \alias{print.t_test}
-\title{Print t-test results}
+\title{Print t-test results (compact)}
 \usage{
 \method{print}{t_test}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"t_test"} returned by \code{\link{t_test}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)
-for numeric values. Default is \code{3}.}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments passed to \code{\link[base]{print}}. Currently unused.}
+\item{...}{Additional arguments (not used).}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for objects of class \code{"t_test"}. Provides a
-formatted display of t-test results including group statistics, test
-statistics, p-values, effect sizes, and confidence intervals.
-}
-\details{
-The print method displays:
-\itemize{
-\item Group-specific descriptive statistics (means and sample sizes)
-\item Test statistics (t-statistic, degrees of freedom, p-value)
-\item Effect size (Cohen's d) with interpretation
-\item Confidence intervals for mean differences
-\item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-}
+Compact print method for objects of class \code{"t_test"}.
+Shows a one-line summary per variable with test statistic, p-value,
+effect size, and sample size.
 
-For grouped analyses (when data is grouped with \code{\link[dplyr]{group_by}}),
-results are displayed separately for each group combination.
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- t_test(survey_data, life_satisfaction, group = gender)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

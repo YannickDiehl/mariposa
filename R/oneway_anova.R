@@ -32,6 +32,7 @@
 #' - Effect sizes (how much do groups matter?)
 #' - Group statistics (means and standard deviations)
 #' - Both standard and Welch ANOVA results
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -87,7 +88,9 @@
 #' \code{\link{tukey_test}} for post-hoc pairwise comparisons.
 #' 
 #' \code{\link{levene_test}} for testing homogeneity of variances.
-#' 
+#'
+#' \code{\link{summary.oneway_anova}} for detailed output with toggleable sections.
+#'
 #' @references
 #' Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.). 
 #' Lawrence Erlbaum Associates.
@@ -136,7 +139,10 @@
 #' result %>% tukey_test()
 #' result %>% levene_test()  # Check homogeneity of variances
 #'
-#' # Note: For repeated measures ANOVA, use rm_anova_test() function instead
+#' # --- Three-layer output ---
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output with all sections
+#' summary(result, descriptives = FALSE)  # hide group statistics
 #'
 #' @family hypothesis_tests
 #' @export
@@ -566,49 +572,115 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
     class = "oneway_anova"
   )
 }
-
-#' Print ANOVA test results
+#' Print ANOVA test results (compact)
 #'
 #' @description
-#' Print method for objects of class \code{"oneway_anova"}. Provides a 
-#' formatted display of ANOVA results including descriptive statistics, ANOVA 
-#' tables, assumption tests, and effect sizes.
+#' Compact print method for objects of class \code{"oneway_anova"}.
+#' Shows a one-line summary per variable with F statistic, p-value,
+#' effect size, and sample size.
+#'
+#' For the full detailed output, use \code{summary()}.
 #'
 #' @param x An object of class \code{"oneway_anova"} returned by \code{\link{oneway_anova}}.
-#' @param digits Number of decimal places to display (default: 3)
-#'   for numeric values. Default is \code{3}.
-#' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
-#'
-#' @details
-#' The print method displays:
-#' \itemize{
-#'   \item Descriptive statistics by group (means, standard deviations, sample sizes)
-#'   \item Complete ANOVA table (Sum of Squares, degrees of freedom, F-statistic, p-value)
-#'   \item Welch's robust test for unequal variances
-#'   \item Effect sizes (Eta-squared, Epsilon-squared, Omega-squared) with interpretation
-#'   \item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-#' }
-#' 
-#' For grouped analyses (when data is grouped with \code{\link[dplyr]{group_by}}), 
-#' results are displayed separately for each group combination.
-#' 
-#' For weighted analyses, both actual sample sizes and effective sample sizes 
-#' (weighted n) are displayed.
+#' @param digits Number of decimal places to display (default: 3).
+#' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
 #'
+#' @examples
+#' result <- oneway_anova(survey_data, life_satisfaction,
+#'                        group = education)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
+#' @method print oneway_anova
 print.oneway_anova <- function(x, digits = 3, ...) {
-  
+
   # Check if this is repeated measures ANOVA
   if (!is.null(x$repeated) && x$repeated) {
     return(print_repeated_measures_anova(x, digits, ...))
   }
-  # Determine test type based on weights
-  test_type <- get_standard_title("One-Way ANOVA", x$weights, "Results")
-  print_header(test_type)
-  
-  # Print basic info using standardized helpers
+
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_tag <- paste0(" by ", x$group)
+  results <- x$results
+  results$p_value <- as.numeric(results$p_value)
+
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(results[x$groups])
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      group_results <- group_results[!is.na(group_results$Variable), ]
+      for (j in seq_len(nrow(group_results))) {
+        .print_oneway_anova_compact(group_results, j, group_tag, weighted_tag, digits)
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(results))) {
+      if (is.na(results$Variable[i])) next
+      .print_oneway_anova_compact(results, i, group_tag, weighted_tag, digits)
+    }
+  }
+
+  invisible(x)
+}
+
+#' Print a compact one-line summary for a single ANOVA variable
+#' @keywords internal
+.print_oneway_anova_compact <- function(results, i, group_tag, weighted_tag, digits) {
+  var_name <- results$Variable[i]
+  f_val    <- results$F_stat[i]
+  df1_val  <- results$df1[i]
+  df2_val  <- results$df2[i]
+  p_val    <- as.numeric(results$p_value[i])
+  eta_val  <- results$eta_squared[i]
+
+  cat(sprintf("One-Way ANOVA: %s%s%s\n", var_name, group_tag, weighted_tag))
+
+  if (!is.na(f_val)) {
+    eta_interp <- if (abs(eta_val) < 0.01) "negligible"
+                  else if (abs(eta_val) < 0.06) "small"
+                  else if (abs(eta_val) < 0.14) "medium"
+                  else "large"
+
+    # Calculate total N from group stats
+    stats <- results$group_stats[[i]]
+    if (!is.null(stats)) {
+      if (!is.null(stats[[1]]$weighted_n)) {
+        n_total <- round(sum(sapply(stats, function(s) s$weighted_n)))
+      } else {
+        n_total <- sum(sapply(stats, function(s) s$n))
+      }
+    } else {
+      n_total <- df1_val + df2_val + 1
+    }
+
+    cat(sprintf("  F(%d, %d) = %.*f, %s %s, eta2 = %.*f (%s), N = %d\n",
+                as.integer(df1_val), as.integer(df2_val), digits, f_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                digits, eta_val, eta_interp, as.integer(n_total)))
+  } else {
+    cat("  Results not available\n")
+  }
+}
+
+# Internal implementation for verbose ANOVA output (used by both
+# print.summary.oneway_anova and can be reused by print.oneway_anova
+# if needed in the future).
+.print_oneway_anova_impl <- function(x, digits = 3) {
+  weights_name <- x$weights
+  is_weighted <- !is.null(weights_name)
+
+  # Print basic info
   cat("\n")
   multi_var_suffix <- ifelse(length(x$variables) > 1, " for each variable", "")
   test_info <- list(
@@ -624,219 +696,87 @@ print.oneway_anova <- function(x, digits = 3, ...) {
   cat(sprintf("  Null hypothesis: All group means are equal%s\n", multi_var_suffix))
   cat(sprintf("  Alternative hypothesis: At least one group mean differs%s\n", multi_var_suffix))
   cat("\n")
-  
-  # Add significance stars using standardized helper
+
+  # Add significance stars
   p_values <- x$results$p_value
   if (is.character(p_values)) {
     p_numeric <- suppressWarnings(as.numeric(p_values))
-    p_numeric[is.na(p_numeric)] <- 1  # Set "n/a" to 1 (non-significant)
+    p_numeric[is.na(p_numeric)] <- 1
   } else {
     p_numeric <- p_values
   }
   x$results$sig <- sapply(p_numeric, add_significance_stars)
-  
-  # Template Standard: Dual grouped data detection
-  is_grouped_data <- isTRUE(x$is_grouped)
-  if (is_grouped_data) {
-    # Get unique groups
-    groups <- unique(x$results[x$groups])
-    
-    # Print results for each group
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-      
-      # Filter results for current group
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
-      }
 
-      if (nrow(group_results) == 0) next
-      group_results <- group_results[!is.na(group_results$Variable), ]
-      if (nrow(group_results) == 0) next
+  # Resolve show toggles (default TRUE when called without summary object)
+  show_descriptives <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
+  show_anova_table  <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
+  show_effect_sizes <- if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
 
-      # Print group header using standardized helper
-      print_group_header(group_values)
-      
-      # Print each variable as separate block
-      for (j in seq_len(nrow(group_results))) {
-        var <- group_results$Variable[j]
-        stats <- group_results$group_stats[[j]]
-        anova_table <- group_results$anova_table[[j]]
-        welch_result <- group_results$welch_result[[j]]
-        
-        cat(sprintf("\n--- %s ---\n", var))
-        cat("\n")  # Add blank line after variable name
-        
-        # Print descriptive statistics
-        if (!is.null(stats)) {
-          if (!is.null(x$weights)) {
-            cat("Weighted Descriptive Statistics by Group:\n")
-            for (level in names(stats)) {
-              stat <- stats[[level]]
-              cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.1f\n", 
-                          level, stat$mean, stat$sd, stat$weighted_n))
-            }
-          } else {
-            cat("Descriptive Statistics by Group:\n")
-            for (level in names(stats)) {
-              stat <- stats[[level]]
-              cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.0f\n", 
-                          level, stat$mean, stat$sd, stat$n))
-            }
-          }
+  # Internal helper: print a single variable block
+  .print_var_block <- function(var_results, idx) {
+    var <- var_results$Variable[idx]
+    stats <- var_results$group_stats[[idx]]
+    anova_table <- var_results$anova_table[[idx]]
+    welch_result <- var_results$welch_result[[idx]]
+
+    cat(sprintf("\n--- %s ---\n", var))
+    cat("\n")
+
+    # Descriptive statistics (gated)
+    if (show_descriptives && !is.null(stats)) {
+      if (is_weighted) {
+        cat("Weighted Descriptive Statistics by Group:\n")
+        for (level in names(stats)) {
+          stat <- stats[[level]]
+          cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.1f\n",
+                      level, stat$mean, stat$sd, stat$weighted_n))
         }
-        
-        # Print ANOVA table
-        if (!is.null(anova_table)) {
-          cat(sprintf("\n%s:\n", ifelse(!is.null(x$weights), "Weighted ANOVA Results", "ANOVA Results")))
-          
-                  # Format ANOVA table for display
-        display_table <- anova_table
-        display_table$Sum_Squares <- round(display_table$Sum_Squares, 3)
-        # Handle Mean_Square column carefully
-        display_table$Mean_Square <- ifelse(display_table$Mean_Square == "", "", 
-                                           round(as.numeric(display_table$Mean_Square), 3))
-        # Handle F column carefully  
-        display_table$F <- ifelse(display_table$F == "", "", 
-                                 round(as.numeric(display_table$F), 3))
-        # Handle p_value column
-        display_table$p_value <- ifelse(display_table$p_value == "", "", 
-                                       ifelse(as.numeric(display_table$p_value) < 0.001, "<.001", 
-                                             round(as.numeric(display_table$p_value), 3)))
-          
-          # Add significance stars to F row
-          f_sig <- group_results$sig[j]
-          display_table$sig <- c(f_sig, "", "")
-          
-          # Create box around ANOVA table like t-test
-          border_width <- paste(rep("-", 80), collapse = "")
-          cat(border_width, "\n")
-          print(display_table, row.names = FALSE, na.print = "")
-          cat(border_width, "\n")
+      } else {
+        cat("Descriptive Statistics by Group:\n")
+        for (level in names(stats)) {
+          stat <- stats[[level]]
+          cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.0f\n",
+                      level, stat$mean, stat$sd, stat$n))
         }
-        
-        # Print assumption tests (Welch)
-        if (!is.null(welch_result)) {
-          cat("\nAssumption Tests:\n")
-          cat(paste(rep("-", 16), collapse = ""), "\n")
-          
-          welch_p <- welch_result$p.value
-          welch_sig <- cut(welch_p, 
-                          breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                          labels = c("***", "**", "*", ""),
-                          right = FALSE)
-          
-          welch_table <- data.frame(
-            Assumption = "Welch",
-            Statistic = round(welch_result$statistic, 3),
-            df1 = welch_result$parameter[1],
-            df2 = round(welch_result$parameter[2], 0),
-            p_value = ifelse(welch_p < 0.001, "<.001", round(welch_p, 3)),
-            sig = welch_sig
-          )
-          
-          print(welch_table, row.names = FALSE)
-        }
-        
-        # Print effect sizes
-        eta_val <- group_results$eta_squared[j]
-        epsilon_val <- group_results$epsilon_squared[j]
-        omega_val <- group_results$omega_squared[j]
-        
-        if (!is.na(eta_val)) {
-          effect_size_category <- if (abs(eta_val) < 0.01) "negligible" else
-                                 if (abs(eta_val) < 0.06) "small" else
-                                 if (abs(eta_val) < 0.14) "medium" else "large"
-          
-          effect_df <- data.frame(
-            Variable = var,
-            Eta_Squared = round(eta_val, 3),
-            Epsilon_Squared = round(epsilon_val, 3),
-            Omega_Squared = round(omega_val, 3),
-            Effect_Size = effect_size_category,
-            stringsAsFactors = FALSE
-          )
-          
-          cat("\nEffect Sizes:\n")
-          cat(paste(rep("-", 12), collapse = ""), "\n")
-          print(effect_df, row.names = FALSE)
-        }
-        cat("\n")
       }
     }
-  } else {
-    # Print results for ungrouped data - each variable as separate block
-    valid_results <- x$results[!is.na(x$results$Variable), ]
-    
-    for (i in seq_len(nrow(valid_results))) {
-      var_name <- valid_results$Variable[i]
-      stats <- valid_results$group_stats[[i]]
-      anova_table <- valid_results$anova_table[[i]]
-      welch_result <- valid_results$welch_result[[i]]
-      
-      cat(sprintf("\n--- %s ---\n", var_name))
-      cat("\n")  # Add blank line after variable name
-      
-      # Print descriptive statistics
-      if (!is.null(stats)) {
-        if (!is.null(x$weights)) {
-          cat("Weighted Descriptive Statistics by Group:\n")
-          for (level in names(stats)) {
-            stat <- stats[[level]]
-            cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.1f\n", 
-                        level, stat$mean, stat$sd, stat$weighted_n))
-          }
-        } else {
-          cat("Descriptive Statistics by Group:\n")
-          for (level in names(stats)) {
-            stat <- stats[[level]]
-            cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.0f\n", 
-                        level, stat$mean, stat$sd, stat$n))
-          }
-        }
-      }
-      
-      # Print ANOVA table
+
+    # ANOVA table (gated)
+    if (show_anova_table) {
       if (!is.null(anova_table)) {
-        cat(sprintf("\n%s:\n", ifelse(!is.null(x$weights), "Weighted ANOVA Results", "ANOVA Results")))
-        
+        cat(sprintf("\n%s:\n", ifelse(is_weighted, "Weighted ANOVA Results", "ANOVA Results")))
+
         # Format ANOVA table for display
         display_table <- anova_table
         display_table$Sum_Squares <- round(display_table$Sum_Squares, 3)
-        # Handle Mean_Square column carefully
-        display_table$Mean_Square <- ifelse(display_table$Mean_Square == "", "", 
+        display_table$Mean_Square <- ifelse(display_table$Mean_Square == "", "",
                                            round(as.numeric(display_table$Mean_Square), 3))
-        # Handle F column carefully  
-        display_table$F <- ifelse(display_table$F == "", "", 
+        display_table$F <- ifelse(display_table$F == "", "",
                                  round(as.numeric(display_table$F), 3))
-        # Handle p_value column
-        display_table$p_value <- ifelse(display_table$p_value == "", "", 
-                                       ifelse(as.numeric(display_table$p_value) < 0.001, "<.001", 
+        display_table$p_value <- ifelse(display_table$p_value == "", "",
+                                       ifelse(as.numeric(display_table$p_value) < 0.001, "<.001",
                                              round(as.numeric(display_table$p_value), 3)))
-        
-            # Add significance stars to F row
-    f_sig <- valid_results$sig[i]
-    display_table$sig <- c(f_sig, "", "")
-    
-    # Create box around ANOVA table like t-test
-    border_width <- paste(rep("-", 80), collapse = "")
-    cat(border_width, "\n")
-    print(display_table, row.names = FALSE, na.print = "")
-    cat(border_width, "\n")
+
+        f_sig <- var_results$sig[idx]
+        display_table$sig <- c(f_sig, "", "")
+
+        border_width <- paste(rep("-", 80), collapse = "")
+        cat(border_width, "\n")
+        print(display_table, row.names = FALSE, na.print = "")
+        cat(border_width, "\n")
       }
-      
-      # Print assumption tests (Welch)
+
+      # Welch test (part of anova_table section)
       if (!is.null(welch_result)) {
         cat("\nAssumption Tests:\n")
         cat(paste(rep("-", 16), collapse = ""), "\n")
-        
+
         welch_p <- welch_result$p.value
-        welch_sig <- cut(welch_p, 
+        welch_sig <- cut(welch_p,
                         breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
                         labels = c("***", "**", "*", ""),
                         right = FALSE)
-        
+
         welch_table <- data.frame(
           Assumption = "Welch",
           Statistic = round(welch_result$statistic, 3),
@@ -845,54 +785,152 @@ print.oneway_anova <- function(x, digits = 3, ...) {
           p_value = ifelse(welch_p < 0.001, "<.001", round(welch_p, 3)),
           sig = welch_sig
         )
-        
+
         print(welch_table, row.names = FALSE)
       }
-      
-      # Print effect sizes
-      eta_val <- valid_results$eta_squared[i]
-      epsilon_val <- valid_results$epsilon_squared[i]
-      omega_val <- valid_results$omega_squared[i]
-      
+    }
+
+    # Effect sizes (gated)
+    if (show_effect_sizes) {
+      eta_val <- var_results$eta_squared[idx]
+      epsilon_val <- var_results$epsilon_squared[idx]
+      omega_val <- var_results$omega_squared[idx]
+
       if (!is.na(eta_val)) {
         effect_size_category <- if (abs(eta_val) < 0.01) "negligible" else
                                if (abs(eta_val) < 0.06) "small" else
                                if (abs(eta_val) < 0.14) "medium" else "large"
-        
+
         effect_df <- data.frame(
-          Variable = var_name,
+          Variable = var,
           Eta_Squared = round(eta_val, 3),
           Epsilon_Squared = round(epsilon_val, 3),
           Omega_Squared = round(omega_val, 3),
           Effect_Size = effect_size_category,
           stringsAsFactors = FALSE
         )
-        
+
         cat("\nEffect Sizes:\n")
         cat(paste(rep("-", 12), collapse = ""), "\n")
         print(effect_df, row.names = FALSE)
-        cat("\n")
       }
     }
+    cat("\n")
   }
-  
-  print_significance_legend()
 
-  # Add interpretation guidelines only once at the end
-  cat("\nEffect Size Interpretation:\n")
-  cat("- Eta-squared: Proportion of variance explained (biased upward)\n")
-  cat("- Epsilon-squared: Less biased than eta-squared\n")
-  cat("- Omega-squared: Unbiased estimate (preferred for publication)\n")
-  cat("- Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14\n")
-  
-  # Add note about post-hoc tests
+  # Template Standard: Dual grouped data detection
+  is_grouped_data <- isTRUE(x$is_grouped)
+
+  if (is_grouped_data) {
+    groups <- unique(x$results[x$groups])
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+
+      group_results <- x$results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      if (nrow(group_results) == 0) next
+      group_results <- group_results[!is.na(group_results$Variable), ]
+      if (nrow(group_results) == 0) next
+
+      print_group_header(group_values)
+
+      for (j in seq_len(nrow(group_results))) {
+        .print_var_block(group_results, j)
+      }
+    }
+  } else {
+    valid_results <- x$results[!is.na(x$results$Variable), ]
+    for (i in seq_len(nrow(valid_results))) {
+      .print_var_block(valid_results, i)
+    }
+  }
+
+  # Footer sections
+  if (show_anova_table) {
+    print_significance_legend()
+  }
+
+  if (show_effect_sizes) {
+    cat("\nEffect Size Interpretation:\n")
+    cat("- Eta-squared: Proportion of variance explained (biased upward)\n")
+    cat("- Epsilon-squared: Less biased than eta-squared\n")
+    cat("- Omega-squared: Unbiased estimate (preferred for publication)\n")
+    cat("- Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14\n")
+  }
+
+  # Post-hoc note (always shown)
   if (x$is_grouped) {
     cat("\nPost-hoc tests: Use tukey_test() for pairwise comparisons on each variable within each group\n")
   } else {
     cat(sprintf("\nPost-hoc tests: Use tukey_test() for pairwise comparisons%s\n",
                 ifelse(length(x$variables) > 1, " on each variable", "")))
   }
+}
 
+#' Summary method for one-way ANOVA results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including group descriptives, ANOVA table with Welch test, and effect sizes.
+#'
+#' @param object A \code{oneway_anova} result object.
+#' @param descriptives Logical. Show group descriptive statistics? (Default: TRUE)
+#' @param anova_table Logical. Show ANOVA results table and Welch test? (Default: TRUE)
+#' @param effect_sizes Logical. Show effect size measures? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.oneway_anova} object.
+#'
+#' @examples
+#' result <- oneway_anova(survey_data, life_satisfaction, group = education)
+#' summary(result)
+#' summary(result, effect_sizes = FALSE)
+#'
+#' @seealso \code{\link{oneway_anova}} for the main analysis function.
+#' @export
+#' @method summary oneway_anova
+summary.oneway_anova <- function(object, descriptives = TRUE, anova_table = TRUE,
+                                  effect_sizes = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object = object,
+    show = list(descriptives = descriptives, anova_table = anova_table,
+                effect_sizes = effect_sizes),
+    digits = digits,
+    class_name = "summary.oneway_anova"
+  )
+}
+
+#' Print summary of one-way ANOVA results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a one-way ANOVA, with sections
+#' controlled by the boolean parameters passed to
+#' \code{\link{summary.oneway_anova}}.  Sections include group descriptives,
+#' ANOVA table, homogeneity of variances (Levene's test), and effect sizes.
+#'
+#' @param x A \code{summary.oneway_anova} object created by
+#'   \code{\link{summary.oneway_anova}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- oneway_anova(survey_data, life_satisfaction, group = education)
+#' summary(result)                        # all sections
+#' summary(result, descriptives = FALSE)  # hide group statistics
+#'
+#' @seealso \code{\link{oneway_anova}} for the main analysis,
+#'   \code{\link{summary.oneway_anova}} for summary options.
+#' @export
+#' @method print summary.oneway_anova
+print.summary.oneway_anova <- function(x, ...) {
+  digits <- x$digits
+  weights_name <- x$weights
+  title <- get_standard_title("One-Way ANOVA", weights_name, "Results")
+  print_header(title, newline_before = FALSE)
+  .print_oneway_anova_impl(x, digits)
   invisible(x)
 }
 

@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
 Title: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data
-Version: 0.5.0.1
+Version: 0.5.1
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
@@ -11,9 +11,10 @@ Description: Professional statistical analysis of survey data with full support
     44 functions for descriptive statistics, hypothesis testing, correlation
     analysis, post-hoc comparisons, weighted statistics, scale analysis,
     regression, non-parametric tests, exact tests, factorial ANOVA, and ANCOVA.
-    All results are validated against SPSS v29 for reproducibility. Designed for
-    survey researchers, social scientists, and students working with complex
-    survey designs.
+    Every analysis offers compact print() and detailed summary() output with
+    toggleable sections. All results are validated against SPSS v29 for
+    reproducibility. Designed for survey researchers, social scientists, and
+    students working with complex survey designs.
 License: MIT + file LICENSE
 Language: en
 Encoding: UTF-8

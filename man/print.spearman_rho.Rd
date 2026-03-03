@@ -2,17 +2,30 @@
 % Please edit documentation in R/spearman_rho.R
 \name{print.spearman_rho}
 \alias{print.spearman_rho}
-\title{Print method for spearman_rho}
+\title{Print Spearman correlation results (compact)}
 \usage{
 \method{print}{spearman_rho}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{An object of class "spearman_rho"}
+\item{x}{An object of class \code{"spearman_rho"} returned by
+\code{\link{spearman_rho}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments (not used)}
+\item{...}{Additional arguments (not used).}
+}
+\value{
+Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for spearman_rho
+Compact print method for objects of class \code{"spearman_rho"}.
+Shows rank correlation coefficient, p-value, and sample size per pair.
+
+For the full detailed output including matrices, use \code{summary()}.
+}
+\examples{
+result <- spearman_rho(survey_data, age, life_satisfaction)
+result              # compact one-line overview
+summary(result)     # full correlation matrices
+
 }

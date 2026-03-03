@@ -31,6 +31,7 @@
 #'   including the tau-b coefficient, p-value, z-score, and sample size for each
 #'   pair. For multiple variables, correlation, significance, and sample size
 #'   matrices are also provided.
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -94,11 +95,13 @@
 #' survey_data %>%
 #'   kendall_tau(age, income, alternative = "greater")
 #'
-#' # Store results for further analysis
+#' # --- Three-layer output ---
 #' result <- survey_data %>%
 #'   kendall_tau(life_satisfaction, political_orientation, trust_media,
 #'               weights = sampling_weight)
-#' print(result)
+#' result              # compact one-line overview
+#' summary(result)     # full correlation, p-value, and N matrices
+#' summary(result, pvalue_matrix = FALSE)  # hide p-values
 #'
 #' @seealso
 #' \code{\link[stats]{cor}} with \code{method = "kendall"} for the base R
@@ -107,6 +110,8 @@
 #' \code{\link{spearman_rho}} for Spearman's rank correlation.
 #'
 #' \code{\link{pearson_cor}} for Pearson correlation analysis.
+#'
+#' \code{\link{summary.kendall_tau}} for detailed output with toggleable sections.
 #'
 #' @references
 #' Kendall, M. G. (1938). A new measure of rank correlation.
@@ -546,20 +551,158 @@ kendall_tau <- function(data, ..., weights = NULL,
   return(result)
 }
 
-#' Print method for kendall_tau
+#' Print Kendall's tau results (compact)
 #'
-#' @param x A kendall_tau object
-#' @param digits Number of decimal places to display (default: 3)
-#' @param ... Additional arguments passed to print
+#' @description
+#' Compact print method for objects of class \code{"kendall_tau"}.
+#' Shows tau coefficient, p-value, and sample size per pair.
+#'
+#' For the full detailed output including matrices, use \code{summary()}.
+#'
+#' @param x An object of class \code{"kendall_tau"} returned by
+#'   \code{\link{kendall_tau}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- kendall_tau(survey_data, age, life_satisfaction)
+#' result              # compact one-line overview
+#' summary(result)     # full correlation matrices
 #'
 #' @export
+#' @method print kendall_tau
 print.kendall_tau <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  corrs <- x$correlations
 
-  # Print header using standardized helper
-  test_type <- get_standard_title("Kendall's Tau-b Correlation", x$weights, "")
-  print_header(test_type)
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(corrs[x$groups])
+    for (gi in seq_len(nrow(groups))) {
+      group_values <- groups[gi, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
 
-  # Print test information using standardized helpers
+      group_corrs <- corrs
+      for (g in names(group_values)) {
+        group_corrs <- group_corrs[group_corrs[[g]] == group_values[[g]], ]
+      }
+      .print_kendall_compact(x, group_corrs, weighted_tag, digits)
+    }
+  } else {
+    .print_kendall_compact(x, corrs, weighted_tag, digits)
+  }
+
+  invisible(x)
+}
+
+#' Print compact kendall_tau output for one group or ungrouped
+#' @keywords internal
+.print_kendall_compact <- function(x, corrs, weighted_tag, digits) {
+  n_vars <- length(x$variables)
+
+  if (n_vars == 2) {
+    pair_label <- paste(x$variables[1], "x", x$variables[2])
+    cat(sprintf("Kendall's Tau: %s%s\n", pair_label, weighted_tag))
+    tau_val <- corrs$tau[1]
+    p_val <- as.numeric(corrs$p_value[1])
+    n_val <- corrs$n[1]
+    cat(sprintf("  tau = %.*f, %s %s, N = %d\n",
+                digits, tau_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                n_val))
+  } else {
+    n_sig <- sum(as.numeric(corrs$p_value) < 0.05, na.rm = TRUE)
+    n_pairs <- nrow(corrs)
+    cat(sprintf("Kendall's Tau: %d variables%s\n", n_vars, weighted_tag))
+
+    for (i in seq_len(n_pairs)) {
+      pair_label <- paste(corrs$var1[i], "x", corrs$var2[i])
+      tau_val <- corrs$tau[i]
+      p_val <- as.numeric(corrs$p_value[i])
+      line <- sprintf("  %-30s tau = %.*f, %s %s",
+                       paste0(pair_label, ":"),
+                       digits, tau_val,
+                       format_p_compact(p_val, digits),
+                       add_significance_stars(p_val))
+      cat(line, "\n")
+    }
+    cat(sprintf("  %d/%d pairs significant (p < .05), N = %d\n",
+                n_sig, n_pairs, corrs$n[1]))
+  }
+}
+
+#' Summary method for Kendall's tau correlation results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including tau matrices, p-value matrices, and sample size matrices.
+#'
+#' @param object A \code{kendall_tau} result object.
+#' @param correlation_matrix Logical. Show the tau coefficient matrix? (Default: TRUE)
+#' @param pvalue_matrix Logical. Show the p-value matrix? (Default: TRUE)
+#' @param n_matrix Logical. Show the sample size matrix? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.kendall_tau} object.
+#'
+#' @examples
+#' result <- kendall_tau(survey_data, trust_government, trust_media)
+#' summary(result)
+#' summary(result, pvalue_matrix = FALSE)
+#'
+#' @seealso \code{\link{kendall_tau}} for the main analysis function.
+#' @export
+#' @method summary kendall_tau
+summary.kendall_tau <- function(object, correlation_matrix = TRUE,
+                                pvalue_matrix = TRUE, n_matrix = TRUE,
+                                digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(correlation_matrix = correlation_matrix,
+                      pvalue_matrix = pvalue_matrix,
+                      n_matrix = n_matrix),
+    digits     = digits,
+    class_name = "summary.kendall_tau"
+  )
+}
+
+#' Print summary of Kendall's tau correlation results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a Kendall's tau correlation,
+#' with sections controlled by the boolean parameters passed to
+#' \code{\link{summary.kendall_tau}}.  Sections include the correlation
+#' matrix, p-value matrix, and sample size matrix.
+#'
+#' @param x A \code{summary.kendall_tau} object created by
+#'   \code{\link{summary.kendall_tau}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- kendall_tau(survey_data, age, life_satisfaction)
+#' summary(result)                             # all matrices
+#' summary(result, pvalue_matrix = FALSE)      # hide p-values
+#'
+#' @seealso \code{\link{kendall_tau}} for the main analysis,
+#'   \code{\link{summary.kendall_tau}} for summary options.
+#' @export
+#' @method print summary.kendall_tau
+print.summary.kendall_tau <- function(x, ...) {
+  digits <- x$digits
+  show_cor <- if (!is.null(x$show)) isTRUE(x$show$correlation_matrix) else TRUE
+  show_p   <- if (!is.null(x$show)) isTRUE(x$show$pvalue_matrix) else TRUE
+  show_n   <- if (!is.null(x$show)) isTRUE(x$show$n_matrix) else TRUE
+
+  # Header
+  title <- get_standard_title("Kendall's Tau-b Correlation", x$weights, "")
+  print_header(title)
+
+  # Info section
   cat("\n")
   test_info <- list(
     "Weights variable" = x$weights,
@@ -569,136 +712,90 @@ print.kendall_tau <- function(x, digits = 3, ...) {
   print_info_section(test_info)
   cat("\n")
 
-  if (x$is_grouped) {
-    # Grouped analysis
+  if (isTRUE(x$is_grouped)) {
     group_combinations <- unique(x$correlations[x$groups])
 
-    for (i in seq_len(nrow(group_combinations))) {
-      # Print group header using standardized helper
-      print_group_header(group_combinations[i, , drop = FALSE])
+    for (gi in seq_len(nrow(group_combinations))) {
+      print_group_header(group_combinations[gi, , drop = FALSE])
 
-      # Filter correlations for this group
       group_corrs <- x$correlations
       for (g in names(group_combinations)) {
-        group_corrs <- group_corrs[group_corrs[[g]] == group_combinations[i, g], ]
+        group_corrs <- group_corrs[group_corrs[[g]] == group_combinations[gi, g], ]
       }
 
-      # For each pair of variables, show results
-      if (length(x$variables) == 2) {
-        var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-        cat(sprintf("\n--- %s ---\n\n", var_pair))
-        .print_single_pair(group_corrs, stat_label = "\u03c4", stat_col = "tau",
-                           corr_name = "Kendall's tau-b",
-                           secondary_label = "z-score",
-                           secondary_col = "z_score",
-                           alternative = x$alternative)
-
-      } else {
-        # Multiple correlations - show matrix first, then detailed results
-        # Use the smart matrix printer for all matrices
-        tau_matrix <- x$matrices[[i]]$tau
-        .print_cor_matrix(tau_matrix, digits = digits,
-                         title = "Kendall's Tau-b Matrix:",
-                         type = "correlation")
-
-        # Print p-value matrix
-        p_matrix <- x$matrices[[i]]$p_values
-        .print_cor_matrix(p_matrix, digits = 4,
-                         title = sprintf("Significance Matrix (p-values, %s):",
-                                       if(x$alternative == "two.sided") "2-tailed" else "1-tailed"),
-                         type = "pvalue")
-
-        # Print sample size matrix
-        n_matrix <- x$matrices[[i]]$n_obs
-        .print_cor_matrix(n_matrix, digits = 0,
-                         title = "Sample Size Matrix:",
-                         type = "n")
-
-        # Detailed pairwise results
-        cat("\nPairwise Results:\n")
-        cat(paste(rep("-", 69), collapse = ""), "\n")
-
-        # Create results table
-        output_df <- data.frame(
-          Pair = paste(group_corrs$var1, "\u00d7", group_corrs$var2),
-          tau_b = sprintf("%.3f", group_corrs$tau),
-          z = sprintf("%.3f", group_corrs$z_score),
-          p = sprintf("%.4f", group_corrs$p_value),
-          n = group_corrs$n,
-          sig = group_corrs$sig,
-          stringsAsFactors = FALSE
-        )
-
-        # Print the table
-        print(output_df, row.names = FALSE, right = TRUE)
-        cat(paste(rep("-", 69), collapse = ""), "\n")
-      }
+      .print_kendall_verbose(x, group_corrs, gi, show_cor, show_p, show_n, digits)
     }
-
   } else {
-    # Ungrouped analysis
-    if (length(x$variables) == 2) {
-      var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-      cat(sprintf("\n--- %s ---\n\n", var_pair))
-      .print_single_pair(x$correlations, stat_label = "\u03c4", stat_col = "tau",
-                         corr_name = "Kendall's tau-b",
-                         secondary_label = "z-score",
-                         secondary_col = "z_score",
-                         alternative = x$alternative)
-
-    } else {
-      # Multiple correlations - show matrices
-      tau_matrix <- x$matrices[[1]]$tau
-      .print_cor_matrix(tau_matrix, digits = digits,
-                       title = "Kendall's Tau-b Matrix:",
-                       type = "correlation")
-
-      # Print p-value matrix
-      p_matrix <- x$matrices[[1]]$p_values
-      .print_cor_matrix(p_matrix, digits = 4,
-                       title = sprintf("Significance Matrix (p-values, %s):",
-                                     if(x$alternative == "two.sided") "2-tailed" else "1-tailed"),
-                       type = "pvalue")
-
-      # Print sample size matrix
-      n_matrix <- x$matrices[[1]]$n_obs
-      .print_cor_matrix(n_matrix, digits = 0,
-                       title = "Sample Size Matrix:",
-                       type = "n")
-
-      # Detailed pairwise results
-      cat("\nPairwise Results:\n")
-      cat(paste(rep("-", 69), collapse = ""), "\n")
-
-      # Create results table
-      output_df <- data.frame(
-        Pair = paste(x$correlations$var1, "\u00d7", x$correlations$var2),
-        tau_b = sprintf("%.3f", x$correlations$tau),
-        z = sprintf("%.3f", x$correlations$z_score),
-        p = sprintf("%.4f", x$correlations$p_value),
-        n = x$correlations$n,
-        sig = x$correlations$sig,
-        stringsAsFactors = FALSE
-      )
-
-      # Print the table
-      print(output_df, row.names = FALSE, right = TRUE)
-      cat(paste(rep("-", 69), collapse = ""), "\n")
-    }
+    .print_kendall_verbose(x, x$correlations, 1, show_cor, show_p, show_n, digits)
   }
 
-  # Print significance codes
+  # Footer
   print_significance_legend()
-
-  # Note about interpretation
-  if (length(x$variables) == 2) {
-    abs_tau <- abs(x$correlations$tau[1])
-    strength <- if (abs_tau < 0.3) "weak"
-                else if (abs_tau < 0.5) "moderate"
-                else "strong"
-    cat(sprintf("\nInterpretation: %s %s correlation\n", strength,
-               if(x$correlations$tau[1] > 0) "positive" else if(x$correlations$tau[1] < 0) "negative" else "no"))
-  }
-
   invisible(x)
+}
+
+#' Print verbose kendall_tau output for one group
+#' @keywords internal
+.print_kendall_verbose <- function(x, corrs, matrix_idx, show_cor, show_p, show_n, digits) {
+  n_vars <- length(x$variables)
+
+  if (n_vars == 2) {
+    # For 2 variables, show single-pair detail with optional sections
+    if (show_cor) {
+      cat(sprintf("\n  Kendall's tau-b: tau-b = %.*f\n", digits, corrs$tau[1]))
+    }
+    if (show_p) {
+      cat(sprintf("  p-value: %s %s\n",
+                  format_p_compact(as.numeric(corrs$p_value[1]), digits),
+                  add_significance_stars(as.numeric(corrs$p_value[1]))))
+    }
+    if (show_n) {
+      cat(sprintf("  N = %d\n", corrs$n[1]))
+    }
+    # Always show z-score
+    if ("z_score" %in% names(corrs)) {
+      cat(sprintf("  z-score: %.*f\n", digits, corrs$z_score[1]))
+    }
+  } else {
+    # For 3+ variables, show matrices and pairwise table
+
+    if (show_cor) {
+      tau_matrix <- x$matrices[[matrix_idx]]$tau
+      .print_cor_matrix(tau_matrix, digits = digits,
+                        title = "Kendall's Tau-b Matrix:",
+                        type = "correlation")
+    }
+
+    if (show_p) {
+      p_matrix <- x$matrices[[matrix_idx]]$p_values
+      .print_cor_matrix(p_matrix, digits = 4,
+                        title = sprintf("Significance Matrix (p-values, %s):",
+                                        if (x$alternative == "two.sided") "2-tailed" else "1-tailed"),
+                        type = "pvalue")
+    }
+
+    if (show_n) {
+      n_mat <- x$matrices[[matrix_idx]]$n_obs
+      .print_cor_matrix(n_mat, digits = 0,
+                        title = "Sample Size Matrix:",
+                        type = "n")
+    }
+
+    # Pairwise results always shown
+    cat("\nPairwise Results:\n")
+    cat(paste(rep("-", 69), collapse = ""), "\n")
+
+    output_df <- data.frame(
+      Pair = paste(corrs$var1, "\u00d7", corrs$var2),
+      tau_b = sprintf("%.*f", digits, corrs$tau),
+      z = sprintf("%.*f", digits, corrs$z_score),
+      p = sprintf("%.4f", as.numeric(corrs$p_value)),
+      n = corrs$n,
+      sig = corrs$sig,
+      stringsAsFactors = FALSE
+    )
+
+    print(output_df, row.names = FALSE, right = TRUE)
+    cat(paste(rep("-", 69), collapse = ""), "\n")
+  }
 }

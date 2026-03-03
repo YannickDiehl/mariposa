@@ -169,7 +169,8 @@ survey_data %>%
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
-print(result)
+result                                  # compact overview
+summary(result, descriptives = FALSE)   # detailed output, skip descriptives
 
 # 4. If significant, find out which groups differ
 tukey_test(result)

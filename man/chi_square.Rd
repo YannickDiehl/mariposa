@@ -30,6 +30,7 @@ Test results showing whether the variables are related, including:
 \item Chi-squared statistic and p-value
 \item Observed vs expected frequencies
 \item Effect sizes to measure relationship strength
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 }
 \description{
@@ -115,6 +116,12 @@ survey_data \%>\%
 # With continuity correction
 survey_data \%>\% chi_square(gender, region, correct = TRUE)
 
+# --- Three-layer output ---
+result <- chi_square(survey_data, gender, education)
+result              # compact one-line overview
+summary(result)     # full detailed output with all sections
+summary(result, cross_tabulation = FALSE)  # hide cross-tabulation
+
 }
 \references{
 Pearson, K. (1900). On the criterion that a given system of deviations from
@@ -133,6 +140,8 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 \code{\link{crosstab}} for detailed cross-tabulation tables.
 
 \code{\link{frequency}} for single-variable frequency tables.
+
+\code{\link{summary.chi_square}} for detailed output with toggleable sections.
 
 Other hypothesis_tests: 
 \code{\link{ancova}()},

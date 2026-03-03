@@ -43,6 +43,7 @@ Test results showing whether groups differ, including:
 \item Z-score and p-value (are groups different?)
 \item Effect size r (how big is the difference?)
 \item Rank means for each group (which group is higher?)
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 }
 \description{
@@ -154,10 +155,12 @@ survey_data \%>\%
 survey_data \%>\%
   mann_whitney(life_satisfaction, group = region, alternative = "greater")
 
-# Store results for further analysis
+# --- Three-layer output ---
 result <- survey_data \%>\%
   mann_whitney(income, group = gender, weights = sampling_weight)
-print(result)
+result              # compact one-line overview
+summary(result)     # full detailed output with all sections
+summary(result, effect_sizes = FALSE)  # hide effect sizes
 
 }
 \references{
@@ -177,6 +180,8 @@ Biometrika, 100(4), 831-842.
 \code{\link[survey]{svyranktest}} for survey-weighted rank tests.
 
 \code{\link{t_test}} for parametric t-tests.
+
+\code{\link{summary.mann_whitney}} for detailed output with toggleable sections.
 
 Other hypothesis_tests: 
 \code{\link{ancova}()},

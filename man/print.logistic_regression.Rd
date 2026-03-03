@@ -2,18 +2,29 @@
 % Please edit documentation in R/logistic_regression.R
 \name{print.logistic_regression}
 \alias{print.logistic_regression}
-\title{Print Logistic Regression Results}
+\title{Print logistic regression results (compact)}
 \usage{
 \method{print}{logistic_regression}(x, ...)
 }
 \arguments{
-\item{x}{An object of class \code{"logistic_regression"}.}
+\item{x}{An object of class \code{"logistic_regression"} returned by
+\code{\link{logistic_regression}}.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{...}{Additional arguments (not used).}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print Logistic Regression Results
+Compact print method for objects of class \code{"logistic_regression"}.
+Shows Nagelkerke R-squared, chi-squared test, and classification accuracy.
+
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)
+result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

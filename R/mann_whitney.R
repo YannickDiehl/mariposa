@@ -36,6 +36,7 @@
 #' - Z-score and p-value (are groups different?)
 #' - Effect size r (how big is the difference?)
 #' - Rank means for each group (which group is higher?)
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -89,7 +90,9 @@
 #' \code{\link[survey]{svyranktest}} for survey-weighted rank tests.
 #' 
 #' \code{\link{t_test}} for parametric t-tests.
-#' 
+#'
+#' \code{\link{summary.mann_whitney}} for detailed output with toggleable sections.
+#'
 #' @references
 #' Mann, H. B., & Whitney, D. R. (1947). On a test of whether one of two random 
 #' variables is stochastically larger than the other. The Annals of Mathematical 
@@ -131,10 +134,12 @@
 #' survey_data %>%
 #'   mann_whitney(life_satisfaction, group = region, alternative = "greater")
 #' 
-#' # Store results for further analysis
+#' # --- Three-layer output ---
 #' result <- survey_data %>%
 #'   mann_whitney(income, group = gender, weights = sampling_weight)
-#' print(result)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output with all sections
+#' summary(result, effect_sizes = FALSE)  # hide effect sizes
 #'
 #' @family hypothesis_tests
 #' @export
@@ -430,12 +435,14 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
 # Helper: print a single variable block (rank means + test table)
 #' @keywords internal
-.print_mw_variable_block <- function(var_name, row_data, stats, weights, digits) {
+.print_mw_variable_block <- function(var_name, row_data, stats, weights, digits,
+                                     show_ranks = TRUE, show_results = TRUE,
+                                     show_effect_sizes = TRUE) {
   cat(sprintf("\n--- %s ---\n", var_name))
   cat("\n")
 
-  # Print group rank means
-  if (!is.null(stats) && !is.null(stats$group1)) {
+  # Print group rank means (gated by ranks toggle)
+  if (show_ranks && !is.null(stats) && !is.null(stats$group1)) {
     cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n",
                 stats$group1$name, stats$group1$rank_mean, stats$group1$n))
     cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n",
@@ -443,55 +450,220 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     cat("\n")
   }
 
-  # Build results table
-  results_df <- data.frame(
-    Test = "Mann-Whitney U",
-    U = ifelse(is.na(row_data$U), "NA",
-               format(round(row_data$U, 0), big.mark = ",")),
-    W = ifelse(is.na(row_data$W), "NA",
-               format(round(row_data$W, 0), big.mark = ",")),
-    Z = round(row_data$Z, digits),
-    p_value = round(row_data$p_value, digits),
-    effect_r = round(row_data$effect_size_r, digits),
-    sig = row_data$sig,
-    stringsAsFactors = FALSE
-  )
+  # Build and print results table (gated by results toggle)
+  if (show_results) {
+    results_df <- data.frame(
+      Test = "Mann-Whitney U",
+      U = ifelse(is.na(row_data$U), "NA",
+                 format(round(row_data$U, 0), big.mark = ",")),
+      W = ifelse(is.na(row_data$W), "NA",
+                 format(round(row_data$W, 0), big.mark = ",")),
+      Z = round(row_data$Z, digits),
+      p_value = round(row_data$p_value, digits),
+      effect_r = round(row_data$effect_size_r, digits),
+      sig = row_data$sig,
+      stringsAsFactors = FALSE
+    )
 
-  # Dynamic border width from actual table content
-  col_widths <- sapply(names(results_df), function(col) {
-    max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
-  })
-  total_width <- sum(col_widths) + length(col_widths) - 1
-  border <- paste(rep("-", total_width), collapse = "")
+    # Dynamic border width from actual table content
+    col_widths <- sapply(names(results_df), function(col) {
+      max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
+    })
+    total_width <- sum(col_widths) + length(col_widths) - 1
+    border <- paste(rep("-", total_width), collapse = "")
 
-  label <- if (!is.null(weights)) "Weighted Mann-Whitney U Test Results" else "Mann-Whitney U Test Results"
-  cat(sprintf("\n%s:\n", label))
-  cat(border, "\n")
-  print(results_df, row.names = FALSE)
-  cat(border, "\n\n")
+    label <- if (!is.null(weights)) "Weighted Mann-Whitney U Test Results" else "Mann-Whitney U Test Results"
+    cat(sprintf("\n%s:\n", label))
+    cat(border, "\n")
+    print(results_df, row.names = FALSE)
+    cat(border, "\n\n")
+  }
+
+  # Effect size detail (gated by effect_sizes toggle, only in summary output)
+  if (show_effect_sizes && !show_results) {
+    # Stand-alone effect size when results table is hidden
+    r_val <- row_data$effect_size_r
+    if (!is.na(r_val)) {
+      r_interp <- if (abs(r_val) < 0.1) "negligible"
+                  else if (abs(r_val) < 0.3) "small"
+                  else if (abs(r_val) < 0.5) "medium"
+                  else "large"
+      cat(sprintf("  Effect size: r = %.*f (%s)\n", digits, r_val, r_interp))
+    }
+  }
 }
 
-#' Print method for Mann-Whitney test results
+# Internal: compact one-line summary for a single Mann-Whitney variable
+#' @keywords internal
+.print_mw_compact <- function(results, i, group_tag, weighted_tag, digits) {
+  var_name <- results$Variable[i]
+  U_val    <- results$U[i]
+  Z_val    <- results$Z[i]
+  p_val    <- as.numeric(results$p_value[i])
+  r_val    <- results$effect_size_r[i]
+
+  cat(sprintf("Mann-Whitney U Test: %s%s%s\n", var_name, group_tag, weighted_tag))
+
+  if (!is.na(r_val)) {
+    r_interp <- if (abs(r_val) < 0.1) "negligible"
+                else if (abs(r_val) < 0.3) "small"
+                else if (abs(r_val) < 0.5) "medium"
+                else "large"
+
+    stats <- results$group_stats[[i]]
+    n_total <- if (!is.null(stats) && !is.null(stats$group1)) {
+      round(stats$group1$n + stats$group2$n)
+    } else NA_real_
+
+    cat(sprintf("  U = %s, Z = %.*f, %s %s, r = %.*f (%s), N = %d\n",
+                format(round(U_val, 0), big.mark = ","),
+                digits, Z_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                digits, r_val, r_interp, n_total))
+  } else {
+    cat(sprintf("  U = %s, Z = %.*f, %s %s\n",
+                format(round(U_val, 0), big.mark = ","),
+                digits, Z_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val)))
+  }
+}
+
+#' Print Mann-Whitney test results (compact)
 #'
-#' @param x A mann_whitney object
-#' @param digits Number of decimal places to display (default: 3)
-#' @param ... Additional arguments (not used)
+#' @description
+#' Compact print method for objects of class \code{"mann_whitney"}.
+#' Shows a one-line summary per variable with test statistic, p-value,
+#' effect size, and sample size.
+#'
+#' For the full detailed output, use \code{summary()}.
+#'
+#' @param x An object of class \code{"mann_whitney"} returned by
+#'   \code{\link{mann_whitney}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- mann_whitney(survey_data, life_satisfaction, group = gender)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
 #' @method print mann_whitney
 print.mann_whitney <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_tag <- if (!is.null(x$group)) paste0(" by ", x$group) else ""
+  results <- x$results
+  results$p_value <- as.numeric(results$p_value)
 
-  # Determine test type using standardized helper
+  if (isTRUE(x$is_grouped)) {
+    group_vars <- setdiff(names(results), c("Variable", "U", "W", "Z", "p_value",
+                                             "effect_size_r", "rank_mean_diff",
+                                             "group_stats"))
+    groups <- unique(results[group_vars])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      group_results <- group_results[!is.na(group_results$Variable), ]
+      for (j in seq_len(nrow(group_results))) {
+        .print_mw_compact(group_results, j, group_tag, weighted_tag, digits)
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(results))) {
+      if (is.na(results$Variable[i])) next
+      .print_mw_compact(results, i, group_tag, weighted_tag, digits)
+    }
+  }
+
+  invisible(x)
+}
+
+#' Summary method for Mann-Whitney test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including rank statistics per group, test results table with U, W, Z
+#' statistics, and effect size interpretation.
+#'
+#' @param object A \code{mann_whitney} result object.
+#' @param ranks Logical. Show rank statistics per group? (Default: TRUE)
+#' @param results Logical. Show test results table? (Default: TRUE)
+#' @param effect_sizes Logical. Show effect size output and interpretation?
+#'   (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.mann_whitney} object.
+#'
+#' @examples
+#' result <- mann_whitney(survey_data, life_satisfaction, group = gender)
+#' summary(result)
+#' summary(result, effect_sizes = FALSE)
+#'
+#' @seealso \code{\link{mann_whitney}} for the main analysis function.
+#' @export
+#' @method summary mann_whitney
+summary.mann_whitney <- function(object, ranks = TRUE, results = TRUE,
+                                 effect_sizes = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(ranks = ranks, results = results,
+                      effect_sizes = effect_sizes),
+    digits     = digits,
+    class_name = "summary.mann_whitney"
+  )
+}
+
+#' Print summary of Mann-Whitney test results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a Mann-Whitney U test, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.mann_whitney}}.  Sections include rank statistics,
+#' test results, and effect sizes (rank-biserial correlation).
+#'
+#' @param x A \code{summary.mann_whitney} object created by
+#'   \code{\link{summary.mann_whitney}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- mann_whitney(survey_data, life_satisfaction, group = gender)
+#' summary(result)                        # all sections
+#' summary(result, effect_sizes = FALSE)  # hide effect sizes
+#'
+#' @seealso \code{\link{mann_whitney}} for the main analysis,
+#'   \code{\link{summary.mann_whitney}} for summary options.
+#' @export
+#' @method print summary.mann_whitney
+print.summary.mann_whitney <- function(x, ...) {
+  digits <- x$digits
   weights_name <- x$weights
-  test_type <- get_standard_title("Mann-Whitney U Test", weights_name, "Results")
-  print_header(test_type)
+  title <- get_standard_title("Mann-Whitney U Test", weights_name, "Results")
+  print_header(title, newline_before = FALSE)
 
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
 
-  # Add significance stars using standard helper
+  # Add significance stars
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
 
-  # Template Standard: Dual grouped data detection
+  # Resolve show toggles
+  show_ranks        <- if (!is.null(x$show)) isTRUE(x$show$ranks) else TRUE
+  show_results      <- if (!is.null(x$show)) isTRUE(x$show$results) else TRUE
+  show_effect_sizes <- if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
+
   is_grouped_data <- isTRUE(x$is_grouped)
 
   # Print info about grouping variable if present
@@ -501,7 +673,9 @@ print.mann_whitney <- function(x, digits = 3, ...) {
       cat("\n")
       test_info <- list(
         "Grouping variable" = x$group,
-        "Groups compared" = sprintf("%s vs. %s", as.character(group_levels[1]), as.character(group_levels[2])),
+        "Groups compared" = sprintf("%s vs. %s",
+                                    as.character(group_levels[1]),
+                                    as.character(group_levels[2])),
         "Weights variable" = weights_name
       )
       print_info_section(test_info)
@@ -517,7 +691,8 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   if (is_grouped_data) {
     # Get unique groups
     group_vars <- setdiff(names(x$results), c("Variable", "U", "W", "Z", "p_value",
-                                               "effect_size_r", "rank_mean_diff", "group_stats", "sig"))
+                                               "effect_size_r", "rank_mean_diff",
+                                               "group_stats", "sig"))
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -534,11 +709,14 @@ print.mann_whitney <- function(x, digits = 3, ...) {
 
       for (j in seq_len(nrow(group_results))) {
         .print_mw_variable_block(
-          var_name  = group_results$Variable[j],
-          row_data  = group_results[j, ],
-          stats     = group_results$group_stats[[j]],
-          weights   = x$weights,
-          digits    = digits
+          var_name         = group_results$Variable[j],
+          row_data         = group_results[j, ],
+          stats            = group_results$group_stats[[j]],
+          weights          = x$weights,
+          digits           = digits,
+          show_ranks       = show_ranks,
+          show_results     = show_results,
+          show_effect_sizes = show_effect_sizes
         )
       }
     }
@@ -547,29 +725,37 @@ print.mann_whitney <- function(x, digits = 3, ...) {
 
     for (i in seq_len(nrow(valid_results))) {
       .print_mw_variable_block(
-        var_name  = valid_results$Variable[i],
-        row_data  = valid_results[i, ],
-        stats     = valid_results$group_stats[[i]],
-        weights   = x$weights,
-        digits    = digits
+        var_name         = valid_results$Variable[i],
+        row_data         = valid_results[i, ],
+        stats            = valid_results$group_stats[[i]],
+        weights          = x$weights,
+        digits           = digits,
+        show_ranks       = show_ranks,
+        show_results     = show_results,
+        show_effect_sizes = show_effect_sizes
       )
     }
   }
 
-  if (!is.null(x$weights)) {
+  # Weighted note (show when ranks or results are shown)
+  if (!is.null(x$weights) && (show_ranks || show_results)) {
     cat("\nNote: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).\n")
     cat("U and W are descriptive statistics derived from weighted ranks.\n")
   }
 
-  print_significance_legend()
+  # Significance legend (show when results are shown)
+  if (show_results) {
+    print_significance_legend()
+  }
 
-  cat("\nEffect Size Interpretation (r):\n")
-  cat("- Small effect: |r| ~ 0.1\n")
-  cat("- Medium effect: |r| ~ 0.3\n")
-  cat("- Large effect: |r| ~ 0.5\n")
+  # Effect size interpretation footer (gated by effect_sizes toggle)
+  if (show_effect_sizes) {
+    cat("\nEffect Size Interpretation (r):\n")
+    cat("- Negligible effect: |r| < 0.1\n")
+    cat("- Small effect: |r| ~ 0.1\n")
+    cat("- Medium effect: |r| ~ 0.3\n")
+    cat("- Large effect: |r| ~ 0.5\n")
+  }
 
   invisible(x)
 }
-
-
-

@@ -44,6 +44,7 @@ Correlation results showing rank-based relationships between variables,
 including the rho coefficient, p-value, t-statistic, and sample size for
 each pair. For multiple variables, correlation, significance, and sample
 size matrices are also provided.
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 Calculates Spearman's rank correlation coefficients (rho) between variables with support
@@ -135,6 +136,12 @@ survey_data \%>\%
 survey_data \%>\%
   spearman_rho(age, income, alternative = "greater")
 
+# --- Three-layer output ---
+result <- spearman_rho(survey_data, age, income, life_satisfaction)
+result              # compact one-line overview
+summary(result)     # full correlation, p-value, and N matrices
+summary(result, pvalue_matrix = FALSE)  # hide p-values
+
 }
 \references{
 Spearman, C. (1904). The proof and measurement of association between two
@@ -150,6 +157,8 @@ implementation.
 \code{\link{kendall_tau}} for Kendall's rank correlation.
 
 \code{\link{pearson_cor}} for Pearson correlation analysis.
+
+\code{\link{summary.spearman_rho}} for detailed output with toggleable sections.
 
 Other correlation: 
 \code{\link{kendall_tau}()},
