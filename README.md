@@ -36,30 +36,25 @@ survey_data %>%
   frequency(education, weights = sampling_weight)
 
 # Compare groups with t-test
-result <- survey_data %>%
+survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
-result              # compact one-line overview
-
-summary(result)     # full SPSS-style output with all details
+# Detailed SPSS-style output with summary()
+survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight) %>%
+  summary()
 
 # Scale analysis workflow
-rel <- reliability(survey_data, trust_government, trust_media, trust_science)
-
-rel                 # compact: Alpha + interpretation
-
-summary(rel)        # detailed: item statistics, inter-item correlations
+reliability(survey_data, trust_government, trust_media, trust_science) %>%
+  summary()    # item statistics, inter-item correlations
 
 survey_data <- survey_data %>%
   mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
 
 # Regression
-lm_result <- survey_data %>%
-  linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
-
-lm_result           # compact: R-squared + significant predictors
-
-summary(lm_result)  # detailed: coefficients, ANOVA table, diagnostics
+survey_data %>%
+  linear_regression(life_satisfaction ~ age + income, weights = sampling_weight) %>%
+  summary()    # coefficients, ANOVA table, diagnostics
 ```
 
 ## Core Features
@@ -142,10 +137,19 @@ kw_result %>% dunn_test()  # Pairwise Dunn comparisons
 Every analysis function provides two output levels. Typing the result name prints a compact one-line summary. Calling `summary()` produces the full SPSS-style output with all details. You can toggle individual sections on or off:
 
 ```r
-result <- t_test(survey_data, life_satisfaction, group = gender)
-result              # compact one-line summary
-summary(result)     # full detailed output
-summary(result, effect_sizes = FALSE)  # hide effect sizes
+# Compact one-line summary (default)
+survey_data %>%
+  t_test(life_satisfaction, group = gender)
+
+# Full detailed output
+survey_data %>%
+  t_test(life_satisfaction, group = gender) %>%
+  summary()
+
+# Toggle individual sections
+survey_data %>%
+  t_test(life_satisfaction, group = gender) %>%
+  summary(effect_sizes = FALSE)
 ```
 
 This works for all 13 analysis functions — `t_test()`, `oneway_anova()`, `chi_square()`, `pearson_cor()`, `reliability()`, `linear_regression()`, and more.
