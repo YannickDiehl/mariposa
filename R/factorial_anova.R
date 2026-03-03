@@ -36,6 +36,7 @@
 #'   \item{model}{The underlying model object for S3 dispatch}
 #'   \item{call_info}{List with metadata (dv, factors, weighted, n_total, n_missing)}
 #' }
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -87,6 +88,8 @@
 #'
 #' \code{\link{ancova}} for ANOVA with covariates.
 #'
+#' \code{\link{summary.factorial_anova}} for detailed output with toggleable sections.
+#'
 #' @references
 #' Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences
 #' (2nd ed.). Lawrence Erlbaum Associates.
@@ -119,6 +122,11 @@
 #'   factorial_anova(dv = income, between = c(gender, education))
 #' result %>% tukey_test()
 #' result %>% levene_test()
+#'
+#' # --- Three-layer output ---
+#' result              # compact overview
+#' summary(result)     # full detailed output with all sections
+#' summary(result, marginal_means = FALSE)  # hide estimated marginal means
 #'
 #' @family hypothesis_tests
 #' @export
@@ -575,21 +583,162 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
   )
 }
 
-
 # ==============================================================================
-# PRINT METHOD
+# PRINT / SUMMARY METHODS
 # ==============================================================================
 
-#' Print factorial ANOVA results
+#' Print factorial ANOVA results (compact)
 #'
-#' @param x An object of class \code{"factorial_anova"}.
-#' @param digits Number of decimal places (default: 3).
-#' @param ... Additional arguments (currently unused).
+#' @description
+#' Compact print method for objects of class \code{"factorial_anova"}.
+#' Shows main effects and interactions with F statistics, p-values,
+#' and effect sizes.
+#'
+#' For the full detailed output, use \code{summary()}.
+#'
+#' @param x An object of class \code{"factorial_anova"} returned by
+#'   \code{\link{factorial_anova}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- factorial_anova(survey_data,
+#'                           dv = life_satisfaction,
+#'                           between = c(gender, education))
+#' result              # compact overview
+#' summary(result)     # full detailed output
+#'
 #' @export
+#' @method print factorial_anova
 print.factorial_anova <- function(x, digits = 3, ...) {
 
+  info <- x$call_info
+  n_factors <- length(info$factors)
+  weighted_tag <- if (info$weighted) " [Weighted]" else ""
+  factor_str <- paste(info$factors, collapse = ", ")
+
+  cat(sprintf("Factorial ANOVA (%d-Way): %s by %s%s\n",
+              n_factors, info$dv, factor_str, weighted_tag))
+
+
+  # Extract effect rows (skip Corrected Model, Intercept, Error, Total, Corrected Total)
+  at <- x$anova_table
+  skip_rows <- c("Corrected Model", "Intercept", "Error", "Total", "Corrected Total")
+  effect_idx <- which(!at$source %in% skip_rows)
+
+  if (length(effect_idx) == 0) {
+    cat("  No effects found\n")
+    invisible(return(x))
+  }
+
+  # Compute label widths for alignment
+  effect_labels <- at$source[effect_idx]
+  # Replace " * " with ":" for compact display
+  effect_labels <- gsub(" \\* ", ":", effect_labels)
+  max_label_width <- max(nchar(effect_labels))
+
+  for (k in seq_along(effect_idx)) {
+    i <- effect_idx[k]
+    label <- effect_labels[k]
+    f_val <- at$f[i]
+    df_val <- at$df[i]
+    p_val <- at$p[i]
+    eta_val <- at$partial_eta_sq[i]
+
+    # Get residual df
+    error_row <- which(at$source == "Error")
+    df_error <- at$df[error_row]
+
+    p_str <- format_p_compact(p_val, digits)
+    stars <- add_significance_stars(p_val)
+
+    # Show N only on last effect line
+    n_suffix <- ""
+    if (k == length(effect_idx)) {
+      n_suffix <- sprintf(", N = %d", info$n_total)
+    }
+
+    cat(sprintf("  %-*s F(%d, %d) = %.*f, %s %s, eta2p = %.*f%s\n",
+                max_label_width + 1,
+                paste0(label, ":"),
+                df_val, df_error,
+                digits, f_val,
+                p_str, stars,
+                digits, eta_val,
+                n_suffix))
+  }
+
+  invisible(x)
+}
+
+
+#' Summary method for factorial ANOVA results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the full ANOVA table, descriptive statistics, and Levene's test.
+#'
+#' @param object A \code{factorial_anova} result object.
+#' @param between_subjects Logical. Show the ANOVA table? (Default: TRUE)
+#' @param descriptives Logical. Show descriptive statistics? (Default: TRUE)
+#' @param levene_test Logical. Show Levene's test? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.factorial_anova} object.
+#'
+#' @examples
+#' result <- factorial_anova(survey_data, dv = life_satisfaction, between = c(gender, education))
+#' summary(result)
+#' summary(result, levene_test = FALSE)
+#'
+#' @seealso \code{\link{factorial_anova}} for the main analysis function.
+#' @export
+#' @method summary factorial_anova
+summary.factorial_anova <- function(object, between_subjects = TRUE,
+                                     descriptives = TRUE, levene_test = TRUE,
+                                     digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(between_subjects = between_subjects,
+                      descriptives = descriptives,
+                      levene_test = levene_test),
+    digits     = digits,
+    class_name = "summary.factorial_anova"
+  )
+}
+
+
+#' Print summary of factorial ANOVA results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a factorial ANOVA, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.factorial_anova}}.  Sections include the ANOVA table
+#' with Type III sums of squares, effect sizes, estimated marginal means,
+#' and Levene's test for homogeneity of variances.
+#'
+#' @param x A \code{summary.factorial_anova} object created by
+#'   \code{\link{summary.factorial_anova}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- factorial_anova(survey_data,
+#'                           dv = life_satisfaction,
+#'                           between = c(gender, education))
+#' summary(result)                          # all sections
+#' summary(result, marginal_means = FALSE)  # hide marginal means
+#'
+#' @seealso \code{\link{factorial_anova}} for the main analysis,
+#'   \code{\link{summary.factorial_anova}} for summary options.
+#' @export
+#' @method print summary.factorial_anova
+print.summary.factorial_anova <- function(x, ...) {
+
+  digits <- x$digits
   info <- x$call_info
   n_factors <- length(info$factors)
   design_label <- paste0(n_factors, "-Way ANOVA")
@@ -600,7 +749,7 @@ print.factorial_anova <- function(x, digits = 3, ...) {
     x$weights,
     "Results"
   )
-  print_header(test_type)
+  print_header(test_type, newline_before = FALSE)
 
   # Info section
   cat("\n")
@@ -616,87 +765,101 @@ print.factorial_anova <- function(x, digits = 3, ...) {
   print_info_section(test_info)
   cat("\n")
 
-  # ---- ANOVA TABLE ----
-  cat("Tests of Between-Subjects Effects\n")
-  at <- x$anova_table
+  # Resolve show toggles
+  show_between <- if (!is.null(x$show)) isTRUE(x$show$between_subjects) else TRUE
+  show_desc    <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
+  show_levene  <- if (!is.null(x$show)) isTRUE(x$show$levene_test) else TRUE
 
-  # Format the table for display
-  fmt_ss <- format(round(at$ss, digits), nsmall = digits, big.mark = "")
-  fmt_df <- format(at$df)
-  fmt_ms <- ifelse(is.na(at$ms), "", format(round(at$ms, digits), nsmall = digits, big.mark = ""))
-  fmt_f <- ifelse(is.na(at$f), "", format(round(at$f, digits), nsmall = digits))
-  fmt_p <- ifelse(is.na(at$p), "",
-                  ifelse(at$p < 0.001, "<.001", format(round(at$p, digits), nsmall = digits)))
-  fmt_eta <- ifelse(is.na(at$partial_eta_sq), "",
-                    format(round(at$partial_eta_sq, digits), nsmall = digits))
+  # ---- ANOVA TABLE (between_subjects) ----
+  if (show_between) {
+    cat("Tests of Between-Subjects Effects\n")
+    at <- x$anova_table
 
-  # Significance stars
-  fmt_sig <- vapply(at$p, function(pv) {
-    if (is.na(pv)) return("")
-    as.character(add_significance_stars(pv))
-  }, character(1))
+    fmt_ss <- format(round(at$ss, digits), nsmall = digits, big.mark = "")
+    fmt_df <- format(at$df)
+    fmt_ms <- ifelse(is.na(at$ms), "",
+                     format(round(at$ms, digits), nsmall = digits, big.mark = ""))
+    fmt_f <- ifelse(is.na(at$f), "",
+                    format(round(at$f, digits), nsmall = digits))
+    fmt_p <- ifelse(is.na(at$p), "",
+                    ifelse(at$p < 0.001, "<.001",
+                           format(round(at$p, digits), nsmall = digits)))
+    fmt_eta <- ifelse(is.na(at$partial_eta_sq), "",
+                      format(round(at$partial_eta_sq, digits), nsmall = digits))
 
-  display_df <- data.frame(
-    Source = at$source,
-    `Type III SS` = fmt_ss,
-    df = fmt_df,
-    `Mean Square` = fmt_ms,
-    F = fmt_f,
-    Sig. = fmt_p,
-    `Partial Eta Sq` = fmt_eta,
-    ` ` = fmt_sig,
-    check.names = FALSE,
-    stringsAsFactors = FALSE
-  )
+    fmt_sig <- vapply(at$p, function(pv) {
+      if (is.na(pv)) return("")
+      as.character(add_significance_stars(pv))
+    }, character(1))
 
-  border_width <- max(nchar(capture.output(print(display_df, row.names = FALSE))),
-                      40)
-  border <- paste(rep("-", border_width), collapse = "")
-  cat(border, "\n")
-  print(display_df, row.names = FALSE, right = FALSE)
-  cat(border, "\n")
+    display_df <- data.frame(
+      Source = at$source,
+      `Type III SS` = fmt_ss,
+      df = fmt_df,
+      `Mean Square` = fmt_ms,
+      F = fmt_f,
+      Sig. = fmt_p,
+      `Partial Eta Sq` = fmt_eta,
+      ` ` = fmt_sig,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
 
-  # R-Squared footnote
-  cat(sprintf("R Squared = %s (Adjusted R Squared = %s)\n",
-              format(round(x$r_squared["r_squared"], digits), nsmall = digits),
-              format(round(x$r_squared["adj_r_squared"], digits), nsmall = digits)))
+    border_width <- max(nchar(capture.output(print(display_df, row.names = FALSE))),
+                        40)
+    border <- paste(rep("-", border_width), collapse = "")
+    cat(border, "\n")
+    print(display_df, row.names = FALSE, right = FALSE)
+    cat(border, "\n")
+
+    cat(sprintf("R Squared = %s (Adjusted R Squared = %s)\n",
+                format(round(x$r_squared["r_squared"], digits), nsmall = digits),
+                format(round(x$r_squared["adj_r_squared"], digits), nsmall = digits)))
+  }
 
   # ---- DESCRIPTIVE STATISTICS ----
-  cat("\nDescriptive Statistics\n")
+  if (show_desc) {
+    cat("\nDescriptive Statistics\n")
 
-  desc <- x$descriptives
-  fmt_desc <- desc
-  for (bn in info$factors) {
-    fmt_desc[[bn]] <- as.character(fmt_desc[[bn]])
-  }
-  fmt_desc$mean <- format(round(desc$mean, 2), nsmall = 2)
-  fmt_desc$sd <- format(round(desc$sd, 3), nsmall = 3)
-  fmt_desc$n <- format(desc$n)
+    desc <- x$descriptives
+    fmt_desc <- desc
+    for (bn in info$factors) {
+      fmt_desc[[bn]] <- as.character(fmt_desc[[bn]])
+    }
+    fmt_desc$mean <- format(round(desc$mean, 2), nsmall = 2)
+    fmt_desc$sd <- format(round(desc$sd, 3), nsmall = 3)
+    fmt_desc$n <- format(desc$n)
 
-  names(fmt_desc)[names(fmt_desc) == "mean"] <- "Mean"
-  names(fmt_desc)[names(fmt_desc) == "sd"] <- "Std. Deviation"
-  names(fmt_desc)[names(fmt_desc) == "n"] <- "N"
+    names(fmt_desc)[names(fmt_desc) == "mean"] <- "Mean"
+    names(fmt_desc)[names(fmt_desc) == "sd"] <- "Std. Deviation"
+    names(fmt_desc)[names(fmt_desc) == "n"] <- "N"
 
-  desc_border <- max(nchar(capture.output(print(fmt_desc, row.names = FALSE))), 40)
-  cat(paste(rep("-", desc_border), collapse = ""), "\n")
-  print(as.data.frame(fmt_desc), row.names = FALSE, right = FALSE)
-  cat(paste(rep("-", desc_border), collapse = ""), "\n")
+    desc_border <- max(nchar(capture.output(print(fmt_desc, row.names = FALSE))),
+                       40)
+    cat(paste(rep("-", desc_border), collapse = ""), "\n")
+    print(as.data.frame(fmt_desc), row.names = FALSE, right = FALSE)
+    cat(paste(rep("-", desc_border), collapse = ""), "\n")
 
-  if (!is.null(x$weights)) {
-    cat("Note: Means and SDs are weighted (WLS)\n")
+    if (!is.null(x$weights)) {
+      cat("Note: Means and SDs are weighted (WLS)\n")
+    }
   }
 
   # ---- LEVENE'S TEST ----
-  cat("\nLevene's Test of Equality of Error Variances\n")
-  lev <- x$levene_test
-  cat(sprintf("  F(%d, %d) = %s, p = %s\n",
-              lev$df1, lev$df2,
-              format(round(lev$f, digits), nsmall = digits),
-              ifelse(lev$p < 0.001, "<.001",
-                     format(round(lev$p, digits), nsmall = digits))))
+  if (show_levene) {
+    cat("\nLevene's Test of Equality of Error Variances\n")
+    lev <- x$levene_test
+    cat(sprintf("  F(%d, %d) = %s, p = %s\n",
+                lev$df1, lev$df2,
+                format(round(lev$f, digits), nsmall = digits),
+                ifelse(lev$p < 0.001, "<.001",
+                       format(round(lev$p, digits), nsmall = digits))))
+  }
 
-  # Significance legend
-  print_significance_legend()
+  # Significance legend (show if any section with p-values was printed)
+  if (show_between || show_levene) {
+    print_significance_legend()
+  }
 
   invisible(x)
 }

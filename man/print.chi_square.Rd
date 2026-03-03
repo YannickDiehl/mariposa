@@ -2,17 +2,31 @@
 % Please edit documentation in R/chi_square.R
 \name{print.chi_square}
 \alias{print.chi_square}
-\title{Print method for chi_square}
+\title{Print chi-squared test results (compact)}
 \usage{
 \method{print}{chi_square}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{Chi-squared test results object}
+\item{x}{An object of class \code{"chi_square"} returned by
+\code{\link{chi_square}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments passed to print}
+\item{...}{Additional arguments (not used).}
+}
+\value{
+Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for chi_square
+Compact print method for objects of class \code{"chi_square"}.
+Shows a one-line summary per test with test statistic, p-value,
+effect size, and sample size.
+
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- chi_square(survey_data, gender, education)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

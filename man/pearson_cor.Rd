@@ -42,6 +42,7 @@ Correlation results showing relationships between variables, including:
 \item P-value: Whether the relationship is statistically significant
 \item Confidence interval: Range of plausible correlation values
 \item Sample size: Number of observations used
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 }
 \description{
@@ -152,10 +153,12 @@ survey_data \%>\%
 survey_data \%>\% 
   pearson_cor(age, income, use = "listwise")
 
-# Store results for further analysis
-result <- survey_data \%>\% 
+# --- Three-layer output ---
+result <- survey_data \%>\%
   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
-print(result)
+result              # compact one-line overview
+summary(result)     # full correlation, p-value, and N matrices
+summary(result, pvalue_matrix = FALSE)  # hide p-values
 
 }
 \references{
@@ -174,6 +177,8 @@ correlation coefficient in samples from an indefinitely large population.
 \code{\link{spearman_rho}} for rank-based correlation (robust to outliers).
 
 \code{\link{kendall_tau}} for ordinal correlation.
+
+\code{\link{summary.pearson_cor}} for detailed output with toggleable sections.
 
 Other correlation: 
 \code{\link{kendall_tau}()},

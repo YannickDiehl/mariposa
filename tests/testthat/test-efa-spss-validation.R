@@ -701,9 +701,10 @@ test_that("efa() print method works without error", {
 
   expect_output(print(result), "Exploratory Factor Analysis")
   expect_output(print(result), "KMO")
-  expect_output(print(result), "Bartlett")
-  expect_output(print(result), "Communalities")
-  expect_output(print(result), "Rotated Component Matrix")
+  # Verbose sections available via summary()
+  expect_output(print(summary(result)), "Bartlett")
+  expect_output(print(summary(result)), "Communalities")
+  expect_output(print(summary(result)), "Rotated Component Matrix")
 })
 
 test_that("efa() print method works for oblimin", {
@@ -715,9 +716,10 @@ test_that("efa() print method works for oblimin", {
                 trust_government, trust_media, trust_science,
                 rotation = "oblimin")
 
-  expect_output(print(result), "Pattern Matrix")
-  expect_output(print(result), "Structure Matrix")
-  expect_output(print(result), "Component Correlation Matrix")
+  # Verbose sections available via summary()
+  expect_output(print(summary(result)), "Pattern Matrix")
+  expect_output(print(summary(result)), "Structure Matrix")
+  expect_output(print(summary(result)), "Component Correlation Matrix")
 })
 
 test_that("efa() print method works for grouped data", {
@@ -728,7 +730,7 @@ test_that("efa() print method works for grouped data", {
     efa(political_orientation, environmental_concern, life_satisfaction,
         trust_government, trust_media, trust_science)
 
-  expect_output(print(result), "Group:")
+  expect_output(print(result), "\\[")
 })
 
 
@@ -1520,9 +1522,10 @@ test_that("efa() print method works for ML extraction", {
                 trust_government, trust_media, trust_science,
                 extraction = "ml", n_factors = 2)
 
-  expect_output(print(result), "Maximum Likelihood")
-  expect_output(print(result), "Factor Matrix")
-  expect_output(print(result), "Goodness-of-fit")
+  expect_output(print(result), "ML")
+  # Verbose sections available via summary()
+  expect_output(print(summary(result)), "Factor Matrix")
+  expect_output(print(summary(result)), "Goodness-of-fit")
 })
 
 test_that("efa() print method works for promax rotation", {
@@ -1534,8 +1537,9 @@ test_that("efa() print method works for promax rotation", {
                 rotation = "promax")
 
   expect_output(print(result), "Promax")
-  expect_output(print(result), "Pattern Matrix")
-  expect_output(print(result), "Structure Matrix")
+  # Verbose sections available via summary()
+  expect_output(print(summary(result)), "Pattern Matrix")
+  expect_output(print(summary(result)), "Structure Matrix")
 })
 
 test_that("efa() print method works for ML + Promax", {
@@ -1547,12 +1551,13 @@ test_that("efa() print method works for ML + Promax", {
                 trust_government, trust_media, trust_science,
                 extraction = "ml", rotation = "promax", n_factors = 2)
 
-  expect_output(print(result), "Maximum Likelihood")
+  expect_output(print(result), "ML")
   expect_output(print(result), "Promax")
-  expect_output(print(result), "Pattern Matrix")
-  expect_output(print(result), "Structure Matrix")
-  expect_output(print(result), "Goodness-of-fit")
-  expect_output(print(result), "Factor Correlation")
+  # Verbose sections available via summary()
+  expect_output(print(summary(result)), "Pattern Matrix")
+  expect_output(print(summary(result)), "Structure Matrix")
+  expect_output(print(summary(result)), "Goodness-of-fit")
+  expect_output(print(summary(result)), "Factor Correlation")
 })
 
 test_that("efa() backward compatibility: PCA results unchanged", {

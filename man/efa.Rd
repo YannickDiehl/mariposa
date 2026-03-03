@@ -75,6 +75,7 @@ An \code{efa} result object containing:
 \item{sort}{Whether loadings are sorted}
 \item{blank}{Suppression threshold}
 }
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 \code{efa()} performs Exploratory Factor Analysis (EFA) to discover underlying
@@ -188,11 +189,20 @@ survey_data \%>\%
   efa(political_orientation, environmental_concern, life_satisfaction,
       trust_government, trust_media, trust_science)
 
+# --- Three-layer output ---
+result <- efa(survey_data, political_orientation, environmental_concern,
+              life_satisfaction, trust_government, trust_media, trust_science)
+result              # compact overview
+summary(result)     # full detailed output with all sections
+summary(result, communalities = FALSE)  # hide communalities table
+
 }
 \seealso{
 \code{\link{reliability}} for checking scale reliability before creating indices.
 
 \code{\link{scale_index}} for creating mean indices after identifying factors.
+
+\code{\link{summary.efa}} for detailed output with toggleable sections.
 
 Other scale: 
 \code{\link{pomps}()},

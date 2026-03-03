@@ -525,21 +525,21 @@ test_that("Print method works without error", {
 
   # Ungrouped
   result <- linear_regression(survey_data, life_satisfaction ~ age)
-  expect_output(print(result), "Linear Regression Results")
-  expect_output(print(result), "Model Summary")
-  expect_output(print(result), "ANOVA")
-  expect_output(print(result), "Coefficients")
+  expect_output(print(result), "Linear Regression:")
+  expect_output(print(result), "R2")
+  expect_output(print(result), "F\\(")
+  expect_output(print(result), "N = ")
 
   # Weighted
   result_w <- linear_regression(survey_data, life_satisfaction ~ age,
                                 weights = sampling_weight)
-  expect_output(print(result_w), "Weighted Linear Regression")
+  expect_output(print(result_w), "\\[Weighted\\]")
 
   # Grouped
   result_g <- linear_regression(
     survey_data %>% dplyr::group_by(region),
     life_satisfaction ~ age)
-  expect_output(print(result_g), "Grouped by")
+  expect_output(print(result_g), "\\[Grouped:")
 })
 
 test_that("Confidence intervals are included", {

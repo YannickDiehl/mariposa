@@ -2,17 +2,30 @@
 % Please edit documentation in R/pearson_cor.R
 \name{print.pearson_cor}
 \alias{print.pearson_cor}
-\title{Print method for pearson_cor}
+\title{Print Pearson correlation results (compact)}
 \usage{
 \method{print}{pearson_cor}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{A pearson_cor object}
+\item{x}{An object of class \code{"pearson_cor"} returned by
+\code{\link{pearson_cor}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments passed to print}
+\item{...}{Additional arguments (not used).}
+}
+\value{
+Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for pearson_cor
+Compact print method for objects of class \code{"pearson_cor"}.
+Shows correlation coefficient, p-value, and sample size per pair.
+
+For the full detailed output including matrices, use \code{summary()}.
+}
+\examples{
+result <- pearson_cor(survey_data, age, life_satisfaction)
+result              # compact one-line overview
+summary(result)     # full correlation matrices
+
 }

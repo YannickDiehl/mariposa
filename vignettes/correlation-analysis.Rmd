@@ -173,7 +173,8 @@ Check the p-value alongside the correlation coefficient:
 ```{r}
 result <- survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
-print(result)
+result             # compact overview
+summary(result)    # detailed output with confidence intervals
 ```
 
 A significant p-value ($p < 0.05$) means the correlation is unlikely to be zero in the population. But with large samples, even very small correlations can be significant --- always consider the magnitude of *r*.

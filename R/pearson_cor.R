@@ -29,6 +29,7 @@
 #' - P-value: Whether the relationship is statistically significant
 #' - Confidence interval: Range of plausible correlation values
 #' - Sample size: Number of observations used
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -110,10 +111,12 @@
 #' survey_data %>% 
 #'   pearson_cor(age, income, use = "listwise")
 #' 
-#' # Store results for further analysis
-#' result <- survey_data %>% 
+#' # --- Three-layer output ---
+#' result <- survey_data %>%
 #'   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
-#' print(result)
+#' result              # compact one-line overview
+#' summary(result)     # full correlation, p-value, and N matrices
+#' summary(result, pvalue_matrix = FALSE)  # hide p-values
 #'
 #' @seealso
 #' \code{\link[stats]{cor}} for the base R correlation function.
@@ -123,6 +126,8 @@
 #' \code{\link{spearman_rho}} for rank-based correlation (robust to outliers).
 #'
 #' \code{\link{kendall_tau}} for ordinal correlation.
+#'
+#' \code{\link{summary.pearson_cor}} for detailed output with toggleable sections.
 #'
 #' @references
 #' Cohen, J. (1988). \emph{Statistical Power Analysis for the Behavioral
@@ -494,163 +499,258 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
   return(result)
 }
 
-#' Print method for pearson_cor
+#' Print Pearson correlation results (compact)
 #'
-#' @param x A pearson_cor object
-#' @param digits Number of decimal places to display (default: 3)
-#' @param ... Additional arguments passed to print
+#' @description
+#' Compact print method for objects of class \code{"pearson_cor"}.
+#' Shows correlation coefficient, p-value, and sample size per pair.
+#'
+#' For the full detailed output including matrices, use \code{summary()}.
+#'
+#' @param x An object of class \code{"pearson_cor"} returned by
+#'   \code{\link{pearson_cor}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- pearson_cor(survey_data, age, life_satisfaction)
+#' result              # compact one-line overview
+#' summary(result)     # full correlation matrices
 #'
 #' @export
+#' @method print pearson_cor
 print.pearson_cor <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  corrs <- x$correlations
 
-  # Determine test type using standardized helper
-  test_type <- get_standard_title("Pearson Correlation", x$weights, "")
-  print_header(test_type)
-  
-  # Print test information using standardized helpers
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(corrs[x$groups])
+    for (gi in seq_len(nrow(groups))) {
+      group_values <- groups[gi, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_corrs <- corrs
+      for (g in names(group_values)) {
+        group_corrs <- group_corrs[group_corrs[[g]] == group_values[[g]], ]
+      }
+      .print_pearson_compact(x, group_corrs, weighted_tag, digits)
+    }
+  } else {
+    .print_pearson_compact(x, corrs, weighted_tag, digits)
+  }
+
+  invisible(x)
+}
+
+#' Print compact pearson_cor output for one group or ungrouped
+#' @keywords internal
+.print_pearson_compact <- function(x, corrs, weighted_tag, digits) {
+  n_vars <- length(x$variables)
+
+  if (n_vars == 2) {
+    pair_label <- paste(x$variables[1], "x", x$variables[2])
+    cat(sprintf("Pearson Correlation: %s%s\n", pair_label, weighted_tag))
+    r_val <- corrs$correlation[1]
+    p_val <- as.numeric(corrs$p_value[1])
+    n_val <- corrs$n[1]
+    cat(sprintf("  r = %.*f, %s %s, N = %d\n",
+                digits, r_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                n_val))
+  } else {
+    n_sig <- sum(as.numeric(corrs$p_value) < 0.05, na.rm = TRUE)
+    n_pairs <- nrow(corrs)
+    cat(sprintf("Pearson Correlation: %d variables%s\n", n_vars, weighted_tag))
+
+    for (i in seq_len(n_pairs)) {
+      pair_label <- paste(corrs$var1[i], "x", corrs$var2[i])
+      r_val <- corrs$correlation[i]
+      p_val <- as.numeric(corrs$p_value[i])
+      line <- sprintf("  %-30s r = %.*f, %s %s",
+                       paste0(pair_label, ":"),
+                       digits, r_val,
+                       format_p_compact(p_val, digits),
+                       add_significance_stars(p_val))
+      cat(line, "\n")
+    }
+    cat(sprintf("  %d/%d pairs significant (p < .05), N = %d\n",
+                n_sig, n_pairs, corrs$n[1]))
+  }
+}
+
+#' Summary method for Pearson correlation results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including correlation matrices, p-value matrices, and sample size matrices.
+#'
+#' @param object A \code{pearson_cor} result object.
+#' @param correlation_matrix Logical. Show the correlation coefficient matrix? (Default: TRUE)
+#' @param pvalue_matrix Logical. Show the p-value matrix? (Default: TRUE)
+#' @param n_matrix Logical. Show the sample size matrix? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.pearson_cor} object.
+#'
+#' @examples
+#' result <- pearson_cor(survey_data, trust_government, trust_media)
+#' summary(result)
+#' summary(result, pvalue_matrix = FALSE)
+#'
+#' @seealso \code{\link{pearson_cor}} for the main analysis function.
+#' @export
+#' @method summary pearson_cor
+summary.pearson_cor <- function(object, correlation_matrix = TRUE,
+                                pvalue_matrix = TRUE, n_matrix = TRUE,
+                                digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(correlation_matrix = correlation_matrix,
+                      pvalue_matrix = pvalue_matrix,
+                      n_matrix = n_matrix),
+    digits     = digits,
+    class_name = "summary.pearson_cor"
+  )
+}
+
+#' Print summary of Pearson correlation results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a Pearson correlation, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.pearson_cor}}.  Sections include the correlation matrix,
+#' p-value matrix, and sample size matrix.
+#'
+#' @param x A \code{summary.pearson_cor} object created by
+#'   \code{\link{summary.pearson_cor}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- pearson_cor(survey_data, age, life_satisfaction)
+#' summary(result)                             # all matrices
+#' summary(result, pvalue_matrix = FALSE)      # hide p-values
+#'
+#' @seealso \code{\link{pearson_cor}} for the main analysis,
+#'   \code{\link{summary.pearson_cor}} for summary options.
+#' @export
+#' @method print summary.pearson_cor
+print.summary.pearson_cor <- function(x, ...) {
+  digits <- x$digits
+  show_cor <- if (!is.null(x$show)) isTRUE(x$show$correlation_matrix) else TRUE
+  show_p   <- if (!is.null(x$show)) isTRUE(x$show$pvalue_matrix) else TRUE
+  show_n   <- if (!is.null(x$show)) isTRUE(x$show$n_matrix) else TRUE
+
+  # Header
+  title <- get_standard_title("Pearson Correlation", x$weights, "")
+  print_header(title)
+
+  # Info section
   cat("\n")
   test_info <- list(
     "Weights variable" = x$weights,
     "Missing data handling" = paste(x$use, "deletion")
   )
   print_info_section(test_info)
-
-  # Print test parameters
   test_params <- list(conf.level = x$conf.level)
   print_test_parameters(test_params)
   cat("\n")
-  
-  if (x$is_grouped) {
-    # Grouped analysis
+
+  if (isTRUE(x$is_grouped)) {
     group_combinations <- unique(x$correlations[x$groups])
-    
-    for (i in seq_len(nrow(group_combinations))) {
-      # Print group header using standardized helper
-      print_group_header(group_combinations[i, , drop = FALSE])
-      
-      # Filter correlations for this group
+
+    for (gi in seq_len(nrow(group_combinations))) {
+      print_group_header(group_combinations[gi, , drop = FALSE])
+
       group_corrs <- x$correlations
       for (g in names(group_combinations)) {
-        group_corrs <- group_corrs[group_corrs[[g]] == group_combinations[i, g], ]
+        group_corrs <- group_corrs[group_corrs[[g]] == group_combinations[gi, g], ]
       }
-      
-      # For each pair of variables, show results like t_test does
-      if (length(x$variables) == 2) {
-        var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-        cat(sprintf("\n--- %s ---\n\n", var_pair))
-        .print_single_pair(group_corrs, stat_label = "r", stat_col = "correlation",
-                           corr_name = "Correlation",
-                           secondary_label = "Effect size: r-squared",
-                           secondary_col = "r_squared",
-                           ci_lower_col = "conf_int_lower",
-                           ci_upper_col = "conf_int_upper")
-        
-      } else {
-        # Multiple correlations - show matrix first, then detailed results
-        # Use the smart matrix printer for all matrices
-        cor_matrix <- x$matrices[[i]]$correlations
-        .print_cor_matrix(cor_matrix, digits = digits, 
-                                  title = "Correlation Matrix:", 
-                                  type = "correlation")
-        
-        # Print p-value matrix
-        p_matrix <- x$matrices[[i]]$p_values
-        .print_cor_matrix(p_matrix, digits = 4, 
-                                  title = "Significance Matrix (p-values):", 
-                                  type = "pvalue")
-        
-        # Print sample size matrix
-        n_matrix <- x$matrices[[i]]$n_obs
-        .print_cor_matrix(n_matrix, digits = 0, 
-                                  title = "Sample Size Matrix:", 
-                                  type = "n")
-        
-        # Detailed pairwise results
-        cat("\nPairwise Results:\n")
-        border_width <- paste(rep("-", 16), collapse = "")
-        cat(border_width, "\n")
-        
-        # Create results table
-        output_df <- data.frame(
-          Variable_Pair = paste(group_corrs$var1, "\u00d7", group_corrs$var2),
-          r = round(group_corrs$correlation, digits),
-          r_squared = round(group_corrs$r_squared, digits),
-          p_value = round(group_corrs$p_value, 4),
-          CI_95 = sprintf("[%.3f, %.3f]", 
-                         group_corrs$conf_int_lower,
-                         group_corrs$conf_int_upper),
-          n = group_corrs$n,
-          sig = group_corrs$sig,
-          stringsAsFactors = FALSE
-        )
-        
-        print(output_df, row.names = FALSE)
-        cat(border_width, "\n")
-      }
+
+      .print_pearson_verbose(x, group_corrs, gi, show_cor, show_p, show_n, digits)
     }
-    
   } else {
-    # Ungrouped analysis
-    
-    if (length(x$variables) == 2) {
-      var_pair <- paste(x$variables[1], "\u00d7", x$variables[2])
-      cat(sprintf("\n--- %s ---\n\n", var_pair))
-      .print_single_pair(x$correlations, stat_label = "r", stat_col = "correlation",
-                         corr_name = "Correlation",
-                         secondary_label = "Effect size: r\u00b2",
-                         secondary_col = "r_squared",
-                         ci_lower_col = "conf_int_lower",
-                         ci_upper_col = "conf_int_upper")
-      
-    } else {
-      # Multiple correlations - show matrix then detailed results
-      # Use the smart matrix printer for all matrices
-      cor_matrix <- x$matrices[[1]]$correlations
-      .print_cor_matrix(cor_matrix, digits = digits, 
-                                title = "Correlation Matrix:", 
-                                type = "correlation")
-      
-      p_matrix <- x$matrices[[1]]$p_values
-      .print_cor_matrix(p_matrix, digits = 4, 
-                                title = "Significance Matrix (p-values):", 
-                                type = "pvalue")
-      
-      n_matrix <- x$matrices[[1]]$n_obs
-      .print_cor_matrix(n_matrix, digits = 0, 
-                                title = "Sample Size Matrix:", 
-                                type = "n")
-      
-      # Detailed pairwise results
-      cat("\nPairwise Results:\n")
-      border_width <- paste(rep("-", 16), collapse = "")
-      cat(border_width, "\n")
-      
-      # Create results table
-      output_df <- data.frame(
-        Variable_Pair = paste(x$correlations$var1, "\u00d7", x$correlations$var2),
-        r = round(x$correlations$correlation, digits),
-        r_squared = round(x$correlations$r_squared, digits),
-        p_value = round(x$correlations$p_value, 4),
-        CI_95 = sprintf("[%.3f, %.3f]", 
-                       x$correlations$conf_int_lower,
-                       x$correlations$conf_int_upper),
-        n = x$correlations$n,
-        sig = x$correlations$sig,
-        stringsAsFactors = FALSE
-      )
-      
-      print(output_df, row.names = FALSE)
-      cat(border_width, "\n")
-    }
+    .print_pearson_verbose(x, x$correlations, 1, show_cor, show_p, show_n, digits)
   }
-  
-  # Footer section with interpretation (Template Standard)
+
+  # Footer
   print_significance_legend()
-  cat("\nCorrelation Strength Interpretation:\n")
-  cat("  |r| < 0.30:        Weak correlation\n")
-  cat("  0.30 \u2264 |r| < 0.70: Moderate correlation\n")
-  cat("  |r| \u2265 0.70:        Strong correlation\n")
-  cat("\nr\u00b2 represents the proportion of variance explained\n")
-  
   invisible(x)
+}
+
+#' Print verbose pearson_cor output for one group
+#' @keywords internal
+.print_pearson_verbose <- function(x, corrs, matrix_idx, show_cor, show_p, show_n, digits) {
+  n_vars <- length(x$variables)
+
+  if (n_vars == 2) {
+    # For 2 variables, show single-pair detail with optional sections
+    if (show_cor) {
+      cat(sprintf("\n  Correlation: r = %.*f\n", digits, corrs$correlation[1]))
+    }
+    if (show_p) {
+      cat(sprintf("  p-value: %s %s\n",
+                  format_p_compact(as.numeric(corrs$p_value[1]), digits),
+                  add_significance_stars(as.numeric(corrs$p_value[1]))))
+    }
+    if (show_n) {
+      cat(sprintf("  N = %d\n", corrs$n[1]))
+    }
+    # Always show CI and r-squared
+    if ("conf_int_lower" %in% names(corrs)) {
+      cat(sprintf("  95%% CI: [%.*f, %.*f]\n", digits, corrs$conf_int_lower[1],
+                  digits, corrs$conf_int_upper[1]))
+    }
+    if ("r_squared" %in% names(corrs)) {
+      cat(sprintf("  r-squared: %.*f\n", digits, corrs$r_squared[1]))
+    }
+  } else {
+    # For 3+ variables, show matrices and pairwise table
+
+    if (show_cor) {
+      cor_matrix <- x$matrices[[matrix_idx]]$correlations
+      .print_cor_matrix(cor_matrix, digits = digits,
+                        title = "Correlation Matrix:",
+                        type = "correlation")
+    }
+
+    if (show_p) {
+      p_matrix <- x$matrices[[matrix_idx]]$p_values
+      .print_cor_matrix(p_matrix, digits = 4,
+                        title = "Significance Matrix (p-values):",
+                        type = "pvalue")
+    }
+
+    if (show_n) {
+      n_matrix <- x$matrices[[matrix_idx]]$n_obs
+      .print_cor_matrix(n_matrix, digits = 0,
+                        title = "Sample Size Matrix:",
+                        type = "n")
+    }
+
+    # Pairwise results always shown
+    cat("\nPairwise Results:\n")
+    border_width <- paste(rep("-", 16), collapse = "")
+    cat(border_width, "\n")
+
+    output_df <- data.frame(
+      Variable_Pair = paste(corrs$var1, "\u00d7", corrs$var2),
+      r = round(corrs$correlation, digits),
+      r_squared = round(corrs$r_squared, digits),
+      p_value = round(as.numeric(corrs$p_value), 4),
+      CI_95 = sprintf("[%.*f, %.*f]", digits, corrs$conf_int_lower,
+                      digits, corrs$conf_int_upper),
+      n = corrs$n,
+      sig = corrs$sig,
+      stringsAsFactors = FALSE
+    )
+
+    print(output_df, row.names = FALSE)
+    cat(border_width, "\n")
+  }
 }

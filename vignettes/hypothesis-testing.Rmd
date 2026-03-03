@@ -409,7 +409,8 @@ survey_data %>%
 anova_result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
-print(anova_result)
+anova_result                                      # compact overview
+summary(anova_result, descriptives = FALSE)       # detailed output
 
 # 3. Post-hoc: which groups differ?
 tukey_test(anova_result)

@@ -414,23 +414,22 @@ test_that("SPSS-style interface works", {
 test_that("Print method works without error", {
   # Ungrouped
   result <- logistic_regression(survey_data, high_satisfaction ~ age)
-  expect_output(print(result), "Logistic Regression Results")
-  expect_output(print(result), "Model Summary")
-  expect_output(print(result), "Variables in the Equation")
-  expect_output(print(result), "Classification Table")
-  expect_output(print(result), "Omnibus Tests")
-  expect_output(print(result), "Hosmer and Lemeshow")
+  expect_output(print(result), "Logistic Regression:")
+  expect_output(print(result), "Nagelkerke R2")
+  expect_output(print(result), "chi2\\(")
+  expect_output(print(result), "Accuracy")
+  expect_output(print(result), "N = ")
 
   # Weighted
   result_w <- logistic_regression(survey_data, high_satisfaction ~ age,
                                   weights = sampling_weight)
-  expect_output(print(result_w), "Weighted Logistic Regression")
+  expect_output(print(result_w), "\\[Weighted\\]")
 
   # Grouped
   result_g <- logistic_regression(
     survey_data %>% dplyr::group_by(region),
     high_satisfaction ~ age)
-  expect_output(print(result_g), "Grouped by")
+  expect_output(print(result_g), "\\[Grouped:")
   expect_output(print(result_g), "region = East")
   expect_output(print(result_g), "region = West")
 })

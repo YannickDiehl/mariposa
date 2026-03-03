@@ -57,6 +57,7 @@
 #'   \item{sort}{Whether loadings are sorted}
 #'   \item{blank}{Suppression threshold}
 #' }
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -158,10 +159,19 @@
 #'   efa(political_orientation, environmental_concern, life_satisfaction,
 #'       trust_government, trust_media, trust_science)
 #'
+#' # --- Three-layer output ---
+#' result <- efa(survey_data, political_orientation, environmental_concern,
+#'               life_satisfaction, trust_government, trust_media, trust_science)
+#' result              # compact overview
+#' summary(result)     # full detailed output with all sections
+#' summary(result, communalities = FALSE)  # hide communalities table
+#'
 #' @seealso
 #' \code{\link{reliability}} for checking scale reliability before creating indices.
 #'
 #' \code{\link{scale_index}} for creating mean indices after identifying factors.
+#'
+#' \code{\link{summary.efa}} for detailed output with toggleable sections.
 #'
 #' @family scale
 #' @export
@@ -874,13 +884,182 @@ efa <- function(data, ...,
 
 
 # ============================================================================
-# PRINT METHOD
+# HELPERS
 # ============================================================================
 
-#' @export
-print.efa <- function(x, digits = 3, ...) {
+#' Interpret KMO value
+#' @keywords internal
+.kmo_interpretation <- function(kmo) {
+  if (is.na(kmo)) return("")
+  if (kmo >= 0.90) return("Marvelous")
+  if (kmo >= 0.80) return("Meritorious")
+  if (kmo >= 0.70) return("Middling")
+  if (kmo >= 0.60) return("Mediocre")
+  if (kmo >= 0.50) return("Miserable")
+  "Unacceptable"
+}
 
-  # Header
+
+# ============================================================================
+# PRINT METHOD (compact)
+# ============================================================================
+
+#' Print EFA results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"efa"}.
+#' Shows KMO value, number of factors, total variance explained,
+#' extraction method, and rotation in a concise format.
+#'
+#' For the full detailed output including communalities, variance
+#' explained per factor, and rotated component matrices, use \code{summary()}.
+#'
+#' @param x An object of class \code{"efa"} returned by \code{\link{efa}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- efa(survey_data, political_orientation, environmental_concern,
+#'               life_satisfaction, trust_government, trust_media, trust_science)
+#' result              # compact overview
+#' summary(result)     # full detailed output
+#'
+#' @export
+#' @method print efa
+print.efa <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+
+  extraction_label <- switch(x$extraction %||% "pca",
+    "pca" = "PCA",
+    "ml" = "ML",
+    "paf" = "PAF"
+  )
+  rotation_label <- switch(x$rotation %||% "varimax",
+    "varimax" = "Varimax",
+    "oblimin" = "Oblimin",
+    "promax" = "Promax",
+    "none" = "Unrotated"
+  )
+
+  if (isTRUE(x$is_grouped)) {
+    for (group_result in x$groups) {
+      group_values <- group_result$group_values
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+      .print_efa_compact(group_result, length(x$variables), extraction_label,
+                         rotation_label, weighted_tag, digits)
+    }
+  } else {
+    .print_efa_compact(x, length(x$variables), extraction_label,
+                       rotation_label, weighted_tag, digits)
+  }
+
+  invisible(x)
+}
+
+#' Print compact one-liner for a single EFA result
+#' @keywords internal
+.print_efa_compact <- function(res, n_vars, extraction_label, rotation_label,
+                               weighted_tag, digits) {
+  n_factors <- res$n_factors
+  component_label <- if (n_factors == 1) "component" else "components"
+
+  kmo <- res$kmo$overall
+  kmo_interp <- .kmo_interpretation(kmo)
+
+  # Total variance explained by extracted components
+  ve <- res$variance_explained
+  total_var_pct <- ve$cumulative_prc[min(n_factors, nrow(ve))]
+
+  cat(sprintf("Exploratory Factor Analysis: %d items, %d %s (%s/%s)%s\n",
+              n_vars, n_factors, component_label,
+              extraction_label, rotation_label, weighted_tag))
+  cat(sprintf("  KMO = %s (%s), Variance explained: %s%%\n",
+              format(round(kmo, digits), nsmall = digits),
+              kmo_interp,
+              format(round(total_var_pct, 1), nsmall = 1)))
+}
+
+
+# ============================================================================
+# SUMMARY METHOD
+# ============================================================================
+
+#' Summarize an exploratory factor analysis
+#'
+#' @description
+#' Creates a detailed summary of an EFA result. All sections are shown by
+#' default; set individual toggles to \code{FALSE} to suppress specific sections.
+#'
+#' @param object An \code{efa} result object
+#' @param kmo_bartlett Show KMO and Bartlett's test? (Default: TRUE)
+#' @param communalities Show communalities table? (Default: TRUE)
+#' @param variance_explained Show total variance explained? (Default: TRUE)
+#' @param unrotated_matrix Show unrotated component/factor matrix? (Default: TRUE)
+#' @param rotated_matrix Show rotated matrix (varimax)? (Default: TRUE)
+#' @param pattern_matrix Show pattern matrix (oblimin/promax)? (Default: TRUE)
+#' @param structure_matrix Show structure matrix (oblimin/promax)? (Default: TRUE)
+#' @param factor_correlations Show factor correlation matrix (oblimin/promax)? (Default: TRUE)
+#' @param digits Number of decimal places (Default: 3)
+#' @param ... Additional arguments (ignored)
+#'
+#' @return A \code{summary.efa} object (list with \code{$show} toggles)
+#'
+#' @examples
+#' result <- efa(survey_data, political_orientation, environmental_concern,
+#'              life_satisfaction, trust_government, trust_media, trust_science)
+#' summary(result)
+#' summary(result, communalities = FALSE)
+#'
+#' @seealso \code{\link{efa}} for the main analysis function.
+#' @export
+#' @method summary efa
+summary.efa <- function(object, kmo_bartlett = TRUE, communalities = TRUE,
+                        variance_explained = TRUE, unrotated_matrix = TRUE,
+                        rotated_matrix = TRUE, pattern_matrix = TRUE,
+                        structure_matrix = TRUE, factor_correlations = TRUE,
+                        digits = 3, ...) {
+  show <- list(
+    kmo_bartlett = kmo_bartlett,
+    communalities = communalities,
+    variance_explained = variance_explained,
+    unrotated_matrix = unrotated_matrix,
+    rotated_matrix = rotated_matrix,
+    pattern_matrix = pattern_matrix,
+    structure_matrix = structure_matrix,
+    factor_correlations = factor_correlations
+  )
+  build_summary_object(object, show, digits, "summary.efa")
+}
+
+
+#' Print summary of EFA results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for an Exploratory Factor Analysis,
+#' with sections controlled by the boolean parameters passed to
+#' \code{\link{summary.efa}}.  Sections include KMO and Bartlett's test,
+#' communalities, variance explained, and rotated component/pattern matrices.
+#'
+#' @param x A \code{summary.efa} object created by
+#'   \code{\link{summary.efa}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- efa(survey_data, political_orientation, environmental_concern,
+#'               life_satisfaction, trust_government, trust_media, trust_science)
+#' summary(result)                        # all sections
+#' summary(result, communalities = FALSE) # hide communalities
+#'
+#' @seealso \code{\link{efa}} for the main analysis,
+#'   \code{\link{summary.efa}} for summary options.
+#' @export
+#' @method print summary.efa
+print.summary.efa <- function(x, ...) {
   extraction_label <- switch(x$extraction %||% "pca",
     "pca" = "PCA",
     "ml" = "Maximum Likelihood",
@@ -899,10 +1078,10 @@ print.efa <- function(x, digits = 3, ...) {
   )
   print_header(title)
 
-  if (x$is_grouped) {
-    .print_efa_grouped(x, digits)
+  if (isTRUE(x$is_grouped)) {
+    .print_efa_grouped(x, x$digits)
   } else {
-    .print_efa_ungrouped(x, digits)
+    .print_efa_ungrouped(x, x$digits)
   }
 
   invisible(x)
@@ -911,6 +1090,14 @@ print.efa <- function(x, digits = 3, ...) {
 #' Print EFA results for ungrouped data
 #' @keywords internal
 .print_efa_ungrouped <- function(x, digits = 3) {
+  show_kmo <- if (!is.null(x$show)) isTRUE(x$show$kmo_bartlett) else TRUE
+  show_comm <- if (!is.null(x$show)) isTRUE(x$show$communalities) else TRUE
+  show_var <- if (!is.null(x$show)) isTRUE(x$show$variance_explained) else TRUE
+  show_unrotated <- if (!is.null(x$show)) isTRUE(x$show$unrotated_matrix) else TRUE
+  show_rotated <- if (!is.null(x$show)) isTRUE(x$show$rotated_matrix) else TRUE
+  show_pattern <- if (!is.null(x$show)) isTRUE(x$show$pattern_matrix) else TRUE
+  show_structure <- if (!is.null(x$show)) isTRUE(x$show$structure_matrix) else TRUE
+  show_factor_cor <- if (!is.null(x$show)) isTRUE(x$show$factor_correlations) else TRUE
 
   blank <- x$blank %||% 0.40
   sort_loadings <- x$sort %||% TRUE
@@ -939,111 +1126,127 @@ print.efa <- function(x, digits = 3, ...) {
   ))
 
   # KMO and Bartlett's Test
-  cat("\n")
-  cat("KMO and Bartlett's Test\n")
-  cat(paste(rep("-", 40), collapse = ""), "\n")
-  cat(sprintf("  Kaiser-Meyer-Olkin Measure:     %s\n",
-              format(round(x$kmo$overall, digits), nsmall = digits)))
-  cat(sprintf("  Bartlett's Chi-Square:          %.3f\n", x$bartlett$chi_sq))
-  cat(sprintf("  df:                             %d\n", x$bartlett$df))
-  cat(sprintf("  Sig.:                           %.3f\n", x$bartlett$p_value))
-
-  # Goodness-of-fit Test (ML only)
-  if (!is.null(x$goodness_of_fit)) {
-    cat("\nGoodness-of-fit Test\n")
+  if (show_kmo) {
+    cat("\n")
+    cat("KMO and Bartlett's Test\n")
     cat(paste(rep("-", 40), collapse = ""), "\n")
-    cat(sprintf("  Chi-Square:                     %.3f\n", x$goodness_of_fit$chi_sq))
-    cat(sprintf("  df:                             %d\n", x$goodness_of_fit$df))
-    cat(sprintf("  Sig.:                           %.3f\n", x$goodness_of_fit$p_value))
+    cat(sprintf("  Kaiser-Meyer-Olkin Measure:     %s\n",
+                format(round(x$kmo$overall, digits), nsmall = digits)))
+    cat(sprintf("  Bartlett's Chi-Square:          %.3f\n", x$bartlett$chi_sq))
+    cat(sprintf("  df:                             %d\n", x$bartlett$df))
+    cat(sprintf("  Sig.:                           %.3f\n", x$bartlett$p_value))
+
+    # Goodness-of-fit Test (ML only)
+    if (!is.null(x$goodness_of_fit)) {
+      cat("\nGoodness-of-fit Test\n")
+      cat(paste(rep("-", 40), collapse = ""), "\n")
+      cat(sprintf("  Chi-Square:                     %.3f\n", x$goodness_of_fit$chi_sq))
+      cat(sprintf("  df:                             %d\n", x$goodness_of_fit$df))
+      cat(sprintf("  Sig.:                           %.3f\n", x$goodness_of_fit$p_value))
+    }
   }
 
   # Communalities
-  cat("\nCommunalities\n")
-  cat(paste(rep("-", 40), collapse = ""), "\n")
+  if (show_comm) {
+    cat("\nCommunalities\n")
+    cat(paste(rep("-", 40), collapse = ""), "\n")
 
-  # Initial communalities: 1.0 for PCA, SMC for ML/PAF
-  initial_vals <- if (!is.null(x$initial_communalities)) {
-    round(as.numeric(x$initial_communalities[names(x$communalities)]), digits)
-  } else {
-    rep(1.000, length(x$communalities))
+    # Initial communalities: 1.0 for PCA, SMC for ML/PAF
+    initial_vals <- if (!is.null(x$initial_communalities)) {
+      round(as.numeric(x$initial_communalities[names(x$communalities)]), digits)
+    } else {
+      rep(1.000, length(x$communalities))
+    }
+
+    comm_df <- data.frame(
+      variable = names(x$communalities),
+      initial = initial_vals,
+      extraction = round(as.numeric(x$communalities), digits),
+      stringsAsFactors = FALSE
+    )
+    print(comm_df, row.names = FALSE)
+    cat(sprintf("Extraction Method: %s.\n", extraction_full))
   }
-
-  comm_df <- data.frame(
-    variable = names(x$communalities),
-    initial = initial_vals,
-    extraction = round(as.numeric(x$communalities), digits),
-    stringsAsFactors = FALSE
-  )
-  print(comm_df, row.names = FALSE)
-  cat(sprintf("Extraction Method: %s.\n", extraction_full))
 
   # Total Variance Explained
-  cat("\nTotal Variance Explained\n")
-  cat(paste(rep("-", 40), collapse = ""), "\n")
-
-  ve <- x$variance_explained
-  n_f <- x$n_factors
-
-  for (i in seq_len(nrow(ve))) {
-    cat(sprintf("  %s%d  Eigenvalue: %s  Variance: %s%%  Cumulative: %s%%\n",
-                prefix, i,
-                format(round(ve$eigenvalue[i], digits), nsmall = digits),
-                format(round(ve$prc_variance[i], digits), nsmall = digits),
-                format(round(ve$cumulative_prc[i], digits), nsmall = digits)))
-  }
-
-  # Rotation sums if available
-  if (!is.null(x$rotation_variance) && x$rotation != "none") {
-    cat("\nRotation Sums of Squared Loadings\n")
+  if (show_var) {
+    cat("\nTotal Variance Explained\n")
     cat(paste(rep("-", 40), collapse = ""), "\n")
-    rv <- x$rotation_variance
-    for (i in seq_len(nrow(rv))) {
-      if ("prc_variance" %in% names(rv)) {
-        cat(sprintf("  %s%d  SS Loading: %s  Variance: %s%%  Cumulative: %s%%\n",
-                    prefix, i,
-                    format(round(rv$ss_loading[i], digits), nsmall = digits),
-                    format(round(rv$prc_variance[i], digits), nsmall = digits),
-                    format(round(rv$cumulative_prc[i], digits), nsmall = digits)))
-      } else {
-        # Oblique rotation: only SS loadings (no cumulative)
-        cat(sprintf("  %s%d  SS Loading: %s\n",
-                    prefix, i,
-                    format(round(rv$ss_loading[i], digits), nsmall = digits)))
+
+    ve <- x$variance_explained
+    n_f <- x$n_factors
+
+    for (i in seq_len(nrow(ve))) {
+      cat(sprintf("  %s%d  Eigenvalue: %s  Variance: %s%%  Cumulative: %s%%\n",
+                  prefix, i,
+                  format(round(ve$eigenvalue[i], digits), nsmall = digits),
+                  format(round(ve$prc_variance[i], digits), nsmall = digits),
+                  format(round(ve$cumulative_prc[i], digits), nsmall = digits)))
+    }
+
+    # Rotation sums if available
+    if (!is.null(x$rotation_variance) && x$rotation != "none") {
+      cat("\nRotation Sums of Squared Loadings\n")
+      cat(paste(rep("-", 40), collapse = ""), "\n")
+      rv <- x$rotation_variance
+      for (i in seq_len(nrow(rv))) {
+        if ("prc_variance" %in% names(rv)) {
+          cat(sprintf("  %s%d  SS Loading: %s  Variance: %s%%  Cumulative: %s%%\n",
+                      prefix, i,
+                      format(round(rv$ss_loading[i], digits), nsmall = digits),
+                      format(round(rv$prc_variance[i], digits), nsmall = digits),
+                      format(round(rv$cumulative_prc[i], digits), nsmall = digits)))
+        } else {
+          # Oblique rotation: only SS loadings (no cumulative)
+          cat(sprintf("  %s%d  SS Loading: %s\n",
+                      prefix, i,
+                      format(round(rv$ss_loading[i], digits), nsmall = digits)))
+        }
       }
     }
   }
 
   # Unrotated matrix
-  cat(sprintf("\n%s Matrix (unrotated)\n", matrix_label))
-  cat(paste(rep("-", 40), collapse = ""), "\n")
-  .print_loading_matrix(x$unrotated_loadings, blank, sort_loadings, digits)
-  cat(sprintf("Extraction Method: %s.\n", extraction_full))
+  if (show_unrotated) {
+    cat(sprintf("\n%s Matrix (unrotated)\n", matrix_label))
+    cat(paste(rep("-", 40), collapse = ""), "\n")
+    .print_loading_matrix(x$unrotated_loadings, blank, sort_loadings, digits)
+    cat(sprintf("Extraction Method: %s.\n", extraction_full))
+  }
 
   # Rotated loadings
   if (x$rotation == "varimax") {
-    cat(sprintf("\nRotated %s Matrix\n", matrix_label))
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-    .print_loading_matrix(x$loadings, blank, sort_loadings, digits)
-    cat(sprintf("Extraction Method: %s.\n", extraction_full))
-    cat("Rotation Method: Varimax with Kaiser Normalization.\n")
+    if (show_rotated) {
+      cat(sprintf("\nRotated %s Matrix\n", matrix_label))
+      cat(paste(rep("-", 40), collapse = ""), "\n")
+      .print_loading_matrix(x$loadings, blank, sort_loadings, digits)
+      cat(sprintf("Extraction Method: %s.\n", extraction_full))
+      cat("Rotation Method: Varimax with Kaiser Normalization.\n")
+    }
 
   } else if (x$rotation %in% c("oblimin", "promax")) {
     rot_label <- if (x$rotation == "oblimin") "Oblimin" else "Promax"
 
-    cat("\nPattern Matrix\n")
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-    .print_loading_matrix(x$pattern_matrix, blank, sort_loadings, digits)
-    cat(sprintf("Extraction Method: %s.\n", extraction_full))
-    cat(sprintf("Rotation Method: %s with Kaiser Normalization.\n", rot_label))
+    if (show_pattern) {
+      cat("\nPattern Matrix\n")
+      cat(paste(rep("-", 40), collapse = ""), "\n")
+      .print_loading_matrix(x$pattern_matrix, blank, sort_loadings, digits)
+      cat(sprintf("Extraction Method: %s.\n", extraction_full))
+      cat(sprintf("Rotation Method: %s with Kaiser Normalization.\n", rot_label))
+    }
 
-    cat("\nStructure Matrix\n")
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-    .print_loading_matrix(x$structure_matrix, blank, sort_loadings, digits)
+    if (show_structure) {
+      cat("\nStructure Matrix\n")
+      cat(paste(rep("-", 40), collapse = ""), "\n")
+      .print_loading_matrix(x$structure_matrix, blank, sort_loadings, digits)
+    }
 
-    cat(sprintf("\n%s Correlation Matrix\n", matrix_label))
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-    fc <- round(x$factor_correlations, digits)
-    print(fc, quote = FALSE)
+    if (show_factor_cor) {
+      cat(sprintf("\n%s Correlation Matrix\n", matrix_label))
+      cat(paste(rep("-", 40), collapse = ""), "\n")
+      fc <- round(x$factor_correlations, digits)
+      print(fc, quote = FALSE)
+    }
   }
 }
 

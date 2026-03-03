@@ -28,6 +28,7 @@ A reliability result object containing:
 \item{inter_item_cor}{Inter-item correlation matrix}
 \item{n}{Sample size (listwise)}
 }
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 \code{reliability()} calculates Cronbach's Alpha and detailed item statistics
@@ -95,11 +96,19 @@ survey_data \%>\%
   group_by(region) \%>\%
   reliability(trust_government, trust_media, trust_science)
 
+# --- Three-layer output ---
+result <- reliability(survey_data, trust_government, trust_media, trust_science)
+result              # compact one-line overview
+summary(result)     # full detailed output with all sections
+summary(result, inter_item_correlations = FALSE)  # hide correlations
+
 }
 \seealso{
 \code{\link{scale_index}} for creating mean indices after checking reliability.
 
 \code{\link{pearson_cor}} for bivariate correlations.
+
+\code{\link{summary.reliability}} for detailed output with toggleable sections.
 
 Other scale: 
 \code{\link{efa}()},

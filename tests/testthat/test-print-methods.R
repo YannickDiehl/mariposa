@@ -125,7 +125,7 @@ test_that("print.crosstab: grouped", {
 test_that("print.t_test: ungrouped, unweighted, two-sample", {
   result <- t_test(survey_data, life_satisfaction, group = gender)
   output <- expect_prints(result, "t-Test")
-  expect_true(any(grepl("Equal variances", output, fixed = TRUE)))
+  expect_true(any(grepl("t(", output, fixed = TRUE)))
 })
 
 test_that("print.t_test: ungrouped, weighted, two-sample", {
@@ -156,8 +156,8 @@ test_that("print.t_test: multiple variables", {
 test_that("print.oneway_anova: ungrouped, unweighted", {
   result <- oneway_anova(survey_data, life_satisfaction, group = education)
   output <- expect_prints(result, "One-Way ANOVA")
-  expect_true(any(grepl("ANOVA Results", output, fixed = TRUE)))
-  expect_true(any(grepl("Effect Sizes", output, fixed = TRUE)))
+  expect_true(any(grepl("F(", output, fixed = TRUE)))
+  expect_true(any(grepl("N =", output, fixed = TRUE)))
 })
 
 test_that("print.oneway_anova: ungrouped, weighted", {
@@ -192,8 +192,7 @@ test_that("print.factorial_anova: unweighted", {
   result <- factorial_anova(survey_data, dv = life_satisfaction,
                             between = c(gender, education))
   output <- expect_prints(result, "Factorial ANOVA")
-  expect_true(any(grepl("Between-Subjects Effects", output, fixed = TRUE)))
-  expect_true(any(grepl("R Squared", output, fixed = TRUE)))
+  expect_true(any(grepl("eta2p", output, fixed = TRUE)))
 })
 
 test_that("print.factorial_anova: weighted", {
@@ -210,8 +209,8 @@ test_that("print.ancova: one-way, unweighted", {
   result <- ancova(survey_data, dv = income, between = c(education),
                    covariate = c(age))
   output <- expect_prints(result, "ANCOVA")
-  expect_true(any(grepl("Parameter Estimates", output, fixed = TRUE)))
-  expect_true(any(grepl("Estimated Marginal Means", output, fixed = TRUE)))
+  expect_true(any(grepl("eta2p", output, fixed = TRUE)))
+  expect_true(any(grepl("covariate", output, fixed = TRUE)))
 })
 
 test_that("print.ancova: one-way, weighted", {
@@ -232,8 +231,8 @@ test_that("print.ancova: two-way", {
 test_that("print.chi_square: ungrouped", {
   result <- chi_square(survey_data, education, region)
   output <- expect_prints(result, "Chi-Squared")
-  expect_true(any(grepl("Observed Frequencies", output, fixed = TRUE)))
-  expect_true(any(grepl("Expected Frequencies", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2(", output, fixed = TRUE)))
+  expect_true(any(grepl("N =", output, fixed = TRUE)))
 })
 
 test_that("print.chi_square: ungrouped, weighted", {
@@ -337,31 +336,33 @@ test_that("print.mcnemar_test: weighted", {
 # ===========================================================================
 test_that("print.pearson_cor: ungrouped, 2 vars", {
   result <- pearson_cor(survey_data, age, income)
-  output <- expect_prints(result, "Pearson")
-  expect_true(any(grepl("Interpretation", output, fixed = TRUE)))
+  output <- expect_prints(result, "Pearson Correlation")
+  expect_true(any(grepl("r = ", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
 })
 
-test_that("print.pearson_cor: ungrouped, 3+ vars (matrix)", {
+test_that("print.pearson_cor: ungrouped, 3+ vars (compact)", {
   result <- pearson_cor(survey_data, age, income, life_satisfaction)
-  output <- expect_prints(result, "Pearson")
-  expect_true(any(grepl("Matrix", output, fixed = TRUE)))
+  output <- expect_prints(result, "Pearson Correlation")
+  expect_true(any(grepl("variables", output, fixed = TRUE)))
 })
 
 test_that("print.pearson_cor: ungrouped, weighted", {
   result <- pearson_cor(survey_data, age, income, weights = sampling_weight)
-  expect_prints(result, "Pearson")
+  output <- expect_prints(result, "Pearson Correlation")
+  expect_true(any(grepl("Weighted", output, fixed = TRUE)))
 })
 
 test_that("print.pearson_cor: grouped, 2 vars", {
   result <- survey_data %>% group_by(region) %>%
     pearson_cor(age, income)
-  expect_prints(result, "Pearson")
+  expect_prints(result, "Pearson Correlation")
 })
 
-test_that("print.pearson_cor: grouped, 3+ vars (matrix)", {
+test_that("print.pearson_cor: grouped, 3+ vars (compact)", {
   result <- survey_data %>% group_by(region) %>%
     pearson_cor(age, income, life_satisfaction)
-  expect_prints(result, "Pearson")
+  expect_prints(result, "Pearson Correlation")
 })
 
 # ===========================================================================
@@ -369,25 +370,27 @@ test_that("print.pearson_cor: grouped, 3+ vars (matrix)", {
 # ===========================================================================
 test_that("print.spearman_rho: ungrouped, 2 vars", {
   result <- spearman_rho(survey_data, age, income)
-  output <- expect_prints(result, "Spearman")
-  expect_true(any(grepl("Interpretation", output, fixed = TRUE)))
+  output <- expect_prints(result, "Spearman Correlation")
+  expect_true(any(grepl("rho = ", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
 })
 
-test_that("print.spearman_rho: ungrouped, 3+ vars (matrix)", {
+test_that("print.spearman_rho: ungrouped, 3+ vars (compact)", {
   result <- spearman_rho(survey_data, age, income, life_satisfaction)
-  output <- expect_prints(result, "Spearman")
-  expect_true(any(grepl("Matrix", output, fixed = TRUE)))
+  output <- expect_prints(result, "Spearman Correlation")
+  expect_true(any(grepl("variables", output, fixed = TRUE)))
 })
 
 test_that("print.spearman_rho: ungrouped, weighted", {
   result <- spearman_rho(survey_data, age, income, weights = sampling_weight)
-  expect_prints(result, "Spearman")
+  output <- expect_prints(result, "Spearman Correlation")
+  expect_true(any(grepl("Weighted", output, fixed = TRUE)))
 })
 
 test_that("print.spearman_rho: grouped", {
   result <- survey_data %>% group_by(region) %>%
     spearman_rho(age, income)
-  expect_prints(result, "Spearman")
+  expect_prints(result, "Spearman Correlation")
 })
 
 # ===========================================================================
@@ -395,25 +398,29 @@ test_that("print.spearman_rho: grouped", {
 # ===========================================================================
 test_that("print.kendall_tau: ungrouped, 2 vars", {
   result <- kendall_tau(survey_data, age, income)
-  expect_prints(result, "Kendall")
+  output <- expect_prints(result, "Kendall's Tau")
+  expect_true(any(grepl("tau = ", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
 })
 
-test_that("print.kendall_tau: ungrouped, 3+ vars (matrix)", {
+test_that("print.kendall_tau: ungrouped, 3+ vars (compact)", {
   result <- kendall_tau(survey_data, age, income, life_satisfaction)
-  output <- expect_prints(result, "Kendall")
-  expect_true(any(grepl("Matrix", output, fixed = TRUE)))
+  output <- expect_prints(result, "Kendall's Tau")
+  expect_true(any(grepl("variables", output, fixed = TRUE)))
 })
 
 test_that("print.kendall_tau: ungrouped, weighted", {
   result <- kendall_tau(survey_data, age, income, weights = sampling_weight)
-  expect_prints(result, "Kendall")
+  output <- expect_prints(result, "Kendall's Tau")
+  expect_true(any(grepl("Weighted", output, fixed = TRUE)))
 })
 
 test_that("print.kendall_tau: grouped", {
   result <- survey_data %>% group_by(region) %>%
     kendall_tau(age, income)
-  expect_prints(result, "Kendall")
+  expect_prints(result, "Kendall's Tau")
 })
+
 
 # ===========================================================================
 # 15. mann_whitney()
@@ -421,7 +428,7 @@ test_that("print.kendall_tau: grouped", {
 test_that("print.mann_whitney: ungrouped, unweighted", {
   result <- mann_whitney(survey_data, life_satisfaction, group = gender)
   output <- expect_prints(result, "Mann-Whitney")
-  expect_true(any(grepl("rank", output, ignore.case = TRUE)))
+  expect_true(any(grepl("U =", output, fixed = TRUE)))
 })
 
 test_that("print.mann_whitney: ungrouped, weighted", {
@@ -693,12 +700,12 @@ test_that("print.pairwise_wilcoxon: weighted", {
 # ===========================================================================
 # 25. reliability()
 # ===========================================================================
-test_that("print.reliability: ungrouped, unweighted", {
+test_that("print.reliability: ungrouped, unweighted (compact)", {
   result <- reliability(survey_data, trust_government, trust_media,
                         trust_science)
   output <- expect_prints(result, "Reliability")
-  expect_true(any(grepl("Cronbach", output, fixed = TRUE)))
-  expect_true(any(grepl("Item Statistics", output, fixed = TRUE)))
+  expect_true(any(grepl("Alpha", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
 })
 
 test_that("print.reliability: ungrouped, weighted", {
@@ -717,29 +724,27 @@ test_that("print.reliability: grouped", {
 # ===========================================================================
 # 26. efa()
 # ===========================================================================
-test_that("print.efa: PCA + varimax (default)", {
+test_that("print.efa: PCA + varimax (default, compact)", {
   result <- efa(survey_data, trust_government, trust_media, trust_science,
                 life_satisfaction)
   output <- expect_prints(result, "Exploratory Factor Analysis")
   expect_true(any(grepl("KMO", output, fixed = TRUE)))
-  expect_true(any(grepl("Communalities", output, fixed = TRUE)))
-  expect_true(any(grepl("Variance Explained", output, fixed = TRUE)))
+  expect_true(any(grepl("Variance explained", output, fixed = TRUE)))
 })
 
-test_that("print.efa: PCA + oblimin", {
+test_that("print.efa: PCA + oblimin (compact)", {
   skip_if_not_installed("GPArotation")
   result <- efa(survey_data, trust_government, trust_media, trust_science,
                 life_satisfaction, rotation = "oblimin")
   output <- expect_prints(result, "Exploratory Factor Analysis")
-  expect_true(any(grepl("Pattern Matrix", output, fixed = TRUE)))
-  expect_true(any(grepl("Structure Matrix", output, fixed = TRUE)))
+  expect_true(any(grepl("Oblimin", output, fixed = TRUE)))
 })
 
-test_that("print.efa: PCA + promax", {
+test_that("print.efa: PCA + promax (compact)", {
   result <- efa(survey_data, trust_government, trust_media, trust_science,
                 life_satisfaction, rotation = "promax")
   output <- expect_prints(result, "Exploratory Factor Analysis")
-  expect_true(any(grepl("Pattern Matrix", output, fixed = TRUE)))
+  expect_true(any(grepl("Promax", output, fixed = TRUE)))
 })
 
 test_that("print.efa: PCA + none", {
@@ -748,12 +753,11 @@ test_that("print.efa: PCA + none", {
   expect_prints(result, "Exploratory Factor Analysis")
 })
 
-test_that("print.efa: ML extraction", {
+test_that("print.efa: ML extraction (compact)", {
   result <- efa(survey_data, trust_government, trust_media, trust_science,
                 life_satisfaction, extraction = "ml")
   output <- expect_prints(result, "Exploratory Factor Analysis")
-  expect_true(any(grepl("Maximum Likelihood", output, fixed = TRUE) |
-                    grepl("Goodness-of-fit", output, ignore.case = TRUE)))
+  expect_true(any(grepl("ML", output, fixed = TRUE)))
 })
 
 test_that("print.efa: weighted", {
@@ -767,76 +771,72 @@ test_that("print.efa: grouped", {
     efa(trust_government, trust_media, trust_science, life_satisfaction)
   expect_prints(result, "Exploratory Factor Analysis")
 })
-
 # ===========================================================================
 # 27. linear_regression()
 # ===========================================================================
-test_that("print.linear_regression: ungrouped, unweighted", {
+test_that("print.linear_regression: ungrouped, unweighted (compact)", {
   result <- linear_regression(survey_data, dependent = life_satisfaction,
                               predictors = c(age, income))
   output <- expect_prints(result, "Linear Regression")
-  expect_true(any(grepl("Model Summary", output, fixed = TRUE)))
-  expect_true(any(grepl("ANOVA", output, fixed = TRUE)))
-  expect_true(any(grepl("Coefficients", output, fixed = TRUE)))
+  expect_true(any(grepl("R2", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("F(", output, fixed = TRUE)))
 })
 
-test_that("print.linear_regression: with standardized Beta", {
-  result <- linear_regression(survey_data, dependent = life_satisfaction,
-                              predictors = c(age, income),
-                              standardized = TRUE)
-  output <- expect_prints(result, "Linear Regression")
-  expect_true(any(grepl("Beta", output, fixed = TRUE)))
-})
-
-test_that("print.linear_regression: weighted", {
+test_that("print.linear_regression: weighted (compact)", {
   result <- linear_regression(survey_data, dependent = life_satisfaction,
                               predictors = c(age, income),
                               weights = sampling_weight)
-  expect_prints(result, "Weighted")
+  output <- expect_prints(result, "Linear Regression")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
 })
 
-test_that("print.linear_regression: grouped", {
+test_that("print.linear_regression: grouped (compact)", {
   result <- survey_data %>% group_by(gender) %>%
     linear_regression(dependent = life_satisfaction,
                       predictors = c(age, income))
-  expect_prints(result, "Linear Regression")
+  output <- expect_prints(result, "Linear Regression")
+  expect_true(any(grepl("[Grouped:", output, fixed = TRUE)))
 })
 
 # ===========================================================================
 # 28. logistic_regression()
 # ===========================================================================
-test_that("print.logistic_regression: ungrouped, unweighted", {
+test_that("print.logistic_regression: ungrouped, unweighted (compact)", {
   sd2 <- survey_data %>%
     mutate(high_sat = as.integer(
       life_satisfaction > median(life_satisfaction, na.rm = TRUE)))
   result <- logistic_regression(sd2, dependent = high_sat,
                                 predictors = c(age, income))
   output <- expect_prints(result, "Logistic Regression")
-  expect_true(any(grepl("Omnibus", output, fixed = TRUE)))
-  expect_true(any(grepl("Model Summary", output, fixed = TRUE)))
-  expect_true(any(grepl("Classification", output, fixed = TRUE)))
-  expect_true(any(grepl("Exp(B)", output, fixed = TRUE)))
+  expect_true(any(grepl("Nagelkerke R2", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2(", output, fixed = TRUE)))
+  expect_true(any(grepl("Accuracy", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
 })
 
-test_that("print.logistic_regression: weighted", {
+test_that("print.logistic_regression: weighted (compact)", {
   sd2 <- survey_data %>%
     mutate(high_sat = as.integer(
       life_satisfaction > median(life_satisfaction, na.rm = TRUE)))
   result <- logistic_regression(sd2, dependent = high_sat,
                                 predictors = c(age, income),
                                 weights = sampling_weight)
-  expect_prints(result, "Weighted")
+  output <- expect_prints(result, "Logistic Regression")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
 })
 
-test_that("print.logistic_regression: grouped", {
+test_that("print.logistic_regression: grouped (compact)", {
   sd2 <- survey_data %>%
     mutate(high_sat = as.integer(
       life_satisfaction > median(life_satisfaction, na.rm = TRUE)))
   result <- sd2 %>% group_by(gender) %>%
     logistic_regression(dependent = high_sat,
                         predictors = c(age, income))
-  expect_prints(result, "Logistic Regression")
+  output <- expect_prints(result, "Logistic Regression")
+  expect_true(any(grepl("[Grouped:", output, fixed = TRUE)))
 })
+
 
 # ===========================================================================
 # 29. w_modus()

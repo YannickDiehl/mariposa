@@ -42,6 +42,7 @@ Correlation results showing rank-based relationships between variables,
 including the tau-b coefficient, p-value, z-score, and sample size for each
 pair. For multiple variables, correlation, significance, and sample size
 matrices are also provided.
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 Calculates Kendall's tau-b rank correlation coefficients between variables with support
@@ -122,11 +123,13 @@ survey_data \%>\%
 survey_data \%>\%
   kendall_tau(age, income, alternative = "greater")
 
-# Store results for further analysis
+# --- Three-layer output ---
 result <- survey_data \%>\%
   kendall_tau(life_satisfaction, political_orientation, trust_media,
               weights = sampling_weight)
-print(result)
+result              # compact one-line overview
+summary(result)     # full correlation, p-value, and N matrices
+summary(result, pvalue_matrix = FALSE)  # hide p-values
 
 }
 \references{
@@ -146,6 +149,8 @@ implementation.
 \code{\link{spearman_rho}} for Spearman's rank correlation.
 
 \code{\link{pearson_cor}} for Pearson correlation analysis.
+
+\code{\link{summary.kendall_tau}} for detailed output with toggleable sections.
 
 Other correlation: 
 \code{\link{pearson_cor}()},

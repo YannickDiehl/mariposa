@@ -31,6 +31,7 @@ An object of class \code{"factorial_anova"} containing:
 \item{model}{The underlying model object for S3 dispatch}
 \item{call_info}{List with metadata (dv, factors, weighted, n_total, n_missing)}
 }
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 \code{factorial_anova()} tests whether group means differ across two or more
@@ -129,6 +130,11 @@ result <- survey_data \%>\%
 result \%>\% tukey_test()
 result \%>\% levene_test()
 
+# --- Three-layer output ---
+result              # compact overview
+summary(result)     # full detailed output with all sections
+summary(result, marginal_means = FALSE)  # hide estimated marginal means
+
 }
 \references{
 Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences
@@ -147,6 +153,8 @@ Analyzing Data (2nd ed.). Lawrence Erlbaum Associates.
 \code{\link{levene_test}} for testing homogeneity of variances.
 
 \code{\link{ancova}} for ANOVA with covariates.
+
+\code{\link{summary.factorial_anova}} for detailed output with toggleable sections.
 
 Other hypothesis_tests: 
 \code{\link{ancova}()},

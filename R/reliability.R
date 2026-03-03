@@ -27,6 +27,7 @@
 #'   \item{inter_item_cor}{Inter-item correlation matrix}
 #'   \item{n}{Sample size (listwise)}
 #' }
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -83,10 +84,18 @@
 #'   group_by(region) %>%
 #'   reliability(trust_government, trust_media, trust_science)
 #'
+#' # --- Three-layer output ---
+#' result <- reliability(survey_data, trust_government, trust_media, trust_science)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output with all sections
+#' summary(result, inter_item_correlations = FALSE)  # hide correlations
+#'
 #' @seealso
 #' \code{\link{scale_index}} for creating mean indices after checking reliability.
 #'
 #' \code{\link{pearson_cor}} for bivariate correlations.
+#'
+#' \code{\link{summary.reliability}} for detailed output with toggleable sections.
 #'
 #' @family scale
 #' @export
@@ -385,20 +394,160 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
 
 # ============================================================================
-# PRINT METHOD
+# HELPERS
 # ============================================================================
 
-#' @export
-print.reliability <- function(x, digits = 3, ...) {
+#' Interpret Cronbach's Alpha value
+#' @keywords internal
+.alpha_interpretation <- function(alpha) {
+  if (is.na(alpha)) return("")
+  if (alpha >= 0.90) return("Excellent")
+  if (alpha >= 0.80) return("Good")
+  if (alpha >= 0.70) return("Acceptable")
+  if (alpha >= 0.60) return("Questionable")
+  "Poor"
+}
 
-  # Header
+
+# ============================================================================
+# PRINT METHOD (compact)
+# ============================================================================
+
+#' Print reliability results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"reliability"}.
+#' Shows Cronbach's Alpha with quality interpretation and item count
+#' in a single line per group.
+#'
+#' For the full detailed output including item statistics, inter-item
+#' correlations, and item-total statistics, use \code{summary()}.
+#'
+#' @param x An object of class \code{"reliability"} returned by
+#'   \code{\link{reliability}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- reliability(survey_data, trust_government, trust_media, trust_science)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
+#' @export
+#' @method print reliability
+print.reliability <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+
+  if (isTRUE(x$is_grouped)) {
+    for (group_result in x$groups) {
+      group_values <- group_result$group_values
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+      .print_reliability_compact(group_result, x$n_items, weighted_tag, digits)
+    }
+  } else {
+    .print_reliability_compact(x, x$n_items, weighted_tag, digits)
+  }
+
+  invisible(x)
+}
+
+#' Print compact one-liner for a single reliability result
+#' @keywords internal
+.print_reliability_compact <- function(res, n_items, weighted_tag, digits) {
+  alpha <- res$alpha
+  interp <- .alpha_interpretation(alpha)
+  n_display <- if (!is.null(res$weighted_n)) {
+    sprintf("%.0f", res$weighted_n)
+  } else {
+    as.character(res$n)
+  }
+
+  cat(sprintf("Reliability Analysis: %d items%s\n", n_items, weighted_tag))
+  cat(sprintf("  Cronbach's Alpha = %s (%s), N = %s\n",
+              format(round(alpha, digits), nsmall = digits),
+              interp, n_display))
+}
+
+
+# ============================================================================
+# SUMMARY METHOD
+# ============================================================================
+
+#' Summarize a reliability analysis
+#'
+#' @description
+#' Creates a detailed summary of a reliability analysis result. All sections
+#' are shown by default; set individual toggles to \code{FALSE} to suppress
+#' specific sections.
+#'
+#' @param object A \code{reliability} result object
+#' @param reliability_statistics Show Cronbach's Alpha statistics? (Default: TRUE)
+#' @param item_statistics Show per-item means and SDs? (Default: TRUE)
+#' @param inter_item_correlations Show inter-item correlation matrix? (Default: TRUE)
+#' @param item_total_statistics Show item-total statistics? (Default: TRUE)
+#' @param digits Number of decimal places (Default: 3)
+#' @param ... Additional arguments (ignored)
+#'
+#' @return A \code{summary.reliability} object (list with \code{$show} toggles)
+#'
+#' @examples
+#' result <- reliability(survey_data, trust_government, trust_media, trust_science)
+#' summary(result)
+#' summary(result, inter_item_correlations = FALSE)
+#'
+#' @seealso \code{\link{reliability}} for the main analysis function.
+#' @export
+#' @method summary reliability
+summary.reliability <- function(object, reliability_statistics = TRUE,
+                                item_statistics = TRUE,
+                                inter_item_correlations = TRUE,
+                                item_total_statistics = TRUE,
+                                digits = 3, ...) {
+  show <- list(
+    reliability_statistics = reliability_statistics,
+    item_statistics = item_statistics,
+    inter_item_correlations = inter_item_correlations,
+    item_total_statistics = item_total_statistics
+  )
+  build_summary_object(object, show, digits, "summary.reliability")
+}
+
+
+#' Print summary of reliability analysis results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a reliability analysis, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.reliability}}.  Sections include reliability
+#' statistics, item statistics, inter-item correlations, and
+#' item-total statistics.
+#'
+#' @param x A \code{summary.reliability} object created by
+#'   \code{\link{summary.reliability}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- reliability(survey_data, trust_government, trust_media, trust_science)
+#' summary(result)                                  # all sections
+#' summary(result, inter_item_correlations = FALSE)  # hide correlations
+#'
+#' @seealso \code{\link{reliability}} for the main analysis,
+#'   \code{\link{summary.reliability}} for summary options.
+#' @export
+#' @method print summary.reliability
+print.summary.reliability <- function(x, ...) {
   title <- get_standard_title("Reliability Analysis", x$weights, "Results")
   print_header(title)
 
-  if (x$is_grouped) {
-    .print_reliability_grouped(x, digits)
+  if (isTRUE(x$is_grouped)) {
+    .print_reliability_grouped(x, x$digits)
   } else {
-    .print_reliability_ungrouped(x, digits)
+    .print_reliability_ungrouped(x, x$digits)
   }
 
   invisible(x)
@@ -407,6 +556,10 @@ print.reliability <- function(x, digits = 3, ...) {
 #' Print reliability results for ungrouped data
 #' @keywords internal
 .print_reliability_ungrouped <- function(x, digits = 3) {
+  show_reliability_stats <- if (!is.null(x$show)) isTRUE(x$show$reliability_statistics) else TRUE
+  show_item_stats <- if (!is.null(x$show)) isTRUE(x$show$item_statistics) else TRUE
+  show_inter_item <- if (!is.null(x$show)) isTRUE(x$show$inter_item_correlations) else TRUE
+  show_item_total <- if (!is.null(x$show)) isTRUE(x$show$item_total_statistics) else TRUE
 
   # Info section
   print_info_section(list(
@@ -416,25 +569,27 @@ print.reliability <- function(x, digits = 3, ...) {
   ))
 
   # Reliability Statistics
-  cat("\n")
-  cat("Reliability Statistics\n")
-  cat(paste(rep("-", 40), collapse = ""), "\n")
+  if (show_reliability_stats) {
+    cat("\n")
+    cat("Reliability Statistics\n")
+    cat(paste(rep("-", 40), collapse = ""), "\n")
 
-  cat(sprintf("  Cronbach's Alpha:              %s\n",
-              format(round(x$alpha, digits), nsmall = digits)))
-  cat(sprintf("  Alpha (standardized):          %s\n",
-              format(round(x$alpha_standardized, digits), nsmall = digits)))
-  cat(sprintf("  N of Items:                    %d\n", x$n_items))
+    cat(sprintf("  Cronbach's Alpha:              %s\n",
+                format(round(x$alpha, digits), nsmall = digits)))
+    cat(sprintf("  Alpha (standardized):          %s\n",
+                format(round(x$alpha_standardized, digits), nsmall = digits)))
+    cat(sprintf("  N of Items:                    %d\n", x$n_items))
 
-  n_label <- if (!is.null(x$weighted_n)) {
-    sprintf("%.2f (weighted)", x$weighted_n)
-  } else {
-    as.character(x$n)
+    n_label <- if (!is.null(x$weighted_n)) {
+      sprintf("%.2f (weighted)", x$weighted_n)
+    } else {
+      as.character(x$n)
+    }
+    cat(sprintf("  N (listwise):                  %s\n", n_label))
   }
-  cat(sprintf("  N (listwise):                  %s\n", n_label))
 
   # Item Statistics
-  if (!is.null(x$item_statistics)) {
+  if (show_item_stats && !is.null(x$item_statistics)) {
     cat("\nItem Statistics\n")
     cat(paste(rep("-", 40), collapse = ""), "\n")
 
@@ -448,14 +603,14 @@ print.reliability <- function(x, digits = 3, ...) {
   }
 
   # Inter-Item Correlation Matrix
-  if (!is.null(x$inter_item_cor)) {
+  if (show_inter_item && !is.null(x$inter_item_cor)) {
     .print_cor_matrix(x$inter_item_cor, digits = digits,
                       title = "Inter-Item Correlation Matrix:",
                       type = "correlation")
   }
 
   # Item-Total Statistics
-  if (!is.null(x$item_total)) {
+  if (show_item_total && !is.null(x$item_total)) {
     cat("\nItem-Total Statistics\n")
     cat(paste(rep("-", 40), collapse = ""), "\n")
 

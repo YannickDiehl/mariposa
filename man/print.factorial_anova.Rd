@@ -2,20 +2,33 @@
 % Please edit documentation in R/factorial_anova.R
 \name{print.factorial_anova}
 \alias{print.factorial_anova}
-\title{Print factorial ANOVA results}
+\title{Print factorial ANOVA results (compact)}
 \usage{
 \method{print}{factorial_anova}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{An object of class \code{"factorial_anova"}.}
+\item{x}{An object of class \code{"factorial_anova"} returned by
+\code{\link{factorial_anova}}.}
 
-\item{digits}{Number of decimal places (default: 3).}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{...}{Additional arguments (not used).}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print factorial ANOVA results
+Compact print method for objects of class \code{"factorial_anova"}.
+Shows main effects and interactions with F statistics, p-values,
+and effect sizes.
+
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- factorial_anova(survey_data,
+                          dv = life_satisfaction,
+                          between = c(gender, education))
+result              # compact overview
+summary(result)     # full detailed output
+
 }

@@ -2,17 +2,30 @@
 % Please edit documentation in R/kendall_tau.R
 \name{print.kendall_tau}
 \alias{print.kendall_tau}
-\title{Print method for kendall_tau}
+\title{Print Kendall's tau results (compact)}
 \usage{
 \method{print}{kendall_tau}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{A kendall_tau object}
+\item{x}{An object of class \code{"kendall_tau"} returned by
+\code{\link{kendall_tau}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments passed to print}
+\item{...}{Additional arguments (not used).}
+}
+\value{
+Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for kendall_tau
+Compact print method for objects of class \code{"kendall_tau"}.
+Shows tau coefficient, p-value, and sample size per pair.
+
+For the full detailed output including matrices, use \code{summary()}.
+}
+\examples{
+result <- kendall_tau(survey_data, age, life_satisfaction)
+result              # compact one-line overview
+summary(result)     # full correlation matrices
+
 }

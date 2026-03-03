@@ -2,20 +2,31 @@
 % Please edit documentation in R/ancova.R
 \name{print.ancova}
 \alias{print.ancova}
-\title{Print ANCOVA results}
+\title{Print ANCOVA results (compact)}
 \usage{
 \method{print}{ancova}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{An object of class \code{"ancova"}.}
+\item{x}{An object of class \code{"ancova"} returned by
+\code{\link{ancova}}.}
 
-\item{digits}{Number of decimal places (default: 3).}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{...}{Additional arguments (not used).}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print ANCOVA results
+Compact print method for objects of class \code{"ancova"}.
+Shows factor effects and covariates with F statistics, p-values,
+and effect sizes.
+
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- ancova(survey_data, dv = life_satisfaction, between = gender, covariate = age)
+result              # compact overview
+summary(result)     # full detailed output
+
 }

@@ -20,6 +20,7 @@
 #' - Chi-squared statistic and p-value
 #' - Observed vs expected frequencies
 #' - Effect sizes to measure relationship strength
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -77,13 +78,21 @@
 #' 
 #' # With continuity correction
 #' survey_data %>% chi_square(gender, region, correct = TRUE)
-#' 
+#'
+#' # --- Three-layer output ---
+#' result <- chi_square(survey_data, gender, education)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output with all sections
+#' summary(result, cross_tabulation = FALSE)  # hide cross-tabulation
+#'
 #' @seealso
 #' \code{\link[stats]{chisq.test}} for the base R chi-squared test.
 #'
 #' \code{\link{crosstab}} for detailed cross-tabulation tables.
 #'
 #' \code{\link{frequency}} for single-variable frequency tables.
+#'
+#' \code{\link{summary.chi_square}} for detailed output with toggleable sections.
 #'
 #' @references
 #' Pearson, K. (1900). On the criterion that a given system of deviations from
@@ -439,23 +448,167 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   return(sprintf(" %5.3f", p))
 }
 
-#' Print method for chi_square
+#' Print chi-squared test results (compact)
 #'
-#' @param x Chi-squared test results object
-#' @param digits Number of decimal places to display (default: 3)
-#' @param ... Additional arguments passed to print
+#' @description
+#' Compact print method for objects of class \code{"chi_square"}.
+#' Shows a one-line summary per test with test statistic, p-value,
+#' effect size, and sample size.
+#'
+#' For the full detailed output, use \code{summary()}.
+#'
+#' @param x An object of class \code{"chi_square"} returned by
+#'   \code{\link{chi_square}}.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- chi_square(survey_data, gender, education)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
+#' @method print chi_square
 print.chi_square <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  var_label <- paste(x$variables[1], "\u00d7", x$variables[2])
 
-  # Determine test type using standardized helper
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(x$results[x$groups])
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      # Find row matching this group
+      group_row <- x$results
+      for (g in names(group_values)) {
+        group_row <- group_row[group_row[[g]] == group_values[[g]], ]
+      }
+      for (j in seq_len(nrow(group_row))) {
+        .print_chi_square_compact(group_row, j, var_label, weighted_tag, digits)
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(x$results))) {
+      .print_chi_square_compact(x$results, i, var_label, weighted_tag, digits)
+    }
+  }
+
+  invisible(x)
+}
+
+#' Print a compact one-line summary for a single chi-squared test
+#' @param results Data frame with chi-squared results
+#' @param i Row index
+#' @param var_label Variable label string (e.g. "gender x region")
+#' @param weighted_tag Weighted tag string (e.g. " \[Weighted\]" or "")
+#' @param digits Number of decimal places
+#' @keywords internal
+.print_chi_square_compact <- function(results, i, var_label, weighted_tag, digits) {
+  chi_val <- results$chi_squared[i]
+  df_val  <- results$df[i]
+  p_val   <- results$p_value[i]
+  v_val   <- results$cramers_v[i]
+  n_val   <- results$n[i]
+
+  cat(sprintf("Chi-Squared Test: %s%s\n", var_label, weighted_tag))
+
+  if (!is.na(v_val)) {
+    v_interp <- .interpret_cramers_v(v_val)
+    cat(sprintf("  chi2(%d) = %.*f, %s %s, V = %.*f (%s), N = %d\n",
+                as.integer(df_val), digits, chi_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                digits, v_val, tolower(v_interp), as.integer(n_val)))
+  } else {
+    cat(sprintf("  chi2(%d) = %.*f, %s %s, N = %d\n",
+                as.integer(df_val), digits, chi_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                as.integer(n_val)))
+  }
+}
+
+#' Summary method for chi-squared test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including observed and expected frequency tables, test results, and
+#' effect size measures.
+#'
+#' @param object A \code{chi_square} result object.
+#' @param observed Logical. Show observed frequency table? (Default: TRUE)
+#' @param expected Logical. Show expected frequency table? (Default: TRUE)
+#' @param results Logical. Show chi-squared test results table? (Default: TRUE)
+#' @param effect_sizes Logical. Show effect size measures? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.chi_square} object.
+#'
+#' @examples
+#' result <- chi_square(survey_data, gender, education)
+#' summary(result)
+#' summary(result, expected = FALSE)
+#'
+#' @seealso \code{\link{chi_square}} for the main analysis function.
+#' @export
+#' @method summary chi_square
+summary.chi_square <- function(object, observed = TRUE, expected = TRUE,
+                               results = TRUE, effect_sizes = TRUE,
+                               digits = 3, ...) {
+  build_summary_object(
+    object = object,
+    show = list(observed = observed, expected = expected,
+                results = results, effect_sizes = effect_sizes),
+    digits = digits,
+    class_name = "summary.chi_square"
+  )
+}
+
+#' Print summary of chi-squared test results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a chi-squared test, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.chi_square}}.  Sections include cross-tabulation,
+#' test results, and effect sizes (Cramer's V, Phi).
+#'
+#' @param x A \code{summary.chi_square} object created by
+#'   \code{\link{summary.chi_square}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- chi_square(survey_data, gender, education)
+#' summary(result)                          # all sections
+#' summary(result, cross_tabulation = FALSE) # hide crosstab
+#'
+#' @seealso \code{\link{chi_square}} for the main analysis,
+#'   \code{\link{summary.chi_square}} for summary options.
+#' @export
+#' @method print summary.chi_square
+print.summary.chi_square <- function(x, ...) {
+  digits <- x$digits
+
+  # Header
   test_type <- get_standard_title("Chi-Squared Test of Independence", x$weights, "")
   print_header(test_type)
-  
-  # Add significance stars using standard helper
+
+  # Resolve show toggles (default TRUE when called without summary object)
+  show_observed     <- if (!is.null(x$show)) isTRUE(x$show$observed) else TRUE
+  show_expected     <- if (!is.null(x$show)) isTRUE(x$show$expected) else TRUE
+  show_results      <- if (!is.null(x$show)) isTRUE(x$show$results) else TRUE
+  show_effect_sizes <- if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
+
+  # Add significance stars
   sig <- sapply(x$results$p_value, add_significance_stars)
-  
+
   if (!x$is_grouped) {
-    # Simple test display using standardized helpers
+    # Test info section
     cat("\n")
     test_info <- list(
       "Variables" = paste(x$variables[1], "\u00d7", x$variables[2]),
@@ -465,80 +618,99 @@ print.chi_square <- function(x, digits = 3, ...) {
     print_info_section(test_info)
     cat("\n")
 
-    # Apply value labels to observed/expected matrices for display
-    obs_display <- .relabel_matrix(x$results$observed[[1]], x$label_maps)
-    exp_display <- .relabel_matrix(x$results$expected[[1]], x$label_maps)
+    # Observed frequencies (gated)
+    if (show_observed) {
+      obs_display <- .relabel_matrix(x$results$observed[[1]], x$label_maps)
+      cat("Observed Frequencies:\n")
+      print(obs_display)
+    }
 
-    # Print observed frequencies
-    cat("Observed Frequencies:\n")
-    print(obs_display)
+    # Expected frequencies (gated)
+    if (show_expected) {
+      exp_display <- .relabel_matrix(x$results$expected[[1]], x$label_maps)
+      cat("\nExpected Frequencies:\n")
+      print(round(exp_display, digits))
+    }
 
-    # Print expected frequencies
-    cat("\nExpected Frequencies:\n")
-    print(round(exp_display, digits))
+    # Chi-squared test results (gated)
+    if (show_results) {
+      results_table <- data.frame(
+        Chi_squared = round(x$results$chi_squared[1], digits),
+        df = x$results$df[1],
+        p_value = ifelse(x$results$p_value[1] < 0.001,
+                       "<.001", round(x$results$p_value[1], digits)),
+        sig = as.character(sig[1])
+      )
 
-    # Print chi-squared results
-    results_table <- data.frame(
-      Chi_squared = round(x$results$chi_squared[1], digits),
-      df = x$results$df[1],
-      p_value = ifelse(x$results$p_value[1] < 0.001,
-                     "<.001", round(x$results$p_value[1], digits)),
-      sig = as.character(sig[1])
-    )
+      cat("\nChi-Squared Test Results:\n")
+      border_width <- paste(rep("-", 50), collapse = "")
+      cat(border_width, "\n")
+      print(results_table, row.names = FALSE)
+      cat(border_width, "\n")
+    }
 
-    cat("\nChi-Squared Test Results:\n")
-    border_width <- paste(rep("-", 50), collapse = "")
-    cat(border_width, "\n")
-    print(results_table, row.names = FALSE)
-    cat(border_width, "\n")
-
-    .print_chi_effect_sizes(x$results, 1, digits)
+    # Effect sizes (gated)
+    if (show_effect_sizes) {
+      .print_chi_effect_sizes(x$results, 1, digits)
+    }
 
   } else {
     # Grouped tests
     cat("\nVariables tested:", paste(x$variables, collapse = " \u00d7 "), "\n")
     cat("Grouped by:", paste(x$groups, collapse = ", "), "\n")
 
-    # Create a unified table with all results
     results_table <- x$results
 
-    # Print results for each group
     for (i in seq_len(nrow(results_table))) {
-      # Print group header using standardized helper
       group_values <- results_table[i, x$groups, drop = FALSE]
       print_group_header(group_values)
-      cat("\n")  # Blank line
+      cat("\n")
 
-      # Apply value labels to observed matrix for display
-      obs_display <- .relabel_matrix(results_table$observed[[i]], x$label_maps)
+      # Observed frequencies (gated)
+      if (show_observed) {
+        obs_display <- .relabel_matrix(results_table$observed[[i]], x$label_maps)
+        cat("Observed Frequencies:\n")
+        print(obs_display)
+      }
 
-      # Print observed frequencies
-      cat("Observed Frequencies:\n")
-      print(obs_display)
+      # Expected frequencies (gated)
+      if (show_expected) {
+        exp_display <- .relabel_matrix(results_table$expected[[i]], x$label_maps)
+        cat("\nExpected Frequencies:\n")
+        print(round(exp_display, digits))
+      }
 
-      # Print test results
-      test_results <- data.frame(
-        Chi_squared = round(results_table$chi_squared[i], digits),
-        df = results_table$df[i],
-        p_value = ifelse(results_table$p_value[i] < 0.001,
-                       "<.001", round(results_table$p_value[i], digits)),
-        sig = as.character(sig[i])
-      )
+      # Chi-squared test results (gated)
+      if (show_results) {
+        test_results <- data.frame(
+          Chi_squared = round(results_table$chi_squared[i], digits),
+          df = results_table$df[i],
+          p_value = ifelse(results_table$p_value[i] < 0.001,
+                         "<.001", round(results_table$p_value[i], digits)),
+          sig = as.character(sig[i])
+        )
 
-      cat("\nChi-Squared Test Results:\n")
-      border_width <- paste(rep("-", 50), collapse = "")
-      cat(border_width, "\n")
-      print(test_results, row.names = FALSE)
-      cat(border_width, "\n")
+        cat("\nChi-Squared Test Results:\n")
+        border_width <- paste(rep("-", 50), collapse = "")
+        cat(border_width, "\n")
+        print(test_results, row.names = FALSE)
+        cat(border_width, "\n")
+      }
 
-      .print_chi_effect_sizes(results_table, i, digits)
+      # Effect sizes (gated)
+      if (show_effect_sizes) {
+        .print_chi_effect_sizes(results_table, i, digits)
+      }
     }
   }
-  
-  print_significance_legend()
+
+  if (show_results || show_effect_sizes) {
+    print_significance_legend()
+  }
 
   invisible(x)
 }
+
 
 #' @rdname chi_square
 #' @export

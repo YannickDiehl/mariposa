@@ -36,6 +36,7 @@ An object of class \code{"ancova"} containing:
 \item{model}{The underlying lm model object}
 \item{call_info}{List with metadata (dv, factors, covariates, weighted, etc.)}
 }
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
 \code{ancova()} tests whether group means differ after controlling for one or
@@ -111,6 +112,13 @@ survey_data \%>\%
   ancova(dv = income, between = c(education),
          covariate = c(age, political_orientation))
 
+# --- Three-layer output ---
+result <- ancova(survey_data, dv = income, between = c(education),
+                 covariate = c(age))
+result              # compact overview
+summary(result)     # full detailed output with all sections
+summary(result, marginal_means = FALSE)  # hide estimated marginal means
+
 }
 \references{
 Huitema, B. E. (2011). The Analysis of Covariance and Alternatives
@@ -124,6 +132,8 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 \code{\link{linear_regression}} for regression analysis.
 
 \code{\link{oneway_anova}} for single-factor ANOVA.
+
+\code{\link{summary.ancova}} for detailed output with toggleable sections.
 
 Other hypothesis_tests: 
 \code{\link{binomial_test}()},

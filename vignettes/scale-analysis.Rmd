@@ -282,10 +282,14 @@ A typical scale analysis workflow from start to finish:
 
 ```{r}
 # 1. Check reliability
-reliability(survey_data, trust_government, trust_media, trust_science)
+rel <- reliability(survey_data, trust_government, trust_media, trust_science)
+rel                # compact: Alpha + interpretation
+summary(rel)       # detailed: item statistics, inter-item correlations
 
 # 2. Explore factor structure
-efa(survey_data, trust_government, trust_media, trust_science)
+efa_result <- efa(survey_data, trust_government, trust_media, trust_science)
+efa_result         # compact: KMO + variance explained
+summary(efa_result, communalities = FALSE)  # detailed, skip communalities
 
 # 3. Create mean index (Alpha was acceptable)
 survey_data <- survey_data %>%

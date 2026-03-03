@@ -51,6 +51,7 @@ Test results showing whether groups differ, including:
 \item Mean difference and confidence interval
 \item Effect sizes (Cohen's d, Hedges' g, Glass' Delta)
 \item Group statistics (mean, SD, sample size)
+Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 }
 \description{
@@ -184,6 +185,12 @@ result <- survey_data \%>\%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 print(result)
 
+# --- Three-layer output ---
+result <- t_test(survey_data, life_satisfaction, group = gender)
+result              # compact one-line summary
+summary(result)     # full detailed output with all sections
+summary(result, effect_sizes = FALSE)  # hide effect sizes
+
 }
 \references{
 Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.).
@@ -204,6 +211,8 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.
 \code{\link{print.t_test}} for printing results.
 
 \code{\link[dplyr]{group_by}} for grouped analyses.
+
+\code{\link{summary.t_test}} for detailed output with toggleable sections.
 
 Other hypothesis_tests: 
 \code{\link{ancova}()},

@@ -1,3 +1,58 @@
+# mariposa 0.5.1
+
+## Three-Layer Output System
+
+* All 13 analysis functions now support `summary()` for detailed SPSS-style
+  output with toggleable sections. The three-layer pattern works as follows:
+  - `print()` — compact one-line overview (default when typing the object name)
+  - `summary()` — builds a detailed summary object with boolean section toggles
+  - `print.summary()` — renders the full verbose output with all requested sections
+
+* Supported functions: `t_test()`, `oneway_anova()`, `factorial_anova()`,
+  `ancova()`, `chi_square()`, `mann_whitney()`, `pearson_cor()`, `spearman_rho()`,
+  `kendall_tau()`, `reliability()`, `efa()`, `linear_regression()`,
+  `logistic_regression()`.
+
+* Each `summary()` method accepts boolean parameters to control which output
+  sections are displayed (e.g., `summary(result, effect_sizes = FALSE)` or
+  `summary(result, descriptives = FALSE)`).
+
+## Internal Helpers
+
+* Added `build_summary_object()` and `format_p_compact()` in
+  `R/summary_helpers.R` as shared infrastructure for all summary methods.
+
+## Documentation
+
+* Complete Roxygen2 documentation for all 39 S3 methods (13 print + 13 summary
+  + 13 print.summary), each with `@description`, `@param`, `@return`,
+  `@examples`, and `@seealso`.
+
+* All 13 main function `@examples` now demonstrate the three-layer output
+  pattern (`result`, `summary(result)`, `summary(result, toggle = FALSE)`).
+
+* Added `print.reliability()` and `print.efa()` documentation (previously
+  undocumented).
+
+## Bug Fixes
+
+* Fixed `print.chi_square()` Roxygen2 tag (`@keywords internal` replaced with
+  correct `@method print chi_square`).
+
+* Fixed example syntax errors in `ancova()` and `factorial_anova()` (formula
+  syntax replaced with correct `dv`/`between` interface).
+
+* Fixed incorrect variable name `education_level` in examples (corrected to
+  `education`).
+
+## Tests
+
+* Added `test-summary-methods.R` with tests for all 13 summary methods.
+
+* Updated `test-print-methods.R` to reflect the new three-layer structure.
+
+---
+
 # mariposa 0.5.0
 
 ## New Functions

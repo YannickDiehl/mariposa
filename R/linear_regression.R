@@ -45,6 +45,7 @@
 #'   \item{weighted}{Logical indicating whether weights were used}
 #'   \item{weight_name}{Name of the weight variable (or NULL)}
 #' }
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -124,12 +125,20 @@
 #'   dplyr::group_by(region) |>
 #'   linear_regression(life_satisfaction ~ age)
 #'
+#' # --- Three-layer output ---
+#' result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed SPSS-style output
+#' summary(result, collinearity = FALSE)  # hide VIF/Tolerance
+#'
 #' @seealso
 #' \code{\link{logistic_regression}} for binary outcome variables.
 #'
 #' \code{\link{describe}} for checking variable distributions before regression.
 #'
 #' \code{\link{pearson_cor}} for checking bivariate correlations.
+#'
+#' \code{\link{summary.linear_regression}} for detailed output with toggleable sections.
 #'
 #' @family regression
 #' @export
@@ -814,32 +823,154 @@ linear_regression <- function(data, formula = NULL,
   )
 }
 
-
 # ============================================================================
-# PRINT METHOD
+# COMPACT PRINT METHOD
 # ============================================================================
 
-#' Print Linear Regression Results
+#' Print linear regression results (compact)
 #'
-#' @param x An object of class \code{"linear_regression"}.
-#' @param ... Additional arguments (currently unused).
+#' @description
+#' Compact print method for objects of class \code{"linear_regression"}.
+#' Shows R-squared, adjusted R-squared, F statistic, and p-value.
+#'
+#' For the full detailed output, use \code{summary()}.
+#'
+#' @param x An object of class \code{"linear_regression"} returned by
+#'   \code{\link{linear_regression}}.
+#' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
 #'
+#' @examples
+#' result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
+#' @method print linear_regression
 print.linear_regression <- function(x, ...) {
+  weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
+  formula_str <- deparse(x$formula)
+
   if (isTRUE(x$is_grouped)) {
-    .print_lm_grouped(x)
+    grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
+    cat(sprintf("Linear Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
+    for (grp in x$groups) {
+      grp_label <- paste(names(grp$group_values), "=",
+                         unlist(grp$group_values), collapse = ", ")
+      f_stat <- grp$anova$F_statistic[1]
+      f_df1 <- grp$anova$df[1]
+      f_df2 <- grp$anova$df[2]
+      f_p <- grp$anova$Sig[1]
+      p_str <- format_p_compact(f_p)
+      stars <- add_significance_stars(f_p)
+      cat(sprintf("  %s: R2 = %.3f, adj.R2 = %.3f, F(%d, %d) = %.2f, %s %s, N = %d\n",
+                  grp_label,
+                  grp$model_summary$R_squared,
+                  grp$model_summary$adj_R_squared,
+                  f_df1, f_df2, f_stat,
+                  p_str, stars, grp$n))
+    }
   } else {
-    .print_lm_ungrouped(x)
+    cat(sprintf("Linear Regression: %s%s\n", formula_str, weighted_tag))
+    f_stat <- x$anova$F_statistic[1]
+    f_df1 <- x$anova$df[1]
+    f_df2 <- x$anova$df[2]
+    f_p <- x$anova$Sig[1]
+    p_str <- format_p_compact(f_p)
+    stars <- add_significance_stars(f_p)
+    cat(sprintf("  R2 = %.3f, adj.R2 = %.3f, F(%d, %d) = %.2f, %s %s, N = %d\n",
+                x$model_summary$R_squared,
+                x$model_summary$adj_R_squared,
+                f_df1, f_df2, f_stat,
+                p_str, stars, x$n))
+  }
+
+  invisible(x)
+}
+
+
+# ============================================================================
+# SUMMARY METHOD
+# ============================================================================
+
+#' Summary method for linear regression results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including model summary, ANOVA table, and coefficient table.
+#'
+#' @param object A \code{linear_regression} result object.
+#' @param model_summary Logical. Show model summary (R, R-squared)? (Default: TRUE)
+#' @param anova_table Logical. Show ANOVA table? (Default: TRUE)
+#' @param coefficients Logical. Show coefficients table? (Default: TRUE)
+#' @param descriptives Logical. Reserved for future use. (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.linear_regression} object.
+#'
+#' @examples
+#' result <- linear_regression(survey_data, life_satisfaction ~ age + trust_government)
+#' summary(result)
+#' summary(result, descriptives = FALSE)
+#'
+#' @seealso \code{\link{linear_regression}} for the main analysis function.
+#' @export
+#' @method summary linear_regression
+summary.linear_regression <- function(object, model_summary = TRUE,
+                                       anova_table = TRUE,
+                                       coefficients = TRUE,
+                                       descriptives = TRUE,
+                                       digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(model_summary = model_summary,
+                      anova_table   = anova_table,
+                      coefficients  = coefficients,
+                      descriptives  = descriptives),
+    digits     = digits,
+    class_name = "summary.linear_regression"
+  )
+}
+
+
+#' Print summary of linear regression results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a linear regression, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.linear_regression}}.  Sections include model summary
+#' (R-squared, F-test), coefficients table (B, SE, Beta, t, p), and
+#' collinearity diagnostics (Tolerance, VIF).
+#'
+#' @param x A \code{summary.linear_regression} object created by
+#'   \code{\link{summary.linear_regression}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+#' summary(result)                           # all sections
+#' summary(result, collinearity = FALSE)     # hide VIF/Tolerance
+#'
+#' @seealso \code{\link{linear_regression}} for the main analysis,
+#'   \code{\link{summary.linear_regression}} for summary options.
+#' @export
+#' @method print summary.linear_regression
+print.summary.linear_regression <- function(x, ...) {
+  if (isTRUE(x$is_grouped)) {
+    .print_summary_lm_grouped(x)
+  } else {
+    .print_summary_lm_ungrouped(x)
   }
   invisible(x)
 }
 
 
-#' Print ungrouped linear regression result
+#' Print ungrouped linear regression summary (verbose)
 #' @keywords internal
-.print_lm_ungrouped <- function(x) {
+.print_summary_lm_ungrouped <- function(x) {
   # Header
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
   print_header(title)
@@ -859,29 +990,35 @@ print.linear_regression <- function(x, ...) {
   }
   print_info_section(info)
 
-  cat("\n")
+  show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
+  show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
+  show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
 
-  # Model Summary
-  .print_model_summary(x$model_summary)
+  if (show_model) {
+    cat("\n")
+    .print_model_summary(x$model_summary)
+  }
 
-  cat("\n")
+  if (show_anova) {
+    cat("\n")
+    .print_anova_table(x$anova)
+  }
 
-  # ANOVA Table
-  .print_anova_table(x$anova)
+  if (show_coefs) {
+    cat("\n")
+    .print_coefficients_table(x$coefficients, x$standardized)
+  }
 
-  cat("\n")
-
-  # Coefficients Table
-  .print_coefficients_table(x$coefficients, x$standardized)
-
-  # Significance legend
-  print_significance_legend(TRUE)
+  # Show significance legend if any p-value section is visible
+  if (show_anova || show_coefs) {
+    print_significance_legend(TRUE)
+  }
 }
 
 
-#' Print grouped linear regression results
+#' Print grouped linear regression summary (verbose)
 #' @keywords internal
-.print_lm_grouped <- function(x) {
+.print_summary_lm_grouped <- function(x) {
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
   print_header(title)
 
@@ -896,22 +1033,37 @@ print.linear_regression <- function(x, ...) {
   }
   print_info_section(info)
 
+  show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
+  show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
+  show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+
   for (grp in x$groups) {
     cat("\n")
     print_group_header(grp$group_values)
 
     cat(sprintf("  N: %d\n", grp$n))
-    cat("\n")
 
-    .print_model_summary(grp$model_summary)
-    cat("\n")
-    .print_anova_table(grp$anova)
-    cat("\n")
-    .print_coefficients_table(grp$coefficients, x$standardized)
+    if (show_model) {
+      cat("\n")
+      .print_model_summary(grp$model_summary)
+    }
+
+    if (show_anova) {
+      cat("\n")
+      .print_anova_table(grp$anova)
+    }
+
+    if (show_coefs) {
+      cat("\n")
+      .print_coefficients_table(grp$coefficients, x$standardized)
+    }
   }
 
-  print_significance_legend(TRUE)
+  if (show_anova || show_coefs) {
+    print_significance_legend(TRUE)
+  }
 }
+
 
 
 # ============================================================================

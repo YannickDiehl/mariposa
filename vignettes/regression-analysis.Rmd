@@ -201,18 +201,22 @@ survey_data %>%
   pearson_cor(life_satisfaction, age, income, trust_government)
 
 # 2. Run the regression
-linear_regression(survey_data,
-                  life_satisfaction ~ age + income + trust_government,
-                  weights = sampling_weight)
+lm_result <- linear_regression(survey_data,
+                               life_satisfaction ~ age + income + trust_government,
+                               weights = sampling_weight)
+lm_result              # compact: R-squared + significant predictors
+summary(lm_result)     # detailed: coefficients, ANOVA table, collinearity
 
 # 3. Create binary outcome for logistic regression
 survey_data <- survey_data %>%
   mutate(high_satisfaction = ifelse(life_satisfaction >= 4, 1, 0))
 
 # 4. Run logistic regression
-logistic_regression(survey_data,
-                    high_satisfaction ~ age + income + trust_government,
-                    weights = sampling_weight)
+log_result <- logistic_regression(survey_data,
+                                  high_satisfaction ~ age + income + trust_government,
+                                  weights = sampling_weight)
+log_result             # compact: model significance + pseudo R-squared
+summary(log_result)    # detailed: odds ratios, classification table
 ```
 
 ## Practical Tips

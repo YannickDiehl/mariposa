@@ -2,17 +2,31 @@
 % Please edit documentation in R/mann_whitney.R
 \name{print.mann_whitney}
 \alias{print.mann_whitney}
-\title{Print method for Mann-Whitney test results}
+\title{Print Mann-Whitney test results (compact)}
 \usage{
 \method{print}{mann_whitney}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{A mann_whitney object}
+\item{x}{An object of class \code{"mann_whitney"} returned by
+\code{\link{mann_whitney}}.}
 
-\item{digits}{Number of decimal places to display (default: 3)}
+\item{digits}{Number of decimal places to display. Default is \code{3}.}
 
-\item{...}{Additional arguments (not used)}
+\item{...}{Additional arguments (not used).}
+}
+\value{
+Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for Mann-Whitney test results
+Compact print method for objects of class \code{"mann_whitney"}.
+Shows a one-line summary per variable with test statistic, p-value,
+effect size, and sample size.
+
+For the full detailed output, use \code{summary()}.
+}
+\examples{
+result <- mann_whitney(survey_data, life_satisfaction, group = gender)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

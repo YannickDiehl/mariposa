@@ -129,10 +129,11 @@ reference:
   - longitudinal_data
   - longitudinal_data_wide
 
-- title: "Print Methods"
-  desc: "Formatted output for all result types"
+- title: "Print & Summary Methods"
+  desc: "Compact and detailed output for all result types"
   contents:
   - starts_with("print.")
+  - starts_with("summary.")
 
 articles:
 - title: "Getting Started"

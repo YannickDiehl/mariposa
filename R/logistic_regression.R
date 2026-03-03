@@ -40,6 +40,7 @@
 #'   \item{weighted}{Logical indicating whether weights were used}
 #'   \item{weight_name}{Name of the weight variable (or NULL)}
 #' }
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -125,10 +126,18 @@
 #'   dplyr::group_by(region) |>
 #'   logistic_regression(high_satisfaction ~ age)
 #'
+#' # --- Three-layer output ---
+#' result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed SPSS-style output
+#' summary(result, classification_table = FALSE)  # hide classification
+#'
 #' @seealso
 #' \code{\link{linear_regression}} for continuous outcome variables.
 #'
 #' \code{\link{chi_square}} for testing associations between categorical variables.
+#'
+#' \code{\link{summary.logistic_regression}} for detailed output with toggleable sections.
 #'
 #' @family regression
 #' @export
@@ -527,30 +536,160 @@ logistic_regression <- function(data, formula = NULL,
 
 
 # ============================================================================
-# PRINT METHOD
+# COMPACT PRINT METHOD
 # ============================================================================
 
-#' Print Logistic Regression Results
+#' Print logistic regression results (compact)
 #'
-#' @param x An object of class \code{"logistic_regression"}.
-#' @param ... Additional arguments (currently unused).
+#' @description
+#' Compact print method for objects of class \code{"logistic_regression"}.
+#' Shows Nagelkerke R-squared, chi-squared test, and classification accuracy.
+#'
+#' For the full detailed output, use \code{summary()}.
+#'
+#' @param x An object of class \code{"logistic_regression"} returned by
+#'   \code{\link{logistic_regression}}.
+#' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
 #'
+#' @examples
+#' survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)
+#' result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
+#' @method print logistic_regression
 print.logistic_regression <- function(x, ...) {
+  weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
+  formula_str <- deparse(x$formula)
+
   if (isTRUE(x$is_grouped)) {
-    .print_logistic_grouped(x)
+    grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
+    cat(sprintf("Logistic Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
+    for (grp in x$groups) {
+      grp_label <- paste(names(grp$group_values), "=",
+                         unlist(grp$group_values), collapse = ", ")
+      chi_sq <- grp$omnibus_test$chi_sq
+      chi_df <- grp$omnibus_test$df
+      chi_p <- grp$omnibus_test$p
+      p_str <- format_p_compact(chi_p)
+      stars <- add_significance_stars(chi_p)
+      cat(sprintf("  %s: Nagelkerke R2 = %.3f, chi2(%d) = %.2f, %s %s, Accuracy = %.1f%%, N = %d\n",
+                  grp_label,
+                  grp$model_summary$nagelkerke_r2,
+                  chi_df, chi_sq,
+                  p_str, stars,
+                  grp$classification$overall_pct,
+                  grp$n))
+    }
   } else {
-    .print_logistic_ungrouped(x)
+    cat(sprintf("Logistic Regression: %s%s\n", formula_str, weighted_tag))
+    chi_sq <- x$omnibus_test$chi_sq
+    chi_df <- x$omnibus_test$df
+    chi_p <- x$omnibus_test$p
+    p_str <- format_p_compact(chi_p)
+    stars <- add_significance_stars(chi_p)
+    cat(sprintf("  Nagelkerke R2 = %.3f, chi2(%d) = %.2f, %s %s, Accuracy = %.1f%%, N = %d\n",
+                x$model_summary$nagelkerke_r2,
+                chi_df, chi_sq,
+                p_str, stars,
+                x$classification$overall_pct,
+                x$n))
+  }
+
+  invisible(x)
+}
+
+
+# ============================================================================
+# SUMMARY METHOD
+# ============================================================================
+
+#' Summary method for logistic regression results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including omnibus test, model summary, Hosmer-Lemeshow test, classification
+#' table, and coefficient table.
+#'
+#' @param object A \code{logistic_regression} result object.
+#' @param omnibus_test Logical. Show omnibus test of model coefficients? (Default: TRUE)
+#' @param model_summary Logical. Show model summary (pseudo R-squared)? (Default: TRUE)
+#' @param hosmer_lemeshow Logical. Show Hosmer-Lemeshow test? (Default: TRUE)
+#' @param classification Logical. Show classification table? (Default: TRUE)
+#' @param coefficients Logical. Show coefficients table? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.logistic_regression} object.
+#'
+#' @examples
+#' survey_data$high_satisfaction <- ifelse(survey_data$life_satisfaction >= 4, 1, 0)
+#' result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+#' summary(result)
+#' summary(result, classification = FALSE)
+#'
+#' @seealso \code{\link{logistic_regression}} for the main analysis function.
+#' @export
+#' @method summary logistic_regression
+summary.logistic_regression <- function(object, omnibus_test = TRUE,
+                                         model_summary = TRUE,
+                                         hosmer_lemeshow = TRUE,
+                                         classification = TRUE,
+                                         coefficients = TRUE,
+                                         digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(omnibus_test    = omnibus_test,
+                      model_summary   = model_summary,
+                      hosmer_lemeshow = hosmer_lemeshow,
+                      classification  = classification,
+                      coefficients    = coefficients),
+    digits     = digits,
+    class_name = "summary.logistic_regression"
+  )
+}
+
+
+#' Print summary of logistic regression results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a logistic regression, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.logistic_regression}}.  Sections include model fit
+#' statistics (Nagelkerke R-squared, Hosmer-Lemeshow), classification table,
+#' coefficients with odds ratios, and model comparison (chi-squared test).
+#'
+#' @param x A \code{summary.logistic_regression} object created by
+#'   \code{\link{summary.logistic_regression}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)
+#' result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+#' summary(result)                              # all sections
+#' summary(result, classification_table = FALSE) # hide classification
+#'
+#' @seealso \code{\link{logistic_regression}} for the main analysis,
+#'   \code{\link{summary.logistic_regression}} for summary options.
+#' @export
+#' @method print summary.logistic_regression
+print.summary.logistic_regression <- function(x, ...) {
+  if (isTRUE(x$is_grouped)) {
+    .print_summary_logistic_grouped(x)
+  } else {
+    .print_summary_logistic_ungrouped(x)
   }
   invisible(x)
 }
 
 
-#' Print ungrouped logistic regression result
+#' Print ungrouped logistic regression summary (verbose)
 #' @keywords internal
-.print_logistic_ungrouped <- function(x) {
+.print_summary_logistic_ungrouped <- function(x) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
 
@@ -565,24 +704,47 @@ print.logistic_regression <- function(x, ...) {
   }
   print_info_section(info)
 
-  cat("\n")
-  .print_omnibus_test(x$omnibus_test)
-  cat("\n")
-  .print_logistic_model_summary(x$model_summary)
-  cat("\n")
-  .print_hosmer_lemeshow(x$hosmer_lemeshow)
-  cat("\n")
-  .print_classification_table(x$classification)
-  cat("\n")
-  .print_logistic_coefficients(x$coefficients)
+  show_omnibus <- if (!is.null(x$show)) isTRUE(x$show$omnibus_test) else TRUE
+  show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
+  show_hl <- if (!is.null(x$show)) isTRUE(x$show$hosmer_lemeshow) else TRUE
+  show_class <- if (!is.null(x$show)) isTRUE(x$show$classification) else TRUE
+  show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
 
-  print_significance_legend(TRUE)
+  if (show_omnibus) {
+    cat("\n")
+    .print_omnibus_test(x$omnibus_test)
+  }
+
+  if (show_model) {
+    cat("\n")
+    .print_logistic_model_summary(x$model_summary)
+  }
+
+  if (show_hl) {
+    cat("\n")
+    .print_hosmer_lemeshow(x$hosmer_lemeshow)
+  }
+
+  if (show_class) {
+    cat("\n")
+    .print_classification_table(x$classification)
+  }
+
+  if (show_coefs) {
+    cat("\n")
+    .print_logistic_coefficients(x$coefficients)
+  }
+
+  # Show significance legend if any section with p-values is visible
+  if (show_omnibus || show_coefs) {
+    print_significance_legend(TRUE)
+  }
 }
 
 
-#' Print grouped logistic regression results
+#' Print grouped logistic regression summary (verbose)
 #' @keywords internal
-.print_logistic_grouped <- function(x) {
+.print_summary_logistic_grouped <- function(x) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
 
@@ -597,25 +759,47 @@ print.logistic_regression <- function(x, ...) {
   }
   print_info_section(info)
 
+  show_omnibus <- if (!is.null(x$show)) isTRUE(x$show$omnibus_test) else TRUE
+  show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
+  show_hl <- if (!is.null(x$show)) isTRUE(x$show$hosmer_lemeshow) else TRUE
+  show_class <- if (!is.null(x$show)) isTRUE(x$show$classification) else TRUE
+  show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+
   for (grp in x$groups) {
     cat("\n")
     print_group_header(grp$group_values)
 
     cat(sprintf("  N: %d\n", grp$n))
-    cat("\n")
 
-    .print_omnibus_test(grp$omnibus_test)
-    cat("\n")
-    .print_logistic_model_summary(grp$model_summary)
-    cat("\n")
-    .print_hosmer_lemeshow(grp$hosmer_lemeshow)
-    cat("\n")
-    .print_classification_table(grp$classification)
-    cat("\n")
-    .print_logistic_coefficients(grp$coefficients)
+    if (show_omnibus) {
+      cat("\n")
+      .print_omnibus_test(grp$omnibus_test)
+    }
+
+    if (show_model) {
+      cat("\n")
+      .print_logistic_model_summary(grp$model_summary)
+    }
+
+    if (show_hl) {
+      cat("\n")
+      .print_hosmer_lemeshow(grp$hosmer_lemeshow)
+    }
+
+    if (show_class) {
+      cat("\n")
+      .print_classification_table(grp$classification)
+    }
+
+    if (show_coefs) {
+      cat("\n")
+      .print_logistic_coefficients(grp$coefficients)
+    }
   }
 
-  print_significance_legend(TRUE)
+  if (show_omnibus || show_coefs) {
+    print_significance_legend(TRUE)
+  }
 }
 
 

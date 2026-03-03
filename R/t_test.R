@@ -37,6 +37,7 @@
 #' - Mean difference and confidence interval
 #' - Effect sizes (Cohen's d, Hedges' g, Glass' Delta)
 #' - Group statistics (mean, SD, sample size)
+#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
 #' ## Understanding the Results
@@ -99,7 +100,9 @@
 #' \code{\link{print.t_test}} for printing results.
 #' 
 #' \code{\link[dplyr]{group_by}} for grouped analyses.
-#' 
+#'
+#' \code{\link{summary.t_test}} for detailed output with toggleable sections.
+#'
 #' @references
 #' Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.). 
 #' Lawrence Erlbaum Associates.
@@ -155,6 +158,12 @@
 #' result <- survey_data %>%
 #'   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #' print(result)
+#'
+#' # --- Three-layer output ---
+#' result <- t_test(survey_data, life_satisfaction, group = gender)
+#' result              # compact one-line summary
+#' summary(result)     # full detailed output with all sections
+#' summary(result, effect_sizes = FALSE)  # hide effect sizes
 #'
 #' @family hypothesis_tests
 #' @export
@@ -732,6 +741,11 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     }
   }
 
+  # Resolve show toggles (default TRUE when called without summary object)
+  show_descriptives <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
+  show_results      <- if (!is.null(x$show)) isTRUE(x$show$results) else TRUE
+  show_effect_sizes <- if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
+
   # Internal helper: print a single variable row from a results data frame
   .print_var_row <- function(row_results, idx, show_group_means) {
     var_name <- row_results$Variable[idx]
@@ -739,68 +753,72 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
     cat(sprintf("\n--- %s ---\n\n", var_name))
 
-    # Group means
-    if (show_group_means && !is.null(stats) && !is.null(stats$group1)) {
+    # Group means (gated by descriptives toggle)
+    if (show_descriptives && show_group_means && !is.null(stats) && !is.null(stats$group1)) {
       cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
                   stats$group1$name, digits, stats$group1$mean, stats$group1$n))
       cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
                   stats$group2$name, digits, stats$group2$mean, stats$group2$n))
     }
 
-    # Results table
-    has_both <- !is.null(row_results$equal_var_result[[idx]])
+    # Results table (gated by results toggle)
+    if (show_results) {
+      has_both <- !is.null(row_results$equal_var_result[[idx]])
 
-    if (has_both) {
-      equal_result <- row_results$equal_var_result[[idx]]
-      unequal_result <- row_results$unequal_var_result[[idx]]
-      spss_df <- data.frame(
-        Assumption = c("Equal variances", "Unequal variances"),
-        t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
-        df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
-        p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
-        mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
-                     round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
-        conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
-                    sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
-      )
-      spss_df$sig <- cut(spss_df$p_value,
-                        breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                        labels = c("***", "**", "*", ""),
-                        right = FALSE)
-      cat(sprintf("\n%s:\n", results_label))
-      border <- paste(rep("-", 80), collapse = "")
-      cat(border, "\n")
-      print(spss_df, row.names = FALSE)
-      cat(border, "\n")
-    } else {
-      results_df <- data.frame(
-        Assumption = "t-test",
-        t_stat = round(row_results$t_stat[idx], digits),
-        df = round(row_results$df[idx], digits),
-        p_value = round(row_results$p_value[idx], digits),
-        mean_diff = round(row_results$mean_diff[idx], digits),
-        conf_int = sprintf("[%.3f, %.3f]",
-                          row_results$conf_int_lower[idx],
-                          row_results$conf_int_upper[idx]),
-        sig = row_results$sig[idx]
-      )
-      cat(sprintf("\n%s:\n", results_label))
-      border <- paste(rep("-", 70), collapse = "")
-      cat(border, "\n")
-      print(results_df, row.names = FALSE)
-      cat(border, "\n")
+      if (has_both) {
+        equal_result <- row_results$equal_var_result[[idx]]
+        unequal_result <- row_results$unequal_var_result[[idx]]
+        spss_df <- data.frame(
+          Assumption = c("Equal variances", "Unequal variances"),
+          t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
+          df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
+          p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
+          mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
+                       round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
+          conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
+                      sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
+        )
+        spss_df$sig <- cut(spss_df$p_value,
+                          breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
+                          labels = c("***", "**", "*", ""),
+                          right = FALSE)
+        cat(sprintf("\n%s:\n", results_label))
+        border <- paste(rep("-", 80), collapse = "")
+        cat(border, "\n")
+        print(spss_df, row.names = FALSE)
+        cat(border, "\n")
+      } else {
+        results_df <- data.frame(
+          Assumption = "t-test",
+          t_stat = round(row_results$t_stat[idx], digits),
+          df = round(row_results$df[idx], digits),
+          p_value = round(row_results$p_value[idx], digits),
+          mean_diff = round(row_results$mean_diff[idx], digits),
+          conf_int = sprintf("[%.3f, %.3f]",
+                            row_results$conf_int_lower[idx],
+                            row_results$conf_int_upper[idx]),
+          sig = row_results$sig[idx]
+        )
+        cat(sprintf("\n%s:\n", results_label))
+        border <- paste(rep("-", 70), collapse = "")
+        cat(border, "\n")
+        print(results_df, row.names = FALSE)
+        cat(border, "\n")
+      }
     }
 
-    # Effect sizes
-    cohens_d_val <- row_results$cohens_d[idx]
-    hedges_g_val <- if ("hedges_g" %in% names(row_results)) row_results$hedges_g[idx] else cohens_d_val
-    glass_delta_val <- if ("glass_delta" %in% names(row_results)) row_results$glass_delta[idx] else cohens_d_val
+    # Effect sizes (gated by effect_sizes toggle)
+    if (show_effect_sizes) {
+      cohens_d_val <- row_results$cohens_d[idx]
+      hedges_g_val <- if ("hedges_g" %in% names(row_results)) row_results$hedges_g[idx] else cohens_d_val
+      glass_delta_val <- if ("glass_delta" %in% names(row_results)) row_results$glass_delta[idx] else cohens_d_val
 
-    if (!is.na(cohens_d_val)) {
-      effect_df <- .create_effect_size_df(var_name, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
-      cat("\nEffect Sizes:\n")
-      cat(paste(rep("-", 12), collapse = ""), "\n")
-      print(effect_df, row.names = FALSE)
+      if (!is.na(cohens_d_val)) {
+        effect_df <- .create_effect_size_df(var_name, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
+        cat("\nEffect Sizes:\n")
+        cat(paste(rep("-", 12), collapse = ""), "\n")
+        print(effect_df, row.names = FALSE)
+      }
     }
     cat("\n")
   }
@@ -831,49 +849,171 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   }
 
   # Footer
-  print_significance_legend()
-  cat("\nEffect Size Interpretation:\n")
-  cat("- Cohen's d: pooled standard deviation (classic)\n")
-  cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
-  cat("- Glass' Delta: control group standard deviation only\n")
-  cat("- Small effect: |effect| ~ 0.2\n")
-  cat("- Medium effect: |effect| ~ 0.5\n")
-  cat("- Large effect: |effect| ~ 0.8\n")
+  if (show_results) {
+    print_significance_legend()
+  }
+  if (show_effect_sizes) {
+    cat("\nEffect Size Interpretation:\n")
+    cat("- Cohen's d: pooled standard deviation (classic)\n")
+    cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
+    cat("- Glass' Delta: control group standard deviation only\n")
+    cat("- Small effect: |effect| ~ 0.2\n")
+    cat("- Medium effect: |effect| ~ 0.5\n")
+    cat("- Large effect: |effect| ~ 0.8\n")
+  }
 }
 
-#' Print t-test results
+#' Print t-test results (compact)
 #'
 #' @description
-#' Print method for objects of class \code{"t_test"}. Provides a
-#' formatted display of t-test results including group statistics, test
-#' statistics, p-values, effect sizes, and confidence intervals.
+#' Compact print method for objects of class \code{"t_test"}.
+#' Shows a one-line summary per variable with test statistic, p-value,
+#' effect size, and sample size.
+#'
+#' For the full detailed output, use \code{summary()}.
 #'
 #' @param x An object of class \code{"t_test"} returned by \code{\link{t_test}}.
-#' @param digits Number of decimal places to display (default: 3)
-#'   for numeric values. Default is \code{3}.
-#' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
-#'
-#' @details
-#' The print method displays:
-#' \itemize{
-#'   \item Group-specific descriptive statistics (means and sample sizes)
-#'   \item Test statistics (t-statistic, degrees of freedom, p-value)
-#'   \item Effect size (Cohen's d) with interpretation
-#'   \item Confidence intervals for mean differences
-#'   \item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-#' }
-#'
-#' For grouped analyses (when data is grouped with \code{\link[dplyr]{group_by}}),
-#' results are displayed separately for each group combination.
+#' @param digits Number of decimal places to display. Default is \code{3}.
+#' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- t_test(survey_data, life_satisfaction, group = gender)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
 #'
 #' @export
 #' @method print t_test
 print.t_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_tag <- if (!is.null(x$group)) paste0(" by ", x$group) else ""
+  results <- x$results
+  results$p_value <- as.numeric(results$p_value)
+
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(results[x$groups])
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      group_results <- group_results[!is.na(group_results$Variable), ]
+      for (j in seq_len(nrow(group_results))) {
+        .print_t_test_compact(group_results, j, group_tag, weighted_tag, digits)
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(results))) {
+      if (is.na(results$Variable[i])) next
+      .print_t_test_compact(results, i, group_tag, weighted_tag, digits)
+    }
+  }
+
+  invisible(x)
+}
+
+#' Print a compact one-line summary for a single t-test variable
+#' @keywords internal
+.print_t_test_compact <- function(results, i, group_tag, weighted_tag, digits) {
+  var_name <- results$Variable[i]
+  t_val    <- results$t_stat[i]
+  df_val   <- results$df[i]
+  p_val    <- as.numeric(results$p_value[i])
+  g_val    <- if ("hedges_g" %in% names(results)) results$hedges_g[i] else results$cohens_d[i]
+
+  cat(sprintf("t-Test: %s%s%s\n", var_name, group_tag, weighted_tag))
+
+  if (!is.na(g_val)) {
+    g_interp <- if (abs(g_val) < 0.2) "negligible"
+                else if (abs(g_val) < 0.5) "small"
+                else if (abs(g_val) < 0.8) "medium"
+                else "large"
+
+    stats <- results$group_stats[[i]]
+    n_total <- if (!is.null(stats) && !is.null(stats$group1)) {
+      round(stats$group1$n + stats$group2$n)
+    } else NA_real_
+
+    cat(sprintf("  t(%.1f) = %.*f, %s %s, g = %.*f (%s), N = %d\n",
+                df_val, digits, t_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val),
+                digits, g_val, g_interp, n_total))
+  } else {
+    cat(sprintf("  t(%.1f) = %.*f, %s %s\n",
+                df_val, digits, t_val,
+                format_p_compact(p_val, digits),
+                add_significance_stars(p_val)))
+  }
+}
+
+#' Summary method for t-test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including group descriptives, test results with both variance assumptions,
+#' effect sizes, and confidence intervals.
+#'
+#' @param object A \code{t_test} result object.
+#' @param descriptives Logical. Show group descriptive statistics? (Default: TRUE)
+#' @param results Logical. Show test results table? (Default: TRUE)
+#' @param effect_sizes Logical. Show effect size measures? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.t_test} object.
+#'
+#' @examples
+#' result <- t_test(survey_data, life_satisfaction, group = gender)
+#' summary(result)
+#' summary(result, effect_sizes = FALSE)
+#'
+#' @seealso \code{\link{t_test}} for the main analysis function.
+#' @export
+#' @method summary t_test
+summary.t_test <- function(object, descriptives = TRUE, results = TRUE,
+                           effect_sizes = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(descriptives = descriptives, results = results,
+                      effect_sizes = effect_sizes),
+    digits     = digits,
+    class_name = "summary.t_test"
+  )
+}
+
+#' Print summary of t-test results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a t-test, with sections
+#' controlled by the boolean parameters passed to
+#' \code{\link{summary.t_test}}.  Sections include group descriptives,
+#' test results (equal and unequal variances), and effect sizes.
+#'
+#' @param x A \code{summary.t_test} object created by
+#'   \code{\link{summary.t_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- t_test(survey_data, life_satisfaction, group = gender)
+#' summary(result)                        # all sections
+#' summary(result, effect_sizes = FALSE)  # hide effect sizes
+#'
+#' @seealso \code{\link{t_test}} for the main analysis,
+#'   \code{\link{summary.t_test}} for summary options.
+#' @export
+#' @method print summary.t_test
+print.summary.t_test <- function(x, ...) {
+  digits <- x$digits
   weights_name <- x$weights
-  test_type <- get_standard_title("t-Test", weights_name, "Results")
-  print_header(test_type, newline_before = FALSE)
+  title <- get_standard_title("t-Test", weights_name, "Results")
+  print_header(title, newline_before = FALSE)
   x$results$p_value <- as.numeric(x$results$p_value)
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
   .print_t_test_impl(x, digits)
