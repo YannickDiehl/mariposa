@@ -52,6 +52,7 @@ reference:
 - title: "Descriptive Statistics"
   desc: "Summarize and explore your survey data"
   contents:
+  - codebook
   - describe
   - frequency
   - crosstab
