@@ -431,6 +431,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 #' @param x A kruskal_wallis object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 #' @method print kruskal_wallis
 print.kruskal_wallis <- function(x, digits = 3, ...) {

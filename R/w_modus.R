@@ -416,6 +416,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @param x A w_modus object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
+#' @return Invisibly returns the input object \code{x}.
 #' @export
 #' @method print w_modus
 print.w_modus <- function(x, digits = 3, ...) {
