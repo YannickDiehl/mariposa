@@ -9,7 +9,7 @@
 
 **Professional statistical analysis for survey data in R.**
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) provides 44 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via `dplyr::group_by()`, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (4,986+ tests pass).
+mariposa (*Marburg Initiative for Political and Social Analysis*) provides 46 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via `dplyr::group_by()`, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (6,200+ tests pass).
 
 ## Installation
 
@@ -26,6 +26,9 @@ library(dplyr)
 
 # Load example survey data (2,500 respondents)
 data(survey_data)
+
+# Interactive HTML codebook in RStudio Viewer
+codebook(survey_data)
 
 # Descriptive statistics with survey weights
 survey_data %>%
@@ -63,7 +66,7 @@ survey_data %>%
 
 | Category | Functions | Purpose |
 |----------|-----------|---------|
-| **Descriptive** | `describe()`, `frequency()`, `crosstab()` | Summaries and distributions |
+| **Descriptive** | `describe()`, `frequency()`, `crosstab()`, `codebook()` | Summaries, distributions, and data dictionaries |
 | **T-Tests** | `t_test()` | Mean comparisons (independent, paired, one-sample) |
 | **ANOVA** | `oneway_anova()`, `factorial_anova()`, `ancova()` | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
 | **Non-parametric** | `mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`, `friedman_test()`, `binomial_test()` | Distribution-free tests |
