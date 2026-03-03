@@ -107,18 +107,24 @@
 <span>  <span class="fu"><a href="reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Compare groups with t-test</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full SPSS-style output with all details</span></span>
 <span></span>
 <span><span class="co"># Scale analysis workflow</span></span>
-<span><span class="fu"><a href="reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
+<span><span class="va">rel</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reliability.html">reliability</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
+<span><span class="va">rel</span>                 <span class="co"># compact: Alpha + interpretation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">rel</span><span class="op">)</span>        <span class="co"># detailed: item statistics, inter-item correlations</span></span>
 <span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Regression</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">lm_result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="va">lm_result</span>           <span class="co"># compact: R-squared + significant predictors</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">lm_result</span><span class="op">)</span>  <span class="co"># detailed: coefficients, ANOVA table, diagnostics</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="core-features">Core Features<a class="anchor" aria-label="anchor" href="#core-features"></a>
