@@ -38,12 +38,16 @@ survey_data %>%
 # Compare groups with t-test
 result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
+
 result              # compact one-line overview
+
 summary(result)     # full SPSS-style output with all details
 
 # Scale analysis workflow
 rel <- reliability(survey_data, trust_government, trust_media, trust_science)
+
 rel                 # compact: Alpha + interpretation
+
 summary(rel)        # detailed: item statistics, inter-item correlations
 
 survey_data <- survey_data %>%
@@ -52,7 +56,9 @@ survey_data <- survey_data %>%
 # Regression
 lm_result <- survey_data %>%
   linear_regression(life_satisfaction ~ age + income, weights = sampling_weight)
+
 lm_result           # compact: R-squared + significant predictors
+
 summary(lm_result)  # detailed: coefficients, ANOVA table, diagnostics
 ```
 
