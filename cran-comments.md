@@ -7,7 +7,7 @@
 ## Test environments
 
 * local macOS (aarch64-apple-darwin), R 4.4.x
-* GitHub Actions: ubuntu-latest (release), macOS-latest (release), windows-latest (release)
+* GitHub Actions: ubuntu-latest (release, devel, oldrel-1), macOS-latest (release), windows-latest (release)
 
 ## Notes
 
@@ -15,3 +15,9 @@
   unable to verify current time
 
   This is an intermittent network-related NOTE and not a package issue.
+
+## Package details
+
+* 44 exported functions across 11 categories
+* 4,986+ unit tests including SPSS v29 cross-validation
+* All tests pass on all platforms
