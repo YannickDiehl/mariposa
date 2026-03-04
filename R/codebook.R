@@ -59,8 +59,11 @@
 .extract_var_metadata <- function(x, var_name, position, max_values = 10) {
   type_info <- .classify_type(x)
 
-  # Variable label (haven-style)
-  var_label <- attr(x, "label") %||% NA_character_
+  # Variable label (haven-style) — coerce to character for safety,
+
+  # because some SPSS imports store numeric label attributes
+  var_label <- attr(x, "label")
+  var_label <- if (is.null(var_label)) NA_character_ else as.character(var_label)
 
   # Value labels via existing helper
   raw_labels <- .build_label_map(x)
