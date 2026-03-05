@@ -596,7 +596,8 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
 }
 
 #' @rdname frequency
-#' @usage fre(...)
+#' @usage fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
+#'   show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto")
 #' @export
 fre <- frequency
 
