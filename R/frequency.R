@@ -456,17 +456,34 @@ print.frequency <- function(x, digits = 3, ...) {
   # Helper functions for formatting
   format_num <- function(x, width = 6) sprintf(paste0("%-", width, ".2f"), ifelse(is.na(x), NA, x))
   format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
-  format_str <- function(x, width) pad_utf8(substr(as.character(x), 1, width), width)
-  
+  format_str <- function(x, width) {
+    s <- as.character(x)
+    if (nchar(s) > width) s <- paste0(substr(s, 1, width - 3), "...")
+    pad_utf8(s, width)
+  }
+
   print_line <- function(widths) {
     cat("+", paste(sapply(widths, function(w) paste(rep("-", w), collapse = "")), collapse = "+"), "+\n", sep = "")
   }
-  
+
   print_row <- function(values, widths) {
     cat("|", paste(mapply(format_str, values, widths), collapse = "|"), "|\n", sep = "")
   }
-  
-  col_widths <- c(Value = 6, Label = 20, N = 8, Raw = 8, Valid = 8, Cum = 8)
+
+  # Dynamic widths for Value and Label based on actual content
+  calc_col_width <- function(values, min_w, max_w) {
+    if (length(values) == 0) return(min_w)
+    content_max <- max(nchar(as.character(values)), na.rm = TRUE)
+    min(max(content_max, min_w), max_w)
+  }
+
+  all_values <- as.character(x$results$value)
+  all_labels <- as.character(x$results$label[!is.na(x$results$label) & x$results$label != ""])
+
+  value_w <- calc_col_width(all_values, min_w = 6, max_w = 40)
+  label_w <- if (length(all_labels) > 0) calc_col_width(all_labels, min_w = 5, max_w = 40) else 20
+
+  col_widths <- c(Value = value_w, Label = label_w, N = 8, Raw = 8, Valid = 8, Cum = 8)
   
   # Determine test type
   weights_name <- x$weights
