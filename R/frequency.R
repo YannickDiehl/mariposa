@@ -461,6 +461,7 @@ print.frequency <- function(x, digits = 3, ...) {
   format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
   format_str <- function(x, width) {
     s <- as.character(x)
+    if (is.na(s)) s <- "NA"
     if (nchar(s) > width - 1) s <- paste0(substr(s, 1, width - 4), "...")
     pad_utf8(paste0(" ", s), width)
   }
