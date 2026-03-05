@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,7 @@
 <!-- badges: start -->
 
 <p><strong>Professional statistical analysis for survey data in R.</strong></p>
-<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 44 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (4,986+ tests pass).</p>
+<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 46 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (6,200+ tests pass).</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -98,6 +98,9 @@
 <span></span>
 <span><span class="co"># Load example survey data (2,500 respondents)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Interactive HTML codebook in RStudio Viewer</span></span>
+<span><span class="fu"><a href="reference/codebook.html">codebook</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Descriptive statistics with survey weights</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -149,9 +152,9 @@
 <tr class="odd">
 <td><strong>Descriptive</strong></td>
 <td>
-<code><a href="reference/describe.html">describe()</a></code>, <code><a href="reference/frequency.html">frequency()</a></code>, <code><a href="reference/crosstab.html">crosstab()</a></code>
+<code><a href="reference/describe.html">describe()</a></code>, <code><a href="reference/frequency.html">frequency()</a></code>, <code><a href="reference/crosstab.html">crosstab()</a></code>, <code><a href="reference/codebook.html">codebook()</a></code>
 </td>
-<td>Summaries and distributions</td>
+<td>Summaries, distributions, and data dictionaries</td>
 </tr>
 <tr class="even">
 <td><strong>T-Tests</strong></td>

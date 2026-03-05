@@ -26,6 +26,8 @@ frequency(
   show.sum = TRUE,
   show.labels = "auto"
 )
+
+fre(...)
 ```
 
 ## Arguments

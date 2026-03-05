@@ -1,5 +1,52 @@
 # Changelog
 
+## mariposa 0.5.2.2
+
+### Convenience
+
+- New
+  [`fre()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
+  shorthand alias for
+  [`frequency()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md).
+  Both functions are identical;
+  [`fre()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
+  simply provides a quicker way to call frequency analysis.
+  [`?fre`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
+  shows the same help page as
+  [`?frequency`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md).
+
+## mariposa 0.5.2
+
+### New Features
+
+- New
+  [`codebook()`](https://YannickDiehl.github.io/mariposa/dev/reference/codebook.md)
+  function: generates an interactive HTML data dictionary displayed in
+  the RStudio Viewer pane. Shows variable ID, name, type, label,
+  empirical values, value labels, and frequencies in a clean, scrollable
+  table. Inspired by sjPlot’s `view_df()` but built natively with
+  `htmltools`.
+
+- HTML codebook features a subtle-accent design: dark header,
+  alternating row stripes, monospace type badges, and per-value
+  frequency counts displayed as vertical lists aligned across columns.
+
+- Console [`print()`](https://rdrr.io/r/base/print.html) shows a minimal
+  metadata overview (variable count, observations, types). Full details
+  are reserved for the HTML viewer.
+
+- [`summary()`](https://rdrr.io/r/base/summary.html) method provides a
+  detailed text-based fallback with toggleable sections (`overview`,
+  `variable_details`, `value_labels`).
+
+- Supports tidyselect variable selection, optional survey weights for
+  weighted frequencies, and `sort.by.name` ordering.
+
+### Dependencies
+
+- Added `htmltools` as an imported dependency for HTML codebook
+  generation.
+
 ## mariposa 0.5.1
 
 ### Three-Layer Output System

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,28 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.2.2" id="mariposa-0522">mariposa 0.5.2.2<a class="anchor" aria-label="anchor" href="#mariposa-0522"></a></h2>
+<div class="section level3">
+<h3 id="convenience-0-5-2-2">Convenience<a class="anchor" aria-label="anchor" href="#convenience-0-5-2-2"></a></h3>
+<ul><li>New <code><a href="../reference/frequency.html">fre()</a></code> shorthand alias for <code><a href="../reference/frequency.html">frequency()</a></code>. Both functions are identical; <code><a href="../reference/frequency.html">fre()</a></code> simply provides a quicker way to call frequency analysis. <code><a href="../reference/frequency.html">?fre</a></code> shows the same help page as <code><a href="../reference/frequency.html">?frequency</a></code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.2" id="mariposa-052">mariposa 0.5.2<a class="anchor" aria-label="anchor" href="#mariposa-052"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-5-2">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-5-2"></a></h3>
+<ul><li><p>New <code><a href="../reference/codebook.html">codebook()</a></code> function: generates an interactive HTML data dictionary displayed in the RStudio Viewer pane. Shows variable ID, name, type, label, empirical values, value labels, and frequencies in a clean, scrollable table. Inspired by sjPlot’s <code>view_df()</code> but built natively with <code>htmltools</code>.</p></li>
+<li><p>HTML codebook features a subtle-accent design: dark header, alternating row stripes, monospace type badges, and per-value frequency counts displayed as vertical lists aligned across columns.</p></li>
+<li><p>Console <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows a minimal metadata overview (variable count, observations, types). Full details are reserved for the HTML viewer.</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method provides a detailed text-based fallback with toggleable sections (<code>overview</code>, <code>variable_details</code>, <code>value_labels</code>).</p></li>
+<li><p>Supports tidyselect variable selection, optional survey weights for weighted frequencies, and <code>sort.by.name</code> ordering.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="dependencies-0-5-2">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies-0-5-2"></a></h3>
+<ul><li>Added <code>htmltools</code> as an imported dependency for HTML codebook generation.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="mariposa-051">mariposa 0.5.1<a class="anchor" aria-label="anchor" href="#mariposa-051"></a></h2>
 <div class="section level3">

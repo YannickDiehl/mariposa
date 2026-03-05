@@ -4,9 +4,12 @@
 
 Summarize and explore your survey data
 
+- [`codebook()`](https://YannickDiehl.github.io/mariposa/dev/reference/codebook.md)
+  : Create a Codebook for Your Data
 - [`describe()`](https://YannickDiehl.github.io/mariposa/dev/reference/describe.md)
   : Get to Know Your Numeric Data
 - [`frequency()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
+  [`fre()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md)
   : Count How Many People Chose Each Option
 - [`crosstab()`](https://YannickDiehl.github.io/mariposa/dev/reference/crosstab.md)
   : Compare Two Categories: See How They Relate
@@ -149,6 +152,8 @@ Compact and detailed output for all result types
   : Print chi-squared test results (compact)
 - [`print(`*`<chisq_gof>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.chisq_gof.md)
   : Print chi-square goodness-of-fit test results
+- [`print(`*`<codebook>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.codebook.md)
+  : Print a Compact Console Overview of the Codebook
 - [`print(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.crosstab.md)
   : Print method for crosstab results
 - [`print(`*`<describe>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.describe.md)
@@ -195,6 +200,8 @@ Compact and detailed output for all result types
   : Print summary of ANCOVA results (detailed output)
 - [`print(`*`<summary.chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.chi_square.md)
   : Print summary of chi-squared test results (detailed output)
+- [`print(`*`<summary.codebook>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.codebook.md)
+  : Print a Detailed Console Codebook Summary
 - [`print(`*`<summary.efa>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.efa.md)
   : Print summary of EFA results (detailed output)
 - [`print(`*`<summary.factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/print.summary.factorial_anova.md)
@@ -229,6 +236,8 @@ Compact and detailed output for all result types
   : Summary method for ANCOVA results
 - [`summary(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.chi_square.md)
   : Summary method for chi-squared test results
+- [`summary(`*`<codebook>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.codebook.md)
+  : Detailed Console Summary of the Codebook
 - [`summary(`*`<efa>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.efa.md)
   : Summarize an exploratory factor analysis
 - [`summary(`*`<factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/dev/reference/summary.factorial_anova.md)

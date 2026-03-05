@@ -3,11 +3,11 @@
 **Professional statistical analysis for survey data in R.**
 
 mariposa (*Marburg Initiative for Political and Social Analysis*)
-provides 44 statistical functions for analyzing survey data. All
+provides 46 statistical functions for analyzing survey data. All
 functions support survey weights, grouped analysis via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
 and produce publication-ready output. Results are validated against SPSS
-v29 for full reproducibility (4,986+ tests pass).
+v29 for full reproducibility (6,200+ tests pass).
 
 ## Installation
 
@@ -24,6 +24,9 @@ library(dplyr)
 
 # Load example survey data (2,500 respondents)
 data(survey_data)
+
+# Interactive HTML codebook in RStudio Viewer
+codebook(survey_data)
 
 # Descriptive statistics with survey weights
 survey_data %>%
@@ -61,7 +64,7 @@ survey_data %>%
 
 | Category           | Functions                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Purpose                                                  |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| **Descriptive**    | [`describe()`](https://YannickDiehl.github.io/mariposa/dev/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/dev/reference/crosstab.md)                                                                                                                                                                                                                       | Summaries and distributions                              |
+| **Descriptive**    | [`describe()`](https://YannickDiehl.github.io/mariposa/dev/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/dev/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/dev/reference/crosstab.md), [`codebook()`](https://YannickDiehl.github.io/mariposa/dev/reference/codebook.md)                                                                                                                                    | Summaries, distributions, and data dictionaries          |
 | **T-Tests**        | [`t_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/t_test.md)                                                                                                                                                                                                                                                                                                                                                                                                   | Mean comparisons (independent, paired, one-sample)       |
 | **ANOVA**          | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/oneway_anova.md), [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/dev/reference/factorial_anova.md), [`ancova()`](https://YannickDiehl.github.io/mariposa/dev/reference/ancova.md)                                                                                                                                                                                                       | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
 | **Non-parametric** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/dev/reference/mann_whitney.md), [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/dev/reference/kruskal_wallis.md), [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/wilcoxon_test.md), [`friedman_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/friedman_test.md), [`binomial_test()`](https://YannickDiehl.github.io/mariposa/dev/reference/binomial_test.md) | Distribution-free tests                                  |
