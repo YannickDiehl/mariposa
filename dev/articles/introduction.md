@@ -89,14 +89,14 @@ survey_data %>%
 #> education (Highest educational attainment)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Basic |Basic Secondary     |848     |33.71   |33.71   |33.71   |
-#> |Interm|Intermediate Seconda|641     |25.47   |25.47   |59.18   |
-#> |Academ|Academic Secondary  |642     |25.51   |25.51   |84.69   |
-#> |Univer|University          |385     |15.31   |15.31   |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +----------------------+----------------------+--------+--------+--------+--------+
+#> |Value                 |Label                 |N       |Raw %   |Valid % |Cum. %  |
+#> +----------------------+----------------------+--------+--------+--------+--------+
+#> |Basic Secondary       |Basic Secondary       |848     |33.71   |33.71   |33.71   |
+#> |Intermediate Secondary|Intermediate Secondary|641     |25.47   |25.47   |59.18   |
+#> |Academic Secondary    |Academic Secondary    |642     |25.51   |25.51   |84.69   |
+#> |University            |University            |385     |15.31   |15.31   |100.00  |
+#> +----------------------+----------------------+--------+--------+--------+--------+
 ```
 
 This tells you how many people fall into each category, what percentage
