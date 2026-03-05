@@ -169,7 +169,10 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
     groups = grp_vars,
     is_grouped = is_grouped,
     options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels),
-    labels = sapply(var_names, function(var) attr(data[[var]], "label") %||% var)
+    labels = sapply(var_names, function(var) {
+      lbl <- attr(data[[var]], "label")
+      if (is.null(lbl)) var else paste(as.character(lbl), collapse = " | ")
+    })
   ), class = "frequency")
 }
 
@@ -458,8 +461,8 @@ print.frequency <- function(x, digits = 3, ...) {
   format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
   format_str <- function(x, width) {
     s <- as.character(x)
-    if (nchar(s) > width) s <- paste0(substr(s, 1, width - 3), "...")
-    pad_utf8(s, width)
+    if (nchar(s) > width - 1) s <- paste0(substr(s, 1, width - 4), "...")
+    pad_utf8(paste0(" ", s), width)
   }
 
   print_line <- function(widths) {
@@ -474,7 +477,7 @@ print.frequency <- function(x, digits = 3, ...) {
   calc_col_width <- function(values, min_w, max_w) {
     if (length(values) == 0) return(min_w)
     content_max <- max(nchar(as.character(values)), na.rm = TRUE)
-    min(max(content_max, min_w), max_w)
+    min(max(content_max + 2, min_w), max_w)
   }
 
   all_values <- as.character(x$results$value)
