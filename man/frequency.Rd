@@ -2,6 +2,7 @@
 % Please edit documentation in R/frequency.R
 \name{frequency}
 \alias{frequency}
+\alias{fre}
 \title{Count How Many People Chose Each Option}
 \usage{
 frequency(
@@ -15,6 +16,8 @@ frequency(
   show.sum = TRUE,
   show.labels = "auto"
 )
+
+fre(...)
 }
 \arguments{
 \item{data}{Your survey data (a data frame or tibble)}

@@ -1,3 +1,11 @@
+# mariposa 0.5.2.2
+
+## Convenience
+
+* New `fre()` shorthand alias for `frequency()`. Both functions are identical;
+  `fre()` simply provides a quicker way to call frequency analysis.
+  `?fre` shows the same help page as `?frequency`.
+
 # mariposa 0.5.2
 
 ## New Features

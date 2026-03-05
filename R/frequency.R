@@ -578,3 +578,8 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
   cat("\n")
 }
 
+#' @rdname frequency
+#' @usage fre(...)
+#' @export
+fre <- frequency
+
