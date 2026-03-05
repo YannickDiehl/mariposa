@@ -27,7 +27,8 @@ frequency(
   show.labels = "auto"
 )
 
-fre(...)
+fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
+  show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto")
 ```
 
 ## Arguments
