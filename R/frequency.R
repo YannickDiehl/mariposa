@@ -28,6 +28,12 @@
 #' @param show.sum Show cumulative totals? (Default: TRUE)
 #' @param show.labels Show category labels if available? (Default: "auto" - shows
 #'   labels when they exist)
+#' @param show.unused Show all defined value labels, even those with zero
+#'   observations? (Default: FALSE). When TRUE, values that have labels defined
+#'   (e.g., from SPSS .sav files) but no cases in the data are included with
+#'   frequency 0. This is useful for SPSS datasets where user-defined missing
+#'   values (like -9 "No answer") are converted to NA by haven but their labels
+#'   are preserved. Automatically enables label display.
 #'
 #' @return A frequency table showing counts and percentages for each category
 #'
@@ -88,7 +94,7 @@
 #' @family descriptive
 #' @export
 frequency <- function(data, ..., weights = NULL, sort.frq = "none",
-                     show.na = TRUE, show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto") {
+                     show.na = TRUE, show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto", show.unused = FALSE) {
   
   if (!is.data.frame(data)) cli_abort("{.arg data} must be a data frame.")
 
@@ -104,6 +110,11 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
   weights_info <- .process_weights(data, rlang::enquo(weights))
   w_name <- weights_info$name
   
+  # When show.unused is TRUE, force labels on (unused labels without label column make no sense)
+  if (show.unused && show.labels == "auto") {
+    show.labels <- TRUE
+  }
+
   # Handle show.labels logic: auto-detect or use explicit user setting
   if (show.labels == "auto") {
     has_meaningful_labels <- any(sapply(var_names, function(var) {
@@ -155,9 +166,9 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
   
   # Calculate frequencies
   if (is_grouped) {
-    results <- calculate_grouped_frequencies(data, var_names, w_name, sort.frq, show.na)
+    results <- calculate_grouped_frequencies(data, var_names, w_name, sort.frq, show.na, show.unused)
   } else {
-    results <- calculate_ungrouped_frequencies(data, var_names, w_name, sort.frq, show.na)
+    results <- calculate_ungrouped_frequencies(data, var_names, w_name, sort.frq, show.na, show.unused)
   }
   
   # Create S3 object
@@ -168,7 +179,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
     weights = w_name,
     groups = grp_vars,
     is_grouped = is_grouped,
-    options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels),
+    options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels, show.unused = show.unused),
     labels = sapply(var_names, function(var) {
       lbl <- attr(data[[var]], "label")
       if (is.null(lbl)) var else paste(as.character(lbl), collapse = " | ")
@@ -218,7 +229,7 @@ adjust_rounded_frequencies <- function(raw_freqs, target_sum = NULL) {
 }
 
 # Helper function: Calculate frequency statistics for a single variable
-calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na = TRUE) {
+calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na = TRUE, show.unused = FALSE) {
   if (is.null(w)) {
     # Unweighted frequencies
     freq_table <- table(x, useNA = if (show.na) "ifany" else "no")
@@ -336,11 +347,53 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
     )
   }
   
+  # Inject unused value labels as rows with freq=0
+  if (show.unused && !is.null(attr(x, "labels"))) {
+    all_labels <- attr(x, "labels")  # named numeric: c("LINKS" = 1, "RECHTS" = 10, ...)
+    observed_values <- result$value[!is.na(result$value)]
+    unused_labels <- all_labels[!all_labels %in% observed_values]
+
+    if (length(unused_labels) > 0) {
+      has_n_eff <- "n_eff" %in% names(result)
+      unused_rows <- data.frame(
+        value = as.numeric(unused_labels),
+        label = names(unused_labels),
+        freq = 0,
+        prc = 0,
+        valid_prc = 0,
+        cum_freq = NA,
+        cum_prc = NA,
+        stringsAsFactors = FALSE
+      )
+      if (has_n_eff) {
+        unused_rows$n_eff <- result$n_eff[1]
+      }
+
+      # Separate NA row, merge non-NA rows, re-sort, re-append NA
+      na_row <- result[is.na(result$value), , drop = FALSE]
+      non_na_rows <- result[!is.na(result$value), , drop = FALSE]
+      combined <- rbind(non_na_rows, unused_rows)
+      combined <- combined[order(combined$value), , drop = FALSE]
+
+      # Recalculate cumulative % for all non-NA rows
+      combined$cum_prc <- cumsum(combined$valid_prc)
+      combined$cum_freq <- cumsum(combined$freq)
+
+      # Re-append NA row
+      if (nrow(na_row) > 0) {
+        result <- rbind(combined, na_row)
+      } else {
+        result <- combined
+      }
+      rownames(result) <- NULL
+    }
+  }
+
   # Sort if requested
   if (sort.frq %in% c("asc", "desc")) {
     result <- result[order(result$value, decreasing = (sort.frq == "desc")), ]
   }
-  
+
   return(result)
 }
 
@@ -393,7 +446,7 @@ calculate_single_stats <- function(x, w = NULL) {
 }
 
 # Helper function: Process variables for a dataset
-process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE, group_info = NULL) {
+process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE, show.unused = FALSE, group_info = NULL) {
   frequencies_list <- list()
   stats_list <- list()
   
@@ -402,7 +455,7 @@ process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE,
     w <- if (!is.null(w_name)) data[[w_name]] else NULL
     
     # Calculate frequencies and stats
-    freq_result <- calculate_single_frequency(x, w, sort.frq, show.na)
+    freq_result <- calculate_single_frequency(x, w, sort.frq, show.na, show.unused)
     freq_result$Variable <- var_name
     
     stats <- calculate_single_stats(x, w)
@@ -425,17 +478,17 @@ process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE,
 }
 
 # Helper function: Calculate frequencies for ungrouped data
-calculate_ungrouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE) {
-  process_variables(data, var_names, w_name, sort.frq, show.na)
+calculate_ungrouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE, show.unused = FALSE) {
+  process_variables(data, var_names, w_name, sort.frq, show.na, show.unused)
 }
 
 # Helper function: Calculate frequencies for grouped data
-calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE) {
+calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE, show.unused = FALSE) {
   data_list <- dplyr::group_split(data)
   group_keys <- dplyr::group_keys(data)
-  
+
   results_list <- lapply(seq_along(data_list), function(i) {
-    process_variables(data_list[[i]], var_names, w_name, sort.frq, show.na, group_keys[i, , drop = FALSE])
+    process_variables(data_list[[i]], var_names, w_name, sort.frq, show.na, show.unused, group_keys[i, , drop = FALSE])
   })
   
   list(
@@ -461,8 +514,9 @@ print.frequency <- function(x, digits = 3, ...) {
   format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
   format_str <- function(x, width) {
     s <- as.character(x)
-    if (is.na(s)) s <- "NA"
-    if (nchar(s) > width - 1) s <- paste0(substr(s, 1, width - 4), "...")
+    if (length(s) == 0 || is.na(s[1])) s <- "NA"
+    nc <- nchar(s)
+    if (!is.na(nc) && nc > width - 1) s <- paste0(substr(s, 1, width - 4), "...")
     pad_utf8(paste0(" ", s), width)
   }
 
@@ -601,7 +655,8 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
 
 #' @rdname frequency
 #' @usage fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
-#'   show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto")
+#'   show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto",
+#'   show.unused = FALSE)
 #' @export
 fre <- frequency
 
