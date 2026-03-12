@@ -131,6 +131,14 @@
     is_range <- length(uvals) > max_values
   }
 
+  # Remove NA-keyed labels from raw_labels — tagged NA labels are displayed
+
+  # separately in the NA section, so they must not count toward truncation
+  if (!is.null(raw_labels) && !is.null(attr(x, "na_tag_map"))) {
+    na_keys <- names(raw_labels) == "NA" | is.na(names(raw_labels))
+    raw_labels <- raw_labels[!na_keys]
+  }
+
   # Truncate value labels if too many
   truncated <- FALSE
   n_total_labels <- if (!is.null(raw_labels)) length(raw_labels) else 0L
