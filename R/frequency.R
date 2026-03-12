@@ -551,8 +551,13 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
   # Replace the original aggregate NA row with the expanded rows
   non_na_result <- result[-na_row_idx, , drop = FALSE]
   # Add is_na_row column to non-NA rows
-  non_na_result$is_na_row <- FALSE
-  non_na_result$na_display_value <- NA_character_
+  if (nrow(non_na_result) > 0L) {
+    non_na_result$is_na_row <- FALSE
+    non_na_result$na_display_value <- NA_character_
+  } else {
+    non_na_result$is_na_row <- logical(0)
+    non_na_result$na_display_value <- character(0)
+  }
 
   # Build the Valid total (sum) row
   valid_total_freq <- sum(non_na_result$freq)
