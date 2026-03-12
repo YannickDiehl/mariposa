@@ -24,11 +24,13 @@ frequency(
   show.prc = TRUE,
   show.valid = TRUE,
   show.sum = TRUE,
-  show.labels = "auto"
+  show.labels = "auto",
+  show.unused = FALSE
 )
 
 fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
-  show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto")
+  show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto",
+  show.unused = FALSE)
 ```
 
 ## Arguments
@@ -79,6 +81,15 @@ fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
 
   Show category labels if available? (Default: "auto" - shows labels
   when they exist)
+
+- show.unused:
+
+  Show all defined value labels, even those with zero observations?
+  (Default: FALSE). When TRUE, values that have labels defined (e.g.,
+  from SPSS .sav files) but no cases in the data are included with
+  frequency 0. This is useful for SPSS datasets where user-defined
+  missing values (like -9 "No answer") are converted to NA by haven but
+  their labels are preserved. Automatically enables label display.
 
 ## Value
 
