@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
 Title: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data
-Version: 0.5.2.4
+Version: 0.5.3
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",

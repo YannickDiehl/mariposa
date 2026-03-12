@@ -49,6 +49,14 @@ navbar:
       aria-label: GitHub
 
 reference:
+- title: "Data Import"
+  desc: "Import SPSS data files with preserved missing value information"
+  contents:
+  - read_spss
+  - na_frequencies
+  - untag_na
+  - strip_tags
+
 - title: "Descriptive Statistics"
   desc: "Summarize and explore your survey data"
   contents:
