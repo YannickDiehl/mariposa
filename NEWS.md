@@ -1,3 +1,34 @@
+# mariposa 0.5.3
+
+## New Functions
+
+* New `read_spss()` function: reads SPSS `.sav` files and preserves user-defined
+  missing values as tagged NAs instead of converting them to regular `NA`. This
+  allows distinguishing between different types of missing data (e.g., "no answer",
+  "not applicable", "refused") while still treating them as `NA` in standard R
+  operations. Fixes the `sjlabelled::read_spss(tag.na=TRUE)` crash on large
+  datasets (e.g., ALLBUS) caused by out-of-bounds `letters[]` indexing.
+
+* New `na_frequencies()` function: shows a breakdown of the different types of
+  missing values in a tagged NA variable, with counts, original SPSS codes, and
+  value labels.
+
+* New `untag_na()` function: converts tagged NAs back to their original SPSS
+  missing value codes (e.g., -9, -8, -42).
+
+* New `strip_tags()` function: converts all tagged NAs to regular (untagged) `NA`
+  values, producing the same result as reading with `haven::read_sav()` directly.
+
+## Improvements
+
+* `frequency()` now displays tagged NAs individually when data was imported with
+  `read_spss()`. Each missing value type is shown as a separate row with its
+  original SPSS code and label, followed by a "Total Valid" and "Total Missing"
+  summary row.
+
+* `frequency()` with `show.unused = TRUE` correctly handles tagged NA labels
+  (no longer shows them as unused with freq=0).
+
 # mariposa 0.5.2.2
 
 ## Convenience

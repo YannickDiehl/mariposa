@@ -100,6 +100,15 @@ Use \code{frequency()} when you have:
 Without weights, you're describing your sample. With weights, you're estimating
 population values. Always use weights for population inference.
 }
+
+\subsection{Tagged Missing Values (SPSS)}{
+
+When data is imported with \code{\link[=read_spss]{read_spss()}} using \code{tag.na = TRUE}, SPSS
+user-defined missing values are preserved as tagged NAs. In this case,
+\code{frequency()} automatically expands the missing value section to show
+each missing type individually (with its original SPSS code and label),
+plus summary rows for \strong{Total Valid} and \strong{Total Missing}.
+}
 }
 \examples{
 # Load required packages and data

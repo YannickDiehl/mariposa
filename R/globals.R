@@ -76,5 +76,8 @@ utils::globalVariables(c(
   # Codebook output columns
   "position", "type_short", "n_valid", "n_missing",
   "n_unique", "empirical_values", "is_range", "value_labels",
-  "n_labels", "truncated"
+  "n_labels", "truncated",
+
+  # Tagged NA frequency display columns (read_spss integration)
+  "is_na_row", "na_display_value"
 ))
