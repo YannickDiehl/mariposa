@@ -13,6 +13,8 @@ codebook(
   show.labels = TRUE,
   show.values = TRUE,
   show.freq = TRUE,
+  show.na = TRUE,
+  show.unused = FALSE,
   max.values = 10,
   max.len = 50,
   sort.by.name = FALSE,
@@ -36,6 +38,15 @@ are shown. Supports tidyselect helpers like \code{starts_with("trust")}.}
 \item{show.values}{Show empirical values and value labels? (Default: TRUE)}
 
 \item{show.freq}{Show frequency counts? (Default: TRUE)}
+
+\item{show.na}{Show tagged missing value types in the codebook? (Default:
+TRUE). When data was imported with \code{\link[=read_spss]{read_spss()}}, tagged NAs are displayed
+with their original SPSS codes, labels, and frequencies below the valid
+values, separated by a thin gray line.}
+
+\item{show.unused}{Show all defined value labels, even those with zero
+observations? (Default: FALSE). Useful for seeing the full SPSS codebook
+including response options that no respondent selected.}
 
 \item{max.values}{Maximum number of values to display per variable
 before truncating or showing a range (Default: 10)}
@@ -116,5 +127,6 @@ summary(cb)
 }
 \seealso{
 \code{\link[=describe]{describe()}} for detailed numeric summaries, \code{\link[=frequency]{frequency()}} for
-detailed frequency tables
+detailed frequency tables, \code{\link[=read_spss]{read_spss()}} for importing SPSS data with
+tagged NAs
 }
