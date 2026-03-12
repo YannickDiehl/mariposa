@@ -424,10 +424,35 @@ test_that("codebook with show.unused=TRUE includes all value labels", {
   result <- codebook(df, show.unused = TRUE)
   freq <- result$frequencies[["test_var"]]
 
-  # Value 4 should appear with freq = 0
+  # Value 4 should appear with freq = 0 in frequency table
   row4 <- freq[as.character(freq$value) == "4", ]
   expect_equal(nrow(row4), 1L)
   expect_equal(row4$freq, 0)
+
+  # The HTML should contain the unused value "4" and its label "Agree"
+  html_str <- as.character(result$html)
+  expect_true(grepl("Agree", html_str))
+})
+
+test_that("codebook with show.unused=FALSE hides unused value labels", {
+  raw <- c(1, 2, 3, 5, 1, 2, 3, 5)
+  labels <- c(
+    "Strongly disagree" = 1,
+    "Disagree" = 2,
+    "Neutral" = 3,
+    "Agree" = 4,
+    "Strongly agree" = 5
+  )
+  x <- haven::labelled(raw, labels = labels, label = "Test")
+  df <- data.frame(test_var = x)
+
+  # Default: show.unused = FALSE
+  result <- codebook(df, show.unused = FALSE)
+
+  # Value 4 should NOT appear in frequency table
+  freq <- result$frequencies[["test_var"]]
+  row4 <- freq[!is.na(freq$value) & as.character(freq$value) == "4", ]
+  expect_equal(nrow(row4), 0L)
 })
 
 test_that("codebook backward compat: survey_data unchanged", {

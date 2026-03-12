@@ -612,6 +612,31 @@ codebook <- function(data, ..., weights = NULL,
       emp_vals <- cb$empirical_values[[i]]
       val_labels <- cb$value_labels[[i]]
       is_rng <- cb$is_range[i]
+
+      # When show.unused is TRUE, add value label keys not yet in emp_vals
+      if (opts$show.unused && !is_rng && !is.null(val_labels) &&
+          length(val_labels) > 0) {
+        label_keys <- names(val_labels)
+        # Filter out NA-valued label keys (tagged NA labels map to "NA")
+        label_keys <- label_keys[!is.na(label_keys) & label_keys != "NA"]
+        missing_keys <- setdiff(label_keys, emp_vals)
+        if (length(missing_keys) > 0) {
+          # Sort numerically if possible, otherwise alphabetically
+          num_keys <- suppressWarnings(as.numeric(missing_keys))
+          if (!all(is.na(num_keys))) {
+            missing_keys <- missing_keys[order(num_keys)]
+          } else {
+            missing_keys <- sort(missing_keys)
+          }
+          # Merge into emp_vals at correct sorted positions
+          all_vals <- c(emp_vals, missing_keys)
+          num_all <- suppressWarnings(as.numeric(all_vals))
+          if (!all(is.na(num_all))) {
+            all_vals <- all_vals[order(num_all)]
+          }
+          emp_vals <- all_vals
+        }
+      }
       freq_data <- freq_list[[cb$name[i]]]
       na_vals <- cb$na_values[[i]]
       na_lbls <- cb$na_labels[[i]]
