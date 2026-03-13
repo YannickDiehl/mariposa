@@ -57,7 +57,7 @@
 #' ## When to Use This
 #'
 #' Run \code{reliability()} before creating scale scores with
-#' \code{\link{scale_index}}:
+#' \code{\link{row_means}}:
 #' \enumerate{
 #'   \item Select your items
 #'   \item Check reliability
@@ -91,7 +91,7 @@
 #' summary(result, inter_item_correlations = FALSE)  # hide correlations
 #'
 #' @seealso
-#' \code{\link{scale_index}} for creating mean indices after checking reliability.
+#' \code{\link{row_means}} for creating mean indices after checking reliability.
 #'
 #' \code{\link{pearson_cor}} for bivariate correlations.
 #'

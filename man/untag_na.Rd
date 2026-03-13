@@ -2,36 +2,50 @@
 % Please edit documentation in R/read_spss.R
 \name{untag_na}
 \alias{untag_na}
-\title{Convert Tagged NAs Back to Original SPSS Codes}
+\title{Convert Tagged NAs Back to Original Codes}
 \usage{
 untag_na(x)
 }
 \arguments{
-\item{x}{A numeric vector with tagged NAs (from \code{\link[=read_spss]{read_spss()}}).}
+\item{x}{A numeric vector with tagged NAs.}
 }
 \value{
-A numeric vector where tagged NAs have been replaced with their
-original SPSS codes. System NAs (untagged) remain as \code{NA}.
+A numeric vector where tagged NAs with numeric codes have been
+replaced with their original values (e.g., -9, -8, -42). System NAs
+(untagged) remain as \code{NA}. For native Stata/SAS tagged NAs (no numeric
+codes), falls back to \code{\link[=strip_tags]{strip_tags()}} behavior with a warning.
 }
 \description{
-Replaces tagged NAs with their original SPSS missing value codes, turning
-\code{NA} values back into the numeric codes that SPSS used (e.g., -9, -8, -42).
+Replaces tagged NAs with their original missing value codes. Works with
+data imported via \code{\link[=read_spss]{read_spss()}} (with \code{tag.na = TRUE}) or any reader
+that used the \code{tag.na} parameter (\code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}},
+\code{\link[=read_xpt]{read_xpt()}}). For native Stata/SAS tagged NAs (e.g., \code{.a}, \code{.A}) that
+have no numeric codes to recover, use \code{\link[=strip_tags]{strip_tags()}} instead.
 }
 \examples{
 \dontrun{
+# SPSS data
 data <- read_spss("survey.sav")
-# Recover original codes
 original <- untag_na(data$satisfaction)
-table(original, useNA = "always")
+
+# Stata data with tag.na
+data <- read_stata("survey.dta", tag.na = c(-9, -8, -42))
+original <- untag_na(data$income)
 }
 
 }
 \seealso{
-\code{\link[=read_spss]{read_spss()}}, \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=strip_tags]{strip_tags()}}
+\code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=na_frequencies]{na_frequencies()}},
+\code{\link[=strip_tags]{strip_tags()}}
 
-Other spss: 
+Other data-import: 
 \code{\link{na_frequencies}()},
+\code{\link{read_por}()},
+\code{\link{read_sas}()},
 \code{\link{read_spss}()},
+\code{\link{read_stata}()},
+\code{\link{read_xlsx}()},
+\code{\link{read_xpt}()},
 \code{\link{strip_tags}()}
 }
-\concept{spss}
+\concept{data-import}

@@ -28,6 +28,7 @@ make_tagged_vector <- function() {
 
   x <- haven::labelled(raw, labels = labels, label = "Satisfaction")
   attr(x, "na_tag_map") <- c("a" = -9, "b" = -11)
+  attr(x, "na_tag_format") <- "spss"
   x
 }
 
@@ -46,7 +47,7 @@ test_that("na_frequencies returns correct counts per tag", {
   expect_s3_class(result, "data.frame")
   expect_true("tag" %in% names(result))
   expect_true("n" %in% names(result))
-  expect_true("spss_code" %in% names(result))
+  expect_true("code" %in% names(result))
   expect_true("label" %in% names(result))
 
   # Should have entries for tag "a", "b", and system NA
@@ -64,15 +65,28 @@ test_that("na_frequencies returns correct counts per tag", {
   expect_equal(sys_row$n, 1L)
 })
 
-test_that("na_frequencies returns correct SPSS codes", {
+test_that("na_frequencies returns correct codes", {
   x <- make_tagged_vector()
   result <- na_frequencies(x)
 
   a_row <- result[result$tag == "a" & !is.na(result$tag), ]
   b_row <- result[result$tag == "b" & !is.na(result$tag), ]
 
-  expect_equal(a_row$spss_code, -9)
-  expect_equal(b_row$spss_code, -11)
+  # Codes are now character (as.character of numeric for SPSS)
+  expect_equal(a_row$code, "-9")
+  expect_equal(b_row$code, "-11")
+})
+
+test_that("na_frequencies has 'code' column, not 'spss_code'", {
+  x <- make_tagged_vector()
+  result <- na_frequencies(x)
+  expect_true("code" %in% names(result))
+  expect_false("spss_code" %in% names(result))
+})
+
+test_that("na_tag_format attribute is set to 'spss'", {
+  x <- make_tagged_vector()
+  expect_equal(attr(x, "na_tag_format"), "spss")
 })
 
 test_that("na_frequencies returns correct labels", {

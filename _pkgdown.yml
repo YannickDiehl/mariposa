@@ -50,12 +50,39 @@ navbar:
 
 reference:
 - title: "Data Import"
-  desc: "Import SPSS data files with preserved missing value information"
+  desc: "Import statistical data files with preserved missing value information"
   contents:
   - read_spss
+  - read_por
+  - read_stata
+  - read_sas
+  - read_xpt
+  - read_xlsx
   - na_frequencies
   - untag_na
   - strip_tags
+
+- title: "Data Export"
+  desc: "Export data to statistical formats with preserved labels and missing values"
+  contents:
+  - write_spss
+  - write_stata
+  - write_xpt
+  - write_xlsx
+
+- title: "Label Management"
+  desc: "Inspect, modify, and convert labelled survey data"
+  contents:
+  - var_label
+  - val_labels
+  - copy_labels
+  - drop_labels
+  - to_label
+  - to_character
+  - to_numeric
+  - to_labelled
+  - set_na
+  - unlabel
 
 - title: "Descriptive Statistics"
   desc: "Summarize and explore your survey data"
@@ -102,13 +129,28 @@ reference:
   - dunn_test
   - pairwise_wilcoxon
 
+- title: "Data Transformation"
+  desc: "Recode, dichotomize, dummy-code, standardize, and center variables"
+  contents:
+  - rec
+  - to_dummy
+  - std
+  - center
+
+- title: "Data Exploration"
+  desc: "Search and inspect your data"
+  contents:
+  - find_var
+
 - title: "Scale Analysis"
   desc: "Factor analysis, reliability, and scale construction"
   contents:
   - reliability
   - efa
-  - scale_index
   - pomps
+  - row_means
+  - row_sums
+  - row_count
 
 - title: "Regression Analysis"
   desc: "Linear and logistic regression with SPSS-compatible output"

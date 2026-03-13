@@ -40,12 +40,13 @@ are shown. Supports tidyselect helpers like \code{starts_with("trust")}.}
 \item{show.freq}{Show frequency counts? (Default: TRUE)}
 
 \item{show.na}{Show tagged missing value types in the codebook? (Default:
-TRUE). When data was imported with \code{\link[=read_spss]{read_spss()}}, tagged NAs are displayed
-with their original SPSS codes, labels, and frequencies below the valid
-values, separated by a thin gray line.}
+TRUE). When data was imported with \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}},
+\code{\link[=read_sas]{read_sas()}}, or \code{\link[=read_xpt]{read_xpt()}} using tagged NAs, they are displayed
+with their original missing value codes, labels, and frequencies below
+the valid values, separated by a thin gray line.}
 
 \item{show.unused}{Show all defined value labels, even those with zero
-observations? (Default: FALSE). Useful for seeing the full SPSS codebook
+observations? (Default: FALSE). Useful for seeing the full codebook
 including response options that no respondent selected.}
 
 \item{max.values}{Maximum number of values to display per variable
@@ -78,7 +79,8 @@ variable names, types, labels, the empirical values found in the data,
 value labels, and frequency counts.
 
 Think of it as a professional "cheat sheet" for your dataset -- especially
-useful when working with labelled survey data imported from SPSS.
+useful when working with labelled survey data imported from SPSS, Stata,
+or SAS.
 }
 \details{
 \subsection{What the Codebook Shows}{
@@ -88,7 +90,7 @@ For each variable, the codebook displays (depending on options):
 \item \strong{ID}: Column position in the dataset
 \item \strong{Name}: Variable name (in monospace font)
 \item \strong{Type}: Data type (numeric, factor, ordered factor, haven_labelled, etc.)
-\item \strong{Label}: Variable label (from SPSS/Stata imports or manual assignment)
+\item \strong{Label}: Variable label (from SPSS/Stata/SAS imports or manual assignment)
 \item \strong{Values}: The empirical values found in the data
 \item \strong{Value Labels}: Labels assigned to those values (if any)
 \item \strong{Freq.}: Frequency count for each value
@@ -100,7 +102,7 @@ For each variable, the codebook displays (depending on options):
 Use \code{codebook()} when you:
 \itemize{
 \item First receive a new dataset and want to understand its structure
-\item Work with SPSS-imported data and need to see all value labels
+\item Work with labelled data (SPSS, Stata, SAS) and need to see all value labels
 \item Want to document your dataset for colleagues or publications
 \item Need to quickly see value distributions across variables
 }
@@ -127,6 +129,6 @@ summary(cb)
 }
 \seealso{
 \code{\link[=describe]{describe()}} for detailed numeric summaries, \code{\link[=frequency]{frequency()}} for
-detailed frequency tables, \code{\link[=read_spss]{read_spss()}} for importing SPSS data with
-tagged NAs
+detailed frequency tables, \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_por]{read_por()}}, \code{\link[=read_stata]{read_stata()}},
+\code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}} for importing data with tagged NAs
 }

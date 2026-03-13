@@ -52,10 +52,10 @@ labels when they exist)}
 
 \item{show.unused}{Show all defined value labels, even those with zero
 observations? (Default: FALSE). When TRUE, values that have labels defined
-(e.g., from SPSS .sav files) but no cases in the data are included with
-frequency 0. This is useful for SPSS datasets where user-defined missing
-values (like -9 "No answer") are converted to NA by haven but their labels
-are preserved. Automatically enables label display.}
+(e.g., from statistical software files) but no cases in the data are
+included with frequency 0. This is useful for labelled datasets where
+unused categories should still appear in the output. Automatically enables
+label display.}
 }
 \value{
 A frequency table showing counts and percentages for each category
@@ -101,13 +101,14 @@ Without weights, you're describing your sample. With weights, you're estimating
 population values. Always use weights for population inference.
 }
 
-\subsection{Tagged Missing Values (SPSS)}{
+\subsection{Tagged Missing Values}{
 
-When data is imported with \code{\link[=read_spss]{read_spss()}} using \code{tag.na = TRUE}, SPSS
-user-defined missing values are preserved as tagged NAs. In this case,
-\code{frequency()} automatically expands the missing value section to show
-each missing type individually (with its original SPSS code and label),
-plus summary rows for \strong{Total Valid} and \strong{Total Missing}.
+When data is imported with tagged NAs (e.g., via \code{\link[=read_spss]{read_spss()}} with
+\code{tag.na = TRUE}, or \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}} with the
+\code{tag.na} parameter), \code{frequency()} automatically expands the missing value
+section to show each missing type individually (with its original missing
+value code and label), plus summary rows for \strong{Total Valid} and \strong{Total
+Missing}.
 }
 }
 \examples{

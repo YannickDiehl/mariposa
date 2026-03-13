@@ -147,17 +147,17 @@
     truncated <- TRUE
   }
 
-  # Extract tagged NA metadata (from read_spss with tag.na = TRUE)
+  # Extract tagged NA metadata (from read_spss, read_stata, read_sas, etc.)
   na_values <- character(0)
   na_labels <- character(0)
   n_system_na <- 0L
 
   tag_map <- attr(x, "na_tag_map")
   if (!is.null(tag_map) && requireNamespace("haven", quietly = TRUE)) {
-    # SPSS codes sorted ascending
+    # Missing value codes sorted ascending
     na_values <- as.character(sort(tag_map))
 
-    # Build label lookup: SPSS code -> label name
+    # Build label lookup: missing value code -> label name
     labels_attr <- attr(x, "labels")
     if (!is.null(labels_attr)) {
       na_labels_attr <- labels_attr[is.na(labels_attr)]
@@ -218,7 +218,8 @@
 #' value labels, and frequency counts.
 #'
 #' Think of it as a professional "cheat sheet" for your dataset -- especially
-#' useful when working with labelled survey data imported from SPSS.
+#' useful when working with labelled survey data imported from SPSS, Stata,
+#' or SAS.
 #'
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... Optional: specific variables to include. If empty, all variables
@@ -230,11 +231,12 @@
 #' @param show.values Show empirical values and value labels? (Default: TRUE)
 #' @param show.freq Show frequency counts? (Default: TRUE)
 #' @param show.na Show tagged missing value types in the codebook? (Default:
-#'   TRUE). When data was imported with [read_spss()], tagged NAs are displayed
-#'   with their original SPSS codes, labels, and frequencies below the valid
-#'   values, separated by a thin gray line.
+#'   TRUE). When data was imported with [read_spss()], [read_stata()],
+#'   [read_sas()], or [read_xpt()] using tagged NAs, they are displayed
+#'   with their original missing value codes, labels, and frequencies below
+#'   the valid values, separated by a thin gray line.
 #' @param show.unused Show all defined value labels, even those with zero
-#'   observations? (Default: FALSE). Useful for seeing the full SPSS codebook
+#'   observations? (Default: FALSE). Useful for seeing the full codebook
 #'   including response options that no respondent selected.
 #' @param max.values Maximum number of values to display per variable
 #'   before truncating or showing a range (Default: 10)
@@ -262,7 +264,7 @@
 #' - **ID**: Column position in the dataset
 #' - **Name**: Variable name (in monospace font)
 #' - **Type**: Data type (numeric, factor, ordered factor, haven_labelled, etc.)
-#' - **Label**: Variable label (from SPSS/Stata imports or manual assignment)
+#' - **Label**: Variable label (from SPSS/Stata/SAS imports or manual assignment)
 #' - **Values**: The empirical values found in the data
 #' - **Value Labels**: Labels assigned to those values (if any)
 #' - **Freq.**: Frequency count for each value
@@ -271,7 +273,7 @@
 #'
 #' Use `codebook()` when you:
 #' - First receive a new dataset and want to understand its structure
-#' - Work with SPSS-imported data and need to see all value labels
+#' - Work with labelled data (SPSS, Stata, SAS) and need to see all value labels
 #' - Want to document your dataset for colleagues or publications
 #' - Need to quickly see value distributions across variables
 #'
@@ -294,8 +296,8 @@
 #' summary(cb)
 #'
 #' @seealso [describe()] for detailed numeric summaries, [frequency()] for
-#'   detailed frequency tables, [read_spss()] for importing SPSS data with
-#'   tagged NAs
+#'   detailed frequency tables, [read_spss()], [read_por()], [read_stata()],
+#'   [read_sas()], [read_xpt()] for importing data with tagged NAs
 #'
 #' @export
 codebook <- function(data, ..., weights = NULL,
@@ -531,7 +533,10 @@ codebook <- function(data, ..., weights = NULL,
       white-space: nowrap;
       color: #444;
     }
-    .labels-cell { font-size: 12px; color: #666; }
+    .labels-cell { font-size: 12px; color: #666; white-space: nowrap; }
+    .values-cell > div, .labels-cell > div, .freq-cell > div {
+      min-height: 1.2em;
+    }
     .freq-cell {
       font-size: 12px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono',
@@ -669,7 +674,7 @@ codebook <- function(data, ..., weights = NULL,
           lbl_text <- if (!is.null(val_labels) && v %in% names(val_labels)) {
             .truncate_labels(unname(val_labels[v]), opts$max.len)
           } else {
-            ""
+            "\u00A0"
           }
           htmltools::tags$div(lbl_text)
         })
@@ -680,11 +685,11 @@ codebook <- function(data, ..., weights = NULL,
             if (nrow(freq_row) > 0) {
               htmltools::tags$div(as.character(round(freq_row$freq[1])))
             } else {
-              htmltools::tags$div("")
+              htmltools::tags$div("\u00A0")
             }
           })
         } else {
-          lapply(emp_vals, function(v) htmltools::tags$div(""))
+          lapply(emp_vals, function(v) htmltools::tags$div("\u00A0"))
         }
 
         # Truncation note for value labels
@@ -693,9 +698,9 @@ codebook <- function(data, ..., weights = NULL,
             class = "truncated-note",
             paste0("... (", cb$n_labels[i] - opts$max.values, " more)")
           )
-          val_divs <- c(val_divs, list(htmltools::tags$div("")))
+          val_divs <- c(val_divs, list(htmltools::tags$div("\u00A0")))
           lbl_divs <- c(lbl_divs, list(trunc_note))
-          freq_divs <- c(freq_divs, list(htmltools::tags$div("")))
+          freq_divs <- c(freq_divs, list(htmltools::tags$div("\u00A0")))
         }
 
         # Append tagged NA rows (separator + per-NA-code rows + system NA)
@@ -706,7 +711,7 @@ codebook <- function(data, ..., weights = NULL,
           lbl_divs <- c(lbl_divs, list(sep_div))
           freq_divs <- c(freq_divs, list(sep_div))
 
-          # One row per tagged NA SPSS code
+          # One row per tagged NA code
           for (nav in na_vals) {
             val_divs <- c(val_divs, list(
               htmltools::tags$div(class = "na-value", nav)

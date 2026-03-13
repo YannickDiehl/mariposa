@@ -9,7 +9,7 @@
 
 **Professional statistical analysis for survey data in R.**
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) provides 46 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via `dplyr::group_by()`, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (6,200+ tests pass).
+mariposa (*Marburg Initiative for Political and Social Analysis*) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. All statistical results are validated against SPSS v29 for full reproducibility.
 
 ## Installation
 
@@ -52,7 +52,7 @@ reliability(survey_data, trust_government, trust_media, trust_science) %>%
   summary()    # item statistics, inter-item correlations
 
 survey_data <- survey_data %>%
-  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
 
 # Regression
 survey_data %>%
@@ -66,6 +66,10 @@ survey_data %>%
 
 | Category | Functions | Purpose |
 |----------|-----------|---------|
+| **Data Import** | `read_spss()`, `read_stata()`, `read_sas()`, `read_xlsx()`, + 2 more | Import SPSS, Stata, SAS, and Excel with tagged NA support |
+| **Data Export** | `write_spss()`, `write_stata()`, `write_xpt()`, `write_xlsx()` | Export with full label and missing value roundtripping |
+| **Label Management** | `var_label()`, `val_labels()`, `to_label()`, `set_na()`, + 6 more | Get/set labels, convert formats, declare missing values |
+| **Data Transformation** | `rec()`, `to_dummy()`, `std()`, `center()`, `find_var()` | Recoding, dummy coding, standardization, centering |
 | **Descriptive** | `describe()`, `frequency()`, `crosstab()`, `codebook()` | Summaries, distributions, and data dictionaries |
 | **T-Tests** | `t_test()` | Mean comparisons (independent, paired, one-sample) |
 | **ANOVA** | `oneway_anova()`, `factorial_anova()`, `ancova()` | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
@@ -73,7 +77,7 @@ survey_data %>%
 | **Exact tests** | `chi_square()`, `fisher_test()`, `chisq_gof()`, `mcnemar_test()` | Categorical associations and exact tests |
 | **Correlation** | `pearson_cor()`, `spearman_rho()`, `kendall_tau()` | Relationships between variables |
 | **Post-hoc** | `tukey_test()`, `scheffe_test()`, `levene_test()`, `dunn_test()`, `pairwise_wilcoxon()` | Follow-up analyses (parametric and non-parametric) |
-| **Scale analysis** | `reliability()`, `efa()`, `scale_index()`, `pomps()` | Cronbach's Alpha, factor analysis, index construction |
+| **Scale analysis** | `reliability()`, `efa()`, `row_means()`, `row_sums()`, `row_count()`, `pomps()` | Cronbach's Alpha, factor analysis, index construction |
 | **Regression** | `linear_regression()`, `logistic_regression()` | Linear and logistic models with SPSS-style output |
 | **Effect sizes** | `phi()`, `cramers_v()`, `goodman_gamma()` | Effect size measures for categorical data |
 | **Weighted stats** | `w_mean()`, `w_median()`, `w_sd()`, + 8 more | Individual weighted statistics |
@@ -155,7 +159,7 @@ survey_data %>%
   summary(effect_sizes = FALSE)
 ```
 
-This works for all 13 analysis functions — `t_test()`, `oneway_anova()`, `chi_square()`, `pearson_cor()`, `reliability()`, `linear_regression()`, and more.
+This works for all analysis functions — `t_test()`, `oneway_anova()`, `chi_square()`, `pearson_cor()`, `reliability()`, `linear_regression()`, and more.
 
 ## SPSS Compatibility
 

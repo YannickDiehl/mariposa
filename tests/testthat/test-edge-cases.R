@@ -328,14 +328,14 @@ test_that("efa with custom n_factors works", {
 # ===========================================================================
 # 16. scale_helpers: edge cases
 # ===========================================================================
-test_that("scale_index with min_valid works correctly", {
+test_that("row_means with min_valid works correctly", {
   test_data <- tibble(
     x1 = c(1, 2, NA, 4),
     x2 = c(5, NA, NA, 8),
     x3 = c(3, 6, NA, 7)
   )
   result <- test_data %>%
-    mutate(idx = scale_index(pick(x1, x2, x3), min_valid = 2))
+    mutate(idx = row_means(pick(x1, x2, x3), min_valid = 2))
   expect_equal(sum(!is.na(result$idx)), 3)  # row 3 has all NA -> NA
 })
 
