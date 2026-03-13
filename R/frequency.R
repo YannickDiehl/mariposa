@@ -30,10 +30,10 @@
 #'   labels when they exist)
 #' @param show.unused Show all defined value labels, even those with zero
 #'   observations? (Default: FALSE). When TRUE, values that have labels defined
-#'   (e.g., from SPSS .sav files) but no cases in the data are included with
-#'   frequency 0. This is useful for SPSS datasets where user-defined missing
-#'   values (like -9 "No answer") are converted to NA by haven but their labels
-#'   are preserved. Automatically enables label display.
+#'   (e.g., from statistical software files) but no cases in the data are
+#'   included with frequency 0. This is useful for labelled datasets where
+#'   unused categories should still appear in the output. Automatically enables
+#'   label display.
 #'
 #' @return A frequency table showing counts and percentages for each category
 #'
@@ -59,13 +59,14 @@
 #' Without weights, you're describing your sample. With weights, you're estimating
 #' population values. Always use weights for population inference.
 #'
-#' ## Tagged Missing Values (SPSS)
+#' ## Tagged Missing Values
 #'
-#' When data is imported with [read_spss()] using `tag.na = TRUE`, SPSS
-#' user-defined missing values are preserved as tagged NAs. In this case,
-#' `frequency()` automatically expands the missing value section to show
-#' each missing type individually (with its original SPSS code and label),
-#' plus summary rows for **Total Valid** and **Total Missing**.
+#' When data is imported with tagged NAs (e.g., via [read_spss()] with
+#' `tag.na = TRUE`, or [read_stata()], [read_sas()], [read_xpt()] with the
+#' `tag.na` parameter), `frequency()` automatically expands the missing value
+#' section to show each missing type individually (with its original missing
+#' value code and label), plus summary rows for **Total Valid** and **Total
+#' Missing**.
 #'
 #' @examples
 #' # Load required packages and data
@@ -238,7 +239,7 @@ adjust_rounded_frequencies <- function(raw_freqs, target_sum = NULL) {
 
 # Helper function: Calculate frequency statistics for a single variable
 calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na = TRUE, show.unused = FALSE) {
-  # Check for tagged NAs (from read_spss with tag.na = TRUE)
+  # Check for tagged NAs (from read_spss, read_stata, read_sas, etc.)
   has_tagged_na <- !is.null(attr(x, "na_tag_map")) &&
     requireNamespace("haven", quietly = TRUE)
 
@@ -422,9 +423,9 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
 }
 
 # Helper: Expand the single NA row into per-tag rows + a total row
-# Called when tagged NAs (from read_spss) are detected
+# Called when tagged NAs are detected (any format: SPSS, Stata, SAS)
 .expand_tagged_na_rows <- function(result, x, w) {
-  tag_map <- attr(x, "na_tag_map")  # named numeric: c("a" = -42, "b" = -11, ...)
+  tag_map <- attr(x, "na_tag_map")  # named numeric (SPSS/tag.na): c("a" = -42), or character (native): c("a" = ".a")
   labels  <- attr(x, "labels")
   has_n_eff <- "n_eff" %in% names(result)
 
@@ -479,7 +480,7 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
       }
     }
 
-    # Display value: show original SPSS code
+    # Display value: show original missing value code
     display_val <- if (tag %in% names(tag_map)) as.character(tag_map[tag]) else paste0("NA(", tag, ")")
 
     row_data <- data.frame(
@@ -661,7 +662,21 @@ process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE,
     frequencies_list[[var_name]] <- freq_result
     stats_list[[var_name]] <- stats_df
   }
-  
+
+  # Normalize columns before rbind: some variables may have tagged-NA columns
+
+  # (is_na_row, na_display_value) while others do not
+  if (length(frequencies_list) > 1L) {
+    all_cols <- unique(unlist(lapply(frequencies_list, names)))
+    frequencies_list <- lapply(frequencies_list, function(df) {
+      missing_cols <- setdiff(all_cols, names(df))
+      for (mc in missing_cols) {
+        df[[mc]] <- if (mc == "is_na_row") FALSE else NA
+      }
+      df[all_cols]
+    })
+  }
+
   list(frequencies = do.call(rbind, frequencies_list), stats = do.call(rbind, stats_list))
 }
 
@@ -679,8 +694,22 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
     process_variables(data_list[[i]], var_names, w_name, sort.frq, show.na, show.unused, group_keys[i, , drop = FALSE])
   })
   
+  freq_parts <- lapply(results_list, `[[`, "frequencies")
+
+  # Normalize columns across groups (tagged-NA columns may differ)
+  if (length(freq_parts) > 1L) {
+    all_cols <- unique(unlist(lapply(freq_parts, names)))
+    freq_parts <- lapply(freq_parts, function(df) {
+      missing_cols <- setdiff(all_cols, names(df))
+      for (mc in missing_cols) {
+        df[[mc]] <- if (mc == "is_na_row") FALSE else NA
+      }
+      df[all_cols]
+    })
+  }
+
   list(
-    frequencies = do.call(rbind, lapply(results_list, `[[`, "frequencies")),
+    frequencies = do.call(rbind, freq_parts),
     stats = do.call(rbind, lapply(results_list, `[[`, "stats"))
   )
 }
@@ -698,8 +727,14 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
 #' @export
 print.frequency <- function(x, digits = 3, ...) {
   # Helper functions for formatting
-  format_num <- function(x, width = 6) sprintf(paste0("%-", width, ".2f"), ifelse(is.na(x), NA, x))
-  format_int <- function(x, width = 6) sprintf(paste0("%-", width, ".0f"), ifelse(is.na(x), NA, round(x)))
+  format_num <- function(x, width = 6) {
+    s <- sprintf("%.2f", ifelse(is.na(x), NA, x))
+    pad_utf8(paste0(s, " "), width, align = "right")
+  }
+  format_int <- function(x, width = 6) {
+    s <- sprintf("%.0f", ifelse(is.na(x), NA, round(x)))
+    pad_utf8(paste0(s, " "), width, align = "right")
+  }
   format_str <- function(x, width) {
     s <- as.character(x)
     if (length(s) == 0 || is.na(s[1])) s <- "NA"
@@ -712,8 +747,20 @@ print.frequency <- function(x, digits = 3, ...) {
     cat("+", paste(sapply(widths, function(w) paste(rep("-", w), collapse = "")), collapse = "+"), "+\n", sep = "")
   }
 
-  print_row <- function(values, widths) {
-    cat("|", paste(mapply(format_str, values, widths), collapse = "|"), "|\n", sep = "")
+  print_row <- function(values, widths, aligns = NULL) {
+    if (is.null(aligns)) aligns <- rep("left", length(values))
+    cells <- mapply(function(v, w, a) {
+      s <- as.character(v)
+      if (length(s) == 0 || is.na(s[1])) s <- "NA"
+      nc <- nchar(s)
+      if (!is.na(nc) && nc > w - 1) s <- paste0(substr(s, 1, w - 4), "...")
+      if (a == "right") {
+        pad_utf8(paste0(s, " "), w, align = "right")
+      } else {
+        pad_utf8(paste0(" ", s), w)
+      }
+    }, values, widths, aligns, SIMPLIFY = TRUE)
+    cat("|", paste(cells, collapse = "|"), "|\n", sep = "")
   }
 
   # Dynamic widths for Value and Label based on actual content
@@ -730,6 +777,13 @@ print.frequency <- function(x, digits = 3, ...) {
     all_values <- c(all_values, as.character(na_disp))
   }
   all_labels <- as.character(x$results$label[!is.na(x$results$label) & x$results$label != ""])
+
+  # Include summary row labels ("Total Valid", "Total Missing") in width calculation
+  # when any variable has missing values
+  has_any_na <- any(is.na(x$results$value))
+  if (has_any_na) {
+    all_labels <- c(all_labels, "Total Valid", "Total Missing")
+  }
 
   value_w <- calc_col_width(all_values, min_w = 6, max_w = 40)
   label_w <- if (length(all_labels) > 0) calc_col_width(all_labels, min_w = 5, max_w = 40) else 20
@@ -823,47 +877,111 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
   # Adjust column widths based on actually shown columns
   active_widths <- col_widths[width_names]
 
+  # Build alignment vector: all columns right-aligned
+  aligns <- c("right")  # Value
+  if (options$show.labels) aligns <- c(aligns, "right")  # Label
+  aligns <- c(aligns, "right")  # N
+  if (options$show.prc) aligns <- c(aligns, "right")  # Raw %
+  if (options$show.valid) aligns <- c(aligns, "right")  # Valid %
+  if (options$show.sum) aligns <- c(aligns, "right")  # Cum. %
+
   # Check if we have tagged NA rows (expanded missing types)
   has_tagged_rows <- "na_display_value" %in% names(results) &&
     any(!is.na(results$na_display_value))
 
-  print_line(active_widths)
-  print_row(headers, active_widths)
-  print_line(active_widths)
-
-  prev_was_na_row <- FALSE
-  for (i in seq_len(nrow(results))) {
-    row <- results[i, ]
-
-    if (has_tagged_rows && !is.na(row$na_display_value)) {
-      # Separator before Total (valid), before first NA detail row, and before NA(total)
-      if (row$na_display_value == "Total" ||
-          row$na_display_value == "NA(total)" ||
-          (isTRUE(row$is_na_row) && !prev_was_na_row)) {
-        print_line(active_widths)
-      }
-    }
-
-    prev_was_na_row <- isTRUE(row$is_na_row)
-
-    # Only use actual labels, don't fall back to value if label is empty
+  # Helper: render a single data row
+  render_row <- function(row) {
     display_label <- if (is.na(row$label) || row$label == "") "" else as.character(row$label)
 
-    # Determine display value: use na_display_value for tagged NA/total rows
     if (has_tagged_rows && !is.na(row$na_display_value)) {
       display_value <- row$na_display_value
     } else {
       display_value <- as.character(row$value)
     }
 
+    freq_str <- sprintf("%.0f", ifelse(is.na(row$freq), NA, round(row$freq)))
+    prc_str <- sprintf("%.2f", ifelse(is.na(row$prc), NA, row$prc))
+    valid_str <- if (is.na(row$valid_prc)) "NA" else sprintf("%.2f", row$valid_prc)
+    cum_str <- if (is.na(row$cum_prc)) "NA" else sprintf("%.2f", row$cum_prc)
+
     values <- c(display_value)
     if (options$show.labels) values <- c(values, display_label)
-    values <- c(values, format_int(row$freq))
-    if (options$show.prc) values <- c(values, format_num(row$prc))
-    if (options$show.valid) values <- c(values, ifelse(is.na(row$valid_prc), "NA", format_num(row$valid_prc)))
-    if (options$show.sum) values <- c(values, ifelse(is.na(row$cum_prc), "NA", format_num(row$cum_prc)))
+    values <- c(values, freq_str)
+    if (options$show.prc) values <- c(values, prc_str)
+    if (options$show.valid) values <- c(values, valid_str)
+    if (options$show.sum) values <- c(values, cum_str)
 
-    print_row(values, active_widths)
+    print_row(values, active_widths, aligns)
+  }
+
+  # Helper: render a summary row (Total Valid / Total Missing / Total)
+  render_summary_row <- function(label, freq, prc, valid_prc_str = "NA", cum_str = "", sublabel = "") {
+    values <- c(label)
+    if (options$show.labels) values <- c(values, sublabel)
+    values <- c(values, sprintf("%.0f", round(freq)))
+    if (options$show.prc) values <- c(values, sprintf("%.2f", prc))
+    if (options$show.valid) values <- c(values, valid_prc_str)
+    if (options$show.sum) values <- c(values, cum_str)
+    print_row(values, active_widths, aligns)
+  }
+
+  print_line(active_widths)
+  print_row(headers, active_widths, aligns)
+  print_line(active_widths)
+
+  if (has_tagged_rows) {
+    # --- Tagged NA layout: already has Total Valid / per-tag rows / Total Missing in data ---
+    prev_was_na_row <- FALSE
+    for (i in seq_len(nrow(results))) {
+      row <- results[i, ]
+
+      if (!is.na(row$na_display_value)) {
+        if (row$na_display_value == "Total" ||
+            row$na_display_value == "NA(total)" ||
+            (isTRUE(row$is_na_row) && !prev_was_na_row)) {
+          print_line(active_widths)
+        }
+      }
+
+      prev_was_na_row <- isTRUE(row$is_na_row)
+      render_row(row)
+    }
+  } else {
+    # --- Standard layout: unified format with Total Valid / NA / Total Missing ---
+    # Separate valid rows from NA rows
+    na_idx <- is.na(results$value)
+    valid_rows <- results[!na_idx, , drop = FALSE]
+    na_rows <- results[na_idx, , drop = FALSE]
+    has_na <- nrow(na_rows) > 0 && options$show.na
+
+    # Print valid data rows
+    for (i in seq_len(nrow(valid_rows))) {
+      render_row(valid_rows[i, ])
+    }
+
+    # Totals section
+    valid_freq <- sum(valid_rows$freq, na.rm = TRUE)
+    valid_prc <- sum(valid_rows$prc, na.rm = TRUE)
+    na_freq <- if (has_na) sum(na_rows$freq, na.rm = TRUE) else 0
+    na_prc <- if (has_na) sum(na_rows$prc, na.rm = TRUE) else 0
+
+    if (has_na) {
+      # Layout with NAs: Total Valid → NA row(s) → Total Missing
+      print_line(active_widths)
+      render_summary_row("Total", valid_freq, valid_prc, "100.00", "", "Total Valid")
+      print_line(active_widths)
+
+      for (i in seq_len(nrow(na_rows))) {
+        render_row(na_rows[i, ])
+      }
+
+      print_line(active_widths)
+      render_summary_row("Total", na_freq, na_prc, "NA", "", "Total Missing")
+    } else {
+      # No NAs: simple total row
+      print_line(active_widths)
+      render_summary_row("Total", valid_freq, valid_prc, "100.00", "")
+    }
   }
 
   print_line(active_widths)

@@ -83,11 +83,13 @@ survey_data <- survey_data \%>\%
 
 }
 \seealso{
-\code{\link{scale_index}} for creating mean indices across items.
+\code{\link{row_means}} for creating mean indices across items.
 
 Other scale: 
 \code{\link{efa}()},
 \code{\link{reliability}()},
-\code{\link{scale_index}()}
+\code{\link{row_count}()},
+\code{\link{row_means}()},
+\code{\link{row_sums}()}
 }
 \concept{scale}
