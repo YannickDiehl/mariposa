@@ -1,5 +1,374 @@
 # Changelog
 
+## mariposa 0.6.0
+
+### New Functions — Label Management
+
+This release adds 10 label management functions for working with
+labelled survey data (inspired by `sjlabelled`, consolidated into a
+clean, consistent API), plus data transformation, row operations, and
+data exploration functions.
+
+#### Variable & Value Labels
+
+- New
+  [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md):
+  dual-mode function for getting and setting variable labels.
+  `var_label(data)` returns all variable labels as a named character
+  vector; `var_label(data, x = "Age", y = "Gender")` sets labels for
+  specific columns. Supports tidyselect for column selection when
+  getting labels.
+
+- New
+  [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md):
+  dual-mode function for getting and setting value labels.
+  `val_labels(data)` returns all value labels as a named list;
+  `val_labels(data, x = c("Low" = 1, "High" = 2))` sets labels. Use
+  `.add = TRUE` to extend existing labels without replacing them.
+
+- New
+  [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md):
+  copies all label attributes (variable labels, value labels, class,
+  tagged NA metadata) from a source data frame to matching columns in
+  the target. Essential for preserving labels after `dplyr` operations
+  that strip attributes.
+
+- New
+  [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md):
+  removes value labels for values that do not actually occur in the
+  data. Use `drop.na = TRUE` to also remove labels for tagged NA values.
+
+#### Type Conversions
+
+- New
+  [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md):
+  converts `haven_labelled` vectors to factors, using value labels as
+  factor levels. Supports `ordered`, `drop.na`, `drop.unused`, and
+  `add.non.labelled` options. Factor levels are ordered by their
+  original numeric codes (not alphabetically).
+
+- New
+  [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md):
+  converts `haven_labelled` vectors to character, replacing numeric
+  codes with their label text.
+
+- New
+  [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md):
+  converts factors or labelled vectors to numeric. When
+  `use.labels = TRUE`, uses value labels if they are numeric; otherwise
+  assigns sequential integers (controlled by `start.at`).
+
+- New
+  [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md):
+  converts factors, character, or numeric vectors to `haven_labelled`
+  with proper value labels. Factor levels become value labels
+  automatically.
+
+#### Missing Value Management
+
+- New
+  [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md):
+  declares specific numeric values as missing (NA or tagged NA).
+  Supports unnamed values (applied to all numeric columns) and named
+  pairs for per-variable control (e.g.,
+  `set_na(data, income = c(-9, -8))`). With `tag = TRUE` (default),
+  creates tagged NAs that integrate with
+  [`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md),
+  [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+  and
+  [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md).
+  Can be called incrementally to add new missing value codes.
+
+- New
+  [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md):
+  strips all label metadata from variables, converting `haven_labelled`
+  vectors to plain base R types. Removes variable labels, value labels,
+  tagged NA metadata, and format attributes. Tagged NAs become regular
+  NA. Supports tidyselect for selective column unlabelling.
+
+### New Functions — Data Transformation
+
+- New
+  [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md):
+  flexible recoding with string syntax (e.g.,
+  `rec(data, x, rec = "1:2=1 [Low]; 3:5=2 [High]")`). Supports value
+  ranges, `min`/`max` keywords, `copy` for unchanged values, and
+  automatic value label generation from bracket syntax. Works with
+  numeric, character, and labelled vectors.
+
+- New
+  [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md):
+  creates dummy (indicator) variables from categorical or labelled
+  vectors. Generates one 0/1 column per unique value with informative
+  column names. Supports tidyselect for multi-variable dummy coding and
+  `suffix = "label"` to use value labels in column names.
+
+- New
+  [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md):
+  z-standardization with four methods (`"sd"`, `"2sd"`, `"mad"`,
+  `"gmd"`). Supports survey weights, grouped standardization via
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
+  and `robust = TRUE` for median/MAD-based standardization.
+
+- New
+  [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md):
+  mean-centering (grand-mean or group-mean). Supports survey weights and
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  for group-mean centering. Returns centered values with the centering
+  value stored as an attribute.
+
+### New Functions — Row Operations
+
+- New
+  [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md):
+  computes row-wise means across selected columns, with `min_valid`
+  parameter matching SPSS `MEAN.x()` syntax. Designed for use inside
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
+  Replaces the deprecated `scale_index()`.
+
+- New
+  [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md):
+  computes row-wise sums across selected columns, with `min_valid`
+  parameter for minimum valid (non-NA) values.
+
+- New
+  [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md):
+  counts occurrences of specific values per row. Useful for counting
+  endorsements in multi-item scales (e.g., how many items a respondent
+  agreed with).
+
+### New Functions — Data Exploration
+
+- New
+  [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md):
+  searches variables by name or label using regular expressions. Returns
+  matching variable names with their labels. Useful for exploring large
+  survey datasets with many variables.
+
+### Breaking Changes
+
+- `scale_index()` has been removed and replaced by
+  [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md),
+  which provides the same functionality with a clearer name. Update
+  existing code: `scale_index(data, x, y, z)` →
+  `row_means(data, x, y, z)`.
+
+## mariposa 0.5.6
+
+### New Functions
+
+- New
+  [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+  function: exports data frames to SPSS `.sav` format with full tagged
+  NA roundtripping. Tagged NAs are converted back to SPSS user-defined
+  missing values, enabling lossless roundtrips via
+  [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
+  -\> processing -\>
+  [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md).
+  Supports byte, none, and zsav compression.
+
+- New
+  [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md)
+  function: exports data frames to Stata `.dta` format. Tagged NAs from
+  any source format are written as Stata extended missing values (`.a`
+  through `.z`). Supports Stata versions 8-15.
+
+- New
+  [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)
+  function: exports data frames to SAS transport `.xpt` format. Tagged
+  NAs are written as SAS special missing values (`.A` through `.Z`,
+  `._`). Supports transport versions 5 and 8.
+
+### Enhancements
+
+- mariposa now provides a unified data import/export platform:
+  - **Import**:
+    [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md),
+    [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md),
+    [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
+    [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md),
+    [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md),
+    [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)
+  - **Export**:
+    [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md),
+    [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md),
+    [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md),
+    [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)
+- Cross-format export is supported: data imported from one format can be
+  exported to another (e.g., SPSS to Stata) with automatic missing value
+  type conversion.
+
+## mariposa 0.5.5
+
+### New Functions
+
+- New
+  [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)
+  function: reads Excel (`.xlsx`) files with automatic label
+  reconstruction. When reading back files created by
+  [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md),
+  variable labels, value labels, and tagged NA metadata are fully
+  restored – enabling lossless roundtripping of labelled survey data
+  through Excel.
+  - Auto-detects mariposa export format (data frame, list, codebook)
+  - Reconstructs `haven_labelled` columns, factor levels, and variable
+    labels
+  - Restores tagged NAs with `na_tag_map` from missing codes in the data
+  - Works as a plain Excel reader for non-mariposa files
+- New
+  [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)
+  generic: exports data frames, codebooks, and named lists to Excel
+  (`.xlsx`) with full support for variable labels, value labels, and
+  tagged NA metadata. Uses `openxlsx2` as an optional dependency.
+  - `write_xlsx(data, "file.xlsx")` – data + “Labels” reference sheet
+    with variable labels, value labels, and missing value codes
+  - `codebook(data) |> write_xlsx("codebook.xlsx")` – structured
+    codebook workbook with Overview, Codebook, and optional per-variable
+    frequency sheets (`frequencies = TRUE`)
+  - `write_xlsx(list(a = df1, b = df2), "multi.xlsx")` – multi-sheet
+    export where each named list element becomes a sheet
+
+### Enhancements
+
+- [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)
+  now preserves tagged NA codes (-9, -11, etc.) as visible values in the
+  data sheet instead of empty cells, enabling perfect roundtripping with
+  [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md).
+  System NAs remain as empty cells.
+- The “Labels” sheet now includes a `Column_Type` column
+  (`haven_labelled` or `factor`) so
+  [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)
+  can deterministically reconstruct column types.
+
+### Dependencies
+
+- Added `openxlsx2` as a suggested dependency for Excel import/export.
+
+## mariposa 0.5.4
+
+### New Functions
+
+- New
+  [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)
+  function: reads Stata `.dta` files and annotates native extended
+  missing values (`.a` through `.z`) for use with mariposa’s tagged NA
+  system. Stata tagged NAs are preserved automatically by haven;
+  [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)
+  adds the `na_tag_map` attribute for seamless integration with
+  [`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md),
+  [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+  and
+  [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md).
+
+- New
+  [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md)
+  function: reads SAS `.sas7bdat` files with optional catalog file
+  (`.sas7bcat`) for value labels. Annotates SAS special missing values
+  (`.A` through `.Z` and `._`) for tagged NA integration.
+
+- New
+  [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)
+  function: reads SAS transport files (`.xpt`) with tagged missing value
+  support. Transport files are the FDA-approved, platform-independent
+  SAS data format.
+
+- New
+  [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md)
+  function: reads SPSS portable `.por` files with the same tagged NA
+  support as
+  [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md).
+  Shares the SPSS missing value conversion logic internally.
+
+### Breaking Changes
+
+- [`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md)
+  column `spss_code` has been renamed to `code` to reflect multi-format
+  support. The column now contains character values: numeric SPSS codes
+  (e.g., `"-9"`) or native format codes (e.g., `".a"` for Stata, `".A"`
+  for SAS).
+
+### Improvements
+
+- [`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md),
+  [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md),
+  and
+  [`strip_tags()`](https://YannickDiehl.github.io/mariposa/reference/strip_tags.md)
+  now work universally with data from all supported formats (SPSS,
+  Stata, SAS).
+
+- [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md)
+  is now format-aware: for Stata and SAS data (where tagged NAs are the
+  native representation with no numeric codes to recover), it warns and
+  falls back to
+  [`strip_tags()`](https://YannickDiehl.github.io/mariposa/reference/strip_tags.md)
+  behavior.
+
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  and
+  [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
+  automatically display format-appropriate missing value codes (e.g.,
+  `-9` for SPSS, `.a` for Stata, `.A` for SAS).
+
+## mariposa 0.5.3
+
+### New Functions
+
+- New
+  [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
+  function: reads SPSS `.sav` files and preserves user-defined missing
+  values as tagged NAs instead of converting them to regular `NA`. This
+  allows distinguishing between different types of missing data (e.g.,
+  “no answer”, “not applicable”, “refused”) while still treating them as
+  `NA` in standard R operations. Fixes the
+  `sjlabelled::read_spss(tag.na=TRUE)` crash on large datasets (e.g.,
+  ALLBUS) caused by out-of-bounds `letters[]` indexing.
+
+- New
+  [`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md)
+  function: shows a breakdown of the different types of missing values
+  in a tagged NA variable, with counts, original SPSS codes, and value
+  labels.
+
+- New
+  [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md)
+  function: converts tagged NAs back to their original SPSS missing
+  value codes (e.g., -9, -8, -42).
+
+- New
+  [`strip_tags()`](https://YannickDiehl.github.io/mariposa/reference/strip_tags.md)
+  function: converts all tagged NAs to regular (untagged) `NA` values,
+  producing the same result as reading with
+  [`haven::read_sav()`](https://haven.tidyverse.org/reference/read_spss.html)
+  directly.
+
+### Improvements
+
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  now displays tagged NAs individually when data was imported with
+  [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md).
+  Each missing value type is shown as a separate row with its original
+  SPSS code and label, followed by a “Total Valid” and “Total Missing”
+  summary row.
+
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  with `show.unused = TRUE` correctly handles tagged NA labels (no
+  longer shows them as unused with freq=0).
+
+## mariposa 0.5.2.2
+
+### Convenience
+
+- New
+  [`fre()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  shorthand alias for
+  [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md).
+  Both functions are identical;
+  [`fre()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  simply provides a quicker way to call frequency analysis.
+  [`?fre`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  shows the same help page as
+  [`?frequency`](https://YannickDiehl.github.io/mariposa/reference/frequency.md).
+
 ## mariposa 0.5.2
 
 ### New Features
@@ -329,10 +698,9 @@
   package). Includes KMO measure, Bartlett’s test, communalities, and
   sorted factor loading matrix with configurable blank threshold.
 
-- Added
-  [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
-  for creating mean indices across survey items, with `min_valid`
-  parameter matching SPSS `MEAN.x()` syntax. Designed for use inside
+- Added `scale_index()` for creating mean indices across survey items,
+  with `min_valid` parameter matching SPSS `MEAN.x()` syntax. Designed
+  for use inside
   [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html).
 
 - Added

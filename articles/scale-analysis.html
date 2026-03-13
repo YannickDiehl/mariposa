@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,7 @@ typical workflow is:</p>
 measure the same thing?</li>
 <li>Explore structure with <code><a href="../reference/efa.html">efa()</a></code> – how do items group into
 dimensions?</li>
-<li>Create scores with <code><a href="../reference/scale_index.html">scale_index()</a></code> – compute mean
+<li>Create scores with <code><a href="../reference/row_means.html">row_means()</a></code> – compute mean
 indices</li>
 <li>Standardize with <code><a href="../reference/pomps.html">pomps()</a></code> – transform to comparable
 0-100 scale</li>
@@ -118,7 +118,7 @@ indices</li>
 <td>Discover underlying dimensions (factor analysis)</td>
 </tr>
 <tr class="odd">
-<td><code><a href="../reference/scale_index.html">scale_index()</a></code></td>
+<td><code><a href="../reference/row_means.html">row_means()</a></code></td>
 <td>Create mean indices across items</td>
 </tr>
 <tr class="even">
@@ -330,12 +330,12 @@ components:</p>
 <h2 id="creating-scale-scores">Creating Scale Scores<a class="anchor" aria-label="anchor" href="#creating-scale-scores"></a>
 </h2>
 <div class="section level3">
-<h3 id="scale_index-mean-indices">scale_index(): Mean Indices<a class="anchor" aria-label="anchor" href="#scale_index-mean-indices"></a>
+<h3 id="row_means-mean-indices">row_means(): Mean Indices<a class="anchor" aria-label="anchor" href="#row_means-mean-indices"></a>
 </h3>
 <p>After confirming reliability, create a mean index:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="../reference/row_means.html">row_means</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Check the result</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -346,7 +346,7 @@ components:</p>
 <span><span class="co">#&gt;  Variable  Mean Median  SD Range IQR Skewness    N Missing</span></span>
 <span><span class="co">#&gt;   m_trust 2.915      3 0.7     4   1    0.015 2500       0</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
-<p><code><a href="../reference/scale_index.html">scale_index()</a></code> works inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>,
+<p><code><a href="../reference/row_means.html">row_means()</a></code> works inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>,
 computing the row-wise mean across items.</p>
 </div>
 <div class="section level3">
@@ -354,7 +354,7 @@ computing the row-wise mean across items.</p>
 </h3>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust2 <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust2 <span class="op">=</span> <span class="fu"><a href="../reference/row_means.html">row_means</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-pick">Using pick()<a class="anchor" aria-label="anchor" href="#using-pick"></a>
@@ -363,7 +363,7 @@ computing the row-wise mean across items.</p>
 and <code>|&gt;</code> pipes:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust3 <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust3 <span class="op">=</span> <span class="fu"><a href="../reference/row_means.html">row_means</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -374,7 +374,7 @@ and <code>|&gt;</code> pipes:</p>
 SPSS <code>MEAN.2()</code> syntax:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust_strict <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust_strict <span class="op">=</span> <span class="fu"><a href="../reference/row_means.html">row_means</a></span><span class="op">(</span></span>
 <span>    <span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>    min_valid <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -500,7 +500,7 @@ Always specify the theoretical scale range for consistent results.</p>
 <span></span>
 <span><span class="co"># 3. Create mean index (Alpha was acceptable)</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="../reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="../reference/row_means.html">row_means</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 4. Transform to POMPS for reporting</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -545,7 +545,7 @@ scale (Cronbach’s Alpha)</li>
 <code><a href="../reference/efa.html">efa()</a></code> discovers underlying dimensions in your items
 (Principal Component Analysis)</li>
 <li>
-<code><a href="../reference/scale_index.html">scale_index()</a></code> computes mean indices for use in further
+<code><a href="../reference/row_means.html">row_means()</a></code> computes mean indices for use in further
 analyses</li>
 <li>
 <code><a href="../reference/pomps.html">pomps()</a></code> transforms scores to a comparable 0-100

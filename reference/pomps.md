@@ -68,13 +68,15 @@ across samples and time points.
 
 ## See also
 
-[`scale_index`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_means`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
 for creating mean indices across items.
 
 Other scale:
 [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md),
 [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md),
-[`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md),
+[`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md),
+[`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)
 
 ## Examples
 

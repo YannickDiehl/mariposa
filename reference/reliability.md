@@ -102,7 +102,7 @@ SPSS-style output with toggleable sections.
 ### When to Use This
 
 Run `reliability()` before creating scale scores with
-[`scale_index`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md):
+[`row_means`](https://YannickDiehl.github.io/mariposa/reference/row_means.md):
 
 1.  Select your items
 
@@ -114,7 +114,7 @@ Run `reliability()` before creating scale scores with
 
 ## See also
 
-[`scale_index`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_means`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
 for creating mean indices after checking reliability.
 
 [`pearson_cor`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
@@ -126,7 +126,9 @@ for detailed output with toggleable sections.
 Other scale:
 [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md),
 [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md),
-[`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md),
+[`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md),
+[`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)
 
 ## Examples
 

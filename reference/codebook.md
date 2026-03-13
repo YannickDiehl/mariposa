@@ -7,7 +7,7 @@ data, value labels, and frequency counts.
 
 Think of it as a professional "cheat sheet" for your dataset –
 especially useful when working with labelled survey data imported from
-SPSS.
+SPSS, Stata, or SAS.
 
 ## Usage
 
@@ -21,6 +21,8 @@ codebook(
   show.labels = TRUE,
   show.values = TRUE,
   show.freq = TRUE,
+  show.na = TRUE,
+  show.unused = FALSE,
   max.values = 10,
   max.len = 50,
   sort.by.name = FALSE,
@@ -62,6 +64,25 @@ codebook(
 - show.freq:
 
   Show frequency counts? (Default: TRUE)
+
+- show.na:
+
+  Show tagged missing value types in the codebook? (Default: TRUE). When
+  data was imported with
+  [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md),
+  [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
+  [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md),
+  or
+  [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)
+  using tagged NAs, they are displayed with their original missing value
+  codes, labels, and frequencies below the valid values, separated by a
+  thin gray line.
+
+- show.unused:
+
+  Show all defined value labels, even those with zero observations?
+  (Default: FALSE). Useful for seeing the full codebook including
+  response options that no respondent selected.
 
 - max.values:
 
@@ -122,7 +143,7 @@ For each variable, the codebook displays (depending on options):
 - **Type**: Data type (numeric, factor, ordered factor, haven_labelled,
   etc.)
 
-- **Label**: Variable label (from SPSS/Stata imports or manual
+- **Label**: Variable label (from SPSS/Stata/SAS imports or manual
   assignment)
 
 - **Values**: The empirical values found in the data
@@ -137,7 +158,8 @@ Use `codebook()` when you:
 
 - First receive a new dataset and want to understand its structure
 
-- Work with SPSS-imported data and need to see all value labels
+- Work with labelled data (SPSS, Stata, SAS) and need to see all value
+  labels
 
 - Want to document your dataset for colleagues or publications
 
@@ -148,7 +170,13 @@ Use `codebook()` when you:
 [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
 for detailed numeric summaries,
 [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
-for detailed frequency tables
+for detailed frequency tables,
+[`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md),
+[`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md),
+[`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
+[`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md),
+[`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)
+for importing data with tagged NAs
 
 ## Examples
 

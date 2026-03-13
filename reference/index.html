@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,194 @@
     </div>
 
     <div class="section level2">
+      <h2 id="data-import">Data Import<a class="anchor" aria-label="anchor" href="#data-import"></a></h2>
+
+      <div class="section-desc"><p>Import statistical data files with preserved missing value information</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="read_spss.html">read_spss()</a></code>
+
+        </dt>
+        <dd>Read SPSS Data with Tagged Missing Values</dd>
+
+        <dt>
+
+          <code><a href="read_por.html">read_por()</a></code>
+
+        </dt>
+        <dd>Read SPSS Portable Data with Tagged Missing Values</dd>
+
+        <dt>
+
+          <code><a href="read_stata.html">read_stata()</a></code>
+
+        </dt>
+        <dd>Read Stata Data with Tagged Missing Values</dd>
+
+        <dt>
+
+          <code><a href="read_sas.html">read_sas()</a></code>
+
+        </dt>
+        <dd>Read SAS Data with Tagged Missing Values</dd>
+
+        <dt>
+
+          <code><a href="read_xpt.html">read_xpt()</a></code>
+
+        </dt>
+        <dd>Read SAS Transport File with Tagged Missing Values</dd>
+
+        <dt>
+
+          <code><a href="read_xlsx.html">read_xlsx()</a></code>
+
+        </dt>
+        <dd>Read Excel Data with Label Reconstruction</dd>
+
+        <dt>
+
+          <code><a href="na_frequencies.html">na_frequencies()</a></code>
+
+        </dt>
+        <dd>Frequency Table of Missing Value Types</dd>
+
+        <dt>
+
+          <code><a href="untag_na.html">untag_na()</a></code>
+
+        </dt>
+        <dd>Convert Tagged NAs Back to Original Codes</dd>
+
+        <dt>
+
+          <code><a href="strip_tags.html">strip_tags()</a></code>
+
+        </dt>
+        <dd>Strip Tags from Tagged NAs</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-export">Data Export<a class="anchor" aria-label="anchor" href="#data-export"></a></h2>
+
+      <div class="section-desc"><p>Export data to statistical formats with preserved labels and missing values</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="write_spss.html">write_spss()</a></code>
+
+        </dt>
+        <dd>Export Data to SPSS Format</dd>
+
+        <dt>
+
+          <code><a href="write_stata.html">write_stata()</a></code>
+
+        </dt>
+        <dd>Export Data to Stata Format</dd>
+
+        <dt>
+
+          <code><a href="write_xpt.html">write_xpt()</a></code>
+
+        </dt>
+        <dd>Export Data to SAS Transport Format</dd>
+
+        <dt>
+
+          <code><a href="write_xlsx.html">write_xlsx()</a></code>
+
+        </dt>
+        <dd>Export Data to Excel with Label Support</dd>
+      </dl></div><div class="section level2">
+      <h2 id="label-management">Label Management<a class="anchor" aria-label="anchor" href="#label-management"></a></h2>
+
+      <div class="section-desc"><p>Inspect, modify, and convert labelled survey data</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="var_label.html">var_label()</a></code>
+
+        </dt>
+        <dd>Get or Set Variable Labels</dd>
+
+        <dt>
+
+          <code><a href="val_labels.html">val_labels()</a></code>
+
+        </dt>
+        <dd>Get or Set Value Labels</dd>
+
+        <dt>
+
+          <code><a href="copy_labels.html">copy_labels()</a></code>
+
+        </dt>
+        <dd>Copy Labels from One Data Frame to Another</dd>
+
+        <dt>
+
+          <code><a href="drop_labels.html">drop_labels()</a></code>
+
+        </dt>
+        <dd>Remove Unused Value Labels</dd>
+
+        <dt>
+
+          <code><a href="to_label.html">to_label()</a></code>
+
+        </dt>
+        <dd>Convert Labelled Variables to Factors</dd>
+
+        <dt>
+
+          <code><a href="to_character.html">to_character()</a></code>
+
+        </dt>
+        <dd>Convert Labelled Variables to Character</dd>
+
+        <dt>
+
+          <code><a href="to_numeric.html">to_numeric()</a></code>
+
+        </dt>
+        <dd>Convert Factors or Labelled Variables to Numeric</dd>
+
+        <dt>
+
+          <code><a href="to_labelled.html">to_labelled()</a></code>
+
+        </dt>
+        <dd>Convert Variables to Labelled Format</dd>
+
+        <dt>
+
+          <code><a href="set_na.html">set_na()</a></code>
+
+        </dt>
+        <dd>Declare Values as Missing</dd>
+
+        <dt>
+
+          <code><a href="unlabel.html">unlabel()</a></code>
+
+        </dt>
+        <dd>Remove All Label Metadata</dd>
+      </dl></div><div class="section level2">
       <h2 id="descriptive-statistics">Descriptive Statistics<a class="anchor" aria-label="anchor" href="#descriptive-statistics"></a></h2>
 
       <div class="section-desc"><p>Summarize and explore your survey data</p></div>
@@ -71,7 +259,7 @@
 
         <dt>
 
-          <code><a href="frequency.html">frequency()</a></code>
+          <code><a href="frequency.html">frequency()</a></code> <code><a href="frequency.html">fre()</a></code>
 
         </dt>
         <dd>Count How Many People Chose Each Option</dd>
@@ -266,6 +454,59 @@
         </dt>
         <dd>Find Which Specific Measurements Differ After Friedman Test</dd>
       </dl></div><div class="section level2">
+      <h2 id="data-transformation">Data Transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a></h2>
+
+      <div class="section-desc"><p>Recode, dichotomize, dummy-code, standardize, and center variables</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="rec.html">rec()</a></code>
+
+        </dt>
+        <dd>Recode Variables Using String Syntax</dd>
+
+        <dt>
+
+          <code><a href="to_dummy.html">to_dummy()</a></code>
+
+        </dt>
+        <dd>Create Dummy Variables (One-Hot Encoding)</dd>
+
+        <dt>
+
+          <code><a href="std.html">std()</a></code>
+
+        </dt>
+        <dd>Standardize Variables (Z-Scores)</dd>
+
+        <dt>
+
+          <code><a href="center.html">center()</a></code>
+
+        </dt>
+        <dd>Center Variables (Mean Centering)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-exploration">Data Exploration<a class="anchor" aria-label="anchor" href="#data-exploration"></a></h2>
+
+      <div class="section-desc"><p>Search and inspect your data</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="find_var.html">find_var()</a></code>
+
+        </dt>
+        <dd>Find Variables by Name or Label</dd>
+      </dl></div><div class="section level2">
       <h2 id="scale-analysis">Scale Analysis<a class="anchor" aria-label="anchor" href="#scale-analysis"></a></h2>
 
       <div class="section-desc"><p>Factor analysis, reliability, and scale construction</p></div>
@@ -291,17 +532,31 @@
 
         <dt>
 
-          <code><a href="scale_index.html">scale_index()</a></code>
-
-        </dt>
-        <dd>Create a Mean Index Across Items</dd>
-
-        <dt>
-
           <code><a href="pomps.html">pomps()</a></code>
 
         </dt>
         <dd>Transform Scores to Percent of Maximum Possible (POMPS)</dd>
+
+        <dt>
+
+          <code><a href="row_means.html">row_means()</a></code>
+
+        </dt>
+        <dd>Compute Row Means Across Items</dd>
+
+        <dt>
+
+          <code><a href="row_sums.html">row_sums()</a></code>
+
+        </dt>
+        <dd>Compute Row Sums Across Items</dd>
+
+        <dt>
+
+          <code><a href="row_count.html">row_count()</a></code>
+
+        </dt>
+        <dd>Count Occurrences of a Value Across Columns</dd>
       </dl></div><div class="section level2">
       <h2 id="regression-analysis">Regression Analysis<a class="anchor" aria-label="anchor" href="#regression-analysis"></a></h2>
 

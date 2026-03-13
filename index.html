@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 <!-- badges: start -->
 
 <p><strong>Professional statistical analysis for survey data in R.</strong></p>
-<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 46 statistical functions for analyzing survey data. All functions support survey weights, grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and produce publication-ready output. Results are validated against SPSS v29 for full reproducibility (6,200+ tests pass).</p>
+<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. All statistical results are validated against SPSS v29 for full reproducibility.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -123,7 +123,7 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span>    <span class="co"># item statistics, inter-item correlations</span></span>
 <span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="reference/scale_index.html">scale_index</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="reference/row_means.html">row_means</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Regression</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -148,6 +148,32 @@
 <th>Purpose</th>
 </tr></thead>
 <tbody>
+<tr class="odd">
+<td><strong>Data Import</strong></td>
+<td>
+<code><a href="reference/read_spss.html">read_spss()</a></code>, <code><a href="reference/read_stata.html">read_stata()</a></code>, <code><a href="reference/read_sas.html">read_sas()</a></code>, <code><a href="reference/read_xlsx.html">read_xlsx()</a></code>, + 2 more</td>
+<td>Import SPSS, Stata, SAS, and Excel with tagged NA support</td>
+</tr>
+<tr class="even">
+<td><strong>Data Export</strong></td>
+<td>
+<code><a href="reference/write_spss.html">write_spss()</a></code>, <code><a href="reference/write_stata.html">write_stata()</a></code>, <code><a href="reference/write_xpt.html">write_xpt()</a></code>, <code><a href="reference/write_xlsx.html">write_xlsx()</a></code>
+</td>
+<td>Export with full label and missing value roundtripping</td>
+</tr>
+<tr class="odd">
+<td><strong>Label Management</strong></td>
+<td>
+<code><a href="reference/var_label.html">var_label()</a></code>, <code><a href="reference/val_labels.html">val_labels()</a></code>, <code><a href="reference/to_label.html">to_label()</a></code>, <code><a href="reference/set_na.html">set_na()</a></code>, + 6 more</td>
+<td>Get/set labels, convert formats, declare missing values</td>
+</tr>
+<tr class="even">
+<td><strong>Data Transformation</strong></td>
+<td>
+<code><a href="reference/rec.html">rec()</a></code>, <code><a href="reference/to_dummy.html">to_dummy()</a></code>, <code><a href="reference/std.html">std()</a></code>, <code><a href="reference/center.html">center()</a></code>, <code><a href="reference/find_var.html">find_var()</a></code>
+</td>
+<td>Recoding, dummy coding, standardization, centering</td>
+</tr>
 <tr class="odd">
 <td><strong>Descriptive</strong></td>
 <td>
@@ -198,7 +224,7 @@
 <tr class="even">
 <td><strong>Scale analysis</strong></td>
 <td>
-<code><a href="reference/reliability.html">reliability()</a></code>, <code><a href="reference/efa.html">efa()</a></code>, <code><a href="reference/scale_index.html">scale_index()</a></code>, <code><a href="reference/pomps.html">pomps()</a></code>
+<code><a href="reference/reliability.html">reliability()</a></code>, <code><a href="reference/efa.html">efa()</a></code>, <code><a href="reference/row_means.html">row_means()</a></code>, <code><a href="reference/row_sums.html">row_sums()</a></code>, <code><a href="reference/row_count.html">row_count()</a></code>, <code><a href="reference/pomps.html">pomps()</a></code>
 </td>
 <td>Cronbach’s Alpha, factor analysis, index construction</td>
 </tr>
@@ -298,7 +324,7 @@
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span>effect_sizes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>This works for all 13 analysis functions — <code><a href="reference/t_test.html">t_test()</a></code>, <code><a href="reference/oneway_anova.html">oneway_anova()</a></code>, <code><a href="reference/chi_square.html">chi_square()</a></code>, <code><a href="reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="reference/reliability.html">reliability()</a></code>, <code><a href="reference/linear_regression.html">linear_regression()</a></code>, and more.</p>
+<p>This works for all analysis functions — <code><a href="reference/t_test.html">t_test()</a></code>, <code><a href="reference/oneway_anova.html">oneway_anova()</a></code>, <code><a href="reference/chi_square.html">chi_square()</a></code>, <code><a href="reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="reference/reliability.html">reliability()</a></code>, <code><a href="reference/linear_regression.html">linear_regression()</a></code>, and more.</p>
 </div>
 </div>
 <div class="section level2">

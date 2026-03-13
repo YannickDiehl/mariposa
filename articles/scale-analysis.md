@@ -19,7 +19,7 @@ workflow is:
     [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)
     – how do items group into dimensions?
 3.  Create scores with
-    [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+    [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
     – compute mean indices
 4.  Standardize with
     [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)
@@ -32,7 +32,7 @@ This guide walks through each step using the trust items from
 |-------------------------------------------------------------------------------------|--------------------------------------------------|
 | [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Check internal consistency (Cronbach’s Alpha)    |
 | [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)                 | Discover underlying dimensions (factor analysis) |
-| [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md) | Create mean indices across items                 |
+| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)     | Create mean indices across items                 |
 | [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)             | Transform to Percent of Maximum Possible Scores  |
 
 ## Reliability Analysis
@@ -246,13 +246,13 @@ efa(survey_data,
 
 ## Creating Scale Scores
 
-### scale_index(): Mean Indices
+### row_means(): Mean Indices
 
 After confirming reliability, create a mean index:
 
 ``` r
 survey_data <- survey_data %>%
-  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
 
 # Check the result
 survey_data %>%
@@ -265,7 +265,7 @@ survey_data %>%
 #> ----------------------------------------
 ```
 
-[`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
 works inside
 [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html),
 computing the row-wise mean across items.
@@ -274,7 +274,7 @@ computing the row-wise mean across items.
 
 ``` r
 survey_data <- survey_data %>%
-  mutate(m_trust2 = scale_index(., starts_with("trust")))
+  mutate(m_trust2 = row_means(., starts_with("trust")))
 ```
 
 ### Using pick()
@@ -284,7 +284,7 @@ works with both `%>%` and `|>` pipes:
 
 ``` r
 survey_data <- survey_data %>%
-  mutate(m_trust3 = scale_index(
+  mutate(m_trust3 = row_means(
     pick(trust_government, trust_media, trust_science)
   ))
 ```
@@ -296,7 +296,7 @@ SPSS `MEAN.2()` syntax:
 
 ``` r
 survey_data <- survey_data %>%
-  mutate(m_trust_strict = scale_index(
+  mutate(m_trust_strict = row_means(
     ., trust_government, trust_media, trust_science,
     min_valid = 2
   ))
@@ -424,7 +424,7 @@ summary(efa_result, communalities = FALSE)  # detailed, skip communalities
 
 # 3. Create mean index (Alpha was acceptable)
 survey_data <- survey_data %>%
-  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
 
 # 4. Transform to POMPS for reporting
 survey_data <- survey_data %>%
@@ -465,7 +465,7 @@ survey_data %>%
 2.  [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)
     discovers underlying dimensions in your items (Principal Component
     Analysis)
-3.  [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+3.  [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
     computes mean indices for use in further analyses
 4.  [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)
     transforms scores to a comparable 0-100 scale

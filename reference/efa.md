@@ -248,7 +248,7 @@ doesn't fit well with the others.
 [`reliability`](https://YannickDiehl.github.io/mariposa/reference/reliability.md)
 for checking scale reliability before creating indices.
 
-[`scale_index`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_means`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
 for creating mean indices after identifying factors.
 
 [`summary.efa`](https://YannickDiehl.github.io/mariposa/reference/summary.efa.md)
@@ -257,7 +257,9 @@ for detailed output with toggleable sections.
 Other scale:
 [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md),
 [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md),
-[`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
+[`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md),
+[`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md),
+[`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)
 
 ## Examples
 

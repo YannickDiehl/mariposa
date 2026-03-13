@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,148 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="mariposa-060">mariposa 0.6.0<a class="anchor" aria-label="anchor" href="#mariposa-060"></a></h2>
+<div class="section level3">
+<h3 id="new-functions--label-management-0-6-0">New Functions — Label Management<a class="anchor" aria-label="anchor" href="#new-functions--label-management-0-6-0"></a></h3>
+<p>This release adds 10 label management functions for working with labelled survey data (inspired by <code>sjlabelled</code>, consolidated into a clean, consistent API), plus data transformation, row operations, and data exploration functions.</p>
+<div class="section level4">
+<h4 id="variable--value-labels-0-6-0">Variable &amp; Value Labels<a class="anchor" aria-label="anchor" href="#variable--value-labels-0-6-0"></a></h4>
+<ul><li><p>New <code><a href="../reference/var_label.html">var_label()</a></code>: dual-mode function for getting and setting variable labels. <code>var_label(data)</code> returns all variable labels as a named character vector; <code>var_label(data, x = "Age", y = "Gender")</code> sets labels for specific columns. Supports tidyselect for column selection when getting labels.</p></li>
+<li><p>New <code><a href="../reference/val_labels.html">val_labels()</a></code>: dual-mode function for getting and setting value labels. <code>val_labels(data)</code> returns all value labels as a named list; <code>val_labels(data, x = c("Low" = 1, "High" = 2))</code> sets labels. Use <code>.add = TRUE</code> to extend existing labels without replacing them.</p></li>
+<li><p>New <code><a href="../reference/copy_labels.html">copy_labels()</a></code>: copies all label attributes (variable labels, value labels, class, tagged NA metadata) from a source data frame to matching columns in the target. Essential for preserving labels after <code>dplyr</code> operations that strip attributes.</p></li>
+<li><p>New <code><a href="../reference/drop_labels.html">drop_labels()</a></code>: removes value labels for values that do not actually occur in the data. Use <code>drop.na = TRUE</code> to also remove labels for tagged NA values.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="type-conversions-0-6-0">Type Conversions<a class="anchor" aria-label="anchor" href="#type-conversions-0-6-0"></a></h4>
+<ul><li><p>New <code><a href="../reference/to_label.html">to_label()</a></code>: converts <code>haven_labelled</code> vectors to factors, using value labels as factor levels. Supports <code>ordered</code>, <code>drop.na</code>, <code>drop.unused</code>, and <code>add.non.labelled</code> options. Factor levels are ordered by their original numeric codes (not alphabetically).</p></li>
+<li><p>New <code><a href="../reference/to_character.html">to_character()</a></code>: converts <code>haven_labelled</code> vectors to character, replacing numeric codes with their label text.</p></li>
+<li><p>New <code><a href="../reference/to_numeric.html">to_numeric()</a></code>: converts factors or labelled vectors to numeric. When <code>use.labels = TRUE</code>, uses value labels if they are numeric; otherwise assigns sequential integers (controlled by <code>start.at</code>).</p></li>
+<li><p>New <code><a href="../reference/to_labelled.html">to_labelled()</a></code>: converts factors, character, or numeric vectors to <code>haven_labelled</code> with proper value labels. Factor levels become value labels automatically.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="missing-value-management-0-6-0">Missing Value Management<a class="anchor" aria-label="anchor" href="#missing-value-management-0-6-0"></a></h4>
+<ul><li><p>New <code><a href="../reference/set_na.html">set_na()</a></code>: declares specific numeric values as missing (NA or tagged NA). Supports unnamed values (applied to all numeric columns) and named pairs for per-variable control (e.g., <code>set_na(data, income = c(-9, -8))</code>). With <code>tag = TRUE</code> (default), creates tagged NAs that integrate with <code><a href="../reference/na_frequencies.html">na_frequencies()</a></code>, <code><a href="../reference/frequency.html">frequency()</a></code>, and <code><a href="../reference/codebook.html">codebook()</a></code>. Can be called incrementally to add new missing value codes.</p></li>
+<li><p>New <code><a href="../reference/unlabel.html">unlabel()</a></code>: strips all label metadata from variables, converting <code>haven_labelled</code> vectors to plain base R types. Removes variable labels, value labels, tagged NA metadata, and format attributes. Tagged NAs become regular NA. Supports tidyselect for selective column unlabelling.</p></li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="new-functions--data-transformation-0-6-0">New Functions — Data Transformation<a class="anchor" aria-label="anchor" href="#new-functions--data-transformation-0-6-0"></a></h3>
+<ul><li><p>New <code><a href="../reference/rec.html">rec()</a></code>: flexible recoding with string syntax (e.g., <code>rec(data, x, rec = "1:2=1 [Low]; 3:5=2 [High]")</code>). Supports value ranges, <code>min</code>/<code>max</code> keywords, <code>copy</code> for unchanged values, and automatic value label generation from bracket syntax. Works with numeric, character, and labelled vectors.</p></li>
+<li><p>New <code><a href="../reference/to_dummy.html">to_dummy()</a></code>: creates dummy (indicator) variables from categorical or labelled vectors. Generates one 0/1 column per unique value with informative column names. Supports tidyselect for multi-variable dummy coding and <code>suffix = "label"</code> to use value labels in column names.</p></li>
+<li><p>New <code><a href="../reference/std.html">std()</a></code>: z-standardization with four methods (<code>"sd"</code>, <code>"2sd"</code>, <code>"mad"</code>, <code>"gmd"</code>). Supports survey weights, grouped standardization via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and <code>robust = TRUE</code> for median/MAD-based standardization.</p></li>
+<li><p>New <code><a href="../reference/center.html">center()</a></code>: mean-centering (grand-mean or group-mean). Supports survey weights and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code> for group-mean centering. Returns centered values with the centering value stored as an attribute.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions--row-operations-0-6-0">New Functions — Row Operations<a class="anchor" aria-label="anchor" href="#new-functions--row-operations-0-6-0"></a></h3>
+<ul><li><p>New <code><a href="../reference/row_means.html">row_means()</a></code>: computes row-wise means across selected columns, with <code>min_valid</code> parameter matching SPSS <code>MEAN.x()</code> syntax. Designed for use inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>. Replaces the deprecated <code>scale_index()</code>.</p></li>
+<li><p>New <code><a href="../reference/row_sums.html">row_sums()</a></code>: computes row-wise sums across selected columns, with <code>min_valid</code> parameter for minimum valid (non-NA) values.</p></li>
+<li><p>New <code><a href="../reference/row_count.html">row_count()</a></code>: counts occurrences of specific values per row. Useful for counting endorsements in multi-item scales (e.g., how many items a respondent agreed with).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions--data-exploration-0-6-0">New Functions — Data Exploration<a class="anchor" aria-label="anchor" href="#new-functions--data-exploration-0-6-0"></a></h3>
+<ul><li>New <code><a href="../reference/find_var.html">find_var()</a></code>: searches variables by name or label using regular expressions. Returns matching variable names with their labels. Useful for exploring large survey datasets with many variables.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-0-6-0">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-0"></a></h3>
+<ul><li>
+<code>scale_index()</code> has been removed and replaced by <code><a href="../reference/row_means.html">row_means()</a></code>, which provides the same functionality with a clearer name. Update existing code: <code>scale_index(data, x, y, z)</code> → <code>row_means(data, x, y, z)</code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.6" id="mariposa-056">mariposa 0.5.6<a class="anchor" aria-label="anchor" href="#mariposa-056"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-5-6">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-6"></a></h3>
+<ul><li><p>New <code><a href="../reference/write_spss.html">write_spss()</a></code> function: exports data frames to SPSS <code>.sav</code> format with full tagged NA roundtripping. Tagged NAs are converted back to SPSS user-defined missing values, enabling lossless roundtrips via <code><a href="../reference/read_spss.html">read_spss()</a></code> -&gt; processing -&gt; <code><a href="../reference/write_spss.html">write_spss()</a></code>. Supports byte, none, and zsav compression.</p></li>
+<li><p>New <code><a href="../reference/write_stata.html">write_stata()</a></code> function: exports data frames to Stata <code>.dta</code> format. Tagged NAs from any source format are written as Stata extended missing values (<code>.a</code> through <code>.z</code>). Supports Stata versions 8-15.</p></li>
+<li><p>New <code><a href="../reference/write_xpt.html">write_xpt()</a></code> function: exports data frames to SAS transport <code>.xpt</code> format. Tagged NAs are written as SAS special missing values (<code>.A</code> through <code>.Z</code>, <code>._</code>). Supports transport versions 5 and 8.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-0-5-6">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-5-6"></a></h3>
+<ul><li>mariposa now provides a unified data import/export platform:
+<ul><li>
+<strong>Import</strong>: <code><a href="../reference/read_spss.html">read_spss()</a></code>, <code><a href="../reference/read_por.html">read_por()</a></code>, <code><a href="../reference/read_stata.html">read_stata()</a></code>, <code><a href="../reference/read_sas.html">read_sas()</a></code>, <code><a href="../reference/read_xpt.html">read_xpt()</a></code>, <code><a href="../reference/read_xlsx.html">read_xlsx()</a></code>
+</li>
+<li>
+<strong>Export</strong>: <code><a href="../reference/write_spss.html">write_spss()</a></code>, <code><a href="../reference/write_stata.html">write_stata()</a></code>, <code><a href="../reference/write_xpt.html">write_xpt()</a></code>, <code><a href="../reference/write_xlsx.html">write_xlsx()</a></code>
+</li>
+</ul></li>
+<li>Cross-format export is supported: data imported from one format can be exported to another (e.g., SPSS to Stata) with automatic missing value type conversion.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.5" id="mariposa-055">mariposa 0.5.5<a class="anchor" aria-label="anchor" href="#mariposa-055"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-5-5">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-5"></a></h3>
+<ul><li>New <code><a href="../reference/read_xlsx.html">read_xlsx()</a></code> function: reads Excel (<code>.xlsx</code>) files with automatic label reconstruction. When reading back files created by <code><a href="../reference/write_xlsx.html">write_xlsx()</a></code>, variable labels, value labels, and tagged NA metadata are fully restored – enabling lossless roundtripping of labelled survey data through Excel.
+<ul><li>Auto-detects mariposa export format (data frame, list, codebook)</li>
+<li>Reconstructs <code>haven_labelled</code> columns, factor levels, and variable labels</li>
+<li>Restores tagged NAs with <code>na_tag_map</code> from missing codes in the data</li>
+<li>Works as a plain Excel reader for non-mariposa files</li>
+</ul></li>
+<li>New <code><a href="../reference/write_xlsx.html">write_xlsx()</a></code> generic: exports data frames, codebooks, and named lists to Excel (<code>.xlsx</code>) with full support for variable labels, value labels, and tagged NA metadata. Uses <code>openxlsx2</code> as an optional dependency.
+<ul><li>
+<code>write_xlsx(data, "file.xlsx")</code> – data + “Labels” reference sheet with variable labels, value labels, and missing value codes</li>
+<li>
+<code>codebook(data) |&gt; write_xlsx("codebook.xlsx")</code> – structured codebook workbook with Overview, Codebook, and optional per-variable frequency sheets (<code>frequencies = TRUE</code>)</li>
+<li>
+<code>write_xlsx(list(a = df1, b = df2), "multi.xlsx")</code> – multi-sheet export where each named list element becomes a sheet</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-0-5-5">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-5-5"></a></h3>
+<ul><li>
+<code><a href="../reference/write_xlsx.html">write_xlsx()</a></code> now preserves tagged NA codes (-9, -11, etc.) as visible values in the data sheet instead of empty cells, enabling perfect roundtripping with <code><a href="../reference/read_xlsx.html">read_xlsx()</a></code>. System NAs remain as empty cells.</li>
+<li>The “Labels” sheet now includes a <code>Column_Type</code> column (<code>haven_labelled</code> or <code>factor</code>) so <code><a href="../reference/read_xlsx.html">read_xlsx()</a></code> can deterministically reconstruct column types.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="dependencies-0-5-5">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies-0-5-5"></a></h3>
+<ul><li>Added <code>openxlsx2</code> as a suggested dependency for Excel import/export.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.4" id="mariposa-054">mariposa 0.5.4<a class="anchor" aria-label="anchor" href="#mariposa-054"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-5-4">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-4"></a></h3>
+<ul><li><p>New <code><a href="../reference/read_stata.html">read_stata()</a></code> function: reads Stata <code>.dta</code> files and annotates native extended missing values (<code>.a</code> through <code>.z</code>) for use with mariposa’s tagged NA system. Stata tagged NAs are preserved automatically by haven; <code><a href="../reference/read_stata.html">read_stata()</a></code> adds the <code>na_tag_map</code> attribute for seamless integration with <code><a href="../reference/na_frequencies.html">na_frequencies()</a></code>, <code><a href="../reference/frequency.html">frequency()</a></code>, and <code><a href="../reference/codebook.html">codebook()</a></code>.</p></li>
+<li><p>New <code><a href="../reference/read_sas.html">read_sas()</a></code> function: reads SAS <code>.sas7bdat</code> files with optional catalog file (<code>.sas7bcat</code>) for value labels. Annotates SAS special missing values (<code>.A</code> through <code>.Z</code> and <code>._</code>) for tagged NA integration.</p></li>
+<li><p>New <code><a href="../reference/read_xpt.html">read_xpt()</a></code> function: reads SAS transport files (<code>.xpt</code>) with tagged missing value support. Transport files are the FDA-approved, platform-independent SAS data format.</p></li>
+<li><p>New <code><a href="../reference/read_por.html">read_por()</a></code> function: reads SPSS portable <code>.por</code> files with the same tagged NA support as <code><a href="../reference/read_spss.html">read_spss()</a></code>. Shares the SPSS missing value conversion logic internally.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-0-5-4">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-5-4"></a></h3>
+<ul><li>
+<code><a href="../reference/na_frequencies.html">na_frequencies()</a></code> column <code>spss_code</code> has been renamed to <code>code</code> to reflect multi-format support. The column now contains character values: numeric SPSS codes (e.g., <code>"-9"</code>) or native format codes (e.g., <code>".a"</code> for Stata, <code>".A"</code> for SAS).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-5-4">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-5-4"></a></h3>
+<ul><li><p><code><a href="../reference/na_frequencies.html">na_frequencies()</a></code>, <code><a href="../reference/untag_na.html">untag_na()</a></code>, and <code><a href="../reference/strip_tags.html">strip_tags()</a></code> now work universally with data from all supported formats (SPSS, Stata, SAS).</p></li>
+<li><p><code><a href="../reference/untag_na.html">untag_na()</a></code> is now format-aware: for Stata and SAS data (where tagged NAs are the native representation with no numeric codes to recover), it warns and falls back to <code><a href="../reference/strip_tags.html">strip_tags()</a></code> behavior.</p></li>
+<li><p><code><a href="../reference/frequency.html">frequency()</a></code> and <code><a href="../reference/codebook.html">codebook()</a></code> automatically display format-appropriate missing value codes (e.g., <code>-9</code> for SPSS, <code>.a</code> for Stata, <code>.A</code> for SAS).</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.3" id="mariposa-053">mariposa 0.5.3<a class="anchor" aria-label="anchor" href="#mariposa-053"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-5-3">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-3"></a></h3>
+<ul><li><p>New <code><a href="../reference/read_spss.html">read_spss()</a></code> function: reads SPSS <code>.sav</code> files and preserves user-defined missing values as tagged NAs instead of converting them to regular <code>NA</code>. This allows distinguishing between different types of missing data (e.g., “no answer”, “not applicable”, “refused”) while still treating them as <code>NA</code> in standard R operations. Fixes the <code>sjlabelled::read_spss(tag.na=TRUE)</code> crash on large datasets (e.g., ALLBUS) caused by out-of-bounds <code>letters[]</code> indexing.</p></li>
+<li><p>New <code><a href="../reference/na_frequencies.html">na_frequencies()</a></code> function: shows a breakdown of the different types of missing values in a tagged NA variable, with counts, original SPSS codes, and value labels.</p></li>
+<li><p>New <code><a href="../reference/untag_na.html">untag_na()</a></code> function: converts tagged NAs back to their original SPSS missing value codes (e.g., -9, -8, -42).</p></li>
+<li><p>New <code><a href="../reference/strip_tags.html">strip_tags()</a></code> function: converts all tagged NAs to regular (untagged) <code>NA</code> values, producing the same result as reading with <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> directly.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-5-3">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-5-3"></a></h3>
+<ul><li><p><code><a href="../reference/frequency.html">frequency()</a></code> now displays tagged NAs individually when data was imported with <code><a href="../reference/read_spss.html">read_spss()</a></code>. Each missing value type is shown as a separate row with its original SPSS code and label, followed by a “Total Valid” and “Total Missing” summary row.</p></li>
+<li><p><code><a href="../reference/frequency.html">frequency()</a></code> with <code>show.unused = TRUE</code> correctly handles tagged NA labels (no longer shows them as unused with freq=0).</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.2.2" id="mariposa-0522">mariposa 0.5.2.2<a class="anchor" aria-label="anchor" href="#mariposa-0522"></a></h2>
+<div class="section level3">
+<h3 id="convenience-0-5-2-2">Convenience<a class="anchor" aria-label="anchor" href="#convenience-0-5-2-2"></a></h3>
+<ul><li>New <code><a href="../reference/frequency.html">fre()</a></code> shorthand alias for <code><a href="../reference/frequency.html">frequency()</a></code>. Both functions are identical; <code><a href="../reference/frequency.html">fre()</a></code> simply provides a quicker way to call frequency analysis. <code><a href="../reference/frequency.html">?fre</a></code> shows the same help page as <code><a href="../reference/frequency.html">?frequency</a></code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.2" id="mariposa-052">mariposa 0.5.2<a class="anchor" aria-label="anchor" href="#mariposa-052"></a></h2>
 <div class="section level3">
@@ -172,7 +314,7 @@
 <h3 id="new-functions-0-2-0">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-0-2-0"></a></h3>
 <ul><li><p>Added <code><a href="../reference/reliability.html">reliability()</a></code> for Cronbach’s Alpha with item statistics, including corrected item-total correlations, alpha-if-item-deleted, and inter-item correlation matrix. Genuine implementation with full survey weight support.</p></li>
 <li><p>Added <code><a href="../reference/efa.html">efa()</a></code> for Exploratory Factor Analysis with PCA extraction. Supports Varimax rotation (Base R) and Oblimin rotation (via optional <code>GPArotation</code> package). Includes KMO measure, Bartlett’s test, communalities, and sorted factor loading matrix with configurable blank threshold.</p></li>
-<li><p>Added <code><a href="../reference/scale_index.html">scale_index()</a></code> for creating mean indices across survey items, with <code>min_valid</code> parameter matching SPSS <code>MEAN.x()</code> syntax. Designed for use inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>.</p></li>
+<li><p>Added <code>scale_index()</code> for creating mean indices across survey items, with <code>min_valid</code> parameter matching SPSS <code>MEAN.x()</code> syntax. Designed for use inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>.</p></li>
 <li><p>Added <code><a href="../reference/pomps.html">pomps()</a></code> for Percent of Maximum Possible Scores transformation, rescaling values to a 0-100 range for cross-scale comparability.</p></li>
 <li><p>Added <code><a href="../reference/linear_regression.html">linear_regression()</a></code> as a wrapper around <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">stats::lm()</a></code> with SPSS-compatible output: coefficients table (B, SE, Beta, t, p), ANOVA table, model summary (R, R-squared, adjusted R-squared), and standardized coefficients. Supports both formula and SPSS-style (dependent/predictors) interfaces.</p></li>
 <li><p>Added <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> as a wrapper around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">stats::glm()</a></code> with odds ratios, Wald statistics, pseudo-R-squared measures (Nagelkerke, Cox-Snell, McFadden), and classification table.</p></li>

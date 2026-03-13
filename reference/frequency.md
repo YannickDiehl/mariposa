@@ -24,8 +24,13 @@ frequency(
   show.prc = TRUE,
   show.valid = TRUE,
   show.sum = TRUE,
-  show.labels = "auto"
+  show.labels = "auto",
+  show.unused = FALSE
 )
+
+fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
+  show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto",
+  show.unused = FALSE)
 ```
 
 ## Arguments
@@ -77,6 +82,15 @@ frequency(
   Show category labels if available? (Default: "auto" - shows labels
   when they exist)
 
+- show.unused:
+
+  Show all defined value labels, even those with zero observations?
+  (Default: FALSE). When TRUE, values that have labels defined (e.g.,
+  from statistical software files) but no cases in the data are included
+  with frequency 0. This is useful for labelled datasets where unused
+  categories should still appear in the output. Automatically enables
+  label display.
+
 ## Value
 
 A frequency table showing counts and percentages for each category
@@ -114,6 +128,19 @@ Without weights, you're describing your sample. With weights, you're
 estimating population values. Always use weights for population
 inference.
 
+### Tagged Missing Values
+
+When data is imported with tagged NAs (e.g., via
+[`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
+with `tag.na = TRUE`, or
+[`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
+[`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md),
+[`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)
+with the `tag.na` parameter), `frequency()` automatically expands the
+missing value section to show each missing type individually (with its
+original missing value code and label), plus summary rows for **Total
+Valid** and **Total Missing**.
+
 ## See also
 
 [`table`](https://rdrr.io/r/base/table.html) for base R frequency
@@ -148,12 +175,14 @@ survey_data %>% frequency(gender)
 #> gender (Gender)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Male  |Male                |1194    |47.76   |47.76   |47.76   |
-#> |Female|Female              |1306    |52.24   |52.24   |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |
+#> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2500 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
 #> 
 
 # Multiple variables with weights
@@ -165,23 +194,27 @@ survey_data %>% frequency(gender, region, weights = sampling_weight)
 #> gender (Gender)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Male  |Male                |1195    |47.48   |47.48   |47.48   |
-#> |Female|Female              |1321    |52.52   |52.52   |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |   1195 |  47.48 |  47.48 |  47.48 |
+#> | Female | Female |   1321 |  52.52 |  52.52 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2516 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
 #> 
 #> 
 #> region (Region (East/West))
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |East  |East                |509     |20.23   |20.23   |20.23   |
-#> |West  |West                |2007    |79.77   |79.77   |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   East |   East |    509 |  20.23 |  20.23 |  20.23 |
+#> |   West |   West |   2007 |  79.77 |  79.77 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2516 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
 #> 
 
 # Grouped analysis by region
@@ -198,24 +231,28 @@ survey_data %>%
 #> --------------------
 #> # total N=509 valid N=509 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Male  |Male                |249     |49.01   |49.01   |49.01   |
-#> |Female|Female              |260     |50.99   |50.99   |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |    249 |  49.01 |  49.01 |  49.01 |
+#> | Female | Female |    260 |  50.99 |  50.99 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |    509 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
 #> 
 #> 
 #> Group: region = West
 #> --------------------
 #> # total N=2007 valid N=2007 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Male  |Male                |945     |47.09   |47.09   |47.09   |
-#> |Female|Female              |1062    |52.91   |52.91   |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |    945 |  47.09 |  47.09 |  47.09 |
+#> | Female | Female |   1062 |  52.91 |  52.91 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2007 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
 #> 
 
 # Education levels with sorting
@@ -227,14 +264,16 @@ survey_data %>% frequency(education, sort.frq = "desc")
 #> education (Highest educational attainment)
 #> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Univer|University          |399     |15.96   |15.96   |100.00  |
-#> |Interm|Intermediate Seconda|629     |25.16   |25.16   |58.80   |
-#> |Basic |Basic Secondary     |841     |33.64   |33.64   |33.64   |
-#> |Academ|Academic Secondary  |631     |25.24   |25.24   |84.04   |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |             University |             University |    399 |  15.96 |  15.96 | 100.00 |
+#> | Intermediate Secondary | Intermediate Secondary |    629 |  25.16 |  25.16 |  58.80 |
+#> |        Basic Secondary |        Basic Secondary |    841 |  33.64 |  33.64 |  33.64 |
+#> |     Academic Secondary |     Academic Secondary |    631 |  25.24 |  25.24 |  84.04 |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Total |                        |   2500 | 100.00 | 100.00 |        |
+#> +------------------------+------------------------+--------+--------+--------+--------+
 #> 
 
 # Employment status with custom display options
@@ -247,14 +286,16 @@ survey_data %>% frequency(employment, weights = sampling_weight,
 #> employment (Employment status)
 #> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
 #> 
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Value |Label               |N       |Raw %   |Valid % |Cum. %  |
-#> +------+--------------------+--------+--------+--------+--------+
-#> |Studen|Student             |80      |3.18    |3.18    |3.18    |
-#> |Employ|Employed            |1603    |63.71   |63.71   |66.89   |
-#> |Unempl|Unemployed          |184     |7.32    |7.32    |74.21   |
-#> |Retire|Retired             |534     |21.21   |21.21   |95.41   |
-#> |Other |Other               |115     |4.59    |4.59    |100.00  |
-#> +------+--------------------+--------+--------+--------+--------+
+#> +------------+------------+--------+--------+--------+--------+
+#> |      Value |      Label |      N |  Raw % |Valid % | Cum. % |
+#> +------------+------------+--------+--------+--------+--------+
+#> |    Student |    Student |     80 |   3.18 |   3.18 |   3.18 |
+#> |   Employed |   Employed |   1603 |  63.71 |  63.71 |  66.89 |
+#> | Unemployed | Unemployed |    184 |   7.32 |   7.32 |  74.21 |
+#> |    Retired |    Retired |    534 |  21.21 |  21.21 |  95.41 |
+#> |      Other |      Other |    115 |   4.59 |   4.59 | 100.00 |
+#> +------------+------------+--------+--------+--------+--------+
+#> |      Total |            |   2516 | 100.00 | 100.00 |        |
+#> +------------+------------+--------+--------+--------+--------+
 #> 
 ```

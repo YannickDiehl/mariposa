@@ -1,5 +1,67 @@
 # Package index
 
+## Data Import
+
+Import statistical data files with preserved missing value information
+
+- [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
+  : Read SPSS Data with Tagged Missing Values
+- [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md)
+  : Read SPSS Portable Data with Tagged Missing Values
+- [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)
+  : Read Stata Data with Tagged Missing Values
+- [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md)
+  : Read SAS Data with Tagged Missing Values
+- [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)
+  : Read SAS Transport File with Tagged Missing Values
+- [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)
+  : Read Excel Data with Label Reconstruction
+- [`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md)
+  : Frequency Table of Missing Value Types
+- [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md)
+  : Convert Tagged NAs Back to Original Codes
+- [`strip_tags()`](https://YannickDiehl.github.io/mariposa/reference/strip_tags.md)
+  : Strip Tags from Tagged NAs
+
+## Data Export
+
+Export data to statistical formats with preserved labels and missing
+values
+
+- [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+  : Export Data to SPSS Format
+- [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md)
+  : Export Data to Stata Format
+- [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)
+  : Export Data to SAS Transport Format
+- [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)
+  : Export Data to Excel with Label Support
+
+## Label Management
+
+Inspect, modify, and convert labelled survey data
+
+- [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md)
+  : Get or Set Variable Labels
+- [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md)
+  : Get or Set Value Labels
+- [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md)
+  : Copy Labels from One Data Frame to Another
+- [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md)
+  : Remove Unused Value Labels
+- [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
+  : Convert Labelled Variables to Factors
+- [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md)
+  : Convert Labelled Variables to Character
+- [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md)
+  : Convert Factors or Labelled Variables to Numeric
+- [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)
+  : Convert Variables to Labelled Format
+- [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)
+  : Declare Values as Missing
+- [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md)
+  : Remove All Label Metadata
+
 ## Descriptive Statistics
 
 Summarize and explore your survey data
@@ -9,6 +71,7 @@ Summarize and explore your survey data
 - [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
   : Get to Know Your Numeric Data
 - [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  [`fre()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
   : Count How Many People Chose Each Option
 - [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
   : Compare Two Categories: See How They Relate
@@ -79,6 +142,26 @@ Follow-up tests for detailed group comparisons
 - [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md)
   : Find Which Specific Measurements Differ After Friedman Test
 
+## Data Transformation
+
+Recode, dichotomize, dummy-code, standardize, and center variables
+
+- [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md) :
+  Recode Variables Using String Syntax
+- [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md)
+  : Create Dummy Variables (One-Hot Encoding)
+- [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md) :
+  Standardize Variables (Z-Scores)
+- [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md)
+  : Center Variables (Mean Centering)
+
+## Data Exploration
+
+Search and inspect your data
+
+- [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md)
+  : Find Variables by Name or Label
+
 ## Scale Analysis
 
 Factor analysis, reliability, and scale construction
@@ -87,10 +170,14 @@ Factor analysis, reliability, and scale construction
   : Check How Reliably Your Scale Measures a Concept
 - [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md) :
   Explore the Structure Behind Your Survey Items
-- [`scale_index()`](https://YannickDiehl.github.io/mariposa/reference/scale_index.md)
-  : Create a Mean Index Across Items
 - [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)
   : Transform Scores to Percent of Maximum Possible (POMPS)
+- [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)
+  : Compute Row Means Across Items
+- [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)
+  : Compute Row Sums Across Items
+- [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md)
+  : Count Occurrences of a Value Across Columns
 
 ## Regression Analysis
 
