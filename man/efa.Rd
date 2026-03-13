@@ -202,13 +202,15 @@ summary(result, communalities = FALSE)  # hide communalities table
 \seealso{
 \code{\link{reliability}} for checking scale reliability before creating indices.
 
-\code{\link{scale_index}} for creating mean indices after identifying factors.
+\code{\link{row_means}} for creating mean indices after identifying factors.
 
 \code{\link{summary.efa}} for detailed output with toggleable sections.
 
 Other scale: 
 \code{\link{pomps}()},
 \code{\link{reliability}()},
-\code{\link{scale_index}()}
+\code{\link{row_count}()},
+\code{\link{row_means}()},
+\code{\link{row_sums}()}
 }
 \concept{scale}

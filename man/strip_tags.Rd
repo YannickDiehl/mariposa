@@ -7,7 +7,7 @@
 strip_tags(x)
 }
 \arguments{
-\item{x}{A numeric vector with tagged NAs (from \code{\link[=read_spss]{read_spss()}}).}
+\item{x}{A numeric vector with tagged NAs.}
 }
 \value{
 A numeric vector where all tagged NAs have been replaced with
@@ -16,8 +16,9 @@ valid values are preserved.
 }
 \description{
 Converts all tagged NAs to regular (untagged) \code{NA} values, effectively
-removing the missing value type information. This produces the same result
-as reading the file with \code{haven::read_sav()} directly.
+removing the missing value type information. Works with data from any
+format: \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_por]{read_por()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, or
+\code{\link[=read_xpt]{read_xpt()}}.
 }
 \examples{
 \dontrun{
@@ -28,11 +29,17 @@ clean <- strip_tags(data$satisfaction)
 
 }
 \seealso{
-\code{\link[=read_spss]{read_spss()}}, \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}
+\code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}},
+\code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}
 
-Other spss: 
+Other data-import: 
 \code{\link{na_frequencies}()},
+\code{\link{read_por}()},
+\code{\link{read_sas}()},
 \code{\link{read_spss}()},
+\code{\link{read_stata}()},
+\code{\link{read_xlsx}()},
+\code{\link{read_xpt}()},
 \code{\link{untag_na}()}
 }
-\concept{spss}
+\concept{data-import}

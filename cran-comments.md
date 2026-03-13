@@ -18,6 +18,6 @@
 
 ## Package details
 
-* 44 exported functions across 11 categories
+* 76 exported functions across 15 categories
 * 4,986+ unit tests including SPSS v29 cross-validation
 * All tests pass on all platforms

@@ -171,7 +171,7 @@
 #' @seealso
 #' \code{\link{reliability}} for checking scale reliability before creating indices.
 #'
-#' \code{\link{scale_index}} for creating mean indices after identifying factors.
+#' \code{\link{row_means}} for creating mean indices after identifying factors.
 #'
 #' \code{\link{summary.efa}} for detailed output with toggleable sections.
 #'

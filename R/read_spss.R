@@ -46,9 +46,9 @@
 #' }
 #'
 #' @seealso [na_frequencies()], [untag_na()], [strip_tags()], [haven::read_sav()],
-#'   [frequency()]
+#'   [frequency()], [read_por()]
 #'
-#' @family spss
+#' @family data-import
 #'
 #' @examples
 #' \dontrun{
@@ -74,7 +74,10 @@
 #' @export
 read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
   if (!requireNamespace("haven", quietly = TRUE)) {
-    stop("Package \"haven\" required. Please install it.", call. = FALSE)
+    cli::cli_abort(c(
+      "Package {.pkg haven} is required for SPSS import.",
+      "i" = "Install it with: {.code install.packages(\"haven\")}"
+    ))
   }
 
   # Read with user_na = TRUE to preserve missing value metadata as attributes
@@ -83,6 +86,75 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
 
   if (!tag.na) return(data)
 
+  .tag_spss_missing_values(data, verbose)
+}
+
+
+#' Read SPSS Portable Data with Tagged Missing Values
+#'
+#' @description
+#' Reads an SPSS portable `.por` file and preserves user-defined missing values
+#' as tagged NAs. This is the portable format equivalent of [read_spss()] for
+#' `.sav` files.
+#'
+#' @param path Path to an SPSS `.por` file.
+#' @param tag.na If `TRUE` (the default), user-defined missing values are
+#'   converted to tagged NAs using [haven::tagged_na()]. If `FALSE`, the file
+#'   is read with standard `haven::read_por()` behavior.
+#' @param verbose If `TRUE`, prints a message summarizing how many values were
+#'   converted.
+#'
+#' @return A tibble with the SPSS data. See [read_spss()] for details on
+#'   tagged NA handling.
+#'
+#' @details
+#' The SPSS portable format (`.por`) is an older, platform-independent format.
+#' Unlike `.sav` files, the portable format does not support specifying a
+#' character encoding. Tagged NA handling is identical to [read_spss()].
+#'
+#' @seealso [read_spss()], [na_frequencies()], [untag_na()], [strip_tags()],
+#'   [haven::read_por()]
+#'
+#' @family data-import
+#'
+#' @examples
+#' \dontrun{
+#' data <- read_por("survey.por")
+#' na_frequencies(data$satisfaction)
+#' }
+#'
+#' @export
+read_por <- function(path, tag.na = TRUE, verbose = FALSE) {
+  if (!requireNamespace("haven", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Package {.pkg haven} is required for SPSS portable import.",
+      "i" = "Install it with: {.code install.packages(\"haven\")}"
+    ))
+  }
+
+  data <- haven::read_por(file = path, user_na = tag.na)
+
+  if (!tag.na) return(data)
+
+  .tag_spss_missing_values(data, verbose)
+}
+
+
+# ---- Internal Helpers -------------------------------------------------------
+
+#' Convert SPSS user-defined missing values to tagged NAs
+#'
+#' Shared internal helper for read_spss() and read_por().
+#' Iterates over numeric columns, replaces values marked as missing
+#' (via na_values/na_range attributes) with haven::tagged_na(),
+#' and stores the mapping in the na_tag_map attribute.
+#'
+#' @param data A tibble read with haven::read_sav() or haven::read_por()
+#'   with user_na = TRUE.
+#' @param verbose If TRUE, print a summary message.
+#' @return The modified tibble with tagged NAs.
+#' @noRd
+.tag_spss_missing_values <- function(data, verbose) {
   n_converted <- 0L
   n_vars_converted <- 0L
 
@@ -118,12 +190,8 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
     # Assign tag characters: a-z, A-Z, 0-9 (62 possible tags per variable)
     tag_pool <- c(letters, LETTERS, as.character(0:9))
     if (length(missing_vals) > length(tag_pool)) {
-      warning(
-        sprintf(
-          "Variable '%s' has %d missing value codes; only the first %d will be tagged.",
-          names(data)[i], length(missing_vals), length(tag_pool)
-        ),
-        call. = FALSE
+      cli::cli_warn(
+        "Variable {.var {names(data)[i]}} has {length(missing_vals)} missing value codes; only the first {length(tag_pool)} will be tagged."
       )
       missing_vals <- missing_vals[seq_len(length(tag_pool))]
     }
@@ -173,17 +241,15 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
 
     # Store the tag-to-code mapping for recovery
     attr(new_x, "na_tag_map") <- stats::setNames(missing_vals, tag_chars)
+    attr(new_x, "na_tag_format") <- "spss"
 
     data[[i]] <- new_x
     n_vars_converted <- n_vars_converted + 1L
   }
 
   if (verbose) {
-    message(
-      sprintf(
-        "Converted %s values in %d variables to tagged NAs.",
-        format(n_converted, big.mark = ","), n_vars_converted
-      )
+    cli::cli_inform(
+      "Converted {format(n_converted, big.mark = ',')} values in {n_vars_converted} variable{?s} to tagged NAs."
     )
   }
 
@@ -191,40 +257,199 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
 }
 
 
+#' Tag user-specified values as missing (for Stata/SAS files without native tags)
+#'
+#' When Stata or SAS files contain missing value codes as regular numeric values
+#' (e.g., -9, -42), this helper converts them to tagged NAs.
+#' Reuses the same logic as .tag_spss_missing_values() but with
+#' user-supplied missing values instead of attribute-derived ones.
+#'
+#' @param data A tibble read with haven::read_dta(), read_sas(), or read_xpt().
+#' @param missing_values Numeric vector of values to treat as missing.
+#' @param format Character string: "stata" or "sas".
+#' @param verbose If TRUE, print a summary message.
+#' @return The modified tibble with tagged NAs.
+#' @noRd
+.tag_user_missing_values <- function(data, missing_values, format, verbose) {
+  missing_values <- sort(unique(missing_values))
+  if (length(missing_values) == 0L) return(data)
+
+  # Assign tag characters: a-z, A-Z, 0-9 (62 possible tags)
+  tag_pool <- c(letters, LETTERS, as.character(0:9))
+  if (length(missing_values) > length(tag_pool)) {
+    cli::cli_warn(
+      "{.arg tag.na} has {length(missing_values)} values; only the first {length(tag_pool)} will be tagged."
+    )
+    missing_values <- missing_values[seq_len(length(tag_pool))]
+  }
+  tag_chars <- tag_pool[seq_along(missing_values)]
+
+  # Pre-compute tagged NAs once (same for all variables)
+  tagged_nas <- haven::tagged_na(tag_chars)
+  names(tagged_nas) <- as.character(missing_values)
+
+  n_converted <- 0L
+  n_vars_converted <- 0L
+
+  for (i in seq_len(ncol(data))) {
+    x <- data[[i]]
+    if (!is.numeric(x)) next
+
+    # Skip columns that already have na_tag_map (native tagged NAs)
+    if (!is.null(attr(x, "na_tag_map"))) next
+
+    raw <- as.double(x)
+    labels <- attr(x, "labels", exact = TRUE)
+
+    # Find which missing values actually occur in this column
+    present_idx <- which(vapply(
+      missing_values,
+      function(mv) any(!is.na(raw) & raw == mv),
+      logical(1)
+    ))
+    if (length(present_idx) == 0L) next
+
+    # Replace matching values with tagged NAs
+    for (j in present_idx) {
+      mask <- !is.na(raw) & raw == missing_values[j]
+      n_matches <- sum(mask)
+      if (n_matches > 0L) {
+        raw[mask] <- tagged_nas[j]
+        n_converted <- n_converted + n_matches
+      }
+    }
+
+    # Update value labels: replace missing-value labels with tagged NA equivalents
+    if (!is.null(labels)) {
+      is_missing_label <- labels %in% missing_values
+      valid_labels   <- labels[!is_missing_label]
+      missing_labels <- labels[is_missing_label]
+
+      new_missing_labels <- numeric(0)
+      for (ml in seq_along(missing_labels)) {
+        val <- unname(missing_labels[ml])
+        idx <- match(val, missing_values)
+        if (!is.na(idx)) {
+          tna <- tagged_nas[idx]
+          names(tna) <- names(missing_labels)[ml]
+          new_missing_labels <- c(new_missing_labels, tna)
+        }
+      }
+
+      labels <- c(valid_labels, new_missing_labels)
+    }
+
+    # Rebuild as haven_labelled vector
+    new_x <- haven::labelled(
+      raw,
+      labels = labels,
+      label = attr(x, "label", exact = TRUE)
+    )
+
+    # Store tag-to-code mapping (numeric, like SPSS) — only for present values
+    attr(new_x, "na_tag_map") <- stats::setNames(
+      missing_values[present_idx], tag_chars[present_idx]
+    )
+    attr(new_x, "na_tag_format") <- format
+
+    data[[i]] <- new_x
+    n_vars_converted <- n_vars_converted + 1L
+  }
+
+  if (verbose && n_vars_converted > 0L) {
+    cli::cli_inform(
+      "Converted {format(n_converted, big.mark = ',')} values in {n_vars_converted} variable{?s} to tagged NAs."
+    )
+  }
+
+  data
+}
+
+
+#' Build na_tag_map from native tagged NAs (Stata/SAS)
+#'
+#' For formats that have native tagged NAs (Stata .a-.z, SAS .A-.Z/._),
+#' haven already returns tagged NA values. This helper scans a column,
+#' discovers the tag characters present, and attaches the na_tag_map
+#' and na_tag_format attributes so that na_frequencies(), frequency(),
+#' and codebook() can work with them.
+#'
+#' @param x A numeric vector potentially containing native tagged NAs.
+#' @param format Either "stata" or "sas".
+#' @return The vector with na_tag_map and na_tag_format attributes set,
+#'   or unmodified if no tagged NAs are found.
+#' @noRd
+.build_na_tag_map_from_native <- function(x, format) {
+  if (!is.numeric(x)) return(x)
+
+  na_mask <- is.na(x)
+  if (!any(na_mask)) return(x)
+
+  tags <- vapply(x[na_mask], haven::na_tag, character(1))
+  unique_tags <- sort(unique(tags[!is.na(tags)]))
+
+  if (length(unique_tags) == 0L) return(x)
+
+  # Build display codes: ".a", ".b" for Stata; ".A", ".B", "._" for SAS
+  native_codes <- paste0(".", unique_tags)
+
+  attr(x, "na_tag_map") <- stats::setNames(native_codes, unique_tags)
+  attr(x, "na_tag_format") <- format
+  x
+}
+
+
+# ---- Universal Tagged NA Helpers --------------------------------------------
+
 #' Frequency Table of Missing Value Types
 #'
 #' @description
 #' Shows a breakdown of the different types of missing values in a variable
-#' that was read with [read_spss()] using `tag.na = TRUE`.
+#' that was read with [read_spss()], [read_stata()], [read_sas()], or
+#' [read_xpt()] and contains tagged NAs.
 #'
-#' @param x A numeric vector with tagged NAs (from [read_spss()]).
+#' @param x A numeric vector with tagged NAs.
 #'
 #' @return A data frame with columns:
-#'   \item{tag}{The tag character (a-z, A-Z, 0-9)}
+#'   \item{tag}{The tag character (e.g., a-z for Stata, A-Z for SAS,
+#'     a-z/A-Z/0-9 for SPSS)}
 #'   \item{n}{Number of cases with this missing type}
-#'   \item{spss_code}{The original SPSS missing value code}
-#'   \item{label}{The SPSS value label for this missing type}
+#'   \item{code}{The original missing value code: numeric SPSS codes (e.g.,
+#'     -9, -8) or native format codes (e.g., ".a" for Stata, ".A" for SAS)}
+#'   \item{label}{The value label for this missing type (if available)}
 #'
 #' @examples
 #' \dontrun{
+#' # SPSS data
 #' data <- read_spss("survey.sav")
 #' na_frequencies(data$satisfaction)
-#' #   tag    n spss_code            label
-#' # 1   b 1774       -11       TNZ: SPLIT
-#' # 2   c   63        -9     KEINE ANGABE
-#' # 3   d   11        -8 WEISS NICHT
-#' # 4   a    6       -42 DATENFEHLER: MFN
+#' #   tag    n  code            label
+#' # 1   b 1774   -11       TNZ: SPLIT
+#' # 2   c   63    -9     KEINE ANGABE
+#' # 3   d   11    -8    WEISS NICHT
+#' # 4   a    6   -42 DATENFEHLER: MFN
+#'
+#' # Stata data
+#' data <- read_stata("survey.dta")
+#' na_frequencies(data$income)
+#' #   tag  n code           label
+#' # 1   a 42   .a     Not applicable
+#' # 2   b 15   .b     Refused
 #' }
 #'
-#' @seealso [read_spss()], [untag_na()], [strip_tags()]
-#' @family spss
+#' @seealso [read_spss()], [read_stata()], [read_sas()], [read_xpt()],
+#'   [untag_na()], [strip_tags()]
+#' @family data-import
 #' @export
 na_frequencies <- function(x) {
   if (!requireNamespace("haven", quietly = TRUE)) {
-    stop("Package \"haven\" required. Please install it.", call. = FALSE)
+    cli::cli_abort(c(
+      "Package {.pkg haven} is required for tagged NA inspection.",
+      "i" = "Install it with: {.code install.packages(\"haven\")}"
+    ))
   }
   if (!is.numeric(x)) {
-    stop("`x` must be a numeric vector.", call. = FALSE)
+    cli::cli_abort("{.arg x} must be a numeric vector.")
   }
 
   tag_map <- attr(x, "na_tag_map")
@@ -234,7 +459,7 @@ na_frequencies <- function(x) {
   if (!any(na_mask)) {
     return(data.frame(
       tag = character(0), n = integer(0),
-      spss_code = numeric(0), label = character(0),
+      code = character(0), label = character(0),
       stringsAsFactors = FALSE
     ))
   }
@@ -248,11 +473,11 @@ na_frequencies <- function(x) {
     stringsAsFactors = FALSE
   )
 
-  # Add original SPSS codes
+  # Add original codes (numeric for SPSS, character for Stata/SAS)
   if (!is.null(tag_map)) {
-    result$spss_code <- tag_map[result$tag]
+    result$code <- as.character(tag_map[result$tag])
   } else {
-    result$spss_code <- NA_real_
+    result$code <- NA_character_
   }
 
   # Add value labels
@@ -267,8 +492,8 @@ na_frequencies <- function(x) {
 
   # Handle system NAs (tag = NA)
   sys_na_rows <- is.na(result$tag)
-  result$label[sys_na_rows]     <- "(System Missing)"
-  result$spss_code[sys_na_rows] <- NA_real_
+  result$label[sys_na_rows] <- "(System Missing)"
+  result$code[sys_na_rows]  <- NA_character_
 
   result <- result[order(-result$n), , drop = FALSE]
   rownames(result) <- NULL
@@ -276,35 +501,61 @@ na_frequencies <- function(x) {
 }
 
 
-#' Convert Tagged NAs Back to Original SPSS Codes
+#' Convert Tagged NAs Back to Original Codes
 #'
 #' @description
-#' Replaces tagged NAs with their original SPSS missing value codes, turning
-#' `NA` values back into the numeric codes that SPSS used (e.g., -9, -8, -42).
+#' Replaces tagged NAs with their original missing value codes. Works with
+#' data imported via [read_spss()] (with `tag.na = TRUE`) or any reader
+#' that used the `tag.na` parameter ([read_stata()], [read_sas()],
+#' [read_xpt()]). For native Stata/SAS tagged NAs (e.g., `.a`, `.A`) that
+#' have no numeric codes to recover, use [strip_tags()] instead.
 #'
-#' @param x A numeric vector with tagged NAs (from [read_spss()]).
+#' @param x A numeric vector with tagged NAs.
 #'
-#' @return A numeric vector where tagged NAs have been replaced with their
-#'   original SPSS codes. System NAs (untagged) remain as `NA`.
+#' @return A numeric vector where tagged NAs with numeric codes have been
+#'   replaced with their original values (e.g., -9, -8, -42). System NAs
+#'   (untagged) remain as `NA`. For native Stata/SAS tagged NAs (no numeric
+#'   codes), falls back to [strip_tags()] behavior with a warning.
 #'
 #' @examples
 #' \dontrun{
+#' # SPSS data
 #' data <- read_spss("survey.sav")
-#' # Recover original codes
 #' original <- untag_na(data$satisfaction)
-#' table(original, useNA = "always")
+#'
+#' # Stata data with tag.na
+#' data <- read_stata("survey.dta", tag.na = c(-9, -8, -42))
+#' original <- untag_na(data$income)
 #' }
 #'
-#' @seealso [read_spss()], [na_frequencies()], [strip_tags()]
-#' @family spss
+#' @seealso [read_spss()], [read_stata()], [read_sas()], [na_frequencies()],
+#'   [strip_tags()]
+#' @family data-import
 #' @export
 untag_na <- function(x) {
   if (!requireNamespace("haven", quietly = TRUE)) {
-    stop("Package \"haven\" required. Please install it.", call. = FALSE)
+    cli::cli_abort(c(
+      "Package {.pkg haven} is required for tagged NA recovery.",
+      "i" = "Install it with: {.code install.packages(\"haven\")}"
+    ))
   }
 
   tag_map <- attr(x, "na_tag_map")
   if (is.null(tag_map)) return(as.double(x))
+
+  # Check if tag_map contains recoverable numeric codes (from tag.na)
+  # vs native format codes (character strings like ".a", ".A")
+  has_numeric_codes <- is.numeric(tag_map)
+
+  if (!has_numeric_codes) {
+    fmt <- attr(x, "na_tag_format") %||% "unknown"
+    cli::cli_warn(c(
+      "{.fn untag_na} recovers numeric missing codes.",
+      "i" = "For {toupper(fmt)} data with native tagged NAs, there are no numeric codes to recover.",
+      "i" = "Use {.fn strip_tags} to convert them to regular {.val NA}."
+    ))
+    return(strip_tags(x))
+  }
 
   raw <- as.double(x)
   na_positions <- which(is.na(x))
@@ -330,10 +581,11 @@ untag_na <- function(x) {
 #'
 #' @description
 #' Converts all tagged NAs to regular (untagged) `NA` values, effectively
-#' removing the missing value type information. This produces the same result
-#' as reading the file with `haven::read_sav()` directly.
+#' removing the missing value type information. Works with data from any
+#' format: [read_spss()], [read_por()], [read_stata()], [read_sas()], or
+#' [read_xpt()].
 #'
-#' @param x A numeric vector with tagged NAs (from [read_spss()]).
+#' @param x A numeric vector with tagged NAs.
 #'
 #' @return A numeric vector where all tagged NAs have been replaced with
 #'   regular `NA`. Value labels for missing types are removed; labels for
@@ -346,8 +598,9 @@ untag_na <- function(x) {
 #' clean <- strip_tags(data$satisfaction)
 #' }
 #'
-#' @seealso [read_spss()], [na_frequencies()], [untag_na()]
-#' @family spss
+#' @seealso [read_spss()], [read_stata()], [read_sas()], [read_xpt()],
+#'   [na_frequencies()], [untag_na()]
+#' @family data-import
 #' @export
 strip_tags <- function(x) {
   raw <- as.double(x)

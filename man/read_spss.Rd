@@ -80,11 +80,16 @@ data_clean <- strip_tags(data$satisfaction)
 }
 \seealso{
 \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}}, \code{\link[haven:read_spss]{haven::read_sav()}},
-\code{\link[=frequency]{frequency()}}
+\code{\link[=frequency]{frequency()}}, \code{\link[=read_por]{read_por()}}
 
-Other spss: 
+Other data-import: 
 \code{\link{na_frequencies}()},
+\code{\link{read_por}()},
+\code{\link{read_sas}()},
+\code{\link{read_stata}()},
+\code{\link{read_xlsx}()},
+\code{\link{read_xpt}()},
 \code{\link{strip_tags}()},
 \code{\link{untag_na}()}
 }
-\concept{spss}
+\concept{data-import}

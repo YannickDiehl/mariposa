@@ -1,166 +1,20 @@
 # ============================================================================
 # SCALE HELPERS - UNIT TESTS
 # ============================================================================
-# Purpose: Validate scale_index() and pomps() functions
+# Purpose: Validate pomps() function
 # Tests: Correctness with hand-calculated reference values
 # Created: 2026-03-01
 #
 # These functions are pure arithmetic transformations, so validation
 # is against hand-calculated values rather than SPSS output.
+#
+# Note: scale_index() was removed in v0.6.0 and replaced by row_means()
+# in R/row_operations.R. See test-row-operations.R for row_means() tests.
 # ============================================================================
 
 library(testthat)
 library(dplyr)
 library(mariposa)
-
-# ============================================================================
-# TEST DATA
-# ============================================================================
-
-test_data <- tibble::tibble(
-  id = 1:6,
-  item1 = c(1, 2, 3, 4, 5, NA),
-  item2 = c(2, 3, 4, 5, 1, 3),
-  item3 = c(3, 4, 5, 1, 2, NA),
-  item4 = c(4, 5, 1, 2, 3, 4),
-  group = c("A", "A", "A", "B", "B", "B")
-)
-
-# ============================================================================
-# SCALE_INDEX() TESTS
-# ============================================================================
-
-test_that("scale_index computes correct row means", {
-  result <- scale_index(test_data, item1, item2, item3)
-
-  # Hand-calculated: mean(1,2,3)=2, mean(2,3,4)=3, mean(3,4,5)=4,
-  #                  mean(4,5,1)=10/3, mean(5,1,2)=8/3
-  expect_equal(result[1], 2)
-  expect_equal(result[2], 3)
-  expect_equal(result[3], 4)
-  expect_equal(result[4], 10 / 3, tolerance = 1e-10)
-  expect_equal(result[5], 8 / 3, tolerance = 1e-10)
-})
-
-test_that("scale_index handles NA values with na.rm = TRUE", {
-  result <- scale_index(test_data, item1, item2, item3)
-
-  # Row 6: item1=NA, item2=3, item3=NA -> mean(3) = 3
-  expect_equal(result[6], 3)
-})
-
-test_that("scale_index returns NA when all values are NA", {
-  all_na_data <- tibble::tibble(
-    a = c(NA_real_, 1),
-    b = c(NA_real_, 2),
-    c = c(NA_real_, 3)
-  )
-  result <- scale_index(all_na_data, a, b, c)
-
-  expect_true(is.na(result[1]))
-  expect_equal(result[2], 2)
-})
-
-test_that("scale_index min_valid works correctly", {
-  result <- scale_index(test_data, item1, item2, item3, min_valid = 2)
-
-  # Row 6: only 1 valid value (item2=3), min_valid=2 -> NA
-  expect_true(is.na(result[6]))
-
-  # Rows 1-5: all 3 values valid -> should have means
-  expect_equal(result[1], 2)
-  expect_equal(result[2], 3)
-})
-
-test_that("scale_index min_valid = 3 requires all items", {
-  result <- scale_index(test_data, item1, item2, item3, min_valid = 3)
-
-  # Row 6: only 1 valid value -> NA
-  expect_true(is.na(result[6]))
-
-  # Rows 1-5: all 3 values valid -> should have means
-  expect_equal(result[1], 2)
-})
-
-test_that("scale_index works with 4 items", {
-  result <- scale_index(test_data, item1, item2, item3, item4)
-
-  # Row 1: mean(1,2,3,4) = 2.5
-  expect_equal(result[1], 2.5)
-  # Row 2: mean(2,3,4,5) = 3.5
-  expect_equal(result[2], 3.5)
-})
-
-test_that("scale_index works with single item", {
-  result <- scale_index(test_data, item1)
-
-  # Should just return the item values
-  expect_equal(result[1], 1)
-  expect_equal(result[2], 2)
-  expect_true(is.na(result[6]))
-})
-
-test_that("scale_index works with tidyselect helpers", {
-  result <- scale_index(test_data, starts_with("item"))
-
-  # All 4 items: Row 1: mean(1,2,3,4) = 2.5
-  expect_equal(result[1], 2.5)
-})
-
-test_that("scale_index works with pick() pattern", {
-  result <- test_data %>%
-    mutate(mean_score = scale_index(pick(item1, item2, item3)))
-
-  expect_equal(result$mean_score[1], 2)
-  expect_equal(result$mean_score[2], 3)
-})
-
-test_that("scale_index works in mutate with dot pattern", {
-  result <- test_data %>%
-    mutate(mean_score = scale_index(., item1, item2, item3))
-
-  expect_equal(result$mean_score[1], 2)
-  expect_equal(result$mean_score[2], 3)
-})
-
-test_that("scale_index returns vector of correct length", {
-  result <- scale_index(test_data, item1, item2, item3)
-  expect_length(result, nrow(test_data))
-})
-
-test_that("scale_index errors on non-data-frame input", {
-  expect_error(scale_index(c(1, 2, 3), item1))
-})
-
-test_that("scale_index errors on non-numeric variables", {
-  expect_error(scale_index(test_data, group))
-})
-
-test_that("scale_index warns when min_valid exceeds number of items", {
-  expect_warning(
-    result <- scale_index(test_data, item1, item2, min_valid = 5)
-  )
-  # All should be NA
-  expect_true(all(is.na(result)))
-})
-
-test_that("scale_index with na.rm = FALSE returns NA if any item is NA", {
-  result <- scale_index(test_data, item1, item2, item3, na.rm = FALSE)
-
-  # Row 6: item1=NA -> entire row should be NA
-  expect_true(is.na(result[6]))
-
-  # Rows 1-5: no NAs -> should have values
-  expect_equal(result[1], 2)
-})
-
-test_that("scale_index works with survey_data", {
-  data(survey_data)
-  result <- scale_index(survey_data, trust_government, trust_media, trust_science)
-
-  expect_length(result, nrow(survey_data))
-  expect_true(is.numeric(result))
-})
 
 # ============================================================================
 # POMPS() TESTS

@@ -28,7 +28,7 @@ Scale analysis is the process of combining multiple survey items into a single s
 
 1. Check reliability with `reliability()` -- do the items measure the same thing?
 2. Explore structure with `efa()` -- how do items group into dimensions?
-3. Create scores with `scale_index()` -- compute mean indices
+3. Create scores with `row_means()` -- compute mean indices
 4. Standardize with `pomps()` -- transform to comparable 0-100 scale
 
 This guide walks through each step using the trust items from `survey_data` (trust in government, media, and science).
@@ -37,7 +37,7 @@ This guide walks through each step using the trust items from `survey_data` (tru
 |----------|---------|
 | `reliability()` | Check internal consistency (Cronbach's Alpha) |
 | `efa()` | Discover underlying dimensions (factor analysis) |
-| `scale_index()` | Create mean indices across items |
+| `row_means()` | Create mean indices across items |
 | `pomps()` | Transform to Percent of Maximum Possible Scores |
 
 ## Reliability Analysis
@@ -204,26 +204,26 @@ efa(survey_data,
 
 ## Creating Scale Scores
 
-### scale_index(): Mean Indices
+### row_means(): Mean Indices
 
 After confirming reliability, create a mean index:
 
 ```{r}
 survey_data <- survey_data %>%
-  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
 
 # Check the result
 survey_data %>%
   describe(m_trust)
 ```
 
-`scale_index()` works inside `mutate()`, computing the row-wise mean across items.
+`row_means()` works inside `mutate()`, computing the row-wise mean across items.
 
 ### Using tidyselect
 
 ```{r}
 survey_data <- survey_data %>%
-  mutate(m_trust2 = scale_index(., starts_with("trust")))
+  mutate(m_trust2 = row_means(., starts_with("trust")))
 ```
 
 ### Using pick()
@@ -232,7 +232,7 @@ The `pick()` function works with both `%>%` and `|>` pipes:
 
 ```{r}
 survey_data <- survey_data %>%
-  mutate(m_trust3 = scale_index(
+  mutate(m_trust3 = row_means(
     pick(trust_government, trust_media, trust_science)
   ))
 ```
@@ -243,7 +243,7 @@ Require a minimum number of valid responses per respondent, matching SPSS `MEAN.
 
 ```{r}
 survey_data <- survey_data %>%
-  mutate(m_trust_strict = scale_index(
+  mutate(m_trust_strict = row_means(
     ., trust_government, trust_media, trust_science,
     min_valid = 2
   ))
@@ -293,7 +293,7 @@ summary(efa_result, communalities = FALSE)  # detailed, skip communalities
 
 # 3. Create mean index (Alpha was acceptable)
 survey_data <- survey_data %>%
-  mutate(m_trust = scale_index(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
 
 # 4. Transform to POMPS for reporting
 survey_data <- survey_data %>%
@@ -320,7 +320,7 @@ survey_data %>%
 
 1. `reliability()` checks whether items form a consistent scale (Cronbach's Alpha)
 2. `efa()` discovers underlying dimensions in your items (Principal Component Analysis)
-3. `scale_index()` computes mean indices for use in further analyses
+3. `row_means()` computes mean indices for use in further analyses
 4. `pomps()` transforms scores to a comparable 0-100 scale
 
 ## Next Steps

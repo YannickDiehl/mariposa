@@ -1,17 +1,20 @@
 Package: mariposa
 Type: Package
 Title: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data
-Version: 0.5.3
+Version: 0.6.0
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
            role = c("aut", "cre"))
 Description: Professional statistical analysis of survey data with full support
     for survey weights, grouped operations, and tidyverse integration. Provides
-    46 functions for descriptive statistics, codebook generation, hypothesis
-    testing, correlation analysis, post-hoc comparisons, weighted statistics,
-    scale analysis, regression, non-parametric tests, exact tests, factorial
-    ANOVA, and ANCOVA.
+    76 functions for data import/export (SPSS, Stata, SAS, Excel) with label
+    roundtripping and tagged NA preservation, label management (variable labels,
+    value labels, type conversions, missing value declaration), data
+    transformation (recoding, dummy coding, standardization, centering),
+    descriptive statistics, codebook generation, hypothesis testing, correlation
+    analysis, post-hoc comparisons, weighted statistics, scale analysis,
+    regression, non-parametric tests, exact tests, factorial ANOVA, and ANCOVA.
     Every analysis offers compact print() and detailed summary() output with
     toggleable sections. All results are validated against SPSS v29 for
     reproducibility. Designed for survey researchers, social scientists, and
@@ -39,7 +42,8 @@ Suggests:
     survey,
     GPArotation,
     MASS,
-    PMCMRplus
+    PMCMRplus,
+    openxlsx2
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -7,37 +7,54 @@
 na_frequencies(x)
 }
 \arguments{
-\item{x}{A numeric vector with tagged NAs (from \code{\link[=read_spss]{read_spss()}}).}
+\item{x}{A numeric vector with tagged NAs.}
 }
 \value{
 A data frame with columns:
-\item{tag}{The tag character (a-z, A-Z, 0-9)}
+\item{tag}{The tag character (e.g., a-z for Stata, A-Z for SAS,
+a-z/A-Z/0-9 for SPSS)}
 \item{n}{Number of cases with this missing type}
-\item{spss_code}{The original SPSS missing value code}
-\item{label}{The SPSS value label for this missing type}
+\item{code}{The original missing value code: numeric SPSS codes (e.g.,
+-9, -8) or native format codes (e.g., ".a" for Stata, ".A" for SAS)}
+\item{label}{The value label for this missing type (if available)}
 }
 \description{
 Shows a breakdown of the different types of missing values in a variable
-that was read with \code{\link[=read_spss]{read_spss()}} using \code{tag.na = TRUE}.
+that was read with \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, or
+\code{\link[=read_xpt]{read_xpt()}} and contains tagged NAs.
 }
 \examples{
 \dontrun{
+# SPSS data
 data <- read_spss("survey.sav")
 na_frequencies(data$satisfaction)
-#   tag    n spss_code            label
-# 1   b 1774       -11       TNZ: SPLIT
-# 2   c   63        -9     KEINE ANGABE
-# 3   d   11        -8 WEISS NICHT
-# 4   a    6       -42 DATENFEHLER: MFN
+#   tag    n  code            label
+# 1   b 1774   -11       TNZ: SPLIT
+# 2   c   63    -9     KEINE ANGABE
+# 3   d   11    -8    WEISS NICHT
+# 4   a    6   -42 DATENFEHLER: MFN
+
+# Stata data
+data <- read_stata("survey.dta")
+na_frequencies(data$income)
+#   tag  n code           label
+# 1   a 42   .a     Not applicable
+# 2   b 15   .b     Refused
 }
 
 }
 \seealso{
-\code{\link[=read_spss]{read_spss()}}, \code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}}
+\code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}},
+\code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}}
 
-Other spss: 
+Other data-import: 
+\code{\link{read_por}()},
+\code{\link{read_sas}()},
 \code{\link{read_spss}()},
+\code{\link{read_stata}()},
+\code{\link{read_xlsx}()},
+\code{\link{read_xpt}()},
 \code{\link{strip_tags}()},
 \code{\link{untag_na}()}
 }
-\concept{spss}
+\concept{data-import}
