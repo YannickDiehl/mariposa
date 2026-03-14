@@ -1,0 +1,330 @@
+---
+title: "Labels and Missing Values"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Labels and Missing Values}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(mariposa)
+library(dplyr)
+data(survey_data)
+```
+
+## Overview
+
+Survey data from SPSS, Stata, and SAS stores two kinds of labels:
+
+- **Variable labels** describe what a variable measures (e.g., `gender` → "Respondent's gender")
+- **Value labels** map numeric codes to text (e.g., `1` → "Male", `2` → "Female")
+
+In R, these labels are stored as attributes on `haven_labelled` columns. mariposa provides 10 functions for inspecting, modifying, and converting labelled data --- plus tools for declaring missing values and searching variables.
+
+| Function | Purpose |
+|----------|---------|
+| `var_label()` | Get or set variable labels |
+| `val_labels()` | Get or set value labels |
+| `find_var()` | Search variables by name or label pattern |
+| `to_label()` | Convert labelled → factor |
+| `to_character()` | Convert labelled → character |
+| `to_numeric()` | Convert factor/labelled → numeric |
+| `to_labelled()` | Convert factor/character → labelled |
+| `set_na()` | Declare values as missing (tagged NAs) |
+| `unlabel()` | Strip all label metadata |
+| `copy_labels()` | Restore labels after dplyr operations |
+| `drop_labels()` | Remove unused value labels |
+
+## Inspecting Labels
+
+### Variable Labels
+
+Variable labels describe what each column contains. Use `var_label()` to retrieve them:
+
+```{r}
+# Get labels for specific variables
+var_label(survey_data, gender, education, life_satisfaction)
+```
+
+```{r}
+# Get labels for all variables
+var_label(survey_data)
+```
+
+### Value Labels
+
+Value labels map numeric codes to meaningful text. Use `val_labels()` to retrieve them:
+
+```{r}
+# Get value labels for a single variable
+val_labels(survey_data, gender)
+```
+
+```{r}
+# Get value labels for multiple variables
+val_labels(survey_data, education, employment)
+```
+
+### Finding Variables
+
+SPSS datasets often have cryptic variable names like `q104a_1` or `v23`. Use `find_var()` to search by name or label:
+
+```{r}
+# Search in both names and labels (default)
+find_var(survey_data, "trust")
+```
+
+```{r}
+# Search only in variable labels
+find_var(survey_data, "satisfaction", search = "label")
+```
+
+```{r}
+# Search only in variable names
+find_var(survey_data, "age|income", search = "name")
+```
+
+## Setting Labels
+
+### Setting Variable Labels
+
+```{r}
+# Set labels for specific variables
+labeled_data <- var_label(survey_data,
+  age = "Age of respondent in years",
+  income = "Monthly net income in euros"
+)
+
+# Verify
+var_label(labeled_data, age, income)
+```
+
+### Setting Value Labels
+
+```{r}
+# Set value labels
+labeled_data <- val_labels(survey_data,
+  gender = c("Male" = 1, "Female" = 2)
+)
+
+# Verify
+val_labels(labeled_data, gender)
+```
+
+```{r}
+# Add labels without replacing existing ones
+labeled_data <- val_labels(survey_data,
+  gender = c("Diverse" = 3),
+  .add = TRUE
+)
+
+val_labels(labeled_data, gender)
+```
+
+## Converting Between Formats
+
+Survey data often needs conversion between labelled, factor, character, and numeric formats depending on the analysis.
+
+### Labelled → Factor
+
+Use `to_label()` when you need factors for plotting or statistical models:
+
+```{r}
+# Convert gender from labelled to factor
+factor_data <- to_label(survey_data, gender, education)
+
+# Check the result
+class(factor_data$gender)
+levels(factor_data$gender)
+head(factor_data$gender)
+```
+
+```{r}
+# Create ordered factors (useful for ordinal variables)
+ordered_data <- to_label(survey_data, education, ordered = TRUE)
+levels(ordered_data$education)
+```
+
+### Labelled → Character
+
+Use `to_character()` for string-based operations:
+
+```{r}
+char_data <- to_character(survey_data, gender, region)
+head(char_data$gender)
+```
+
+### Factor → Numeric
+
+Use `to_numeric()` to convert factors or labelled vectors back to numbers:
+
+```{r}
+# First convert to factor, then back to numeric
+factor_data <- to_label(survey_data, education)
+
+# Parse numeric values from factor levels
+numeric_data <- to_numeric(factor_data, education)
+head(numeric_data$education)
+```
+
+### Numeric/Factor → Labelled
+
+Use `to_labelled()` to add labels to plain numeric or factor columns:
+
+```{r}
+# Convert a factor back to haven_labelled
+plain_data <- data.frame(
+  gender = factor(c("Male", "Female", "Male")),
+  score = c(3, 4, 2)
+)
+
+labelled_data <- to_labelled(plain_data, gender)
+class(labelled_data$gender)
+```
+
+## Declaring Missing Values
+
+### Setting Values as Missing
+
+Use `set_na()` to declare specific numeric codes as missing values:
+
+```{r, eval = FALSE}
+# After importing SPSS data where -9 = refused, -8 = don't know
+data <- read_spss("survey.sav", tag.na = FALSE)
+
+# Declare -9 and -8 as missing across all numeric columns
+data <- set_na(data, -9, -8, tag = TRUE)
+
+# Declare different missing codes for specific variables
+data <- set_na(data, q1 = c(-9, -8), q2 = c(99))
+```
+
+When `tag = TRUE` (the default), each missing code becomes a distinct tagged NA, so you can later distinguish "refused" from "don't know" responses.
+
+### Removing All Labels
+
+Use `unlabel()` when you need plain numeric data without any label metadata:
+
+```{r, eval = FALSE}
+# Strip all labels from entire dataset
+plain_data <- unlabel(survey_data)
+
+# Strip labels from specific variables only
+plain_data <- unlabel(survey_data, gender, education)
+```
+
+This converts `haven_labelled` columns to plain `numeric` or `character`, tagged NAs to regular `NA`, and removes all label attributes.
+
+## Preserving Labels Through Pipelines
+
+### The Problem
+
+dplyr operations like `filter()`, `mutate()`, and `select()` can strip label attributes from columns:
+
+```{r}
+filtered <- survey_data %>%
+  filter(age >= 30) %>%
+  select(gender, education, income)
+
+# Labels may be lost after certain operations
+```
+
+### The Solution: copy_labels()
+
+Use `copy_labels()` to restore labels from the original data:
+
+```{r}
+# Restore labels from the source dataset
+filtered <- copy_labels(filtered, survey_data)
+
+# Verify labels are back
+var_label(filtered, gender, education)
+```
+
+### Cleaning Unused Labels
+
+After filtering, some value label categories may no longer appear in the data. Use `drop_labels()` to clean them up:
+
+```{r}
+# Subset to one region only
+subset_data <- survey_data %>% filter(region == 1)
+
+# Remove value labels for regions that are no longer in the data
+clean_data <- drop_labels(subset_data, region)
+val_labels(clean_data, region)
+```
+
+## Complete Example
+
+A typical workflow for preparing SPSS data for analysis:
+
+```{r, eval = FALSE}
+# 1. Import SPSS file
+data <- read_spss("survey_2024.sav")
+
+# 2. Explore what's in the data
+codebook(data)
+find_var(data, "satisf")
+find_var(data, "trust")
+
+# 3. Check labels
+var_label(data, q1, q2, q3)
+val_labels(data, q1)
+
+# 4. Rename variables for clarity
+data <- data %>%
+  rename(life_satisfaction = q1, income = q2, education = q3)
+
+# Update variable labels
+data <- var_label(data,
+  life_satisfaction = "Overall life satisfaction (1-5)",
+  income = "Monthly net income in euros",
+  education = "Highest education level"
+)
+
+# 5. Convert categorical variables for analysis
+data <- to_label(data, education, gender)
+
+# 6. Analyze
+data %>%
+  describe(life_satisfaction, income, weights = sampling_weight)
+
+data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+```
+
+## Practical Tips
+
+1. **Keep labels as long as possible.** Labels carry important context. Only convert to factor or character when a specific function requires it.
+
+2. **Use `find_var()` instead of `names()`.** It searches both names and labels, which is essential for SPSS datasets with non-descriptive variable names.
+
+3. **Use `copy_labels()` after complex pipelines.** If your pipeline involves joins, reshaping, or other operations that might strip attributes, restore labels from the original data.
+
+4. **Prefer `to_label()` over `as.factor()`.** `to_label()` uses the value labels as factor levels, giving you meaningful names instead of numeric codes.
+
+5. **Use `set_na()` early in your workflow.** Declaring missing values immediately after import ensures they are handled correctly in all downstream analyses.
+
+## Summary
+
+1. `var_label()` and `val_labels()` get and set variable and value labels
+2. `find_var()` searches variables by name or label pattern
+3. `to_label()`, `to_character()`, `to_numeric()`, `to_labelled()` convert between formats
+4. `set_na()` declares values as missing; `unlabel()` strips all metadata
+5. `copy_labels()` restores labels after dplyr operations; `drop_labels()` cleans up unused labels
+
+## Next Steps
+
+- Transform and recode variables --- see `vignette("data-transformation")`
+- Import data from SPSS, Stata, and SAS --- see `vignette("data-io")`
+- Start analyzing your data --- see `vignette("descriptive-statistics")`
