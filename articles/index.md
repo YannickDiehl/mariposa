@@ -5,6 +5,15 @@
 - [Introduction to
   mariposa](https://YannickDiehl.github.io/mariposa/articles/introduction.md):
 
+### Data Management
+
+- [Importing and Exporting
+  Data](https://YannickDiehl.github.io/mariposa/articles/data-io.md):
+- [Labels and Missing
+  Values](https://YannickDiehl.github.io/mariposa/articles/labels-and-missing-values.md):
+- [Data
+  Transformation](https://YannickDiehl.github.io/mariposa/articles/data-transformation.md):
+
 ### Core Analysis
 
 - [Descriptive Statistics and

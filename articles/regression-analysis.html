@@ -42,6 +42,11 @@
 <li><h6 class="dropdown-header" data-toc-skip>Getting Started</h6></li>
     <li><a class="dropdown-item" href="../articles/introduction.html">Introduction to mariposa</a></li>
     <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Management</h6></li>
+    <li><a class="dropdown-item" href="../articles/data-io.html">Importing &amp; Exporting Data</a></li>
+    <li><a class="dropdown-item" href="../articles/labels-and-missing-values.html">Labels &amp; Missing Values</a></li>
+    <li><a class="dropdown-item" href="../articles/data-transformation.html">Data Transformation</a></li>
+    <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Core Analysis</h6></li>
     <li><a class="dropdown-item" href="../articles/descriptive-statistics.html">Descriptive Statistics</a></li>
     <li><a class="dropdown-item" href="../articles/hypothesis-testing.html">Hypothesis Testing</a></li>
@@ -93,48 +98,88 @@ mariposa provides two regression functions with SPSS-compatible
 output:</p>
 <table class="table">
 <colgroup>
-<col width="43%">
-<col width="56%">
+<col width="50%">
+<col width="50%">
 </colgroup>
 <thead><tr class="header">
 <th>Function</th>
-<th>Use when…</th>
+<th>Use when</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code><a href="../reference/linear_regression.html">linear_regression()</a></code></td>
-<td>Your outcome is continuous (e.g., income, satisfaction score)</td>
+<td>Outcome is continuous (e.g., income, satisfaction score)</td>
 </tr>
 <tr class="even">
 <td><code><a href="../reference/logistic_regression.html">logistic_regression()</a></code></td>
-<td>Your outcome is binary (e.g., yes/no, high/low)</td>
+<td>Outcome is binary (e.g., yes/no, high/low)</td>
 </tr>
 </tbody>
 </table>
 <p>Both functions support two interface styles:</p>
 <ul>
 <li>
-<strong>Formula interface:</strong>
-<code>linear_regression(data, y ~ x1 + x2)</code> – standard R
-style</li>
+<strong>Formula</strong>:
+<code>linear_regression(data, y ~ x1 + x2)</code> — standard R
+syntax</li>
 <li>
-<strong>SPSS-style:</strong>
+<strong>SPSS-style</strong>:
 <code>linear_regression(data, dependent = y, predictors = c(x1, x2))</code>
-– familiar for SPSS users</li>
+</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="linear-regression">Linear Regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
 </h2>
 <div class="section level3">
-<h3 id="bivariate-regression">Bivariate Regression<a class="anchor" aria-label="anchor" href="#bivariate-regression"></a>
+<h3 id="simple-regression">Simple Regression<a class="anchor" aria-label="anchor" href="#simple-regression"></a>
 </h3>
-<p>Start with a single predictor:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age</span></span>
 <span><span class="co">#&gt;   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421</span></span></code></pre></div>
-<p>The output includes four sections matching SPSS REGRESSION:</p>
+</div>
+<div class="section level3">
+<h3 id="detailed-output">Detailed Output<a class="anchor" aria-label="anchor" href="#detailed-output"></a>
+</h3>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear Regression Results</span></span>
+<span><span class="co">#&gt; -------------------------</span></span>
+<span><span class="co">#&gt; - Formula: life_satisfaction ~ age</span></span>
+<span><span class="co">#&gt; - Method: ENTER (all predictors)</span></span>
+<span><span class="co">#&gt; - N: 2421</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Model Summary</span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   R                              0.029</span></span>
+<span><span class="co">#&gt;   R Square                       0.001</span></span>
+<span><span class="co">#&gt;   Adjusted R Square              0.000</span></span>
+<span><span class="co">#&gt;   Std. Error of Estimate         1.153</span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ANOVA</span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Source           Sum of Squares    df      Mean Square          F     Sig.</span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Regression                2.653     1            2.653      1.996    0.158 </span></span>
+<span><span class="co">#&gt;   Residual               3214.775  2419            1.329                     </span></span>
+<span><span class="co">#&gt;   Total                  3217.428  2420                                      </span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Coefficients</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Term                               B  Std.Error     Beta          t     Sig. </span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   (Intercept)                    3.727      0.074              50.663    0.000 ***</span></span>
+<span><span class="co">#&gt;   age                           -0.002      0.001   -0.029     -1.413    0.158 </span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>The detailed output includes four sections matching SPSS
+REGRESSION:</p>
 <ul>
 <li>
 <strong>Model Summary</strong>: R, R-squared, Adjusted
@@ -143,91 +188,97 @@ R-squared</li>
 <strong>ANOVA Table</strong>: Overall model significance</li>
 <li>
 <strong>Coefficients</strong>: B (unstandardized), Beta
-(standardized), t, p, and confidence intervals</li>
+(standardized), t, p, confidence intervals</li>
 <li>
 <strong>Descriptives</strong>: Mean and SD for all variables</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="understanding-the-coefficients">Understanding the Coefficients<a class="anchor" aria-label="anchor" href="#understanding-the-coefficients"></a>
+<h3 id="understanding-coefficients">Understanding Coefficients<a class="anchor" aria-label="anchor" href="#understanding-coefficients"></a>
 </h3>
 <ul>
 <li>
-<strong>B (unstandardized):</strong> For each 1-unit increase in the
-predictor, the outcome changes by B units. The intercept is the
-predicted value when all predictors are zero.</li>
+<strong>B (unstandardized)</strong>: For each 1-unit increase in the
+predictor, the outcome changes by B units</li>
 <li>
-<strong>Beta (standardized):</strong> Allows comparison across
-predictors measured on different scales. A Beta of 0.30 means a 1-SD
-increase in the predictor is associated with a 0.30-SD change in the
-outcome.</li>
+<strong>Beta (standardized)</strong>: Allows comparison across
+predictors on different scales. A Beta of 0.30 means a 1-SD increase in
+the predictor is associated with a 0.30-SD change in the outcome</li>
 <li>
-<strong>p-value:</strong> Values below 0.05 indicate that the
-predictor’s effect is statistically significant.</li>
+<strong>p-value</strong>: Below 0.05 indicates statistical
+significance</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="multiple-regression">Multiple Regression<a class="anchor" aria-label="anchor" href="#multiple-regression"></a>
 </h3>
-<p>Add more predictors to explain more variance:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">trust_government</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
+<span>                  <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">trust_government</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income + trust_government</span></span>
 <span><span class="co">#&gt;   R2 = 0.198, adj.R2 = 0.197, F(3, 1991) = 163.89, p &lt; 0.001 ***, N = 1995</span></span></code></pre></div>
-<p>Compare Beta values to see which predictor has the strongest
-effect.</p>
+<p>Compare Beta values to identify the strongest predictor.</p>
 </div>
 <div class="section level3">
 <h3 id="spss-style-interface">SPSS-Style Interface<a class="anchor" aria-label="anchor" href="#spss-style-interface"></a>
 </h3>
-<p>If you prefer the SPSS approach with separate dependent and predictor
-arguments:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                  dependent <span class="op">=</span> <span class="va">life_satisfaction</span>,</span>
 <span>                  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">trust_government</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income + trust_government</span></span>
 <span><span class="co">#&gt;   R2 = 0.198, adj.R2 = 0.197, F(3, 1991) = 163.89, p &lt; 0.001 ***, N = 1995</span></span></code></pre></div>
-<p>Results are identical regardless of which interface you use.</p>
 </div>
 <div class="section level3">
 <h3 id="with-survey-weights">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                  <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>,</span>
 <span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income [Weighted]</span></span>
 <span><span class="co">#&gt;   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p &lt; 0.001 ***, N = 2130</span></span></code></pre></div>
-<p>Weights are treated as frequency weights, matching SPSS WEIGHT BY
-behavior.</p>
+<p>Weights are treated as frequency weights, matching SPSS
+<code>WEIGHT BY</code> behavior.</p>
 </div>
 <div class="section level3">
 <h3 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
 </h3>
 <p>Run separate regressions for each subgroup:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income [Grouped: region]</span></span>
 <span><span class="co">#&gt;   region = East: R2 = 0.203, adj.R2 = 0.199, F(2, 407) = 51.95, p &lt; 0.001 ***, N = 410</span></span>
 <span><span class="co">#&gt;   region = West: R2 = 0.201, adj.R2 = 0.200, F(2, 1702) = 214.58, p &lt; 0.001 ***, N = 1705</span></span></code></pre></div>
-<p>This matches SPSS SPLIT FILE BY – a separate model is fitted for each
-group.</p>
 </div>
 <div class="section level3">
 <h3 id="interpreting-r-squared">Interpreting R-squared<a class="anchor" aria-label="anchor" href="#interpreting-r-squared"></a>
 </h3>
-<p>R-squared tells you how much variance your predictors explain:</p>
+<p>R-squared tells you how much variance the predictors explain:</p>
 <ul>
-<li>R-squared = 0.01 – 0.05: Small effect</li>
-<li>R-squared = 0.06 – 0.13: Medium effect</li>
-<li>R-squared = 0.14+: Large effect</li>
+<li>0.01 – 0.05: Small effect</li>
+<li>0.06 – 0.13: Medium effect</li>
+<li>0.14+: Large effect</li>
 </ul>
-<p>These benchmarks follow Cohen’s (1988) conventions for the social
-sciences. Always check the ANOVA table to confirm the model is
-statistically significant.</p>
+<p>These benchmarks follow Cohen (1988). Always check the ANOVA table to
+confirm overall model significance.</p>
+</div>
+<div class="section level3">
+<h3 id="using-transformed-predictors">Using Transformed Predictors<a class="anchor" aria-label="anchor" href="#using-transformed-predictors"></a>
+</h3>
+<p>Combine with data transformation functions for better models:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Standardize predictors for comparable coefficients</span></span>
+<span><span class="va">survey_data_z</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/std.html">std</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, suffix <span class="op">=</span> <span class="st">"_z"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data_z</span>,</span>
+<span>                  <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age_z</span> <span class="op">+</span> <span class="va">income_z</span> <span class="op">+</span> <span class="va">trust_government</span>,</span>
+<span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age_z + income_z + trust_government [Weighted]</span></span>
+<span><span class="co">#&gt;   R2 = 0.200, adj.R2 = 0.199, F(3, 2005) = 167.49, p &lt; 0.001 ***, N = 2009</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -238,60 +289,111 @@ statistically significant.</p>
 </h3>
 <p>Use <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> when your outcome is binary.
 First, create a binary variable:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>high_satisfaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">&gt;=</span> <span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="basic-logistic-regression">Basic Logistic Regression<a class="anchor" aria-label="anchor" href="#basic-logistic-regression"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Logistic Regression: high_satisfaction ~ age + income</span></span>
 <span><span class="co">#&gt;   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p &lt; 0.001 ***, Accuracy = 68.4%, N = 2115</span></span></code></pre></div>
-<p>The output includes five sections matching SPSS LOGISTIC
+</div>
+<div class="section level3">
+<h3 id="detailed-output-1">Detailed Output<a class="anchor" aria-label="anchor" href="#detailed-output-1"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">log_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">log_result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Logistic Regression Results</span></span>
+<span><span class="co">#&gt; ---------------------------</span></span>
+<span><span class="co">#&gt; - Formula: high_satisfaction ~ age + income</span></span>
+<span><span class="co">#&gt; - Method: ENTER</span></span>
+<span><span class="co">#&gt; - N: 2115</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Omnibus Tests of Model Coefficients</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                          Chi-square    df       Sig.</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Model                     357.432     2      0.000 ***</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Model Summary</span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   -2 Log Likelihood                  2520.010</span></span>
+<span><span class="co">#&gt;   Cox &amp; Snell R Square                  0.155</span></span>
+<span><span class="co">#&gt;   Nagelkerke R Square                   0.209</span></span>
+<span><span class="co">#&gt;   McFadden R Square                     0.124</span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Hosmer and Lemeshow Test</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                          Chi-square    df       Sig.</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                             150.764     8      0.000</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Classification Table (cutoff = 0.50)</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;                                   Predicted                     </span></span>
+<span><span class="co">#&gt;   Observed                      0          1       % Correct</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   0                           508        380           57.2</span></span>
+<span><span class="co">#&gt;   1                           289        938           76.4</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Overall Percentage                                   68.4</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Variables in the Equation</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***</span></span>
+<span><span class="co">#&gt;   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 </span></span>
+<span><span class="co">#&gt;   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>The detailed output includes five sections matching SPSS LOGISTIC
 REGRESSION:</p>
 <ul>
 <li>
-<strong>Omnibus Test</strong>: Is the overall model
-significant?</li>
+<strong>Omnibus Test</strong>: Overall model significance</li>
 <li>
 <strong>Model Summary</strong>: -2 Log Likelihood and pseudo
 R-squared values</li>
 <li>
-<strong>Hosmer-Lemeshow Test</strong>: Does the model fit the data
-well?</li>
+<strong>Hosmer-Lemeshow Test</strong>: Model fit assessment</li>
 <li>
-<strong>Classification Table</strong>: How well does the model
-classify cases?</li>
+<strong>Classification Table</strong>: Prediction accuracy</li>
 <li>
-<strong>Coefficients</strong>: B, Wald, Exp(B) (odds ratios), and
+<strong>Coefficients</strong>: B, Wald, Exp(B) (odds ratios),
 confidence intervals</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="understanding-odds-ratios">Understanding Odds Ratios<a class="anchor" aria-label="anchor" href="#understanding-odds-ratios"></a>
 </h3>
-<p>The key statistic in logistic regression is Exp(B), the odds
-ratio:</p>
+<p>Exp(B) is the odds ratio — the key statistic in logistic
+regression:</p>
 <ul>
 <li>
-<strong>Exp(B) &gt; 1:</strong> Each unit increase in the predictor
-increases the odds of the outcome</li>
+<strong>Exp(B) &gt; 1</strong>: Each unit increase raises the odds
+(e.g., 1.50 = 50% higher odds)</li>
 <li>
-<strong>Exp(B) &lt; 1:</strong> Each unit increase in the predictor
-decreases the odds</li>
+<strong>Exp(B) &lt; 1</strong>: Each unit increase lowers the odds
+(e.g., 0.80 = 20% lower odds)</li>
 <li>
-<strong>Exp(B) = 1:</strong> No effect</li>
+<strong>Exp(B) = 1</strong>: No effect</li>
 </ul>
-<p>For example, Exp(B) = 1.50 means the odds increase by 50% for each
-1-unit increase in the predictor. Exp(B) = 0.80 means the odds decrease
-by 20%.</p>
 </div>
 <div class="section level3">
-<h3 id="with-multiple-predictors">With Multiple Predictors<a class="anchor" aria-label="anchor" href="#with-multiple-predictors"></a>
+<h3 id="multiple-predictors">Multiple Predictors<a class="anchor" aria-label="anchor" href="#multiple-predictors"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                    <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">trust_government</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Logistic Regression: high_satisfaction ~ age + income + trust_government + education</span></span>
@@ -300,7 +402,7 @@ by 20%.</p>
 <div class="section level3">
 <h3 id="spss-style-interface-1">SPSS-Style Interface<a class="anchor" aria-label="anchor" href="#spss-style-interface-1"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                    dependent <span class="op">=</span> <span class="va">high_satisfaction</span>,</span>
 <span>                    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">trust_government</span><span class="op">)</span><span class="op">)</span></span>
@@ -310,7 +412,7 @@ by 20%.</p>
 <div class="section level3">
 <h3 id="with-survey-weights-1">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights-1"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                    <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>,</span>
 <span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -320,7 +422,7 @@ by 20%.</p>
 <div class="section level3">
 <h3 id="grouped-analysis-1">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis-1"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span>
@@ -332,8 +434,7 @@ by 20%.</p>
 <h3 id="interpreting-model-fit">Interpreting Model Fit<a class="anchor" aria-label="anchor" href="#interpreting-model-fit"></a>
 </h3>
 <p><strong>Pseudo R-squared</strong> values are not directly comparable
-to linear regression R-squared, but provide a rough indication of model
-quality:</p>
+to linear regression R-squared:</p>
 <ul>
 <li>
 <strong>Nagelkerke R-squared</strong>: Adjusted to reach 1.0, most
@@ -345,21 +446,18 @@ lower</li>
 <strong>McFadden R-squared</strong>: Values above 0.20 indicate good
 fit</li>
 </ul>
-<p><strong>Hosmer-Lemeshow Test</strong>: A non-significant result
+<p><strong>Hosmer-Lemeshow Test</strong>: Non-significant
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&gt;</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p &gt; .05</annotation></semantics></math>)
-means the model fits well. A significant result suggests the model may
-not adequately describe the data.</p>
-<p><strong>Classification Table</strong>: Shows the percentage of cases
-correctly predicted. Compare this to the base rate (percentage in the
-larger group) – your model should do better than simply guessing the
-most common outcome.</p>
+means the model fits well.</p>
+<p><strong>Classification Table</strong>: Compare correct predictions to
+the base rate — your model should outperform guessing the most common
+category.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
-<p>A full regression analysis workflow:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Explore relationships first</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">age</span>, <span class="va">income</span>, <span class="va">trust_government</span><span class="op">)</span></span>
@@ -372,14 +470,14 @@ most common outcome.</p>
 <span><span class="co">#&gt;   income x trust_government:     r = 0.000, p = 0.991  </span></span>
 <span><span class="co">#&gt;   1/6 pairs significant (p &lt; .05), N = 2421</span></span>
 <span></span>
-<span><span class="co"># 2. Run the regression</span></span>
+<span><span class="co"># 2. Run linear regression</span></span>
 <span><span class="va">lm_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                               <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">trust_government</span>,</span>
 <span>                               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">lm_result</span>              <span class="co"># compact: R-squared + significant predictors</span></span>
+<span><span class="va">lm_result</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income + trust_government [Weighted]</span></span>
 <span><span class="co">#&gt;   R2 = 0.200, adj.R2 = 0.199, F(3, 2005) = 167.49, p &lt; 0.001 ***, N = 2009</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">lm_result</span><span class="op">)</span>     <span class="co"># detailed: coefficients, ANOVA table, collinearity</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">lm_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Linear Regression Results</span></span>
 <span><span class="co">#&gt; ----------------------------------</span></span>
@@ -417,7 +515,7 @@ most common outcome.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span></span>
-<span><span class="co"># 3. Create binary outcome for logistic regression</span></span>
+<span><span class="co"># 3. Create binary outcome</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>high_satisfaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">&gt;=</span> <span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -425,10 +523,10 @@ most common outcome.</p>
 <span><span class="va">log_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                                  <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">trust_government</span>,</span>
 <span>                                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">log_result</span>             <span class="co"># compact: model significance + pseudo R-squared</span></span>
+<span><span class="va">log_result</span></span>
 <span><span class="co">#&gt; Logistic Regression: high_satisfaction ~ age + income + trust_government [Weighted]</span></span>
 <span><span class="co">#&gt;   Nagelkerke R2 = 0.207, chi2(3) = 333.71, p &lt; 0.001 ***, Accuracy = 68.5%, N = 2009</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">log_result</span><span class="op">)</span>    <span class="co"># detailed: odds ratios, classification table</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">log_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Logistic Regression Results</span></span>
 <span><span class="co">#&gt; ------------------------------------</span></span>
@@ -488,22 +586,24 @@ most common outcome.</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Check correlations first.</strong> Use
 <code><a href="../reference/pearson_cor.html">pearson_cor()</a></code> to explore bivariate relationships before
-building a regression model.</p></li>
-<li><p><strong>Examine descriptives.</strong> Use
-<code><a href="../reference/describe.html">describe()</a></code> to check variable distributions, ranges, and
-missing data before running regression.</p></li>
+building a model.</p></li>
+<li><p><strong>Center or standardize predictors.</strong> Centering
+makes the intercept interpretable; standardizing (with
+<code><a href="../reference/std.html">std()</a></code>) makes Beta coefficients comparable. Use
+<code>std(method = "2sd")</code> to make continuous predictors
+comparable to binary ones.</p></li>
 <li><p><strong>Compare Beta values.</strong> In multiple regression,
-standardized Beta coefficients tell you which predictor has the
-strongest effect, regardless of measurement scale.</p></li>
-<li><p><strong>Report completely.</strong> Always include R-squared,
-F-test (for linear) or Omnibus test (for logistic), individual
-coefficients, and sample size.</p></li>
-<li><p><strong>Watch for multicollinearity.</strong> If predictors are
-highly correlated with each other, coefficients may be unstable. Check
-bivariate correlations before interpreting results.</p></li>
-<li><p><strong>Binary outcomes need logistic regression.</strong> Never
-use <code><a href="../reference/linear_regression.html">linear_regression()</a></code> with a 0/1 outcome – predicted
-values can fall outside 0-1, and statistical tests are invalid.</p></li>
+standardized Beta coefficients reveal which predictor has the strongest
+effect, regardless of measurement scale.</p></li>
+<li><p><strong>Watch for multicollinearity.</strong> Highly correlated
+predictors produce unstable coefficients. Check bivariate correlations
+before interpreting results.</p></li>
+<li><p><strong>Never use <code><a href="../reference/linear_regression.html">linear_regression()</a></code> with a binary
+outcome.</strong> Predicted values can fall outside 0–1, and the
+statistical tests are invalid. Use <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code>
+instead.</p></li>
+<li><p><strong>Report completely.</strong> Include R-squared, F-test or
+Omnibus test, individual coefficients, and sample size.</p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -511,31 +611,33 @@ values can fall outside 0-1, and statistical tests are invalid.</p></li>
 </h2>
 <ol style="list-style-type: decimal">
 <li>
-<code><a href="../reference/linear_regression.html">linear_regression()</a></code> predicts continuous outcomes,
-providing B, Beta, ANOVA table, and R-squared</li>
+<code><a href="../reference/linear_regression.html">linear_regression()</a></code> predicts continuous outcomes (B,
+Beta, ANOVA, R-squared)</li>
 <li>
-<code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> predicts binary outcomes,
-providing odds ratios, classification table, and pseudo R-squared</li>
+<code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> predicts binary outcomes (odds
+ratios, classification, pseudo R-squared)</li>
 <li>Both support formula and SPSS-style interfaces, survey weights, and
 grouped analysis</li>
-<li>Always check correlations and descriptives before building
-regression models</li>
+<li>Use <code><a href="../reference/std.html">std()</a></code> and <code><a href="../reference/center.html">center()</a></code> to prepare
+predictors for better interpretability</li>
+<li>Always explore bivariate relationships before building regression
+models</li>
 </ol>
 </div>
 <div class="section level2">
 <h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
 <ul>
-<li>Create reliable scale scores first – see
+<li>Prepare variables with <code><a href="../reference/std.html">std()</a></code> and <code><a href="../reference/center.html">center()</a></code>
+— see <code><a href="../articles/data-transformation.html">vignette("data-transformation")</a></code>
+</li>
+<li>Construct reliable scale scores — see
 <code><a href="../articles/scale-analysis.html">vignette("scale-analysis")</a></code>
 </li>
-<li>Compare group means directly – see
+<li>Compare groups directly — see
 <code><a href="../articles/hypothesis-testing.html">vignette("hypothesis-testing")</a></code>
 </li>
-<li>Explore bivariate relationships – see
-<code><a href="../articles/correlation-analysis.html">vignette("correlation-analysis")</a></code>
-</li>
-<li>Handle survey weights properly – see
+<li>Handle survey weights — see
 <code><a href="../articles/survey-weights.html">vignette("survey-weights")</a></code>
 </li>
 </ul>

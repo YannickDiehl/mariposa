@@ -3,13 +3,16 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   correlation-analysis: correlation-analysis.html
+  data-io: data-io.html
+  data-transformation: data-transformation.html
   descriptive-statistics: descriptive-statistics.html
   hypothesis-testing: hypothesis-testing.html
   introduction: introduction.html
+  labels-and-missing-values: labels-and-missing-values.html
   regression-analysis: regression-analysis.html
   scale-analysis: scale-analysis.html
   survey-weights: survey-weights.html
-last_built: 2026-03-13T22:50Z
+last_built: 2026-03-14T06:21Z
 urls:
   reference: https://YannickDiehl.github.io/mariposa/reference
   article: https://YannickDiehl.github.io/mariposa/articles

@@ -42,6 +42,11 @@
 <li><h6 class="dropdown-header" data-toc-skip>Getting Started</h6></li>
     <li><a class="dropdown-item" href="../articles/introduction.html">Introduction to mariposa</a></li>
     <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Management</h6></li>
+    <li><a class="dropdown-item" href="../articles/data-io.html">Importing &amp; Exporting Data</a></li>
+    <li><a class="dropdown-item" href="../articles/labels-and-missing-values.html">Labels &amp; Missing Values</a></li>
+    <li><a class="dropdown-item" href="../articles/data-transformation.html">Data Transformation</a></li>
+    <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Core Analysis</h6></li>
     <li><a class="dropdown-item" href="../articles/descriptive-statistics.html">Descriptive Statistics</a></li>
     <li><a class="dropdown-item" href="../articles/hypothesis-testing.html">Hypothesis Testing</a></li>
@@ -88,63 +93,48 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Survey weights adjust your analysis to make results representative of
-the target population. Without weights, your results only describe your
-sample — which might be biased if some groups were over- or
-under-represented.</p>
-<p>Common reasons for weighting:</p>
-<ul>
-<li>
-<strong>Oversampling</strong>: Deliberately surveying more people
-from small groups to ensure adequate sample sizes</li>
-<li>
-<strong>Non-response</strong>: Some groups are less likely to
-participate, creating bias</li>
-<li>
-<strong>Post-stratification</strong>: Adjusting the sample to match
-known population demographics</li>
-</ul>
-<p>In mariposa, adding weights is as simple as including
-<code>weights = sampling_weight</code> in any function call.</p>
+<p>Survey weights correct for sampling biases so your results represent
+the target population, not just your sample. Common reasons for
+weighting include oversampling of small groups, differential
+non-response, and post-stratification to known demographics.</p>
+<p>In mariposa, adding weights is as simple as
+<code>weights = sampling_weight</code> in any function call. This guide
+covers the dedicated <code>w_*</code> functions, the effective sample
+size concept, and best practices.</p>
 </div>
 <div class="section level2">
-<h2 id="impact-of-weights">Impact of Weights<a class="anchor" aria-label="anchor" href="#impact-of-weights"></a>
+<h2 id="the-impact-of-weights">The Impact of Weights<a class="anchor" aria-label="anchor" href="#the-impact-of-weights"></a>
 </h2>
-<p>Let’s see the difference weights make:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Without weights (describes the sample)</span></span>
-<span><span class="va">unweighted_stats</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">unweighted</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
 <span>    mean_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">age</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    mean_satisfaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    mean_income <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">income</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unweighted_stats</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
-<span><span class="co">#&gt;   mean_age mean_satisfaction</span></span>
-<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     50.5              3.63</span></span>
 <span></span>
 <span><span class="co"># With weights (represents the population)</span></span>
-<span><span class="va">age_weighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">satisfaction_weighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span>,</span>
-<span>                                weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="va">age_w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="va">income_w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">weighted_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  mean_age <span class="op">=</span> <span class="va">age_weighted</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>,</span>
-<span>  mean_satisfaction <span class="op">=</span> <span class="va">satisfaction_weighted</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span></span>
+<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  Variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Income"</span><span class="op">)</span>,</span>
+<span>  Unweighted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">unweighted</span><span class="op">$</span><span class="va">mean_age</span>, <span class="va">unweighted</span><span class="op">$</span><span class="va">mean_income</span><span class="op">)</span>,</span>
+<span>  Weighted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age_w</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>, <span class="va">income_w</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weighted_stats</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   mean_age mean_satisfaction</span></span>
-<span><span class="co">#&gt; 1  50.5144          3.624863</span></span></code></pre></div>
-<p>The difference between weighted and unweighted results tells you how
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   Variable Unweighted  Weighted</span></span>
+<span><span class="co">#&gt; 1      Age    50.5496   50.5144</span></span>
+<span><span class="co">#&gt; 2   Income  3753.9341 3743.0994</span></span></code></pre></div>
+<p>The difference between weighted and unweighted results reflects how
 biased your sample is. Larger differences mean weights are doing more
 important work.</p>
 </div>
 <div class="section level2">
 <h2 id="weighted-statistics-functions">Weighted Statistics Functions<a class="anchor" aria-label="anchor" href="#weighted-statistics-functions"></a>
 </h2>
-<p>mariposa provides specialized <code>w_*</code> functions for
-individual weighted statistics.</p>
+<p>mariposa provides 11 <code>w_*</code> functions for individual
+weighted statistics.</p>
 <div class="section level3">
 <h3 id="central-tendency">Central Tendency<a class="anchor" aria-label="anchor" href="#central-tendency"></a>
 </h3>
@@ -169,7 +159,7 @@ individual weighted statistics.</p>
 <span><span class="co">#&gt;  Variable weighted_median Effective_N</span></span>
 <span><span class="co">#&gt;    income            3500      2158.9</span></span>
 <span></span>
-<span><span class="co"># Weighted mode (most common value)</span></span>
+<span><span class="co"># Weighted mode</span></span>
 <span><span class="fu"><a href="../reference/w_modus.html">w_modus</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Mode Statistics</span></span>
@@ -238,10 +228,20 @@ individual weighted statistics.</p>
 <span><span class="co">#&gt;    income             0.388      2158.9</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="other-useful-functions">Other Useful Functions<a class="anchor" aria-label="anchor" href="#other-useful-functions"></a>
+<h3 id="precision-and-range">Precision and Range<a class="anchor" aria-label="anchor" href="#precision-and-range"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Weighted quantiles (25th, 50th, 75th percentiles)</span></span>
+<code class="sourceCode R"><span><span class="co"># Weighted standard error</span></span>
+<span><span class="fu"><a href="../reference/w_se.html">w_se</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Standard Error Statistics</span></span>
+<span><span class="co">#&gt; ----------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- income ---</span></span>
+<span><span class="co">#&gt;  Variable weighted_se Effective_N</span></span>
+<span><span class="co">#&gt;    income      30.353      2158.9</span></span>
+<span></span>
+<span><span class="co"># Weighted quantiles</span></span>
 <span><span class="fu"><a href="../reference/w_quantile.html">w_quantile</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>,</span>
 <span>           probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -254,32 +254,53 @@ individual weighted statistics.</p>
 <span><span class="co">#&gt;    income      75%  4600 2186      2158.9 sampling_weight</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span></span>
-<span><span class="co"># Weighted standard error</span></span>
-<span><span class="fu"><a href="../reference/w_se.html">w_se</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co"># Weighted range</span></span>
+<span><span class="fu"><a href="../reference/w_range.html">w_range</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Standard Error Statistics</span></span>
-<span><span class="co">#&gt; ----------------------------------</span></span>
+<span><span class="co">#&gt; Weighted Range Statistics</span></span>
+<span><span class="co">#&gt; -------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- income ---</span></span>
-<span><span class="co">#&gt;  Variable weighted_se Effective_N</span></span>
-<span><span class="co">#&gt;    income      30.353      2158.9</span></span></code></pre></div>
+<span><span class="co">#&gt;  Variable weighted_range Effective_N</span></span>
+<span><span class="co">#&gt;    income           7200      2158.9</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="multiple-variables">Multiple Variables<a class="anchor" aria-label="anchor" href="#multiple-variables"></a>
+</h3>
+<p>All <code>w_*</code> functions accept multiple variables:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
+<span>       weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Mean Statistics</span></span>
+<span><span class="co">#&gt; ------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- age ---</span></span>
+<span><span class="co">#&gt;  Variable weighted_mean Effective_N</span></span>
+<span><span class="co">#&gt;       age        50.514      2468.8</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- income ---</span></span>
+<span><span class="co">#&gt;  Variable weighted_mean Effective_N</span></span>
+<span><span class="co">#&gt;    income      3743.099      2158.9</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
+<span><span class="co">#&gt;           Variable weighted_mean Effective_N</span></span>
+<span><span class="co">#&gt;  life_satisfaction         3.625      2390.9</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="effective-sample-size">Effective Sample Size<a class="anchor" aria-label="anchor" href="#effective-sample-size"></a>
 </h2>
-<p>Weighting reduces the statistical precision of your estimates. The
-<em>effective sample size</em>
+<p>Weighting reduces statistical precision. The <em>effective sample
+size</em>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>e</mi><mi>f</mi><mi>f</mi></mrow></msub><annotation encoding="application/x-tex">n_{eff}</annotation></semantics></math>)
 tells you how much information your weighted sample actually
 carries:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mrow><mi>e</mi><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mo>∑</mo><msub><mi>w</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mrow><mo>∑</mo><msubsup><mi>w</mi><mi>i</mi><mn>2</mn></msubsup></mrow></mfrac></mrow><annotation encoding="application/x-tex">n_{eff} = \frac{\left(\sum w_i\right)^2}{\sum w_i^2}</annotation></semantics></math></p>
-<p>The <em>design effect</em> is the ratio of actual to effective sample
-size:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">actual_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
-<span><span class="va">age_weighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">effective_n</span> <span class="op">&lt;-</span> <span class="va">age_weighted</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">effective_n</span></span>
+<span><span class="va">age_w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="va">effective_n</span> <span class="op">&lt;-</span> <span class="va">age_w</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">effective_n</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Actual sample size:"</span>, <span class="va">actual_n</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Actual sample size: 2500</span></span>
@@ -288,58 +309,84 @@ size:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Design effect:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">actual_n</span> <span class="op">/</span> <span class="va">effective_n</span>, <span class="fl">2</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Design effect: 1.01</span></span></code></pre></div>
 <p>A design effect of 1.0 means weights have no impact on precision.
-Values above 1 mean the effective sample is smaller than the actual
-sample — your standard errors are larger than they would be without
-weights.</p>
+Values above 1 mean larger standard errors than an unweighted sample of
+the same size.</p>
 </div>
 <div class="section level2">
-<h2 id="weights-in-statistical-tests">Weights in Statistical Tests<a class="anchor" aria-label="anchor" href="#weights-in-statistical-tests"></a>
+<h2 id="weights-in-analysis-functions">Weights in Analysis Functions<a class="anchor" aria-label="anchor" href="#weights-in-analysis-functions"></a>
 </h2>
-<p>All main analysis functions support the <code>weights</code>
+<p>Every analysis function in mariposa supports the <code>weights</code>
 argument:</p>
-<div class="section level3">
-<h3 id="weighted-t-test">Weighted t-test<a class="anchor" aria-label="anchor" href="#weighted-t-test"></a>
-</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Descriptive statistics</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
+<span><span class="co">#&gt; -------------------------------</span></span>
+<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Frequency tables</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
+<span><span class="co">#&gt; -----------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; education (Highest educational attainment)</span></span>
+<span><span class="co">#&gt; # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span>
+<span><span class="co">#&gt; |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |</span></span>
+<span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span>
+<span><span class="co">#&gt; |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |</span></span>
+<span><span class="co">#&gt; | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |</span></span>
+<span><span class="co">#&gt; |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |</span></span>
+<span><span class="co">#&gt; |             University |             University |    385 |  15.31 |  15.31 | 100.00 |</span></span>
+<span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span>
+<span><span class="co">#&gt; |                  Total |                        |   2516 | 100.00 | 100.00 |        |</span></span>
+<span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># t-test</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
 <span><span class="co">#&gt;   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="weighted-anova">Weighted ANOVA<a class="anchor" aria-label="anchor" href="#weighted-anova"></a>
-</h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># ANOVA</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
 <span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="weighted-chi-square">Weighted Chi-square<a class="anchor" aria-label="anchor" href="#weighted-chi-square"></a>
-</h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Chi-square</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chi_square.html">chi_square</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Chi-Squared Test: education × employment [Weighted]</span></span>
 <span><span class="co">#&gt;   chi2(12) = 130.696, p &lt; 0.001 ***, V = 0.132 (small), N = 2518</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="weighted-correlations">Weighted Correlations<a class="anchor" aria-label="anchor" href="#weighted-correlations"></a>
-</h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Correlation</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
 <span><span class="co">#&gt;   r = -0.005, p = 0.828 , N = 2201</span></span></code></pre></div>
-</div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Regression</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>,</span>
+<span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income [Weighted]</span></span>
+<span><span class="co">#&gt;   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p &lt; 0.001 ***, N = 2130</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="grouped-analysis-with-weights">Grouped Analysis with Weights<a class="anchor" aria-label="anchor" href="#grouped-analysis-with-weights"></a>
+<h2 id="grouped-weighted-analysis">Grouped Weighted Analysis<a class="anchor" aria-label="anchor" href="#grouped-weighted-analysis"></a>
 </h2>
 <p>All functions work seamlessly with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
@@ -365,50 +412,57 @@ argument:</p>
 <span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [region = 1]</span></span>
+<span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450</span></span>
+<span><span class="co">#&gt; [region = 2]</span></span>
+<span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="diagnosing-weight-issues">Diagnosing Weight Issues<a class="anchor" aria-label="anchor" href="#diagnosing-weight-issues"></a>
 </h2>
 <div class="section level3">
-<h3 id="extreme-weights">Extreme Weights<a class="anchor" aria-label="anchor" href="#extreme-weights"></a>
+<h3 id="checking-weight-distribution">Checking Weight Distribution<a class="anchor" aria-label="anchor" href="#checking-weight-distribution"></a>
 </h3>
-<p>Weights that are very large or very small can destabilize your
-estimates. Check the distribution of your weights:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">weight_stats</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    min_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    max_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    mean_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    sd_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weight_stats</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
-<span><span class="co">#&gt;   min_weight max_weight mean_weight sd_weight</span></span>
-<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      0.702       1.40        1.01     0.113</span></span></code></pre></div>
-<p>A rule of thumb: weights should typically range from about 0.2 to 5.
-Extreme values (below 0.1 or above 10) may indicate problems with the
-weighting scheme.</p>
+<span><span class="co">#&gt;     min   max  mean    sd</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0.702  1.40  1.01 0.113</span></span></code></pre></div>
+<p>A rule of thumb: weights should range from about 0.2 to 5. Extreme
+values (below 0.1 or above 10) may indicate problems with the weighting
+scheme.</p>
 </div>
 <div class="section level3">
 <h3 id="missing-weights">Missing Weights<a class="anchor" aria-label="anchor" href="#missing-weights"></a>
 </h3>
-<p>Check how many cases lack weight values:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">missing_weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">sampling_weight</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">total_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Cases with missing weights:"</span>, <span class="va">missing_weights</span>, <span class="st">"/"</span>, <span class="va">total_cases</span>,</span>
-<span>    <span class="st">"("</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">missing_weights</span> <span class="op">/</span> <span class="va">total_cases</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"%)\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Cases with missing weights: 0 / 2500 ( 0 %)</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">sampling_weight</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Missing weights:"</span>, <span class="va">missing</span>, <span class="st">"/"</span>, <span class="va">total</span>,</span>
+<span>    <span class="st">"("</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">missing</span> <span class="op">/</span> <span class="va">total</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"%)\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Missing weights: 0 / 2500 ( 0 %)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="weight-trimming">Weight Trimming<a class="anchor" aria-label="anchor" href="#weight-trimming"></a>
 </h3>
-<p>If weights are extreme, consider trimming them to reduce variance at
-the cost of a small increase in bias:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data_trimmed</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<p>If weights are extreme, trim them to reduce variance at the cost of a
+small increase in bias:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trimmed</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    weight_trimmed <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>      <span class="va">sampling_weight</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">~</span> <span class="fl">5</span>,</span>
@@ -418,77 +472,35 @@ the cost of a small increase in bias:</p>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">original</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">trimmed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data_trimmed</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">weight_trimmed</span><span class="op">)</span></span>
+<span><span class="va">trimmed_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">trimmed</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">weight_trimmed</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Original weighted mean:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">original</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Original weighted mean: 3743.1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Trimmed weighted mean:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">trimmed</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Trimmed weighted mean:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">trimmed_result</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Trimmed weighted mean: 3743.1</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="best-practices">Best Practices<a class="anchor" aria-label="anchor" href="#best-practices"></a>
-</h2>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Always use weights when they are provided.</strong> They
-ensure your results generalize to the population, not just the
-sample.</li>
-<li>
-<strong>Report both weighted and unweighted results</strong> for
-transparency:</li>
-</ol>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  Statistic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Mean Age"</span>, <span class="st">"Mean Income"</span><span class="op">)</span>,</span>
-<span>  Unweighted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">age</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">income</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  Weighted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>,</span>
-<span>    <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     Statistic Unweighted  Weighted</span></span>
-<span><span class="co">#&gt; 1    Mean Age    50.5496   50.5144</span></span>
-<span><span class="co">#&gt; 2 Mean Income  3753.9341 3743.0994</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal">
-<li>
-<strong>Document the weight source.</strong> Explain how weights
-were calculated and what they adjust for.</li>
-<li>
-<strong>Report the effective sample size.</strong> This tells
-readers about the precision of your estimates.</li>
-<li>
-<strong>Check for extreme weights.</strong> Large variation in
-weights inflates standard errors and reduces power.</li>
-</ol>
-</div>
-<div class="section level2">
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
-<p>A full weighted analysis workflow:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Inspect weight properties</span></span>
-<span><span class="va">weight_summary</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
 <span>    n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    mean_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    sd_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    min_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    max_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">sampling_weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weight_summary</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
-<span><span class="co">#&gt;       n  mean    sd   min   max</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>500  1.01 0.113 0.702  1.40</span></span>
+<span><span class="co">#&gt;       n mean_weight sd_weight min_weight max_weight</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>500        1.01     0.113      0.702       1.40</span></span>
 <span></span>
 <span><span class="co"># 2. Compare weighted vs unweighted</span></span>
-<span><span class="va">vars_to_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"income"</span>, <span class="st">"life_satisfaction"</span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">var</span> <span class="kw">in</span> <span class="va">vars_to_check</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"income"</span>, <span class="st">"life_satisfaction"</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">var</span> <span class="kw">in</span> <span class="va">vars</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">unw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">[[</span><span class="va">var</span><span class="op">]</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="va">w_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="op">!</span><span class="op">!</span><span class="fu"><a href="https://rlang.r-lib.org/reference/sym.html" class="external-link">sym</a></span><span class="op">(</span><span class="va">var</span><span class="op">)</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span>  <span class="va">w</span> <span class="op">&lt;-</span> <span class="va">w_result</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span></span>
@@ -499,7 +511,7 @@ weights inflates standard errors and reduces power.</li>
 <span><span class="co">#&gt; income: unweighted = 3753.93, weighted = 3743.10 (diff = -0.3%)</span></span>
 <span><span class="co">#&gt; life_satisfaction: unweighted = 3.63, weighted = 3.62 (diff = -0.1%)</span></span>
 <span></span>
-<span><span class="co"># 3. Weighted group comparisons</span></span>
+<span><span class="co"># 3. Weighted group comparison</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -528,25 +540,43 @@ weights inflates standard errors and reduces power.</li>
 <span><span class="co">#&gt;   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="best-practices">Best Practices<a class="anchor" aria-label="anchor" href="#best-practices"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Always use weights when they are provided.</strong> They
+correct for sampling biases and make your results
+generalizable.</p></li>
+<li><p><strong>Report both weighted and unweighted sample
+sizes.</strong> The actual <em>n</em> tells readers about data
+collection; the effective <em>n</em> tells them about statistical
+precision.</p></li>
+<li><p><strong>Check for extreme weights.</strong> Large variation
+inflates standard errors and reduces statistical power. Consider
+trimming if necessary.</p></li>
+<li><p><strong>Document the weight source.</strong> Explain how weights
+were calculated and what they adjust for (e.g., age, gender, region
+post-stratification).</p></li>
+<li><p><strong>Report the effective sample size.</strong> This tells
+readers how much precision was lost due to weighting.</p></li>
+</ol>
+</div>
+<div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
 <ol style="list-style-type: decimal">
+<li>Survey weights make results <strong>representative of the
+population</strong>, not just the sample</li>
+<li>The 11 <code>w_*</code> functions provide individual weighted
+statistics</li>
 <li>
-<strong>Always use weights</strong> when they are available — they
-correct for sampling biases</li>
-<li>
-<strong>Check weight properties</strong> — extreme values may need
-trimming</li>
-<li>
-<strong>Report the effective
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math></strong>
-— weights reduce statistical precision</li>
-<li>
-<strong>Document everything</strong> — explain what weights adjust
-for</li>
-<li>In mariposa, adding weights is as simple as
-<code>weights = sampling_weight</code>
+<strong>All analysis functions</strong> support weights via
+<code>weights =</code>
 </li>
+<li>The <strong>effective sample size</strong> measures how much
+precision weighting costs</li>
+<li>
+<strong>Check and document</strong> weight distributions, extreme
+values, and missing weights</li>
 </ol>
 </div>
 <div class="section level2">
@@ -562,8 +592,8 @@ for</li>
 <li>Test hypotheses — see
 <code><a href="../articles/hypothesis-testing.html">vignette("hypothesis-testing")</a></code>
 </li>
-<li>Measure relationships — see
-<code><a href="../articles/correlation-analysis.html">vignette("correlation-analysis")</a></code>
+<li>Import weighted data from SPSS — see
+<code><a href="../articles/data-io.html">vignette("data-io")</a></code>
 </li>
 </ul>
 </div>

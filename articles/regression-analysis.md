@@ -11,24 +11,21 @@ data(survey_data)
 Regression analysis predicts an outcome from one or more predictors.
 mariposa provides two regression functions with SPSS-compatible output:
 
-| Function                                                                                            | Use when…                                                     |
-|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)     | Your outcome is continuous (e.g., income, satisfaction score) |
-| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Your outcome is binary (e.g., yes/no, high/low)               |
+| Function                                                                                            | Use when                                                 |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)     | Outcome is continuous (e.g., income, satisfaction score) |
+| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Outcome is binary (e.g., yes/no, high/low)               |
 
 Both functions support two interface styles:
 
-- **Formula interface:** `linear_regression(data, y ~ x1 + x2)` –
-  standard R style
-- **SPSS-style:**
-  `linear_regression(data, dependent = y, predictors = c(x1, x2))` –
-  familiar for SPSS users
+- **Formula**: `linear_regression(data, y ~ x1 + x2)` — standard R
+  syntax
+- **SPSS-style**:
+  `linear_regression(data, dependent = y, predictors = c(x1, x2))`
 
 ## Linear Regression
 
-### Bivariate Regression
-
-Start with a single predictor:
+### Simple Regression
 
 ``` r
 linear_regression(survey_data, life_satisfaction ~ age)
@@ -36,41 +33,75 @@ linear_regression(survey_data, life_satisfaction ~ age)
 #>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421
 ```
 
-The output includes four sections matching SPSS REGRESSION:
+### Detailed Output
+
+``` r
+result <- linear_regression(survey_data, life_satisfaction ~ age)
+summary(result)
+#> 
+#> Linear Regression Results
+#> -------------------------
+#> - Formula: life_satisfaction ~ age
+#> - Method: ENTER (all predictors)
+#> - N: 2421
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   R                              0.029
+#>   R Square                       0.001
+#>   Adjusted R Square              0.000
+#>   Std. Error of Estimate         1.153
+#>   ------------------------------------------------------------
+#> 
+#>   ANOVA
+#>   ------------------------------------------------------------------------------
+#>   Source           Sum of Squares    df      Mean Square          F     Sig.
+#>   ------------------------------------------------------------------------------
+#>   Regression                2.653     1            2.653      1.996    0.158 
+#>   Residual               3214.775  2419            1.329                     
+#>   Total                  3217.428  2420                                      
+#>   ------------------------------------------------------------------------------
+#> 
+#>   Coefficients
+#>   ----------------------------------------------------------------------------------------
+#>   Term                               B  Std.Error     Beta          t     Sig. 
+#>   ----------------------------------------------------------------------------------------
+#>   (Intercept)                    3.727      0.074              50.663    0.000 ***
+#>   age                           -0.002      0.001   -0.029     -1.413    0.158 
+#>   ----------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+```
+
+The detailed output includes four sections matching SPSS REGRESSION:
 
 - **Model Summary**: R, R-squared, Adjusted R-squared
 - **ANOVA Table**: Overall model significance
-- **Coefficients**: B (unstandardized), Beta (standardized), t, p, and
+- **Coefficients**: B (unstandardized), Beta (standardized), t, p,
   confidence intervals
 - **Descriptives**: Mean and SD for all variables
 
-### Understanding the Coefficients
+### Understanding Coefficients
 
-- **B (unstandardized):** For each 1-unit increase in the predictor, the
-  outcome changes by B units. The intercept is the predicted value when
-  all predictors are zero.
-- **Beta (standardized):** Allows comparison across predictors measured
-  on different scales. A Beta of 0.30 means a 1-SD increase in the
-  predictor is associated with a 0.30-SD change in the outcome.
-- **p-value:** Values below 0.05 indicate that the predictor’s effect is
-  statistically significant.
+- **B (unstandardized)**: For each 1-unit increase in the predictor, the
+  outcome changes by B units
+- **Beta (standardized)**: Allows comparison across predictors on
+  different scales. A Beta of 0.30 means a 1-SD increase in the
+  predictor is associated with a 0.30-SD change in the outcome
+- **p-value**: Below 0.05 indicates statistical significance
 
 ### Multiple Regression
 
-Add more predictors to explain more variance:
-
 ``` r
-linear_regression(survey_data, life_satisfaction ~ age + income + trust_government)
+linear_regression(survey_data,
+                  life_satisfaction ~ age + income + trust_government)
 #> Linear Regression: life_satisfaction ~ age + income + trust_government
 #>   R2 = 0.198, adj.R2 = 0.197, F(3, 1991) = 163.89, p < 0.001 ***, N = 1995
 ```
 
-Compare Beta values to see which predictor has the strongest effect.
+Compare Beta values to identify the strongest predictor.
 
 ### SPSS-Style Interface
-
-If you prefer the SPSS approach with separate dependent and predictor
-arguments:
 
 ``` r
 linear_regression(survey_data,
@@ -79,8 +110,6 @@ linear_regression(survey_data,
 #> Linear Regression: life_satisfaction ~ age + income + trust_government
 #>   R2 = 0.198, adj.R2 = 0.197, F(3, 1991) = 163.89, p < 0.001 ***, N = 1995
 ```
-
-Results are identical regardless of which interface you use.
 
 ### With Survey Weights
 
@@ -92,7 +121,7 @@ linear_regression(survey_data,
 #>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p < 0.001 ***, N = 2130
 ```
 
-Weights are treated as frequency weights, matching SPSS WEIGHT BY
+Weights are treated as frequency weights, matching SPSS `WEIGHT BY`
 behavior.
 
 ### Grouped Analysis
@@ -108,20 +137,32 @@ survey_data %>%
 #>   region = West: R2 = 0.201, adj.R2 = 0.200, F(2, 1702) = 214.58, p < 0.001 ***, N = 1705
 ```
 
-This matches SPSS SPLIT FILE BY – a separate model is fitted for each
-group.
-
 ### Interpreting R-squared
 
-R-squared tells you how much variance your predictors explain:
+R-squared tells you how much variance the predictors explain:
 
-- R-squared = 0.01 – 0.05: Small effect
-- R-squared = 0.06 – 0.13: Medium effect
-- R-squared = 0.14+: Large effect
+- 0.01 – 0.05: Small effect
+- 0.06 – 0.13: Medium effect
+- 0.14+: Large effect
 
-These benchmarks follow Cohen’s (1988) conventions for the social
-sciences. Always check the ANOVA table to confirm the model is
-statistically significant.
+These benchmarks follow Cohen (1988). Always check the ANOVA table to
+confirm overall model significance.
+
+### Using Transformed Predictors
+
+Combine with data transformation functions for better models:
+
+``` r
+# Standardize predictors for comparable coefficients
+survey_data_z <- survey_data %>%
+  std(age, income, suffix = "_z")
+
+linear_regression(survey_data_z,
+                  life_satisfaction ~ age_z + income_z + trust_government,
+                  weights = sampling_weight)
+#> Linear Regression: life_satisfaction ~ age_z + income_z + trust_government [Weighted]
+#>   R2 = 0.200, adj.R2 = 0.199, F(3, 2005) = 167.49, p < 0.001 ***, N = 2009
+```
 
 ## Logistic Regression
 
@@ -144,30 +185,83 @@ logistic_regression(survey_data, high_satisfaction ~ age + income)
 #>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p < 0.001 ***, Accuracy = 68.4%, N = 2115
 ```
 
-The output includes five sections matching SPSS LOGISTIC REGRESSION:
+### Detailed Output
 
-- **Omnibus Test**: Is the overall model significant?
+``` r
+log_result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
+summary(log_result)
+#> 
+#> Logistic Regression Results
+#> ---------------------------
+#> - Formula: high_satisfaction ~ age + income
+#> - Method: ENTER
+#> - N: 2115
+#> 
+#>   Omnibus Tests of Model Coefficients
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>   Model                     357.432     2      0.000 ***
+#>   --------------------------------------------------
+#> 
+#>   Model Summary
+#>   ------------------------------------------------------------
+#>   -2 Log Likelihood                  2520.010
+#>   Cox & Snell R Square                  0.155
+#>   Nagelkerke R Square                   0.209
+#>   McFadden R Square                     0.124
+#>   ------------------------------------------------------------
+#> 
+#>   Hosmer and Lemeshow Test
+#>   --------------------------------------------------
+#>                          Chi-square    df       Sig.
+#>   --------------------------------------------------
+#>                             150.764     8      0.000
+#>   --------------------------------------------------
+#> 
+#>   Classification Table (cutoff = 0.50)
+#>   -----------------------------------------------------------------
+#>                                   Predicted                     
+#>   Observed                      0          1       % Correct
+#>   -----------------------------------------------------------------
+#>   0                           508        380           57.2
+#>   1                           289        938           76.4
+#>   -----------------------------------------------------------------
+#>   Overall Percentage                                   68.4
+#>   -----------------------------------------------------------------
+#> 
+#>   Variables in the Equation
+#>   -----------------------------------------------------------------------------------------------
+#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   -----------------------------------------------------------------------------------------------
+#>   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***
+#>   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 
+#>   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***
+#>   -----------------------------------------------------------------------------------------------
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+```
+
+The detailed output includes five sections matching SPSS LOGISTIC
+REGRESSION:
+
+- **Omnibus Test**: Overall model significance
 - **Model Summary**: -2 Log Likelihood and pseudo R-squared values
-- **Hosmer-Lemeshow Test**: Does the model fit the data well?
-- **Classification Table**: How well does the model classify cases?
-- **Coefficients**: B, Wald, Exp(B) (odds ratios), and confidence
-  intervals
+- **Hosmer-Lemeshow Test**: Model fit assessment
+- **Classification Table**: Prediction accuracy
+- **Coefficients**: B, Wald, Exp(B) (odds ratios), confidence intervals
 
 ### Understanding Odds Ratios
 
-The key statistic in logistic regression is Exp(B), the odds ratio:
+Exp(B) is the odds ratio — the key statistic in logistic regression:
 
-- **Exp(B) \> 1:** Each unit increase in the predictor increases the
-  odds of the outcome
-- **Exp(B) \< 1:** Each unit increase in the predictor decreases the
-  odds
-- **Exp(B) = 1:** No effect
+- **Exp(B) \> 1**: Each unit increase raises the odds (e.g., 1.50 = 50%
+  higher odds)
+- **Exp(B) \< 1**: Each unit increase lowers the odds (e.g., 0.80 = 20%
+  lower odds)
+- **Exp(B) = 1**: No effect
 
-For example, Exp(B) = 1.50 means the odds increase by 50% for each
-1-unit increase in the predictor. Exp(B) = 0.80 means the odds decrease
-by 20%.
-
-### With Multiple Predictors
+### Multiple Predictors
 
 ``` r
 logistic_regression(survey_data,
@@ -210,25 +304,20 @@ survey_data %>%
 ### Interpreting Model Fit
 
 **Pseudo R-squared** values are not directly comparable to linear
-regression R-squared, but provide a rough indication of model quality:
+regression R-squared:
 
 - **Nagelkerke R-squared**: Adjusted to reach 1.0, most commonly
   reported
 - **Cox & Snell R-squared**: Cannot reach 1.0, always lower
 - **McFadden R-squared**: Values above 0.20 indicate good fit
 
-**Hosmer-Lemeshow Test**: A non-significant result ($p > .05$) means the
-model fits well. A significant result suggests the model may not
-adequately describe the data.
+**Hosmer-Lemeshow Test**: Non-significant ($p > .05$) means the model
+fits well.
 
-**Classification Table**: Shows the percentage of cases correctly
-predicted. Compare this to the base rate (percentage in the larger
-group) – your model should do better than simply guessing the most
-common outcome.
+**Classification Table**: Compare correct predictions to the base rate —
+your model should outperform guessing the most common category.
 
 ## Complete Example
-
-A full regression analysis workflow:
 
 ``` r
 # 1. Explore relationships first
@@ -243,14 +332,14 @@ survey_data %>%
 #>   income x trust_government:     r = 0.000, p = 0.991  
 #>   1/6 pairs significant (p < .05), N = 2421
 
-# 2. Run the regression
+# 2. Run linear regression
 lm_result <- linear_regression(survey_data,
                                life_satisfaction ~ age + income + trust_government,
                                weights = sampling_weight)
-lm_result              # compact: R-squared + significant predictors
+lm_result
 #> Linear Regression: life_satisfaction ~ age + income + trust_government [Weighted]
 #>   R2 = 0.200, adj.R2 = 0.199, F(3, 2005) = 167.49, p < 0.001 ***, N = 2009
-summary(lm_result)     # detailed: coefficients, ANOVA table, collinearity
+summary(lm_result)
 #> 
 #> Weighted Linear Regression Results
 #> ----------------------------------
@@ -288,7 +377,7 @@ summary(lm_result)     # detailed: coefficients, ANOVA table, collinearity
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 
-# 3. Create binary outcome for logistic regression
+# 3. Create binary outcome
 survey_data <- survey_data %>%
   mutate(high_satisfaction = ifelse(life_satisfaction >= 4, 1, 0))
 
@@ -296,10 +385,10 @@ survey_data <- survey_data %>%
 log_result <- logistic_regression(survey_data,
                                   high_satisfaction ~ age + income + trust_government,
                                   weights = sampling_weight)
-log_result             # compact: model significance + pseudo R-squared
+log_result
 #> Logistic Regression: high_satisfaction ~ age + income + trust_government [Weighted]
 #>   Nagelkerke R2 = 0.207, chi2(3) = 333.71, p < 0.001 ***, Accuracy = 68.5%, N = 2009
-summary(log_result)    # detailed: odds ratios, classification table
+summary(log_result)
 #> 
 #> Weighted Logistic Regression Results
 #> ------------------------------------
@@ -358,51 +447,60 @@ summary(log_result)    # detailed: odds ratios, classification table
 
 1.  **Check correlations first.** Use
     [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
-    to explore bivariate relationships before building a regression
-    model.
+    to explore bivariate relationships before building a model.
 
-2.  **Examine descriptives.** Use
-    [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
-    to check variable distributions, ranges, and missing data before
-    running regression.
+2.  **Center or standardize predictors.** Centering makes the intercept
+    interpretable; standardizing (with
+    [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md))
+    makes Beta coefficients comparable. Use `std(method = "2sd")` to
+    make continuous predictors comparable to binary ones.
 
 3.  **Compare Beta values.** In multiple regression, standardized Beta
-    coefficients tell you which predictor has the strongest effect,
+    coefficients reveal which predictor has the strongest effect,
     regardless of measurement scale.
 
-4.  **Report completely.** Always include R-squared, F-test (for linear)
-    or Omnibus test (for logistic), individual coefficients, and sample
-    size.
+4.  **Watch for multicollinearity.** Highly correlated predictors
+    produce unstable coefficients. Check bivariate correlations before
+    interpreting results.
 
-5.  **Watch for multicollinearity.** If predictors are highly correlated
-    with each other, coefficients may be unstable. Check bivariate
-    correlations before interpreting results.
-
-6.  **Binary outcomes need logistic regression.** Never use
+5.  **Never use
     [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
-    with a 0/1 outcome – predicted values can fall outside 0-1, and
-    statistical tests are invalid.
+    with a binary outcome.** Predicted values can fall outside 0–1, and
+    the statistical tests are invalid. Use
+    [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+    instead.
+
+6.  **Report completely.** Include R-squared, F-test or Omnibus test,
+    individual coefficients, and sample size.
 
 ## Summary
 
 1.  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
-    predicts continuous outcomes, providing B, Beta, ANOVA table, and
-    R-squared
+    predicts continuous outcomes (B, Beta, ANOVA, R-squared)
 2.  [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
-    predicts binary outcomes, providing odds ratios, classification
-    table, and pseudo R-squared
+    predicts binary outcomes (odds ratios, classification, pseudo
+    R-squared)
 3.  Both support formula and SPSS-style interfaces, survey weights, and
     grouped analysis
-4.  Always check correlations and descriptives before building
-    regression models
+4.  Use
+    [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md)
+    and
+    [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md)
+    to prepare predictors for better interpretability
+5.  Always explore bivariate relationships before building regression
+    models
 
 ## Next Steps
 
-- Create reliable scale scores first – see
+- Prepare variables with
+  [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md)
+  and
+  [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md)
+  — see
+  [`vignette("data-transformation")`](https://YannickDiehl.github.io/mariposa/articles/data-transformation.md)
+- Construct reliable scale scores — see
   [`vignette("scale-analysis")`](https://YannickDiehl.github.io/mariposa/articles/scale-analysis.md)
-- Compare group means directly – see
+- Compare groups directly — see
   [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
-- Explore bivariate relationships – see
-  [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
-- Handle survey weights properly – see
+- Handle survey weights — see
   [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)

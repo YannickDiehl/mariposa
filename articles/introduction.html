@@ -42,6 +42,11 @@
 <li><h6 class="dropdown-header" data-toc-skip>Getting Started</h6></li>
     <li><a class="dropdown-item" href="../articles/introduction.html">Introduction to mariposa</a></li>
     <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Management</h6></li>
+    <li><a class="dropdown-item" href="../articles/data-io.html">Importing &amp; Exporting Data</a></li>
+    <li><a class="dropdown-item" href="../articles/labels-and-missing-values.html">Labels &amp; Missing Values</a></li>
+    <li><a class="dropdown-item" href="../articles/data-transformation.html">Data Transformation</a></li>
+    <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Core Analysis</h6></li>
     <li><a class="dropdown-item" href="../articles/descriptive-statistics.html">Descriptive Statistics</a></li>
     <li><a class="dropdown-item" href="../articles/hypothesis-testing.html">Hypothesis Testing</a></li>
@@ -85,23 +90,46 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://YannickDiehl.github.io/mariposa/">mariposa</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+<h2 id="what-is-mariposa">What is mariposa?<a class="anchor" aria-label="anchor" href="#what-is-mariposa"></a>
 </h2>
 <p>mariposa (<em>Marburg Initiative for Political and Social
-Analysis</em>) makes it easy to analyze survey data in R. Whether you
-are working with social surveys, customer satisfaction data, or market
-research, this package helps you get reliable results quickly.</p>
-<p>The package handles the complexities of survey analysis for you —
-things like sampling weights, grouped comparisons, and missing data are
-all taken care of automatically. Every function is validated against
-SPSS, so you can trust the numbers.</p>
+Analysis</em>) is a comprehensive R package for professional survey data
+analysis. It covers the entire workflow — from importing SPSS, Stata,
+SAS, and Excel files through label management, recoding, and
+standardization to statistical analysis with survey weights and
+publication-ready output.</p>
+<p>Every statistical result is validated against SPSS v29, so
+researchers migrating from SPSS can trust their numbers.</p>
+<div class="section level3">
+<h3 id="key-features">Key Features<a class="anchor" aria-label="anchor" href="#key-features"></a>
+</h3>
+<ul>
+<li>
+<strong>76 functions</strong> across 15 categories</li>
+<li>
+<strong>Full data pipeline</strong>: import → labels →
+transformation → analysis → export</li>
+<li>
+<strong>Survey weights</strong> built into every function</li>
+<li>
+<strong>Tidyverse integration</strong>: pipes (<code>%&gt;%</code>),
+<code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>, tidyselect</li>
+<li>
+<strong>Two-level output</strong>: compact <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> and
+detailed <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
+</li>
+<li>
+<strong>SPSS-validated</strong>: 4,986+ tests ensure results match
+SPSS v29</li>
+</ul>
+</div>
 </div>
 <div class="section level2">
-<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+<h2 id="the-example-dataset">The Example Dataset<a class="anchor" aria-label="anchor" href="#the-example-dataset"></a>
 </h2>
-<p>Let’s start with the included example data. It contains responses
-from 2,500 people about their life satisfaction, demographics, and
-opinions.</p>
+<p>mariposa includes <code>survey_data</code>, a synthetic survey of
+2,500 respondents with demographics, attitudes, and a sampling
+weight:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
@@ -123,49 +151,38 @@ opinions.</p>
 <span><span class="co">#&gt; $ sampling_weight       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1.2690774<span style="color: #949494;">, </span>0.8926824<span style="color: #949494;">, </span>1.0424119<span style="color: #949494;">, </span>1.0024385<span style="color: #949494;">, </span>1.02…</span></span>
 <span><span class="co">#&gt; $ stratum               <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> East_Old<span style="color: #949494;">, </span>West_Old<span style="color: #949494;">, </span>West_Middle<span style="color: #949494;">, </span>West_Middle<span style="color: #949494;">, </span>We…</span></span>
 <span><span class="co">#&gt; $ interview_mode        <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Face-to-face<span style="color: #949494;">, </span>Face-to-face<span style="color: #949494;">, </span>Online<span style="color: #949494;">, </span>Telephone<span style="color: #949494;">, </span>T…</span></span></code></pre></div>
+<p>All examples in this guide use this dataset.</p>
 </div>
 <div class="section level2">
-<h2 id="understanding-your-data">Understanding Your Data<a class="anchor" aria-label="anchor" href="#understanding-your-data"></a>
+<h2 id="five-minute-tour">Five-Minute Tour<a class="anchor" aria-label="anchor" href="#five-minute-tour"></a>
 </h2>
+<p>Here is a complete analysis workflow showing what mariposa can
+do:</p>
 <div class="section level3">
-<h3 id="summary-statistics">Summary Statistics<a class="anchor" aria-label="anchor" href="#summary-statistics"></a>
+<h3 id="explore-the-data">1. Explore the Data<a class="anchor" aria-label="anchor" href="#explore-the-data"></a>
 </h3>
-<p>The <code><a href="../reference/describe.html">describe()</a></code> function gives you a complete summary of
-numeric variables. The <code>weights</code> argument ensures results
-represent the population correctly:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Find variables related to "trust"</span></span>
+<span><span class="fu"><a href="../reference/find_var.html">find_var</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="st">"trust"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   col             name                                    label</span></span>
+<span><span class="co">#&gt; 1  11 trust_government Trust in government (1=none, 5=complete)</span></span>
+<span><span class="co">#&gt; 2  12      trust_media      Trust in media (1=none, 5=complete)</span></span>
+<span><span class="co">#&gt; 3  13    trust_science    Trust in science (1=none, 5=complete)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Descriptive statistics with survey weights</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
 <span><span class="co">#&gt; -------------------------------</span></span>
-<span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;       age   50.514     50   17.084    77   25    0.159      2468.8</span></span>
-<span><span class="co">#&gt;    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
+<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span><span class="co">#&gt;                age   50.514     50   17.084    77   25    0.159      2468.8</span></span>
+<span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
-<p>The output shows:</p>
-<ul>
-<li>
-<strong>n</strong>: Number of valid responses</li>
-<li>
-<strong>mean</strong>: The average
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>x</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{x}</annotation></semantics></math>)</li>
-<li>
-<strong>sd</strong>: Standard deviation — how spread out the values
-are</li>
-<li>
-<strong>median</strong>: The middle value (50th percentile)</li>
-<li>
-<strong>range</strong>: Minimum and maximum values</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="categorical-variables">Categorical Variables<a class="anchor" aria-label="anchor" href="#categorical-variables"></a>
-</h3>
-<p>For categorical data like education level or employment status, use
-<code><a href="../reference/frequency.html">frequency()</a></code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Frequency table</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
@@ -184,226 +201,40 @@ are</li>
 <span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span>
 <span><span class="co">#&gt; |                  Total |                        |   2516 | 100.00 | 100.00 |        |</span></span>
 <span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span></code></pre></div>
-<p>This tells you how many people fall into each category, what
-percentage they represent, and cumulative percentages.</p>
 </div>
-</div>
-<div class="section level2">
-<h2 id="comparing-groups">Comparing Groups<a class="anchor" aria-label="anchor" href="#comparing-groups"></a>
-</h2>
 <div class="section level3">
-<h3 id="two-groups-t-test">Two Groups: t-Test<a class="anchor" aria-label="anchor" href="#two-groups-t-test"></a>
+<h3 id="transform-variables">2. Transform Variables<a class="anchor" aria-label="anchor" href="#transform-variables"></a>
 </h3>
-<p>Want to know if men and women differ in life satisfaction? Use
-<code><a href="../reference/t_test.html">t_test()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create age groups</span></span>
+<span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>,</span>
+<span>  rules <span class="op">=</span> <span class="st">"18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]"</span>,</span>
+<span>  suffix <span class="op">=</span> <span class="st">"_group"</span>, as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Build a trust scale</span></span>
+<span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu"><a href="../reference/row_means.html">row_means</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
+<span>                             min_valid <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="compare-groups">3. Compare Groups<a class="anchor" aria-label="anchor" href="#compare-groups"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># t-test with survey weights</span></span>
+<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: life_satisfaction by gender [Weighted]</span></span>
 <span><span class="co">#&gt;   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span></span></code></pre></div>
-<p>If the p-value is below 0.05, the difference is statistically
-significant. But always check the effect size too — a significant result
-with a tiny effect might not be practically meaningful.</p>
-</div>
-<div class="section level3">
-<h3 id="three-or-more-groups-anova">Three or More Groups: ANOVA<a class="anchor" aria-label="anchor" href="#three-or-more-groups-anova"></a>
-</h3>
-<p>When comparing more than two groups, use
-<code><a href="../reference/oneway_anova.html">oneway_anova()</a></code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># ANOVA across education levels</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="va">result</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
 <span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="finding-relationships">Finding Relationships<a class="anchor" aria-label="anchor" href="#finding-relationships"></a>
-</h2>
-<div class="section level3">
-<h3 id="correlation">Correlation<a class="anchor" aria-label="anchor" href="#correlation"></a>
-</h3>
-<p>Are age and income related? Pearson’s <em>r</em> measures linear
-association:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
-<span><span class="co">#&gt;   r = -0.005, p = 0.828 , N = 2201</span></span></code></pre></div>
-<ul>
-<li>
-<strong>r &gt; 0</strong>: As one variable increases, the other
-tends to increase</li>
-<li>
-<strong>r &lt; 0</strong>: As one increases, the other tends to
-decrease</li>
-<li>
-<strong>r near 0</strong>: No linear relationship</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="cross-tabulation">Cross-Tabulation<a class="anchor" aria-label="anchor" href="#cross-tabulation"></a>
-</h3>
-<p>See how two categorical variables relate:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Crosstabulation: education × employment</span></span>
-<span><span class="co">#&gt; --------------------------------------- </span></span>
-<span><span class="co">#&gt; - Row variable: education</span></span>
-<span><span class="co">#&gt; - Column variable: employment</span></span>
-<span><span class="co">#&gt; - Percentages: Row percentages</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - N (valid): 2516 (weighted)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
-<span><span class="co">#&gt; |                      |                                 employment                                  |</span></span>
-<span><span class="co">#&gt; | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |</span></span>
-<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
-<span><span class="co">#&gt; | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |</span></span>
-<span><span class="co">#&gt; |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |</span></span>
-<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
-<span><span class="co">#&gt; | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |</span></span>
-<span><span class="co">#&gt; |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |</span></span>
-<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
-<span><span class="co">#&gt; | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |</span></span>
-<span><span class="co">#&gt; |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |</span></span>
-<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
-<span><span class="co">#&gt; | University           |         34 |        240 |         21 |         72 |         20 |        385 |</span></span>
-<span><span class="co">#&gt; |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |</span></span>
-<span><span class="co">#&gt; +======================+============+============+============+============+============+============+</span></span>
-<span><span class="co">#&gt; | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |</span></span>
-<span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="working-with-groups">Working with Groups<a class="anchor" aria-label="anchor" href="#working-with-groups"></a>
-</h2>
-<div class="section level3">
-<h3 id="regional-analysis">Regional Analysis<a class="anchor" aria-label="anchor" href="#regional-analysis"></a>
-</h3>
-<p>Use <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code> from dplyr to compare statistics across
-subgroups:</p>
+<p>Every result has a detailed view with <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; -------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = East</span></span>
-<span><span class="co">#&gt; --------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
-<span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: region = West</span></span>
-<span><span class="co">#&gt; --------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
-<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="multiple-variables-at-once">Multiple Variables at Once<a class="anchor" aria-label="anchor" href="#multiple-variables-at-once"></a>
-</h3>
-<p>Test several variables simultaneously:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
-<span>         group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; t-Test: trust_government by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371</span></span>
-<span><span class="co">#&gt; t-Test: trust_media by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382</span></span>
-<span><span class="co">#&gt; t-Test: trust_science by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="why-weights-matter">Why Weights Matter<a class="anchor" aria-label="anchor" href="#why-weights-matter"></a>
-</h2>
-<p>Survey weights make your results representative of the population.
-Here is the difference they make:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unweighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">age</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">weighted_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">weighted</span> <span class="op">&lt;-</span> <span class="va">weighted_result</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Sample average age:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">unweighted</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Sample average age: 50.5</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Population average age:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">weighted</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Population average age: 50.5</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Difference:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">weighted</span> <span class="op">-</span> <span class="va">unweighted</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"years\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Difference: 0 years</span></span></code></pre></div>
-<p>Always use weights when they are provided — unweighted results can be
-misleading.</p>
-</div>
-<div class="section level2">
-<h2 id="a-typical-workflow">A Typical Workflow<a class="anchor" aria-label="anchor" href="#a-typical-workflow"></a>
-</h2>
-<p>Here is how a complete analysis might look:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Descriptive overview</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; -------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.625      4 1.152     4   2   -0.498      2390.9</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span></span>
-<span><span class="co"># 2. Compare across groups</span></span>
-<span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
-<span><span class="co">#&gt; -------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: education = Basic Secondary</span></span>
-<span><span class="co">#&gt; ----------------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: education = Intermediate Secondary</span></span>
-<span><span class="co">#&gt; -----------------------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median   SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: education = Academic Secondary</span></span>
-<span><span class="co">#&gt; -------------------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Group: education = University</span></span>
-<span><span class="co">#&gt; -----------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span></span>
-<span><span class="co"># 3. Test for significant differences</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
-<span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="va">result</span>                                  <span class="co"># compact overview</span></span>
-<span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
-<span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, descriptives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>   <span class="co"># detailed output, skip descriptives</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, descriptives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Weighted One-Way ANOVA Results</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -445,9 +276,13 @@ misleading.</p>
 <span><span class="co">#&gt; - Omega-squared: Unbiased estimate (preferred for publication)</span></span>
 <span><span class="co">#&gt; - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Post-hoc tests: Use tukey_test() for pairwise comparisons</span></span>
-<span></span>
-<span><span class="co"># 4. If significant, find out which groups differ</span></span>
+<span><span class="co">#&gt; Post-hoc tests: Use tukey_test() for pairwise comparisons</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="post-hoc-analysis">4. Post-Hoc Analysis<a class="anchor" aria-label="anchor" href="#post-hoc-analysis"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Which education groups differ?</span></span>
 <span><span class="fu"><a href="../reference/tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Weighted Tukey HSD Post-Hoc Test Results</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
@@ -488,98 +323,578 @@ misleading.</p>
 <span><span class="co">#&gt; - Confidence intervals not containing 0 indicate significant differences</span></span>
 <span><span class="co">#&gt; - p-values are adjusted for multiple comparisons (family-wise error control)</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="measure-relationships">5. Measure Relationships<a class="anchor" aria-label="anchor" href="#measure-relationships"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Pearson Correlation: 3 variables [Weighted]</span></span>
+<span><span class="co">#&gt;   age x income:                  r = -0.005, p = 0.828  </span></span>
+<span><span class="co">#&gt;   age x life_satisfaction:       r = -0.029, p = 0.150  </span></span>
+<span><span class="co">#&gt;   income x life_satisfaction:    r = 0.450, p &lt; 0.001 *** </span></span>
+<span><span class="co">#&gt;   1/3 pairs significant (p &lt; .05), N = 2201</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="build-models">6. Build Models<a class="anchor" aria-label="anchor" href="#build-models"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">m_trust</span>,</span>
+<span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income + m_trust [Weighted]</span></span>
+<span><span class="co">#&gt;   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.00, p &lt; 0.001 ***, N = 2113</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level2">
-<h2 id="tips-for-success">Tips for Success<a class="anchor" aria-label="anchor" href="#tips-for-success"></a>
+<h2 id="compact-vs--detailed-output">Compact vs. Detailed Output<a class="anchor" aria-label="anchor" href="#compact-vs--detailed-output"></a>
 </h2>
-<ol style="list-style-type: decimal">
+<p>Every analysis function in mariposa provides two output levels:</p>
+<ul>
 <li>
-<strong>Always start with descriptives.</strong> Understand your
-data before running tests.</li>
+<strong><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code></strong> (default): A compact one-line
+summary with the key statistic</li>
 <li>
-<strong>Check your assumptions.</strong> Skewness near 0 suggests
-roughly normal data; values beyond
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>±</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pm 1</annotation></semantics></math>
-indicate notable skew.</li>
-<li>
-<strong>Use appropriate tests.</strong> Continuous data: t-test,
-ANOVA, Pearson. Ordinal data: Mann-Whitney, Spearman. Categorical data:
-chi-square.</li>
-<li>
-<strong>Report effect sizes.</strong> Statistical significance alone
-does not tell you whether a difference matters in practice.</li>
-</ol>
+<strong><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code></strong>: Full SPSS-style output with
+all details</li>
+</ul>
+<p>You can toggle individual sections in the detailed output:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compact</span></span>
+<span><span class="va">result</span></span>
+<span><span class="co">#&gt; t-Test: life_satisfaction by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span></span>
+<span></span>
+<span><span class="co"># Detailed</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Weighted t-Test Results</span></span>
+<span><span class="co">#&gt; -----------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Grouping variable: gender</span></span>
+<span><span class="co">#&gt; - Groups compared: Male vs. Female</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
+<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Male: mean = 3.598, n = 1149.0</span></span>
+<span><span class="co">#&gt;   Female: mean = 3.648, n = 1287.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted t-test Results:</span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
+<span><span class="co">#&gt;    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    </span></span>
+<span><span class="co">#&gt;  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    </span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect Sizes:</span></span>
+<span><span class="co">#&gt; ------------ </span></span>
+<span><span class="co">#&gt;           Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
+<span><span class="co">#&gt;  life_satisfaction   -0.043   -0.043      -0.043  negligible</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect Size Interpretation:</span></span>
+<span><span class="co">#&gt; - Cohen's d: pooled standard deviation (classic)</span></span>
+<span><span class="co">#&gt; - Hedges' g: bias-corrected Cohen's d (preferred)</span></span>
+<span><span class="co">#&gt; - Glass' Delta: control group standard deviation only</span></span>
+<span><span class="co">#&gt; - Small effect: |effect| ~ 0.2</span></span>
+<span><span class="co">#&gt; - Medium effect: |effect| ~ 0.5</span></span>
+<span><span class="co">#&gt; - Large effect: |effect| ~ 0.8</span></span>
+<span></span>
+<span><span class="co"># Detailed, skip effect sizes</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, effect_sizes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Weighted t-Test Results</span></span>
+<span><span class="co">#&gt; -----------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Grouping variable: gender</span></span>
+<span><span class="co">#&gt; - Groups compared: Male vs. Female</span></span>
+<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
+<span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Male: mean = 3.598, n = 1149.0</span></span>
+<span><span class="co">#&gt;   Female: mean = 3.648, n = 1287.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted t-test Results:</span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
+<span><span class="co">#&gt;    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    </span></span>
+<span><span class="co">#&gt;  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    </span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
+</h2>
+<p>All functions support <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code> for subgroup
+analysis:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
+<span><span class="co">#&gt; -------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = East</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: region = West</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [region = 1]</span></span>
+<span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450</span></span>
+<span><span class="co">#&gt; [region = 2]</span></span>
+<span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
+<span><span class="co">#&gt;   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-reference">Quick Reference<a class="anchor" aria-label="anchor" href="#quick-reference"></a>
 </h2>
+<div class="section level3">
+<h3 id="data-import-export">Data Import &amp; Export<a class="anchor" aria-label="anchor" href="#data-import-export"></a>
+</h3>
 <table class="table">
 <colgroup>
-<col width="24%">
-<col width="40%">
-<col width="36%">
+<col width="52%">
+<col width="47%">
 </colgroup>
 <thead><tr class="header">
-<th>Task</th>
 <th>Function</th>
-<th>Example</th>
+<th>Purpose</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Summarize numeric</td>
-<td><code><a href="../reference/describe.html">describe()</a></code></td>
-<td><code>describe(age, income)</code></td>
+<td>
+<code><a href="../reference/read_spss.html">read_spss()</a></code>, <code><a href="../reference/read_por.html">read_por()</a></code>
+</td>
+<td>Import SPSS files with tagged NA support</td>
 </tr>
 <tr class="even">
-<td>Count categories</td>
-<td><code><a href="../reference/frequency.html">frequency()</a></code></td>
-<td><code>frequency(education)</code></td>
+<td><code><a href="../reference/read_stata.html">read_stata()</a></code></td>
+<td>Import Stata files</td>
 </tr>
 <tr class="odd">
-<td>Compare 2 groups</td>
-<td><code><a href="../reference/t_test.html">t_test()</a></code></td>
-<td><code>t_test(income, group = gender)</code></td>
+<td>
+<code><a href="../reference/read_sas.html">read_sas()</a></code>, <code><a href="../reference/read_xpt.html">read_xpt()</a></code>
+</td>
+<td>Import SAS files</td>
 </tr>
 <tr class="even">
-<td>Compare 3+ groups</td>
-<td><code><a href="../reference/oneway_anova.html">oneway_anova()</a></code></td>
-<td><code>oneway_anova(income, group = education)</code></td>
+<td><code><a href="../reference/read_xlsx.html">read_xlsx()</a></code></td>
+<td>Import Excel files with label reconstruction</td>
 </tr>
 <tr class="odd">
-<td>Test association</td>
-<td><code><a href="../reference/chi_square.html">chi_square()</a></code></td>
-<td><code>chi_square(education, employment)</code></td>
+<td><code><a href="../reference/write_spss.html">write_spss()</a></code></td>
+<td>Export to SPSS with label/missing roundtripping</td>
 </tr>
 <tr class="even">
-<td>Measure correlation</td>
-<td><code><a href="../reference/pearson_cor.html">pearson_cor()</a></code></td>
-<td><code>pearson_cor(age, income)</code></td>
+<td><code><a href="../reference/write_stata.html">write_stata()</a></code></td>
+<td>Export to Stata</td>
 </tr>
 <tr class="odd">
-<td>Cross-tabulate</td>
-<td><code><a href="../reference/crosstab.html">crosstab()</a></code></td>
-<td><code>crosstab(education, region)</code></td>
+<td><code><a href="../reference/write_xpt.html">write_xpt()</a></code></td>
+<td>Export to SAS transport format</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/write_xlsx.html">write_xlsx()</a></code></td>
+<td>Export to Excel (data, codebook, frequencies)</td>
 </tr>
 </tbody>
 </table>
-<p>All functions support survey weights via <code>weights =</code> and
-grouped analysis via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>.</p>
+</div>
+<div class="section level3">
+<h3 id="label-management">Label Management<a class="anchor" aria-label="anchor" href="#label-management"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/var_label.html">var_label()</a></code></td>
+<td>Get/set variable labels</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/val_labels.html">val_labels()</a></code></td>
+<td>Get/set value labels</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/find_var.html">find_var()</a></code></td>
+<td>Search variables by name or label</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/to_label.html">to_label()</a></code></td>
+<td>Labelled → factor</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/to_character.html">to_character()</a></code></td>
+<td>Labelled → character</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/to_numeric.html">to_numeric()</a></code></td>
+<td>Factor/labelled → numeric</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/to_labelled.html">to_labelled()</a></code></td>
+<td>Factor/character → labelled</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/set_na.html">set_na()</a></code></td>
+<td>Declare values as missing</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/unlabel.html">unlabel()</a></code></td>
+<td>Strip all label metadata</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/copy_labels.html">copy_labels()</a></code></td>
+<td>Restore labels after dplyr operations</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/drop_labels.html">drop_labels()</a></code></td>
+<td>Remove unused value labels</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="data-transformation">Data Transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/rec.html">rec()</a></code></td>
+<td>Recode with string syntax (ranges, reverse, median split)</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/to_dummy.html">to_dummy()</a></code></td>
+<td>One-hot encoding / dummy variables</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/std.html">std()</a></code></td>
+<td>Z-standardization (sd, 2sd, mad, gmd methods)</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/center.html">center()</a></code></td>
+<td>Mean-centering (grand-mean, group-mean)</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/row_means.html">row_means()</a></code></td>
+<td>Row-wise means with min_valid threshold</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/row_sums.html">row_sums()</a></code></td>
+<td>Row-wise sums</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/row_count.html">row_count()</a></code></td>
+<td>Count specific values per row</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/pomps.html">pomps()</a></code></td>
+<td>Percent of Maximum Possible Scores (0–100)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="descriptive-statistics">Descriptive Statistics<a class="anchor" aria-label="anchor" href="#descriptive-statistics"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/codebook.html">codebook()</a></code></td>
+<td>Interactive HTML data dictionary</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/describe.html">describe()</a></code></td>
+<td>Numeric summaries (mean, sd, median, range, skewness)</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/frequency.html">frequency()</a></code></td>
+<td>Frequency tables with valid/cumulative percent</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/crosstab.html">crosstab()</a></code></td>
+<td>Cross-tabulations with row/column/cell percentages</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="hypothesis-testing">Hypothesis Testing<a class="anchor" aria-label="anchor" href="#hypothesis-testing"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/t_test.html">t_test()</a></code></td>
+<td>Independent, paired, and one-sample t-tests</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/oneway_anova.html">oneway_anova()</a></code></td>
+<td>One-way ANOVA</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/factorial_anova.html">factorial_anova()</a></code></td>
+<td>Multi-factor ANOVA with Type III SS</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/ancova.html">ancova()</a></code></td>
+<td>ANCOVA with estimated marginal means</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/mann_whitney.html">mann_whitney()</a></code></td>
+<td>Mann-Whitney U test</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code></td>
+<td>Kruskal-Wallis H test</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code></td>
+<td>Wilcoxon signed-rank test</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/friedman_test.html">friedman_test()</a></code></td>
+<td>Friedman test</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/binomial_test.html">binomial_test()</a></code></td>
+<td>Exact binomial test</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/chi_square.html">chi_square()</a></code></td>
+<td>Chi-square test of independence</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/fisher_test.html">fisher_test()</a></code></td>
+<td>Fisher’s exact test</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/chisq_gof.html">chisq_gof()</a></code></td>
+<td>Chi-square goodness-of-fit</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code></td>
+<td>McNemar’s test for paired proportions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="post-hoc-effect-sizes">Post-Hoc &amp; Effect Sizes<a class="anchor" aria-label="anchor" href="#post-hoc-effect-sizes"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/tukey_test.html">tukey_test()</a></code></td>
+<td>Tukey HSD pairwise comparisons</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/scheffe_test.html">scheffe_test()</a></code></td>
+<td>Scheffe pairwise comparisons</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/levene_test.html">levene_test()</a></code></td>
+<td>Test for homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/dunn_test.html">dunn_test()</a></code></td>
+<td>Dunn’s post-hoc for Kruskal-Wallis</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code></td>
+<td>Pairwise Wilcoxon for Friedman</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/chi_square.html">phi()</a></code></td>
+<td>Phi coefficient</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/chi_square.html">cramers_v()</a></code></td>
+<td>Cramer’s V</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/chi_square.html">goodman_gamma()</a></code></td>
+<td>Goodman-Kruskal gamma</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="scale-analysis">Scale Analysis<a class="anchor" aria-label="anchor" href="#scale-analysis"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="52%">
+<col width="47%">
+</colgroup>
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/reliability.html">reliability()</a></code></td>
+<td>Cronbach’s Alpha with item statistics</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/efa.html">efa()</a></code></td>
+<td>Exploratory Factor Analysis (PCA/ML, Varimax/Oblimin/Promax)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="regression">Regression<a class="anchor" aria-label="anchor" href="#regression"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/linear_regression.html">linear_regression()</a></code></td>
+<td>Linear regression with SPSS-style output</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/logistic_regression.html">logistic_regression()</a></code></td>
+<td>Logistic regression with odds ratios</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="weighted-statistics">Weighted Statistics<a class="anchor" aria-label="anchor" href="#weighted-statistics"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="52%">
+<col width="47%">
+</colgroup>
+<thead><tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<code><a href="../reference/w_mean.html">w_mean()</a></code>, <code><a href="../reference/w_median.html">w_median()</a></code>, <code><a href="../reference/w_sd.html">w_sd()</a></code>,
+<code><a href="../reference/w_var.html">w_var()</a></code>
+</td>
+<td>Central tendency and spread</td>
+</tr>
+<tr class="even">
+<td>
+<code><a href="../reference/w_se.html">w_se()</a></code>, <code><a href="../reference/w_quantile.html">w_quantile()</a></code>,
+<code><a href="../reference/w_iqr.html">w_iqr()</a></code>, <code><a href="../reference/w_range.html">w_range()</a></code>
+</td>
+<td>Precision and distribution</td>
+</tr>
+<tr class="odd">
+<td>
+<code><a href="../reference/w_skew.html">w_skew()</a></code>, <code><a href="../reference/w_kurtosis.html">w_kurtosis()</a></code>,
+<code><a href="../reference/w_modus.html">w_modus()</a></code>
+</td>
+<td>Shape and mode</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section level2">
-<h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+<h2 id="guides">Guides<a class="anchor" aria-label="anchor" href="#guides"></a>
 </h2>
+<p>Explore the full documentation:</p>
 <ul>
 <li>
-<code><a href="../articles/descriptive-statistics.html">vignette("descriptive-statistics")</a></code> — Deep dive into
-summaries and frequencies</li>
+<strong>Data Management</strong>
+<ul>
+<li>
+<code><a href="../articles/data-io.html">vignette("data-io")</a></code> — Importing and exporting data</li>
+<li>
+<code><a href="../articles/labels-and-missing-values.html">vignette("labels-and-missing-values")</a></code> — Working with
+labels and missing values</li>
+<li>
+<code><a href="../articles/data-transformation.html">vignette("data-transformation")</a></code> — Recoding,
+standardization, and row operations</li>
+</ul>
+</li>
+<li>
+<strong>Core Analysis</strong>
+<ul>
+<li>
+<code><a href="../articles/descriptive-statistics.html">vignette("descriptive-statistics")</a></code> — Summaries,
+frequencies, and cross-tabulations</li>
 <li>
 <code><a href="../articles/hypothesis-testing.html">vignette("hypothesis-testing")</a></code> — Comparing groups and
-testing differences</li>
+testing hypotheses</li>
 <li>
 <code><a href="../articles/correlation-analysis.html">vignette("correlation-analysis")</a></code> — Measuring
-relationships</li>
+relationships between variables</li>
+</ul>
+</li>
+<li>
+<strong>Advanced Topics</strong>
+<ul>
+<li>
+<code><a href="../articles/scale-analysis.html">vignette("scale-analysis")</a></code> — Reliability, factor
+analysis, and scale construction</li>
+<li>
+<code><a href="../articles/regression-analysis.html">vignette("regression-analysis")</a></code> — Linear and logistic
+regression</li>
 <li>
 <code><a href="../articles/survey-weights.html">vignette("survey-weights")</a></code> — Working with weighted
 data</li>
+</ul>
+</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

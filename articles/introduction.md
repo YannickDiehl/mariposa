@@ -5,22 +5,35 @@ library(mariposa)
 library(dplyr)
 ```
 
-## Overview
+## What is mariposa?
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) makes
-it easy to analyze survey data in R. Whether you are working with social
-surveys, customer satisfaction data, or market research, this package
-helps you get reliable results quickly.
+mariposa (*Marburg Initiative for Political and Social Analysis*) is a
+comprehensive R package for professional survey data analysis. It covers
+the entire workflow — from importing SPSS, Stata, SAS, and Excel files
+through label management, recoding, and standardization to statistical
+analysis with survey weights and publication-ready output.
 
-The package handles the complexities of survey analysis for you — things
-like sampling weights, grouped comparisons, and missing data are all
-taken care of automatically. Every function is validated against SPSS,
-so you can trust the numbers.
+Every statistical result is validated against SPSS v29, so researchers
+migrating from SPSS can trust their numbers.
 
-## Getting Started
+### Key Features
 
-Let’s start with the included example data. It contains responses from
-2,500 people about their life satisfaction, demographics, and opinions.
+- **76 functions** across 15 categories
+- **Full data pipeline**: import → labels → transformation → analysis →
+  export
+- **Survey weights** built into every function
+- **Tidyverse integration**: pipes (`%>%`),
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
+  tidyselect
+- **Two-level output**: compact
+  [`print()`](https://rdrr.io/r/base/print.html) and detailed
+  [`summary()`](https://rdrr.io/r/base/summary.html)
+- **SPSS-validated**: 4,986+ tests ensure results match SPSS v29
+
+## The Example Dataset
+
+mariposa includes `survey_data`, a synthetic survey of 2,500 respondents
+with demographics, attitudes, and a sampling weight:
 
 ``` r
 data(survey_data)
@@ -45,41 +58,39 @@ glimpse(survey_data)
 #> $ interview_mode        <fct> Face-to-face, Face-to-face, Online, Telephone, T…
 ```
 
-## Understanding Your Data
+All examples in this guide use this dataset.
 
-### Summary Statistics
+## Five-Minute Tour
 
-The
-[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
-function gives you a complete summary of numeric variables. The
-`weights` argument ensures results represent the population correctly:
+Here is a complete analysis workflow showing what mariposa can do:
+
+### 1. Explore the Data
 
 ``` r
+# Find variables related to "trust"
+find_var(survey_data, "trust")
+#>   col             name                                    label
+#> 1  11 trust_government Trust in government (1=none, 5=complete)
+#> 2  12      trust_media      Trust in media (1=none, 5=complete)
+#> 3  13    trust_science    Trust in science (1=none, 5=complete)
+```
+
+``` r
+# Descriptive statistics with survey weights
 survey_data %>%
-  describe(age, income, weights = sampling_weight)
+  describe(age, income, life_satisfaction, weights = sampling_weight)
 #> 
 #> Weighted Descriptive Statistics
 #> -------------------------------
-#>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>       age   50.514     50   17.084    77   25    0.159      2468.8
-#>    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
+#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
+#>                age   50.514     50   17.084    77   25    0.159      2468.8
+#>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
+#>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
 #> ----------------------------------------
 ```
 
-The output shows:
-
-- **n**: Number of valid responses
-- **mean**: The average ($\bar{x}$)
-- **sd**: Standard deviation — how spread out the values are
-- **median**: The middle value (50th percentile)
-- **range**: Minimum and maximum values
-
-### Categorical Variables
-
-For categorical data like education level or employment status, use
-[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md):
-
 ``` r
+# Frequency table
 survey_data %>%
   frequency(education, weights = sampling_weight)
 #> 
@@ -101,221 +112,44 @@ survey_data %>%
 #> +------------------------+------------------------+--------+--------+--------+--------+
 ```
 
-This tells you how many people fall into each category, what percentage
-they represent, and cumulative percentages.
-
-## Comparing Groups
-
-### Two Groups: t-Test
-
-Want to know if men and women differ in life satisfaction? Use
-[`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md):
+### 2. Transform Variables
 
 ``` r
+# Create age groups
+survey_data <- rec(survey_data, age,
+  rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
+  suffix = "_group", as.factor = TRUE)
+
+# Build a trust scale
+survey_data <- survey_data %>%
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science,
+                             min_valid = 2))
+```
+
+### 3. Compare Groups
+
+``` r
+# t-test with survey weights
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
 #>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 ```
 
-If the p-value is below 0.05, the difference is statistically
-significant. But always check the effect size too — a significant result
-with a tiny effect might not be practically meaningful.
-
-### Three or More Groups: ANOVA
-
-When comparing more than two groups, use
-[`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md):
-
 ``` r
-survey_data %>%
-  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
-#> One-Way ANOVA: life_satisfaction by education [Weighted]
-#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
-```
-
-## Finding Relationships
-
-### Correlation
-
-Are age and income related? Pearson’s *r* measures linear association:
-
-``` r
-survey_data %>%
-  pearson_cor(age, income, weights = sampling_weight)
-#> Pearson Correlation: age x income [Weighted]
-#>   r = -0.005, p = 0.828 , N = 2201
-```
-
-- **r \> 0**: As one variable increases, the other tends to increase
-- **r \< 0**: As one increases, the other tends to decrease
-- **r near 0**: No linear relationship
-
-### Cross-Tabulation
-
-See how two categorical variables relate:
-
-``` r
-survey_data %>%
-  crosstab(education, employment, weights = sampling_weight)
-#> 
-#> Crosstabulation: education × employment
-#> --------------------------------------- 
-#> - Row variable: education
-#> - Column variable: employment
-#> - Percentages: Row percentages
-#> - Weights variable: sampling_weight
-#> - N (valid): 2516 (weighted)
-#> 
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> |                      |                                 employment                                  |
-#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | Basic Secondary      |          0 |        573 |         66 |        175 |         34 |        848 |
-#> |   row %              |       0.0% |      67.6% |       7.8% |      20.6% |       4.0% |     100.0% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | Intermediate Seco... |          0 |        420 |         52 |        139 |         29 |        641 |
-#> |   row %              |       0.0% |      65.6% |       8.1% |      21.7% |       4.6% |     100.0% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | Academic Secondary   |         46 |        370 |         45 |        149 |         33 |        642 |
-#> |   row %              |       7.2% |      57.6% |       7.0% |      23.1% |       5.1% |     100.0% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | University           |         34 |        240 |         21 |         72 |         20 |        385 |
-#> |   row %              |       8.7% |      62.2% |       5.4% |      18.6% |       5.1% |     100.0% |
-#> +======================+============+============+============+============+============+============+
-#> | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-```
-
-## Working with Groups
-
-### Regional Analysis
-
-Use [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
-from dplyr to compare statistics across subgroups:
-
-``` r
-survey_data %>%
-  group_by(region) %>%
-  describe(income, life_satisfaction, weights = sampling_weight)
-#> 
-#> Weighted Descriptive Statistics
-#> -------------------------------
-#> 
-#> Group: region = East
-#> --------------------
-#> ----------------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
-#> ----------------------------------------
-#> 
-#> Group: region = West
-#> --------------------
-#> ----------------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
-#>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
-#> ----------------------------------------
-```
-
-### Multiple Variables at Once
-
-Test several variables simultaneously:
-
-``` r
-survey_data %>%
-  t_test(trust_government, trust_media, trust_science,
-         group = gender, weights = sampling_weight)
-#> t-Test: trust_government by gender [Weighted]
-#>   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371
-#> t-Test: trust_media by gender [Weighted]
-#>   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
-#> t-Test: trust_science by gender [Weighted]
-#>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414
-```
-
-## Why Weights Matter
-
-Survey weights make your results representative of the population. Here
-is the difference they make:
-
-``` r
-unweighted <- mean(survey_data$age, na.rm = TRUE)
-
-weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
-weighted <- weighted_result$results$weighted_mean
-
-cat("Sample average age:", round(unweighted, 1), "\n")
-#> Sample average age: 50.5
-cat("Population average age:", round(weighted, 1), "\n")
-#> Population average age: 50.5
-cat("Difference:", round(weighted - unweighted, 1), "years\n")
-#> Difference: 0 years
-```
-
-Always use weights when they are provided — unweighted results can be
-misleading.
-
-## A Typical Workflow
-
-Here is how a complete analysis might look:
-
-``` r
-# 1. Descriptive overview
-survey_data %>%
-  describe(life_satisfaction, weights = sampling_weight)
-#> 
-#> Weighted Descriptive Statistics
-#> -------------------------------
-#>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.625      4 1.152     4   2   -0.498      2390.9
-#> ----------------------------------------
-
-# 2. Compare across groups
-survey_data %>%
-  group_by(education) %>%
-  describe(life_satisfaction, weights = sampling_weight)
-#> 
-#> Weighted Descriptive Statistics
-#> -------------------------------
-#> 
-#> Group: education = Basic Secondary
-#> ----------------------------------
-#> ----------------------------------------
-#>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
-#> ----------------------------------------
-#> 
-#> Group: education = Intermediate Secondary
-#> -----------------------------------------
-#> ----------------------------------------
-#>           Variable  Mean Median   SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
-#> ----------------------------------------
-#> 
-#> Group: education = Academic Secondary
-#> -------------------------------------
-#> ----------------------------------------
-#>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
-#> ----------------------------------------
-#> 
-#> Group: education = University
-#> -----------------------------
-#> ----------------------------------------
-#>           Variable Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
-#> ----------------------------------------
-
-# 3. Test for significant differences
+# ANOVA across education levels
 result <- survey_data %>%
-  oneway_anova(life_satisfaction, group = education,
-               weights = sampling_weight)
-result                                  # compact overview
+  oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
 #>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
-summary(result, descriptives = FALSE)   # detailed output, skip descriptives
+```
+
+Every result has a detailed view with
+[`summary()`](https://rdrr.io/r/base/summary.html):
+
+``` r
+summary(result, descriptives = FALSE)
 #> Weighted One-Way ANOVA Results
 #> ------------------------------
 #> 
@@ -358,8 +192,12 @@ summary(result, descriptives = FALSE)   # detailed output, skip descriptives
 #> - Small effect: eta-squared ~ 0.01, Medium effect: eta-squared ~ 0.06, Large effect: eta-squared ~ 0.14
 #> 
 #> Post-hoc tests: Use tukey_test() for pairwise comparisons
+```
 
-# 4. If significant, find out which groups differ
+### 4. Post-Hoc Analysis
+
+``` r
+# Which education groups differ?
 tukey_test(result)
 #> Weighted Tukey HSD Post-Hoc Test Results
 #> ----------------------------------------
@@ -401,40 +239,289 @@ tukey_test(result)
 #> - p-values are adjusted for multiple comparisons (family-wise error control)
 ```
 
-## Tips for Success
+### 5. Measure Relationships
 
-1.  **Always start with descriptives.** Understand your data before
-    running tests.
-2.  **Check your assumptions.** Skewness near 0 suggests roughly normal
-    data; values beyond $\pm 1$ indicate notable skew.
-3.  **Use appropriate tests.** Continuous data: t-test, ANOVA, Pearson.
-    Ordinal data: Mann-Whitney, Spearman. Categorical data: chi-square.
-4.  **Report effect sizes.** Statistical significance alone does not
-    tell you whether a difference matters in practice.
+``` r
+survey_data %>%
+  pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
+#> Pearson Correlation: 3 variables [Weighted]
+#>   age x income:                  r = -0.005, p = 0.828  
+#>   age x life_satisfaction:       r = -0.029, p = 0.150  
+#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
+#>   1/3 pairs significant (p < .05), N = 2201
+```
+
+### 6. Build Models
+
+``` r
+survey_data %>%
+  linear_regression(life_satisfaction ~ age + income + m_trust,
+                    weights = sampling_weight)
+#> Linear Regression: life_satisfaction ~ age + income + m_trust [Weighted]
+#>   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.00, p < 0.001 ***, N = 2113
+```
+
+## Compact vs. Detailed Output
+
+Every analysis function in mariposa provides two output levels:
+
+- **[`print()`](https://rdrr.io/r/base/print.html)** (default): A
+  compact one-line summary with the key statistic
+- **[`summary()`](https://rdrr.io/r/base/summary.html)**: Full
+  SPSS-style output with all details
+
+You can toggle individual sections in the detailed output:
+
+``` r
+result <- survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+
+# Compact
+result
+#> t-Test: life_satisfaction by gender [Weighted]
+#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+
+# Detailed
+summary(result)
+#> Weighted t-Test Results
+#> -----------------------
+#> 
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#>   Male: mean = 3.598, n = 1149.0
+#>   Female: mean = 3.648, n = 1287.0
+#> 
+#> Weighted t-test Results:
+#> -------------------------------------------------------------------------------- 
+#>         Assumption t_stat       df p_value mean_diff        conf_int sig
+#>    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    
+#>  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    
+#> -------------------------------------------------------------------------------- 
+#> 
+#> Effect Sizes:
+#> ------------ 
+#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
+#>  life_satisfaction   -0.043   -0.043      -0.043  negligible
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Effect Size Interpretation:
+#> - Cohen's d: pooled standard deviation (classic)
+#> - Hedges' g: bias-corrected Cohen's d (preferred)
+#> - Glass' Delta: control group standard deviation only
+#> - Small effect: |effect| ~ 0.2
+#> - Medium effect: |effect| ~ 0.5
+#> - Large effect: |effect| ~ 0.8
+
+# Detailed, skip effect sizes
+summary(result, effect_sizes = FALSE)
+#> Weighted t-Test Results
+#> -----------------------
+#> 
+#> - Grouping variable: gender
+#> - Groups compared: Male vs. Female
+#> - Weights variable: sampling_weight
+#> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
+#> - Null hypothesis (mu): 0.000
+#> 
+#> 
+#> --- life_satisfaction ---
+#> 
+#>   Male: mean = 3.598, n = 1149.0
+#>   Female: mean = 3.648, n = 1287.0
+#> 
+#> Weighted t-test Results:
+#> -------------------------------------------------------------------------------- 
+#>         Assumption t_stat       df p_value mean_diff        conf_int sig
+#>    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    
+#>  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    
+#> -------------------------------------------------------------------------------- 
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+```
+
+## Grouped Analysis
+
+All functions support
+[`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+for subgroup analysis:
+
+``` r
+survey_data %>%
+  group_by(region) %>%
+  describe(income, life_satisfaction, weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#> 
+#> Group: region = East
+#> --------------------
+#> ----------------------------------------
+#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
+#>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#> ----------------------------------------
+#> 
+#> Group: region = West
+#> --------------------
+#> ----------------------------------------
+#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
+#>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
+#> ----------------------------------------
+```
+
+``` r
+survey_data %>%
+  group_by(region) %>%
+  t_test(income, group = gender, weights = sampling_weight)
+#> [region = 1]
+#> t-Test: income by gender [Weighted]
+#>   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450
+#> [region = 2]
+#> t-Test: income by gender [Weighted]
+#>   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+```
 
 ## Quick Reference
 
-| Task                | Function                                                                              | Example                                   |
-|---------------------|---------------------------------------------------------------------------------------|-------------------------------------------|
-| Summarize numeric   | [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)         | `describe(age, income)`                   |
-| Count categories    | [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)       | `frequency(education)`                    |
-| Compare 2 groups    | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)             | `t_test(income, group = gender)`          |
-| Compare 3+ groups   | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | `oneway_anova(income, group = education)` |
-| Test association    | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)     | `chi_square(education, employment)`       |
-| Measure correlation | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)   | `pearson_cor(age, income)`                |
-| Cross-tabulate      | [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)         | `crosstab(education, region)`             |
+### Data Import & Export
 
-All functions support survey weights via `weights =` and grouped
-analysis via
-[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html).
+| Function                                                                                                                                                       | Purpose                                         |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md), [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md) | Import SPSS files with tagged NA support        |
+| [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)                                                                              | Import Stata files                              |
+| [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md), [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)   | Import SAS files                                |
+| [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)                                                                                | Import Excel files with label reconstruction    |
+| [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)                                                                              | Export to SPSS with label/missing roundtripping |
+| [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md)                                                                            | Export to Stata                                 |
+| [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)                                                                                | Export to SAS transport format                  |
+| [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)                                                                              | Export to Excel (data, codebook, frequencies)   |
 
-## Next Steps
+### Label Management
 
-- [`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md)
-  — Deep dive into summaries and frequencies
-- [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
-  — Comparing groups and testing differences
-- [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
-  — Measuring relationships
-- [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)
-  — Working with weighted data
+| Function                                                                              | Purpose                               |
+|---------------------------------------------------------------------------------------|---------------------------------------|
+| [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md)       | Get/set variable labels               |
+| [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md)     | Get/set value labels                  |
+| [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md)         | Search variables by name or label     |
+| [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)         | Labelled → factor                     |
+| [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md) | Labelled → character                  |
+| [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md)     | Factor/labelled → numeric             |
+| [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)   | Factor/character → labelled           |
+| [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)             | Declare values as missing             |
+| [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md)           | Strip all label metadata              |
+| [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md)   | Restore labels after dplyr operations |
+| [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md)   | Remove unused value labels            |
+
+### Data Transformation
+
+| Function                                                                        | Purpose                                                   |
+|---------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md)             | Recode with string syntax (ranges, reverse, median split) |
+| [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md)   | One-hot encoding / dummy variables                        |
+| [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md)             | Z-standardization (sd, 2sd, mad, gmd methods)             |
+| [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md)       | Mean-centering (grand-mean, group-mean)                   |
+| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Row-wise means with min_valid threshold                   |
+| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)   | Row-wise sums                                             |
+| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md) | Count specific values per row                             |
+| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)         | Percent of Maximum Possible Scores (0–100)                |
+
+### Descriptive Statistics
+
+| Function                                                                        | Purpose                                               |
+|---------------------------------------------------------------------------------|-------------------------------------------------------|
+| [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)   | Interactive HTML data dictionary                      |
+| [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)   | Numeric summaries (mean, sd, median, range, skewness) |
+| [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md) | Frequency tables with valid/cumulative percent        |
+| [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)   | Cross-tabulations with row/column/cell percentages    |
+
+### Hypothesis Testing
+
+| Function                                                                                    | Purpose                                     |
+|---------------------------------------------------------------------------------------------|---------------------------------------------|
+| [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)                   | Independent, paired, and one-sample t-tests |
+| [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)       | One-way ANOVA                               |
+| [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | Multi-factor ANOVA with Type III SS         |
+| [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)                   | ANCOVA with estimated marginal means        |
+| [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)       | Mann-Whitney U test                         |
+| [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)   | Kruskal-Wallis H test                       |
+| [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)     | Wilcoxon signed-rank test                   |
+| [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)     | Friedman test                               |
+| [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md)     | Exact binomial test                         |
+| [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)           | Chi-square test of independence             |
+| [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md)         | Fisher’s exact test                         |
+| [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md)             | Chi-square goodness-of-fit                  |
+| [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md)       | McNemar’s test for paired proportions       |
+
+### Post-Hoc & Effect Sizes
+
+| Function                                                                                        | Purpose                            |
+|-------------------------------------------------------------------------------------------------|------------------------------------|
+| [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)               | Tukey HSD pairwise comparisons     |
+| [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md)           | Scheffe pairwise comparisons       |
+| [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)             | Test for homogeneity of variances  |
+| [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md)                 | Dunn’s post-hoc for Kruskal-Wallis |
+| [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md) | Pairwise Wilcoxon for Friedman     |
+| [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)                      | Phi coefficient                    |
+| [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)                | Cramer’s V                         |
+| [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)            | Goodman-Kruskal gamma              |
+
+### Scale Analysis
+
+| Function                                                                            | Purpose                                                      |
+|-------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Cronbach’s Alpha with item statistics                        |
+| [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)                 | Exploratory Factor Analysis (PCA/ML, Varimax/Oblimin/Promax) |
+
+### Regression
+
+| Function                                                                                            | Purpose                                  |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------|
+| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)     | Linear regression with SPSS-style output |
+| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Logistic regression with odds ratios     |
+
+### Weighted Statistics
+
+| Function                                                                                                                                                                                                                                                                                                       | Purpose                     |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md), [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md), [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md), [`w_var()`](https://YannickDiehl.github.io/mariposa/reference/w_var.md)       | Central tendency and spread |
+| [`w_se()`](https://YannickDiehl.github.io/mariposa/reference/w_se.md), [`w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md), [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md), [`w_range()`](https://YannickDiehl.github.io/mariposa/reference/w_range.md) | Precision and distribution  |
+| [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md), [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md), [`w_modus()`](https://YannickDiehl.github.io/mariposa/reference/w_modus.md)                                                                      | Shape and mode              |
+
+## Guides
+
+Explore the full documentation:
+
+- **Data Management**
+  - [`vignette("data-io")`](https://YannickDiehl.github.io/mariposa/articles/data-io.md)
+    — Importing and exporting data
+  - [`vignette("labels-and-missing-values")`](https://YannickDiehl.github.io/mariposa/articles/labels-and-missing-values.md)
+    — Working with labels and missing values
+  - [`vignette("data-transformation")`](https://YannickDiehl.github.io/mariposa/articles/data-transformation.md)
+    — Recoding, standardization, and row operations
+- **Core Analysis**
+  - [`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md)
+    — Summaries, frequencies, and cross-tabulations
+  - [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
+    — Comparing groups and testing hypotheses
+  - [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
+    — Measuring relationships between variables
+- **Advanced Topics**
+  - [`vignette("scale-analysis")`](https://YannickDiehl.github.io/mariposa/articles/scale-analysis.md)
+    — Reliability, factor analysis, and scale construction
+  - [`vignette("regression-analysis")`](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.md)
+    — Linear and logistic regression
+  - [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)
+    — Working with weighted data

@@ -8,10 +8,8 @@ data(survey_data)
 
 ## Overview
 
-Correlation measures how two variables move together. When one goes up,
-does the other tend to go up (positive) or down (negative)?
-
-mariposa provides three correlation methods for different situations:
+Correlation measures how two variables move together. mariposa provides
+three methods for different situations:
 
 | Method            | Function                                                                              | Best for                                                     |
 |-------------------|---------------------------------------------------------------------------------------|--------------------------------------------------------------|
@@ -19,11 +17,12 @@ mariposa provides three correlation methods for different situations:
 | Spearman’s $\rho$ | [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) | Monotonic relationships, ordinal data, or data with outliers |
 | Kendall’s $\tau$  | [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)   | Ordinal data, small samples, or many tied values             |
 
+All three support survey weights, multiple variables (correlation
+matrices), and grouped analysis.
+
 ## Pearson Correlation
 
 ### Basic Usage
-
-Measure the linear correlation between age and income:
 
 ``` r
 survey_data %>%
@@ -40,8 +39,6 @@ Interpretation of *r*:
 
 ### With Survey Weights
 
-Get population-representative correlations:
-
 ``` r
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
@@ -49,9 +46,9 @@ survey_data %>%
 #>   r = -0.005, p = 0.828 , N = 2201
 ```
 
-### Multiple Variables
+### Correlation Matrix
 
-Create a correlation matrix for several variables at once:
+Pass multiple variables to get all pairwise correlations:
 
 ``` r
 survey_data %>%
@@ -64,9 +61,32 @@ survey_data %>%
 #>   0/3 pairs significant (p < .05), N = 2242
 ```
 
-### Grouped Analysis
+### Detailed Output
 
-Calculate correlations within subgroups:
+``` r
+result <- survey_data %>%
+  pearson_cor(age, income, weights = sampling_weight)
+
+summary(result)
+#> 
+#> Weighted Pearson Correlation 
+#> -----------------------------
+#> 
+#> - Weights variable: sampling_weight
+#> - Missing data handling: pairwise deletion
+#> - Confidence level: 95.0%
+#> 
+#> 
+#>   Correlation: r = -0.005
+#>   p-value: p = 0.828 
+#>   N = 2201
+#>   95% CI: [-0.046, 0.037]
+#>   r-squared: 0.000
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+```
+
+### Grouped Analysis
 
 ``` r
 survey_data %>%
@@ -80,42 +100,11 @@ survey_data %>%
 #>   r = -0.019, p = 0.427 , N = 1751
 ```
 
-### Confidence Intervals
-
-Specify the confidence level for the interval around the estimate:
-
-``` r
-survey_data %>%
-  pearson_cor(age, income,
-              conf.level = 0.95,
-              weights = sampling_weight)
-#> Pearson Correlation: age x income [Weighted]
-#>   r = -0.005, p = 0.828 , N = 2201
-```
-
 ## Spearman Correlation
 
-### When to Use
-
-Use Spearman’s $\rho$ when:
-
-- The relationship is **monotonic** but not necessarily linear
-- Your data contains **outliers** that might distort Pearson’s *r*
-- Variables are **ordinal** (e.g., Likert scales, rankings)
-
-Spearman’s correlation works on the ranks of the data rather than the
-raw values.
-
-### Basic Usage
-
-``` r
-survey_data %>%
-  spearman_rho(political_orientation, environmental_concern)
-#> Spearman Correlation: political_orientation x environmental_concern
-#>   rho = -0.576, p < 0.001 ***, N = 2207
-```
-
-### With Weights
+Use Spearman’s $\rho$ when the relationship is monotonic but not
+necessarily linear, or when working with ordinal data or data with
+outliers:
 
 ``` r
 survey_data %>%
@@ -144,27 +133,9 @@ survey_data %>%
 
 ## Kendall’s Tau
 
-### When to Use
-
-Use Kendall’s $\tau$ when:
-
-- Data is **ordinal**
-- The sample size is **small** ($n < 30$)
-- There are **many tied values**
-
-Kendall’s $\tau$ is typically smaller in magnitude than Spearman’s
-$\rho$, but is considered more robust.
-
-### Basic Usage
-
-``` r
-survey_data %>%
-  kendall_tau(political_orientation, life_satisfaction)
-#> Kendall's Tau: political_orientation x life_satisfaction
-#>   tau = -0.004, p = 0.832 , N = 2228
-```
-
-### With Weights
+Use Kendall’s $\tau$ for ordinal data, small samples ($n < 30$), or data
+with many tied values. It is more robust than Spearman but typically
+produces smaller absolute values:
 
 ``` r
 survey_data %>%
@@ -184,63 +155,21 @@ survey_data %>%
 | 0.3 – 0.7             | Moderate       |
 | 0.7 – 1.0             | Strong         |
 
-These are rough guidelines. Context matters — in some fields, $r = 0.3$
-is considered a strong finding.
+These are general guidelines. In survey research, correlations of
+0.2–0.4 between different constructs are common and often substantively
+meaningful.
 
-### Statistical Significance
+### Choosing the Right Method
 
-Check the p-value alongside the correlation coefficient:
+1.  **Both variables continuous, relationship is linear** → Pearson
+2.  **Monotonic but non-linear relationship, or outliers present** →
+    Spearman
+3.  **Ordinal data, small sample, or many ties** → Kendall
 
-``` r
-result <- survey_data %>%
-  pearson_cor(age, income, weights = sampling_weight)
-result             # compact overview
-#> Pearson Correlation: age x income [Weighted]
-#>   r = -0.005, p = 0.828 , N = 2201
-summary(result)    # detailed output with confidence intervals
-#> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
-#> 
-#> - Weights variable: sampling_weight
-#> - Missing data handling: pairwise deletion
-#> - Confidence level: 95.0%
-#> 
-#> 
-#>   Correlation: r = -0.005
-#>   p-value: p = 0.828 
-#>   N = 2201
-#>   95% CI: [-0.046, 0.037]
-#>   r-squared: 0.000
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-```
+### Comparing Methods
 
-A significant p-value ($p < 0.05$) means the correlation is unlikely to
-be zero in the population. But with large samples, even very small
-correlations can be significant — always consider the magnitude of *r*.
-
-### Correlation Does Not Imply Causation
-
-This is the most important caveat in correlation analysis:
-
-- A **third variable** might explain the relationship
-- The **direction** of causality is unknown
-- There may be **no causal link** at all
-
-For example, ice cream sales and drowning rates are correlated — but
-both are driven by warm weather, not by each other.
-
-## Choosing the Right Method
-
-1.  **Are both variables continuous?**
-    - Yes, and relationship is linear → **Pearson**
-    - Yes, but relationship is non-linear (monotonic) → **Spearman**
-2.  **Are variables ordinal or ranked?**
-    - Yes → **Spearman** or **Kendall**
-    - Many tied values or small sample → prefer **Kendall**
-
-### Comparing All Three Methods
+If Pearson and Spearman give very different results, the relationship
+may be non-linear:
 
 ``` r
 pearson_result <- survey_data %>%
@@ -268,64 +197,24 @@ print(comparison)
 #> 3  Kendall   0.4501535 5.179415e-130
 ```
 
-If Pearson and Spearman give very different results, the relationship
-may be non-linear.
+### Correlation Does Not Imply Causation
 
-## Common Patterns in Survey Data
+A significant correlation does not mean one variable causes the other:
 
-### Age and Attitudes
-
-``` r
-survey_data %>%
-  pearson_cor(age, political_orientation, environmental_concern,
-              life_satisfaction, trust_government,
-              weights = sampling_weight)
-#> Pearson Correlation: 5 variables [Weighted]
-#>   age x political_orientation:   r = -0.029, p = 0.168  
-#>   age x environmental_concern:   r = 0.024, p = 0.244  
-#>   age x life_satisfaction:       r = -0.029, p = 0.150  
-#>   age x trust_government:        r = 0.005, p = 0.804  
-#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 *** 
-#>   political_orientation x life_satisfaction: r = -0.004, p = 0.836  
-#>   political_orientation x trust_government: r = -0.057, p = 0.008 ** 
-#>   environmental_concern x life_satisfaction: r = -0.003, p = 0.866  
-#>   environmental_concern x trust_government: r = 0.064, p = 0.002 ** 
-#>   life_satisfaction x trust_government: r = 0.011, p = 0.604  
-#>   3/10 pairs significant (p < .05), N = 2312
-```
-
-### Income Effects
-
-``` r
-survey_data %>%
-  pearson_cor(income, life_satisfaction, trust_government,
-              trust_media, trust_science,
-              weights = sampling_weight)
-#> Pearson Correlation: 5 variables [Weighted]
-#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
-#>   income x trust_government:     r = -0.001, p = 0.975  
-#>   income x trust_media:          r = -0.011, p = 0.629  
-#>   income x trust_science:        r = -0.024, p = 0.270  
-#>   life_satisfaction x trust_government: r = 0.011, p = 0.604  
-#>   life_satisfaction x trust_media: r = 0.020, p = 0.330  
-#>   life_satisfaction x trust_science: r = -0.019, p = 0.371  
-#>   trust_government x trust_media: r = 0.012, p = 0.582  
-#>   trust_government x trust_science: r = 0.031, p = 0.145  
-#>   trust_media x trust_science:   r = 0.024, p = 0.259  
-#>   1/10 pairs significant (p < .05), N = 2130
-```
+- A **third variable** may drive both (e.g., warm weather → both ice
+  cream sales and drowning)
+- The **direction of causality** is unknown
+- There may be **no causal link** at all
 
 ## Complete Example
 
-A comprehensive correlation analysis workflow:
-
 ``` r
-# 1. Correlation matrix
-cor_matrix <- survey_data %>%
+# 1. Correlation matrix for key variables
+cor_result <- survey_data %>%
   pearson_cor(age, income, life_satisfaction,
               political_orientation, environmental_concern,
               weights = sampling_weight)
-print(cor_matrix)
+cor_result
 #> Pearson Correlation: 5 variables [Weighted]
 #>   age x income:                  r = -0.005, p = 0.828  
 #>   age x life_satisfaction:       r = -0.029, p = 0.150  
@@ -339,11 +228,11 @@ print(cor_matrix)
 #>   political_orientation x environmental_concern: r = -0.584, p < 0.001 *** 
 #>   2/10 pairs significant (p < .05), N = 2201
 
-# 2. Focus on significant correlations
-significant_cors <- cor_matrix$correlations %>%
+# 2. Identify the strongest correlations
+significant <- cor_result$correlations %>%
   filter(p_value < 0.05) %>%
   arrange(desc(abs(correlation)))
-print(significant_cors)
+print(significant)
 #>                    var1                  var2 correlation       p_value
 #> 1 political_orientation environmental_concern  -0.5843752 1.558234e-203
 #> 2                income     life_satisfaction   0.4501535 8.997507e-107
@@ -351,7 +240,7 @@ print(significant_cors)
 #> 1     -0.6111168     -0.5563011 2221 *** 0.3414944
 #> 2      0.4156264      0.4833852 2130 *** 0.2026382
 
-# 3. Regional differences in key relationship
+# 3. Check if relationships vary by region
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
@@ -363,35 +252,47 @@ survey_data %>%
 #>   r = -0.019, p = 0.427 , N = 1751
 ```
 
-## Reporting Results
+## Reporting Results (APA Style)
 
-When writing up correlation results, include:
+Include the correlation coefficient, confidence interval, p-value, and
+sample size:
 
-- The correlation coefficient (*r*, $\rho$, or $\tau$)
-- The confidence interval
-- The p-value
-- The sample size or effective *N*
-- Whether weights were used
+> “There was a moderate positive correlation between age and income (*r*
+> = .34, 95% CI \[.29, .39\], *p* \< .001, *N*_(eff) = 2,341),
+> indicating that older respondents tended to report higher incomes.”
 
-**Example (APA style):** “There was a moderate positive correlation
-between age and income (*r* = .34, 95% CI \[.29, .39\], *p* \< .001,
-*N*_(eff) = 2,341), indicating that older respondents tended to report
-higher incomes.”
+## Practical Tips
+
+1.  **Always check the scatterplot.** Correlations can miss non-linear
+    relationships, and a single outlier can inflate or deflate the
+    coefficient.
+
+2.  **Use Spearman when in doubt.** It makes fewer assumptions than
+    Pearson and works with both continuous and ordinal data.
+
+3.  **Report the magnitude, not just significance.** With large samples,
+    even $r = .05$ can be significant but is practically meaningless.
+
+4.  **Use correlation matrices to prioritize.** Before regression, check
+    which variables are most strongly related to your outcome.
 
 ## Summary
 
-1.  **Pearson** for linear relationships between continuous variables
-2.  **Spearman** for monotonic relationships, outliers, or ordinal data
-3.  **Kendall** for ordinal data, small samples, or many ties
-4.  Always report both the **magnitude** and **significance** of
-    correlations
+1.  **Pearson** measures linear relationships between continuous
+    variables
+2.  **Spearman** measures monotonic relationships and works with ordinal
+    data
+3.  **Kendall** is the most robust choice for ordinal data and small
+    samples
+4.  All three support **weights**, **correlation matrices**, and
+    **group_by()**
 5.  Correlation does **not** imply causation
 
 ## Next Steps
 
-- Compare groups statistically — see
+- Build predictive models — see
+  [`vignette("regression-analysis")`](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.md)
+- Compare groups — see
   [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
-- Learn about weighted analysis — see
-  [`vignette("survey-weights")`](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md)
-- Start with descriptive exploration — see
-  [`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md)
+- Construct reliable scales — see
+  [`vignette("scale-analysis")`](https://YannickDiehl.github.io/mariposa/articles/scale-analysis.md)

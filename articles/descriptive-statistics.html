@@ -42,6 +42,11 @@
 <li><h6 class="dropdown-header" data-toc-skip>Getting Started</h6></li>
     <li><a class="dropdown-item" href="../articles/introduction.html">Introduction to mariposa</a></li>
     <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Management</h6></li>
+    <li><a class="dropdown-item" href="../articles/data-io.html">Importing &amp; Exporting Data</a></li>
+    <li><a class="dropdown-item" href="../articles/labels-and-missing-values.html">Labels &amp; Missing Values</a></li>
+    <li><a class="dropdown-item" href="../articles/data-transformation.html">Data Transformation</a></li>
+    <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Core Analysis</h6></li>
     <li><a class="dropdown-item" href="../articles/descriptive-statistics.html">Descriptive Statistics</a></li>
     <li><a class="dropdown-item" href="../articles/hypothesis-testing.html">Hypothesis Testing</a></li>
@@ -88,46 +93,55 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Descriptive statistics help you understand your data before doing any
-complex analysis. Think of it as getting to know your survey responses —
-what is typical, what is unusual, and how spread out the answers
-are.</p>
-<p>This guide covers three functions:</p>
-<ul>
-<li>
-<code><a href="../reference/describe.html">describe()</a></code> — Summary statistics for numeric
-variables</li>
-<li>
-<code><a href="../reference/frequency.html">frequency()</a></code> — Frequency tables for categorical
-variables</li>
-<li>
-<code><a href="../reference/crosstab.html">crosstab()</a></code> — Cross-tabulations comparing two
-categorical variables</li>
-</ul>
+<p>Before running any statistical tests, you should understand your
+data. Descriptive statistics summarize what is typical, what is unusual,
+and how responses are distributed.</p>
+<p>mariposa provides four functions for data exploration:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Best for</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/describe.html">describe()</a></code></td>
+<td>Numeric variables — means, medians, spread</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/frequency.html">frequency()</a></code></td>
+<td>Categorical variables — counts and percentages</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/crosstab.html">crosstab()</a></code></td>
+<td>Relationships between two categorical variables</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/codebook.html">codebook()</a></code></td>
+<td>Full data dictionary with types, labels, and values</td>
+</tr>
+</tbody>
+</table>
+<p>All four support survey weights and grouped analysis.</p>
 </div>
 <div class="section level2">
-<h2 id="getting-summary-statistics">Getting Summary Statistics<a class="anchor" aria-label="anchor" href="#getting-summary-statistics"></a>
+<h2 id="summary-statistics-with-describe">Summary Statistics with describe()<a class="anchor" aria-label="anchor" href="#summary-statistics-with-describe"></a>
 </h2>
 <div class="section level3">
 <h3 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h3>
-<p>The simplest way to get descriptive statistics:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
 <span><span class="co">#&gt;  Variable  Mean Median     SD Range IQR Skewness    N Missing</span></span>
 <span><span class="co">#&gt;       age 50.55     50 16.976    77  24    0.172 2500       0</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
-<p>This gives you the mean
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>x</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{x}</annotation></semantics></math>),
-median, standard deviation (<em>SD</em>), and other key statistics.</p>
 </div>
 <div class="section level3">
-<h3 id="multiple-variables-at-once">Multiple Variables at Once<a class="anchor" aria-label="anchor" href="#multiple-variables-at-once"></a>
+<h3 id="multiple-variables">Multiple Variables<a class="anchor" aria-label="anchor" href="#multiple-variables"></a>
 </h3>
-<p>Analyze several variables together:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span>
@@ -143,12 +157,11 @@ median, standard deviation (<em>SD</em>), and other key statistics.</p>
 <div class="section level3">
 <h3 id="with-survey-weights">With Survey Weights<a class="anchor" aria-label="anchor" href="#with-survey-weights"></a>
 </h3>
-<p>To get population-representative statistics, add the
-<code>weights</code> argument:</p>
+<p>Add <code>weights</code> for population-representative
+statistics:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
-<span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
 <span><span class="co">#&gt; -------------------------------</span></span>
@@ -157,17 +170,15 @@ median, standard deviation (<em>SD</em>), and other key statistics.</p>
 <span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
-<p>The weighted results better represent your target population by
-correcting for sampling biases.</p>
 </div>
 <div class="section level3">
 <h3 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
 </h3>
-<p>Compare statistics across groups using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>:</p>
+<p>Compare statistics across subgroups:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
 <span><span class="co">#&gt; -------------------------------</span></span>
@@ -175,24 +186,24 @@ correcting for sampling biases.</p>
 <span><span class="co">#&gt; Group: region = East</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;       age   52.278     53   17.595    77   24    0.098       477.0</span></span>
-<span><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = West</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;       age   50.067     49   16.927    77   24    0.170      1993.1</span></span>
-<span><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
+<span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="customizing-output">Customizing Output<a class="anchor" aria-label="anchor" href="#customizing-output"></a>
+<h3 id="choosing-statistics">Choosing Statistics<a class="anchor" aria-label="anchor" href="#choosing-statistics"></a>
 </h3>
-<p>Choose which statistics to display with the <code>show</code>
-argument:</p>
+<p>The <code>show</code> argument controls which statistics are
+displayed:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Just the essentials</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -203,9 +214,9 @@ argument:</p>
 <span><span class="co">#&gt;  Variable     Mean       SD Range    N Missing</span></span>
 <span><span class="co">#&gt;       age   50.550   16.976    77 2500       0</span></span>
 <span><span class="co">#&gt;    income 3753.934 1432.802  7200 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span></span>
-<span><span class="co"># Everything available</span></span>
+<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Everything available</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, show <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -217,15 +228,41 @@ argument:</p>
 <span><span class="co">#&gt;   38  50  62 2500       0</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="understanding-the-output">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output"></a>
+</h3>
+<ul>
+<li>
+<strong>n</strong>: Number of valid (non-missing) cases</li>
+<li>
+<strong>mean</strong>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>x</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{x}</annotation></semantics></math>):
+The arithmetic average</li>
+<li>
+<strong>sd</strong>: Standard deviation — how spread out the values
+are</li>
+<li>
+<strong>median</strong>: The middle value (50th percentile)</li>
+<li>
+<strong>min / max</strong>: The range of observed values</li>
+<li>
+<strong>skewness</strong>: Distribution symmetry. Values near 0
+indicate symmetry; values beyond
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>±</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pm 1</annotation></semantics></math>
+indicate notable skew</li>
+<li>
+<strong>kurtosis</strong>: Tail heaviness. Values near 0 indicate a
+normal-like shape</li>
+</ul>
+</div>
 </div>
 <div class="section level2">
-<h2 id="frequency-tables">Frequency Tables<a class="anchor" aria-label="anchor" href="#frequency-tables"></a>
+<h2 id="frequency-tables-with-frequency">Frequency Tables with frequency()<a class="anchor" aria-label="anchor" href="#frequency-tables-with-frequency"></a>
 </h2>
 <div class="section level3">
 <h3 id="basic-frequency">Basic Frequency<a class="anchor" aria-label="anchor" href="#basic-frequency"></a>
 </h3>
-<p>For categorical variables, use <code><a href="../reference/frequency.html">frequency()</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -247,15 +284,15 @@ argument:</p>
 <span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="understanding-the-output">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output"></a>
+<h3 id="understanding-the-output-1">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output-1"></a>
 </h3>
-<p>The output includes:</p>
 <ul>
 <li>
-<strong>Frequency</strong>: Count of responses in each category</li>
+<strong>Frequency</strong>: Number of respondents in each
+category</li>
 <li>
-<strong>Percent</strong>: Percentage of all cases (including
-missing)</li>
+<strong>Percent</strong>: Percentage of all cases, including
+missing</li>
 <li>
 <strong>Valid Percent</strong>: Percentage of non-missing cases
 only</li>
@@ -263,14 +300,14 @@ only</li>
 <strong>Cumulative Percent</strong>: Running total of valid
 percentages</li>
 </ul>
-<p>When reporting results, use <em>Valid Percent</em> if missing values
-are truly missing (e.g., skip patterns), and <em>Percent</em> when
-non-response is meaningful.</p>
+<p>Use <em>Valid Percent</em> when missing values are truly missing
+(e.g., skip patterns). Use <em>Percent</em> when non-response is itself
+meaningful.</p>
 </div>
 <div class="section level3">
 <h3 id="weighted-frequencies">Weighted Frequencies<a class="anchor" aria-label="anchor" href="#weighted-frequencies"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -292,13 +329,11 @@ non-response is meaningful.</p>
 <span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="multiple-variables">Multiple Variables<a class="anchor" aria-label="anchor" href="#multiple-variables"></a>
+<h3 id="multiple-variables-1">Multiple Variables<a class="anchor" aria-label="anchor" href="#multiple-variables-1"></a>
 </h3>
-<p>Analyze several categorical variables at once:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, <span class="va">region</span>,</span>
-<span>            weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Frequency Analysis Results</span></span>
 <span><span class="co">#&gt; -----------------------------------</span></span>
@@ -349,8 +384,7 @@ non-response is meaningful.</p>
 <div class="section level3">
 <h3 id="grouped-frequencies">Grouped Frequencies<a class="anchor" aria-label="anchor" href="#grouped-frequencies"></a>
 </h3>
-<p>See how distributions vary by group:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -393,13 +427,13 @@ non-response is meaningful.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="cross-tabulation">Cross-Tabulation<a class="anchor" aria-label="anchor" href="#cross-tabulation"></a>
+<h2 id="cross-tabulation-with-crosstab">Cross-Tabulation with crosstab()<a class="anchor" aria-label="anchor" href="#cross-tabulation-with-crosstab"></a>
 </h2>
 <div class="section level3">
 <h3 id="basic-crosstab">Basic Crosstab<a class="anchor" aria-label="anchor" href="#basic-crosstab"></a>
 </h3>
 <p>Examine the relationship between two categorical variables:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -430,9 +464,8 @@ non-response is meaningful.</p>
 <span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="understanding-the-output-1">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output-1"></a>
+<h3 id="understanding-the-output-2">Understanding the Output<a class="anchor" aria-label="anchor" href="#understanding-the-output-2"></a>
 </h3>
-<p>Cross-tabulations show several types of percentages:</p>
 <ul>
 <li>
 <strong>Count</strong>: Number of cases in each cell</li>
@@ -446,14 +479,14 @@ across)</li>
 <strong>Cell %</strong>: Percentage of the total sample</li>
 </ul>
 <p>Row percentages answer: “Of people with this education level, what
-proportion has each employment status?” Column percentages answer: “Of
-people with this employment status, what proportion has each education
-level?”</p>
+proportion has each employment status?”</p>
+<p>Column percentages answer: “Of people with this employment status,
+what proportion has each education level?”</p>
 </div>
 <div class="section level3">
 <h3 id="weighted-crosstabs">Weighted Crosstabs<a class="anchor" aria-label="anchor" href="#weighted-crosstabs"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -487,8 +520,7 @@ level?”</p>
 <div class="section level3">
 <h3 id="grouped-crosstabs">Grouped Crosstabs<a class="anchor" aria-label="anchor" href="#grouped-crosstabs"></a>
 </h3>
-<p>Create separate cross-tabulations for each subgroup:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -560,78 +592,33 @@ level?”</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="practical-tips">Practical Tips<a class="anchor" aria-label="anchor" href="#practical-tips"></a>
+<h2 id="data-dictionary-with-codebook">Data Dictionary with codebook()<a class="anchor" aria-label="anchor" href="#data-dictionary-with-codebook"></a>
 </h2>
-<div class="section level3">
-<h3 id="always-check-your-data-first">1. Always Check Your Data First<a class="anchor" aria-label="anchor" href="#always-check-your-data-first"></a>
-</h3>
-<p>Start with basic descriptives to spot potential issues:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, show <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;  Variable     Mean Median       SD     SE Range  IQR Skewness Kurtosis</span></span>
-<span><span class="co">#&gt;       age   50.550     50   16.976  0.340    77   24    0.172   -0.364</span></span>
-<span><span class="co">#&gt;    income 3753.934   3500 1432.802 30.645  7200 1900    0.730    0.376</span></span>
-<span><span class="co">#&gt;     Variance Mode  Q25  Q50  Q75    N Missing</span></span>
-<span><span class="co">#&gt;      288.185   18   38   50   62 2500       0</span></span>
-<span><span class="co">#&gt;  2052920.442 3200 2700 3500 4600 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
-<p>Look for:</p>
-<ul>
-<li>
-<strong>Impossible values</strong> (e.g., negative ages) indicating
-data entry errors</li>
-<li>
-<strong>High rates of missing data</strong> that might bias
-results</li>
-<li>
-<strong>Extreme skewness</strong> (values beyond
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>±</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pm 1</annotation></semantics></math>)
-suggesting non-normal distributions</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="use-weights-when-available">2. Use Weights When Available<a class="anchor" aria-label="anchor" href="#use-weights-when-available"></a>
-</h3>
-<p>Unweighted results can be misleading:</p>
+<p>For a comprehensive overview of your entire dataset, use
+<code><a href="../reference/codebook.html">codebook()</a></code>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unweighted_mean</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">age</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">weighted_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Unweighted mean age:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">unweighted_mean</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Unweighted mean age: 50.5</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Weighted mean age:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">weighted_result</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">weighted_mean</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted mean age: 50.5</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="consider-your-audience">3. Consider Your Audience<a class="anchor" aria-label="anchor" href="#consider-your-audience"></a>
-</h3>
-<ul>
-<li>
-<strong>Technical audience</strong>: Include <em>SD</em>, skewness,
-kurtosis</li>
-<li>
-<strong>General audience</strong>: Focus on mean, median, and
-percentages</li>
-</ul>
-</div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/codebook.html">codebook</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span></code></pre></div>
+<p>This opens an interactive HTML view in the RStudio Viewer showing
+variable names, types, labels, value distributions, and missing data
+patterns. It is the fastest way to orient yourself in a new dataset.</p>
 </div>
 <div class="section level2">
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
 <p>A typical descriptive analysis workflow:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Overall summary</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Explore the dataset</span></span>
+<span><span class="fu"><a href="../reference/find_var.html">find_var</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="st">"trust|satisfaction"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   col              name                                           label</span></span>
+<span><span class="co">#&gt; 1  10 life_satisfaction Life satisfaction (1=dissatisfied, 5=satisfied)</span></span>
+<span><span class="co">#&gt; 2  11  trust_government        Trust in government (1=none, 5=complete)</span></span>
+<span><span class="co">#&gt; 3  12       trust_media             Trust in media (1=none, 5=complete)</span></span>
+<span><span class="co">#&gt; 4  13     trust_science           Trust in science (1=none, 5=complete)</span></span>
+<span></span>
+<span><span class="co"># 2. Summarize numeric variables</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
-<span>           weights <span class="op">=</span> <span class="va">sampling_weight</span>,</span>
-<span>           show <span class="op">=</span> <span class="st">"short"</span><span class="op">)</span></span>
+<span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
 <span><span class="co">#&gt; -------------------------------</span></span>
@@ -641,7 +628,7 @@ percentages</li>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span></span>
-<span><span class="co"># 2. Key distributions</span></span>
+<span><span class="co"># 3. Check categorical distributions</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>,</span>
 <span>            weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -679,7 +666,7 @@ percentages</li>
 <span><span class="co">#&gt; |                  Total |                        |   2516 | 100.00 | 100.00 |        |</span></span>
 <span><span class="co">#&gt; +------------------------+------------------------+--------+--------+--------+--------+</span></span>
 <span></span>
-<span><span class="co"># 3. Relationship between categories</span></span>
+<span><span class="co"># 4. Cross-tabulate key relationships</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>,</span>
 <span>           weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -711,7 +698,7 @@ percentages</li>
 <span><span class="co">#&gt; | Total                |         80 |       1603 |        184 |        534 |        115 |       2516 |</span></span>
 <span><span class="co">#&gt; +----------------------+------------+------------+------------+------------+------------+------------+</span></span>
 <span></span>
-<span><span class="co"># 4. Regional comparisons</span></span>
+<span><span class="co"># 5. Compare across regions</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/describe.html">describe</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">life_satisfaction</span>,</span>
@@ -737,37 +724,59 @@ percentages</li>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="practical-tips">Practical Tips<a class="anchor" aria-label="anchor" href="#practical-tips"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Start with descriptives before testing.</strong>
+Understanding distributions, ranges, and missing data patterns prevents
+surprises in later analyses.</p></li>
+<li><p><strong>Check for impossible values.</strong> Negative ages,
+incomes above plausible limits, or out-of-range Likert responses
+indicate data quality issues.</p></li>
+<li><p><strong>Look at skewness.</strong> Values beyond
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>±</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pm 1</annotation></semantics></math>
+suggest the distribution departs notably from normality. This affects
+the choice between parametric and non-parametric tests.</p></li>
+<li><p><strong>Always use weights when available.</strong> Unweighted
+statistics describe your sample; weighted statistics estimate the
+population.</p></li>
+<li><p><strong>Consider your audience.</strong> For technical readers,
+include SD, skewness, and kurtosis. For general audiences, focus on
+means, medians, and percentages.</p></li>
+</ol>
+</div>
+<div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong><code><a href="../reference/describe.html">describe()</a></code></strong> gives you a full picture of
-numeric variables</li>
+<strong><code><a href="../reference/describe.html">describe()</a></code></strong> summarizes numeric
+variables (mean, SD, median, range, skewness)</li>
 <li>
-<strong><code><a href="../reference/frequency.html">frequency()</a></code></strong> shows the distribution of
-categorical variables</li>
+<strong><code><a href="../reference/frequency.html">frequency()</a></code></strong> counts categories with
+percent, valid percent, and cumulative percent</li>
 <li>
-<strong><code><a href="../reference/crosstab.html">crosstab()</a></code></strong> reveals relationships
-between two categorical variables</li>
-<li>All three functions support <strong>survey weights</strong> and
-<strong>grouped analysis</strong>
+<strong><code><a href="../reference/crosstab.html">crosstab()</a></code></strong> shows the joint
+distribution of two categorical variables</li>
+<li>
+<strong><code><a href="../reference/codebook.html">codebook()</a></code></strong> provides an interactive
+HTML data dictionary</li>
+<li>All four functions support <strong>survey weights</strong> and
+<strong><code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code></strong>
 </li>
-<li>Always explore your data descriptively before running statistical
-tests</li>
 </ol>
 </div>
 <div class="section level2">
 <h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
 <ul>
-<li>Test for significant differences with <code><a href="../reference/t_test.html">t_test()</a></code> or
-<code><a href="../reference/chi_square.html">chi_square()</a></code> — see
+<li>Test for significant differences — see
 <code><a href="../articles/hypothesis-testing.html">vignette("hypothesis-testing")</a></code>
 </li>
-<li>Explore relationships with <code><a href="../reference/pearson_cor.html">pearson_cor()</a></code> — see
+<li>Measure relationships between variables — see
 <code><a href="../articles/correlation-analysis.html">vignette("correlation-analysis")</a></code>
 </li>
-<li>Learn about weighted analysis — see
+<li>Learn about survey weights — see
 <code><a href="../articles/survey-weights.html">vignette("survey-weights")</a></code>
 </li>
 </ul>

@@ -8,62 +8,47 @@ data(survey_data)
 
 ## Overview
 
-Survey weights adjust your analysis to make results representative of
-the target population. Without weights, your results only describe your
-sample — which might be biased if some groups were over- or
-under-represented.
+Survey weights correct for sampling biases so your results represent the
+target population, not just your sample. Common reasons for weighting
+include oversampling of small groups, differential non-response, and
+post-stratification to known demographics.
 
-Common reasons for weighting:
+In mariposa, adding weights is as simple as `weights = sampling_weight`
+in any function call. This guide covers the dedicated `w_*` functions,
+the effective sample size concept, and best practices.
 
-- **Oversampling**: Deliberately surveying more people from small groups
-  to ensure adequate sample sizes
-- **Non-response**: Some groups are less likely to participate, creating
-  bias
-- **Post-stratification**: Adjusting the sample to match known
-  population demographics
-
-In mariposa, adding weights is as simple as including
-`weights = sampling_weight` in any function call.
-
-## Impact of Weights
-
-Let’s see the difference weights make:
+## The Impact of Weights
 
 ``` r
 # Without weights (describes the sample)
-unweighted_stats <- survey_data %>%
+unweighted <- survey_data %>%
   summarise(
     mean_age = mean(age, na.rm = TRUE),
-    mean_satisfaction = mean(life_satisfaction, na.rm = TRUE)
+    mean_income = mean(income, na.rm = TRUE)
   )
-print(unweighted_stats)
-#> # A tibble: 1 × 2
-#>   mean_age mean_satisfaction
-#>      <dbl>             <dbl>
-#> 1     50.5              3.63
 
 # With weights (represents the population)
-age_weighted <- w_mean(survey_data, age, weights = sampling_weight)
-satisfaction_weighted <- w_mean(survey_data, life_satisfaction,
-                                weights = sampling_weight)
+age_w <- w_mean(survey_data, age, weights = sampling_weight)
+income_w <- w_mean(survey_data, income, weights = sampling_weight)
 
-weighted_stats <- data.frame(
-  mean_age = age_weighted$results$weighted_mean,
-  mean_satisfaction = satisfaction_weighted$results$weighted_mean
+comparison <- data.frame(
+  Variable = c("Age", "Income"),
+  Unweighted = c(unweighted$mean_age, unweighted$mean_income),
+  Weighted = c(age_w$results$weighted_mean, income_w$results$weighted_mean)
 )
-print(weighted_stats)
-#>   mean_age mean_satisfaction
-#> 1  50.5144          3.624863
+print(comparison)
+#>   Variable Unweighted  Weighted
+#> 1      Age    50.5496   50.5144
+#> 2   Income  3753.9341 3743.0994
 ```
 
-The difference between weighted and unweighted results tells you how
+The difference between weighted and unweighted results reflects how
 biased your sample is. Larger differences mean weights are doing more
 important work.
 
 ## Weighted Statistics Functions
 
-mariposa provides specialized `w_*` functions for individual weighted
-statistics.
+mariposa provides 11 `w_*` functions for individual weighted statistics.
 
 ### Central Tendency
 
@@ -88,7 +73,7 @@ w_median(survey_data, income, weights = sampling_weight)
 #>  Variable weighted_median Effective_N
 #>    income            3500      2158.9
 
-# Weighted mode (most common value)
+# Weighted mode
 w_modus(survey_data, education, weights = sampling_weight)
 #> 
 #> Weighted Mode Statistics
@@ -157,10 +142,20 @@ w_kurtosis(survey_data, income, weights = sampling_weight)
 #>    income             0.388      2158.9
 ```
 
-### Other Useful Functions
+### Precision and Range
 
 ``` r
-# Weighted quantiles (25th, 50th, 75th percentiles)
+# Weighted standard error
+w_se(survey_data, income, weights = sampling_weight)
+#> 
+#> Weighted Standard Error Statistics
+#> ----------------------------------
+#> 
+#> --- income ---
+#>  Variable weighted_se Effective_N
+#>    income      30.353      2158.9
+
+# Weighted quantiles
 w_quantile(survey_data, income,
            probs = c(0.25, 0.5, 0.75),
            weights = sampling_weight)
@@ -173,31 +168,53 @@ w_quantile(survey_data, income,
 #>    income      75%  4600 2186      2158.9 sampling_weight
 #> ----------------------------------------
 
-# Weighted standard error
-w_se(survey_data, income, weights = sampling_weight)
+# Weighted range
+w_range(survey_data, income, weights = sampling_weight)
 #> 
-#> Weighted Standard Error Statistics
-#> ----------------------------------
+#> Weighted Range Statistics
+#> -------------------------
 #> 
 #> --- income ---
-#>  Variable weighted_se Effective_N
-#>    income      30.353      2158.9
+#>  Variable weighted_range Effective_N
+#>    income           7200      2158.9
+```
+
+### Multiple Variables
+
+All `w_*` functions accept multiple variables:
+
+``` r
+w_mean(survey_data, age, income, life_satisfaction,
+       weights = sampling_weight)
+#> 
+#> Weighted Mean Statistics
+#> ------------------------
+#> 
+#> --- age ---
+#>  Variable weighted_mean Effective_N
+#>       age        50.514      2468.8
+#> 
+#> --- income ---
+#>  Variable weighted_mean Effective_N
+#>    income      3743.099      2158.9
+#> 
+#> --- life_satisfaction ---
+#>           Variable weighted_mean Effective_N
+#>  life_satisfaction         3.625      2390.9
 ```
 
 ## Effective Sample Size
 
-Weighting reduces the statistical precision of your estimates. The
-*effective sample size* ($n_{eff}$) tells you how much information your
-weighted sample actually carries:
+Weighting reduces statistical precision. The *effective sample size*
+($n_{eff}$) tells you how much information your weighted sample actually
+carries:
 
 $$n_{eff} = \frac{\left( \sum w_{i} \right)^{2}}{\sum w_{i}^{2}}$$
 
-The *design effect* is the ratio of actual to effective sample size:
-
 ``` r
 actual_n <- nrow(survey_data)
-age_weighted <- w_mean(survey_data, age, weights = sampling_weight)
-effective_n <- age_weighted$results$effective_n
+age_w <- w_mean(survey_data, age, weights = sampling_weight)
+effective_n <- age_w$results$effective_n
 
 cat("Actual sample size:", actual_n, "\n")
 #> Actual sample size: 2500
@@ -208,25 +225,59 @@ cat("Design effect:", round(actual_n / effective_n, 2), "\n")
 ```
 
 A design effect of 1.0 means weights have no impact on precision. Values
-above 1 mean the effective sample is smaller than the actual sample —
-your standard errors are larger than they would be without weights.
+above 1 mean larger standard errors than an unweighted sample of the
+same size.
 
-## Weights in Statistical Tests
+## Weights in Analysis Functions
 
-All main analysis functions support the `weights` argument:
-
-### Weighted t-test
+Every analysis function in mariposa supports the `weights` argument:
 
 ``` r
+# Descriptive statistics
+survey_data %>%
+  describe(income, life_satisfaction, weights = sampling_weight)
+#> 
+#> Weighted Descriptive Statistics
+#> -------------------------------
+#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
+#>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
+#>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#> ----------------------------------------
+```
+
+``` r
+# Frequency tables
+survey_data %>%
+  frequency(education, weights = sampling_weight)
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
+#> education (Highest educational attainment)
+#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> 
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |
+#> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |
+#> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |
+#> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+```
+
+``` r
+# t-test
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> t-Test: income by gender [Weighted]
 #>   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
 ```
 
-### Weighted ANOVA
-
 ``` r
+# ANOVA
 survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
@@ -234,25 +285,32 @@ survey_data %>%
 #>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
-### Weighted Chi-square
-
 ``` r
+# Chi-square
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
 #> Chi-Squared Test: education × employment [Weighted]
 #>   chi2(12) = 130.696, p < 0.001 ***, V = 0.132 (small), N = 2518
 ```
 
-### Weighted Correlations
-
 ``` r
+# Correlation
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> Pearson Correlation: age x income [Weighted]
 #>   r = -0.005, p = 0.828 , N = 2201
 ```
 
-## Grouped Analysis with Weights
+``` r
+# Regression
+survey_data %>%
+  linear_regression(life_satisfaction ~ age + income,
+                    weights = sampling_weight)
+#> Linear Regression: life_satisfaction ~ age + income [Weighted]
+#>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p < 0.001 ***, N = 2130
+```
+
+## Grouped Weighted Analysis
 
 All functions work seamlessly with
 [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html):
@@ -285,51 +343,58 @@ survey_data %>%
 #> ----------------------------------------
 ```
 
+``` r
+survey_data %>%
+  group_by(region) %>%
+  t_test(income, group = gender, weights = sampling_weight)
+#> [region = 1]
+#> t-Test: income by gender [Weighted]
+#>   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450
+#> [region = 2]
+#> t-Test: income by gender [Weighted]
+#>   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+```
+
 ## Diagnosing Weight Issues
 
-### Extreme Weights
-
-Weights that are very large or very small can destabilize your
-estimates. Check the distribution of your weights:
+### Checking Weight Distribution
 
 ``` r
 weight_stats <- survey_data %>%
   summarise(
-    min_weight = min(sampling_weight, na.rm = TRUE),
-    max_weight = max(sampling_weight, na.rm = TRUE),
-    mean_weight = mean(sampling_weight, na.rm = TRUE),
-    sd_weight = sd(sampling_weight, na.rm = TRUE)
+    min = min(sampling_weight, na.rm = TRUE),
+    max = max(sampling_weight, na.rm = TRUE),
+    mean = mean(sampling_weight, na.rm = TRUE),
+    sd = sd(sampling_weight, na.rm = TRUE)
   )
 print(weight_stats)
 #> # A tibble: 1 × 4
-#>   min_weight max_weight mean_weight sd_weight
-#>        <dbl>      <dbl>       <dbl>     <dbl>
-#> 1      0.702       1.40        1.01     0.113
+#>     min   max  mean    sd
+#>   <dbl> <dbl> <dbl> <dbl>
+#> 1 0.702  1.40  1.01 0.113
 ```
 
-A rule of thumb: weights should typically range from about 0.2 to 5.
-Extreme values (below 0.1 or above 10) may indicate problems with the
-weighting scheme.
+A rule of thumb: weights should range from about 0.2 to 5. Extreme
+values (below 0.1 or above 10) may indicate problems with the weighting
+scheme.
 
 ### Missing Weights
 
-Check how many cases lack weight values:
-
 ``` r
-missing_weights <- sum(is.na(survey_data$sampling_weight))
-total_cases <- nrow(survey_data)
-cat("Cases with missing weights:", missing_weights, "/", total_cases,
-    "(", round(missing_weights / total_cases * 100, 1), "%)\n")
-#> Cases with missing weights: 0 / 2500 ( 0 %)
+missing <- sum(is.na(survey_data$sampling_weight))
+total <- nrow(survey_data)
+cat("Missing weights:", missing, "/", total,
+    "(", round(missing / total * 100, 1), "%)\n")
+#> Missing weights: 0 / 2500 ( 0 %)
 ```
 
 ### Weight Trimming
 
-If weights are extreme, consider trimming them to reduce variance at the
-cost of a small increase in bias:
+If weights are extreme, trim them to reduce variance at the cost of a
+small increase in bias:
 
 ``` r
-survey_data_trimmed <- survey_data %>%
+trimmed <- survey_data %>%
   mutate(
     weight_trimmed = case_when(
       sampling_weight > 5 ~ 5,
@@ -339,68 +404,34 @@ survey_data_trimmed <- survey_data %>%
   )
 
 original <- w_mean(survey_data, income, weights = sampling_weight)
-trimmed <- w_mean(survey_data_trimmed, income, weights = weight_trimmed)
+trimmed_result <- w_mean(trimmed, income, weights = weight_trimmed)
 
 cat("Original weighted mean:", round(original$results$weighted_mean, 1), "\n")
 #> Original weighted mean: 3743.1
-cat("Trimmed weighted mean:", round(trimmed$results$weighted_mean, 1), "\n")
+cat("Trimmed weighted mean:", round(trimmed_result$results$weighted_mean, 1), "\n")
 #> Trimmed weighted mean: 3743.1
 ```
 
-## Best Practices
-
-1.  **Always use weights when they are provided.** They ensure your
-    results generalize to the population, not just the sample.
-2.  **Report both weighted and unweighted results** for transparency:
-
-``` r
-comparison <- data.frame(
-  Statistic = c("Mean Age", "Mean Income"),
-  Unweighted = c(
-    mean(survey_data$age, na.rm = TRUE),
-    mean(survey_data$income, na.rm = TRUE)
-  ),
-  Weighted = c(
-    w_mean(survey_data, age, weights = sampling_weight)$results$weighted_mean,
-    w_mean(survey_data, income, weights = sampling_weight)$results$weighted_mean
-  )
-)
-print(comparison)
-#>     Statistic Unweighted  Weighted
-#> 1    Mean Age    50.5496   50.5144
-#> 2 Mean Income  3753.9341 3743.0994
-```
-
-3.  **Document the weight source.** Explain how weights were calculated
-    and what they adjust for.
-4.  **Report the effective sample size.** This tells readers about the
-    precision of your estimates.
-5.  **Check for extreme weights.** Large variation in weights inflates
-    standard errors and reduces power.
-
 ## Complete Example
-
-A full weighted analysis workflow:
 
 ``` r
 # 1. Inspect weight properties
-weight_summary <- survey_data %>%
+survey_data %>%
   summarise(
     n = n(),
-    mean = mean(sampling_weight, na.rm = TRUE),
-    sd = sd(sampling_weight, na.rm = TRUE),
-    min = min(sampling_weight, na.rm = TRUE),
-    max = max(sampling_weight, na.rm = TRUE)
+    mean_weight = mean(sampling_weight, na.rm = TRUE),
+    sd_weight = sd(sampling_weight, na.rm = TRUE),
+    min_weight = min(sampling_weight, na.rm = TRUE),
+    max_weight = max(sampling_weight, na.rm = TRUE)
   )
-print(weight_summary)
 #> # A tibble: 1 × 5
-#>       n  mean    sd   min   max
-#>   <int> <dbl> <dbl> <dbl> <dbl>
-#> 1  2500  1.01 0.113 0.702  1.40
+#>       n mean_weight sd_weight min_weight max_weight
+#>   <int>       <dbl>     <dbl>      <dbl>      <dbl>
+#> 1  2500        1.01     0.113      0.702       1.40
 
 # 2. Compare weighted vs unweighted
-vars_to_check <- c("age", "income", "life_satisfaction")
-for (var in vars_to_check) {
+vars <- c("age", "income", "life_satisfaction")
+for (var in vars) {
   unw <- mean(survey_data[[var]], na.rm = TRUE)
   w_result <- w_mean(survey_data, !!sym(var), weights = sampling_weight)
   w <- w_result$results$weighted_mean
@@ -411,7 +442,7 @@ for (var in vars_to_check) {
 #> income: unweighted = 3753.93, weighted = 3743.10 (diff = -0.3%)
 #> life_satisfaction: unweighted = 3.63, weighted = 3.62 (diff = -0.1%)
 
-# 3. Weighted group comparisons
+# 3. Weighted group comparison
 survey_data %>%
   group_by(region) %>%
   describe(income, weights = sampling_weight)
@@ -440,15 +471,36 @@ survey_data %>%
 #>   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
 ```
 
+## Best Practices
+
+1.  **Always use weights when they are provided.** They correct for
+    sampling biases and make your results generalizable.
+
+2.  **Report both weighted and unweighted sample sizes.** The actual *n*
+    tells readers about data collection; the effective *n* tells them
+    about statistical precision.
+
+3.  **Check for extreme weights.** Large variation inflates standard
+    errors and reduces statistical power. Consider trimming if
+    necessary.
+
+4.  **Document the weight source.** Explain how weights were calculated
+    and what they adjust for (e.g., age, gender, region
+    post-stratification).
+
+5.  **Report the effective sample size.** This tells readers how much
+    precision was lost due to weighting.
+
 ## Summary
 
-1.  **Always use weights** when they are available — they correct for
-    sampling biases
-2.  **Check weight properties** — extreme values may need trimming
-3.  **Report the effective $n$** — weights reduce statistical precision
-4.  **Document everything** — explain what weights adjust for
-5.  In mariposa, adding weights is as simple as
-    `weights = sampling_weight`
+1.  Survey weights make results **representative of the population**,
+    not just the sample
+2.  The 11 `w_*` functions provide individual weighted statistics
+3.  **All analysis functions** support weights via `weights =`
+4.  The **effective sample size** measures how much precision weighting
+    costs
+5.  **Check and document** weight distributions, extreme values, and
+    missing weights
 
 ## Next Steps
 
@@ -458,5 +510,5 @@ survey_data %>%
   [`vignette("descriptive-statistics")`](https://YannickDiehl.github.io/mariposa/articles/descriptive-statistics.md)
 - Test hypotheses — see
   [`vignette("hypothesis-testing")`](https://YannickDiehl.github.io/mariposa/articles/hypothesis-testing.md)
-- Measure relationships — see
-  [`vignette("correlation-analysis")`](https://YannickDiehl.github.io/mariposa/articles/correlation-analysis.md)
+- Import weighted data from SPSS — see
+  [`vignette("data-io")`](https://YannickDiehl.github.io/mariposa/articles/data-io.md)
