@@ -28,6 +28,14 @@ navbar:
       - text: "Introduction to mariposa"
         href: articles/introduction.html
       - text: "-------"
+      - text: "Data Management"
+      - text: "Importing & Exporting Data"
+        href: articles/data-io.html
+      - text: "Labels & Missing Values"
+        href: articles/labels-and-missing-values.html
+      - text: "Data Transformation"
+        href: articles/data-transformation.html
+      - text: "-------"
       - text: "Core Analysis"
       - text: "Descriptive Statistics"
         href: articles/descriptive-statistics.html
@@ -58,9 +66,6 @@ reference:
   - read_sas
   - read_xpt
   - read_xlsx
-  - na_frequencies
-  - untag_na
-  - strip_tags
 
 - title: "Data Export"
   desc: "Export data to statistical formats with preserved labels and missing values"
@@ -83,6 +88,19 @@ reference:
   - to_labelled
   - set_na
   - unlabel
+
+- title: "Data Transformation"
+  desc: "Recode, dichotomize, dummy-code, standardize, and center variables"
+  contents:
+  - rec
+  - to_dummy
+  - std
+  - center
+
+- title: "Data Exploration"
+  desc: "Search and inspect your data"
+  contents:
+  - find_var
 
 - title: "Descriptive Statistics"
   desc: "Summarize and explore your survey data"
@@ -129,19 +147,6 @@ reference:
   - dunn_test
   - pairwise_wilcoxon
 
-- title: "Data Transformation"
-  desc: "Recode, dichotomize, dummy-code, standardize, and center variables"
-  contents:
-  - rec
-  - to_dummy
-  - std
-  - center
-
-- title: "Data Exploration"
-  desc: "Search and inspect your data"
-  contents:
-  - find_var
-
 - title: "Scale Analysis"
   desc: "Factor analysis, reliability, and scale construction"
   contents:
@@ -180,9 +185,12 @@ reference:
   - longitudinal_data
   - longitudinal_data_wide
 
-- title: "Print & Summary Methods"
-  desc: "Compact and detailed output for all result types"
+- title: internal
   contents:
+  - na_frequencies
+  - untag_na
+  - strip_tags
+  - fre
   - starts_with("print.")
   - starts_with("summary.")
 
@@ -191,6 +199,13 @@ articles:
   navbar: ~
   contents:
   - introduction
+
+- title: "Data Management"
+  navbar: ~
+  contents:
+  - data-io
+  - labels-and-missing-values
+  - data-transformation
 
 - title: "Core Analysis"
   navbar: ~
