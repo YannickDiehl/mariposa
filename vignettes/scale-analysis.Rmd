@@ -24,37 +24,42 @@ data(survey_data)
 
 ## Overview
 
-Scale analysis is the process of combining multiple survey items into a single score that reliably measures a concept. In mariposa, the typical workflow is:
+Scale analysis combines multiple survey items into a single score that reliably measures a concept. The typical workflow is:
 
-1. Check reliability with `reliability()` -- do the items measure the same thing?
-2. Explore structure with `efa()` -- how do items group into dimensions?
-3. Create scores with `row_means()` -- compute mean indices
-4. Standardize with `pomps()` -- transform to comparable 0-100 scale
+1. **Check reliability** with `reliability()` --- do the items measure the same thing?
+2. **Explore structure** with `efa()` --- how do items group into dimensions?
+3. **Create scores** with `row_means()` --- compute mean indices
+4. **Standardize** with `pomps()` --- transform to a comparable 0--100 scale
 
-This guide walks through each step using the trust items from `survey_data` (trust in government, media, and science).
+This guide uses the trust items from `survey_data` (trust in government, media, and science).
 
 | Function | Purpose |
 |----------|---------|
-| `reliability()` | Check internal consistency (Cronbach's Alpha) |
+| `reliability()` | Internal consistency (Cronbach's Alpha) |
 | `efa()` | Discover underlying dimensions (factor analysis) |
-| `row_means()` | Create mean indices across items |
-| `pomps()` | Transform to Percent of Maximum Possible Scores |
+| `row_means()` | Row-wise mean indices |
+| `row_sums()` | Row-wise sums |
+| `row_count()` | Count specific values per row |
+| `pomps()` | Percent of Maximum Possible Scores (0--100) |
 
 ## Reliability Analysis
 
 ### Basic Usage
 
-Before creating a scale score, check whether your items measure the same concept consistently:
-
 ```{r}
 reliability(survey_data, trust_government, trust_media, trust_science)
 ```
 
-The output shows Cronbach's Alpha, item-total correlations, and alpha-if-item-deleted -- matching SPSS RELIABILITY output.
+### Detailed Output
 
-### Understanding the Output
+```{r}
+rel <- reliability(survey_data, trust_government, trust_media, trust_science)
+summary(rel)
+```
 
-**Cronbach's Alpha** tells you how internally consistent your scale is:
+The detailed output shows item-total correlations, alpha-if-item-deleted, and inter-item correlations --- matching SPSS RELIABILITY.
+
+### Interpreting Cronbach's Alpha
 
 - Alpha > 0.90: Excellent
 - 0.80 -- 0.90: Good
@@ -62,11 +67,7 @@ The output shows Cronbach's Alpha, item-total correlations, and alpha-if-item-de
 - 0.60 -- 0.70: Questionable
 - Below 0.60: Reconsider your items
 
-**Item-Total Correlation** shows how well each item fits:
-
-- Above 0.40: Good fit
-- 0.20 -- 0.40: Needs review
-- Below 0.20: Consider removing
+**Item-Total Correlation** shows how well each item fits the scale. Values above 0.40 indicate good fit; below 0.20 suggests the item does not belong.
 
 **Alpha if Item Deleted** shows what happens without each item. If alpha increases when you remove an item, that item weakens the scale.
 
@@ -78,8 +79,6 @@ reliability(survey_data, trust_government, trust_media, trust_science,
 ```
 
 ### Using tidyselect
-
-When your items share a naming pattern, select them efficiently:
 
 ```{r}
 reliability(survey_data, starts_with("trust"))
@@ -95,6 +94,8 @@ survey_data %>%
   reliability(trust_government, trust_media, trust_science)
 ```
 
+A scale that works well overall might be unreliable in specific subgroups. Always check when your sample spans diverse populations.
+
 ## Exploratory Factor Analysis
 
 ### Basic Usage
@@ -107,19 +108,27 @@ efa(survey_data,
     trust_government, trust_media, trust_science)
 ```
 
-The output includes KMO measure, Bartlett's test, eigenvalues, and the rotated component matrix -- matching SPSS FACTOR output.
+### Detailed Output
+
+```{r}
+efa_result <- efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science)
+
+summary(efa_result)
+```
 
 ### Understanding the Output
 
-**KMO (Kaiser-Meyer-Olkin)** measures whether your data is suitable for factor analysis:
+**KMO (Kaiser-Meyer-Olkin)** measures sampling adequacy for factor analysis:
 
 - Above 0.80: Good to excellent
 - 0.60 -- 0.80: Acceptable
 - Below 0.60: Factor analysis may not be appropriate
 
-**Bartlett's Test** should be significant ($p < .05$), confirming that correlations exist in your data.
+**Bartlett's Test** should be significant ($p < .05$), confirming that meaningful correlations exist.
 
-**Eigenvalues** show how much variance each component explains. By default, components with eigenvalue > 1 are retained (Kaiser criterion).
+**Eigenvalues** show variance explained per component. By default, components with eigenvalue > 1 are retained (Kaiser criterion).
 
 **Factor Loadings** show item-component associations:
 
@@ -127,9 +136,9 @@ The output includes KMO measure, Bartlett's test, eigenvalues, and the rotated c
 - 0.40 -- 0.70: Moderate
 - Below 0.40: Suppressed by default
 
-### Choosing a Rotation
+### Rotation Methods
 
-**Varimax** (default) assumes uncorrelated factors -- simpler to interpret:
+**Varimax** (default) --- assumes uncorrelated factors:
 
 ```{r}
 efa(survey_data,
@@ -138,7 +147,16 @@ efa(survey_data,
     rotation = "varimax")
 ```
 
-**Oblimin** allows correlated factors -- often more realistic for social science:
+**Promax** --- allows correlated factors, produces Pattern and Structure matrices:
+
+```{r}
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    rotation = "promax")
+```
+
+**Oblimin** --- another oblique rotation, common in psychology:
 
 ```{r, eval = FALSE}
 # Requires GPArotation package
@@ -148,18 +166,7 @@ efa(survey_data,
     rotation = "oblimin")
 ```
 
-With oblimin, you get a Pattern Matrix (unique contributions) and Structure Matrix (total correlations).
-
-**Promax** is another oblique rotation, common in SPSS. Like oblimin, it produces Pattern and Structure matrices:
-
-```{r}
-efa(survey_data,
-    political_orientation, environmental_concern, life_satisfaction,
-    trust_government, trust_media, trust_science,
-    rotation = "promax")
-```
-
-### Choosing an Extraction Method
+### Extraction Methods
 
 By default, `efa()` uses PCA (Principal Component Analysis). For a true factor analysis model, use Maximum Likelihood:
 
@@ -170,12 +177,9 @@ efa(survey_data,
     extraction = "ml")
 ```
 
-ML extraction provides a **goodness-of-fit test** that evaluates whether your factor model adequately reproduces the observed correlations. A non-significant chi-square ($p > .05$) suggests good fit. ML also reports initial communalities as SMC (squared multiple correlations) instead of 1.0.
-
-You can combine any extraction with any rotation:
+ML extraction provides a goodness-of-fit test and uses SMC (squared multiple correlations) as initial communalities. Combine any extraction with any rotation:
 
 ```{r}
-# ML extraction with Promax rotation
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -183,8 +187,6 @@ efa(survey_data,
 ```
 
 ### Fixing the Number of Factors
-
-If you have a theoretical reason for a specific number of components:
 
 ```{r}
 efa(survey_data,
@@ -204,128 +206,90 @@ efa(survey_data,
 
 ## Creating Scale Scores
 
-### row_means(): Mean Indices
+After confirming reliability, create scores using the row operation functions. For details on `row_means()`, `row_sums()`, `row_count()`, and `pomps()`, see `vignette("data-transformation")`.
 
-After confirming reliability, create a mean index:
+### Quick Scale Construction
 
 ```{r}
+# Create mean index
 survey_data <- survey_data %>%
-  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science,
+                             min_valid = 2))
 
-# Check the result
-survey_data %>%
-  describe(m_trust)
-```
-
-`row_means()` works inside `mutate()`, computing the row-wise mean across items.
-
-### Using tidyselect
-
-```{r}
-survey_data <- survey_data %>%
-  mutate(m_trust2 = row_means(., starts_with("trust")))
-```
-
-### Using pick()
-
-The `pick()` function works with both `%>%` and `|>` pipes:
-
-```{r}
-survey_data <- survey_data %>%
-  mutate(m_trust3 = row_means(
-    pick(trust_government, trust_media, trust_science)
-  ))
-```
-
-### Minimum Valid Items
-
-Require a minimum number of valid responses per respondent, matching SPSS `MEAN.2()` syntax:
-
-```{r}
-survey_data <- survey_data %>%
-  mutate(m_trust_strict = row_means(
-    ., trust_government, trust_media, trust_science,
-    min_valid = 2
-  ))
-```
-
-If a respondent answered fewer than 2 items, they receive `NA` instead of a potentially unreliable score.
-
-### pomps(): Standardize to 0-100
-
-Transform scores to a common 0-100 scale for cross-scale comparison:
-
-```{r}
+# Transform to 0-100 scale
 survey_data <- survey_data %>%
   mutate(trust_pomps = pomps(m_trust, scale_min = 1, scale_max = 5))
 
+# Check the result
 survey_data %>%
-  describe(trust_pomps)
+  describe(m_trust, trust_pomps)
 ```
 
-A score of 0 means the minimum possible, 100 means the maximum. Always specify the theoretical scale range for consistent results.
-
-### Multiple Variables at Once
+### Using the Scale in Analysis
 
 ```{r}
-survey_data <- survey_data %>%
-  mutate(across(
-    c(trust_government, trust_media, trust_science),
-    ~ pomps(.x, scale_min = 1, scale_max = 5),
-    .names = "{.col}_pomps"
-  ))
+# Group comparison
+survey_data %>%
+  t_test(m_trust, group = gender, weights = sampling_weight)
+```
+
+```{r}
+# As a predictor in regression
+survey_data %>%
+  linear_regression(life_satisfaction ~ m_trust + age + income,
+                    weights = sampling_weight)
 ```
 
 ## Complete Example
 
-A typical scale analysis workflow from start to finish:
-
 ```{r}
 # 1. Check reliability
 rel <- reliability(survey_data, trust_government, trust_media, trust_science)
-rel                # compact: Alpha + interpretation
-summary(rel)       # detailed: item statistics, inter-item correlations
+rel
+summary(rel)
 
 # 2. Explore factor structure
 efa_result <- efa(survey_data, trust_government, trust_media, trust_science)
-efa_result         # compact: KMO + variance explained
-summary(efa_result, communalities = FALSE)  # detailed, skip communalities
+efa_result
 
 # 3. Create mean index (Alpha was acceptable)
 survey_data <- survey_data %>%
-  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science,
+                             min_valid = 2))
 
-# 4. Transform to POMPS for reporting
+# 4. Transform to POMPS
 survey_data <- survey_data %>%
   mutate(trust_pomps = pomps(m_trust, scale_min = 1, scale_max = 5))
 
-# 5. Use in further analyses
+# 5. Use in further analysis
 survey_data %>%
-  t_test(m_trust, group = region, weights = sampling_weight)
+  group_by(education) %>%
+  describe(m_trust, trust_pomps, weights = sampling_weight)
 ```
 
 ## Practical Tips
 
 1. **Always check reliability first.** A mean index from unreliable items produces meaningless results. Aim for Alpha > .70.
 
-2. **Use `min_valid` wisely.** For scales with 3-5 items, `min_valid = 2` is a reasonable compromise between data loss and score quality.
+2. **Use `min_valid` wisely.** For 3--5 item scales, `min_valid = 2` is a reasonable compromise. For longer scales, require at least half the items.
 
-3. **Specify `scale_min` and `scale_max` in `pomps()`.** Using observed values instead of theoretical range makes scores incomparable across samples.
+3. **Specify theoretical `scale_min` / `scale_max` in `pomps()`.** Using observed values makes scores sample-dependent and non-comparable.
 
-4. **Run EFA when you have many items.** With 6+ items, factor analysis can reveal unexpected dimensions before you create indices.
+4. **Run EFA when you have 6+ items.** Factor analysis can reveal unexpected dimensions before you create indices.
 
-5. **Check grouped reliability.** Alpha may differ substantially across subgroups (e.g., regions, education levels). A scale that works well overall might be unreliable in specific groups.
+5. **Check grouped reliability.** A scale that works well overall may be unreliable in specific subgroups (e.g., different regions or education levels).
 
 ## Summary
 
 1. `reliability()` checks whether items form a consistent scale (Cronbach's Alpha)
-2. `efa()` discovers underlying dimensions in your items (Principal Component Analysis)
-3. `row_means()` computes mean indices for use in further analyses
-4. `pomps()` transforms scores to a comparable 0-100 scale
+2. `efa()` discovers underlying dimensions (PCA or ML extraction, Varimax/Oblimin/Promax rotation)
+3. `row_means()` creates mean indices; `row_sums()` and `row_count()` provide alternatives
+4. `pomps()` transforms scores to a comparable 0--100 scale
+5. Always validate reliability **before** creating scale scores
 
 ## Next Steps
 
-- Use your new scale scores in group comparisons -- see `vignette("hypothesis-testing")`
-- Explore relationships between scales -- see `vignette("correlation-analysis")`
-- Predict outcomes with regression -- see `vignette("regression-analysis")`
-- Apply survey weights to all analyses -- see `vignette("survey-weights")`
+- Learn about row operations and transformations --- see `vignette("data-transformation")`
+- Use scales in regression models --- see `vignette("regression-analysis")`
+- Compare scale scores across groups --- see `vignette("hypothesis-testing")`
+- Apply survey weights --- see `vignette("survey-weights")`

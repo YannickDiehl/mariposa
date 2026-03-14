@@ -1,0 +1,407 @@
+---
+title: "Data Transformation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data Transformation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(mariposa)
+library(dplyr)
+data(survey_data)
+```
+
+## Overview
+
+Before analyzing survey data, you often need to transform variables --- recode responses, create dummy variables, standardize scales, or compute row-wise indices. mariposa provides a set of functions that handle these tasks with a clean, survey-oriented syntax.
+
+| Function | Purpose |
+|----------|---------|
+| `rec()` | Recode values using a string syntax |
+| `to_dummy()` | Create dummy (0/1) variables from categorical columns |
+| `std()` | Z-standardize variables (4 methods) |
+| `center()` | Mean-center variables (grand-mean or group-mean) |
+| `row_means()` | Compute row-wise means across items |
+| `row_sums()` | Compute row-wise sums across items |
+| `row_count()` | Count specific values per row |
+| `pomps()` | Transform to Percent of Maximum Possible Scores (0--100) |
+
+## Recoding with rec()
+
+`rec()` uses a concise string syntax to recode variables. It works inside `mutate()` and supports ranges, reverse-coding, and inline value labels.
+
+### Simple Recoding
+
+Collapse categories by mapping old values to new values:
+
+```{r}
+survey_data <- rec(survey_data, age,
+  rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
+  suffix = "_group", as.factor = TRUE
+)
+
+frequency(survey_data, age_group)
+```
+
+The bracket notation (`[Young]`) automatically creates value labels on the recoded variable. The `suffix` argument creates a new column (here `age_group`) instead of overwriting the original.
+
+### Reverse-Coding
+
+Reverse the direction of a Likert scale. Useful when some items in a scale are negatively worded:
+
+```{r}
+survey_data <- rec(survey_data, trust_government,
+  rules = "rev", suffix = "_rev"
+)
+
+# Original: 1=low trust ... 5=high trust
+# Reversed: 1=high trust ... 5=low trust
+head(data.frame(
+  original = survey_data$trust_government,
+  reversed = survey_data$trust_government_rev
+))
+```
+
+### Dichotomizing
+
+Split a variable at its median into two groups:
+
+```{r}
+survey_data <- rec(survey_data, income,
+  rules = "dicho", suffix = "_dicho"
+)
+
+frequency(survey_data, income_dicho)
+```
+
+Other split options:
+
+```{r}
+# Split at the mean
+survey_data <- rec(survey_data, income,
+  rules = "mean", suffix = "_mean_split"
+)
+
+# Split at a fixed cut-point
+survey_data <- rec(survey_data, income,
+  rules = "dicho(3000)", suffix = "_custom"
+)
+```
+
+### Keeping and Copying Values
+
+Use `copy` to keep values that are not explicitly recoded, and `else` for a catch-all:
+
+```{r}
+survey_data <- rec(survey_data, education,
+  rules = "1:2=1 [Lower]; else=2 [Higher]",
+  suffix = "_binary", as.factor = TRUE
+)
+
+frequency(survey_data, education_binary)
+```
+
+## Dummy Coding with to_dummy()
+
+`to_dummy()` creates binary (0/1) indicator variables from categorical columns --- also known as one-hot encoding.
+
+### Basic Usage
+
+```{r}
+# Create dummy variables for region
+dummies <- to_dummy(survey_data, region, append = FALSE)
+head(dummies)
+```
+
+### Label-Based Column Names
+
+Use `suffix = "label"` to name columns after the value labels instead of numeric codes:
+
+```{r}
+dummies <- to_dummy(survey_data, gender, suffix = "label", append = FALSE)
+head(dummies)
+```
+
+### Reference Category (n-1 Coding)
+
+For regression analysis, you typically need n-1 dummies (one category omitted as reference):
+
+```{r}
+dummies <- to_dummy(survey_data, education, ref = 1, append = FALSE)
+head(dummies)
+```
+
+### Adding to Existing Data
+
+By default, dummy columns are appended to the original data:
+
+```{r, eval = FALSE}
+survey_data <- to_dummy(survey_data, gender, suffix = "label")
+# Adds gender_Male, gender_Female to the data frame
+```
+
+## Standardization with std()
+
+`std()` z-standardizes variables so they have mean 0 and standard deviation 1. This is useful for comparing variables on different scales.
+
+### Basic Standardization
+
+```{r}
+survey_data <- survey_data %>%
+  std(age, income)
+
+# Check: mean ≈ 0, sd ≈ 1
+survey_data %>%
+  describe(age, income, show = c("mean", "sd"))
+```
+
+### Standardization Methods
+
+`std()` supports four methods:
+
+```{r}
+# Default: divide by SD
+survey_data_methods <- survey_data %>%
+  std(life_satisfaction, method = "sd", suffix = "_sd") %>%
+  std(life_satisfaction, method = "2sd", suffix = "_2sd") %>%
+  std(life_satisfaction, method = "mad", suffix = "_mad")
+
+survey_data_methods %>%
+  describe(life_satisfaction_sd, life_satisfaction_2sd, life_satisfaction_mad,
+           show = c("mean", "sd"))
+```
+
+- **`"sd"`** (default): Classic z-standardization ($\frac{x - \bar{x}}{SD}$)
+- **`"2sd"`**: Gelman's (2008) recommendation --- divides by 2 SD, making coefficients comparable to untransformed binary predictors
+- **`"mad"`**: Robust standardization using median and MAD (resistant to outliers)
+- **`"gmd"`**: Standardization using the Gini Mean Difference
+
+### Weighted Standardization
+
+```{r}
+survey_data <- survey_data %>%
+  std(income, weights = sampling_weight, suffix = "_wstd")
+
+survey_data %>%
+  describe(income_wstd, show = c("mean", "sd"))
+```
+
+### Group-Wise Standardization
+
+Standardize within subgroups:
+
+```{r}
+survey_data <- survey_data %>%
+  group_by(region) %>%
+  std(income, suffix = "_gstd") %>%
+  ungroup()
+```
+
+## Centering with center()
+
+`center()` subtracts the mean from each value, shifting the distribution so the mean is zero while preserving the original scale.
+
+### Grand-Mean Centering
+
+```{r}
+survey_data <- survey_data %>%
+  center(age, income, suffix = "_c")
+
+survey_data %>%
+  describe(age_c, income_c, show = c("mean", "sd", "min", "max"))
+```
+
+### Group-Mean Centering
+
+Center within groups --- each observation is expressed as a deviation from its group mean:
+
+```{r}
+survey_data <- survey_data %>%
+  group_by(region) %>%
+  center(income, suffix = "_gc") %>%
+  ungroup()
+
+# Group means are now zero within each region
+survey_data %>%
+  group_by(region) %>%
+  describe(income_gc, show = c("mean", "sd"))
+```
+
+### Weighted Centering
+
+```{r}
+survey_data <- survey_data %>%
+  center(age, weights = sampling_weight, suffix = "_wc")
+```
+
+## Row Operations
+
+Row operations compute values *across columns* for each respondent --- essential for creating scale scores from multiple survey items.
+
+### Row Means
+
+`row_means()` computes the arithmetic mean across selected variables for each row:
+
+```{r}
+survey_data <- survey_data %>%
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
+
+survey_data %>%
+  describe(m_trust)
+```
+
+#### Using tidyselect
+
+```{r}
+survey_data <- survey_data %>%
+  mutate(m_trust2 = row_means(., starts_with("trust")))
+```
+
+#### Using pick()
+
+The `pick()` function works with both `%>%` and `|>`:
+
+```{r}
+survey_data <- survey_data %>%
+  mutate(m_trust3 = row_means(
+    pick(trust_government, trust_media, trust_science)
+  ))
+```
+
+#### Minimum Valid Items
+
+Require a minimum number of non-missing items per row. This matches SPSS `MEAN.2()` syntax:
+
+```{r}
+survey_data <- survey_data %>%
+  mutate(m_trust_strict = row_means(
+    ., trust_government, trust_media, trust_science,
+    min_valid = 2
+  ))
+```
+
+If a respondent answered fewer than 2 of the 3 items, they receive `NA` instead of a potentially unreliable score.
+
+### Row Sums
+
+`row_sums()` works like `row_means()` but returns the total:
+
+```{r}
+survey_data <- survey_data %>%
+  mutate(trust_total = row_sums(., trust_government, trust_media, trust_science))
+
+survey_data %>%
+  describe(trust_total)
+```
+
+### Row Count
+
+`row_count()` counts how many times a specific value appears in each row:
+
+```{r}
+# How many trust items did each person rate as 5 (highest)?
+survey_data <- survey_data %>%
+  mutate(n_high_trust = row_count(
+    ., trust_government, trust_media, trust_science,
+    count = 5
+  ))
+
+frequency(survey_data, n_high_trust)
+```
+
+## POMPS Transformation
+
+`pomps()` transforms scores to a Percent of Maximum Possible Scores scale (0--100). This makes scores from different scales directly comparable:
+
+```{r}
+survey_data <- survey_data %>%
+  mutate(trust_pomps = pomps(m_trust, scale_min = 1, scale_max = 5))
+
+survey_data %>%
+  describe(trust_pomps)
+```
+
+A score of 0 means the respondent chose the minimum on every item; 100 means the maximum on every item.
+
+Always specify `scale_min` and `scale_max` based on the theoretical scale range, not the observed range. This ensures scores are comparable across samples.
+
+```{r}
+# Transform multiple variables at once
+survey_data <- survey_data %>%
+  mutate(across(
+    c(trust_government, trust_media, trust_science),
+    ~ pomps(.x, scale_min = 1, scale_max = 5),
+    .names = "{.col}_pomps"
+  ))
+```
+
+## Complete Example
+
+A typical data transformation workflow before analysis:
+
+```{r}
+data(survey_data)  # fresh copy
+
+# 1. Recode: create age groups and reverse-code an item
+survey_data <- rec(survey_data, age,
+  rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
+  suffix = "_group", as.factor = TRUE)
+survey_data <- rec(survey_data, trust_government,
+  rules = "rev", suffix = "_rev")
+
+# 2. Create scale score
+survey_data <- survey_data %>%
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science,
+                             min_valid = 2))
+
+# 3. Standardize for regression
+survey_data <- survey_data %>%
+  std(age, income, suffix = "_z")
+
+# 4. Use in analysis
+survey_data %>%
+  t_test(m_trust, group = gender, weights = sampling_weight)
+
+survey_data %>%
+  linear_regression(life_satisfaction ~ age_z + income_z + m_trust,
+                    weights = sampling_weight)
+```
+
+## Practical Tips
+
+1. **Use `rec()` for survey-specific recoding.** The string syntax is more readable than nested `ifelse()` or `case_when()` for typical survey transformations.
+
+2. **Always specify `min_valid` for `row_means()`.** Without it, a respondent who answered only 1 out of 10 items gets a scale score based on a single response. Setting `min_valid` to half the number of items is a common rule of thumb.
+
+3. **Center variables before regression.** Centering makes the intercept interpretable as the expected value at the mean of all predictors. Group-mean centering separates within-group and between-group effects.
+
+4. **Use `std(method = "2sd")` for mixed models.** Gelman (2008) recommends dividing by 2 SD so that standardized coefficients for continuous predictors are comparable to those for binary predictors.
+
+5. **Always use theoretical min/max in `pomps()`.** Using observed min/max makes scores sample-dependent and non-comparable.
+
+## Summary
+
+1. `rec()` recodes variables with a concise string syntax (ranges, reverse, dichotomize, inline labels)
+2. `to_dummy()` creates binary indicator variables for regression
+3. `std()` z-standardizes with four methods (sd, 2sd, mad, gmd) and weight/group support
+4. `center()` mean-centers variables (grand-mean or group-mean)
+5. `row_means()`, `row_sums()`, `row_count()` compute values across columns per row
+6. `pomps()` transforms scores to a comparable 0--100 scale
+
+## Next Steps
+
+- Explore your transformed data --- see `vignette("descriptive-statistics")`
+- Build and validate scales --- see `vignette("scale-analysis")`
+- Test group differences --- see `vignette("hypothesis-testing")`
+- Predict outcomes with regression --- see `vignette("regression-analysis")`

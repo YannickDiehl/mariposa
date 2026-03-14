@@ -21,102 +21,138 @@ library(mariposa)
 library(dplyr)
 ```
 
-## Overview
+## What is mariposa?
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) makes it easy to analyze survey data in R. Whether you are working with social surveys, customer satisfaction data, or market research, this package helps you get reliable results quickly.
+mariposa (*Marburg Initiative for Political and Social Analysis*) is a comprehensive R package for professional survey data analysis. It covers the entire workflow --- from importing SPSS, Stata, SAS, and Excel files through label management, recoding, and standardization to statistical analysis with survey weights and publication-ready output.
 
-The package handles the complexities of survey analysis for you --- things like sampling weights, grouped comparisons, and missing data are all taken care of automatically. Every function is validated against SPSS, so you can trust the numbers.
+Every statistical result is validated against SPSS v29, so researchers migrating from SPSS can trust their numbers.
 
-## Getting Started
+### Key Features
 
-Let's start with the included example data. It contains responses from 2,500 people about their life satisfaction, demographics, and opinions.
+- **76 functions** across 15 categories
+- **Full data pipeline**: import → labels → transformation → analysis → export
+- **Survey weights** built into every function
+- **Tidyverse integration**: pipes (`%>%`), `group_by()`, tidyselect
+- **Two-level output**: compact `print()` and detailed `summary()`
+- **SPSS-validated**: 4,986+ tests ensure results match SPSS v29
+
+## The Example Dataset
+
+mariposa includes `survey_data`, a synthetic survey of 2,500 respondents with demographics, attitudes, and a sampling weight:
 
 ```{r}
 data(survey_data)
 glimpse(survey_data)
 ```
 
-## Understanding Your Data
+All examples in this guide use this dataset.
 
-### Summary Statistics
+## Five-Minute Tour
 
-The `describe()` function gives you a complete summary of numeric variables. The `weights` argument ensures results represent the population correctly:
+Here is a complete analysis workflow showing what mariposa can do:
+
+### 1. Explore the Data
 
 ```{r}
-survey_data %>%
-  describe(age, income, weights = sampling_weight)
+# Find variables related to "trust"
+find_var(survey_data, "trust")
 ```
 
-The output shows:
-
-- **n**: Number of valid responses
-- **mean**: The average ($\bar{x}$)
-- **sd**: Standard deviation --- how spread out the values are
-- **median**: The middle value (50th percentile)
-- **range**: Minimum and maximum values
-
-### Categorical Variables
-
-For categorical data like education level or employment status, use `frequency()`:
+```{r}
+# Descriptive statistics with survey weights
+survey_data %>%
+  describe(age, income, life_satisfaction, weights = sampling_weight)
+```
 
 ```{r}
+# Frequency table
 survey_data %>%
   frequency(education, weights = sampling_weight)
 ```
 
-This tells you how many people fall into each category, what percentage they represent, and cumulative percentages.
-
-## Comparing Groups
-
-### Two Groups: t-Test
-
-Want to know if men and women differ in life satisfaction? Use `t_test()`:
+### 2. Transform Variables
 
 ```{r}
+# Create age groups
+survey_data <- rec(survey_data, age,
+  rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
+  suffix = "_group", as.factor = TRUE)
+
+# Build a trust scale
+survey_data <- survey_data %>%
+  mutate(m_trust = row_means(., trust_government, trust_media, trust_science,
+                             min_valid = 2))
+```
+
+### 3. Compare Groups
+
+```{r}
+# t-test with survey weights
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 ```
 
-If the p-value is below 0.05, the difference is statistically significant. But always check the effect size too --- a significant result with a tiny effect might not be practically meaningful.
-
-### Three or More Groups: ANOVA
-
-When comparing more than two groups, use `oneway_anova()`:
-
 ```{r}
-survey_data %>%
+# ANOVA across education levels
+result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+result
 ```
 
-## Finding Relationships
+Every result has a detailed view with `summary()`:
 
-### Correlation
+```{r}
+summary(result, descriptives = FALSE)
+```
 
-Are age and income related? Pearson's *r* measures linear association:
+### 4. Post-Hoc Analysis
+
+```{r}
+# Which education groups differ?
+tukey_test(result)
+```
+
+### 5. Measure Relationships
 
 ```{r}
 survey_data %>%
-  pearson_cor(age, income, weights = sampling_weight)
+  pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
 ```
 
-- **r > 0**: As one variable increases, the other tends to increase
-- **r < 0**: As one increases, the other tends to decrease
-- **r near 0**: No linear relationship
-
-### Cross-Tabulation
-
-See how two categorical variables relate:
+### 6. Build Models
 
 ```{r}
 survey_data %>%
-  crosstab(education, employment, weights = sampling_weight)
+  linear_regression(life_satisfaction ~ age + income + m_trust,
+                    weights = sampling_weight)
 ```
 
-## Working with Groups
+## Compact vs. Detailed Output
 
-### Regional Analysis
+Every analysis function in mariposa provides two output levels:
 
-Use `group_by()` from dplyr to compare statistics across subgroups:
+- **`print()`** (default): A compact one-line summary with the key statistic
+- **`summary()`**: Full SPSS-style output with all details
+
+You can toggle individual sections in the detailed output:
+
+```{r}
+result <- survey_data %>%
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
+
+# Compact
+result
+
+# Detailed
+summary(result)
+
+# Detailed, skip effect sizes
+summary(result, effect_sizes = FALSE)
+```
+
+## Grouped Analysis
+
+All functions support `dplyr::group_by()` for subgroup analysis:
 
 ```{r}
 survey_data %>%
@@ -124,82 +160,131 @@ survey_data %>%
   describe(income, life_satisfaction, weights = sampling_weight)
 ```
 
-### Multiple Variables at Once
-
-Test several variables simultaneously:
-
 ```{r}
 survey_data %>%
-  t_test(trust_government, trust_media, trust_science,
-         group = gender, weights = sampling_weight)
+  group_by(region) %>%
+  t_test(income, group = gender, weights = sampling_weight)
 ```
-
-## Why Weights Matter
-
-Survey weights make your results representative of the population. Here is the difference they make:
-
-```{r}
-unweighted <- mean(survey_data$age, na.rm = TRUE)
-
-weighted_result <- w_mean(survey_data, age, weights = sampling_weight)
-weighted <- weighted_result$results$weighted_mean
-
-cat("Sample average age:", round(unweighted, 1), "\n")
-cat("Population average age:", round(weighted, 1), "\n")
-cat("Difference:", round(weighted - unweighted, 1), "years\n")
-```
-
-Always use weights when they are provided --- unweighted results can be misleading.
-
-## A Typical Workflow
-
-Here is how a complete analysis might look:
-
-```{r}
-# 1. Descriptive overview
-survey_data %>%
-  describe(life_satisfaction, weights = sampling_weight)
-
-# 2. Compare across groups
-survey_data %>%
-  group_by(education) %>%
-  describe(life_satisfaction, weights = sampling_weight)
-
-# 3. Test for significant differences
-result <- survey_data %>%
-  oneway_anova(life_satisfaction, group = education,
-               weights = sampling_weight)
-result                                  # compact overview
-summary(result, descriptives = FALSE)   # detailed output, skip descriptives
-
-# 4. If significant, find out which groups differ
-tukey_test(result)
-```
-
-## Tips for Success
-
-1. **Always start with descriptives.** Understand your data before running tests.
-2. **Check your assumptions.** Skewness near 0 suggests roughly normal data; values beyond $\pm 1$ indicate notable skew.
-3. **Use appropriate tests.** Continuous data: t-test, ANOVA, Pearson. Ordinal data: Mann-Whitney, Spearman. Categorical data: chi-square.
-4. **Report effect sizes.** Statistical significance alone does not tell you whether a difference matters in practice.
 
 ## Quick Reference
 
-| Task | Function | Example |
-|------|----------|---------|
-| Summarize numeric | `describe()` | `describe(age, income)` |
-| Count categories | `frequency()` | `frequency(education)` |
-| Compare 2 groups | `t_test()` | `t_test(income, group = gender)` |
-| Compare 3+ groups | `oneway_anova()` | `oneway_anova(income, group = education)` |
-| Test association | `chi_square()` | `chi_square(education, employment)` |
-| Measure correlation | `pearson_cor()` | `pearson_cor(age, income)` |
-| Cross-tabulate | `crosstab()` | `crosstab(education, region)` |
+### Data Import & Export
 
-All functions support survey weights via `weights =` and grouped analysis via `group_by()`.
+| Function | Purpose |
+|----------|---------|
+| `read_spss()`, `read_por()` | Import SPSS files with tagged NA support |
+| `read_stata()` | Import Stata files |
+| `read_sas()`, `read_xpt()` | Import SAS files |
+| `read_xlsx()` | Import Excel files with label reconstruction |
+| `write_spss()` | Export to SPSS with label/missing roundtripping |
+| `write_stata()` | Export to Stata |
+| `write_xpt()` | Export to SAS transport format |
+| `write_xlsx()` | Export to Excel (data, codebook, frequencies) |
 
-## Next Steps
+### Label Management
 
-- `vignette("descriptive-statistics")` --- Deep dive into summaries and frequencies
-- `vignette("hypothesis-testing")` --- Comparing groups and testing differences
-- `vignette("correlation-analysis")` --- Measuring relationships
-- `vignette("survey-weights")` --- Working with weighted data
+| Function | Purpose |
+|----------|---------|
+| `var_label()` | Get/set variable labels |
+| `val_labels()` | Get/set value labels |
+| `find_var()` | Search variables by name or label |
+| `to_label()` | Labelled → factor |
+| `to_character()` | Labelled → character |
+| `to_numeric()` | Factor/labelled → numeric |
+| `to_labelled()` | Factor/character → labelled |
+| `set_na()` | Declare values as missing |
+| `unlabel()` | Strip all label metadata |
+| `copy_labels()` | Restore labels after dplyr operations |
+| `drop_labels()` | Remove unused value labels |
+
+### Data Transformation
+
+| Function | Purpose |
+|----------|---------|
+| `rec()` | Recode with string syntax (ranges, reverse, median split) |
+| `to_dummy()` | One-hot encoding / dummy variables |
+| `std()` | Z-standardization (sd, 2sd, mad, gmd methods) |
+| `center()` | Mean-centering (grand-mean, group-mean) |
+| `row_means()` | Row-wise means with min_valid threshold |
+| `row_sums()` | Row-wise sums |
+| `row_count()` | Count specific values per row |
+| `pomps()` | Percent of Maximum Possible Scores (0--100) |
+
+### Descriptive Statistics
+
+| Function | Purpose |
+|----------|---------|
+| `codebook()` | Interactive HTML data dictionary |
+| `describe()` | Numeric summaries (mean, sd, median, range, skewness) |
+| `frequency()` | Frequency tables with valid/cumulative percent |
+| `crosstab()` | Cross-tabulations with row/column/cell percentages |
+
+### Hypothesis Testing
+
+| Function | Purpose |
+|----------|---------|
+| `t_test()` | Independent, paired, and one-sample t-tests |
+| `oneway_anova()` | One-way ANOVA |
+| `factorial_anova()` | Multi-factor ANOVA with Type III SS |
+| `ancova()` | ANCOVA with estimated marginal means |
+| `mann_whitney()` | Mann-Whitney U test |
+| `kruskal_wallis()` | Kruskal-Wallis H test |
+| `wilcoxon_test()` | Wilcoxon signed-rank test |
+| `friedman_test()` | Friedman test |
+| `binomial_test()` | Exact binomial test |
+| `chi_square()` | Chi-square test of independence |
+| `fisher_test()` | Fisher's exact test |
+| `chisq_gof()` | Chi-square goodness-of-fit |
+| `mcnemar_test()` | McNemar's test for paired proportions |
+
+### Post-Hoc & Effect Sizes
+
+| Function | Purpose |
+|----------|---------|
+| `tukey_test()` | Tukey HSD pairwise comparisons |
+| `scheffe_test()` | Scheffe pairwise comparisons |
+| `levene_test()` | Test for homogeneity of variances |
+| `dunn_test()` | Dunn's post-hoc for Kruskal-Wallis |
+| `pairwise_wilcoxon()` | Pairwise Wilcoxon for Friedman |
+| `phi()` | Phi coefficient |
+| `cramers_v()` | Cramer's V |
+| `goodman_gamma()` | Goodman-Kruskal gamma |
+
+### Scale Analysis
+
+| Function | Purpose |
+|----------|---------|
+| `reliability()` | Cronbach's Alpha with item statistics |
+| `efa()` | Exploratory Factor Analysis (PCA/ML, Varimax/Oblimin/Promax) |
+
+### Regression
+
+| Function | Purpose |
+|----------|---------|
+| `linear_regression()` | Linear regression with SPSS-style output |
+| `logistic_regression()` | Logistic regression with odds ratios |
+
+### Weighted Statistics
+
+| Function | Purpose |
+|----------|---------|
+| `w_mean()`, `w_median()`, `w_sd()`, `w_var()` | Central tendency and spread |
+| `w_se()`, `w_quantile()`, `w_iqr()`, `w_range()` | Precision and distribution |
+| `w_skew()`, `w_kurtosis()`, `w_modus()` | Shape and mode |
+
+## Guides
+
+Explore the full documentation:
+
+- **Data Management**
+  - `vignette("data-io")` --- Importing and exporting data
+  - `vignette("labels-and-missing-values")` --- Working with labels and missing values
+  - `vignette("data-transformation")` --- Recoding, standardization, and row operations
+- **Core Analysis**
+  - `vignette("descriptive-statistics")` --- Summaries, frequencies, and cross-tabulations
+  - `vignette("hypothesis-testing")` --- Comparing groups and testing hypotheses
+  - `vignette("correlation-analysis")` --- Measuring relationships between variables
+- **Advanced Topics**
+  - `vignette("scale-analysis")` --- Reliability, factor analysis, and scale construction
+  - `vignette("regression-analysis")` --- Linear and logistic regression
+  - `vignette("survey-weights")` --- Working with weighted data
