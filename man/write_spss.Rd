@@ -74,9 +74,9 @@ write_spss(data, "survey_compressed.zsav", compress = "zsav")
 \code{\link[=write_xpt]{write_xpt()}} for SAS transport export,
 \code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}}
 
-Other data-export: 
-\code{\link{write_stata}()},
-\code{\link{write_xlsx}()},
-\code{\link{write_xpt}()}
+Other data-export:
+\code{\link[=write_stata]{write_stata()}},
+\code{\link[=write_xlsx]{write_xlsx()}},
+\code{\link[=write_xpt]{write_xpt()}}
 }
 \concept{data-export}

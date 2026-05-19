@@ -168,7 +168,7 @@ summary(result, collinearity = FALSE)  # hide VIF/Tolerance
 
 \code{\link{summary.linear_regression}} for detailed output with toggleable sections.
 
-Other regression: 
-\code{\link{logistic_regression}()}
+Other regression:
+\code{\link[=logistic_regression]{logistic_regression()}}
 }
 \concept{regression}

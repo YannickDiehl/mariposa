@@ -137,18 +137,18 @@ can be reasonably supposed to have arisen from random sampling.
 
 \code{\link{binomial_test}} for testing a single proportion.
 
-Other hypothesis_tests: 
-\code{\link{ancova}()},
-\code{\link{binomial_test}()},
-\code{\link{chi_square}()},
-\code{\link{factorial_anova}()},
-\code{\link{fisher_test}()},
-\code{\link{friedman_test}()},
-\code{\link{kruskal_wallis}()},
-\code{\link{mann_whitney}()},
-\code{\link{mcnemar_test}()},
-\code{\link{oneway_anova}()},
-\code{\link{t_test}()},
-\code{\link{wilcoxon_test}()}
+Other hypothesis_tests:
+\code{\link[=ancova]{ancova()}},
+\code{\link[=binomial_test]{binomial_test()}},
+\code{\link[=chi_square]{chi_square()}},
+\code{\link[=factorial_anova]{factorial_anova()}},
+\code{\link[=fisher_test]{fisher_test()}},
+\code{\link[=friedman_test]{friedman_test()}},
+\code{\link[=kruskal_wallis]{kruskal_wallis()}},
+\code{\link[=mann_whitney]{mann_whitney()}},
+\code{\link[=mcnemar_test]{mcnemar_test()}},
+\code{\link[=oneway_anova]{oneway_anova()}},
+\code{\link[=t_test]{t_test()}},
+\code{\link[=wilcoxon_test]{wilcoxon_test()}}
 }
 \concept{hypothesis_tests}

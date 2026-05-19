@@ -17,9 +17,7 @@ knitr::opts_chunk$set(
 
 This vignette reports the SPSS-compatibility status of every statistical
 function in **mariposa**. It is auto-generated from the test suite and the
-validation exception registry. See
-[Validation Charter](https://github.com/YannickDiehl/mariposa/blob/main/.claude/VALIDATION_CHARTER.md)
-for the underlying policy.
+validation exception registry.
 
 **Generated:** 2026-05-19
 
@@ -139,8 +137,8 @@ the documented tolerance policy.
 All validation runs SPSS v29 syntax scripts in
 `tests/spss_reference/syntax/` against `tests/spss_reference/data/`,
 saves the output to `tests/spss_reference/outputs/`, and asserts the
-R-side computation matches via
-[`assert_spss()`](https://github.com/YannickDiehl/mariposa/blob/main/tests/testthat/helper-validation-tolerances.R).
+R-side computation matches via `assert_spss()` from the
+validation helpers in `tests/testthat/`.
 Inline cached values in test files cite their source line via
 trailing `# <output_file>:<line>` comments; the dev-only script
 `tests/spss_reference/verify_inline.R` audits this citation chain

@@ -160,8 +160,8 @@ implementation.
 
 \code{\link{summary.spearman_rho}} for detailed output with toggleable sections.
 
-Other correlation: 
-\code{\link{kendall_tau}()},
-\code{\link{pearson_cor}()}
+Other correlation:
+\code{\link[=kendall_tau]{kendall_tau()}},
+\code{\link[=pearson_cor]{pearson_cor()}}
 }
 \concept{correlation}

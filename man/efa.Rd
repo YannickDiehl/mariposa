@@ -206,11 +206,11 @@ summary(result, communalities = FALSE)  # hide communalities table
 
 \code{\link{summary.efa}} for detailed output with toggleable sections.
 
-Other scale: 
-\code{\link{pomps}()},
-\code{\link{reliability}()},
-\code{\link{row_count}()},
-\code{\link{row_means}()},
-\code{\link{row_sums}()}
+Other scale:
+\code{\link[=pomps]{pomps()}},
+\code{\link[=reliability]{reliability()}},
+\code{\link[=row_count]{row_count()}},
+\code{\link[=row_means]{row_means()}},
+\code{\link[=row_sums]{row_sums()}}
 }
 \concept{scale}

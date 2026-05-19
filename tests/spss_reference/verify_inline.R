@@ -175,9 +175,10 @@ read_ref_line <- function(ref_file, line_no, cache = ref_cache) {
 
 extract_numeric_tokens <- function(text) {
   if (is.na(text)) return(numeric(0))
-  matches <- regmatches(text, gregexpr("[+-]?[0-9]+\\.?[0-9]*(?:[eE][+-]?[0-9]+)?",
+  # Match numbers with optional leading sign, including those starting with
+  # a decimal point (SPSS print style: .006, -.029, etc.)
+  matches <- regmatches(text, gregexpr("[+-]?(?:[0-9]+\\.?[0-9]*|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?",
                                        text, perl = TRUE))[[1]]
-  # Drop empty matches
   matches <- matches[nzchar(matches)]
   suppressWarnings(as.numeric(matches))
 }
@@ -193,7 +194,7 @@ compare_value <- function(citation, ref_text) {
       return(list(status = "missing-ref",
                   detail = sprintf("Reference file/line not found")))
     }
-    if (grepl("<\\.?001|0\\.000\\b", ref_text)) {
+    if (grepl("<\\.?001|0?\\.000", ref_text)) {
       return(list(status = "match",
                   detail = sprintf("sentinel '<.001' confirmed at %s:%d",
                                    citation$ref_file, citation$ref_line)))

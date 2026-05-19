@@ -154,8 +154,8 @@ implementation.
 
 \code{\link{summary.kendall_tau}} for detailed output with toggleable sections.
 
-Other correlation: 
-\code{\link{pearson_cor}()},
-\code{\link{spearman_rho}()}
+Other correlation:
+\code{\link[=pearson_cor]{pearson_cor()}},
+\code{\link[=spearman_rho]{spearman_rho()}}
 }
 \concept{correlation}

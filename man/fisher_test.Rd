@@ -129,18 +129,18 @@ contingency, goodness of fit and other problems of significance.
 
 \code{\link{mcnemar_test}} for paired proportions.
 
-Other hypothesis_tests: 
-\code{\link{ancova}()},
-\code{\link{binomial_test}()},
-\code{\link{chi_square}()},
-\code{\link{chisq_gof}()},
-\code{\link{factorial_anova}()},
-\code{\link{friedman_test}()},
-\code{\link{kruskal_wallis}()},
-\code{\link{mann_whitney}()},
-\code{\link{mcnemar_test}()},
-\code{\link{oneway_anova}()},
-\code{\link{t_test}()},
-\code{\link{wilcoxon_test}()}
+Other hypothesis_tests:
+\code{\link[=ancova]{ancova()}},
+\code{\link[=binomial_test]{binomial_test()}},
+\code{\link[=chi_square]{chi_square()}},
+\code{\link[=chisq_gof]{chisq_gof()}},
+\code{\link[=factorial_anova]{factorial_anova()}},
+\code{\link[=friedman_test]{friedman_test()}},
+\code{\link[=kruskal_wallis]{kruskal_wallis()}},
+\code{\link[=mann_whitney]{mann_whitney()}},
+\code{\link[=mcnemar_test]{mcnemar_test()}},
+\code{\link[=oneway_anova]{oneway_anova()}},
+\code{\link[=t_test]{t_test()}},
+\code{\link[=wilcoxon_test]{wilcoxon_test()}}
 }
 \concept{hypothesis_tests}

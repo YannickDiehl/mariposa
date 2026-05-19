@@ -76,7 +76,7 @@ dummies <- to_dummy(survey_data, gender, append = FALSE)
 \seealso{
 \code{\link[=rec]{rec()}} for general recoding, \code{\link[=to_label]{to_label()}} for converting to factor
 
-Other recode: 
-\code{\link{rec}()}
+Other recode:
+\code{\link[=rec]{rec()}}
 }
 \concept{recode}

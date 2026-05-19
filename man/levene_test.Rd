@@ -163,10 +163,10 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 \code{\link[stats]{var.test}} for the base R F-test of variance equality.
 
-Other posthoc: 
-\code{\link{dunn_test}()},
-\code{\link{pairwise_wilcoxon}()},
-\code{\link{scheffe_test}()},
-\code{\link{tukey_test}()}
+Other posthoc:
+\code{\link[=dunn_test]{dunn_test()}},
+\code{\link[=pairwise_wilcoxon]{pairwise_wilcoxon()}},
+\code{\link[=scheffe_test]{scheffe_test()}},
+\code{\link[=tukey_test]{tukey_test()}}
 }
 \concept{posthoc}

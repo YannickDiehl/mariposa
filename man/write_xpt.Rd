@@ -69,9 +69,9 @@ write_xpt(data, "survey.xpt")
 \code{\link[=write_stata]{write_stata()}} for Stata export,
 \code{\link[=write_xlsx]{write_xlsx()}} for Excel export
 
-Other data-export: 
-\code{\link{write_spss}()},
-\code{\link{write_stata}()},
-\code{\link{write_xlsx}()}
+Other data-export:
+\code{\link[=write_spss]{write_spss()}},
+\code{\link[=write_stata]{write_stata()}},
+\code{\link[=write_xlsx]{write_xlsx()}}
 }
 \concept{data-export}

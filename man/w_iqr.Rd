@@ -97,16 +97,16 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 
 \code{\link{describe}} for comprehensive descriptive statistics including IQR.
 
-Other weighted_statistics: 
-\code{\link{w_kurtosis}()},
-\code{\link{w_mean}()},
-\code{\link{w_median}()},
-\code{\link{w_modus}()},
-\code{\link{w_quantile}()},
-\code{\link{w_range}()},
-\code{\link{w_sd}()},
-\code{\link{w_se}()},
-\code{\link{w_skew}()},
-\code{\link{w_var}()}
+Other weighted_statistics:
+\code{\link[=w_kurtosis]{w_kurtosis()}},
+\code{\link[=w_mean]{w_mean()}},
+\code{\link[=w_median]{w_median()}},
+\code{\link[=w_modus]{w_modus()}},
+\code{\link[=w_quantile]{w_quantile()}},
+\code{\link[=w_range]{w_range()}},
+\code{\link[=w_sd]{w_sd()}},
+\code{\link[=w_se]{w_se()}},
+\code{\link[=w_skew]{w_skew()}},
+\code{\link[=w_var]{w_var()}}
 }
 \concept{weighted_statistics}

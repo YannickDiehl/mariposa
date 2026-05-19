@@ -90,11 +90,11 @@ survey_data <- survey_data \%>\%
 \code{\link[=row_sums]{row_sums()}} for row-wise sums, \code{\link[=row_count]{row_count()}} for counting
 specific values, \code{\link[=pomps]{pomps()}} for rescaling to 0-100
 
-Other scale: 
-\code{\link{efa}()},
-\code{\link{pomps}()},
-\code{\link{reliability}()},
-\code{\link{row_count}()},
-\code{\link{row_sums}()}
+Other scale:
+\code{\link[=efa]{efa()}},
+\code{\link[=pomps]{pomps()}},
+\code{\link[=reliability]{reliability()}},
+\code{\link[=row_count]{row_count()}},
+\code{\link[=row_sums]{row_sums()}}
 }
 \concept{scale}

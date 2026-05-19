@@ -26,7 +26,7 @@ A tibble with the SPSS data. When \code{tag.na = TRUE}:
 \item User-defined missing values are stored as tagged NAs
 \item \code{is.na()} returns \code{TRUE} for these values (standard R behavior)
 \item The original SPSS missing codes can be recovered via
-\code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, or \code{\link[haven:tagged_na]{haven::na_tag()}}
+\code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, or \code{\link[haven:na_tag]{haven::na_tag()}}
 \item Each tagged variable has an \code{"na_tag_map"} attribute mapping
 tag characters to original SPSS codes
 }
@@ -46,7 +46,7 @@ information about \emph{why} a value is missing.
 
 \code{read_spss()} preserves this information using haven's tagged NA system:
 each missing value type gets a unique tag character (a-z, A-Z, 0-9) that
-can be inspected with \code{\link[haven:tagged_na]{haven::na_tag()}}. The values still behave as \code{NA}
+can be inspected with \code{\link[haven:na_tag]{haven::na_tag()}}. The values still behave as \code{NA}
 in all standard R operations (\code{mean()}, \code{sum()}, \code{is.na()}, etc.).
 
 Use the companion functions to work with the tagged NAs:
@@ -79,17 +79,17 @@ data_clean <- strip_tags(data$satisfaction)
 
 }
 \seealso{
-\code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}}, \code{\link[haven:read_spss]{haven::read_sav()}},
+\code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}}, \code{\link[haven:read_sav]{haven::read_sav()}},
 \code{\link[=frequency]{frequency()}}, \code{\link[=read_por]{read_por()}}
 
-Other data-import: 
-\code{\link{na_frequencies}()},
-\code{\link{read_por}()},
-\code{\link{read_sas}()},
-\code{\link{read_stata}()},
-\code{\link{read_xlsx}()},
-\code{\link{read_xpt}()},
-\code{\link{strip_tags}()},
-\code{\link{untag_na}()}
+Other data-import:
+\code{\link[=na_frequencies]{na_frequencies()}},
+\code{\link[=read_por]{read_por()}},
+\code{\link[=read_sas]{read_sas()}},
+\code{\link[=read_stata]{read_stata()}},
+\code{\link[=read_xlsx]{read_xlsx()}},
+\code{\link[=read_xpt]{read_xpt()}},
+\code{\link[=strip_tags]{strip_tags()}},
+\code{\link[=untag_na]{untag_na()}}
 }
 \concept{data-import}

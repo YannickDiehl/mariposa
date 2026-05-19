@@ -32,14 +32,14 @@ clean <- strip_tags(data$satisfaction)
 \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}},
 \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}
 
-Other data-import: 
-\code{\link{na_frequencies}()},
-\code{\link{read_por}()},
-\code{\link{read_sas}()},
-\code{\link{read_spss}()},
-\code{\link{read_stata}()},
-\code{\link{read_xlsx}()},
-\code{\link{read_xpt}()},
-\code{\link{untag_na}()}
+Other data-import:
+\code{\link[=na_frequencies]{na_frequencies()}},
+\code{\link[=read_por]{read_por()}},
+\code{\link[=read_sas]{read_sas()}},
+\code{\link[=read_spss]{read_spss()}},
+\code{\link[=read_stata]{read_stata()}},
+\code{\link[=read_xlsx]{read_xlsx()}},
+\code{\link[=read_xpt]{read_xpt()}},
+\code{\link[=untag_na]{untag_na()}}
 }
 \concept{data-import}

@@ -62,16 +62,16 @@ to_numeric(survey_data$life_satisfaction)
 \code{\link[=to_label]{to_label()}} for the reverse (numeric → factor),
 \code{\link[=to_labelled]{to_labelled()}} for creating labelled vectors
 
-Other labels: 
-\code{\link{copy_labels}()},
-\code{\link{drop_labels}()},
-\code{\link{find_var}()},
-\code{\link{set_na}()},
-\code{\link{to_character}()},
-\code{\link{to_label}()},
-\code{\link{to_labelled}()},
-\code{\link{unlabel}()},
-\code{\link{val_labels}()},
-\code{\link{var_label}()}
+Other labels:
+\code{\link[=copy_labels]{copy_labels()}},
+\code{\link[=drop_labels]{drop_labels()}},
+\code{\link[=find_var]{find_var()}},
+\code{\link[=set_na]{set_na()}},
+\code{\link[=to_character]{to_character()}},
+\code{\link[=to_label]{to_label()}},
+\code{\link[=to_labelled]{to_labelled()}},
+\code{\link[=unlabel]{unlabel()}},
+\code{\link[=val_labels]{val_labels()}},
+\code{\link[=var_label]{var_label()}}
 }
 \concept{labels}

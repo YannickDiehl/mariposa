@@ -109,8 +109,17 @@ Use \code{codebook()} when you:
 }
 }
 \examples{
-# View the full codebook (opens in RStudio Viewer)
 data(survey_data)
+
+# Compact console overview (no Viewer)
+cb <- codebook(survey_data)
+print(cb)
+
+# Detailed console output
+summary(cb)
+
+\donttest{
+# Full codebook (opens in RStudio Viewer when interactive)
 codebook(survey_data)
 
 # Only trust-related variables
@@ -118,13 +127,7 @@ codebook(survey_data, starts_with("trust"))
 
 # Save to file for sharing
 codebook(survey_data, file = tempfile(fileext = ".html"))
-
-# Compact console overview (without opening Viewer)
-cb <- codebook(survey_data)
-print(cb)
-
-# Detailed console output
-summary(cb)
+}
 
 }
 \seealso{

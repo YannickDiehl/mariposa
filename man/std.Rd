@@ -104,7 +104,7 @@ data <- survey_data \%>\%
 \code{\link[=center]{center()}} for mean-centering without scaling,
 \code{\link[=pomps]{pomps()}} for rescaling to 0-100
 
-Other transform: 
-\code{\link{center}()}
+Other transform:
+\code{\link[=center]{center()}}
 }
 \concept{transform}

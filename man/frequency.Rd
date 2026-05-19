@@ -144,8 +144,8 @@ survey_data \%>\% frequency(employment, weights = sampling_weight,
 
 \code{\link{describe}} for numeric variable summaries.
 
-Other descriptive: 
-\code{\link{crosstab}()},
-\code{\link{describe}()}
+Other descriptive:
+\code{\link[=crosstab]{crosstab()}},
+\code{\link[=describe]{describe()}}
 }
 \concept{descriptive}
