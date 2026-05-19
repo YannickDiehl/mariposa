@@ -1,3 +1,65 @@
+# mariposa 0.6.1
+
+## Validation
+
+Substantial hardening of the SPSS-compatibility test suite. All 29 SPSS-
+validation test files were rewritten under a new [Validation Charter](https://github.com/YannickDiehl/mariposa/blob/main/.claude/VALIDATION_CHARTER.md)
+that defines tolerance tiers (Spec / Display / Exception / Internal),
+forbids inline tolerance literals, NA placeholders, and `expect_true(TRUE)`
+reporting blocks, and requires citation comments linking every reference
+value to its source line in `tests/spss_reference/outputs/`.
+
+* 1832+ passing assertions across all 29 validation files, 0 failures.
+* New `tests/testthat/helper-validation-tolerances.R` provides
+  `assert_spss()` and `tol()` helpers with explicit tier semantics.
+* New `tests/testthat/test-validation-discipline.R` meta-test lints
+  validation files for Charter-forbidden patterns.
+* New `vignettes/spss-compatibility.Rmd` reports per-function validation
+  status, auto-generated from the test suite.
+* New CI workflow `.github/workflows/strict-validation.yaml` runs the
+  full suite in strict-discipline mode on release tags and weekly.
+
+## Source-Code Fixes (weighted statistics)
+
+Three weighted statistical functions were corrected to use unrounded
+`sum(w)` per SPSS frequency-weights convention. Earlier versions rounded
+too early and produced systematic drift from SPSS in weighted scenarios.
+
+* `t_test()`: weighted variance, SE, and df calculations now use
+  unrounded `sum(w)` (one-sample and two-sample paths). Welch-
+  Satterthwaite df now derived from unrounded per-group weighted N.
+* `oneway_anova()`: weighted variance divisor is now `(sum(w) - 1)`
+  (sample formula, not population). Weighted SE uses `sqrt(sum(w))`,
+  not `sqrt(physical n)`. Weighted CI t-critical-value uses
+  `df = sum(w) - 1`, not Kish design-effective N. `df_within` now uses
+  `floor(sum(w)) - k` (SPSS ONEWAY-specific convention).
+* `levene_test()`: weighted Levene df now uses unrounded `sum(w) - k`
+  (SPSS T-TEST family convention).
+
+These changes are bug fixes and may slightly shift weighted-scenario
+results in user code. Differences are small (typically < 0.01 on F or t)
+and bring mariposa into closer agreement with SPSS v29.
+
+## SPSS-Compatibility Vignette
+
+`vignette("spss-compatibility")` documents the per-function validation
+status, the four tolerance tiers, and the SPSS-procedure-specific
+WEIGHT BY conventions discovered during the migration:
+
+* T-TEST family: unrounded `sum(w)`
+* ONEWAY: `floor(sum(w))`
+* UNIANOVA: Type III SS
+* NPAR TESTS: WEIGHT BY effectively ignored
+* NONPAR CORR (Spearman, Kendall): WEIGHT BY effectively ignored
+* CORRELATIONS (Pearson): WEIGHT BY honored
+* CROSSTABS, FREQUENCIES, RELIABILITY, FACTOR, REGRESSION: WEIGHT BY honored
+
+## DESCRIPTION
+
+* `Title` shortened to "SPSS-Compatible Statistical Tools for Survey Data"
+  (CRAN soft-limit compliance).
+* Suggests cleanup: removed `PMCMRplus` and `survey` (no longer needed).
+
 # mariposa 0.6.0
 
 ## New Functions — Label Management
