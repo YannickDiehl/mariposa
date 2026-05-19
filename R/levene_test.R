@@ -588,10 +588,15 @@ perform_grouped_levene_test <- function(data, var_name, group_name, weight_name 
       ss_within <- ss_within + w[i] * (z_values[i] - group_mean)^2
     }
     
-    # SPSS degrees of freedom for grouped analysis
-    # SPSS uses the total weighted sample size minus number of groups
+    # SPSS Levene df: df1 = k - 1, df2 = sum(w) - k (UNROUNDED).
+    # Empirical verification against SPSS v29 (2026-05-19): Levene's test
+    # in SPSS is part of the T-TEST procedure output and inherits T-TEST's
+    # unrounded-sum(w) convention, NOT ONEWAY's floor() convention.
+    # Verified across Tests 2b (life_sat) and 4b (income, East) where
+    # floor() would match one but not the other; unrounded matches both.
+    # See VALIDATION_CHARTER.md §5.1.
     df1 <- length(g_levels) - 1
-    df2 <- round(sum(w)) - length(g_levels)  # SPSS method: N - k
+    df2 <- sum(w) - length(g_levels)
     
     # Calculate F-statistic (SPSS method)
     F_stat <- (ss_between / df1) / (ss_within / df2)
@@ -729,11 +734,11 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
       ss_within <- ss_within + w[i] * (z_values[i] - group_mean)^2
     }
     
-    # SPSS degrees of freedom: 
-    # df1 = k-1 (number of groups - 1)
-    # df2 = sum of weights - k (total weighted sample size - number of groups)
+    # SPSS Levene df: df1 = k - 1, df2 = floor(sum(w)) - k.
+    # See VALIDATION_CHARTER.md §5.1 and the grouped path above for the
+    # empirical justification of floor() vs round() vs unrounded.
     df1 <- length(g_levels) - 1
-    df2 <- round(sum(w)) - length(g_levels)  # SPSS method: sum(weights) - k
+    df2 <- sum(w) - length(g_levels)
     
     # Calculate F-statistic (SPSS method)
     # F = (SS_between / df1) / (SS_within / df2)
