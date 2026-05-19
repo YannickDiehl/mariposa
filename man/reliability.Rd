@@ -110,11 +110,11 @@ summary(result, inter_item_correlations = FALSE)  # hide correlations
 
 \code{\link{summary.reliability}} for detailed output with toggleable sections.
 
-Other scale: 
-\code{\link{efa}()},
-\code{\link{pomps}()},
-\code{\link{row_count}()},
-\code{\link{row_means}()},
-\code{\link{row_sums}()}
+Other scale:
+\code{\link[=efa]{efa()}},
+\code{\link[=pomps]{pomps()}},
+\code{\link[=row_count]{row_count()}},
+\code{\link[=row_means]{row_means()}},
+\code{\link[=row_sums]{row_sums()}}
 }
 \concept{scale}

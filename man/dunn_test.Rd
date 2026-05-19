@@ -145,10 +145,10 @@ Dunn, O. J. (1964). Multiple comparisons using rank sums. Technometrics,
 
 \code{\link{scheffe_test}} for conservative parametric post-hoc comparisons.
 
-Other posthoc: 
-\code{\link{levene_test}()},
-\code{\link{pairwise_wilcoxon}()},
-\code{\link{scheffe_test}()},
-\code{\link{tukey_test}()}
+Other posthoc:
+\code{\link[=levene_test]{levene_test()}},
+\code{\link[=pairwise_wilcoxon]{pairwise_wilcoxon()}},
+\code{\link[=scheffe_test]{scheffe_test()}},
+\code{\link[=tukey_test]{tukey_test()}}
 }
 \concept{posthoc}

@@ -3,8 +3,9 @@
 ## Validation
 
 Substantial hardening of the SPSS-compatibility test suite. All 29 SPSS-
-validation test files were rewritten under a new [Validation Charter](https://github.com/YannickDiehl/mariposa/blob/main/.claude/VALIDATION_CHARTER.md)
-that defines tolerance tiers (Spec / Display / Exception / Internal),
+validation test files were rewritten under a new Validation Charter (see
+`vignette("spss-compatibility")`) that defines tolerance tiers
+(Spec / Display / Exception / Internal),
 forbids inline tolerance literals, NA placeholders, and `expect_true(TRUE)`
 reporting blocks, and requires citation comments linking every reference
 value to its source line in `tests/spss_reference/outputs/`.

@@ -4,7 +4,7 @@
 \name{mariposa-package}
 \alias{mariposa}
 \alias{mariposa-package}
-\title{mariposa: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data}
+\title{mariposa: SPSS-Compatible Statistical Tools for Survey Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
@@ -21,6 +21,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Yannick Diehl \email{yannick.diehl@gmail.com}
+
+Authors:
+\itemize{
+  \item Yannick Diehl \email{yannick.diehl@gmail.com}
+}
 
 }
 \keyword{internal}

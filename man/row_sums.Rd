@@ -61,11 +61,11 @@ survey_data <- survey_data \%>\%
 \code{\link[=row_means]{row_means()}} for row-wise means, \code{\link[=row_count]{row_count()}} for counting
 specific values
 
-Other scale: 
-\code{\link{efa}()},
-\code{\link{pomps}()},
-\code{\link{reliability}()},
-\code{\link{row_count}()},
-\code{\link{row_means}()}
+Other scale:
+\code{\link[=efa]{efa()}},
+\code{\link[=pomps]{pomps()}},
+\code{\link[=reliability]{reliability()}},
+\code{\link[=row_count]{row_count()}},
+\code{\link[=row_means]{row_means()}}
 }
 \concept{scale}

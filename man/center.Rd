@@ -70,7 +70,7 @@ data <- survey_data \%>\%
 \seealso{
 \code{\link[=std]{std()}} for full standardization (centering + scaling)
 
-Other transform: 
-\code{\link{std}()}
+Other transform:
+\code{\link[=std]{std()}}
 }
 \concept{transform}

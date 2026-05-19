@@ -140,10 +140,10 @@ Bulletin, 1(6), 80-83.
 
 \code{\link{dunn_test}} for post-hoc comparisons after Kruskal-Wallis.
 
-Other posthoc: 
-\code{\link{dunn_test}()},
-\code{\link{levene_test}()},
-\code{\link{scheffe_test}()},
-\code{\link{tukey_test}()}
+Other posthoc:
+\code{\link[=dunn_test]{dunn_test()}},
+\code{\link[=levene_test]{levene_test()}},
+\code{\link[=scheffe_test]{scheffe_test()}},
+\code{\link[=tukey_test]{tukey_test()}}
 }
 \concept{posthoc}

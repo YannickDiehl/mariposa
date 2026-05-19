@@ -71,9 +71,9 @@ write_stata(data, "survey_v13.dta", version = 13)
 \code{\link[=write_xlsx]{write_xlsx()}} for Excel export,
 \code{\link[=write_xpt]{write_xpt()}} for SAS transport export
 
-Other data-export: 
-\code{\link{write_spss}()},
-\code{\link{write_xlsx}()},
-\code{\link{write_xpt}()}
+Other data-export:
+\code{\link[=write_spss]{write_spss()}},
+\code{\link[=write_xlsx]{write_xlsx()}},
+\code{\link[=write_xpt]{write_xpt()}}
 }
 \concept{data-export}

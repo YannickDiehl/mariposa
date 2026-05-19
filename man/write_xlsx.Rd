@@ -133,9 +133,9 @@ frequency(survey_data, gender, life_satisfaction, region) |>
 \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_por]{read_por()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}},
 \code{\link[=read_xpt]{read_xpt()}}, \code{\link[=read_xlsx]{read_xlsx()}} for importing labelled data
 
-Other data-export: 
-\code{\link{write_spss}()},
-\code{\link{write_stata}()},
-\code{\link{write_xpt}()}
+Other data-export:
+\code{\link[=write_spss]{write_spss()}},
+\code{\link[=write_stata]{write_stata()}},
+\code{\link[=write_xpt]{write_xpt()}}
 }
 \concept{data-export}

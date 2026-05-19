@@ -121,8 +121,8 @@ individual weighted statistics.
 
 \code{\link{t_test}} and \code{\link{oneway_anova}} for group comparisons.
 
-Other descriptive: 
-\code{\link{crosstab}()},
-\code{\link{frequency}()}
+Other descriptive:
+\code{\link[=crosstab]{crosstab()}},
+\code{\link[=frequency]{frequency()}}
 }
 \concept{descriptive}

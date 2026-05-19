@@ -88,14 +88,14 @@ strip_tags(data$income) # Converts all to NA
 \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=strip_tags]{strip_tags()}}, \code{\link[=untag_na]{untag_na()}}, \code{\link[=read_spss]{read_spss()}},
 \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}}, \code{\link[haven:read_dta]{haven::read_dta()}}
 
-Other data-import: 
-\code{\link{na_frequencies}()},
-\code{\link{read_por}()},
-\code{\link{read_sas}()},
-\code{\link{read_spss}()},
-\code{\link{read_xlsx}()},
-\code{\link{read_xpt}()},
-\code{\link{strip_tags}()},
-\code{\link{untag_na}()}
+Other data-import:
+\code{\link[=na_frequencies]{na_frequencies()}},
+\code{\link[=read_por]{read_por()}},
+\code{\link[=read_sas]{read_sas()}},
+\code{\link[=read_spss]{read_spss()}},
+\code{\link[=read_xlsx]{read_xlsx()}},
+\code{\link[=read_xpt]{read_xpt()}},
+\code{\link[=strip_tags]{strip_tags()}},
+\code{\link[=untag_na]{untag_na()}}
 }
 \concept{data-import}

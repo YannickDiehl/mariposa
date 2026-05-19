@@ -38,11 +38,11 @@ survey_data <- survey_data \%>\%
 \seealso{
 \code{\link[=row_sums]{row_sums()}} for row-wise sums, \code{\link[=row_means]{row_means()}} for row-wise means
 
-Other scale: 
-\code{\link{efa}()},
-\code{\link{pomps}()},
-\code{\link{reliability}()},
-\code{\link{row_means}()},
-\code{\link{row_sums}()}
+Other scale:
+\code{\link[=efa]{efa()}},
+\code{\link[=pomps]{pomps()}},
+\code{\link[=reliability]{reliability()}},
+\code{\link[=row_means]{row_means()}},
+\code{\link[=row_sums]{row_sums()}}
 }
 \concept{scale}

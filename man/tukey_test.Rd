@@ -153,10 +153,10 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.
 
 \code{\link{levene_test}} for testing homogeneity of variances.
 
-Other posthoc: 
-\code{\link{dunn_test}()},
-\code{\link{levene_test}()},
-\code{\link{pairwise_wilcoxon}()},
-\code{\link{scheffe_test}()}
+Other posthoc:
+\code{\link[=dunn_test]{dunn_test()}},
+\code{\link[=levene_test]{levene_test()}},
+\code{\link[=pairwise_wilcoxon]{pairwise_wilcoxon()}},
+\code{\link[=scheffe_test]{scheffe_test()}}
 }
 \concept{posthoc}

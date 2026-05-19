@@ -9,7 +9,7 @@
 
 **Professional statistical analysis for survey data in R.**
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. All statistical results are validated against SPSS v29 under the [Validation Charter](https://github.com/YannickDiehl/mariposa/blob/main/.claude/VALIDATION_CHARTER.md); see `vignette("spss-compatibility")` for per-function status.
+mariposa (*Marburg Initiative for Political and Social Analysis*) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. All statistical results are validated against SPSS v29; see `vignette("spss-compatibility")` for per-function status.
 
 ## Installation
 
@@ -189,7 +189,6 @@ survey_data %>%
 ## Support
 
 - [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug reports and feature requests
-- [GitHub Discussions](https://github.com/YannickDiehl/mariposa/discussions) - Questions and ideas
 
 ## License
 

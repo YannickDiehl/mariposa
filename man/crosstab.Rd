@@ -123,8 +123,8 @@ survey_data \%>\% crosstab(education, employment, percentages = "col")
 \code{\link{chi_square}} for testing if the cross-tabulated variables
 are related.
 
-Other descriptive: 
-\code{\link{describe}()},
-\code{\link{frequency}()}
+Other descriptive:
+\code{\link[=describe]{describe()}},
+\code{\link[=frequency]{frequency()}}
 }
 \concept{descriptive}

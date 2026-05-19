@@ -163,7 +163,7 @@ summary(result, classification_table = FALSE)  # hide classification
 
 \code{\link{summary.logistic_regression}} for detailed output with toggleable sections.
 
-Other regression: 
-\code{\link{linear_regression}()}
+Other regression:
+\code{\link[=linear_regression]{linear_regression()}}
 }
 \concept{regression}

@@ -147,7 +147,7 @@ survey_data <- survey_data \%>\%
 \code{\link[=set_na]{set_na()}} for declaring missing values,
 \code{\link[=to_label]{to_label()}} for converting to factor labels
 
-Other recode: 
-\code{\link{to_dummy}()}
+Other recode:
+\code{\link[=to_dummy]{to_dummy()}}
 }
 \concept{recode}

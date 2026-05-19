@@ -39,16 +39,16 @@ na_frequencies(data$satisfaction)
 }
 \seealso{
 \code{\link[=read_spss]{read_spss()}}, \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, \code{\link[=strip_tags]{strip_tags()}},
-\code{\link[haven:read_spss]{haven::read_por()}}
+\code{\link[haven:read_por]{haven::read_por()}}
 
-Other data-import: 
-\code{\link{na_frequencies}()},
-\code{\link{read_sas}()},
-\code{\link{read_spss}()},
-\code{\link{read_stata}()},
-\code{\link{read_xlsx}()},
-\code{\link{read_xpt}()},
-\code{\link{strip_tags}()},
-\code{\link{untag_na}()}
+Other data-import:
+\code{\link[=na_frequencies]{na_frequencies()}},
+\code{\link[=read_sas]{read_sas()}},
+\code{\link[=read_spss]{read_spss()}},
+\code{\link[=read_stata]{read_stata()}},
+\code{\link[=read_xlsx]{read_xlsx()}},
+\code{\link[=read_xpt]{read_xpt()}},
+\code{\link[=strip_tags]{strip_tags()}},
+\code{\link[=untag_na]{untag_na()}}
 }
 \concept{data-import}

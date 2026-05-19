@@ -180,8 +180,8 @@ correlation coefficient in samples from an indefinitely large population.
 
 \code{\link{summary.pearson_cor}} for detailed output with toggleable sections.
 
-Other correlation: 
-\code{\link{kendall_tau}()},
-\code{\link{spearman_rho}()}
+Other correlation:
+\code{\link[=kendall_tau]{kendall_tau()}},
+\code{\link[=spearman_rho]{spearman_rho()}}
 }
 \concept{correlation}

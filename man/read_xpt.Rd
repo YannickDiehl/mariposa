@@ -51,14 +51,14 @@ na_frequencies(data$income)
 \code{\link[=read_sas]{read_sas()}}, \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=strip_tags]{strip_tags()}}, \code{\link[=untag_na]{untag_na()}},
 \code{\link[haven:read_xpt]{haven::read_xpt()}}
 
-Other data-import: 
-\code{\link{na_frequencies}()},
-\code{\link{read_por}()},
-\code{\link{read_sas}()},
-\code{\link{read_spss}()},
-\code{\link{read_stata}()},
-\code{\link{read_xlsx}()},
-\code{\link{strip_tags}()},
-\code{\link{untag_na}()}
+Other data-import:
+\code{\link[=na_frequencies]{na_frequencies()}},
+\code{\link[=read_por]{read_por()}},
+\code{\link[=read_sas]{read_sas()}},
+\code{\link[=read_spss]{read_spss()}},
+\code{\link[=read_stata]{read_stata()}},
+\code{\link[=read_xlsx]{read_xlsx()}},
+\code{\link[=strip_tags]{strip_tags()}},
+\code{\link[=untag_na]{untag_na()}}
 }
 \concept{data-import}
