@@ -37,11 +37,13 @@ spss_values <- list(
   ),
 
   # ---- Test 2: Weighted Ungrouped (Age) -------------------------------
+  # NB: q25/q75 omitted — SPSS displays weighted percentiles only at certain
+  # cut-points that don't include 25/75 by default for this scenario.
   test_2a_age_weighted = list(
     n = 2516L, missing = 0L,
     mean = 50.5144, se = 0.34058, median = 50.0000, mode = 18.00,
     sd = 17.08382, variance = 291.857, skewness = 0.159, kurtosis = -0.396,
-    range = 77.00, q25 = NA, q50 = 50.0000, q75 = NA  # SPSS shows specific percentiles
+    range = 77.00, q50 = 50.0000
   ),
 
   # ---- Test 3a: Age grouped by region (unweighted) --------------------

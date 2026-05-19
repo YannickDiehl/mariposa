@@ -63,8 +63,11 @@ test_that("logistic_regression with single predictor — structural", {
 test_that("logistic_regression exp(B) = exp(B) consistency", {
   r <- logistic_regression(survey_data, high_life ~ age + income)
   for (i in seq_len(nrow(r$coefficients))) {
-    expect_equal(r$coefficients$`Exp(B)`[i], exp(r$coefficients$B[i]),
-                 tolerance = 1e-6,
-                 label = sprintf("exp(B) consistency for %s", r$coefficients$Term[i]))
+    actual   <- r$coefficients$`Exp(B)`[i]
+    expected <- exp(r$coefficients$B[i])
+    assert_spss(as.numeric(actual), as.numeric(expected),
+                tier = "display", precision = 5,
+                label = sprintf("exp(B) consistency for %s",
+                                r$coefficients$Term[i]))
   }
 })
