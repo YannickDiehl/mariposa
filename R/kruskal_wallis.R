@@ -216,11 +216,14 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
     } else {
       # ------------------------------------------------------------------
-      # Weighted Kruskal-Wallis (design-based approach)
+      # Weighted Kruskal-Wallis (frequency-weighted approximation)
       # ------------------------------------------------------------------
-      # Uses frequency-weighted ranks matching SPSS WEIGHT BY behaviour.
-      # Weighted mid-ranks are computed, then H is calculated from
-      # weighted rank sums.
+      # NOTE: This is NOT a design-based / Lumley-Scott implementation.
+      # It substitutes sum(w) for n in the standard H formula and
+      # computes mid-ranks from cumulative weights. Matches SPSS WEIGHT BY
+      # behaviour when weights are frequency weights. For sampling weights
+      # that differ meaningfully from 1.0, use survey::svyranktest()
+      # instead.
       # ------------------------------------------------------------------
 
       N_pop <- sum(w)

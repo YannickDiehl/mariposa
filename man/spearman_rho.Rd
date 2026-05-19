@@ -20,9 +20,12 @@ spearman_rho(
 correlation or more for a correlation matrix. You can use helpers like
 \code{starts_with("trust")}.}
 
-\item{weights}{Optional survey weights for population-representative results.
-Note: SPSS may not apply weights to Spearman's rho; our implementation uses
-weighted ranks for mathematically correct survey analysis.}
+\item{weights}{Optional survey weights. Following the SPSS NONPAR CORR
+convention, weights are used only to filter cases (rows with weight
+<= 0 or NA are dropped); the rank correlation itself is computed
+unweighted on the remaining sample. For design-based weighted
+Spearman use \code{survey::svyolr()} or
+\code{wCorr::weightedCorr(method = "Spearman")}.}
 
 \item{alternative}{Direction of the test:
 \itemize{

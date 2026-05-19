@@ -212,10 +212,12 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
     } else {
       # ------------------------------------------------------------------
-      # Weighted Wilcoxon Signed-Rank Test
+      # Weighted Wilcoxon Signed-Rank Test (frequency-weighted approx.)
       # ------------------------------------------------------------------
-      # Uses frequency-weighted ranks matching SPSS WEIGHT BY behaviour.
-      # With sampling_weight ≈ 1.0, results should match unweighted.
+      # NOTE: Substitutes sum(w) for n in the standard variance formula.
+      # NOT a design-based estimator. With sampling_weight ≈ 1.0 results
+      # match the unweighted Z to ~3 decimals; for weights far from 1.0
+      # use the survey package instead.
 
       w_no_ties <- w[!tie_idx]
 

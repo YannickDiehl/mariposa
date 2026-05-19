@@ -412,17 +412,11 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
         group_vars_welch[i] <- sum(group_weights * (group_data - group_means_welch[i])^2) / (sum(group_weights) - 1)
       }
       
-      # Overall weighted mean
-      grand_mean_welch <- sum(w_total_groups * group_means_welch) / sum(w_total_groups)
-      
-      # Classical Welch ANOVA with frequency weights (SPSS-compatible)
-      # This is the standard textbook formula that SPSS uses
-      # Frequency weights treat weights as replications of observations
-      
-      # Welch weights: w_i / s_i^2 (effective sample size / variance)
-      welch_weights <- w_total_groups / group_vars_welch
-      
-      # Weighted grand mean for Welch test
+      # Classical Welch ANOVA with frequency weights (SPSS-compatible).
+      # Welch weights = n_i / s_i^2; the Welch-weighted grand mean is used
+      # as the centre for the F-statistic numerator (NOT the unweighted
+      # grand mean).
+      welch_weights    <- w_total_groups / group_vars_welch
       grand_mean_welch <- sum(welch_weights * group_means_welch) / sum(welch_weights)
       
       # Classical Welch F-statistic

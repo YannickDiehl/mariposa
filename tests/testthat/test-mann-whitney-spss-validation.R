@@ -401,12 +401,39 @@ test_that("Edge case: missing values reduce N exactly by the NAs", {
 # mann_whitney_output.txt at lines 33-38 vs 152-157, etc.). This is a
 # SPSS-side limitation, not a mariposa issue. mariposa's weighted Mann-
 # Whitney uses Lumley & Scott (2013) and produces meaningful weighted
-# statistics; those are not validatable against SPSS but are validated
-# against survey::svyranktest() during package development (see
-# R/mann_whitney.R:273-345).
+# statistics; those are validated against survey::svyranktest() by the
+# test below (when the survey package is available).
 #
 # This is the first SPSS-NPAR-TESTS finding for the Charter §5.1
-# convention catalogue. Likely-related: kruskal_wallis, wilcoxon_test,
-# friedman_test, binomial_test (all NPAR TESTS procedures) may have
-# similar weight-handling limitations on the SPSS side.
+# convention catalogue. Of the related NPAR procedures, only
+# mann_whitney implements true design-based ranks; kruskal_wallis,
+# wilcoxon_test, and friedman_test use frequency-weighted approximations
+# (substitute sum(w) for n) — see their respective source comments.
+# =============================================================================
+
+
+# =============================================================================
+# DESIGN-BASED VALIDATION — vs survey::svyranktest (Lumley-Scott reference)
+# =============================================================================
+# Verifies that mariposa's weighted Mann-Whitney matches the canonical
+# design-based rank test from the survey package (Lumley & Scott 2013).
+# Skipped when survey is not installed.
+
+test_that("mann_whitney weighted matches survey::svyranktest (Lumley-Scott)", {
+  skip_if_not_installed("survey")
+
+  des <- survey::svydesign(~1, weights = ~sampling_weight, data = survey_data)
+  ref <- survey::svyranktest(life_satisfaction ~ gender, design = des,
+                             test = "wilcoxon")
+  r   <- mann_whitney(survey_data, life_satisfaction, group = gender,
+                      weights = sampling_weight)
+
+  # |Z| (or |t|) should match svyranktest to machine precision (~1e-5)
+  assert_spss(abs(as.numeric(r$results$Z[1])), abs(as.numeric(ref$statistic)),
+              tier = "display", precision = 4,
+              label = "|Z| vs survey::svyranktest")
+  assert_spss(as.numeric(r$results$p_value[1]), as.numeric(ref$p.value),
+              tier = "display", precision = 4,
+              label = "p-value vs survey::svyranktest")
+})
 # =============================================================================

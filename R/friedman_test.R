@@ -173,11 +173,13 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 
     } else {
       # ----------------------------------------------------------------
-      # Weighted Friedman Test
+      # Weighted Friedman Test (frequency-weighted approximation)
       # ----------------------------------------------------------------
-      # SPSS treats weights as frequency weights (rounded to integers).
-      # Since sampling_weight is close to 1.0, results are nearly identical
-      # to unweighted. We implement the full weighted version for correctness.
+      # NOTE: NOT a design-based estimator. Substitutes sum(w) for n in
+      # the standard Friedman formula. For sampling weights differing
+      # meaningfully from 1.0 the variance is not survey-design corrected.
+      # With sampling_weight ≈ 1.0 results closely match the unweighted
+      # branch.
 
       # Rank within each subject (row)
       rank_mat <- t(apply(mat, 1, rank))
@@ -186,12 +188,21 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
       w_total <- sum(w)
       mean_ranks <- colSums(w * rank_mat) / w_total
 
-      # Weighted Friedman chi-squared:
-      # Chi^2 = [12 * N / (k * (k+1))] * sum((Rbar_j - (k+1)/2)^2)
-      # This is algebraically equivalent to the standard formula
+      # Weighted Friedman chi-squared with tie correction
+      # (matches stats::friedman.test handling of ties within subjects)
       expected_rank <- (k + 1) / 2
-      chi_sq <- (12 * w_total) / (k * (k + 1)) *
+      chi_sq_raw <- (12 * w_total) / (k * (k + 1)) *
         sum((mean_ranks - expected_rank)^2)
+
+      # Tie correction: sum over subjects of sum_g(t_g^3 - t_g) where t_g
+      # is the tied-rank group size within each subject's k measurements.
+      ties_per_subject <- apply(rank_mat, 1, function(r) {
+        tab <- table(r)
+        sum(tab^3 - tab)
+      })
+      tie_term <- sum(w * ties_per_subject)
+      tie_corr <- 1 - tie_term / (w_total * (k^3 - k))
+      chi_sq <- chi_sq_raw / tie_corr
 
       df <- k - 1
       p_value <- pchisq(chi_sq, df = df, lower.tail = FALSE)

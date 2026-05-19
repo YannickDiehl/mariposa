@@ -183,6 +183,15 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
       N <- length(y)
       all_ranks <- rank(y, ties.method = "average")
 
+      # Tie correction (Dunn 1964; Conover 1999, §5.2.3):
+      #   T = sum over tied groups of (t_k^3 - t_k);
+      #   sigma^2 = (N(N+1)/12 - T / (12*(N-1))) * (1/n_i + 1/n_j)
+      # Singletons contribute 0; if no ties, T = 0 and formula reduces to
+      # the no-correction form.
+      tie_table   <- table(y)
+      tie_sum     <- sum(tie_table^3 - tie_table)
+      tie_correct <- tie_sum / (12 * (N - 1))
+
       # Group-level statistics
       group_n <- numeric(length(group_levels))
       group_mean_rank <- numeric(length(group_levels))
@@ -198,8 +207,14 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
     } else {
       # ------------------------------------------------------------------
       # Weighted Dunn test (matching kruskal_wallis.R weighted mid-ranks)
+      #
+      # Tie correction in the weighted case has no universally accepted
+      # convention (PMCMRplus does not accept weights). We omit it here;
+      # users who need exact tie correction should use the unweighted
+      # form. With near-uniform survey weights the effect is small.
       # ------------------------------------------------------------------
       N <- sum(w)
+      tie_correct <- 0
 
       # Weighted mid-ranks (same approach as kruskal_wallis.R)
       ii <- order(y)
@@ -230,9 +245,10 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
       i <- pairs[1, idx]
       j <- pairs[2, idx]
 
-      # Z-statistic
+      # Z-statistic with tie-corrected variance
       diff <- group_mean_rank[i] - group_mean_rank[j]
-      se <- sqrt((N * (N + 1) / 12) * (1 / group_n[i] + 1 / group_n[j]))
+      se <- sqrt((N * (N + 1) / 12 - tie_correct) *
+                 (1 / group_n[i] + 1 / group_n[j]))
       z <- diff / se
 
       # Unadjusted p-value (two-sided)

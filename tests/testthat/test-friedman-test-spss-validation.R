@@ -216,10 +216,17 @@ test_that("Test 5b: Friedman longitudinal, grouped by treatment group — matche
 # =============================================================================
 # WEIGHTED SCENARIOS — TIER 4 (R-only baselines)
 # =============================================================================
+# SPSS NPAR TESTS /FRIEDMAN does not honor WEIGHT BY. mariposa's weighted
+# Friedman is a frequency-weighted approximation: substitutes sum(w) for n
+# in the standard chi-squared formula, with tie correction applied
+# consistently with stats::friedman.test (the unweighted reference).
+# NOT a design-based estimator. Baselines captured 2026-05-19 from
+# R/friedman_test.R.
+# =============================================================================
 
 r_only_baselines <- list(
-  trust = list(chi_sq = 846.4230, df = 2L, p_value = 0.0000000, n = 2150L),
-  lifestyle = list(chi_sq = 469.6700, df = 2L, p_value = 0.0000000, n = 2152L)
+  trust     = list(chi_sq = 1012.0840, df = 2L, p_value = 0.0000000, n = 2150L),
+  lifestyle = list(chi_sq =  551.7114, df = 2L, p_value = 0.0000000, n = 2152L)
 )
 
 compare_weighted_baseline <- function(row, baseline, scenario) {

@@ -20,7 +20,14 @@ pearson_cor(
 \item{...}{The numeric variables you want to correlate. List two for a single
 correlation or more for a correlation matrix.}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Following SPSS CORRELATIONS, the weighted degrees of freedom
+use \code{n = sum(w)} (not Kish's effective sample size). This is
+appropriate for normalized survey weights with mean \eqn{\approx 1}.
+For raw expansion weights (e.g., summing to millions of population
+units), the resulting standard errors and confidence intervals will
+be drastically too narrow — in that case, normalize weights so that
+\code{sum(w) == n}, or use the survey package for design-based inference.}
 
 \item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 

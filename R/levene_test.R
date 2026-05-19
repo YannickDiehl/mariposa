@@ -734,9 +734,9 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
       ss_within <- ss_within + w[i] * (z_values[i] - group_mean)^2
     }
     
-    # SPSS Levene df: df1 = k - 1, df2 = floor(sum(w)) - k.
-    # See VALIDATION_CHARTER.md §5.1 and the grouped path above for the
-    # empirical justification of floor() vs round() vs unrounded.
+    # SPSS Levene df: df1 = k - 1, df2 = sum(w) - k (UNROUNDED).
+    # T-TEST family convention; see grouped path above for empirical
+    # justification.
     df1 <- length(g_levels) - 1
     df2 <- sum(w) - length(g_levels)
     

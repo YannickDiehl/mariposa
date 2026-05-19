@@ -61,6 +61,62 @@ WEIGHT BY conventions discovered during the migration:
   (CRAN soft-limit compliance).
 * Suggests cleanup: removed `PMCMRplus` and `survey` (no longer needed).
 
+## Audit-Driven Math Fixes (post-Phase-1)
+
+A second audit pass identified additional math defects and test fudges,
+all corrected in this release:
+
+* `dunn_test()`: SE now includes the Dunn (1964) / Conover (1999) tie
+  correction. Previous versions systematically under-estimated `|Z|`
+  on tied data (e.g., Likert scales). Baselines regenerated from
+  `PMCMRplus::kwAllPairsDunnTest` (exact match to 4 decimals).
+* `friedman_test()`: weighted branch now applies the tie correction
+  consistently with `stats::friedman.test` (unweighted branch). The
+  inconsistency caused weighted chi-squared values to be too low for
+  tied data.
+* `describe()`: weighted skewness and kurtosis now delegate to
+  `.calc_skewness()` / `.calc_kurtosis()` in `helpers.R` (Joanes-Gill
+  Type-2 with `Σw` substitution), matching `w_skew()` / `w_kurtosis()`
+  and SPSS FREQUENCIES exactly. The previous duplicate implementation
+  used a simple weighted moment without bias correction.
+* `.w_quantile()`: weighted quantiles now use Type-6 (HAVERAGE) linear
+  interpolation between cumulative-weight crossings — matches SPSS
+  FREQUENCIES /PERCENTILES. Unweighted quantiles also switched from
+  R default `type = 7` to SPSS-compatible `type = 6`.
+
+## Documentation Honesty
+
+Several SPSS-compatibility claims were narrowed to reflect what the
+code actually does:
+
+* Source comments and test-file headers for the weighted paths of
+  `kruskal_wallis()`, `wilcoxon_test()`, and `friedman_test()` corrected
+  from "design-based" / "Lumley-Scott" to "frequency-weighted
+  approximation". Only `mann_whitney()` is a genuine Lumley & Scott (2013)
+  implementation; the others substitute `sum(w)` for `n` in the standard
+  variance formula.
+* `mann_whitney()` test now includes a permanent cross-check against
+  `survey::svyranktest()` (skipped when survey is not installed).
+* `spearman_rho()`: `weights` parameter docstring rewritten to disclose
+  that weights are used only for case filtering (per SPSS NONPAR CORR
+  convention), not in the rank correlation itself.
+* `pearson_cor()`: docstring now warns that the weighted-df convention
+  (`n = sum(w)`) gives spuriously narrow CIs for raw expansion weights;
+  users with such weights should normalize first.
+* `logistic_regression()`: test file replaced with property-based
+  assertions (Wald formula, Sig from chi-sq, exp(B) vs independent
+  2x2 odds ratio, Cox & Snell/Nagelkerke/McFadden from textbook
+  formulas, Omnibus from likelihood ratio). No longer a tautological
+  glm-vs-glm self-comparison.
+
+## Code Smell Cleanup
+
+* `oneway_anova()`: removed dead-code overwrite of `grand_mean_welch`
+  in the weighted Welch path.
+* `levene_test()`: stale comment claiming `df2 = floor(sum(w)) - k`
+  corrected — the code uses unrounded `sum(w) - k` (T-TEST family
+  convention).
+
 # mariposa 0.6.0
 
 ## New Functions — Label Management

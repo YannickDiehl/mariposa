@@ -2,11 +2,18 @@
 % Please edit documentation in R/describe.R
 \name{.w_quantile}
 \alias{.w_quantile}
-\title{Weighted quantiles using cumulative weights}
+\title{Weighted quantiles (SPSS Type-6 HAVERAGE with linear interpolation)}
 \usage{
 .w_quantile(x, weights = NULL, probs = 0.5, na.rm = TRUE)
 }
 \description{
-Weighted quantiles using cumulative weights
+For weighted data, weights are treated as frequency multipliers. The
+Type-6 position is h = p * (W + 1) where W = sum(w). The percentile is
+linearly interpolated between the values whose cumulative weights bracket h.
+Matches IBM SPSS FREQUENCIES /PERCENTILES (HAVERAGE) algorithm.
+}
+\details{
+For unweighted data, delegates to stats::quantile(type = 6) which is the
+SPSS-compatible default (HAVERAGE) — base R's default is type = 7.
 }
 \keyword{internal}
