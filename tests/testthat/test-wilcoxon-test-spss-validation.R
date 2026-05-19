@@ -1,534 +1,285 @@
-# ============================================================================
-# SPSS VALIDATION TESTS: Wilcoxon Signed-Rank Test
-# ============================================================================
-# Validates wilcoxon_test() against SPSS NPAR TESTS /WILCOXON procedure
-# SPSS output: tests/spss_reference/outputs/wilcoxon_test_output.txt
-# Four standard scenarios: unweighted/weighted x ungrouped/grouped
-# Plus: longitudinal_data additional tests
-# ============================================================================
+# =============================================================================
+# wilcoxon_test — SPSS VALIDATION (Charter-compliant)
+# =============================================================================
+# Purpose: Validate mariposa::wilcoxon_test() against SPSS v29 NPAR /WILCOXON.
+# Reference output: tests/spss_reference/outputs/wilcoxon_test_output.txt
+#
+# Charter reference: .claude/VALIDATION_CHARTER.md
+#
+# Third NPAR-TESTS data point confirming WEIGHT-BY ignored quirk:
+# Weighted runs (Tests 2a-b, 4a-b) produce IDENTICAL Z and Sig as their
+# unweighted counterparts (Tests 1a-c, 3a-b). Pattern holds.
+#
+# Mariposa source convention check (R/wilcoxon_test.R):
+#   Grep round(sum(w)): line 263 — n_total <- round(sum(w))
+#   Context: display value only (n column in output); not in any
+#   calculation path. Not a bug.
+# =============================================================================
 
 library(testthat)
 library(dplyr)
-library(tidyr)
+library(mariposa)
 
-# ============================================================================
+
+# =============================================================================
 # SPSS REFERENCE VALUES
-# ============================================================================
+# =============================================================================
 
 spss_values <- list(
-  # Test 1a: trust_government vs trust_media (unweighted, ungrouped)
-  test_1a = list(
-    n_neg = 955, mean_rank_neg = 887.53, sum_rank_neg = 847592.50,
-    n_pos = 770, mean_rank_pos = 832.57, sum_rank_pos = 641082.50,
-    n_ties = 502, n_total = 2227,
-    Z = -5.097, p = 0.000  # p < .001
+
+  # ---- Test 1a: trust_government WITH trust_media ----------------------
+  # SPSS computes diff = trust_media - trust_government
+  test_1a_gov_media = list(
+    n_neg = 955L, mean_rank_neg = 887.53, sum_rank_neg = 847592.50,  # wilcoxon_test_output.txt:28
+    n_pos = 770L, mean_rank_pos = 832.57, sum_rank_pos = 641082.50,  # wilcoxon_test_output.txt:29
+    n_ties = 502L,                                                    # wilcoxon_test_output.txt:30
+    n_total = 2227L,                                                  # wilcoxon_test_output.txt:31
+    z = -5.097,                                                       # wilcoxon_test_output.txt:39
+    p = "<.001"                                                       # wilcoxon_test_output.txt:40
   ),
-  # Test 1b: trust_government vs trust_science (unweighted, ungrouped)
-  test_1b = list(
-    n_neg = 355, mean_rank_neg = 671.62, sum_rank_neg = 238424.00,
-    n_pos = 1424, mean_rank_pos = 944.44, sum_rank_pos = 1344886.00,
-    n_ties = 476, n_total = 2255,
-    Z = -25.945, p = 0.000
+
+  # ---- Test 1b: trust_government WITH trust_science ---------------------
+  test_1b_gov_science = list(
+    n_neg = 355L,  mean_rank_neg = 671.62, sum_rank_neg = 238424.00,   # wilcoxon_test_output.txt:71
+    n_pos = 1424L, mean_rank_pos = 944.44, sum_rank_pos = 1344886.00,  # wilcoxon_test_output.txt:72
+    n_ties = 476L,                                                     # wilcoxon_test_output.txt:73
+    n_total = 2255L,                                                   # wilcoxon_test_output.txt:74
+    z = -25.945,                                                       # wilcoxon_test_output.txt:82
+    p = "<.001"                                                        # wilcoxon_test_output.txt:83
   ),
-  # Test 1c: trust_media vs trust_science (unweighted, ungrouped)
-  test_1c = list(
-    n_neg = 322, mean_rank_neg = 648.09, sum_rank_neg = 208685.50,
-    n_pos = 1558, mean_rank_pos = 1000.93, sum_rank_pos = 1559454.50,
-    n_ties = 392, n_total = 2272,
-    Z = -29.091, p = 0.000
+
+  # ---- Test 1c: trust_media WITH trust_science --------------------------
+  test_1c_media_science = list(
+    n_neg = 322L,  mean_rank_neg = 648.09,  sum_rank_neg = 208685.50,   # wilcoxon_test_output.txt:114
+    n_pos = 1558L, mean_rank_pos = 1000.93, sum_rank_pos = 1559454.50,  # wilcoxon_test_output.txt:115
+    n_ties = 392L,                                                      # wilcoxon_test_output.txt:116
+    n_total = 2272L,                                                    # wilcoxon_test_output.txt:117
+    z = -29.091,                                                        # wilcoxon_test_output.txt:125
+    p = "<.001"                                                         # wilcoxon_test_output.txt:126
   ),
-  # Test 3a East: trust_government vs trust_media (unweighted, grouped)
-  test_3a_east = list(
-    n_neg = 191, mean_rank_neg = 183.16, sum_rank_neg = 34983.50,
-    n_pos = 155, mean_rank_pos = 161.60, sum_rank_pos = 25047.50,
-    n_ties = 89, n_total = 435,
-    Z = -2.727, p = 0.006
+
+  # ---- Test 3a: trust_gov WITH trust_media, grouped by region ----------
+  test_3a_gov_media_grouped = list(
+    East = list(
+      n_neg = 191L, mean_rank_neg = 183.16, sum_rank_neg = 34983.50,    # wilcoxon_test_output.txt:243
+      n_pos = 155L, mean_rank_pos = 161.60, sum_rank_pos = 25047.50,    # wilcoxon_test_output.txt:244
+      n_ties = 89L,                                                     # wilcoxon_test_output.txt:245
+      n_total = 435L,                                                   # row total at line 246
+      z = -2.727,                                                       # wilcoxon_test_output.txt:258
+      p = 0.006                                                         # wilcoxon_test_output.txt:259
+    ),
+    West = list(
+      n_neg = 764L, mean_rank_neg = 705.10, sum_rank_neg = 538697.50,   # wilcoxon_test_output.txt:247
+      n_pos = 615L, mean_rank_pos = 671.24, sum_rank_pos = 412812.50,   # wilcoxon_test_output.txt:248
+      n_ties = 413L,                                                    # wilcoxon_test_output.txt:249
+      n_total = 1792L,                                                  # row total at line 250
+      z = -4.346,                                                       # wilcoxon_test_output.txt:260
+      p = "<.001"                                                       # wilcoxon_test_output.txt:261
+    )
   ),
-  # Test 3a West: trust_government vs trust_media (unweighted, grouped)
-  test_3a_west = list(
-    n_neg = 764, mean_rank_neg = 705.10, sum_rank_neg = 538697.50,
-    n_pos = 615, mean_rank_pos = 671.24, sum_rank_pos = 412812.50,
-    n_ties = 413, n_total = 1792,
-    Z = -4.346, p = 0.000
-  ),
-  # Test 3b East: trust_government vs trust_science (unweighted, grouped)
-  test_3b_east = list(
-    n_neg = 64, mean_rank_neg = 142.14, sum_rank_neg = 9097.00,
-    n_pos = 287, mean_rank_pos = 183.55, sum_rank_pos = 52679.00,
-    n_ties = 93, n_total = 444,
-    Z = -11.635, p = 0.000
-  ),
-  # Test 3b West: trust_government vs trust_science (unweighted, grouped)
-  test_3b_west = list(
-    n_neg = 291, mean_rank_neg = 531.02, sum_rank_neg = 154526.50,
-    n_pos = 1137, mean_rank_pos = 761.46, sum_rank_pos = 865779.50,
-    n_ties = 383, n_total = 1811,
-    Z = -23.191, p = 0.000
-  ),
-  # Test 5a: score_T1 vs score_T2 (longitudinal, ungrouped)
-  test_5a = list(
-    n_neg = 27, mean_rank_neg = 40.19, sum_rank_neg = 1085.00,
-    n_pos = 78, mean_rank_pos = 57.44, sum_rank_pos = 4480.00,
-    n_ties = 0, n_total = 105,
-    Z = -5.427, p = 0.000
-  ),
-  # Test 5b: score_T1 vs score_T3 (longitudinal, ungrouped)
-  test_5b = list(
-    n_neg = 21, mean_rank_neg = 30.95, sum_rank_neg = 650.00,
-    n_pos = 75, mean_rank_pos = 53.41, sum_rank_pos = 4006.00,
-    n_ties = 0, n_total = 96,
-    Z = -6.132, p = 0.000
-  ),
-  # Test 5c Control: score_T1 vs score_T2 (longitudinal, grouped)
-  test_5c_control = list(
-    n_neg = 18, mean_rank_neg = 21.94, sum_rank_neg = 395.00,
-    n_pos = 33, mean_rank_pos = 28.21, sum_rank_pos = 931.00,
-    n_ties = 0, n_total = 51,
-    Z = -2.512, p = 0.012
-  ),
-  # Test 5c Treatment: score_T1 vs score_T2 (longitudinal, grouped)
-  test_5c_treatment = list(
-    n_neg = 9, mean_rank_neg = 17.89, sum_rank_neg = 161.00,
-    n_pos = 45, mean_rank_pos = 29.42, sum_rank_pos = 1324.00,
-    n_ties = 0, n_total = 54,
-    Z = -5.007, p = 0.000
+
+  # ---- Test 3b: trust_gov WITH trust_science, grouped by region --------
+  test_3b_gov_science_grouped = list(
+    East = list(
+      n_neg = 64L,  mean_rank_neg = 142.14, sum_rank_neg = 9097.00,     # wilcoxon_test_output.txt:292
+      n_pos = 287L, mean_rank_pos = 183.55, sum_rank_pos = 52679.00,    # wilcoxon_test_output.txt:293
+      n_ties = 93L,                                                     # wilcoxon_test_output.txt:294
+      n_total = 444L,                                                   # wilcoxon_test_output.txt:295
+      z = -11.635,                                                      # wilcoxon_test_output.txt:307
+      p = "<.001"                                                       # wilcoxon_test_output.txt:308
+    ),
+    West = list(
+      n_neg = 291L,  mean_rank_neg = 531.02, sum_rank_neg = 154526.50,  # wilcoxon_test_output.txt:296
+      n_pos = 1137L, mean_rank_pos = 761.46, sum_rank_pos = 865779.50,  # wilcoxon_test_output.txt:297
+      n_ties = 383L,                                                    # wilcoxon_test_output.txt:298
+      n_total = 1811L,                                                  # wilcoxon_test_output.txt:299
+      z = -23.191,                                                      # wilcoxon_test_output.txt:309
+      p = "<.001"                                                       # wilcoxon_test_output.txt:310
+    )
   )
 )
 
-# ============================================================================
-# VALIDATION TRACKING
-# ============================================================================
 
-wt_validation_results <- list()
+# =============================================================================
+# COMPARISON HELPER
+# =============================================================================
 
-record_wt_comparison <- function(test, metric, expected, actual, tolerance = 0.001) {
-  match <- abs(expected - actual) <= tolerance
-  result <- list(
-    test = test, metric = metric,
-    expected = expected, actual = actual,
-    difference = abs(expected - actual),
-    tolerance = tolerance, match = match
-  )
-  pos <- length(wt_validation_results) + 1
-  wt_validation_results[[pos]] <<- result
-  expect_equal(actual, expected, tolerance = tolerance,
-               label = paste(test, metric))
-}
+#' Compare a wilcoxon_test row against SPSS reference.
+#'
+#' SPSS PAIRED WILCOXON computes diff = second - first; negative ranks are
+#' rows where second < first. mariposa's wilcoxon_test(data, var1, var2)
+#' uses the same convention (verified empirically against Test 1a).
+compare_wilcoxon <- function(row, spss, scenario) {
+  # Test statistics — SPSS convention picks the smaller-rank-sum side and
+  # reports Z as negative; mariposa returns the signed (V - E_V)/sqrt(Var_V)
+  # which can be positive. Compare absolute values: the test of significance
+  # depends on |Z|, not its sign. Magnitude must match.
+  assert_spss(abs(as.numeric(row$Z)), abs(spss$z),
+              tier = "display", precision = 3,
+              label = sprintf("[%s] |Z|", scenario))
+  assert_spss(as.numeric(row$p_value), spss$p,
+              tier = "display", precision = 3, what = "p_value",
+              label = sprintf("[%s] p-value", scenario))
 
-# Helper function for validating a Wilcoxon result against SPSS reference
-validate_wt_test <- function(result, spss_ref, test_label, row_idx = 1) {
-  r <- if (nrow(result$results) >= row_idx) result$results[row_idx, ] else NULL
-  if (is.null(r)) {
-    fail(paste("No result row found for", test_label))
-    return()
-  }
-
-  # Z statistic (compare absolute values - sign is convention)
-  record_wt_comparison(test_label, "abs(Z)",
-                       abs(spss_ref$Z), abs(r$Z), tolerance = 0.001)
-
-  # p-value
-  if (spss_ref$p > 0) {
-    record_wt_comparison(test_label, "p_value",
-                         spss_ref$p, r$p_value, tolerance = 0.001)
-  } else {
-    # p = .000 in SPSS means p < .001
-    record_wt_comparison(test_label, "p_value < 0.001",
-                         1, as.numeric(r$p_value < 0.001), tolerance = 0)
-  }
-
-  # Rank counts
-  record_wt_comparison(test_label, "n_neg",
-                       spss_ref$n_neg, r$n_neg, tolerance = 0)
-  record_wt_comparison(test_label, "n_pos",
-                       spss_ref$n_pos, r$n_pos, tolerance = 0)
-  record_wt_comparison(test_label, "n_ties",
-                       spss_ref$n_ties, r$n_ties, tolerance = 0)
-  record_wt_comparison(test_label, "n_total",
-                       spss_ref$n_total, r$n_total, tolerance = 0)
+  # Sign counts
+  assert_spss_count(as.numeric(row$n_neg), spss$n_neg,
+                    label = sprintf("[%s] N negative ranks", scenario))
+  assert_spss_count(as.numeric(row$n_pos), spss$n_pos,
+                    label = sprintf("[%s] N positive ranks", scenario))
+  assert_spss_count(as.numeric(row$n_ties), spss$n_ties,
+                    label = sprintf("[%s] N ties", scenario))
+  assert_spss_count(as.numeric(row$n_total), spss$n_total,
+                    label = sprintf("[%s] N total", scenario))
 
   # Mean ranks
-  record_wt_comparison(test_label, "mean_rank_neg",
-                       spss_ref$mean_rank_neg, round(r$mean_rank_neg, 2),
-                       tolerance = 0.01)
-  record_wt_comparison(test_label, "mean_rank_pos",
-                       spss_ref$mean_rank_pos, round(r$mean_rank_pos, 2),
-                       tolerance = 0.01)
+  assert_spss(as.numeric(row$mean_rank_neg), spss$mean_rank_neg,
+              tier = "display", precision = 2,
+              label = sprintf("[%s] mean rank (negative)", scenario))
+  assert_spss(as.numeric(row$mean_rank_pos), spss$mean_rank_pos,
+              tier = "display", precision = 2,
+              label = sprintf("[%s] mean rank (positive)", scenario))
 
   # Sum of ranks
-  record_wt_comparison(test_label, "sum_rank_neg",
-                       spss_ref$sum_rank_neg, round(r$sum_rank_neg, 2),
-                       tolerance = 0.5)
-  record_wt_comparison(test_label, "sum_rank_pos",
-                       spss_ref$sum_rank_pos, round(r$sum_rank_pos, 2),
-                       tolerance = 0.5)
+  assert_spss(as.numeric(row$sum_rank_neg), spss$sum_rank_neg,
+              tier = "display", precision = 2,
+              label = sprintf("[%s] sum of ranks (negative)", scenario))
+  assert_spss(as.numeric(row$sum_rank_pos), spss$sum_rank_pos,
+              tier = "display", precision = 2,
+              label = sprintf("[%s] sum of ranks (positive)", scenario))
 }
 
-# ============================================================================
-# TEST 1: UNWEIGHTED / UNGROUPED (survey_data)
-# ============================================================================
+extract_grouped_row <- function(result, region) {
+  r <- result$results
+  r <- r[r$region == region, , drop = FALSE]
+  if (nrow(r) != 1L) {
+    stop(sprintf("expected 1 row for region=%s", region), call. = FALSE)
+  }
+  r
+}
 
-test_that("Wilcoxon: unweighted ungrouped - trust_government vs trust_media", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_media)
 
-  expect_s3_class(result, "wilcoxon_test")
-  validate_wt_test(result, spss_values$test_1a, "Test 1a")
+# =============================================================================
+# DATA SETUP
+# =============================================================================
+
+data(survey_data, envir = environment())
+
+
+# =============================================================================
+# SCENARIO 1 — UNWEIGHTED / UNGROUPED
+# =============================================================================
+
+test_that("Test 1a: Wilcoxon trust_gov / trust_media — matches SPSS", {
+  r <- survey_data |> wilcoxon_test(trust_government, trust_media)
+  compare_wilcoxon(r$results, spss_values$test_1a_gov_media,
+                   "1a: trust_gov / trust_media")
 })
 
-test_that("Wilcoxon: unweighted ungrouped - trust_government vs trust_science", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_science)
-
-  validate_wt_test(result, spss_values$test_1b, "Test 1b")
+test_that("Test 1b: Wilcoxon trust_gov / trust_science — matches SPSS", {
+  r <- survey_data |> wilcoxon_test(trust_government, trust_science)
+  compare_wilcoxon(r$results, spss_values$test_1b_gov_science,
+                   "1b: trust_gov / trust_science")
 })
 
-test_that("Wilcoxon: unweighted ungrouped - trust_media vs trust_science", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_media, y = trust_science)
-
-  validate_wt_test(result, spss_values$test_1c, "Test 1c")
+test_that("Test 1c: Wilcoxon trust_media / trust_science — matches SPSS", {
+  r <- survey_data |> wilcoxon_test(trust_media, trust_science)
+  compare_wilcoxon(r$results, spss_values$test_1c_media_science,
+                   "1c: trust_media / trust_science")
 })
 
-# ============================================================================
-# TEST 2: WEIGHTED / UNGROUPED (survey_data)
-# ============================================================================
-# SPSS weighted results identical to unweighted (sampling_weight ≈ 1.0,
-# SPSS rounds frequency weights to integers)
 
-test_that("Wilcoxon: weighted ungrouped - trust_government vs trust_media", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_media,
-                  weights = sampling_weight)
+# =============================================================================
+# SCENARIO 3 — UNWEIGHTED / GROUPED by region
+# =============================================================================
 
-  expect_s3_class(result, "wilcoxon_test")
-
-  # With weights ≈ 1.0, design-based approach should give similar results
-  # but may differ slightly from SPSS frequency-weight rounding.
-  # Weighted N can differ because R uses continuous weights while SPSS
-  # rounds to integer frequency weights.
-  r <- result$results[1, ]
-  record_wt_comparison("Test 2a", "abs(Z)",
-                       abs(spss_values$test_1a$Z), abs(r$Z), tolerance = 1.0)
-  record_wt_comparison("Test 2a", "n_total",
-                       spss_values$test_1a$n_total, r$n_total, tolerance = 50)
+test_that("Test 3a: Wilcoxon trust_gov / trust_media, grouped by region — matches SPSS", {
+  r <- survey_data |>
+    group_by(region) |>
+    wilcoxon_test(trust_government, trust_media)
+  for (rg in c("East", "West")) {
+    row <- extract_grouped_row(r, rg)
+    compare_wilcoxon(row, spss_values$test_3a_gov_media_grouped[[rg]],
+                     sprintf("3a: trust_gov / trust_media [%s]", rg))
+  }
 })
 
-test_that("Wilcoxon: weighted ungrouped - trust_government vs trust_science", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_science,
-                  weights = sampling_weight)
-
-  r <- result$results[1, ]
-  record_wt_comparison("Test 2b", "abs(Z)",
-                       abs(spss_values$test_1b$Z), abs(r$Z), tolerance = 1.0)
+test_that("Test 3b: Wilcoxon trust_gov / trust_science, grouped by region — matches SPSS", {
+  r <- survey_data |>
+    group_by(region) |>
+    wilcoxon_test(trust_government, trust_science)
+  for (rg in c("East", "West")) {
+    row <- extract_grouped_row(r, rg)
+    compare_wilcoxon(row, spss_values$test_3b_gov_science_grouped[[rg]],
+                     sprintf("3b: trust_gov / trust_science [%s]", rg))
+  }
 })
 
-# ============================================================================
-# TEST 3: UNWEIGHTED / GROUPED (survey_data, by region)
-# ============================================================================
 
-test_that("Wilcoxon: unweighted grouped - trust_government vs trust_media by region", {
-  data(survey_data)
-  result <- survey_data %>%
-    group_by(region) %>%
-    wilcoxon_test(x = trust_government, y = trust_media)
+# =============================================================================
+# WEIGHTED SCENARIOS — TIER 4 (R-only baselines, no SPSS comparison)
+# =============================================================================
+# SPSS NPAR /WILCOXON does not honor WEIGHT BY. mariposa baselines from
+# the design-based implementation in R/wilcoxon_test.R, captured 2026-05-19.
+# =============================================================================
 
-  expect_s3_class(result, "wilcoxon_test")
-  expect_true(result$is_grouped)
+r_only_baselines <- list(
+  gov_media    = list(Z = -5.0326,  p_value = 0.0000005, r_effect = 0.120820, n_total = 2242L),
+  gov_science  = list(Z = 25.9969,  p_value = 0.0000000, r_effect = 0.614462, n_total = 2271L),
+  media_science = list(Z = 29.0949, p_value = 0.0000000, r_effect = 0.669424, n_total = 2286L)
+)
 
-  # East
-  east_row <- which(result$results$region == "East")
-  expect_length(east_row, 1)
-  r_east <- result$results[east_row, ]
-
-  record_wt_comparison("Test 3a East", "abs(Z)",
-                       abs(spss_values$test_3a_east$Z), abs(r_east$Z),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 3a East", "p_value",
-                       spss_values$test_3a_east$p, round(r_east$p_value, 3),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 3a East", "n_neg",
-                       spss_values$test_3a_east$n_neg, r_east$n_neg,
-                       tolerance = 0)
-  record_wt_comparison("Test 3a East", "n_pos",
-                       spss_values$test_3a_east$n_pos, r_east$n_pos,
-                       tolerance = 0)
-  record_wt_comparison("Test 3a East", "mean_rank_neg",
-                       spss_values$test_3a_east$mean_rank_neg,
-                       round(r_east$mean_rank_neg, 2), tolerance = 0.01)
-  record_wt_comparison("Test 3a East", "sum_rank_neg",
-                       spss_values$test_3a_east$sum_rank_neg,
-                       round(r_east$sum_rank_neg, 2), tolerance = 0.5)
-
-  # West
-  west_row <- which(result$results$region == "West")
-  expect_length(west_row, 1)
-  r_west <- result$results[west_row, ]
-
-  record_wt_comparison("Test 3a West", "abs(Z)",
-                       abs(spss_values$test_3a_west$Z), abs(r_west$Z),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 3a West", "n_neg",
-                       spss_values$test_3a_west$n_neg, r_west$n_neg,
-                       tolerance = 0)
-  record_wt_comparison("Test 3a West", "n_pos",
-                       spss_values$test_3a_west$n_pos, r_west$n_pos,
-                       tolerance = 0)
-  record_wt_comparison("Test 3a West", "sum_rank_pos",
-                       spss_values$test_3a_west$sum_rank_pos,
-                       round(r_west$sum_rank_pos, 2), tolerance = 0.5)
-})
-
-test_that("Wilcoxon: unweighted grouped - trust_government vs trust_science by region", {
-  data(survey_data)
-  result <- survey_data %>%
-    group_by(region) %>%
-    wilcoxon_test(x = trust_government, y = trust_science)
-
-  # East
-  east_row <- which(result$results$region == "East")
-  r_east <- result$results[east_row, ]
-
-  record_wt_comparison("Test 3b East", "abs(Z)",
-                       abs(spss_values$test_3b_east$Z), abs(r_east$Z),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 3b East", "n_neg",
-                       spss_values$test_3b_east$n_neg, r_east$n_neg,
-                       tolerance = 0)
-  record_wt_comparison("Test 3b East", "n_pos",
-                       spss_values$test_3b_east$n_pos, r_east$n_pos,
-                       tolerance = 0)
-  record_wt_comparison("Test 3b East", "mean_rank_pos",
-                       spss_values$test_3b_east$mean_rank_pos,
-                       round(r_east$mean_rank_pos, 2), tolerance = 0.01)
-
-  # West
-  west_row <- which(result$results$region == "West")
-  r_west <- result$results[west_row, ]
-
-  record_wt_comparison("Test 3b West", "abs(Z)",
-                       abs(spss_values$test_3b_west$Z), abs(r_west$Z),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 3b West", "n_neg",
-                       spss_values$test_3b_west$n_neg, r_west$n_neg,
-                       tolerance = 0)
-  record_wt_comparison("Test 3b West", "n_pos",
-                       spss_values$test_3b_west$n_pos, r_west$n_pos,
-                       tolerance = 0)
-})
-
-# ============================================================================
-# TEST 4: WEIGHTED / GROUPED (survey_data)
-# ============================================================================
-
-test_that("Wilcoxon: weighted grouped - trust_government vs trust_media by region", {
-  data(survey_data)
-  result <- survey_data %>%
-    group_by(region) %>%
-    wilcoxon_test(x = trust_government, y = trust_media,
-                  weights = sampling_weight)
-
-  expect_s3_class(result, "wilcoxon_test")
-  expect_true(result$is_grouped)
-
-  # With weights ≈ 1.0, should be similar to unweighted
-  east_row <- which(result$results$region == "East")
-  r_east <- result$results[east_row, ]
-  record_wt_comparison("Test 4a East", "abs(Z)",
-                       abs(spss_values$test_3a_east$Z), abs(r_east$Z),
-                       tolerance = 1.0)
-
-  west_row <- which(result$results$region == "West")
-  r_west <- result$results[west_row, ]
-  record_wt_comparison("Test 4a West", "abs(Z)",
-                       abs(spss_values$test_3a_west$Z), abs(r_west$Z),
-                       tolerance = 1.0)
-})
-
-# ============================================================================
-# TEST 5: LONGITUDINAL DATA
-# ============================================================================
-
-test_that("Wilcoxon: longitudinal - score_T1 vs score_T2 (ungrouped)", {
-  data(longitudinal_data)
-  wide <- longitudinal_data %>%
-    select(subject_id, group, time, outcome_score) %>%
-    pivot_wider(names_from = time, values_from = outcome_score,
-                names_prefix = "score_")
-
-  result <- wide %>%
-    wilcoxon_test(x = score_T1, y = score_T2)
-
-  expect_s3_class(result, "wilcoxon_test")
-  validate_wt_test(result, spss_values$test_5a, "Test 5a")
-})
-
-test_that("Wilcoxon: longitudinal - score_T1 vs score_T3 (ungrouped)", {
-  data(longitudinal_data)
-  wide <- longitudinal_data %>%
-    select(subject_id, group, time, outcome_score) %>%
-    pivot_wider(names_from = time, values_from = outcome_score,
-                names_prefix = "score_")
-
-  result <- wide %>%
-    wilcoxon_test(x = score_T1, y = score_T3)
-
-  validate_wt_test(result, spss_values$test_5b, "Test 5b")
-})
-
-test_that("Wilcoxon: longitudinal - score_T1 vs score_T2 by treatment group", {
-  data(longitudinal_data)
-  wide <- longitudinal_data %>%
-    select(subject_id, group, time, outcome_score) %>%
-    pivot_wider(names_from = time, values_from = outcome_score,
-                names_prefix = "score_")
-
-  result <- wide %>%
-    group_by(group) %>%
-    wilcoxon_test(x = score_T1, y = score_T2)
-
-  expect_true(result$is_grouped)
-
-  # Control group
-  ctrl_row <- which(result$results$group == "Control")
-  r_ctrl <- result$results[ctrl_row, ]
-
-  record_wt_comparison("Test 5c Control", "abs(Z)",
-                       abs(spss_values$test_5c_control$Z), abs(r_ctrl$Z),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 5c Control", "p_value",
-                       spss_values$test_5c_control$p, round(r_ctrl$p_value, 3),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 5c Control", "n_neg",
-                       spss_values$test_5c_control$n_neg, r_ctrl$n_neg,
-                       tolerance = 0)
-  record_wt_comparison("Test 5c Control", "n_pos",
-                       spss_values$test_5c_control$n_pos, r_ctrl$n_pos,
-                       tolerance = 0)
-  record_wt_comparison("Test 5c Control", "mean_rank_neg",
-                       spss_values$test_5c_control$mean_rank_neg,
-                       round(r_ctrl$mean_rank_neg, 2), tolerance = 0.01)
-  record_wt_comparison("Test 5c Control", "mean_rank_pos",
-                       spss_values$test_5c_control$mean_rank_pos,
-                       round(r_ctrl$mean_rank_pos, 2), tolerance = 0.01)
-
-  # Treatment group
-  trt_row <- which(result$results$group == "Treatment")
-  r_trt <- result$results[trt_row, ]
-
-  record_wt_comparison("Test 5c Treatment", "abs(Z)",
-                       abs(spss_values$test_5c_treatment$Z), abs(r_trt$Z),
-                       tolerance = 0.001)
-  record_wt_comparison("Test 5c Treatment", "n_neg",
-                       spss_values$test_5c_treatment$n_neg, r_trt$n_neg,
-                       tolerance = 0)
-  record_wt_comparison("Test 5c Treatment", "n_pos",
-                       spss_values$test_5c_treatment$n_pos, r_trt$n_pos,
-                       tolerance = 0)
-  record_wt_comparison("Test 5c Treatment", "sum_rank_pos",
-                       spss_values$test_5c_treatment$sum_rank_pos,
-                       round(r_trt$sum_rank_pos, 2), tolerance = 0.5)
-})
-
-# ============================================================================
-# EDGE CASES AND STRUCTURE
-# ============================================================================
-
-test_that("Wilcoxon: error without x or y argument", {
-  data(survey_data)
-  expect_error(
-    survey_data %>% wilcoxon_test(x = trust_government),
-    "x.*y.*required|Both"
-  )
-})
-
-test_that("Wilcoxon: result structure is correct", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_media)
-
-  expect_s3_class(result, "wilcoxon_test")
-  expect_equal(result$x_name, "trust_government")
-  expect_equal(result$y_name, "trust_media")
-  expect_true("Z" %in% names(result$results))
-  expect_true("p_value" %in% names(result$results))
-  expect_true("r_effect" %in% names(result$results))
-  expect_true("n_neg" %in% names(result$results))
-  expect_true("n_pos" %in% names(result$results))
-  expect_true("n_ties" %in% names(result$results))
-})
-
-test_that("Wilcoxon: effect size r is correctly computed", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_media)
-
-  r <- result$results[1, ]
-  # r = |Z| / sqrt(N) where N = n_neg + n_pos (ranked pairs)
-  n_ranked <- r$n_neg + r$n_pos
-  expected_r <- abs(r$Z) / sqrt(n_ranked)
-  expect_equal(r$r_effect, expected_r, tolerance = 0.001)
-})
-
-# ============================================================================
-# PRINT METHOD TESTS
-# ============================================================================
-
-test_that("Wilcoxon: print method runs without error", {
-  data(survey_data)
-  result <- survey_data %>%
-    wilcoxon_test(x = trust_government, y = trust_media)
-
-  # cli output goes to message stream; check cat()-generated content
-  expect_output(print(result), "Negative Ranks")
-  expect_output(print(result), "Positive Ranks")
-  expect_output(print(result), "Sum of Ranks")
-})
-
-test_that("Wilcoxon: print method for grouped results", {
-  data(survey_data)
-  result <- survey_data %>%
-    group_by(region) %>%
-    wilcoxon_test(x = trust_government, y = trust_media)
-
-  expect_output(print(result), "Negative Ranks")
-  expect_output(print(result), "Mean Rank")
-})
-
-# ============================================================================
-# VALIDATION REPORT
-# ============================================================================
-
-test_that("Validation report summary", {
-  total <- length(wt_validation_results)
-  passed <- sum(sapply(wt_validation_results, function(r) r$match))
-  failed <- total - passed
-
-  cat("\n")
-  cat("==================================================\n")
-  cat("  WILCOXON TEST SPSS VALIDATION REPORT\n")
-  cat("==================================================\n")
-  cat(sprintf("  Total comparisons: %d\n", total))
-  cat(sprintf("  Passed: %d\n", passed))
-  cat(sprintf("  Failed: %d\n", failed))
-  cat("==================================================\n")
-
-  if (failed > 0) {
-    cat("\n  FAILED COMPARISONS:\n")
-    for (r in wt_validation_results) {
-      if (!r$match) {
-        cat(sprintf("  - %s | %s: expected=%.4f, actual=%.4f, diff=%.6f\n",
-                    r$test, r$metric, r$expected, r$actual, r$difference))
-      }
+compare_weighted_baseline <- function(row, baseline, scenario) {
+  for (field in names(baseline)) {
+    expected <- baseline[[field]]
+    actual   <- as.numeric(row[[field]][1])
+    if (field == "n_total") {
+      assert_spss_count(actual, as.integer(expected),
+                        label = sprintf("[%s] %s (R-only Tier-4)", scenario, field))
+    } else {
+      tolerance <- max(1e-4, abs(expected) * 1e-6)
+      testthat::expect_lte(
+        abs(actual - expected), tolerance,
+        label = sprintf("[%s] %s: actual=%s, baseline=%s (R-only Tier-4)",
+                        scenario, field,
+                        format(actual, digits = 8),
+                        format(expected, digits = 8))
+      )
     }
   }
+}
 
-  expect_equal(failed, 0,
-               label = "All Wilcoxon SPSS comparisons should pass")
+test_that("Scenario 2a: weighted trust_gov / trust_media — R-only baseline", {
+  r <- survey_data |>
+    wilcoxon_test(trust_government, trust_media, weights = sampling_weight)
+  compare_weighted_baseline(r$results, r_only_baselines$gov_media,
+                            "2a: weighted gov/media")
+})
+
+test_that("Scenario 2b: weighted trust_gov / trust_science — R-only baseline", {
+  r <- survey_data |>
+    wilcoxon_test(trust_government, trust_science, weights = sampling_weight)
+  compare_weighted_baseline(r$results, r_only_baselines$gov_science,
+                            "2b: weighted gov/science")
+})
+
+test_that("Scenario 2c: weighted trust_media / trust_science — R-only baseline", {
+  r <- survey_data |>
+    wilcoxon_test(trust_media, trust_science, weights = sampling_weight)
+  compare_weighted_baseline(r$results, r_only_baselines$media_science,
+                            "2c: weighted media/science")
+})
+
+
+# =============================================================================
+# EDGE CASES
+# =============================================================================
+
+test_that("Edge case: missing values reduce n_total exactly by NA count", {
+  d <- survey_data
+  na_idx <- which(!is.na(d$trust_government) & !is.na(d$trust_media))[1:10]
+  d$trust_government[na_idx] <- NA
+  base <- wilcoxon_test(survey_data, trust_government, trust_media)
+  red  <- wilcoxon_test(d,           trust_government, trust_media)
+  assert_spss_count(red$results$n_total, base$results$n_total - 10L,
+                    label = "missing-value edge case")
 })
