@@ -1,11 +1,22 @@
 # =============================================================================
-# logistic_regression — VALIDATION (Charter-compliant, R-only Tier-4)
+# logistic_regression — PROPERTY-BASED VALIDATION (Charter Tier-4)
 # =============================================================================
-# Purpose: Validate mariposa::logistic_regression() output stability.
+# Purpose: Validate that logistic_regression() correctly implements the
+# SPSS LOGISTIC REGRESSION output formulas, without circular self-comparison.
 #
-# No SPSS reference exists for this function. mariposa logistic_regression
-# wraps glm(family = binomial); the validation reference is glm() directly.
-# Inline R-only baselines captured 2026-05-19.
+# Strategy: where logistic_regression() wraps stats::glm(family=binomial),
+# the wrapper's job is to expose specific SPSS-style derived quantities
+# (Wald, Exp(B), pseudo-R^2, classification table, Hosmer-Lemeshow). We
+# validate each derived quantity against its TEXTBOOK FORMULA evaluated
+# independently — NOT against another mariposa call or a glm refit that
+# already produces the same intermediate values.
+#
+# References:
+#   - IBM SPSS Statistics Algorithms, "LOGISTIC REGRESSION" chapter
+#   - Hosmer & Lemeshow (2013), Applied Logistic Regression, 3rd ed.
+#
+# No SPSS .txt reference is generated; the textbook formulas serve as the
+# oracle. Captured 2026-05-19.
 # =============================================================================
 
 library(testthat)
@@ -15,59 +26,143 @@ library(mariposa)
 
 data(survey_data, envir = environment())
 survey_data$high_life <- as.integer(survey_data$life_satisfaction >= 4)
+# A clean binary predictor for OR-from-2x2 cross-check
+survey_data$is_female <- as.integer(survey_data$gender == "Female")
 
 
-test_that("logistic_regression high_life ~ age + income — coefficients match glm", {
-  r <- logistic_regression(survey_data, high_life ~ age + income)
-
-  # Run base glm for ground truth
-  d_complete <- survey_data[stats::complete.cases(survey_data[, c("high_life", "age", "income")]), ]
-  glm_fit <- glm(high_life ~ age + income, data = d_complete, family = binomial)
-  glm_coefs <- coef(summary(glm_fit))
-
-  # Coefficients should match base glm exactly
-  for (term in c("(Intercept)", "age", "income")) {
-    actual_B <- r$coefficients$B[r$coefficients$Term == term]
-    expected_B <- glm_coefs[term, "Estimate"]
-    assert_spss(as.numeric(actual_B), expected_B,
-                tier = "display", precision = 5,
-                label = sprintf("B[%s]", term))
-
-    actual_SE <- r$coefficients$S.E.[r$coefficients$Term == term]
-    expected_SE <- glm_coefs[term, "Std. Error"]
-    assert_spss(as.numeric(actual_SE), expected_SE,
-                tier = "display", precision = 5,
-                label = sprintf("SE[%s]", term))
-  }
-
-  # Wald = (B/SE)^2 for SPSS convention
-  for (term in c("age", "income")) {
-    actual_wald <- r$coefficients$Wald[r$coefficients$Term == term]
-    actual_B    <- r$coefficients$B[r$coefficients$Term == term]
-    actual_SE   <- r$coefficients$S.E.[r$coefficients$Term == term]
-    expected_wald <- (as.numeric(actual_B) / as.numeric(actual_SE))^2
-    assert_spss(as.numeric(actual_wald), expected_wald,
-                tier = "display", precision = 3,
-                label = sprintf("Wald[%s] = (B/SE)^2", term))
-  }
-})
-
-
-test_that("logistic_regression with single predictor — structural", {
-  r <- logistic_regression(survey_data, high_life ~ age)
-  expect_equal(nrow(r$coefficients), 2L)  # intercept + age
-  expect_equal(r$n, sum(stats::complete.cases(survey_data[, c("high_life", "age")])))
-})
-
-
-test_that("logistic_regression exp(B) = exp(B) consistency", {
+test_that("Wald = (B/SE)^2 exactly (catches wrapper formula errors)", {
   r <- logistic_regression(survey_data, high_life ~ age + income)
   for (i in seq_len(nrow(r$coefficients))) {
-    actual   <- r$coefficients$`Exp(B)`[i]
-    expected <- exp(r$coefficients$B[i])
-    assert_spss(as.numeric(actual), as.numeric(expected),
-                tier = "display", precision = 5,
-                label = sprintf("exp(B) consistency for %s",
-                                r$coefficients$Term[i]))
+    B  <- as.numeric(r$coefficients$B[i])
+    SE <- as.numeric(r$coefficients$S.E.[i])
+    W  <- as.numeric(r$coefficients$Wald[i])
+    assert_spss(W, (B / SE)^2,
+                tier = "spec", what = "statistic",
+                label = sprintf("Wald[%s] = (B/SE)^2", r$coefficients$Term[i]))
   }
+})
+
+
+test_that("Sig = pchisq(Wald, df=1, lower.tail=FALSE) exactly", {
+  r <- logistic_regression(survey_data, high_life ~ age + income)
+  for (i in seq_len(nrow(r$coefficients))) {
+    W <- as.numeric(r$coefficients$Wald[i])
+    p <- as.numeric(r$coefficients$Sig.[i])
+    assert_spss(p, pchisq(W, df = 1, lower.tail = FALSE),
+                tier = "spec", what = "p_value",
+                label = sprintf("Sig[%s] from chi-sq", r$coefficients$Term[i]))
+  }
+})
+
+
+test_that("Exp(B) = exp(B); for binary predictor matches OR from 2x2 table", {
+  r <- logistic_regression(survey_data, high_life ~ is_female)
+
+  # Exp(B) should equal exp(B) elementwise
+  for (i in seq_len(nrow(r$coefficients))) {
+    expB <- as.numeric(r$coefficients$`Exp(B)`[i])
+    B    <- as.numeric(r$coefficients$B[i])
+    assert_spss(expB, exp(B),
+                tier = "spec", what = "statistic",
+                label = sprintf("Exp(B) = exp(B) for %s", r$coefficients$Term[i]))
+  }
+
+  # For the single binary predictor, Exp(B) should equal the odds ratio
+  # computed directly from the 2x2 table — completely independent of glm.
+  d <- survey_data[stats::complete.cases(survey_data[, c("high_life", "is_female")]), ]
+  tbl <- table(female = d$is_female, high = d$high_life)
+  or_2x2 <- (tbl["1", "1"] * tbl["0", "0"]) / (tbl["1", "0"] * tbl["0", "1"])
+  expB_is_female <- as.numeric(r$coefficients$`Exp(B)`[r$coefficients$Term == "is_female"])
+  assert_spss(expB_is_female, or_2x2,
+              tier = "display", precision = 4,
+              label = "Exp(B) for binary predictor matches 2x2 OR")
+})
+
+
+test_that("CI for Exp(B) = exp(B +/- z_crit * SE)", {
+  r <- logistic_regression(survey_data, high_life ~ age + income, conf.level = 0.95)
+  z95 <- qnorm(0.975)
+  for (i in seq_len(nrow(r$coefficients))) {
+    B  <- as.numeric(r$coefficients$B[i])
+    SE <- as.numeric(r$coefficients$S.E.[i])
+    lo <- as.numeric(r$coefficients$CI_lower[i])
+    hi <- as.numeric(r$coefficients$CI_upper[i])
+    assert_spss(lo, exp(B - z95 * SE), tier = "display", precision = 5,
+                label = sprintf("CI_lower[%s]", r$coefficients$Term[i]))
+    assert_spss(hi, exp(B + z95 * SE), tier = "display", precision = 5,
+                label = sprintf("CI_upper[%s]", r$coefficients$Term[i]))
+  }
+})
+
+
+test_that("Cox & Snell and Nagelkerke R^2 match textbook formulas", {
+  r <- logistic_regression(survey_data, high_life ~ age + income)
+  d <- survey_data[stats::complete.cases(survey_data[, c("high_life","age","income")]), ]
+  n <- nrow(d)
+
+  # Independent computation of -2LL_null and -2LL_model
+  null_fit <- glm(high_life ~ 1, data = d, family = binomial)
+  full_fit <- glm(high_life ~ age + income, data = d, family = binomial)
+  m2_null <- -2 * as.numeric(logLik(null_fit))
+  m2_full <- -2 * as.numeric(logLik(full_fit))
+
+  # Textbook formulas
+  cs_expected   <- 1 - exp((m2_full - m2_null) / n)
+  cs_max        <- 1 - exp(-m2_null / n)
+  nagk_expected <- cs_expected / cs_max
+  mcf_expected  <- 1 - (-0.5 * m2_full) / (-0.5 * m2_null)
+
+  assert_spss(r$model_summary$cox_snell_r2, cs_expected,
+              tier = "display", precision = 5, label = "Cox & Snell R^2")
+  assert_spss(r$model_summary$nagelkerke_r2, nagk_expected,
+              tier = "display", precision = 5, label = "Nagelkerke R^2")
+  assert_spss(r$model_summary$mcfadden_r2, mcf_expected,
+              tier = "display", precision = 5, label = "McFadden R^2")
+  assert_spss(r$model_summary$minus2LL, m2_full,
+              tier = "display", precision = 3, label = "-2 Log Likelihood")
+})
+
+
+test_that("Omnibus chi-sq = -2LL_null - -2LL_model (independent recomputation)", {
+  r <- logistic_regression(survey_data, high_life ~ age + income)
+  d <- survey_data[stats::complete.cases(survey_data[, c("high_life","age","income")]), ]
+
+  null_fit <- glm(high_life ~ 1, data = d, family = binomial)
+  full_fit <- glm(high_life ~ age + income, data = d, family = binomial)
+  expected_chi <- -2 * as.numeric(logLik(null_fit)) - (-2 * as.numeric(logLik(full_fit)))
+
+  assert_spss(r$omnibus_test$chi_sq, expected_chi,
+              tier = "display", precision = 3,
+              label = "Omnibus chi-sq from likelihood ratio")
+  assert_spss_count(r$omnibus_test$df, 2L, label = "Omnibus df = number of predictors")
+  assert_spss(r$omnibus_test$p,
+              pchisq(expected_chi, df = 2, lower.tail = FALSE),
+              tier = "spec", what = "p_value",
+              label = "Omnibus p from chi-sq")
+})
+
+
+test_that("Classification accuracy reproducible from cutoff 0.5", {
+  r <- logistic_regression(survey_data, high_life ~ age + income)
+  d <- survey_data[stats::complete.cases(survey_data[, c("high_life","age","income")]), ]
+  fit <- glm(high_life ~ age + income, data = d, family = binomial)
+  pred_class <- as.integer(fitted(fit) >= 0.5)
+  expected_pct <- mean(pred_class == d$high_life) * 100
+
+  assert_spss(r$classification$overall_pct, expected_pct,
+              tier = "display", precision = 2,
+              label = "Overall classification %")
+  assert_spss_count(r$classification$n_0, sum(d$high_life == 0),
+                    label = "Classification N for class 0")
+  assert_spss_count(r$classification$n_1, sum(d$high_life == 1),
+                    label = "Classification N for class 1")
+})
+
+
+test_that("Structural sanity: single predictor + n + Term names", {
+  r <- logistic_regression(survey_data, high_life ~ age)
+  expect_equal(nrow(r$coefficients), 2L)  # intercept + age
+  expect_setequal(r$coefficients$Term, c("(Intercept)", "age"))
+  expect_equal(r$n,
+               sum(stats::complete.cases(survey_data[, c("high_life", "age")])))
 })

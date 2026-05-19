@@ -37,13 +37,11 @@ spss_values <- list(
   ),
 
   # ---- Test 2: Weighted Ungrouped (Age) -------------------------------
-  # NB: q25/q75 omitted — SPSS displays weighted percentiles only at certain
-  # cut-points that don't include 25/75 by default for this scenario.
   test_2a_age_weighted = list(
     n = 2516L, missing = 0L,
     mean = 50.5144, se = 0.34058, median = 50.0000, mode = 18.00,
     sd = 17.08382, variance = 291.857, skewness = 0.159, kurtosis = -0.396,
-    range = 77.00, q50 = 50.0000
+    range = 77.00, q25 = 38.0000, q50 = 50.0000, q75 = 63.0000
   ),
 
   # ---- Test 3a: Age grouped by region (unweighted) --------------------
@@ -137,8 +135,8 @@ test_that("Test 1c: describe life_satisfaction unweighted — matches SPSS", {
 test_that("Test 2a: describe age weighted — matches SPSS", {
   r <- survey_data |> describe(age, weights = sampling_weight, show = "all")
   # Weighted N is integer-rounded in SPSS but mariposa keeps non-integer.
-  # Kurtosis tolerance bumped (SPSS rounds at 3 dp, mariposa goes deeper).
-  spss_values$test_2a_age_weighted$kurtosis <- -0.397  # adjusted to mariposa-rounded value
+  # Weighted skew/kurtosis now use Type-2 formula (via .calc_kurtosis /
+  # .calc_skewness in helpers.R), matching w_kurtosis() / w_skew() and SPSS.
   compare_describe(r$results[1, ], spss_values$test_2a_age_weighted,
                    "age", "2a: age weighted", is_weighted = TRUE)
 })

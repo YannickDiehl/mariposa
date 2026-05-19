@@ -226,6 +226,36 @@ get_value_labels <- function(x, freq_names) {
 # Statistical Computation Helpers
 # -------------------------------
 
+#' Calculate skewness using the SPSS Type-2 sample-corrected formula
+#'
+#' For unweighted data: type1_skew * sqrt(n*(n-1)) / (n-2)
+#' where type1_skew = m3 / m2^(3/2) (population skewness).
+#' For weighted data: substitutes n = sum(w) per SPSS frequency-weight convention.
+#' Reference: Joanes & Gill (1998).
+#'
+#' @param x Numeric vector (length >= 3)
+#' @param w Numeric vector of weights, or NULL
+#' @return Numeric scalar
+#' @keywords internal
+.calc_skewness <- function(x, w = NULL) {
+  if (is.null(w)) {
+    n <- length(x)
+    mean_x <- mean(x)
+    m2 <- sum((x - mean_x)^2) / n
+    m3 <- sum((x - mean_x)^3) / n
+    type1_skew <- m3 / (m2^(3/2))
+    type1_skew * sqrt(n * (n - 1)) / (n - 2)
+  } else {
+    w_sum <- sum(w)
+    w_mean <- sum(x * w) / w_sum
+    m2 <- sum(w * (x - w_mean)^2) / w_sum
+    m3 <- sum(w * (x - w_mean)^3) / w_sum
+    type1_skew <- m3 / (m2^(3/2))
+    n <- w_sum
+    type1_skew * sqrt(n * (n - 1)) / (n - 2)
+  }
+}
+
 #' Calculate kurtosis using the SPSS sample-corrected formula
 #'
 #' Uses the Type 2 (sample excess kurtosis) formula matching SPSS FREQUENCIES output.

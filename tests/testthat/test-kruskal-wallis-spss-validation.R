@@ -280,9 +280,13 @@ test_that("Test 3b: KW income by employment, grouped by region — matches SPSS"
 # SPSS NPAR TESTS /K-W does not honor WEIGHT BY (verified at 10 reference
 # comparisons in kruskal_wallis_output.txt). See header note for details.
 #
-# The baselines below are mariposa-only Lumley-Scott-style weighted KW
-# values, captured 2026-05-19 from R/kruskal_wallis.R. They guard against
-# R-side algorithmic regressions, not SPSS equivalence.
+# The baselines below are mariposa-only weighted KW values, captured
+# 2026-05-19 from R/kruskal_wallis.R. The weighted implementation is a
+# frequency-weighted approximation (substitutes sum(w) for n in the
+# standard H formula) — NOT design-based / Lumley-Scott. They guard
+# against R-side algorithmic regressions, not SPSS equivalence and not
+# survey-design correctness. For sampling weights far from 1.0 prefer
+# survey::svyranktest().
 # =============================================================================
 
 r_only_baselines <- list(

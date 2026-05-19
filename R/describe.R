@@ -425,140 +425,84 @@ describe <- function(data, ..., weights = NULL,
   return(q75 - q25)
 }
 
-#' Weighted quantiles using cumulative weights
+#' Weighted quantiles (SPSS Type-6 HAVERAGE with linear interpolation)
+#'
+#' For weighted data, weights are treated as frequency multipliers. The
+#' Type-6 position is h = p * (W + 1) where W = sum(w). The percentile is
+#' linearly interpolated between the values whose cumulative weights bracket h.
+#' Matches IBM SPSS FREQUENCIES /PERCENTILES (HAVERAGE) algorithm.
+#'
+#' For unweighted data, delegates to stats::quantile(type = 6) which is the
+#' SPSS-compatible default (HAVERAGE) — base R's default is type = 7.
+#'
 #' @keywords internal
 .w_quantile <- function(x, weights = NULL, probs = 0.5, na.rm = TRUE) {
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
+
   if (!cleaned$valid || is.null(cleaned$weights)) {
-    return(quantile(cleaned$x, probs = probs, na.rm = na.rm))
+    # SPSS uses Type-6 (HAVERAGE), not R's default Type-7
+    return(quantile(cleaned$x, probs = probs, na.rm = na.rm, type = 6))
   }
-  
+
   x_clean <- cleaned$x
   w_clean <- cleaned$weights
-  
+
   if (length(x_clean) == 0) return(rep(NA_real_, length(probs)))
-  
-  # Sort by x values and calculate cumulative weights
-  ord <- order(x_clean)
+
+  ord      <- order(x_clean)
   x_sorted <- x_clean[ord]
   w_sorted <- w_clean[ord]
-  cum_w <- cumsum(w_sorted)
-  total_w <- sum(w_sorted)
-  
-  # Calculate quantiles for each probability
-  result <- numeric(length(probs))
-  for (i in seq_along(probs)) {
-    target_w <- probs[i] * total_w
-    
-    if (target_w <= cum_w[1]) {
-      result[i] <- x_sorted[1]
-    } else if (target_w >= cum_w[length(cum_w)]) {
-      result[i] <- x_sorted[length(x_sorted)]
-    } else {
-      idx <- which(cum_w >= target_w)[1]
-      if (cum_w[idx] == target_w && idx < length(x_sorted)) {
-        result[i] <- (x_sorted[idx] + x_sorted[idx + 1]) / 2
-      } else {
-        result[i] <- x_sorted[idx]
-      }
-    }
-  }
-  
+  cum_w    <- cumsum(w_sorted)
+  W        <- sum(w_sorted)
+
+  result <- vapply(probs, function(p) {
+    # Type-6 position
+    h <- p * (W + 1)
+
+    if (h <= cum_w[1])               return(x_sorted[1])
+    if (h >= cum_w[length(cum_w)])   return(x_sorted[length(x_sorted)])
+
+    # Find the bracket: cum_w[j-1] < h <= cum_w[j]
+    j <- which(cum_w >= h)[1]
+    if (j == 1L) return(x_sorted[1])
+
+    lo_w <- cum_w[j - 1]
+    hi_w <- cum_w[j]
+    if (hi_w == lo_w) return(x_sorted[j])
+
+    # Linear interpolation between adjacent observations
+    frac <- (h - lo_w) / (hi_w - lo_w)
+    x_sorted[j - 1] + frac * (x_sorted[j] - x_sorted[j - 1])
+  }, numeric(1))
+
   names(result) <- paste0(probs * 100, "%")
-  return(result)
+  result
 }
 
 #' Weighted skewness with bias correction
 #' @keywords internal
 .w_skew <- function(x, weights = NULL, na.rm = TRUE) {
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
   if (!cleaned$valid || is.null(cleaned$weights)) {
-    # Unweighted skewness with SPSS formula
-    if (any(ina <- is.na(x)))
-      x <- x[!ina]
-
-    n <- length(x)
-
-    if (n < 3) return(NA_real_)
-
-    mean_x <- mean(x)
-    sd_x <- sd(x)  # Uses n-1 divisor
-
-    if (sd_x <= 0) return(NA_real_)
-
-    # SPSS formula for skewness with bias correction
-    skew_spss <- n * sum((x - mean_x)^3) / ((n - 1) * (n - 2) * sd_x^3)
-    return(skew_spss)
+    xc <- if (na.rm) x[!is.na(x)] else x
+    if (length(xc) < 3) return(NA_real_)
+    return(.calc_skewness(xc, w = NULL))
   }
-  
-  # Weighted skewness calculation
-  x_clean <- cleaned$x
-  w_clean <- cleaned$weights
-
-  if (length(x_clean) < 3) return(NA_real_)
-
-  # Use SPSS-compatible simple weighted formula (as in frequency.R)
-  # SPSS treats weights as frequency weights without bias correction
-  w_norm <- w_clean / sum(w_clean, na.rm = na.rm)
-  w_mean <- sum(x_clean * w_norm, na.rm = na.rm)
-
-  # Calculate weighted standard deviation
-  w_sd <- sqrt(sum(w_norm * (x_clean - w_mean)^2, na.rm = na.rm))
-
-  if (w_sd <= 0) return(NA_real_)
-
-  # Simple weighted skewness without bias correction (SPSS approach)
-  skew_weighted <- sum(w_norm * ((x_clean - w_mean) / w_sd)^3, na.rm = na.rm)
-
-  return(skew_weighted)
+  if (length(cleaned$x) < 3) return(NA_real_)
+  .calc_skewness(cleaned$x, w = cleaned$weights)
 }
 
-#' Weighted kurtosis with bias correction
+#' Weighted kurtosis (SPSS Type-2; delegates to .calc_kurtosis)
 #' @keywords internal
 .w_kurtosis <- function(x, weights = NULL, na.rm = TRUE, excess = TRUE) {
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
   if (!cleaned$valid || is.null(cleaned$weights)) {
-    # Unweighted kurtosis with bias correction
-    x_clean <- if (na.rm) x[!is.na(x)] else x
-    if (length(x_clean) < 4) return(NA_real_)
-    
-    n <- length(x_clean)
-    mean_x <- mean(x_clean)
-    var_x <- var(x_clean)  # Uses n-1 divisor
-
-    if (var_x <= 0) return(NA_real_)
-
-    # SPSS formula for kurtosis (already excess kurtosis)
-    kurt_spss <- (n * (n + 1) * sum((x_clean - mean_x)^4)) /
-                 ((n - 1) * (n - 2) * (n - 3) * var_x^2) -
-                 (3 * (n - 1)^2) / ((n - 2) * (n - 3))
-
-    return(if (excess) kurt_spss else kurt_spss + 3)
+    xc <- if (na.rm) x[!is.na(x)] else x
+    if (length(xc) < 4) return(NA_real_)
+    return(.calc_kurtosis(xc, w = NULL, excess = excess))
   }
-  
-  # Weighted kurtosis calculation
-  x_clean <- cleaned$x
-  w_clean <- cleaned$weights
-
-  if (length(x_clean) < 4) return(NA_real_)
-
-  # Use SPSS-compatible simple weighted formula (as in frequency.R)
-  # SPSS treats weights as frequency weights without bias correction
-  w_norm <- w_clean / sum(w_clean, na.rm = na.rm)
-  w_mean <- sum(x_clean * w_norm, na.rm = na.rm)
-
-  # Calculate weighted standard deviation
-  w_sd <- sqrt(sum(w_norm * (x_clean - w_mean)^2, na.rm = na.rm))
-
-  if (w_sd <= 0) return(NA_real_)
-
-  # Simple weighted kurtosis (standardized 4th moment)
-  kurt_raw <- sum(w_norm * ((x_clean - w_mean) / w_sd)^4, na.rm = na.rm)
-
-  return(if (excess) kurt_raw - 3 else kurt_raw)
+  if (length(cleaned$x) < 4) return(NA_real_)
+  .calc_kurtosis(cleaned$x, w = cleaned$weights, excess = excess)
 }
 
 #' Weighted mode (most frequent value by weight)

@@ -2,11 +2,11 @@
 % Please edit documentation in R/describe.R
 \name{.w_kurtosis}
 \alias{.w_kurtosis}
-\title{Weighted kurtosis with bias correction}
+\title{Weighted kurtosis (SPSS Type-2; delegates to .calc_kurtosis)}
 \usage{
 .w_kurtosis(x, weights = NULL, na.rm = TRUE, excess = TRUE)
 }
 \description{
-Weighted kurtosis with bias correction
+Weighted kurtosis (SPSS Type-2; delegates to .calc_kurtosis)
 }
 \keyword{internal}

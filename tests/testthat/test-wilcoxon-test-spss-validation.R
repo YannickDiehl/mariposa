@@ -219,7 +219,10 @@ test_that("Test 3b: Wilcoxon trust_gov / trust_science, grouped by region — ma
 # WEIGHTED SCENARIOS — TIER 4 (R-only baselines, no SPSS comparison)
 # =============================================================================
 # SPSS NPAR /WILCOXON does not honor WEIGHT BY. mariposa baselines from
-# the design-based implementation in R/wilcoxon_test.R, captured 2026-05-19.
+# the frequency-weighted approximation in R/wilcoxon_test.R (substitutes
+# sum(w) for n in the standard variance formula — NOT a design-based
+# estimator). Captured 2026-05-19. For sampling weights far from 1.0,
+# users should prefer survey::svyranktest().
 # =============================================================================
 
 r_only_baselines <- list(
