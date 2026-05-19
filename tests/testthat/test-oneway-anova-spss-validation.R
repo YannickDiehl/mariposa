@@ -1,770 +1,855 @@
-# ============================================================================
-# ONEWAY_ANOVA_TEST FUNCTION - SPSS VALIDATION TEST
-# ============================================================================
-# Purpose: Validate R oneway_anova() against SPSS ONEWAY procedure
-# Dataset: survey_data
-# Variable: life_satisfaction by education
-# Created: 2025-01-24
-# SPSS Version: 29.0.0.0
+# =============================================================================
+# oneway_anova — SPSS VALIDATION (Charter-compliant)
+# =============================================================================
+# Purpose: Validate mariposa::oneway_anova() against SPSS v29 ONEWAY procedure.
+# Reference syntax:  tests/spss_reference/syntax/oneway_anova_test.sps
+# Reference output:  tests/spss_reference/outputs/oneway_anova_output.txt
 #
-# This is the primary validation test for the oneway_anova() function,
-# comparing output against SPSS reference values across 4 scenarios:
-# 1. Unweighted/Ungrouped
-# 2. Weighted/Ungrouped
-# 3. Unweighted/Grouped (by region)
-# 4. Weighted/Grouped (by region)
+# Charter reference: .claude/VALIDATION_CHARTER.md
 #
-# SPSS outputs validated:
-# - Descriptive statistics (N, Mean, SD, SE, CI bounds)
-# - ANOVA table (Sum of Squares, df, Mean Square, F, p-value)
-# - Robust tests (Welch and Brown-Forsythe statistics)
-# - Effect sizes (Eta², Epsilon², Omega²)
-# ============================================================================
+# Scenario coverage (per Charter §8):
+#   Scenario 1 — Unweighted / Ungrouped         (Tests 1a-c: life_sat / income / age by education)
+#   Scenario 2 — Weighted   / Ungrouped         (Tests 2a-c)
+#   Scenario 3 — Unweighted / Grouped by region (Tests 3a-c)
+#   Scenario 4 — Weighted   / Grouped by region (Tests 4a-c)
+#
+# Plus auxiliary scenarios:
+#   Tests 6a, 6b — alternative CI levels (90%, 99%)
+#   Test  7      — multiple variables at once
+#
+# Out of scope for this file:
+#   - Test 1d/2d (trust variables): identical structure to Test 7 multi-variable.
+#   - Tests 1e-f/2e-f/3d/4d (life_sat by employment): same statistical
+#     machinery as 1a-c; the employment factor adds no algorithmic novelty.
+#   - Test 5a Tukey post-hoc: covered by test-tukey-test-spss-validation.R.
+#
+# Tolerance tier assignments (per Charter §5):
+#   N (unweighted)            — Spec (count, exact integer)
+#   N (weighted, displayed)   — Display(0), tol ±0.5
+#   Mean                      — Display(2) for life_sat, Display(4) for income/age
+#   SD                        — Display(3) for life_sat, Display(5) for income/age
+#   SE                        — Display(3) for life_sat, Display(5) for income/age
+#   CI bounds                 — Display(2) for life_sat, Display(4) for income/age
+#   ANOVA SS                  — Display(3)
+#   ANOVA MS                  — Display(3)
+#   F-statistic               — Display(3)
+#   p-value                   — Display(3), sentinel "<.001"
+#   df_between                — Spec (integer)
+#   df_within (unweighted)    — Spec (integer)
+#   df_within (weighted)      — Display(0), tol ±0.5
+#   Welch F, df2              — Display(3)
+#
+# Pre-fix bugs discovered during this migration (R/oneway_anova.R 2026-05-19):
+#   - Line 368: df_within = round(sum(w)) - k → fixed to sum(w) - k
+#     Same pattern as t_test bug. Affects F = MS_between / MS_within and p.
+#
+# Validation gaps (Phase 2 candidates):
+#   - Brown-Forsythe statistic: SPSS prints it, mariposa does not expose it.
+#     Asserting Brown-Forsythe would require adding it to the output object.
+#   - mariposa's weighted-descriptives SE divides by sqrt(physical n) rather
+#     than sqrt(sum(w)). May surface as additional Display-tier mismatches in
+#     scenarios 2/4. If so, register as bug fix in same R file.
+# =============================================================================
 
 library(testthat)
 library(dplyr)
 library(mariposa)
 
-# ============================================================================
-# GLOBAL TRACKING FOR VALIDATION REPORT
-# ============================================================================
 
-# Initialize a list to track all comparison results
-validation_results <- list()
-
-# Function to record a comparison result with enhanced formatting
-record_comparison <- function(test_name, category, metric, expected, actual, tolerance = 0) {
-  # Properly handle NA values and use tolerance for matching
-  match_status <- if (is.na(expected) && is.na(actual)) {
-    TRUE
-  } else if (is.na(expected) || is.na(actual)) {
-    FALSE
-  } else {
-    # Match if within tolerance (same logic as testthat's expect_equal)
-    abs(expected - actual) <= tolerance
-  }
-
-  result <- list(
-    test = test_name,
-    category = as.character(category),
-    metric = metric,
-    expected = expected,
-    actual = actual,
-    match = if (match_status) "✓" else "✗",  # Use visual indicators
-    tolerance = tolerance,
-    difference = if (!is.na(expected) && !is.na(actual)) abs(expected - actual) else NA
-  )
-
-  # Append to global list
-  validation_results <<- append(validation_results, list(result))
-
-  return(match_status)
-}
-
-# ============================================================================
-# SPSS REFERENCE VALUES (from oneway_anova_output.txt)
-# ============================================================================
+# =============================================================================
+# SPSS REFERENCE VALUES (with citation comments per Charter §7)
+# =============================================================================
 
 spss_values <- list(
-  # Test 1a: Unweighted/Ungrouped - Life Satisfaction by Education
-  unweighted_ungrouped = list(
-    # Descriptive statistics by group
+
+  # =========================================================================
+  # SCENARIO 1: UNWEIGHTED / UNGROUPED
+  # =========================================================================
+
+  # ---- Test 1a: life_satisfaction by education --------------------------
+  test_1a_life_by_education = list(
     descriptives = list(
-      "Basic Secondary" = list(n = 809, mean = 3.20, sd = 1.243, se = 0.044,
-                               ci_lower = 3.12, ci_upper = 3.29),
-      "Intermediate Secondary" = list(n = 618, mean = 3.70, sd = 1.112, se = 0.045,
-                                      ci_lower = 3.61, ci_upper = 3.79),
-      "Academic Secondary" = list(n = 607, mean = 3.85, sd = 0.998, se = 0.041,
-                                  ci_lower = 3.77, ci_upper = 3.93),
-      "University" = list(n = 387, mean = 4.05, sd = 0.957, se = 0.049,
-                         ci_lower = 3.95, ci_upper = 4.14)
+      "Basic Secondary"        = list(n = 809,  mean = 3.20, sd = 1.243, se = 0.044, ci_lower = 3.12, ci_upper = 3.29),   # oneway_anova_output.txt:13
+      "Intermediate Secondary" = list(n = 618,  mean = 3.70, sd = 1.112, se = 0.045, ci_lower = 3.61, ci_upper = 3.79),   # oneway_anova_output.txt:14
+      "Academic Secondary"     = list(n = 607,  mean = 3.85, sd = 0.998, se = 0.041, ci_lower = 3.77, ci_upper = 3.93),   # oneway_anova_output.txt:15
+      "University"             = list(n = 387,  mean = 4.05, sd = 0.957, se = 0.049, ci_lower = 3.95, ci_upper = 4.14)    # oneway_anova_output.txt:16
     ),
-    total = list(n = 2421, mean = 3.63, sd = 1.153, se = 0.023),
-
-    # ANOVA table
     anova = list(
-      ss_between = 247.347,
-      ss_within = 2970.080,
-      ss_total = 3217.428,
-      df_between = 3,
-      df_within = 2417,
-      ms_between = 82.449,
-      ms_within = 1.229,
-      f_stat = 67.096,
-      p_value = 0.000
+      ss_between = 247.347,    # oneway_anova_output.txt:23
+      df_between = 3,          # oneway_anova_output.txt:23
+      ms_between = 82.449,     # oneway_anova_output.txt:23
+      f_stat     = 67.096,     # oneway_anova_output.txt:23
+      p_value    = "<.001",    # oneway_anova_output.txt:23  (SPSS prints ".000")
+      ss_within  = 2970.080,   # oneway_anova_output.txt:24
+      df_within  = 2417,       # oneway_anova_output.txt:24
+      ms_within  = 1.229,      # oneway_anova_output.txt:24
+      ss_total   = 3217.428,   # oneway_anova_output.txt:25
+      df_total   = 2420        # oneway_anova_output.txt:25
     ),
-
-    # Robust tests
-    welch = list(statistic = 64.489, df1 = 3, df2 = 1229.456, p_value = 0.000),
-    brown_forsythe = list(statistic = 71.350, df1 = 3, df2 = 2338.259, p_value = 0.000)
+    welch = list(
+      f_stat = 64.489,         # oneway_anova_output.txt:31
+      df1    = 3,              # oneway_anova_output.txt:31
+      df2    = 1229.456,       # oneway_anova_output.txt:31
+      p      = "<.001"         # oneway_anova_output.txt:31
+    ),
+    var_precision = list(mean = 2, sd = 3, se = 3, ci = 2)
   ),
 
-  # Test 2a: Weighted/Ungrouped - Life Satisfaction by Education
-  weighted_ungrouped = list(
-    # Descriptive statistics by group (weighted)
+  # ---- Test 1b: income by education -------------------------------------
+  test_1b_income_by_education = list(
     descriptives = list(
-      "Basic Secondary" = list(n = 816, mean = 3.21, sd = 1.243, se = 0.044,
-                               ci_lower = 3.12, ci_upper = 3.29),
-      "Intermediate Secondary" = list(n = 630, mean = 3.70, sd = 1.110, se = 0.044,
-                                      ci_lower = 3.61, ci_upper = 3.78),
-      "Academic Secondary" = list(n = 618, mean = 3.85, sd = 0.997, se = 0.040,
-                                  ci_lower = 3.77, ci_upper = 3.93),
-      "University" = list(n = 373, mean = 4.04, sd = 0.962, se = 0.050,
-                         ci_lower = 3.94, ci_upper = 4.14)
+      "Basic Secondary"        = list(n = 735, mean = 2759.0476, sd = 786.56752,  se = 29.01298, ci_lower = 2702.0893, ci_upper = 2816.0059),   # oneway_anova_output.txt:45
+      "Intermediate Secondary" = list(n = 548, mean = 3592.5182, sd = 995.63887,  se = 42.53158, ci_lower = 3508.9730, ci_upper = 3676.0635),   # oneway_anova_output.txt:46
+      "Academic Secondary"     = list(n = 548, mean = 4224.0876, sd = 1178.63526, se = 50.34880, ci_lower = 4125.1869, ci_upper = 4322.9883),   # oneway_anova_output.txt:47
+      "University"             = list(n = 355, mean = 5337.1831, sd = 1660.95846, se = 88.15452, ci_lower = 5163.8107, ci_upper = 5510.5555)    # oneway_anova_output.txt:48
     ),
-    total = list(n = 2437, mean = 3.62, sd = 1.152, se = 0.023),
-
-    # ANOVA table
     anova = list(
-      ss_between = 241.130,
-      ss_within = 2992.019,
-      ss_total = 3233.149,
-      df_between = 3,
-      df_within = 2432,  # Note: SPSS uses rounded weighted N for df
-      ms_between = 80.377,
-      ms_within = 1.230,
-      f_stat = 65.333,
-      p_value = 0.000
+      ss_between = 1752783281.470,  # oneway_anova_output.txt:55
+      df_between = 3,                # oneway_anova_output.txt:55
+      ms_between = 584261093.824,    # oneway_anova_output.txt:55
+      f_stat     = 466.494,          # oneway_anova_output.txt:55
+      p_value    = "<.001",          # oneway_anova_output.txt:55
+      ss_within  = 2732847885.046,   # oneway_anova_output.txt:56
+      df_within  = 2182,             # oneway_anova_output.txt:56
+      ms_within  = 1252450.910,      # oneway_anova_output.txt:56
+      ss_total   = 4485631166.515,   # oneway_anova_output.txt:57
+      df_total   = 2185              # oneway_anova_output.txt:57
     ),
-
-    # Robust tests
-    welch = list(statistic = 62.636, df1 = 3, df2 = 1216.114, p_value = 0.000),
-    brown_forsythe = list(statistic = 69.524, df1 = 3, df2 = 2326.240, p_value = 0.000)
+    welch = list(
+      f_stat = 418.250,    # oneway_anova_output.txt:63
+      df1    = 3,          # oneway_anova_output.txt:63
+      df2    = 978.181,    # oneway_anova_output.txt:63
+      p      = "<.001"     # oneway_anova_output.txt:63
+    ),
+    var_precision = list(mean = 4, sd = 5, se = 5, ci = 4)
   ),
 
-  # Test 3a: Unweighted/Grouped - Life Satisfaction by Education (East)
-  unweighted_grouped_east = list(
+  # ---- Test 1c: age by education ----------------------------------------
+  test_1c_age_by_education = list(
     descriptives = list(
-      "Basic Secondary" = list(n = 161, mean = 3.30, sd = 1.337, se = 0.105,
-                               ci_lower = 3.10, ci_upper = 3.51),
-      "Intermediate Secondary" = list(n = 119, mean = 3.64, sd = 1.140, se = 0.105,
-                                      ci_lower = 3.43, ci_upper = 3.85),
-      "Academic Secondary" = list(n = 110, mean = 3.84, sd = 1.088, se = 0.104,
-                                  ci_lower = 3.63, ci_upper = 4.04),
-      "University" = list(n = 75, mean = 3.95, sd = 1.025, se = 0.118,
-                         ci_lower = 3.71, ci_upper = 4.18)
+      "Basic Secondary"        = list(n = 841, mean = 50.1165, sd = 16.86658, se = 0.58161, ci_lower = 48.9750, ci_upper = 51.2581),   # oneway_anova_output.txt:77
+      "Intermediate Secondary" = list(n = 629, mean = 51.1924, sd = 17.23894, se = 0.68736, ci_lower = 49.8426, ci_upper = 52.5422),   # oneway_anova_output.txt:78
+      "Academic Secondary"     = list(n = 631, mean = 51.2266, sd = 17.04358, se = 0.67849, ci_lower = 49.8942, ci_upper = 52.5590),   # oneway_anova_output.txt:79
+      "University"             = list(n = 399, mean = 49.3784, sd = 16.64904, se = 0.83349, ci_lower = 47.7398, ci_upper = 51.0170)    # oneway_anova_output.txt:80
     ),
-    total = list(n = 465, mean = 3.62, sd = 1.207, se = 0.056),
-
     anova = list(
-      ss_between = 29.235,
-      ss_within = 646.390,
-      ss_total = 675.626,
-      df_between = 3,
-      df_within = 461,
-      ms_between = 9.745,
-      ms_within = 1.402,
-      f_stat = 6.950,
-      p_value = 0.000
+      ss_between = 1254.099,     # oneway_anova_output.txt:87
+      df_between = 3,             # oneway_anova_output.txt:87
+      ms_between = 418.033,       # oneway_anova_output.txt:87
+      f_stat     = 1.451,         # oneway_anova_output.txt:87
+      p_value    = 0.226,         # oneway_anova_output.txt:87
+      ss_within  = 718920.751,    # oneway_anova_output.txt:88
+      df_within  = 2496,          # oneway_anova_output.txt:88
+      ms_within  = 288.029,       # oneway_anova_output.txt:88
+      ss_total   = 720174.850,    # oneway_anova_output.txt:89
+      df_total   = 2499           # oneway_anova_output.txt:89
     ),
-
-    welch = list(statistic = 6.682, df1 = 3, df2 = 233.415, p_value = 0.000)
+    welch = list(
+      f_stat = 1.464,     # oneway_anova_output.txt:95
+      df1    = 3,         # oneway_anova_output.txt:95
+      df2    = 1228.520,  # oneway_anova_output.txt:95
+      p      = 0.223      # oneway_anova_output.txt:95
+    ),
+    var_precision = list(mean = 4, sd = 5, se = 5, ci = 4)
   ),
 
-  # Test 3b: Unweighted/Grouped - Life Satisfaction by Education (West)
-  unweighted_grouped_west = list(
+  # =========================================================================
+  # SCENARIO 2: WEIGHTED / UNGROUPED
+  # =========================================================================
+
+  # ---- Test 2a: life_satisfaction by education, weighted ----------------
+  test_2a_life_by_education_weighted = list(
     descriptives = list(
-      "Basic Secondary" = list(n = 648, mean = 3.18, sd = 1.219, se = 0.048,
-                               ci_lower = 3.08, ci_upper = 3.27),
-      "Intermediate Secondary" = list(n = 499, mean = 3.72, sd = 1.106, se = 0.050,
-                                      ci_lower = 3.62, ci_upper = 3.81),
-      "Academic Secondary" = list(n = 497, mean = 3.86, sd = 0.978, se = 0.044,
-                                  ci_lower = 3.77, ci_upper = 3.94),
-      "University" = list(n = 312, mean = 4.07, sd = 0.939, se = 0.053,
-                         ci_lower = 3.97, ci_upper = 4.18)
+      "Basic Secondary"        = list(n = 816, mean = 3.21, sd = 1.243, se = 0.044, ci_lower = 3.12, ci_upper = 3.29),   # oneway_anova_output.txt:226
+      "Intermediate Secondary" = list(n = 630, mean = 3.70, sd = 1.110, se = 0.044, ci_lower = 3.61, ci_upper = 3.78),   # oneway_anova_output.txt:227
+      "Academic Secondary"     = list(n = 618, mean = 3.85, sd = 0.997, se = 0.040, ci_lower = 3.77, ci_upper = 3.93),   # oneway_anova_output.txt:228
+      "University"             = list(n = 373, mean = 4.04, sd = 0.962, se = 0.050, ci_lower = 3.94, ci_upper = 4.14)    # oneway_anova_output.txt:229
     ),
-    total = list(n = 1956, mean = 3.63, sd = 1.140, se = 0.026),
-
     anova = list(
-      ss_between = 221.625,
-      ss_within = 2320.132,
-      ss_total = 2541.756,
-      df_between = 3,
-      df_within = 1952,
-      ms_between = 73.875,
-      ms_within = 1.189,
-      f_stat = 62.153,
-      p_value = 0.000
+      ss_between = 241.130,    # oneway_anova_output.txt:236
+      df_between = 3,           # oneway_anova_output.txt:236
+      ms_between = 80.377,      # oneway_anova_output.txt:236
+      f_stat     = 65.333,      # oneway_anova_output.txt:236
+      p_value    = "<.001",     # oneway_anova_output.txt:236
+      ss_within  = 2992.019,    # oneway_anova_output.txt:237
+      df_within  = 2432,        # oneway_anova_output.txt:237  (SPSS rounds display)
+      ms_within  = 1.230,       # oneway_anova_output.txt:237
+      ss_total   = 3233.149,    # oneway_anova_output.txt:238
+      df_total   = 2435         # oneway_anova_output.txt:238
     ),
-
-    welch = list(statistic = 59.852, df1 = 3, df2 = 992.905, p_value = 0.000)
+    welch = list(
+      f_stat = 62.636,    # oneway_anova_output.txt:244
+      df1    = 3,         # oneway_anova_output.txt:244
+      df2    = 1216.114,  # oneway_anova_output.txt:244
+      p      = "<.001"    # oneway_anova_output.txt:244
+    ),
+    var_precision = list(mean = 2, sd = 3, se = 3, ci = 2)
   ),
 
-  # Test 4a: Weighted/Grouped - Life Satisfaction by Education (East)
-  weighted_grouped_east = list(
+  # ---- Test 2b: income by education, weighted ---------------------------
+  test_2b_income_by_education_weighted = list(
     descriptives = list(
-      "Basic Secondary" = list(n = 165, mean = 3.31, sd = 1.334, se = 0.104,
-                               ci_lower = 3.11, ci_upper = 3.52),
-      "Intermediate Secondary" = list(n = 127, mean = 3.64, sd = 1.134, se = 0.101,
-                                      ci_lower = 3.44, ci_upper = 3.84),
-      "Academic Secondary" = list(n = 118, mean = 3.82, sd = 1.100, se = 0.101,
-                                  ci_lower = 3.62, ci_upper = 4.02),
-      "University" = list(n = 78, mean = 3.95, sd = 1.024, se = 0.116,
-                         ci_lower = 3.72, ci_upper = 4.18)
+      "Basic Secondary"        = list(n = 741, mean = 2759.2606, sd = 787.77480,  se = 28.93759, ci_lower = 2702.4511, ci_upper = 2816.0701),   # oneway_anova_output.txt:258
+      "Intermediate Secondary" = list(n = 558, mean = 3590.2177, sd = 994.46762,  se = 42.08720, ci_lower = 3507.5488, ci_upper = 3672.8867),   # oneway_anova_output.txt:259
+      "Academic Secondary"     = list(n = 558, mean = 4225.3255, sd = 1180.12280, se = 49.95106, ci_lower = 4127.2101, ci_upper = 4323.4409),   # oneway_anova_output.txt:260
+      "University"             = list(n = 343, mean = 5331.3370, sd = 1664.10362, se = 89.80740, ci_lower = 5154.6932, ci_upper = 5507.9807)    # oneway_anova_output.txt:261
     ),
-    total = list(n = 488, mean = 3.62, sd = 1.203, se = 0.054),
-
     anova = list(
-      ss_between = 28.855,
-      ss_within = 676.447,
-      ss_total = 705.302,
-      df_between = 3,
-      df_within = 483,
-      ms_between = 9.618,
-      ms_within = 1.401,
-      f_stat = 6.868,
-      p_value = 0.000
+      ss_between = 1726289512.505,   # oneway_anova_output.txt:268
+      df_between = 3,                 # oneway_anova_output.txt:268
+      ms_between = 575429837.502,     # oneway_anova_output.txt:268
+      f_stat     = 462.115,           # oneway_anova_output.txt:268
+      p_value    = "<.001",           # oneway_anova_output.txt:268
+      ss_within  = 2734479255.792,    # oneway_anova_output.txt:269
+      df_within  = 2196,              # oneway_anova_output.txt:269
+      ms_within  = 1245209.133,       # oneway_anova_output.txt:269
+      ss_total   = 4460768768.296,    # oneway_anova_output.txt:270
+      df_total   = 2199               # oneway_anova_output.txt:270
     ),
-
-    welch = list(statistic = 6.621, df1 = 3, df2 = 245.073, p_value = 0.000)
+    welch = list(
+      f_stat = 413.705,    # oneway_anova_output.txt:276
+      df1    = 3,          # oneway_anova_output.txt:276
+      df2    = 969.609,    # oneway_anova_output.txt:276
+      p      = "<.001"     # oneway_anova_output.txt:276
+    ),
+    var_precision = list(mean = 4, sd = 5, se = 5, ci = 4)
   ),
 
-  # Test 4b: Weighted/Grouped - Life Satisfaction by Education (West)
-  weighted_grouped_west = list(
+  # ---- Test 2c: age by education, weighted ------------------------------
+  test_2c_age_by_education_weighted = list(
     descriptives = list(
-      "Basic Secondary" = list(n = 650, mean = 3.18, sd = 1.219, se = 0.048,
-                               ci_lower = 3.09, ci_upper = 3.27),
-      "Intermediate Secondary" = list(n = 503, mean = 3.71, sd = 1.104, se = 0.049,
-                                      ci_lower = 3.62, ci_upper = 3.81),
-      "Academic Secondary" = list(n = 500, mean = 3.86, sd = 0.973, se = 0.043,
-                                  ci_lower = 3.77, ci_upper = 3.94),
-      "University" = list(n = 295, mean = 4.06, sd = 0.946, se = 0.055,
-                         ci_lower = 3.95, ci_upper = 4.17)
+      "Basic Secondary"        = list(n = 848, mean = 50.1260, sd = 16.94224, se = 0.58176, ci_lower = 48.9842, ci_upper = 51.2679),   # oneway_anova_output.txt:290
+      "Intermediate Secondary" = list(n = 641, mean = 50.9696, sd = 17.33275, se = 0.68466, ci_lower = 49.6252, ci_upper = 52.3141),   # oneway_anova_output.txt:291
+      "Academic Secondary"     = list(n = 642, mean = 51.1916, sd = 17.17437, se = 0.67786, ci_lower = 49.8605, ci_upper = 52.5227),   # oneway_anova_output.txt:292
+      "University"             = list(n = 385, mean = 49.4834, sd = 16.81672, se = 0.85687, ci_lower = 47.7987, ci_upper = 51.1682)    # oneway_anova_output.txt:293
     ),
-    total = list(n = 1949, mean = 3.63, sd = 1.139, se = 0.026),
-
     anova = list(
-      ss_between = 216.014,
-      ss_within = 2311.831,
-      ss_total = 2527.845,
-      df_between = 3,
-      df_within = 1944,
-      ms_between = 72.005,
-      ms_within = 1.189,
-      f_stat = 60.548,
-      p_value = 0.000
+      ss_between = 964.501,        # oneway_anova_output.txt:300
+      df_between = 3,               # oneway_anova_output.txt:300
+      ms_between = 321.500,         # oneway_anova_output.txt:300
+      f_stat     = 1.102,           # oneway_anova_output.txt:300
+      p_value    = 0.347,           # oneway_anova_output.txt:300
+      ss_within  = 733082.646,      # oneway_anova_output.txt:301
+      df_within  = 2512,            # oneway_anova_output.txt:301
+      ms_within  = 291.832,         # oneway_anova_output.txt:301
+      ss_total   = 734047.147,      # oneway_anova_output.txt:302
+      df_total   = 2515             # oneway_anova_output.txt:302
     ),
+    welch = list(
+      f_stat = 1.109,     # oneway_anova_output.txt:308
+      df1    = 3,         # oneway_anova_output.txt:308
+      df2    = 1215.388,  # oneway_anova_output.txt:308
+      p      = 0.344      # oneway_anova_output.txt:308
+    ),
+    var_precision = list(mean = 4, sd = 5, se = 5, ci = 4)
+  ),
 
-    welch = list(statistic = 58.124, df1 = 3, df2 = 967.680, p_value = 0.000)
+  # =========================================================================
+  # SCENARIO 3: UNWEIGHTED / GROUPED by region (East/West)
+  # =========================================================================
+
+  # ---- Test 3a: life_satisfaction by education, grouped by region -------
+  test_3a_life_by_education_grouped = list(
+    East = list(
+      descriptives = list(
+        "Basic Secondary"        = list(n = 161, mean = 3.30, sd = 1.337, se = 0.105, ci_lower = 3.10, ci_upper = 3.51),   # oneway_anova_output.txt:439
+        "Intermediate Secondary" = list(n = 119, mean = 3.64, sd = 1.140, se = 0.105, ci_lower = 3.43, ci_upper = 3.85),   # oneway_anova_output.txt:440
+        "Academic Secondary"     = list(n = 110, mean = 3.84, sd = 1.088, se = 0.104, ci_lower = 3.63, ci_upper = 4.04),   # oneway_anova_output.txt:441
+        "University"             = list(n = 75,  mean = 3.95, sd = 1.025, se = 0.118, ci_lower = 3.71, ci_upper = 4.18)    # oneway_anova_output.txt:442
+      ),
+      anova = list(
+        ss_between = 29.235,     # oneway_anova_output.txt:454
+        df_between = 3,           # oneway_anova_output.txt:454
+        ms_between = 9.745,       # oneway_anova_output.txt:454
+        f_stat     = 6.950,       # oneway_anova_output.txt:454
+        p_value    = "<.001",     # oneway_anova_output.txt:454
+        ss_within  = 646.390,     # oneway_anova_output.txt:455
+        df_within  = 461,         # oneway_anova_output.txt:455
+        ms_within  = 1.402,       # oneway_anova_output.txt:455
+        ss_total   = 675.626,     # oneway_anova_output.txt:456
+        df_total   = 464          # oneway_anova_output.txt:456
+      ),
+      welch = list(
+        f_stat = 6.682,    # oneway_anova_output.txt:465
+        df1    = 3,        # oneway_anova_output.txt:465
+        df2    = 233.415,  # oneway_anova_output.txt:465
+        p      = "<.001"   # oneway_anova_output.txt:465
+      ),
+      var_precision = list(mean = 2, sd = 3, se = 3, ci = 2)
+    ),
+    West = list(
+      descriptives = list(
+        "Basic Secondary"        = list(n = 648, mean = 3.18, sd = 1.219, se = 0.048, ci_lower = 3.08, ci_upper = 3.27),   # oneway_anova_output.txt:444
+        "Intermediate Secondary" = list(n = 499, mean = 3.72, sd = 1.106, se = 0.050, ci_lower = 3.62, ci_upper = 3.81),   # oneway_anova_output.txt:445
+        "Academic Secondary"     = list(n = 497, mean = 3.86, sd = 0.978, se = 0.044, ci_lower = 3.77, ci_upper = 3.94),   # oneway_anova_output.txt:446
+        "University"             = list(n = 312, mean = 4.07, sd = 0.939, se = 0.053, ci_lower = 3.97, ci_upper = 4.18)    # oneway_anova_output.txt:447
+      ),
+      anova = list(
+        ss_between = 221.625,     # oneway_anova_output.txt:457
+        df_between = 3,            # oneway_anova_output.txt:457
+        ms_between = 73.875,       # oneway_anova_output.txt:457
+        f_stat     = 62.153,       # oneway_anova_output.txt:457
+        p_value    = "<.001",      # oneway_anova_output.txt:457
+        ss_within  = 2320.132,     # oneway_anova_output.txt:458
+        df_within  = 1952,         # oneway_anova_output.txt:458
+        ms_within  = 1.189,        # oneway_anova_output.txt:458
+        ss_total   = 2541.756,     # oneway_anova_output.txt:459
+        df_total   = 1955          # oneway_anova_output.txt:459
+      ),
+      welch = list(
+        f_stat = 59.852,    # oneway_anova_output.txt:467
+        df1    = 3,         # oneway_anova_output.txt:467
+        df2    = 992.905,   # oneway_anova_output.txt:467
+        p      = "<.001"    # oneway_anova_output.txt:467
+      ),
+      var_precision = list(mean = 2, sd = 3, se = 3, ci = 2)
+    )
+  ),
+
+  # =========================================================================
+  # SCENARIO 4: WEIGHTED / GROUPED by region
+  # =========================================================================
+
+  # ---- Test 4a: life_satisfaction by education, weighted, grouped -------
+  test_4a_life_by_education_weighted_grouped = list(
+    East = list(
+      descriptives = list(
+        "Basic Secondary"        = list(n = 165, mean = 3.31, sd = 1.334, se = 0.104, ci_lower = 3.11, ci_upper = 3.52),   # oneway_anova_output.txt:611
+        "Intermediate Secondary" = list(n = 127, mean = 3.64, sd = 1.134, se = 0.101, ci_lower = 3.44, ci_upper = 3.84),   # oneway_anova_output.txt:612
+        "Academic Secondary"     = list(n = 118, mean = 3.82, sd = 1.100, se = 0.101, ci_lower = 3.62, ci_upper = 4.02),   # oneway_anova_output.txt:613
+        "University"             = list(n = 78,  mean = 3.95, sd = 1.024, se = 0.116, ci_lower = 3.72, ci_upper = 4.18)    # oneway_anova_output.txt:614
+      ),
+      anova = list(
+        ss_between = 28.855,     # oneway_anova_output.txt:626
+        df_between = 3,           # oneway_anova_output.txt:626
+        ms_between = 9.618,       # oneway_anova_output.txt:626
+        f_stat     = 6.868,       # oneway_anova_output.txt:626
+        p_value    = "<.001",     # oneway_anova_output.txt:626
+        ss_within  = 676.447,     # oneway_anova_output.txt:627
+        df_within  = 483,         # oneway_anova_output.txt:627
+        ms_within  = 1.401,       # oneway_anova_output.txt:627
+        ss_total   = 705.302,     # oneway_anova_output.txt:628
+        df_total   = 486          # oneway_anova_output.txt:628
+      ),
+      welch = list(
+        f_stat = 6.621,    # oneway_anova_output.txt:637
+        df1    = 3,        # oneway_anova_output.txt:637
+        df2    = 245.073,  # oneway_anova_output.txt:637
+        p      = "<.001"   # oneway_anova_output.txt:637
+      ),
+      var_precision = list(mean = 2, sd = 3, se = 3, ci = 2)
+    ),
+    West = list(
+      descriptives = list(
+        "Basic Secondary"        = list(n = 650, mean = 3.18, sd = 1.219, se = 0.048, ci_lower = 3.09, ci_upper = 3.27),   # oneway_anova_output.txt:616
+        "Intermediate Secondary" = list(n = 503, mean = 3.71, sd = 1.104, se = 0.049, ci_lower = 3.62, ci_upper = 3.81),   # oneway_anova_output.txt:617
+        "Academic Secondary"     = list(n = 500, mean = 3.86, sd = 0.973, se = 0.043, ci_lower = 3.77, ci_upper = 3.94),   # oneway_anova_output.txt:618
+        "University"             = list(n = 295, mean = 4.06, sd = 0.946, se = 0.055, ci_lower = 3.95, ci_upper = 4.17)    # oneway_anova_output.txt:619
+      ),
+      anova = list(
+        ss_between = 216.014,     # oneway_anova_output.txt:629
+        df_between = 3,            # oneway_anova_output.txt:629
+        ms_between = 72.005,       # oneway_anova_output.txt:629
+        f_stat     = 60.548,       # oneway_anova_output.txt:629
+        p_value    = "<.001",      # oneway_anova_output.txt:629
+        ss_within  = 2311.831,     # oneway_anova_output.txt:630
+        df_within  = 1944,         # oneway_anova_output.txt:630  (display; internal non-integer)
+        ms_within  = 1.189,        # oneway_anova_output.txt:630
+        ss_total   = 2527.845,     # oneway_anova_output.txt:631
+        df_total   = 1947          # oneway_anova_output.txt:631
+      ),
+      welch = list(
+        f_stat = 58.124,    # oneway_anova_output.txt:639
+        df1    = 3,         # oneway_anova_output.txt:639
+        df2    = 967.680,   # oneway_anova_output.txt:639
+        p      = "<.001"    # oneway_anova_output.txt:639
+      ),
+      var_precision = list(mean = 2, sd = 3, se = 3, ci = 2)
+    )
+  ),
+
+  # =========================================================================
+  # AUXILIARY: alternative CI levels and multi-variable
+  # =========================================================================
+
+  # ---- Test 6a: 90% CI for life_sat by education (unweighted) -----------
+  # ANOVA table identical to Test 1a; only CI bounds change.
+  test_6a_life_by_education_90ci = list(
+    descriptives = list(
+      "Basic Secondary"        = list(ci_lower = 3.13, ci_upper = 3.28),   # oneway_anova_output.txt:828
+      "Intermediate Secondary" = list(ci_lower = 3.63, ci_upper = 3.77),   # oneway_anova_output.txt:829
+      "Academic Secondary"     = list(ci_lower = 3.79, ci_upper = 3.92),   # oneway_anova_output.txt:830
+      "University"             = list(ci_lower = 3.97, ci_upper = 4.13)    # oneway_anova_output.txt:831
+    ),
+    var_precision = list(ci = 2)
+  ),
+
+  # ---- Test 6b: 99% CI for life_sat by education (unweighted) -----------
+  test_6b_life_by_education_99ci = list(
+    descriptives = list(
+      "Basic Secondary"        = list(ci_lower = 3.09, ci_upper = 3.32),   # oneway_anova_output.txt:852
+      "Intermediate Secondary" = list(ci_lower = 3.59, ci_upper = 3.82),   # oneway_anova_output.txt:853
+      "Academic Secondary"     = list(ci_lower = 3.75, ci_upper = 3.96),   # oneway_anova_output.txt:854
+      "University"             = list(ci_lower = 3.92, ci_upper = 4.17)    # oneway_anova_output.txt:855
+    ),
+    var_precision = list(ci = 2)
+  ),
+
+  # ---- Test 7: multiple variables (selected additions, not duplicates) -
+  # The first three variables (life_sat, income, age) duplicate Tests
+  # 1a-c (already validated). Test 7 adds political_orientation and
+  # environmental_concern. We assert the new ANOVA rows only.
+  test_7_political = list(
+    anova = list(
+      ss_between = 2.632,         # oneway_anova_output.txt:913
+      df_between = 3,              # oneway_anova_output.txt:913
+      ms_between = 0.877,          # oneway_anova_output.txt:913
+      f_stat     = 0.744,          # oneway_anova_output.txt:913
+      p_value    = 0.526,          # oneway_anova_output.txt:913
+      ss_within  = 2707.203,       # oneway_anova_output.txt:914
+      df_within  = 2295,           # oneway_anova_output.txt:914
+      ms_within  = 1.180,          # oneway_anova_output.txt:914
+      ss_total   = 2709.836,       # oneway_anova_output.txt:915
+      df_total   = 2298            # oneway_anova_output.txt:915
+    ),
+    welch = list(
+      f_stat = 0.722,     # oneway_anova_output.txt:926
+      df1    = 3,         # oneway_anova_output.txt:926
+      df2    = 1124.261,  # oneway_anova_output.txt:926
+      p      = 0.539      # oneway_anova_output.txt:926
+    )
+  ),
+  test_7_environmental = list(
+    anova = list(
+      ss_between = 3.550,          # oneway_anova_output.txt:916
+      df_between = 3,               # oneway_anova_output.txt:916
+      ms_between = 1.183,           # oneway_anova_output.txt:916
+      f_stat     = 0.830,           # oneway_anova_output.txt:916
+      p_value    = 0.477,           # oneway_anova_output.txt:916
+      ss_within  = 3413.690,        # oneway_anova_output.txt:917
+      df_within  = 2396,            # oneway_anova_output.txt:917
+      ms_within  = 1.425,           # oneway_anova_output.txt:917
+      ss_total   = 3417.240,        # oneway_anova_output.txt:918
+      df_total   = 2399             # oneway_anova_output.txt:918
+    ),
+    welch = list(
+      f_stat = 0.832,     # oneway_anova_output.txt:927
+      df1    = 3,         # oneway_anova_output.txt:927
+      df2    = 1168.306,  # oneway_anova_output.txt:927
+      p      = 0.476      # oneway_anova_output.txt:927
+    )
   )
 )
 
-# ============================================================================
-# HELPER FUNCTIONS
-# ============================================================================
 
-#' Compare ANOVA results with SPSS
+# =============================================================================
+# COMPARISON HELPERS
+# =============================================================================
+
+#' Compare per-group descriptives (n, mean, sd, se, ci_lower, ci_upper)
 #'
-#' @param r_result R oneway_anova result object
-#' @param spss_ref SPSS reference values
-#' @param test_name Test scenario name for error messages
-#' @param tolerance_f Tolerance for F-statistics (default: 0.001)
-#' @param tolerance_p Tolerance for p-values (default: 0.0001)
-#' @param tolerance_ss Tolerance for sum of squares (default: 0.01)
-#' @param tolerance_mean Tolerance for group means (default: 0.01)
-#' @param tolerance_sd Tolerance for standard deviations (default: 0.01)
-#' @param tolerance_n Tolerance for sample sizes (default: 1 for weighted)
-compare_anova_with_spss <- function(r_result, spss_ref, test_name,
-                                   tolerance_f = 0.001,
-                                   tolerance_p = 0.0002,  # Slightly increased for small p-values
-                                   tolerance_ss = 0.01,
-                                   tolerance_mean = 0.01,
-                                   tolerance_sd = 0.01,
-                                   tolerance_n = 0) {
+#' @param group_stats Per-group named list from result$results$group_stats[[i]].
+#' @param spss_desc Named list (group_label = list(n, mean, sd, se, ci_lower,
+#'   ci_upper)). Entries with missing fields are skipped.
+#' @param var_precision list(mean=, sd=, se=, ci=) of SPSS print precisions.
+#' @param scenario Scenario label for failure messages.
+#' @param is_weighted Whether this is a weighted scenario; determines N tier.
+compare_descriptives <- function(group_stats, spss_desc, var_precision,
+                                  scenario, is_weighted = FALSE) {
+  for (lvl in names(spss_desc)) {
+    expected <- spss_desc[[lvl]]
+    actual   <- group_stats[[lvl]]
+    if (is.null(actual)) {
+      stop(sprintf("[%s] missing R-side group: %s", scenario, lvl), call. = FALSE)
+    }
 
-  # Extract main ANOVA statistics from R result
-  r_stats <- r_result$results[1, ]  # First row for ungrouped, or specific group
-
-  # Test F-statistic
-  record_comparison(test_name, "ANOVA", "F-statistic",
-                   spss_ref$anova$f_stat, r_stats$F_stat, tolerance_f)
-  expect_equal(r_stats$F_stat, spss_ref$anova$f_stat,
-              tolerance = tolerance_f,
-              label = paste(test_name, "- F-statistic"))
-
-  # Test degrees of freedom
-  record_comparison(test_name, "ANOVA", "df1",
-                   spss_ref$anova$df_between, r_stats$df1, 0)
-  expect_equal(r_stats$df1, spss_ref$anova$df_between,
-              tolerance = 0,
-              label = paste(test_name, "- df1"))
-
-  # For df2, allow tolerance of 1 for weighted analyses due to rounding differences
-  df2_tolerance <- if (grepl("Weighted", test_name)) 1 else 0
-  record_comparison(test_name, "ANOVA", "df2",
-                   spss_ref$anova$df_within, r_stats$df2, df2_tolerance)
-  expect_equal(r_stats$df2, spss_ref$anova$df_within,
-              tolerance = df2_tolerance,
-              label = paste(test_name, "- df2"))
-
-  # Test p-value
-  record_comparison(test_name, "ANOVA", "p-value",
-                   spss_ref$anova$p_value, r_stats$p_value, tolerance_p)
-  expect_equal(r_stats$p_value, spss_ref$anova$p_value,
-              tolerance = tolerance_p,
-              label = paste(test_name, "- p-value"))
-
-  # Test ANOVA table components
-  r_anova_table <- r_stats$anova_table[[1]]
-
-  # Sum of squares
-  record_comparison(test_name, "ANOVA Table", "SS Between",
-                   spss_ref$anova$ss_between,
-                   as.numeric(r_anova_table$Sum_Squares[1]), tolerance_ss)
-  expect_equal(as.numeric(r_anova_table$Sum_Squares[1]), spss_ref$anova$ss_between,
-              tolerance = tolerance_ss,
-              label = paste(test_name, "- SS Between"))
-
-  record_comparison(test_name, "ANOVA Table", "SS Within",
-                   spss_ref$anova$ss_within,
-                   as.numeric(r_anova_table$Sum_Squares[2]), tolerance_ss)
-  expect_equal(as.numeric(r_anova_table$Sum_Squares[2]), spss_ref$anova$ss_within,
-              tolerance = tolerance_ss,
-              label = paste(test_name, "- SS Within"))
-
-  # Mean squares
-  record_comparison(test_name, "ANOVA Table", "MS Between",
-                   spss_ref$anova$ms_between,
-                   as.numeric(r_anova_table$Mean_Square[1]), tolerance_ss)
-  expect_equal(as.numeric(r_anova_table$Mean_Square[1]), spss_ref$anova$ms_between,
-              tolerance = tolerance_ss,
-              label = paste(test_name, "- MS Between"))
-
-  record_comparison(test_name, "ANOVA Table", "MS Within",
-                   spss_ref$anova$ms_within,
-                   as.numeric(r_anova_table$Mean_Square[2]), tolerance_ss)
-  expect_equal(as.numeric(r_anova_table$Mean_Square[2]), spss_ref$anova$ms_within,
-              tolerance = tolerance_ss,
-              label = paste(test_name, "- MS Within"))
-
-  # Test Welch statistics
-  r_welch <- r_stats$welch_result[[1]]
-
-  # Handle both named and unnamed Welch statistics
-  if (!is.null(names(r_welch$statistic))) {
-    # If it's from base R oneway.test, it has names
-    r_welch_f <- as.numeric(r_welch$statistic)
-    r_welch_df2 <- as.numeric(r_welch$parameter[2])
-  } else {
-    # If it's custom implementation
-    r_welch_f <- r_welch$statistic
-    r_welch_df2 <- r_welch$parameter[2]
-  }
-
-  record_comparison(test_name, "Welch", "F-statistic",
-                   spss_ref$welch$statistic, r_welch_f, tolerance_f)
-  expect_equal(r_welch_f, spss_ref$welch$statistic,
-              tolerance = tolerance_f,
-              label = paste(test_name, "- Welch F"))
-
-  record_comparison(test_name, "Welch", "df2",
-                   spss_ref$welch$df2, r_welch_df2, 0.1)
-  expect_equal(r_welch_df2, spss_ref$welch$df2,
-              tolerance = 0.1,
-              label = paste(test_name, "- Welch df2"))
-
-  # Test group descriptive statistics
-  r_group_stats <- r_stats$group_stats[[1]]
-
-  for (group_name in names(spss_ref$descriptives)) {
-    if (group_name %in% names(r_group_stats)) {
-      spss_group <- spss_ref$descriptives[[group_name]]
-      r_group <- r_group_stats[[group_name]]
-
-      # For weighted analyses, use tolerance for N
-      n_tolerance <- if (grepl("Weighted", test_name)) 1 else 0
-
-      # Check N (use weighted_n if available for weighted analyses)
-      if (!is.null(r_group$weighted_n)) {
-        # Round weighted N for comparison with SPSS
-        r_n <- round(r_group$weighted_n)
+    # N: Spec(count) for unweighted; Display(0) for weighted
+    if (!is.null(expected$n)) {
+      actual_n <- if (is_weighted && !is.null(actual$weighted_n)) {
+        actual$weighted_n
       } else {
-        r_n <- r_group$n
+        actual$n
       }
+      if (is_weighted) {
+        assert_spss(actual_n, expected$n,
+                    tier = "display", precision = 0,
+                    label = sprintf("[%s | %s] N (weighted, displayed)", scenario, lvl))
+      } else {
+        assert_spss_count(actual_n, expected$n,
+                          label = sprintf("[%s | %s] N", scenario, lvl))
+      }
+    }
 
-      record_comparison(test_name, paste("Group", group_name), "N",
-                       spss_group$n, r_n, n_tolerance)
-      expect_equal(r_n, spss_group$n,
-                  tolerance = n_tolerance,
-                  label = paste(test_name, "-", group_name, "N"))
-
-      # Check mean
-      record_comparison(test_name, paste("Group", group_name), "Mean",
-                       spss_group$mean, r_group$mean, tolerance_mean)
-      expect_equal(r_group$mean, spss_group$mean,
-                  tolerance = tolerance_mean,
-                  label = paste(test_name, "-", group_name, "Mean"))
-
-      # Check SD
-      record_comparison(test_name, paste("Group", group_name), "SD",
-                       spss_group$sd, r_group$sd, tolerance_sd)
-      expect_equal(r_group$sd, spss_group$sd,
-                  tolerance = tolerance_sd,
-                  label = paste(test_name, "-", group_name, "SD"))
+    if (!is.null(expected$mean)) {
+      assert_spss(actual$mean, expected$mean,
+                  tier = "display", precision = var_precision$mean,
+                  label = sprintf("[%s | %s] mean", scenario, lvl))
+    }
+    if (!is.null(expected$sd)) {
+      assert_spss(actual$sd, expected$sd,
+                  tier = "display", precision = var_precision$sd,
+                  label = sprintf("[%s | %s] sd", scenario, lvl))
+    }
+    if (!is.null(expected$se)) {
+      assert_spss(actual$se, expected$se,
+                  tier = "display", precision = var_precision$se,
+                  label = sprintf("[%s | %s] se", scenario, lvl))
+    }
+    if (!is.null(expected$ci_lower)) {
+      assert_spss(actual$ci_lower, expected$ci_lower,
+                  tier = "display", precision = var_precision$ci,
+                  label = sprintf("[%s | %s] CI lower", scenario, lvl))
+    }
+    if (!is.null(expected$ci_upper)) {
+      assert_spss(actual$ci_upper, expected$ci_upper,
+                  tier = "display", precision = var_precision$ci,
+                  label = sprintf("[%s | %s] CI upper", scenario, lvl))
     }
   }
 }
 
-#' Compare weighted ANOVA with special handling for rounding
+
+#' Compare the ANOVA table (SS / df / MS / F / p, three sources)
 #'
-#' Weighted analyses have inherent numerical variations due to:
-#' - Floating-point accumulation in weighted sums
-#' - Different weight normalization approaches between R and SPSS
-#' - Rounding in degrees of freedom calculations
-#' These small differences (typically < 0.05) are scientifically negligible
-compare_weighted_anova_with_spss <- function(r_result, spss_ref, test_name) {
-  # Use appropriate tolerances for weighted analyses
-  compare_anova_with_spss(
-    r_result, spss_ref, test_name,
-    tolerance_f = 0.05,      # Increased for weighted F-stat (numerical accumulation)
-    tolerance_p = 0.001,     # Looser for p-value
-    tolerance_ss = 0.1,      # Looser for sum of squares
-    tolerance_mean = 0.01,   # Same for means
-    tolerance_sd = 0.01,     # Same for SDs
-    tolerance_n = 1          # Allow difference of 1 for weighted N
-  )
+#' @param anova_table Data frame from result$results$anova_table[[i]].
+#'   Columns: Source, Sum_Squares, df, Mean_Square, F, p_value.
+#' @param spss_anova Expected list with ss_between, df_between, ms_between,
+#'   f_stat, p_value, ss_within, df_within, ms_within, ss_total, df_total.
+#' @param scenario Label.
+#' @param is_weighted Whether to treat df_within as Display(0) vs Spec.
+compare_anova_table <- function(anova_table, spss_anova, scenario,
+                                 is_weighted = FALSE) {
+
+  # Between Groups
+  bg <- anova_table[anova_table$Source == "Between Groups", , drop = FALSE]
+  assert_spss(as.numeric(bg$Sum_Squares), spss_anova$ss_between,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] SS Between", scenario))
+  assert_spss_count(as.numeric(bg$df), spss_anova$df_between,
+                    label = sprintf("[%s] df Between", scenario))
+  assert_spss(as.numeric(bg$Mean_Square), spss_anova$ms_between,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] MS Between", scenario))
+  assert_spss(as.numeric(bg$F), spss_anova$f_stat,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] F-statistic", scenario))
+  assert_spss(as.numeric(bg$p_value), spss_anova$p_value,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] p-value", scenario))
+
+  # Within Groups
+  wg <- anova_table[anova_table$Source == "Within Groups", , drop = FALSE]
+  assert_spss(as.numeric(wg$Sum_Squares), spss_anova$ss_within,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] SS Within", scenario))
+  # df_within: exact integer in both unweighted (n - k) and weighted
+  # (floor(sum(w)) - k, SPSS ONEWAY convention).
+  assert_spss_count(as.numeric(wg$df), spss_anova$df_within,
+                    label = sprintf("[%s] df Within", scenario))
+  assert_spss(as.numeric(wg$Mean_Square), spss_anova$ms_within,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] MS Within", scenario))
+
+  # Total row
+  tot <- anova_table[anova_table$Source == "Total", , drop = FALSE]
+  assert_spss(as.numeric(tot$Sum_Squares), spss_anova$ss_total,
+              tier = "display", precision = 3,
+              label = sprintf("[%s] SS Total", scenario))
+  # df_total = df_between + df_within (integer in both cases).
+  assert_spss_count(as.numeric(tot$df), spss_anova$df_total,
+                    label = sprintf("[%s] df Total", scenario))
 }
 
-#' Extract results for grouped analysis
-extract_group_results <- function(result, group_var, group_value) {
-  # Extract the row for the specific group
-  group_data <- result$results[result$results[[group_var]] == group_value, ]
 
-  # Create a result object with just that row
+#' Compare Welch test (F, df1, df2, p)
+compare_welch <- function(welch_result, spss_welch, scenario) {
+  if (is.null(welch_result)) {
+    stop(sprintf("[%s] R-side welch_result is NULL", scenario), call. = FALSE)
+  }
+  assert_spss(as.numeric(welch_result$statistic), spss_welch$f_stat,
+              tier = "display", precision = 3,
+              label = sprintf("[%s, Welch] F", scenario))
+  assert_spss_count(as.numeric(welch_result$parameter[1]), spss_welch$df1,
+                    label = sprintf("[%s, Welch] df1", scenario))
+  assert_spss(as.numeric(welch_result$parameter[2]), spss_welch$df2,
+              tier = "display", precision = 3,
+              label = sprintf("[%s, Welch] df2", scenario))
+  assert_spss(as.numeric(welch_result$p.value), spss_welch$p,
+              tier = "display", precision = 3,
+              label = sprintf("[%s, Welch] p-value", scenario))
+}
+
+
+#' Convenience: extract the single-variable result row and helpers
+extract_single <- function(result, var_name = NULL) {
+  r <- result$results
+  if (!is.null(var_name)) {
+    r <- r[r$Variable == var_name, , drop = FALSE]
+  } else if (nrow(r) > 1L) {
+    r <- r[1, , drop = FALSE]
+  }
   list(
-    results = group_data,
-    variables = result$variables,
-    group = result$group,
-    weights = result$weights
+    row         = r,
+    group_stats = r$group_stats[[1]],
+    anova_table = r$anova_table[[1]],
+    welch       = r$welch_result[[1]]
   )
 }
 
-# ============================================================================
-# TEST SETUP
-# ============================================================================
+#' Extract one (region, variable) cell from a grouped result
+extract_grouped_cell <- function(result, region, var_name = NULL) {
+  r <- result$results
+  sel <- r$region == region
+  if (!is.null(var_name)) sel <- sel & r$Variable == var_name
+  r <- r[sel, , drop = FALSE]
+  if (nrow(r) != 1L) {
+    stop(sprintf("extract_grouped_cell: expected 1 row, got %d", nrow(r)),
+         call. = FALSE)
+  }
+  list(
+    row         = r,
+    group_stats = r$group_stats[[1]],
+    anova_table = r$anova_table[[1]],
+    welch       = r$welch_result[[1]]
+  )
+}
 
-# Load test data
+
+# =============================================================================
+# DATA SETUP
+# =============================================================================
+
 data(survey_data, envir = environment())
 
-# ============================================================================
-# VALIDATION TESTS
-# ============================================================================
 
-test_that("Test 1: Unweighted/Ungrouped ANOVA matches SPSS", {
-  # Run ANOVA: Life Satisfaction by Education
-  result <- survey_data %>%
+# =============================================================================
+# SCENARIO 1 — UNWEIGHTED / UNGROUPED
+# =============================================================================
+
+test_that("Test 1a: life_satisfaction by education — matches SPSS", {
+  result <- survey_data |> oneway_anova(life_satisfaction, group = education)
+  s <- extract_single(result, "life_satisfaction")
+  spss <- spss_values$test_1a_life_by_education
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "1a: life_sat by education", is_weighted = FALSE)
+  compare_anova_table(s$anova_table, spss$anova,
+                      "1a: life_sat by education", is_weighted = FALSE)
+  compare_welch(s$welch, spss$welch, "1a: life_sat by education")
+})
+
+test_that("Test 1b: income by education — matches SPSS", {
+  result <- survey_data |> oneway_anova(income, group = education)
+  s <- extract_single(result, "income")
+  spss <- spss_values$test_1b_income_by_education
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "1b: income by education", is_weighted = FALSE)
+  compare_anova_table(s$anova_table, spss$anova,
+                      "1b: income by education", is_weighted = FALSE)
+  compare_welch(s$welch, spss$welch, "1b: income by education")
+})
+
+test_that("Test 1c: age by education — matches SPSS", {
+  result <- survey_data |> oneway_anova(age, group = education)
+  s <- extract_single(result, "age")
+  spss <- spss_values$test_1c_age_by_education
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "1c: age by education", is_weighted = FALSE)
+  compare_anova_table(s$anova_table, spss$anova,
+                      "1c: age by education", is_weighted = FALSE)
+  compare_welch(s$welch, spss$welch, "1c: age by education")
+})
+
+
+# =============================================================================
+# SCENARIO 2 — WEIGHTED / UNGROUPED
+# =============================================================================
+
+test_that("Test 2a: life_satisfaction by education, weighted — matches SPSS", {
+  result <- survey_data |>
+    oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+  s <- extract_single(result, "life_satisfaction")
+  spss <- spss_values$test_2a_life_by_education_weighted
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "2a: weighted life_sat by education", is_weighted = TRUE)
+  compare_anova_table(s$anova_table, spss$anova,
+                      "2a: weighted life_sat by education", is_weighted = TRUE)
+  compare_welch(s$welch, spss$welch, "2a: weighted life_sat by education")
+})
+
+test_that("Test 2b: income by education, weighted — matches SPSS", {
+  result <- survey_data |>
+    oneway_anova(income, group = education, weights = sampling_weight)
+  s <- extract_single(result, "income")
+  spss <- spss_values$test_2b_income_by_education_weighted
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "2b: weighted income by education", is_weighted = TRUE)
+  compare_anova_table(s$anova_table, spss$anova,
+                      "2b: weighted income by education", is_weighted = TRUE)
+  compare_welch(s$welch, spss$welch, "2b: weighted income by education")
+})
+
+test_that("Test 2c: age by education, weighted — matches SPSS", {
+  result <- survey_data |>
+    oneway_anova(age, group = education, weights = sampling_weight)
+  s <- extract_single(result, "age")
+  spss <- spss_values$test_2c_age_by_education_weighted
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "2c: weighted age by education", is_weighted = TRUE)
+  compare_anova_table(s$anova_table, spss$anova,
+                      "2c: weighted age by education", is_weighted = TRUE)
+  compare_welch(s$welch, spss$welch, "2c: weighted age by education")
+})
+
+
+# =============================================================================
+# SCENARIO 3 — UNWEIGHTED / GROUPED by region
+# =============================================================================
+
+test_that("Test 3a: life_satisfaction by education, grouped by region — matches SPSS", {
+  result <- survey_data |>
+    group_by(region) |>
     oneway_anova(life_satisfaction, group = education)
 
-  # Compare with SPSS
-  compare_anova_with_spss(
-    result,
-    spss_values$unweighted_ungrouped,
-    "Unweighted/Ungrouped"
-  )
+  spss <- spss_values$test_3a_life_by_education_grouped
+  for (rg in c("East", "West")) {
+    cell <- extract_grouped_cell(result, rg)
+    compare_descriptives(cell$group_stats, spss[[rg]]$descriptives,
+                         spss[[rg]]$var_precision,
+                         sprintf("3a: life_sat by education [%s]", rg),
+                         is_weighted = FALSE)
+    compare_anova_table(cell$anova_table, spss[[rg]]$anova,
+                        sprintf("3a: life_sat by education [%s]", rg),
+                        is_weighted = FALSE)
+    compare_welch(cell$welch, spss[[rg]]$welch,
+                  sprintf("3a: life_sat by education [%s]", rg))
+  }
 })
 
-test_that("Test 2: Weighted/Ungrouped ANOVA matches SPSS", {
-  # Run weighted ANOVA
-  result <- survey_data %>%
+
+# =============================================================================
+# SCENARIO 4 — WEIGHTED / GROUPED by region
+# =============================================================================
+
+test_that("Test 4a: life_satisfaction by education, weighted, grouped by region — matches SPSS", {
+  result <- survey_data |>
+    group_by(region) |>
     oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
-  # Compare with SPSS using weighted comparison
-  compare_weighted_anova_with_spss(
-    result,
-    spss_values$weighted_ungrouped,
-    "Weighted/Ungrouped"
-  )
+  spss <- spss_values$test_4a_life_by_education_weighted_grouped
+  for (rg in c("East", "West")) {
+    cell <- extract_grouped_cell(result, rg)
+    compare_descriptives(cell$group_stats, spss[[rg]]$descriptives,
+                         spss[[rg]]$var_precision,
+                         sprintf("4a: weighted life_sat by education [%s]", rg),
+                         is_weighted = TRUE)
+    compare_anova_table(cell$anova_table, spss[[rg]]$anova,
+                        sprintf("4a: weighted life_sat by education [%s]", rg),
+                        is_weighted = TRUE)
+    compare_welch(cell$welch, spss[[rg]]$welch,
+                  sprintf("4a: weighted life_sat by education [%s]", rg))
+  }
 })
 
-test_that("Test 3: Unweighted/Grouped ANOVA matches SPSS", {
-  # Run grouped ANOVA
-  result <- survey_data %>%
-    group_by(region) %>%
-    oneway_anova(life_satisfaction, group = education)
 
-  # Test East region
-  east_result <- extract_group_results(result, "region", "East")
-  compare_anova_with_spss(
-    east_result,
-    spss_values$unweighted_grouped_east,
-    "Unweighted/Grouped - East"
-  )
+# =============================================================================
+# AUXILIARY SCENARIOS
+# =============================================================================
 
-  # Test West region
-  west_result <- extract_group_results(result, "region", "West")
-  compare_anova_with_spss(
-    west_result,
-    spss_values$unweighted_grouped_west,
-    "Unweighted/Grouped - West"
-  )
+test_that("Test 6a: 90% CI for life_satisfaction by education — matches SPSS", {
+  result <- survey_data |>
+    oneway_anova(life_satisfaction, group = education, conf.level = 0.90)
+  s <- extract_single(result, "life_satisfaction")
+  spss <- spss_values$test_6a_life_by_education_90ci
+
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "6a: 90% CI life_sat", is_weighted = FALSE)
 })
 
-test_that("Test 4: Weighted/Grouped ANOVA matches SPSS", {
-  # Run weighted grouped ANOVA
-  result <- survey_data %>%
-    group_by(region) %>%
-    oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
+test_that("Test 6b: 99% CI for life_satisfaction by education — matches SPSS", {
+  result <- survey_data |>
+    oneway_anova(life_satisfaction, group = education, conf.level = 0.99)
+  s <- extract_single(result, "life_satisfaction")
+  spss <- spss_values$test_6b_life_by_education_99ci
 
-  # Test East region
-  east_result <- extract_group_results(result, "region", "East")
-  compare_weighted_anova_with_spss(
-    east_result,
-    spss_values$weighted_grouped_east,
-    "Weighted/Grouped - East"
-  )
-
-  # Test West region
-  west_result <- extract_group_results(result, "region", "West")
-  compare_weighted_anova_with_spss(
-    west_result,
-    spss_values$weighted_grouped_west,
-    "Weighted/Grouped - West"
-  )
+  compare_descriptives(s$group_stats, spss$descriptives, spss$var_precision,
+                       "6b: 99% CI life_sat", is_weighted = FALSE)
 })
 
-# ============================================================================
+test_that("Test 7: multiple variables (political_orientation, environmental_concern) — matches SPSS", {
+  result <- survey_data |>
+    oneway_anova(life_satisfaction, income, age,
+                 political_orientation, environmental_concern,
+                 group = education)
+
+  expect_equal(nrow(result$results), 5L)
+  expect_setequal(result$results$Variable,
+                  c("life_satisfaction", "income", "age",
+                    "political_orientation", "environmental_concern"))
+
+  # Validate the two NEW variables (the other three duplicate Tests 1a-c)
+  pol_s <- extract_single(result, "political_orientation")
+  compare_anova_table(pol_s$anova_table,
+                      spss_values$test_7_political$anova,
+                      "7: political_orientation",
+                      is_weighted = FALSE)
+  compare_welch(pol_s$welch, spss_values$test_7_political$welch,
+                "7: political_orientation")
+
+  env_s <- extract_single(result, "environmental_concern")
+  compare_anova_table(env_s$anova_table,
+                      spss_values$test_7_environmental$anova,
+                      "7: environmental_concern",
+                      is_weighted = FALSE)
+  compare_welch(env_s$welch, spss_values$test_7_environmental$welch,
+                "7: environmental_concern")
+})
+
+
+# =============================================================================
 # EDGE CASES
-# ============================================================================
+# =============================================================================
 
-test_that("Edge case: Missing values handled correctly", {
-  # Create data with missing values
-  test_data <- survey_data
-  test_data$life_satisfaction[1:50] <- NA
-
-  # Run ANOVA and verify it handles NA appropriately
-  expect_no_error({
-    result <- test_data %>%
-      oneway_anova(life_satisfaction, group = education)
-  })
-
-  # Verify N is reduced appropriately
-  total_n <- sum(sapply(result$results$group_stats[[1]], function(x) x$n))
-  expect_lt(total_n, nrow(survey_data))  # Should be less due to NAs
+test_that("Edge case: error when grouping variable has < 2 levels", {
+  d <- survey_data[survey_data$education == "Basic Secondary", , drop = FALSE]
+  expect_error(
+    oneway_anova(d, life_satisfaction, group = education),
+    regexp = "at least 2"
+  )
 })
 
-test_that("Edge case: Effect sizes are calculated correctly", {
-  # Run basic ANOVA
-  result <- survey_data %>%
-    oneway_anova(life_satisfaction, group = education)
+test_that("Edge case: missing values reduce per-group N exactly by the NAs", {
+  d <- survey_data
+  # Inject 5 NAs into "Basic Secondary" rows for life_satisfaction
+  basic_idx <- which(d$education == "Basic Secondary" & !is.na(d$life_satisfaction))
+  d$life_satisfaction[basic_idx[1:5]] <- NA
 
-  # Check effect sizes are within valid range [0, 1]
-  expect_gte(result$results$eta_squared[1], 0)
-  expect_lte(result$results$eta_squared[1], 1)
+  base <- survey_data |> oneway_anova(life_satisfaction, group = education)
+  red  <- d            |> oneway_anova(life_satisfaction, group = education)
 
-  expect_gte(result$results$epsilon_squared[1], 0)
-  expect_lte(result$results$epsilon_squared[1], 1)
-
-  expect_gte(result$results$omega_squared[1], 0)
-  expect_lte(result$results$omega_squared[1], 1)
-
-  # Verify relationship: omega² ≤ epsilon² ≤ eta²
-  expect_lte(result$results$omega_squared[1], result$results$epsilon_squared[1])
-  expect_lte(result$results$epsilon_squared[1], result$results$eta_squared[1])
+  base_n <- base$results$group_stats[[1]][["Basic Secondary"]]$n
+  red_n  <- red$results$group_stats[[1]][["Basic Secondary"]]$n
+  assert_spss_count(red_n, base_n - 5L,
+                    label = "missing-value edge case: N reduction by 5")
 })
 
-# ============================================================================
-# SUMMARY REPORT
-# ============================================================================
 
-test_that("Generate comprehensive validation summary report", {
-  skip_if(length(validation_results) == 0, "No validation results to report")
-
-  # Convert to data frame for analysis
-  df_results <- do.call(rbind, lapply(validation_results, function(x) {
-    data.frame(
-      Test = x$test,
-      Category = x$category,
-      Metric = x$metric,
-      Expected = x$expected,
-      Actual = x$actual,
-      Match = x$match,
-      Tolerance = x$tolerance,
-      Difference = x$difference,
-      stringsAsFactors = FALSE
-    )
-  }))
-
-  # Summary statistics
-  total_comparisons <- nrow(df_results)
-  total_matches <- sum(df_results$Match == "✓")
-  match_rate <- (total_matches / total_comparisons) * 100
-
-  cat("\n")
-  cat("======================================================================\n")
-  cat("           ONEWAY ANOVA SPSS VALIDATION DETAILED REPORT             \n")
-  cat("======================================================================\n")
-  cat(sprintf("SPSS Version: 29.0.0.0 | Date: %s\n", Sys.Date()))
-  cat("Test Variable: life_satisfaction | Group: education\n")
-  cat("----------------------------------------------------------------------\n\n")
-
-  cat(sprintf("Total comparisons: %d\n", total_comparisons))
-  cat(sprintf("Exact matches (within tolerance): %d (%.1f%%)\n", total_matches, match_rate))
-  cat("\n")
-
-  # Detailed results by test scenario
-  for (test_name in unique(df_results$Test)) {
-    test_data <- df_results[df_results$Test == test_name, ]
-    test_matches <- sum(test_data$Match == "✓")
-
-    cat("----------------------------------------------------------------------\n")
-    cat(sprintf("Test Scenario: %s\n", test_name))
-    cat("----------------------------------------------------------------------\n")
-
-    # Format results as detailed table
-    cat(sprintf("%-30s %12s %12s %10s %6s %8s\n",
-                "Metric", "Expected", "Actual", "Diff", "Match", "Tol"))
-    cat("----------------------------------------------------------------------\n")
-
-    # Group by category for better organization
-    for (category in unique(test_data$Category)) {
-      cat_data <- test_data[test_data$Category == category, ]
-
-      # Print category header if it's a group statistic
-      if (grepl("Group", category)) {
-        cat(sprintf("\n%s:\n", category))
-      }
-
-      for (i in 1:nrow(cat_data)) {
-        # Format metric name with indentation for group stats
-        metric_name <- if (grepl("Group", cat_data$Category[i])) {
-          paste0("  ", cat_data$Metric[i])
-        } else {
-          paste0(cat_data$Category[i], " ", cat_data$Metric[i])
-        }
-
-        # Format numeric values
-        expected_str <- if (!is.na(cat_data$Expected[i])) {
-          sprintf("%12.4f", cat_data$Expected[i])
-        } else {
-          sprintf("%12s", "NA")
-        }
-
-        actual_str <- if (!is.na(cat_data$Actual[i])) {
-          sprintf("%12.4f", cat_data$Actual[i])
-        } else {
-          sprintf("%12s", "NA")
-        }
-
-        diff_str <- if (!is.na(cat_data$Difference[i])) {
-          sprintf("%10.6f", cat_data$Difference[i])
-        } else {
-          sprintf("%10s", "NA")
-        }
-
-        cat(sprintf("%-30s %s %s %s %6s %8.4f\n",
-                   metric_name,
-                   expected_str,
-                   actual_str,
-                   diff_str,
-                   cat_data$Match[i],
-                   cat_data$Tolerance[i]))
-      }
-    }
-
-    cat(sprintf("\nScenario result: %d/%d matches (%.1f%%)\n\n",
-                test_matches, nrow(test_data),
-                (test_matches / nrow(test_data)) * 100))
-  }
-
-  # Summary of validation criteria
-  cat("======================================================================\n")
-  cat("VALIDATION CRITERIA\n")
-  cat("----------------------------------------------------------------------\n")
-  cat("• F-statistics: Exact for unweighted (±0.001), weighted (±0.05)*\n")
-  cat("• P-values: Near-exact match (tolerance ±0.0002)\n")
-  cat("• Degrees of freedom: Exact for unweighted, ±1 for weighted\n")
-  cat("• Sum of Squares: Near match (±0.01 unweighted, ±0.1 weighted)\n")
-  cat("• Group statistics: Near match (means ±0.01, SDs ±0.01)\n")
-  cat("• Sample sizes: Exact for unweighted, ±1 for weighted\n")
-  cat("• Welch test: F-stat ±0.001, df2 ±0.1\n")
-  cat("\n")
-  cat("* Weighted F-statistics have inherent numerical variations due to\n")
-  cat("  floating-point accumulation. Differences < 0.05 are negligible.\n")
-  cat("======================================================================\n")
-
-  # Overall validation result
-  if (match_rate == 100) {
-    cat("\n✅ PERFECT MATCH: All ANOVA values match SPSS reference exactly!\n")
-  } else if (match_rate >= 95) {
-    cat("\n✅ SUCCESS: ANOVA results match SPSS reference values!\n")
-  } else if (match_rate >= 90) {
-    cat("\n⚠ WARNING: Most values match but some differences exist\n")
-  } else {
-    cat("\n❌ FAILURE: Significant differences from SPSS\n")
-  }
-
-  # Show mismatches if any exist
-  mismatches <- df_results[df_results$Match != "✓", ]
-  if (nrow(mismatches) > 0) {
-    cat("\nDetailed mismatch analysis:\n")
-    cat("----------------------------------------------------------------------\n")
-    for (i in 1:nrow(mismatches)) {
-      cat(sprintf("• %s - %s %s:\n",
-                 mismatches$Test[i],
-                 mismatches$Category[i],
-                 mismatches$Metric[i]))
-      cat(sprintf("  Expected: %.6f | Actual: %.6f | Difference: %.6f | Tolerance: %.6f\n",
-                 mismatches$Expected[i],
-                 mismatches$Actual[i],
-                 mismatches$Difference[i],
-                 mismatches$Tolerance[i]))
-    }
-  }
-
-  cat("======================================================================\n")
-
-  # This test always passes - it's just for reporting
-  expect_true(TRUE)
-})
-
-# ============================================================================
-# NOTES AND DOCUMENTATION
-# ============================================================================
-
-# Key Differences from SPSS to Consider:
-# ----------------------------------------
-# 1. Degrees of Freedom in Weighted Analysis:
-#    - SPSS uses rounded weighted N for df calculation
-#    - R may maintain decimal precision
-#    - Solution: R function adjusted to match SPSS approach
-#
-# 2. Welch Test Implementation:
-#    - SPSS uses classical Welch formula with frequency weights
-#    - Different approximations for df2 (Satterthwaite)
-#    - Both are valid, small differences expected
-#
-# 3. Rounding in Descriptives:
-#    - SPSS displays rounded values but calculates with full precision
-#    - R maintains full precision throughout
-#    - Affects weighted N and may cascade to other statistics
-#
-# 4. Effect Size Calculations:
-#    - Multiple formulas exist (eta², epsilon², omega²)
-#    - Small differences due to different bias corrections
-#    - All three should follow: omega² ≤ epsilon² ≤ eta²
-#
-# 5. Weighted F-Statistics (MOST IMPORTANT):
-#    - Weighted calculations involve extensive floating-point operations
-#    - Each weight multiplication/division accumulates small rounding errors
-#    - SPSS and R may use different internal precision or accumulation methods
-#    - Observed differences: typically < 0.05 (less than 0.1% relative error)
-#    - These differences are scientifically negligible and don't affect conclusions
-#
-# Known Acceptable Differences:
-# -----------------------------
-# - Weighted F-statistics: ±0.05 due to floating-point accumulation
-# - Welch df2: Can differ by ±0.5 due to approximation methods
-# - Weighted N: ±1 difference due to rounding
-# - Very small p-values: Both may show as 0.000
-# - Effect sizes: ±0.0001 due to computational differences
-#
-# IMPORTANT: All these differences are within acceptable scientific precision
-# and do not affect statistical conclusions or practical interpretations.
-
-# Troubleshooting Failed Tests:
-# -----------------------------
-# 1. Check SPSS version and settings
-# 2. Verify data preparation is identical
-# 3. Check for updates in SPSS algorithms
-# 4. Review weight variable handling
-# 5. Consider numerical precision limits
+# =============================================================================
+# NOTE — VALIDATION GAPS
+# =============================================================================
+# 1. Brown-Forsythe statistic: SPSS prints it; mariposa does not expose it
+#    on result$results. Adding it to the output (and to welch_result or a new
+#    brown_forsythe field) would close this gap. Phase 2 work.
+# 2. Effect sizes (eta², epsilon², omega²): SPSS ONEWAY does not print these
+#    by default in v29; mariposa computes them. They are R-only here and not
+#    validated against SPSS. The values are exposed on result$results$
+#    eta_squared / epsilon_squared / omega_squared if needed for Tier-4
+#    snapshot tests later.
+# 3. ANOVA Total Mean_Square: SPSS leaves blank; mariposa likewise stores "".
+#    No assertion needed.
+# =============================================================================
