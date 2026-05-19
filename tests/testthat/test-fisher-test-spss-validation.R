@@ -51,10 +51,10 @@ test_that("Test 3: Fisher grouped by education — structural", {
   expect_true(all(r$results$p_value > 0 & r$results$p_value < 1))
 })
 
-test_that("Edge case: Fisher rejects > 2-column table cleanly", {
-  # Fisher exact for r×c can be slow; mariposa may not support it. Test that
-  # it either succeeds with 2x3 or errors clearly.
-  expect_no_error(suppressWarnings(
-    fisher_test(survey_data, gender, interview_mode)
-  ))
+test_that("Edge case: Fisher 2x3 table returns numeric p-value", {
+  r <- suppressWarnings(fisher_test(survey_data, gender, interview_mode))
+  # Validate result structure: p in (0,1), N positive
+  expect_true(as.numeric(r$results$p_value) > 0 &&
+              as.numeric(r$results$p_value) < 1)
+  expect_true(as.numeric(r$results$n) > 0)
 })
