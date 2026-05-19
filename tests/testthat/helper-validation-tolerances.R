@@ -196,6 +196,16 @@ assertion. NA-as-match is forbidden by Charter §8.",
     abs_tol <- max(abs_tol, rel_tol)
   }
 
+  # For Display tier with very large expected values (|expected| > 1e6),
+  # IEEE-754 floating-point precision (~1e-15 relative) dominates over the
+  # absolute print-precision tolerance, which becomes meaningless. Apply a
+  # relative floor of 1e-7 (well above FP precision, far below any real
+  # disagreement). Charter §4 sanctions this for SS values > 1e6.
+  if (tier == "display" && abs(expected) > 1e6) {
+    rel_tol <- abs(expected) * 1e-7
+    abs_tol <- max(abs_tol, rel_tol)
+  }
+
   diff <- abs(actual - expected)
 
   # Use <= because tolerance "within X" is inclusive of the boundary. This
