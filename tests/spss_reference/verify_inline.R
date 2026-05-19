@@ -173,6 +173,32 @@ read_ref_line <- function(ref_file, line_no, cache = ref_cache) {
 }
 
 
+#' Read a window of lines around a citation point.
+#'
+#' SPSS prints related statistics (r/p/n; chi-sq/df/Sig; per-cell counts) on
+#' adjacent rows of a table. A citation pointing at the top of a block — or
+#' at any line within it — should resolve any value contained in the block.
+#' This helper returns the cited line plus `window` lines before and after,
+#' so compare_value() can do block-level fuzzy matching.
+read_ref_window <- function(ref_file, line_no, window = 10L,
+                            cache = ref_cache) {
+  if (!exists(ref_file, envir = cache, inherits = FALSE)) {
+    path <- file.path(ref_dir, ref_file)
+    if (!file.exists(path)) {
+      assign(ref_file, character(), envir = cache)
+      return(character())
+    }
+    assign(ref_file, readLines(path, warn = FALSE), envir = cache)
+  }
+
+  lines <- get(ref_file, envir = cache)
+  if (length(lines) == 0L) return(character())
+  lo <- max(1L, line_no - window)
+  hi <- min(length(lines), line_no + window)
+  lines[lo:hi]
+}
+
+
 extract_numeric_tokens <- function(text) {
   if (is.na(text)) return(numeric(0))
   # Match numbers with optional leading sign, including those starting with
@@ -189,7 +215,6 @@ extract_numeric_tokens <- function(text) {
 compare_value <- function(citation, ref_text) {
 
   if (citation$value_type == "sentinel") {
-    # Check that the reference line contains "<.001" or "Sig." with <.001
     if (is.na(ref_text)) {
       return(list(status = "missing-ref",
                   detail = sprintf("Reference file/line not found")))
@@ -197,6 +222,16 @@ compare_value <- function(citation, ref_text) {
     if (grepl("<\\.?001|0?\\.000", ref_text)) {
       return(list(status = "match",
                   detail = sprintf("sentinel '<.001' confirmed at %s:%d",
+                                   citation$ref_file, citation$ref_line)))
+    }
+    # Block fallback: SPSS often prints chi-sq/df/Sig as three adjacent
+    # rows. The citation may point at the Chi-Square row while the p-value
+    # is in the Asymp. Sig. row a few lines later. Search a window.
+    window_lines <- read_ref_window(citation$ref_file, citation$ref_line,
+                                     window = 10L)
+    if (any(grepl("<\\.?001|0?\\.000", window_lines))) {
+      return(list(status = "match-window",
+                  detail = sprintf("sentinel '<.001' found in ±10-line window of %s:%d",
                                    citation$ref_file, citation$ref_line)))
     }
     return(list(status = "mismatch",
@@ -215,32 +250,47 @@ compare_value <- function(citation, ref_text) {
                                  citation$ref_file, citation$ref_line)))
   }
 
-  ref_tokens <- extract_numeric_tokens(ref_text)
-  if (length(ref_tokens) == 0L) {
-    return(list(status = "no-numbers",
-                detail = sprintf("Reference line has no numeric tokens: %s",
-                                 trimws(ref_text))))
-  }
-
   inline <- citation$value
   if (is.na(inline)) {
     return(list(status = "skip", detail = "Inline value parsed as NA"))
   }
 
-  # Fuzzy match: any reference token within 1% (or 1e-4 absolute, whichever
-  # is larger) counts as a match. This absorbs SPSS print rounding.
+  # 1) Try the cited line exactly.
+  ref_tokens <- extract_numeric_tokens(ref_text)
   tol <- max(abs(inline) * 0.01, 1e-4)
-  diffs <- abs(ref_tokens - inline)
-  matches <- ref_tokens[diffs <= tol]
-
-  if (length(matches) > 0L) {
-    return(list(status = "match",
-                detail = sprintf("%g matches reference token(s) %s on line",
-                                 inline, paste(matches, collapse = ", "))))
+  if (length(ref_tokens) > 0L) {
+    diffs <- abs(ref_tokens - inline)
+    matches <- ref_tokens[diffs <= tol]
+    if (length(matches) > 0L) {
+      return(list(status = "match",
+                  detail = sprintf("%g matches reference token(s) %s on line",
+                                   inline, paste(matches, collapse = ", "))))
+    }
   }
 
+  # 2) Block fallback: search a window of ±10 lines. SPSS tables put
+  #    related values (r/p/n; chi-sq/df/Sig; per-cell counts) on adjacent
+  #    rows, so citations pointing at the block header should resolve any
+  #    value within the block.
+  window_lines <- read_ref_window(citation$ref_file, citation$ref_line,
+                                   window = 10L)
+  for (line in window_lines) {
+    tokens <- extract_numeric_tokens(line)
+    if (length(tokens) == 0L) next
+    if (any(abs(tokens - inline) <= tol)) {
+      return(list(status = "match-window",
+                  detail = sprintf("%g matched within ±10-line window of %s:%d",
+                                   inline, citation$ref_file, citation$ref_line)))
+    }
+  }
+
+  if (length(ref_tokens) == 0L) {
+    return(list(status = "no-numbers",
+                detail = sprintf("Reference line has no numeric tokens: %s",
+                                 trimws(ref_text))))
+  }
   return(list(status = "drift",
-              detail = sprintf("Inline %g not on reference line. Tokens: %s. Line: %s",
+              detail = sprintf("Inline %g not on reference line or within ±10 lines. Tokens: %s. Line: %s",
                                inline,
                                paste(ref_tokens, collapse = ", "),
                                trimws(ref_text))))

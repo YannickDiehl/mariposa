@@ -18,7 +18,7 @@ spss_values <- list(
   # ---- Test 1: trust_gov_high vs trust_media_high ----
   test_1_gov_media = list(
     n = 2227L, b = 338L, c = 448L,
-    exact_p = "<.001"      # mcnemar_test_output.txt:63
+    exact_p = "<.001"      # mcnemar_test_output.txt:45
   ),
   # ---- Test 2: trust_gov_high vs trust_sci_high ----
   test_2_gov_sci = list(
