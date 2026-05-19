@@ -1,418 +1,240 @@
-# ============================================================================
-# SPSS Validation Tests for pearson_cor Function
-# ============================================================================
-# SPSS Version: 29.0.0.0
-# Date: 2025-01-23
-# Settings: Correlations with pairwise deletion
-# Known issues: SPSS uses pairwise deletion for missing values
+# =============================================================================
+# pearson_cor — SPSS VALIDATION (Charter-compliant)
+# =============================================================================
+# Purpose: Validate mariposa::pearson_cor() against SPSS v29 CORRELATIONS.
+# Reference output: tests/spss_reference/outputs/pearson_cor_output.txt
+#
+# Charter reference: .claude/VALIDATION_CHARTER.md
+#
+# SPSS-procedure-family finding: CORRELATIONS DOES honor WEIGHT BY (unlike
+# NPAR TESTS). Weighted runs produce different r/p/N values. All 4 canonical
+# scenarios are SPSS-validatable.
+#
+# Source audit (R/pearson_cor.R): n_eff <- sum(w) (line 221) — correct,
+# uses unrounded sum(w). round(sum(w)) at line 333 is for n_matrix display
+# only. No bug.
+#
+# Variables: life_satisfaction × political_orientation × trust_media
+# (chosen for non-trivial NA patterns; tests pairwise deletion).
+# =============================================================================
 
-# Load required packages
 library(testthat)
 library(dplyr)
+library(mariposa)
 
-# Load test data
-data(survey_data, package = "mariposa")
 
-# ============================================================================
+# =============================================================================
 # SPSS REFERENCE VALUES
-# ============================================================================
-# Extracted from: tests/spss_reference/outputs/pearson_cor_output.txt
-# Variables tested: life_satisfaction, political_orientation, trust_media
-# 
-# NOTE: Expected values have been adjusted to match R's actual output.
-# SPSS displays values rounded to 3 decimal places, while R calculates 
-# with higher precision. The differences are minimal (< 0.001) and within 
-# acceptable tolerance for correlation coefficients. This ensures tests
-# pass while maintaining statistical validity.
+# =============================================================================
 
 spss_values <- list(
-  # Test 1: Unweighted/Ungrouped
-  unweighted_ungrouped = list(
-    correlations = list(
-      life_pol = list(r = -0.001, p = 0.962, n = 2228),
-      life_trust = list(r = 0.0211, p = 0.312, n = 2291),  # Actual R value is 0.0211
-      pol_trust = list(r = 0.002, p = 0.909, n = 2177)
+
+  # ---- Test 1: Unweighted / Ungrouped (3x3 correlation matrix) ---------
+  test_1 = list(
+    cells = list(
+      # life_satisfaction vs political_orientation
+      "life_political"  = list(r = -0.001, p = 0.962, n = 2228),  # pearson_cor_output.txt:9-11 column 2
+      # life_satisfaction vs trust_media
+      "life_trust"      = list(r = 0.021,  p = 0.312, n = 2291),  # pearson_cor_output.txt:9-11 column 3
+      # political_orientation vs trust_media
+      "political_trust" = list(r = 0.002,  p = 0.909, n = 2177)   # pearson_cor_output.txt:12-14 column 3
+    ),
+    diag_n = c(life_satisfaction = 2421L,                          # pearson_cor_output.txt:11
+               political_orientation = 2299L,                       # pearson_cor_output.txt:14
+               trust_media = 2367L)                                 # pearson_cor_output.txt:17
+  ),
+
+  # ---- Test 2: Weighted / Ungrouped ------------------------------------
+  test_2 = list(
+    cells = list(
+      "life_political"  = list(r = -0.004, p = 0.836, n = 2241),   # pearson_cor_output.txt:27-29
+      "life_trust"      = list(r = 0.020,  p = 0.330, n = 2305),   # pearson_cor_output.txt:27-29
+      "political_trust" = list(r = 0.004,  p = 0.835, n = 2190)    # pearson_cor_output.txt:30-32
+    ),
+    diag_n = c(life_satisfaction = 2437L, political_orientation = 2312L,
+               trust_media = 2382L)
+  ),
+
+  # ---- Test 3: Unweighted / Grouped by region --------------------------
+  test_3 = list(
+    East = list(
+      cells = list(
+        "life_political"  = list(r = 0.008,  p = 0.876, n = 427),   # pearson_cor_output.txt:45-47
+        "life_trust"      = list(r = -0.062, p = 0.197, n = 440),
+        "political_trust" = list(r = 0.087,  p = 0.074, n = 420)
+      ),
+      diag_n = c(life_satisfaction = 465L, political_orientation = 443L,
+                 trust_media = 460L)
+    ),
+    West = list(
+      cells = list(
+        "life_political"  = list(r = -0.003, p = 0.894, n = 1801),  # pearson_cor_output.txt:54-56
+        "life_trust"      = list(r = 0.041,  p = 0.080, n = 1851),
+        "political_trust" = list(r = -0.017, p = 0.480, n = 1757)
+      ),
+      diag_n = c(life_satisfaction = 1956L, political_orientation = 1856L,
+                 trust_media = 1907L)
     )
   ),
-  
-  # Test 2: Weighted/Ungrouped
-  weighted_ungrouped = list(
-    correlations = list(
-      life_pol = list(r = -0.004, p = 0.836, n = 2241),
-      life_trust = list(r = 0.0203, p = 0.330, n = 2305),  # Actual R value is 0.0203
-      pol_trust = list(r = 0.004, p = 0.835, n = 2190)
-    )
-  ),
-  
-  # Test 3: Unweighted/Grouped - East
-  unweighted_grouped_east = list(
-    correlations = list(
-      life_pol = list(r = 0.00755, p = 0.876, n = 427),    # Adjusted from 0.008
-      life_trust = list(r = -0.0616, p = 0.197, n = 440),  # Adjusted from -0.062
-      pol_trust = list(r = 0.087, p = 0.074, n = 420)
-    )
-  ),
-  
-  # Test 3: Unweighted/Grouped - West
-  unweighted_grouped_west = list(
-    correlations = list(
-      life_pol = list(r = -0.003, p = 0.894, n = 1801),
-      life_trust = list(r = 0.0407, p = 0.080, n = 1851),   # Adjusted from 0.041
-      pol_trust = list(r = -0.0168, p = 0.480, n = 1757)     # Adjusted from -0.017
-    )
-  ),
-  
-  # Test 4: Weighted/Grouped - East
-  weighted_grouped_east = list(
-    correlations = list(
-      life_pol = list(r = 0.001, p = 0.978, n = 447),
-      life_trust = list(r = -0.0584, p = 0.210, n = 462),   # Adjusted from -0.058
-      pol_trust = list(r = 0.091, p = 0.056, n = 440)
-    )
-  ),
-  
-  # Test 4: Weighted/Grouped - West
-  weighted_grouped_west = list(
-    correlations = list(
-      life_pol = list(r = -0.00586, p = 0.804, n = 1794),    # Adjusted from -0.006
-      life_trust = list(r = 0.040, p = 0.087, n = 1844),
-      pol_trust = list(r = -0.0164, p = 0.493, n = 1749)     # Adjusted from -0.016
+
+  # ---- Test 4: Weighted / Grouped by region ----------------------------
+  test_4 = list(
+    East = list(
+      cells = list(
+        "life_political"  = list(r = 0.001,  p = 0.978, n = 447),
+        "life_trust"      = list(r = -0.058, p = 0.210, n = 462),
+        "political_trust" = list(r = 0.091,  p = 0.056, n = 440)
+      ),
+      diag_n = c(life_satisfaction = 488L, political_orientation = 464L,
+                 trust_media = 483L)
+    ),
+    West = list(
+      cells = list(
+        "life_political"  = list(r = -0.006, p = 0.804, n = 1794),
+        "life_trust"      = list(r = 0.040,  p = 0.087, n = 1844),
+        "political_trust" = list(r = -0.016, p = 0.493, n = 1749)
+      ),
+      diag_n = c(life_satisfaction = 1949L, political_orientation = 1848L,
+                 trust_media = 1899L)
     )
   )
 )
 
-# ============================================================================
-# TRACKING AND COMPARISON FRAMEWORK
-# ============================================================================
 
-# Global tracking for validation results
-validation_results <- list()
+# =============================================================================
+# COMPARISON HELPER
+# =============================================================================
 
-# Record comparison function for correlation tests
-record_cor_comparison <- function(test_name, var_pair, metric, expected, actual, tolerance = 0.01) {
-  # Handle NULL values
-  if (is.null(actual)) actual <- NA
-  if (is.null(expected)) expected <- NA
-  
-  match_status <- if (is.na(expected) && is.na(actual)) {
-    TRUE
-  } else if (is.na(expected) || is.na(actual)) {
-    FALSE
-  } else {
-    abs(expected - actual) <= tolerance
-  }
-  
-  validation_results <<- append(validation_results, list(list(
-    test = test_name,
-    var_pair = var_pair,
-    metric = metric,
-    expected = expected,
-    actual = actual,
-    match = if (match_status) "✓" else "✗",
-    tolerance = tolerance,
-    difference = if (!is.na(expected) && !is.na(actual)) abs(expected - actual) else NA
-  )))
-  
-  return(match_status)
-}
+compare_pearson <- function(matrices, spss, scenario, is_weighted = FALSE) {
+  cor_mat <- matrices$correlations
+  p_mat   <- matrices$p_values
+  n_mat   <- matrices$n_obs
 
-# Compare correlation matrix with SPSS output
-compare_cor_with_spss <- function(r_result, spss_ref, test_name, 
-                                   tol_r = 0.005, tol_p = 0.01, tol_n = 1) {
-  
-  # Extract correlation matrix from R result
-  # For ungrouped data, matrices are in a list with one element
-  if (!is.null(r_result$matrices)) {
-    cor_matrix <- r_result$matrices[[1]]$correlations
-    p_matrix <- r_result$matrices[[1]]$p_values
-    # For grouped data, n_obs might be in the matrix itself
-    if (!is.null(r_result$matrices[[1]]$n_obs)) {
-      n_matrix <- r_result$matrices[[1]]$n_obs
+  # Off-diagonal cells (upper triangle)
+  cell_map <- list(
+    "life_political"  = c("life_satisfaction", "political_orientation"),
+    "life_trust"      = c("life_satisfaction", "trust_media"),
+    "political_trust" = c("political_orientation", "trust_media")
+  )
+  for (cell_name in names(spss$cells)) {
+    expected <- spss$cells[[cell_name]]
+    pair <- cell_map[[cell_name]]
+    actual_r <- cor_mat[pair[1], pair[2]]
+    actual_p <- p_mat[pair[1], pair[2]]
+    actual_n <- n_mat[pair[1], pair[2]]
+
+    assert_spss(actual_r, expected$r,
+                tier = "display", precision = 3,
+                label = sprintf("[%s | %s] r", scenario, cell_name))
+    assert_spss(actual_p, expected$p,
+                tier = "display", precision = 3, what = "p_value",
+                label = sprintf("[%s | %s] Sig", scenario, cell_name))
+    # N: integer for unweighted, display(0) for weighted (rounded sum(w))
+    if (is_weighted) {
+      assert_spss(actual_n, expected$n,
+                  tier = "display", precision = 0,
+                  label = sprintf("[%s | %s] N", scenario, cell_name))
     } else {
-      n_matrix <- r_result$n_obs
-    }
-  } else {
-    # Fallback for different structure
-    cor_matrix <- r_result$correlation_matrix
-    p_matrix <- r_result$p_values
-    n_matrix <- r_result$n_pairs
-  }
-  
-  # Variable indices (assuming order: life_satisfaction, political_orientation, trust_media)
-  # life_satisfaction = 1, political_orientation = 2, trust_media = 3
-  
-  # Compare life_satisfaction vs political_orientation
-  if (!is.null(spss_ref$correlations$life_pol)) {
-    spss_life_pol <- spss_ref$correlations$life_pol
-    
-    # Correlation coefficient
-    record_cor_comparison(test_name, "life_sat × pol_orient", "r", 
-                         spss_life_pol$r, cor_matrix[1, 2], tol_r)
-    expect_equal(cor_matrix[1, 2], spss_life_pol$r, tolerance = 0.005,
-                 label = paste(test_name, "- life×pol r"))
-    
-    # P-value
-    record_cor_comparison(test_name, "life_sat × pol_orient", "p-value", 
-                         spss_life_pol$p, p_matrix[1, 2], tol_p)
-    expect_equal(p_matrix[1, 2], spss_life_pol$p, tolerance = 0.01,
-                 label = paste(test_name, "- life×pol p"))
-    
-    # N pairs - only if n_matrix is available
-    if (!is.null(n_matrix)) {
-      record_cor_comparison(test_name, "life_sat × pol_orient", "n", 
-                           spss_life_pol$n, n_matrix[1, 2], tol_n)
-      expect_equal(n_matrix[1, 2], spss_life_pol$n, tolerance = 1,
-                   label = paste(test_name, "- life×pol n"))
+      assert_spss_count(actual_n, expected$n,
+                        label = sprintf("[%s | %s] N", scenario, cell_name))
     }
   }
-  
-  # Compare life_satisfaction vs trust_media
-  if (!is.null(spss_ref$correlations$life_trust)) {
-    spss_life_trust <- spss_ref$correlations$life_trust
-    
-    record_cor_comparison(test_name, "life_sat × trust_media", "r", 
-                         spss_life_trust$r, cor_matrix[1, 3], tol_r)
-    expect_equal(cor_matrix[1, 3], spss_life_trust$r, tolerance = 0.005,
-                 label = paste(test_name, "- life×trust r"))
-    
-    record_cor_comparison(test_name, "life_sat × trust_media", "p-value", 
-                         spss_life_trust$p, p_matrix[1, 3], tol_p)
-    expect_equal(p_matrix[1, 3], spss_life_trust$p, tolerance = 0.01,
-                 label = paste(test_name, "- life×trust p"))
-    
-    if (!is.null(n_matrix)) {
-      record_cor_comparison(test_name, "life_sat × trust_media", "n", 
-                           spss_life_trust$n, n_matrix[1, 3], tol_n)
-      expect_equal(n_matrix[1, 3], spss_life_trust$n, tolerance = 1,
-                   label = paste(test_name, "- life×trust n"))
-    }
-  }
-  
-  # Compare political_orientation vs trust_media
-  if (!is.null(spss_ref$correlations$pol_trust)) {
-    spss_pol_trust <- spss_ref$correlations$pol_trust
-    
-    record_cor_comparison(test_name, "pol_orient × trust_media", "r", 
-                         spss_pol_trust$r, cor_matrix[2, 3], tol_r)
-    expect_equal(cor_matrix[2, 3], spss_pol_trust$r, tolerance = 0.005,
-                 label = paste(test_name, "- pol×trust r"))
-    
-    record_cor_comparison(test_name, "pol_orient × trust_media", "p-value", 
-                         spss_pol_trust$p, p_matrix[2, 3], tol_p)
-    expect_equal(p_matrix[2, 3], spss_pol_trust$p, tolerance = 0.01,
-                 label = paste(test_name, "- pol×trust p"))
-    
-    if (!is.null(n_matrix)) {
-      record_cor_comparison(test_name, "pol_orient × trust_media", "n", 
-                           spss_pol_trust$n, n_matrix[2, 3], tol_n)
-      expect_equal(n_matrix[2, 3], spss_pol_trust$n, tolerance = 1,
-                   label = paste(test_name, "- pol×trust n"))
+
+  # Diagonal N (variable's own N, listwise)
+  for (var in names(spss$diag_n)) {
+    expected <- spss$diag_n[[var]]
+    actual <- n_mat[var, var]
+    if (is_weighted) {
+      assert_spss(actual, expected,
+                  tier = "display", precision = 0,
+                  label = sprintf("[%s | %s] diag N", scenario, var))
+    } else {
+      assert_spss_count(actual, expected,
+                        label = sprintf("[%s | %s] diag N", scenario, var))
     }
   }
 }
 
-# ============================================================================
-# TEST SCENARIOS
-# ============================================================================
 
-test_that("Test 1: Unweighted/Ungrouped correlation matches SPSS", {
-  result <- survey_data %>% 
+# =============================================================================
+# DATA SETUP
+# =============================================================================
+
+data(survey_data, envir = environment())
+
+
+# =============================================================================
+# SCENARIO 1 — UNWEIGHTED / UNGROUPED
+# =============================================================================
+
+test_that("Test 1: Pearson 3-variable unweighted ungrouped — matches SPSS", {
+  r <- survey_data |>
     pearson_cor(life_satisfaction, political_orientation, trust_media)
-  
-  compare_cor_with_spss(result, spss_values$unweighted_ungrouped, 
-                       "Unweighted/Ungrouped")
+  compare_pearson(r$matrices[[1]], spss_values$test_1,
+                  "1: unweighted ungrouped", is_weighted = FALSE)
 })
 
-test_that("Test 2: Weighted/Ungrouped correlation matches SPSS", {
-  result <- survey_data %>% 
-    pearson_cor(life_satisfaction, political_orientation, trust_media, 
-                weights = sampling_weight)
-  
-  compare_cor_with_spss(result, spss_values$weighted_ungrouped,
-                       "Weighted/Ungrouped")
-})
 
-test_that("Test 3: Unweighted/Grouped correlation matches SPSS", {
-  results <- survey_data %>%
-    group_by(region) %>%
-    pearson_cor(life_satisfaction, political_orientation, trust_media)
-  
-  # For grouped data, results should have multiple matrices
-  # Find the index for each region
-  if (!is.null(results$group_keys)) {
-    east_idx <- which(results$group_keys$region == "East")
-    west_idx <- which(results$group_keys$region == "West")
-  } else if (!is.null(results$groups)) {
-    # Alternative structure
-    east_idx <- which(results$groups == "East")
-    west_idx <- which(results$groups == "West")
-  } else {
-    # Try to find East and West in the results
-    east_idx <- 1  # Assuming East is first
-    west_idx <- 2  # Assuming West is second
-  }
-  
-  # Test East region
-  if (length(east_idx) > 0 && length(results$matrices) >= east_idx) {
-    east_result <- list(
-      matrices = list(results$matrices[[east_idx]]),
-      n_obs = results$n_obs
-    )
-    
-    compare_cor_with_spss(east_result, spss_values$unweighted_grouped_east,
-                         "Unweighted/Grouped - East")
-  }
-  
-  # Test West region
-  if (length(west_idx) > 0 && length(results$matrices) >= west_idx) {
-    west_result <- list(
-      matrices = list(results$matrices[[west_idx]]),
-      n_obs = results$n_obs
-    )
-    
-    compare_cor_with_spss(west_result, spss_values$unweighted_grouped_west,
-                         "Unweighted/Grouped - West")
-  }
-})
+# =============================================================================
+# SCENARIO 2 — WEIGHTED / UNGROUPED
+# =============================================================================
 
-test_that("Test 4: Weighted/Grouped correlation matches SPSS", {
-  results <- survey_data %>%
-    group_by(region) %>%
+test_that("Test 2: Pearson 3-variable weighted ungrouped — matches SPSS", {
+  r <- survey_data |>
     pearson_cor(life_satisfaction, political_orientation, trust_media,
                 weights = sampling_weight)
-  
-  # For grouped data, results should have multiple matrices
-  # Find the index for each region
-  if (!is.null(results$group_keys)) {
-    east_idx <- which(results$group_keys$region == "East")
-    west_idx <- which(results$group_keys$region == "West")
-  } else if (!is.null(results$groups)) {
-    # Alternative structure
-    east_idx <- which(results$groups == "East")
-    west_idx <- which(results$groups == "West")
-  } else {
-    # Try to find East and West in the results
-    east_idx <- 1  # Assuming East is first
-    west_idx <- 2  # Assuming West is second
-  }
-  
-  # Test East region
-  if (length(east_idx) > 0 && length(results$matrices) >= east_idx) {
-    east_result <- list(
-      matrices = list(results$matrices[[east_idx]]),
-      n_obs = results$n_obs
-    )
-    
-    compare_cor_with_spss(east_result, spss_values$weighted_grouped_east,
-                         "Weighted/Grouped - East")
-  }
-  
-  # Test West region  
-  if (length(west_idx) > 0 && length(results$matrices) >= west_idx) {
-    west_result <- list(
-      matrices = list(results$matrices[[west_idx]]),
-      n_obs = results$n_obs
-    )
-    
-    compare_cor_with_spss(west_result, spss_values$weighted_grouped_west,
-                         "Weighted/Grouped - West")
+  compare_pearson(r$matrices[[1]], spss_values$test_2,
+                  "2: weighted ungrouped", is_weighted = TRUE)
+})
+
+
+# =============================================================================
+# SCENARIO 3 — UNWEIGHTED / GROUPED by region
+# =============================================================================
+
+test_that("Test 3: Pearson 3-variable unweighted grouped by region — matches SPSS", {
+  r <- survey_data |>
+    group_by(region) |>
+    pearson_cor(life_satisfaction, political_orientation, trust_media)
+  # matrices is named/keyed by group; we look up by name
+  for (i in seq_along(r$matrices)) {
+    rg <- as.character(r$group_keys$region[i])
+    compare_pearson(r$matrices[[i]], spss_values$test_3[[rg]],
+                    sprintf("3: unweighted grouped [%s]", rg),
+                    is_weighted = FALSE)
   }
 })
 
-# ============================================================================
-# VALIDATION REPORT GENERATION
-# ============================================================================
 
-test_that("Generate comprehensive validation report", {
-  skip_if(length(validation_results) == 0, "No validation results to report")
-  
-  # Convert to data frame for analysis
-  df_results <- do.call(rbind, lapply(validation_results, function(x) {
-    data.frame(
-      Test = x$test,
-      VarPair = x$var_pair,
-      Metric = x$metric,
-      Expected = round(x$expected, 4),
-      Actual = round(x$actual, 4),
-      Match = x$match,
-      Tolerance = x$tolerance,
-      Difference = round(x$difference, 6),
-      stringsAsFactors = FALSE
-    )
-  }))
-  
-  # Summary statistics
-  total_comparisons <- nrow(df_results)
-  total_matches <- sum(df_results$Match == "✓")
-  match_rate <- (total_matches / total_comparisons) * 100
-  
-  cat("\n")
-  cat("======================================================================\n")
-  cat("               PEARSON CORRELATION SPSS VALIDATION REPORT            \n")
-  cat("======================================================================\n")
-  cat(sprintf("SPSS Version: 29.0.0.0 | Date: %s\n", Sys.Date()))
-  cat("Variables: life_satisfaction, political_orientation, trust_media\n")
-  cat("----------------------------------------------------------------------\n\n")
-  
-  cat(sprintf("Total comparisons: %d\n", total_comparisons))
-  cat(sprintf("Exact matches: %d (%.1f%%)\n", total_matches, match_rate))
-  cat("\n")
-  
-  # Detailed results by test
-  for (test_name in unique(df_results$Test)) {
-    test_data <- df_results[df_results$Test == test_name, ]
-    test_matches <- sum(test_data$Match == "✓")
-    
-    cat("------------------------------------------------------------\n")
-    cat(sprintf("Test: %s\n", test_name))
-    cat("------------------------------------------------------------\n")
-    
-    # Format results as table
-    cat(sprintf("%-25s %-8s %10s %10s %8s %6s %6s\n",
-                "Variable Pair", "Metric", "Expected", "Actual", "Diff", "Match", "Tol"))
-    cat("----------------------------------------------------------------------\n")
-    
-    for (i in 1:nrow(test_data)) {
-      cat(sprintf("%-25s %-8s %10.4f %10.4f %8.6f %6s %6.3f\n",
-                  test_data$VarPair[i],
-                  test_data$Metric[i],
-                  test_data$Expected[i],
-                  test_data$Actual[i],
-                  test_data$Difference[i],
-                  test_data$Match[i],
-                  test_data$Tolerance[i]))
-    }
-    
-    cat(sprintf("\nTest result: %d/%d matches (%.1f%%)\n\n", 
-                test_matches, nrow(test_data), 
-                (test_matches / nrow(test_data)) * 100))
+# =============================================================================
+# SCENARIO 4 — WEIGHTED / GROUPED by region
+# =============================================================================
+
+test_that("Test 4: Pearson 3-variable weighted grouped by region — matches SPSS", {
+  r <- survey_data |>
+    group_by(region) |>
+    pearson_cor(life_satisfaction, political_orientation, trust_media,
+                weights = sampling_weight)
+  for (i in seq_along(r$matrices)) {
+    rg <- as.character(r$group_keys$region[i])
+    compare_pearson(r$matrices[[i]], spss_values$test_4[[rg]],
+                    sprintf("4: weighted grouped [%s]", rg),
+                    is_weighted = TRUE)
   }
-  
-  # Overall summary
-  cat("======================================================================\n")
-  if (match_rate == 100) {
-    cat("\n✅ SUCCESS: All correlation values match SPSS reference exactly!\n")
-  } else if (match_rate >= 95) {
-    cat("\n✅ SUCCESS: >95% of values match SPSS reference!\n")
-  } else {
-    cat("\n⚠ WARNING: Some values do not match SPSS reference\n")
-    
-    # Show mismatches
-    mismatches <- df_results[df_results$Match != "✓", ]
-    if (nrow(mismatches) > 0) {
-      cat("\nMismatches requiring investigation:\n")
-      for (i in 1:nrow(mismatches)) {
-        cat(sprintf("  - %s %s %s: Expected %.4f, Got %.4f (diff: %.6f)\n",
-                    mismatches$Test[i],
-                    mismatches$VarPair[i],
-                    mismatches$Metric[i],
-                    mismatches$Expected[i],
-                    mismatches$Actual[i],
-                    mismatches$Difference[i]))
-      }
-    }
-  }
-  cat("======================================================================\n")
-  
-  expect_true(TRUE)  # Always passes - just for reporting
+})
+
+
+# =============================================================================
+# EDGE CASES
+# =============================================================================
+
+test_that("Edge case: 2 variables produces 2x2 matrix with off-diagonal = SPSS r", {
+  r <- survey_data |>
+    pearson_cor(life_satisfaction, political_orientation)
+  cor_mat <- r$matrices[[1]]$correlations
+  expect_equal(dim(cor_mat), c(2L, 2L))
+  # Off-diagonal should match Test 1's life_political cell
+  assert_spss(cor_mat["life_satisfaction", "political_orientation"], -0.001,
+              tier = "display", precision = 3,
+              label = "2-var edge case: r")
 })
