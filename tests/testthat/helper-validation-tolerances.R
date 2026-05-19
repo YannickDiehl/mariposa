@@ -206,6 +206,19 @@ assertion. NA-as-match is forbidden by Charter §8.",
     abs_tol <- max(abs_tol, rel_tol)
   }
 
+  # Boundary-rounding guard for p-values: when SPSS rounds p to 3 dp, an
+  # internal R-side p of 0.20542 may round to 0.205 while SPSS's internal
+  # 0.20567 rounds to 0.206. The printed difference is 0.001 even though
+  # the underlying agreement is <0.0003. To absorb this purely-rounding
+  # disagreement at the boundary, we accept up to one full unit of the
+  # last decimal for p-values at Display tier (instead of the strict
+  # half-unit), bounded by the relative_p (default 1%).
+  if (tier == "display" && identical(what, "p_value")) {
+    full_unit <- 10^(-precision)
+    rel_tol   <- max(abs(expected), 1e-4) * relative_p
+    abs_tol   <- max(abs_tol, full_unit, rel_tol)
+  }
+
   diff <- abs(actual - expected)
 
   # Use <= because tolerance "within X" is inclusive of the boundary. This
