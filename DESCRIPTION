@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
-Title: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data
-Version: 0.6.0
+Title: SPSS-Compatible Statistical Tools for Survey Data
+Version: 0.6.1
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
@@ -39,10 +39,8 @@ Suggests:
     rmarkdown,
     covr,
     haven (>= 2.4.0),
-    survey,
     GPArotation,
     MASS,
-    PMCMRplus,
     openxlsx2
 VignetteBuilder: knitr
 LazyData: true

@@ -6,18 +6,22 @@
 
 ## Test environments
 
-* local macOS (aarch64-apple-darwin), R 4.4.x
-* GitHub Actions: ubuntu-latest (release, devel, oldrel-1), macOS-latest (release), windows-latest (release)
+* local macOS, R 4.6.0
+* GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
+  macOS-latest (release), windows-latest (release)
 
 ## Notes
 
-* checking for future file timestamps ... NOTE
-  unable to verify current time
+* checking CRAN incoming feasibility ... NOTE — "New submission". Expected.
 
-  This is an intermittent network-related NOTE and not a package issue.
-
-## Package details
+## Package summary
 
 * 76 exported functions across 15 categories
-* 4,986+ unit tests including SPSS v29 cross-validation
-* All tests pass on all platforms
+* 1832 passing assertions across 29 SPSS-validation test files,
+  validated against SPSS v29 under a published Validation Charter
+  (see `vignette("spss-compatibility")` and
+  `.claude/VALIDATION_CHARTER.md` in the repo).
+* All Suggests packages properly gated with `requireNamespace()`
+* No reverse dependencies (new package)
+* Strict CRAN-style checks pass on all platforms via R-CMD-check
+  workflow with `--as-cran`
