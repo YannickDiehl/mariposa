@@ -41,7 +41,8 @@ Suggests:
     haven (>= 2.4.0),
     GPArotation,
     MASS,
-    openxlsx2
+    openxlsx2,
+    survey
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
