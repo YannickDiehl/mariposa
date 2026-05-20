@@ -176,8 +176,8 @@ survey_data %>% describe(age, income, life_satisfaction,
 #> -------------------------------
 #>           Variable     Mean       SD Skewness Effective_N
 #>                age   50.514   17.084    0.159      2468.8
-#>             income 3743.099 1423.966    0.724      2158.9
-#>  life_satisfaction    3.625    1.152   -0.498      2390.9
+#>             income 3743.099 1423.966    0.725      2158.9
+#>  life_satisfaction    3.625    1.152   -0.499      2390.9
 #> ----------------------------------------
 
 # Grouped analysis

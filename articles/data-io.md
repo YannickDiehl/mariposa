@@ -1,6 +1,7 @@
 # Importing and Exporting Data
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -13,24 +14,24 @@ Survey data lives in many formats — SPSS (.sav), Stata (.dta), SAS
 the metadata that makes survey data special: variable labels, value
 labels, and missing value definitions.
 
-| Function                                                                          | Format        | Notes                                             |
-|-----------------------------------------------------------------------------------|---------------|---------------------------------------------------|
-| [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)   | SPSS .sav     | Tagged NA support for user-defined missing values |
-| [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md)     | SPSS .por     | Portable SPSS format                              |
-| [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md) | Stata .dta    | Extended missing values                           |
-| [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md)     | SAS .sas7bdat | Catalog file support for labels                   |
-| [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)     | SAS .xpt      | SAS transport format                              |
-| [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)   | Excel .xlsx   | Label reconstruction from metadata sheets         |
+| Function | Format | Notes |
+|----|----|----|
+| [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md) | SPSS .sav | Tagged NA support for user-defined missing values |
+| [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md) | SPSS .por | Portable SPSS format |
+| [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md) | Stata .dta | Extended missing values |
+| [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md) | SAS .sas7bdat | Catalog file support for labels |
+| [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md) | SAS .xpt | SAS transport format |
+| [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md) | Excel .xlsx | Label reconstruction from metadata sheets |
 
 For export, mariposa writes data back to statistical formats with full
 preservation of labels and missing values:
 
-| Function                                                                            | Format      | Notes                                               |
-|-------------------------------------------------------------------------------------|-------------|-----------------------------------------------------|
-| [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)   | SPSS .sav   | Tagged NA roundtripping                             |
-| [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md) | Stata .dta  | Label preservation                                  |
-| [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)     | SAS .xpt    | SAS transport format                                |
-| [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)   | Excel .xlsx | Multiple export modes (data, codebook, frequencies) |
+| Function | Format | Notes |
+|----|----|----|
+| [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md) | SPSS .sav | Tagged NA roundtripping |
+| [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md) | Stata .dta | Label preservation |
+| [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md) | SAS .xpt | SAS transport format |
+| [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md) | Excel .xlsx | Multiple export modes (data, codebook, frequencies) |
 
 ## Reading SPSS Files
 
@@ -41,6 +42,7 @@ SPSS is the most common format in survey research.
 reads .sav files and preserves all metadata:
 
 ``` r
+
 # Read an SPSS file
 data <- read_spss("survey_2024.sav")
 ```
@@ -59,6 +61,7 @@ preserves these as *tagged NAs* — special NA values that remember which
 missing code they came from:
 
 ``` r
+
 # Tagged NAs are on by default
 data <- read_spss("survey.sav", tag.na = TRUE)
 
@@ -71,6 +74,7 @@ data <- read_spss("survey.sav", tag.na = FALSE)
 Once imported, you can inspect the tagged NAs:
 
 ``` r
+
 # See a breakdown of missing types
 na_frequencies(data, q1, q2, q3)
 
@@ -91,6 +95,7 @@ question.
 ### Stata
 
 ``` r
+
 data <- read_stata("survey.dta")
 ```
 
@@ -100,6 +105,7 @@ Extended missing values (.a through .z) are preserved.
 ### SAS
 
 ``` r
+
 # SAS data file
 data <- read_sas("survey.sas7bdat")
 
@@ -113,12 +119,14 @@ data <- read_xpt("survey.xpt")
 ### SPSS Portable
 
 ``` r
+
 data <- read_por("survey.por")
 ```
 
 ### Excel
 
 ``` r
+
 # Basic Excel import
 data <- read_xlsx("survey.xlsx")
 
@@ -137,6 +145,7 @@ After importing, use
 to get an interactive overview of your data:
 
 ``` r
+
 codebook(survey_data)
 ```
 
@@ -153,6 +162,7 @@ console, use
 [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md):
 
 ``` r
+
 # Find variables related to "trust"
 find_var(survey_data, "trust")
 #>   col             name                                    label
@@ -177,6 +187,7 @@ If your data contains tagged NAs (from
 they are converted back to SPSS user-defined missing values:
 
 ``` r
+
 # Basic export
 write_spss(survey_data, "output.sav")
 
@@ -187,12 +198,14 @@ write_spss(survey_data, "output.sav", compress = "zsav")  # smaller file
 ### Writing Stata Files
 
 ``` r
+
 write_stata(survey_data, "output.dta")
 ```
 
 ### Writing SAS Transport Files
 
 ``` r
+
 write_xpt(survey_data, "output.xpt")
 ```
 
@@ -202,6 +215,7 @@ write_xpt(survey_data, "output.xpt")
 supports multiple export modes:
 
 ``` r
+
 # Export data only
 write_xlsx(survey_data, "output.xlsx")
 
@@ -220,6 +234,7 @@ A key strength of mariposa is lossless roundtripping. Data imported from
 SPSS can be exported back without losing any information:
 
 ``` r
+
 # 1. Import from SPSS
 original <- read_spss("survey.sav")
 

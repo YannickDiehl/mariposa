@@ -69,22 +69,22 @@ frame, the modified data frame is returned (invisibly).
 Rules are specified as a semicolon-separated string of `"old=new"`
 pairs:
 
-|                     |                           |                               |
-|---------------------|---------------------------|-------------------------------|
-| **Syntax**          | **Meaning**               | **Example**                   |
-| `"old=new"`         | Single value              | `"1=0; 2=1"`                  |
-| `"lo:hi=new"`       | Range of values           | `"1:3=1; 4:6=2"`              |
-| `"old=new [Label]"` | Inline value label        | `"1:2=1 [Low]; 3:5=2 [High]"` |
-| `"else=new"`        | Catch-all for unmatched   | `"1=1; else=NA"`              |
-| `"copy"`            | Keep original value       | `"1:3=copy; else=NA"`         |
-| `"min"/"max"`       | Dynamic boundaries        | `"min:3=1; 4:max=2"`          |
-| `"rev"`             | Reverse scale             | `"rev"`                       |
-| `"dicho"`           | Median split              | `"dicho"`                     |
-| `"dicho(x)"`        | Fixed cut-point           | `"dicho(3)"`                  |
-| `"mean"`            | Mean split                | `"mean"`                      |
-| `"quart"`           | Quartile split (4 groups) | `"quart"`                     |
-| `"NA=new"`          | Replace NA                | `"NA=0; else=copy"`           |
-| `"val=NA"`          | Set values to NA          | `"-9=NA; -8=NA"`              |
+|  |  |  |
+|----|----|----|
+| **Syntax** | **Meaning** | **Example** |
+| `"old=new"` | Single value | `"1=0; 2=1"` |
+| `"lo:hi=new"` | Range of values | `"1:3=1; 4:6=2"` |
+| `"old=new [Label]"` | Inline value label | `"1:2=1 [Low]; 3:5=2 [High]"` |
+| `"else=new"` | Catch-all for unmatched | `"1=1; else=NA"` |
+| `"copy"` | Keep original value | `"1:3=copy; else=NA"` |
+| `"min"/"max"` | Dynamic boundaries | `"min:3=1; 4:max=2"` |
+| `"rev"` | Reverse scale | `"rev"` |
+| `"dicho"` | Median split | `"dicho"` |
+| `"dicho(x)"` | Fixed cut-point | `"dicho(3)"` |
+| `"mean"` | Mean split | `"mean"` |
+| `"quart"` | Quartile split (4 groups) | `"quart"` |
+| `"NA=new"` | Replace NA | `"NA=0; else=copy"` |
+| `"val=NA"` | Set values to NA | `"-9=NA; -8=NA"` |
 
 Rules are evaluated in order — the first matching rule wins.
 

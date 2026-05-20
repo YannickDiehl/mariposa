@@ -1,6 +1,7 @@
 # Regression Analysis
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -11,10 +12,10 @@ data(survey_data)
 Regression analysis predicts an outcome from one or more predictors.
 mariposa provides two regression functions with SPSS-compatible output:
 
-| Function                                                                                            | Use when                                                 |
-|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)     | Outcome is continuous (e.g., income, satisfaction score) |
-| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Outcome is binary (e.g., yes/no, high/low)               |
+| Function | Use when |
+|----|----|
+| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md) | Outcome is continuous (e.g., income, satisfaction score) |
+| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Outcome is binary (e.g., yes/no, high/low) |
 
 Both functions support two interface styles:
 
@@ -28,6 +29,7 @@ Both functions support two interface styles:
 ### Simple Regression
 
 ``` r
+
 linear_regression(survey_data, life_satisfaction ~ age)
 #> Linear Regression: life_satisfaction ~ age
 #>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421
@@ -36,6 +38,7 @@ linear_regression(survey_data, life_satisfaction ~ age)
 ### Detailed Output
 
 ``` r
+
 result <- linear_regression(survey_data, life_satisfaction ~ age)
 summary(result)
 #> 
@@ -93,6 +96,7 @@ The detailed output includes four sections matching SPSS REGRESSION:
 ### Multiple Regression
 
 ``` r
+
 linear_regression(survey_data,
                   life_satisfaction ~ age + income + trust_government)
 #> Linear Regression: life_satisfaction ~ age + income + trust_government
@@ -104,6 +108,7 @@ Compare Beta values to identify the strongest predictor.
 ### SPSS-Style Interface
 
 ``` r
+
 linear_regression(survey_data,
                   dependent = life_satisfaction,
                   predictors = c(age, income, trust_government))
@@ -114,6 +119,7 @@ linear_regression(survey_data,
 ### With Survey Weights
 
 ``` r
+
 linear_regression(survey_data,
                   life_satisfaction ~ age + income,
                   weights = sampling_weight)
@@ -129,6 +135,7 @@ behavior.
 Run separate regressions for each subgroup:
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   linear_regression(life_satisfaction ~ age + income)
@@ -153,6 +160,7 @@ confirm overall model significance.
 Combine with data transformation functions for better models:
 
 ``` r
+
 # Standardize predictors for comparable coefficients
 survey_data_z <- survey_data %>%
   std(age, income, suffix = "_z")
@@ -173,6 +181,7 @@ Use
 when your outcome is binary. First, create a binary variable:
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(high_satisfaction = ifelse(life_satisfaction >= 4, 1, 0))
 ```
@@ -180,6 +189,7 @@ survey_data <- survey_data %>%
 ### Basic Logistic Regression
 
 ``` r
+
 logistic_regression(survey_data, high_satisfaction ~ age + income)
 #> Logistic Regression: high_satisfaction ~ age + income
 #>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p < 0.001 ***, Accuracy = 68.4%, N = 2115
@@ -188,6 +198,7 @@ logistic_regression(survey_data, high_satisfaction ~ age + income)
 ### Detailed Output
 
 ``` r
+
 log_result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
 summary(log_result)
 #> 
@@ -264,6 +275,7 @@ Exp(B) is the odds ratio — the key statistic in logistic regression:
 ### Multiple Predictors
 
 ``` r
+
 logistic_regression(survey_data,
                     high_satisfaction ~ age + income + trust_government + education)
 #> Logistic Regression: high_satisfaction ~ age + income + trust_government + education
@@ -273,6 +285,7 @@ logistic_regression(survey_data,
 ### SPSS-Style Interface
 
 ``` r
+
 logistic_regression(survey_data,
                     dependent = high_satisfaction,
                     predictors = c(age, income, trust_government))
@@ -283,6 +296,7 @@ logistic_regression(survey_data,
 ### With Survey Weights
 
 ``` r
+
 logistic_regression(survey_data,
                     high_satisfaction ~ age + income,
                     weights = sampling_weight)
@@ -293,6 +307,7 @@ logistic_regression(survey_data,
 ### Grouped Analysis
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   logistic_regression(high_satisfaction ~ age + income)
@@ -311,7 +326,7 @@ regression R-squared:
 - **Cox & Snell R-squared**: Cannot reach 1.0, always lower
 - **McFadden R-squared**: Values above 0.20 indicate good fit
 
-**Hosmer-Lemeshow Test**: Non-significant ($p > .05$) means the model
+**Hosmer-Lemeshow Test**: Non-significant ($`p > .05`$) means the model
 fits well.
 
 **Classification Table**: Compare correct predictions to the base rate —
@@ -320,6 +335,7 @@ your model should outperform guessing the most common category.
 ## Complete Example
 
 ``` r
+
 # 1. Explore relationships first
 survey_data %>%
   pearson_cor(life_satisfaction, age, income, trust_government)

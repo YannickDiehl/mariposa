@@ -249,10 +249,10 @@ survey_data %>% levene_test(income, group = education, weights = sampling_weight
 #> --- income ---
 #> 
 #> Weighted Levene's Test Results:
-#> ----------------------------------------------------------- 
-#>  Variable F_statistic df1  df2 p_value sig        Conclusion
-#>    income      102.05   3 2197       0 *** Variances unequal
-#> ----------------------------------------------------------- 
+#> ----------------------------------------------------------------------- 
+#>  Variable F_statistic df1      df2 p_value sig        Conclusion
+#>    income     102.048   3 2196.939       0 *** Variances unequal
+#> ----------------------------------------------------------------------- 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 

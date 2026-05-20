@@ -230,7 +230,7 @@ survey_data %>%
 survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
 #> One-Way ANOVA: income by education [Weighted]
-#>   F(3, 2197) = 462.325, p < 0.001 ***, eta2 = 0.387 (large), N = 2201
+#>   F(3, 2196) = 462.115, p < 0.001 ***, eta2 = 0.387 (large), N = 2200
 
 # Grouped analysis (separate ANOVA for each region)
 survey_data %>%

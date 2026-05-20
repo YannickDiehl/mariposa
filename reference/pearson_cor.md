@@ -43,7 +43,14 @@ pearson_cor(
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results.
+  Following SPSS CORRELATIONS, the weighted degrees of freedom use
+  `n = sum(w)` (not Kish's effective sample size). This is appropriate
+  for normalized survey weights with mean \\\approx 1\\. For raw
+  expansion weights (e.g., summing to millions of population units), the
+  resulting standard errors and confidence intervals will be drastically
+  too narrow — in that case, normalize weights so that `sum(w) == n`, or
+  use the survey package for design-based inference.
 
 - conf.level:
 

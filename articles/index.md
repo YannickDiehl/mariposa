@@ -31,3 +31,8 @@
   Analysis](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.md):
 - [Working with Survey
   Weights](https://YannickDiehl.github.io/mariposa/articles/survey-weights.md):
+
+### Validation
+
+- [SPSS Compatibility
+  Status](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md):

@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="mariposa - Professional Survey Analysis in R">
@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,7 @@
 <!-- badges: start -->
 
 <p><strong>Professional statistical analysis for survey data in R.</strong></p>
-<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. All statistical results are validated against SPSS v29 for full reproducibility.</p>
+<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. All statistical results are validated against SPSS v29; see <code><a href="articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for per-function status.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -147,107 +147,107 @@
 <col width="36%">
 <col width="30%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Category</th>
 <th>Functions</th>
 <th>Purpose</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><strong>Data Import</strong></td>
 <td>
 <code><a href="reference/read_spss.html">read_spss()</a></code>, <code><a href="reference/read_stata.html">read_stata()</a></code>, <code><a href="reference/read_sas.html">read_sas()</a></code>, <code><a href="reference/read_xlsx.html">read_xlsx()</a></code>, + 2 more</td>
 <td>Import SPSS, Stata, SAS, and Excel with tagged NA support</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Data Export</strong></td>
 <td>
 <code><a href="reference/write_spss.html">write_spss()</a></code>, <code><a href="reference/write_stata.html">write_stata()</a></code>, <code><a href="reference/write_xpt.html">write_xpt()</a></code>, <code><a href="reference/write_xlsx.html">write_xlsx()</a></code>
 </td>
 <td>Export with full label and missing value roundtripping</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Label Management</strong></td>
 <td>
 <code><a href="reference/var_label.html">var_label()</a></code>, <code><a href="reference/val_labels.html">val_labels()</a></code>, <code><a href="reference/to_label.html">to_label()</a></code>, <code><a href="reference/set_na.html">set_na()</a></code>, + 6 more</td>
 <td>Get/set labels, convert formats, declare missing values</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Data Transformation</strong></td>
 <td>
 <code><a href="reference/rec.html">rec()</a></code>, <code><a href="reference/to_dummy.html">to_dummy()</a></code>, <code><a href="reference/std.html">std()</a></code>, <code><a href="reference/center.html">center()</a></code>, <code><a href="reference/find_var.html">find_var()</a></code>
 </td>
 <td>Recoding, dummy coding, standardization, centering</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Descriptive</strong></td>
 <td>
 <code><a href="reference/describe.html">describe()</a></code>, <code><a href="reference/frequency.html">frequency()</a></code>, <code><a href="reference/crosstab.html">crosstab()</a></code>, <code><a href="reference/codebook.html">codebook()</a></code>
 </td>
 <td>Summaries, distributions, and data dictionaries</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>T-Tests</strong></td>
 <td><code><a href="reference/t_test.html">t_test()</a></code></td>
 <td>Mean comparisons (independent, paired, one-sample)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>ANOVA</strong></td>
 <td>
 <code><a href="reference/oneway_anova.html">oneway_anova()</a></code>, <code><a href="reference/factorial_anova.html">factorial_anova()</a></code>, <code><a href="reference/ancova.html">ancova()</a></code>
 </td>
 <td>One-way, multi-factor ANOVA, and ANCOVA with Type III SS</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Non-parametric</strong></td>
 <td>
 <code><a href="reference/mann_whitney.html">mann_whitney()</a></code>, <code><a href="reference/kruskal_wallis.html">kruskal_wallis()</a></code>, <code><a href="reference/wilcoxon_test.html">wilcoxon_test()</a></code>, <code><a href="reference/friedman_test.html">friedman_test()</a></code>, <code><a href="reference/binomial_test.html">binomial_test()</a></code>
 </td>
 <td>Distribution-free tests</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Exact tests</strong></td>
 <td>
 <code><a href="reference/chi_square.html">chi_square()</a></code>, <code><a href="reference/fisher_test.html">fisher_test()</a></code>, <code><a href="reference/chisq_gof.html">chisq_gof()</a></code>, <code><a href="reference/mcnemar_test.html">mcnemar_test()</a></code>
 </td>
 <td>Categorical associations and exact tests</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Correlation</strong></td>
 <td>
 <code><a href="reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="reference/spearman_rho.html">spearman_rho()</a></code>, <code><a href="reference/kendall_tau.html">kendall_tau()</a></code>
 </td>
 <td>Relationships between variables</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Post-hoc</strong></td>
 <td>
 <code><a href="reference/tukey_test.html">tukey_test()</a></code>, <code><a href="reference/scheffe_test.html">scheffe_test()</a></code>, <code><a href="reference/levene_test.html">levene_test()</a></code>, <code><a href="reference/dunn_test.html">dunn_test()</a></code>, <code><a href="reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>
 </td>
 <td>Follow-up analyses (parametric and non-parametric)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Scale analysis</strong></td>
 <td>
 <code><a href="reference/reliability.html">reliability()</a></code>, <code><a href="reference/efa.html">efa()</a></code>, <code><a href="reference/row_means.html">row_means()</a></code>, <code><a href="reference/row_sums.html">row_sums()</a></code>, <code><a href="reference/row_count.html">row_count()</a></code>, <code><a href="reference/pomps.html">pomps()</a></code>
 </td>
 <td>Cronbach’s Alpha, factor analysis, index construction</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Regression</strong></td>
 <td>
 <code><a href="reference/linear_regression.html">linear_regression()</a></code>, <code><a href="reference/logistic_regression.html">logistic_regression()</a></code>
 </td>
 <td>Linear and logistic models with SPSS-style output</td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Effect sizes</strong></td>
 <td>
 <code><a href="reference/chi_square.html">phi()</a></code>, <code><a href="reference/chi_square.html">cramers_v()</a></code>, <code><a href="reference/chi_square.html">goodman_gamma()</a></code>
 </td>
 <td>Effect size measures for categorical data</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Weighted stats</strong></td>
 <td>
 <code><a href="reference/w_mean.html">w_mean()</a></code>, <code><a href="reference/w_median.html">w_median()</a></code>, <code><a href="reference/w_sd.html">w_sd()</a></code>, + 8 more</td>
@@ -367,8 +367,6 @@ T-TEST GROUPS=gender(1 2)
 <ul>
 <li>
 <a href="https://github.com/YannickDiehl/mariposa/issues" class="external-link">GitHub Issues</a> - Bug reports and feature requests</li>
-<li>
-<a href="https://github.com/YannickDiehl/mariposa/discussions" class="external-link">GitHub Discussions</a> - Questions and ideas</li>
 </ul>
 </div>
 <div class="section level2">

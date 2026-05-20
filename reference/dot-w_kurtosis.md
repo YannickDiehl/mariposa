@@ -1,6 +1,6 @@
-# Weighted kurtosis with bias correction
+# Weighted kurtosis (SPSS Type-2; delegates to .calc_kurtosis)
 
-Weighted kurtosis with bias correction
+Weighted kurtosis (SPSS Type-2; delegates to .calc_kurtosis)
 
 ## Usage
 

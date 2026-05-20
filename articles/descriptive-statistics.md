@@ -1,6 +1,7 @@
 # Descriptive Statistics and Frequencies
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -14,12 +15,12 @@ how responses are distributed.
 
 mariposa provides four functions for data exploration:
 
-| Function                                                                        | Best for                                            |
-|---------------------------------------------------------------------------------|-----------------------------------------------------|
-| [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)   | Numeric variables — means, medians, spread          |
-| [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md) | Categorical variables — counts and percentages      |
-| [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)   | Relationships between two categorical variables     |
-| [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)   | Full data dictionary with types, labels, and values |
+| Function | Best for |
+|----|----|
+| [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md) | Numeric variables — means, medians, spread |
+| [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md) | Categorical variables — counts and percentages |
+| [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md) | Relationships between two categorical variables |
+| [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md) | Full data dictionary with types, labels, and values |
 
 All four support survey weights and grouped analysis.
 
@@ -28,6 +29,7 @@ All four support survey weights and grouped analysis.
 ### Basic Usage
 
 ``` r
+
 survey_data %>%
   describe(age)
 #> 
@@ -41,6 +43,7 @@ survey_data %>%
 ### Multiple Variables
 
 ``` r
+
 survey_data %>%
   describe(age, income, life_satisfaction)
 #> 
@@ -58,6 +61,7 @@ survey_data %>%
 Add `weights` for population-representative statistics:
 
 ``` r
+
 survey_data %>%
   describe(age, income, life_satisfaction, weights = sampling_weight)
 #> 
@@ -65,8 +69,8 @@ survey_data %>%
 #> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
-#>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#>             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
+#>  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9
 #> ----------------------------------------
 ```
 
@@ -75,6 +79,7 @@ survey_data %>%
 Compare statistics across subgroups:
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction, weights = sampling_weight)
@@ -86,15 +91,15 @@ survey_data %>%
 #> --------------------
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#>             income 3760.687   3600 1388.321  7200 1700    0.721       421.9
+#>  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4
 #> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#>             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
 #> ----------------------------------------
 ```
@@ -104,6 +109,7 @@ survey_data %>%
 The `show` argument controls which statistics are displayed:
 
 ``` r
+
 # Just the essentials
 survey_data %>%
   describe(age, income, show = c("mean", "sd", "range"))
@@ -117,6 +123,7 @@ survey_data %>%
 ```
 
 ``` r
+
 # Everything available
 survey_data %>%
   describe(age, show = "all")
@@ -133,12 +140,12 @@ survey_data %>%
 ### Understanding the Output
 
 - **n**: Number of valid (non-missing) cases
-- **mean** ($\bar{x}$): The arithmetic average
+- **mean** ($`\bar{x}`$): The arithmetic average
 - **sd**: Standard deviation — how spread out the values are
 - **median**: The middle value (50th percentile)
 - **min / max**: The range of observed values
 - **skewness**: Distribution symmetry. Values near 0 indicate symmetry;
-  values beyond $\pm 1$ indicate notable skew
+  values beyond $`\pm 1`$ indicate notable skew
 - **kurtosis**: Tail heaviness. Values near 0 indicate a normal-like
   shape
 
@@ -147,6 +154,7 @@ survey_data %>%
 ### Basic Frequency
 
 ``` r
+
 survey_data %>%
   frequency(education)
 #> 
@@ -181,6 +189,7 @@ patterns). Use *Percent* when non-response is itself meaningful.
 ### Weighted Frequencies
 
 ``` r
+
 survey_data %>%
   frequency(education, weights = sampling_weight)
 #> 
@@ -205,6 +214,7 @@ survey_data %>%
 ### Multiple Variables
 
 ``` r
+
 survey_data %>%
   frequency(education, employment, region, weights = sampling_weight)
 #> 
@@ -258,6 +268,7 @@ survey_data %>%
 ### Grouped Frequencies
 
 ``` r
+
 survey_data %>%
   group_by(gender) %>%
   frequency(education, weights = sampling_weight)
@@ -306,6 +317,7 @@ survey_data %>%
 Examine the relationship between two categorical variables:
 
 ``` r
+
 survey_data %>%
   crosstab(education, employment)
 #> 
@@ -352,6 +364,7 @@ proportion has each education level?”
 ### Weighted Crosstabs
 
 ``` r
+
 survey_data %>%
   crosstab(education, employment, weights = sampling_weight)
 #> 
@@ -386,6 +399,7 @@ survey_data %>%
 ### Grouped Crosstabs
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   crosstab(education, employment, weights = sampling_weight)
@@ -462,6 +476,7 @@ For a comprehensive overview of your entire dataset, use
 [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md):
 
 ``` r
+
 codebook(survey_data)
 ```
 
@@ -474,6 +489,7 @@ patterns. It is the fastest way to orient yourself in a new dataset.
 A typical descriptive analysis workflow:
 
 ``` r
+
 # 1. Explore the dataset
 find_var(survey_data, "trust|satisfaction")
 #>   col              name                                           label
@@ -491,8 +507,8 @@ survey_data %>%
 #> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
-#>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#>             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
+#>  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9
 #> ----------------------------------------
 
 # 3. Check categorical distributions
@@ -578,15 +594,15 @@ survey_data %>%
 #> --------------------
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#>             income 3760.687   3600 1388.321  7200 1700    0.721       421.9
+#>  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4
 #> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#>             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
 #> ----------------------------------------
 ```
@@ -601,9 +617,9 @@ survey_data %>%
     plausible limits, or out-of-range Likert responses indicate data
     quality issues.
 
-3.  **Look at skewness.** Values beyond $\pm 1$ suggest the distribution
-    departs notably from normality. This affects the choice between
-    parametric and non-parametric tests.
+3.  **Look at skewness.** Values beyond $`\pm 1`$ suggest the
+    distribution departs notably from normality. This affects the choice
+    between parametric and non-parametric tests.
 
 4.  **Always use weights when available.** Unweighted statistics
     describe your sample; weighted statistics estimate the population.

@@ -1,5 +1,149 @@
 # Changelog
 
+## mariposa 0.6.1
+
+### Validation
+
+Substantial hardening of the SPSS-compatibility test suite. All 29 SPSS-
+validation test files were rewritten under a new Validation Charter (see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md))
+that defines tolerance tiers (Spec / Display / Exception / Internal),
+forbids inline tolerance literals, NA placeholders, and
+`expect_true(TRUE)` reporting blocks, and requires citation comments
+linking every reference value to its source line in
+`tests/spss_reference/outputs/`.
+
+- 1832+ passing assertions across all 29 validation files, 0 failures.
+- New `tests/testthat/helper-validation-tolerances.R` provides
+  `assert_spss()` and `tol()` helpers with explicit tier semantics.
+- New `tests/testthat/test-validation-discipline.R` meta-test lints
+  validation files for Charter-forbidden patterns.
+- New `vignettes/spss-compatibility.Rmd` reports per-function validation
+  status, auto-generated from the test suite.
+- New CI workflow `.github/workflows/strict-validation.yaml` runs the
+  full suite in strict-discipline mode on release tags and weekly.
+
+### Source-Code Fixes (weighted statistics)
+
+Three weighted statistical functions were corrected to use unrounded
+`sum(w)` per SPSS frequency-weights convention. Earlier versions rounded
+too early and produced systematic drift from SPSS in weighted scenarios.
+
+- [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md):
+  weighted variance, SE, and df calculations now use unrounded `sum(w)`
+  (one-sample and two-sample paths). Welch- Satterthwaite df now derived
+  from unrounded per-group weighted N.
+- [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md):
+  weighted variance divisor is now `(sum(w) - 1)` (sample formula, not
+  population). Weighted SE uses `sqrt(sum(w))`, not `sqrt(physical n)`.
+  Weighted CI t-critical-value uses `df = sum(w) - 1`, not Kish
+  design-effective N. `df_within` now uses `floor(sum(w)) - k` (SPSS
+  ONEWAY-specific convention).
+- [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md):
+  weighted Levene df now uses unrounded `sum(w) - k` (SPSS T-TEST family
+  convention).
+
+These changes are bug fixes and may slightly shift weighted-scenario
+results in user code. Differences are small (typically \< 0.01 on F or
+t) and bring mariposa into closer agreement with SPSS v29.
+
+### SPSS-Compatibility Vignette
+
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+documents the per-function validation status, the four tolerance tiers,
+and the SPSS-procedure-specific WEIGHT BY conventions discovered during
+the migration:
+
+- T-TEST family: unrounded `sum(w)`
+- ONEWAY: `floor(sum(w))`
+- UNIANOVA: Type III SS
+- NPAR TESTS: WEIGHT BY effectively ignored
+- NONPAR CORR (Spearman, Kendall): WEIGHT BY effectively ignored
+- CORRELATIONS (Pearson): WEIGHT BY honored
+- CROSSTABS, FREQUENCIES, RELIABILITY, FACTOR, REGRESSION: WEIGHT BY
+  honored
+
+### DESCRIPTION
+
+- `Title` shortened to “SPSS-Compatible Statistical Tools for Survey
+  Data” (CRAN soft-limit compliance).
+- Suggests cleanup: removed `PMCMRplus` and `survey` (no longer needed).
+
+### Audit-Driven Math Fixes (post-Phase-1)
+
+A second audit pass identified additional math defects and test fudges,
+all corrected in this release:
+
+- [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md):
+  SE now includes the Dunn (1964) / Conover (1999) tie correction.
+  Previous versions systematically under-estimated `|Z|` on tied data
+  (e.g., Likert scales). Baselines regenerated from
+  `PMCMRplus::kwAllPairsDunnTest` (exact match to 4 decimals).
+- [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md):
+  weighted branch now applies the tie correction consistently with
+  [`stats::friedman.test`](https://rdrr.io/r/stats/friedman.test.html)
+  (unweighted branch). The inconsistency caused weighted chi-squared
+  values to be too low for tied data.
+- [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md):
+  weighted skewness and kurtosis now delegate to
+  [`.calc_skewness()`](https://YannickDiehl.github.io/mariposa/reference/dot-calc_skewness.md)
+  /
+  [`.calc_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/dot-calc_kurtosis.md)
+  in `helpers.R` (Joanes-Gill Type-2 with `Σw` substitution), matching
+  [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md)
+  /
+  [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md)
+  and SPSS FREQUENCIES exactly. The previous duplicate implementation
+  used a simple weighted moment without bias correction.
+- [`.w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/dot-w_quantile.md):
+  weighted quantiles now use Type-6 (HAVERAGE) linear interpolation
+  between cumulative-weight crossings — matches SPSS FREQUENCIES
+  /PERCENTILES. Unweighted quantiles also switched from R default
+  `type = 7` to SPSS-compatible `type = 6`.
+
+### Documentation Honesty
+
+Several SPSS-compatibility claims were narrowed to reflect what the code
+actually does:
+
+- Source comments and test-file headers for the weighted paths of
+  [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
+  [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md),
+  and
+  [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
+  corrected from “design-based” / “Lumley-Scott” to “frequency-weighted
+  approximation”. Only
+  [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
+  is a genuine Lumley & Scott (2013) implementation; the others
+  substitute `sum(w)` for `n` in the standard variance formula.
+- [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
+  test now includes a permanent cross-check against
+  [`survey::svyranktest()`](https://rdrr.io/pkg/survey/man/svyranktest.html)
+  (skipped when survey is not installed).
+- [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md):
+  `weights` parameter docstring rewritten to disclose that weights are
+  used only for case filtering (per SPSS NONPAR CORR convention), not in
+  the rank correlation itself.
+- [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md):
+  docstring now warns that the weighted-df convention (`n = sum(w)`)
+  gives spuriously narrow CIs for raw expansion weights; users with such
+  weights should normalize first.
+- [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md):
+  test file replaced with property-based assertions (Wald formula, Sig
+  from chi-sq, exp(B) vs independent 2x2 odds ratio, Cox &
+  Snell/Nagelkerke/McFadden from textbook formulas, Omnibus from
+  likelihood ratio). No longer a tautological glm-vs-glm
+  self-comparison.
+
+### Code Smell Cleanup
+
+- [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md):
+  removed dead-code overwrite of `grand_mean_welch` in the weighted
+  Welch path.
+- [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md):
+  stale comment claiming `df2 = floor(sum(w)) - k` corrected — the code
+  uses unrounded `sum(w) - k` (T-TEST family convention).
+
 ## mariposa 0.6.0
 
 ### New Functions — Label Management

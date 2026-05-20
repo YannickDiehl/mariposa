@@ -1,6 +1,7 @@
 # Comparing Groups and Testing Hypotheses
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -14,15 +15,15 @@ in mariposa, organized by the type of data and research question.
 
 ### Choosing the Right Test
 
-| Your data                     | 2 groups                                                                                | 3+ groups                                                                                   | Paired                                                                                  |
-|-------------------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| **Continuous, normal**        | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)               | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)       | `t_test(paired)`                                                                        |
-| **Continuous, non-normal**    | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)   | [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)   | [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md) |
-| **Categorical**               | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)       | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)           | [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md)   |
-| **Small sample, categorical** | [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md)     | —                                                                                           | —                                                                                       |
-| **Multiple factors**          | —                                                                                       | [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md) |
-| **With covariate**            | —                                                                                       | [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)                   | —                                                                                       |
-| **Proportion vs. expected**   | [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md) | [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md)             | —                                                                                       |
+| Your data | 2 groups | 3+ groups | Paired |
+|----|----|----|----|
+| **Continuous, normal** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | `t_test(paired)` |
+| **Continuous, non-normal** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md) | [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md) | [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md) |
+| **Categorical** | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md) |
+| **Small sample, categorical** | [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md) | — | — |
+| **Multiple factors** | — | [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md) |
+| **With covariate** | — | [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md) | — |
+| **Proportion vs. expected** | [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md) | [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md) | — |
 
 ## t-Tests
 
@@ -31,10 +32,11 @@ in mariposa, organized by the type of data and research question.
 Compare two groups on a continuous variable:
 
 ``` r
+
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 ```
 
 The output includes both Student’s t-test (equal variances assumed) and
@@ -45,6 +47,7 @@ For the detailed output with group descriptives, Levene’s test, and
 confidence intervals:
 
 ``` r
+
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight) %>%
   summary()
@@ -67,8 +70,8 @@ survey_data %>%
 #> Weighted t-test Results:
 #> -------------------------------------------------------------------------------- 
 #>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    
+#>    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    
+#>  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    
 #> -------------------------------------------------------------------------------- 
 #> 
 #> Effect Sizes:
@@ -91,13 +94,14 @@ survey_data %>%
 ### Multiple Variables at Once
 
 ``` r
+
 survey_data %>%
   t_test(trust_government, trust_media, trust_science,
          group = gender, weights = sampling_weight)
 #> t-Test: trust_government by gender [Weighted]
-#>   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371
+#>   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371
 #> t-Test: trust_media by gender [Weighted]
-#>   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
+#>   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
 #> t-Test: trust_science by gender [Weighted]
 #>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414
 ```
@@ -107,11 +111,12 @@ survey_data %>%
 Test whether a mean differs from a specific value:
 
 ``` r
+
 # Is average life satisfaction different from the scale midpoint (3)?
 survey_data %>%
   t_test(life_satisfaction, mu = 3, weights = sampling_weight)
 #> t-Test: life_satisfaction [Weighted]
-#>   t(2436.0) = 26.776, p < 0.001 ***
+#>   t(2435.6) = 26.771, p < 0.001 ***
 ```
 
 ### Grouped Analysis
@@ -119,15 +124,16 @@ survey_data %>%
 Run separate tests per subgroup:
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> [region = 1]
 #> t-Test: income by gender [Weighted]
-#>   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450
+#>   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450
 #> [region = 2]
 #> t-Test: income by gender [Weighted]
-#>   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+#>   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
 ```
 
 ## One-Way ANOVA
@@ -135,19 +141,20 @@ survey_data %>%
 Compare means across three or more groups:
 
 ``` r
+
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
-#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
-The effect size $\eta^{2}$ (eta-squared) indicates how much variance is
+The effect size $`\eta^2`$ (eta-squared) indicates how much variance is
 explained by group membership:
 
-- **Small**: $\eta^{2} \approx 0.01$
-- **Medium**: $\eta^{2} \approx 0.06$
-- **Large**: $\eta^{2} \approx 0.14$
+- **Small**: $`\eta^2 \approx 0.01`$
+- **Medium**: $`\eta^2 \approx 0.06`$
+- **Large**: $`\eta^2 \approx 0.14`$
 
 ### Post-Hoc Tests
 
@@ -155,6 +162,7 @@ A significant ANOVA tells you that groups differ, but not *which*
 groups. Use post-hoc tests:
 
 ``` r
+
 # Tukey HSD: balanced comparison of all pairs
 tukey_test(result)
 #> Weighted Tukey HSD Post-Hoc Test Results
@@ -198,6 +206,7 @@ tukey_test(result)
 ```
 
 ``` r
+
 # Scheffe: more conservative (fewer false positives)
 scheffe_test(result)
 #> Weighted Scheffe Post-Hoc Test Results
@@ -247,6 +256,7 @@ scheffe_test(result)
 ANOVA assumes equal variances. Test with Levene’s test:
 
 ``` r
+
 levene_test(result)
 #> 
 #> Weighted Levene's Test for Homogeneity of Variance 
@@ -260,10 +270,10 @@ levene_test(result)
 #> --- life_satisfaction ---
 #> 
 #> Weighted Levene's Test Results:
-#> -------------------------------------------------------------------- 
-#>           Variable F_statistic df1  df2 p_value sig        Conclusion
-#>  life_satisfaction      31.287   3 2433       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
+#> -------------------------------------------------------------------------------- 
+#>           Variable F_statistic df1      df2 p_value sig        Conclusion
+#>  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal
+#> -------------------------------------------------------------------------------- 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
@@ -275,14 +285,15 @@ levene_test(result)
 #> - Use Welch's t-test (unequal variances)
 ```
 
-If Levene’s test is significant ($p < .05$), variances are unequal. Use
-the Welch correction included in the ANOVA output.
+If Levene’s test is significant ($`p < .05`$), variances are unequal.
+Use the Welch correction included in the ANOVA output.
 
 ## Factorial ANOVA
 
 Test the effects of two or more factors and their interactions:
 
 ``` r
+
 survey_data %>%
   factorial_anova(dv = income, between = c(gender, education),
                   weights = sampling_weight)
@@ -292,13 +303,14 @@ survey_data %>%
 #>   gender:education: F(3, 2178) = 0.300, p = 0.825 , eta2p = 0.000, N = 2186
 ```
 
-The output uses Type III sums of squares and reports partial $\eta^{2}$
+The output uses Type III sums of squares and reports partial $`\eta^2`$
 for each effect. Weighted analysis uses WLS estimation, matching SPSS
 UNIANOVA.
 
 For the full output with descriptive statistics per cell:
 
 ``` r
+
 survey_data %>%
   factorial_anova(dv = life_satisfaction, between = c(gender, region),
                   weights = sampling_weight) %>%
@@ -357,6 +369,7 @@ survey_data %>%
 Compare groups while controlling for a covariate:
 
 ``` r
+
 survey_data %>%
   ancova(dv = income, between = education, covariate = age,
          weights = sampling_weight)
@@ -378,6 +391,7 @@ small samples.
 The non-parametric alternative to the independent t-test:
 
 ``` r
+
 survey_data %>%
   mann_whitney(political_orientation, group = region,
                weights = sampling_weight)
@@ -390,6 +404,7 @@ survey_data %>%
 The non-parametric alternative to one-way ANOVA (3+ groups):
 
 ``` r
+
 kw_result <- survey_data %>%
   kruskal_wallis(life_satisfaction, group = education)
 
@@ -431,6 +446,7 @@ kw_result
 When significant, use Dunn’s post-hoc test with Bonferroni correction:
 
 ``` r
+
 dunn_test(kw_result)
 #> Dunn Post-Hoc Test (Bonferroni) Results
 #> ---------------------------------------
@@ -441,12 +457,12 @@ dunn_test(kw_result)
 #> 
 #> ---------------------------------------------------------------------------- 
 #>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.402     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.465     <.001   <.001 *** 
-#>         Basic Secondary             University -11.159     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.291     
-#>  Intermediate Secondary             University  -4.539     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.790     0.005   0.032   * 
+#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
+#>         Basic Secondary             University -11.545     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
+#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.886     0.004   0.023   * 
 #> ---------------------------------------------------------------------------- 
 #> 
 #> 
@@ -463,6 +479,7 @@ dunn_test(kw_result)
 The non-parametric alternative to the paired t-test:
 
 ``` r
+
 data(longitudinal_data_wide)
 
 longitudinal_data_wide %>%
@@ -509,6 +526,7 @@ The non-parametric alternative to repeated-measures ANOVA (3+
 measurements):
 
 ``` r
+
 friedman_result <- longitudinal_data_wide %>%
   friedman_test(score_T1, score_T2, score_T3)
 
@@ -546,6 +564,7 @@ friedman_result
 When significant, use pairwise Wilcoxon post-hoc tests:
 
 ``` r
+
 pairwise_wilcoxon(friedman_result)
 #> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results
 #> ----------------------------------------------------
@@ -575,6 +594,7 @@ pairwise_wilcoxon(friedman_result)
 Test whether an observed proportion differs from an expected value:
 
 ``` r
+
 survey_data %>%
   binomial_test(gender)
 #> 
@@ -611,6 +631,7 @@ survey_data %>%
 Test whether two categorical variables are related:
 
 ``` r
+
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
 #> Chi-Squared Test: education × employment [Weighted]
@@ -623,6 +644,7 @@ one tells you something about the other.
 ### Effect Sizes for Categorical Data
 
 ``` r
+
 # Phi coefficient (2x2 tables)
 survey_data %>%
   phi(gender, employment, weights = sampling_weight)
@@ -631,6 +653,7 @@ survey_data %>%
 ```
 
 ``` r
+
 # Cramer's V (larger tables)
 survey_data %>%
   cramers_v(education, employment, weights = sampling_weight)
@@ -643,6 +666,7 @@ survey_data %>%
 Use when expected cell frequencies are below 5:
 
 ``` r
+
 small_sample <- survey_data %>% slice_sample(n = 30)
 
 small_sample %>%
@@ -675,6 +699,7 @@ small_sample %>%
 Test whether observed frequencies match expected proportions:
 
 ``` r
+
 # Equal proportions (default)
 survey_data %>%
   chisq_gof(education)
@@ -703,6 +728,7 @@ survey_data %>%
 ```
 
 ``` r
+
 # Custom expected proportions
 survey_data %>%
   chisq_gof(education, expected = c(0.30, 0.25, 0.25, 0.20))
@@ -735,6 +761,7 @@ survey_data %>%
 Compare paired proportions (e.g., before/after):
 
 ``` r
+
 test_data <- survey_data %>%
   mutate(
     trust_gov_high = ifelse(trust_government > 3, 1, 0),
@@ -749,8 +776,8 @@ test_data %>%
 
 ### p-Values
 
-- $p < .05$: The difference is statistically significant
-- $p \geq .05$: No significant difference detected
+- $`p < .05`$: The difference is statistically significant
+- $`p \geq .05`$: No significant difference detected
 
 “Not significant” does **not** mean “no difference” — it means we cannot
 rule out chance given the sample size.
@@ -763,7 +790,7 @@ check effect sizes:
 | Test        | Effect size  | Small | Medium | Large |
 |-------------|--------------|-------|--------|-------|
 | t-test      | Cohen’s *d*  | 0.20  | 0.50   | 0.80  |
-| ANOVA       | $\eta^{2}$   | 0.01  | 0.06   | 0.14  |
+| ANOVA       | $`\eta^2`$   | 0.01  | 0.06   | 0.14  |
 | Chi-square  | Cramer’s *V* | 0.10  | 0.30   | 0.50  |
 | Correlation | *r*          | 0.10  | 0.30   | 0.50  |
 
@@ -780,6 +807,7 @@ handle this automatically with corrections.
 A typical hypothesis testing workflow:
 
 ``` r
+
 # 1. Describe the groups
 survey_data %>%
   group_by(education) %>%
@@ -799,21 +827,21 @@ survey_data %>%
 #> -----------------------------------------
 #> ----------------------------------------
 #>           Variable  Mean Median   SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8
+#>  life_satisfaction 3.698      4 1.11     4   2   -0.592       611.8
 #> ----------------------------------------
 #> 
 #> Group: education = Academic Secondary
 #> -------------------------------------
 #> ----------------------------------------
 #>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6
+#>  life_satisfaction 3.851      4 0.997     4   2   -0.581       600.6
 #> ----------------------------------------
 #> 
 #> Group: education = University
 #> -----------------------------
 #> ----------------------------------------
 #>           Variable Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8
+#>  life_satisfaction 4.04      4 0.962     4   1   -0.967       377.8
 #> ----------------------------------------
 
 # 2. Test for overall differences
@@ -822,7 +850,7 @@ anova_result <- survey_data %>%
                weights = sampling_weight)
 anova_result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
-#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 
 # 3. Check assumptions
 levene_test(anova_result)
@@ -838,10 +866,10 @@ levene_test(anova_result)
 #> --- life_satisfaction ---
 #> 
 #> Weighted Levene's Test Results:
-#> -------------------------------------------------------------------- 
-#>           Variable F_statistic df1  df2 p_value sig        Conclusion
-#>  life_satisfaction      31.287   3 2433       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
+#> -------------------------------------------------------------------------------- 
+#>           Variable F_statistic df1      df2 p_value sig        Conclusion
+#>  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal
+#> -------------------------------------------------------------------------------- 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 

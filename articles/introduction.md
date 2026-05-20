@@ -1,6 +1,7 @@
 # Introduction to mariposa
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 ```
@@ -36,6 +37,7 @@ mariposa includes `survey_data`, a synthetic survey of 2,500 respondents
 with demographics, attitudes, and a sampling weight:
 
 ``` r
+
 data(survey_data)
 glimpse(survey_data)
 #> Rows: 2,500
@@ -67,6 +69,7 @@ Here is a complete analysis workflow showing what mariposa can do:
 ### 1. Explore the Data
 
 ``` r
+
 # Find variables related to "trust"
 find_var(survey_data, "trust")
 #>   col             name                                    label
@@ -76,6 +79,7 @@ find_var(survey_data, "trust")
 ```
 
 ``` r
+
 # Descriptive statistics with survey weights
 survey_data %>%
   describe(age, income, life_satisfaction, weights = sampling_weight)
@@ -84,12 +88,13 @@ survey_data %>%
 #> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.514     50   17.084    77   25    0.159      2468.8
-#>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#>             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
+#>  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9
 #> ----------------------------------------
 ```
 
 ``` r
+
 # Frequency table
 survey_data %>%
   frequency(education, weights = sampling_weight)
@@ -115,6 +120,7 @@ survey_data %>%
 ### 2. Transform Variables
 
 ``` r
+
 # Create age groups
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
@@ -129,26 +135,29 @@ survey_data <- survey_data %>%
 ### 3. Compare Groups
 
 ``` r
+
 # t-test with survey weights
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 ```
 
 ``` r
+
 # ANOVA across education levels
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
-#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
 Every result has a detailed view with
 [`summary()`](https://rdrr.io/r/base/summary.html):
 
 ``` r
+
 summary(result, descriptives = FALSE)
 #> Weighted One-Way ANOVA Results
 #> ------------------------------
@@ -167,9 +176,9 @@ summary(result, descriptives = FALSE)
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.359   <.001   1
-#>   Within Groups    2992.019 2433        1.23                   
-#>           Total    3233.149 2436                               
+#>  Between Groups     241.130    3      80.377 65.333   <.001   1
+#>   Within Groups    2992.019 2432        1.23                   
+#>           Total    3233.149 2435                               
 #> -------------------------------------------------------------------------------- 
 #> 
 #> Assumption Tests:
@@ -197,6 +206,7 @@ summary(result, descriptives = FALSE)
 ### 4. Post-Hoc Analysis
 
 ``` r
+
 # Which education groups differ?
 tukey_test(result)
 #> Weighted Tukey HSD Post-Hoc Test Results
@@ -242,6 +252,7 @@ tukey_test(result)
 ### 5. Measure Relationships
 
 ``` r
+
 survey_data %>%
   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
 #> Pearson Correlation: 3 variables [Weighted]
@@ -254,6 +265,7 @@ survey_data %>%
 ### 6. Build Models
 
 ``` r
+
 survey_data %>%
   linear_regression(life_satisfaction ~ age + income + m_trust,
                     weights = sampling_weight)
@@ -273,13 +285,14 @@ Every analysis function in mariposa provides two output levels:
 You can toggle individual sections in the detailed output:
 
 ``` r
+
 result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 
 # Compact
 result
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 
 # Detailed
 summary(result)
@@ -302,8 +315,8 @@ summary(result)
 #> Weighted t-test Results:
 #> -------------------------------------------------------------------------------- 
 #>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    
+#>    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    
+#>  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    
 #> -------------------------------------------------------------------------------- 
 #> 
 #> Effect Sizes:
@@ -343,8 +356,8 @@ summary(result, effect_sizes = FALSE)
 #> Weighted t-test Results:
 #> -------------------------------------------------------------------------------- 
 #>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    
+#>    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    
+#>  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    
 #> -------------------------------------------------------------------------------- 
 #> 
 #> 
@@ -358,6 +371,7 @@ All functions support
 for subgroup analysis:
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   describe(income, life_satisfaction, weights = sampling_weight)
@@ -369,136 +383,137 @@ survey_data %>%
 #> --------------------
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#>             income 3760.687   3600 1388.321  7200 1700    0.721       421.9
+#>  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4
 #> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#>             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
 #> ----------------------------------------
 ```
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> [region = 1]
 #> t-Test: income by gender [Weighted]
-#>   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450
+#>   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450
 #> [region = 2]
 #> t-Test: income by gender [Weighted]
-#>   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+#>   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
 ```
 
 ## Quick Reference
 
 ### Data Import & Export
 
-| Function                                                                                                                                                       | Purpose                                         |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md), [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md) | Import SPSS files with tagged NA support        |
-| [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)                                                                              | Import Stata files                              |
-| [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md), [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)   | Import SAS files                                |
-| [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)                                                                                | Import Excel files with label reconstruction    |
-| [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)                                                                              | Export to SPSS with label/missing roundtripping |
-| [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md)                                                                            | Export to Stata                                 |
-| [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)                                                                                | Export to SAS transport format                  |
-| [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)                                                                              | Export to Excel (data, codebook, frequencies)   |
+| Function | Purpose |
+|----|----|
+| [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md), [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md) | Import SPSS files with tagged NA support |
+| [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md) | Import Stata files |
+| [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md), [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md) | Import SAS files |
+| [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md) | Import Excel files with label reconstruction |
+| [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md) | Export to SPSS with label/missing roundtripping |
+| [`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md) | Export to Stata |
+| [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md) | Export to SAS transport format |
+| [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md) | Export to Excel (data, codebook, frequencies) |
 
 ### Label Management
 
-| Function                                                                              | Purpose                               |
-|---------------------------------------------------------------------------------------|---------------------------------------|
-| [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md)       | Get/set variable labels               |
-| [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md)     | Get/set value labels                  |
-| [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md)         | Search variables by name or label     |
-| [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)         | Labelled → factor                     |
-| [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md) | Labelled → character                  |
-| [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md)     | Factor/labelled → numeric             |
-| [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)   | Factor/character → labelled           |
-| [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)             | Declare values as missing             |
-| [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md)           | Strip all label metadata              |
-| [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md)   | Restore labels after dplyr operations |
-| [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md)   | Remove unused value labels            |
+| Function | Purpose |
+|----|----|
+| [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md) | Get/set variable labels |
+| [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md) | Get/set value labels |
+| [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md) | Search variables by name or label |
+| [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md) | Labelled → factor |
+| [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md) | Labelled → character |
+| [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md) | Factor/labelled → numeric |
+| [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md) | Factor/character → labelled |
+| [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md) | Declare values as missing |
+| [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md) | Strip all label metadata |
+| [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md) | Restore labels after dplyr operations |
+| [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md) | Remove unused value labels |
 
 ### Data Transformation
 
-| Function                                                                        | Purpose                                                   |
-|---------------------------------------------------------------------------------|-----------------------------------------------------------|
-| [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md)             | Recode with string syntax (ranges, reverse, median split) |
-| [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md)   | One-hot encoding / dummy variables                        |
-| [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md)             | Z-standardization (sd, 2sd, mad, gmd methods)             |
-| [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md)       | Mean-centering (grand-mean, group-mean)                   |
-| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Row-wise means with min_valid threshold                   |
-| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)   | Row-wise sums                                             |
-| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md) | Count specific values per row                             |
-| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)         | Percent of Maximum Possible Scores (0–100)                |
+| Function | Purpose |
+|----|----|
+| [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md) | Recode with string syntax (ranges, reverse, median split) |
+| [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md) | One-hot encoding / dummy variables |
+| [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md) | Z-standardization (sd, 2sd, mad, gmd methods) |
+| [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md) | Mean-centering (grand-mean, group-mean) |
+| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Row-wise means with min_valid threshold |
+| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md) | Row-wise sums |
+| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md) | Count specific values per row |
+| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md) | Percent of Maximum Possible Scores (0–100) |
 
 ### Descriptive Statistics
 
-| Function                                                                        | Purpose                                               |
-|---------------------------------------------------------------------------------|-------------------------------------------------------|
-| [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)   | Interactive HTML data dictionary                      |
-| [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)   | Numeric summaries (mean, sd, median, range, skewness) |
-| [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md) | Frequency tables with valid/cumulative percent        |
-| [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)   | Cross-tabulations with row/column/cell percentages    |
+| Function | Purpose |
+|----|----|
+| [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md) | Interactive HTML data dictionary |
+| [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md) | Numeric summaries (mean, sd, median, range, skewness) |
+| [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md) | Frequency tables with valid/cumulative percent |
+| [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md) | Cross-tabulations with row/column/cell percentages |
 
 ### Hypothesis Testing
 
-| Function                                                                                    | Purpose                                     |
-|---------------------------------------------------------------------------------------------|---------------------------------------------|
-| [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)                   | Independent, paired, and one-sample t-tests |
-| [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)       | One-way ANOVA                               |
-| [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | Multi-factor ANOVA with Type III SS         |
-| [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)                   | ANCOVA with estimated marginal means        |
-| [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)       | Mann-Whitney U test                         |
-| [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)   | Kruskal-Wallis H test                       |
-| [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)     | Wilcoxon signed-rank test                   |
-| [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)     | Friedman test                               |
-| [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md)     | Exact binomial test                         |
-| [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)           | Chi-square test of independence             |
-| [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md)         | Fisher’s exact test                         |
-| [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md)             | Chi-square goodness-of-fit                  |
-| [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md)       | McNemar’s test for paired proportions       |
+| Function | Purpose |
+|----|----|
+| [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | Independent, paired, and one-sample t-tests |
+| [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | One-way ANOVA |
+| [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | Multi-factor ANOVA with Type III SS |
+| [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md) | ANCOVA with estimated marginal means |
+| [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md) | Mann-Whitney U test |
+| [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md) | Kruskal-Wallis H test |
+| [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md) | Wilcoxon signed-rank test |
+| [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md) | Friedman test |
+| [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md) | Exact binomial test |
+| [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Chi-square test of independence |
+| [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md) | Fisher’s exact test |
+| [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md) | Chi-square goodness-of-fit |
+| [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md) | McNemar’s test for paired proportions |
 
 ### Post-Hoc & Effect Sizes
 
-| Function                                                                                        | Purpose                            |
-|-------------------------------------------------------------------------------------------------|------------------------------------|
-| [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md)               | Tukey HSD pairwise comparisons     |
-| [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md)           | Scheffe pairwise comparisons       |
-| [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)             | Test for homogeneity of variances  |
-| [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md)                 | Dunn’s post-hoc for Kruskal-Wallis |
-| [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md) | Pairwise Wilcoxon for Friedman     |
-| [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)                      | Phi coefficient                    |
-| [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)                | Cramer’s V                         |
-| [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)            | Goodman-Kruskal gamma              |
+| Function | Purpose |
+|----|----|
+| [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md) | Tukey HSD pairwise comparisons |
+| [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md) | Scheffe pairwise comparisons |
+| [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md) | Test for homogeneity of variances |
+| [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md) | Dunn’s post-hoc for Kruskal-Wallis |
+| [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md) | Pairwise Wilcoxon for Friedman |
+| [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Phi coefficient |
+| [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Cramer’s V |
+| [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Goodman-Kruskal gamma |
 
 ### Scale Analysis
 
-| Function                                                                            | Purpose                                                      |
-|-------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Cronbach’s Alpha with item statistics                        |
-| [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)                 | Exploratory Factor Analysis (PCA/ML, Varimax/Oblimin/Promax) |
+| Function | Purpose |
+|----|----|
+| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Cronbach’s Alpha with item statistics |
+| [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md) | Exploratory Factor Analysis (PCA/ML, Varimax/Oblimin/Promax) |
 
 ### Regression
 
-| Function                                                                                            | Purpose                                  |
-|-----------------------------------------------------------------------------------------------------|------------------------------------------|
-| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)     | Linear regression with SPSS-style output |
-| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Logistic regression with odds ratios     |
+| Function | Purpose |
+|----|----|
+| [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md) | Linear regression with SPSS-style output |
+| [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Logistic regression with odds ratios |
 
 ### Weighted Statistics
 
-| Function                                                                                                                                                                                                                                                                                                       | Purpose                     |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
-| [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md), [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md), [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md), [`w_var()`](https://YannickDiehl.github.io/mariposa/reference/w_var.md)       | Central tendency and spread |
-| [`w_se()`](https://YannickDiehl.github.io/mariposa/reference/w_se.md), [`w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md), [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md), [`w_range()`](https://YannickDiehl.github.io/mariposa/reference/w_range.md) | Precision and distribution  |
-| [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md), [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md), [`w_modus()`](https://YannickDiehl.github.io/mariposa/reference/w_modus.md)                                                                      | Shape and mode              |
+| Function | Purpose |
+|----|----|
+| [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md), [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md), [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md), [`w_var()`](https://YannickDiehl.github.io/mariposa/reference/w_var.md) | Central tendency and spread |
+| [`w_se()`](https://YannickDiehl.github.io/mariposa/reference/w_se.md), [`w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/w_quantile.md), [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md), [`w_range()`](https://YannickDiehl.github.io/mariposa/reference/w_range.md) | Precision and distribution |
+| [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md), [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md), [`w_modus()`](https://YannickDiehl.github.io/mariposa/reference/w_modus.md) | Shape and mode |
 
 ## Guides
 

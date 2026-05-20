@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Comparing Groups and Testing Hypotheses">
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -171,7 +171,7 @@ question.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: life_satisfaction by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span></span></code></pre></div>
 <p>The output includes both Student’s t-test (equal variances assumed)
 and Welch’s t-test (not assumed). When in doubt, use Welch — it is more
 robust.</p>
@@ -200,8 +200,8 @@ confidence intervals:</p>
 <span><span class="co">#&gt; Weighted t-test Results:</span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -1.070 2434.000   0.285     -0.05 [-0.142, 0.042]    </span></span>
-<span><span class="co">#&gt;  Unequal variances -1.069 2390.755   0.285     -0.05 [-0.142, 0.042]    </span></span>
+<span><span class="co">#&gt;    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    </span></span>
+<span><span class="co">#&gt;  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    </span></span>
 <span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Sizes:</span></span>
@@ -228,9 +228,9 @@ confidence intervals:</p>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>         group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: trust_government by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371</span></span>
+<span><span class="co">#&gt;   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371</span></span>
 <span><span class="co">#&gt; t-Test: trust_media by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382</span></span>
+<span><span class="co">#&gt;   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382</span></span>
 <span><span class="co">#&gt; t-Test: trust_science by gender [Weighted]</span></span>
 <span><span class="co">#&gt;   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414</span></span></code></pre></div>
 </div>
@@ -243,7 +243,7 @@ confidence intervals:</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, mu <span class="op">=</span> <span class="fl">3</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: life_satisfaction [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2436.0) = 26.776, p &lt; 0.001 ***</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2435.6) = 26.771, p &lt; 0.001 ***</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
@@ -255,10 +255,10 @@ confidence intervals:</p>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [region = 1]</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450</span></span>
+<span><span class="co">#&gt;   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450</span></span>
 <span><span class="co">#&gt; [region = 2]</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -270,7 +270,7 @@ confidence intervals:</p>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="va">result</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
-<span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
+<span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
 <p>The effect size
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>η</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\eta^2</annotation></semantics></math>
 (eta-squared) indicates how much variance is explained by group
@@ -397,10 +397,10 @@ membership:</p>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Levene's Test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;           Variable F_statistic df1  df2 p_value sig        Conclusion</span></span>
-<span><span class="co">#&gt;  life_satisfaction      31.287   3 2433       0 *** Variances unequal</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;           Variable F_statistic df1      df2 p_value sig        Conclusion</span></span>
+<span><span class="co">#&gt;  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal</span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -571,12 +571,12 @@ correction:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt;                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span></span>
-<span><span class="co">#&gt;         Basic Secondary Intermediate Secondary  -7.402     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;         Basic Secondary     Academic Secondary  -9.465     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;         Basic Secondary             University -11.159     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.291     </span></span>
-<span><span class="co">#&gt;  Intermediate Secondary             University  -4.539     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;      Academic Secondary             University  -2.790     0.005   0.032   * </span></span>
+<span><span class="co">#&gt;         Basic Secondary Intermediate Secondary  -7.658     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;         Basic Secondary     Academic Secondary  -9.792     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;         Basic Secondary             University -11.545     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     </span></span>
+<span><span class="co">#&gt;  Intermediate Secondary             University  -4.696     &lt;.001   &lt;.001 *** </span></span>
+<span><span class="co">#&gt;      Academic Secondary             University  -2.886     0.004   0.023   * </span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -960,21 +960,21 @@ corrections.</p>
 <span><span class="co">#&gt; -----------------------------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable  Mean Median   SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.698      4 1.11     4   2    -0.59       611.8</span></span>
+<span><span class="co">#&gt;  life_satisfaction 3.698      4 1.11     4   2   -0.592       611.8</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = Academic Secondary</span></span>
 <span><span class="co">#&gt; -------------------------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.851      4 0.997     4   2    -0.58       600.6</span></span>
+<span><span class="co">#&gt;  life_satisfaction 3.851      4 0.997     4   2   -0.581       600.6</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = University</span></span>
 <span><span class="co">#&gt; -----------------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 4.04      4 0.962     4   1   -0.963       377.8</span></span>
+<span><span class="co">#&gt;  life_satisfaction 4.04      4 0.962     4   1   -0.967       377.8</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span></span>
 <span><span class="co"># 2. Test for overall differences</span></span>
@@ -983,7 +983,7 @@ corrections.</p>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="va">anova_result</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
-<span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span>
+<span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span>
 <span></span>
 <span><span class="co"># 3. Check assumptions</span></span>
 <span><span class="fu"><a href="../reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="va">anova_result</span><span class="op">)</span></span>
@@ -999,10 +999,10 @@ corrections.</p>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Levene's Test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;           Variable F_statistic df1  df2 p_value sig        Conclusion</span></span>
-<span><span class="co">#&gt;  life_satisfaction      31.287   3 2433       0 *** Variances unequal</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;           Variable F_statistic df1      df2 p_value sig        Conclusion</span></span>
+<span><span class="co">#&gt;  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal</span></span>
+<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>

@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Working with Survey Weights">
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -325,8 +325,8 @@ argument:</p>
 <span><span class="co">#&gt; Weighted Descriptive Statistics</span></span>
 <span><span class="co">#&gt; -------------------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9</span></span>
-<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9</span></span>
+<span><span class="co">#&gt;             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Frequency tables</span></span>
@@ -354,14 +354,14 @@ argument:</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2178.7) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ANOVA</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
-<span><span class="co">#&gt;   F(3, 2433) = 65.359, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
+<span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Chi-square</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -400,8 +400,8 @@ argument:</p>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;                age   52.278     53   17.595    77   24    0.098       477.0</span></span>
-<span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
-<span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4</span></span>
+<span><span class="co">#&gt;             income 3760.687   3600 1388.321  7200 1700    0.721       421.9</span></span>
+<span><span class="co">#&gt;  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = West</span></span>
@@ -409,7 +409,7 @@ argument:</p>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;           Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
 <span><span class="co">#&gt;                age   50.067     49   16.927    77   24    0.170      1993.1</span></span>
-<span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span><span class="co">#&gt;             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1</span></span>
 <span><span class="co">#&gt;  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -418,10 +418,10 @@ argument:</p>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [region = 1]</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450</span></span>
+<span><span class="co">#&gt;   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450</span></span>
 <span><span class="co">#&gt; [region = 2]</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="diagnosing-weight-issues">Diagnosing Weight Issues<a class="anchor" aria-label="anchor" href="#diagnosing-weight-issues"></a>
@@ -523,21 +523,21 @@ small increase in bias:</p>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.718       421.9</span></span>
+<span><span class="co">#&gt;    income 3760.687   3600 1388.321  7200 1700    0.721       421.9</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = West</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span><span class="co">#&gt;  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1</span></span>
+<span><span class="co">#&gt;    income 3738.586   3500 1433.325  7200 1900    0.727      1738.1</span></span>
 <span><span class="co">#&gt; ----------------------------------------</span></span>
 <span></span>
 <span><span class="co"># 4. Weighted hypothesis test</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2178.7) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="best-practices">Best Practices<a class="anchor" aria-label="anchor" href="#best-practices"></a>

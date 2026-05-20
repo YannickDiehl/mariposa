@@ -152,12 +152,12 @@ kw_result %>% dunn_test()
 #> 
 #> ---------------------------------------------------------------------------- 
 #>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.402     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.465     <.001   <.001 *** 
-#>         Basic Secondary             University -11.159     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.291     
-#>  Intermediate Secondary             University  -4.539     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.790     0.005   0.032   * 
+#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
+#>         Basic Secondary             University -11.545     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
+#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.886     0.004   0.023   * 
 #> ---------------------------------------------------------------------------- 
 #> 
 #> 
@@ -179,12 +179,12 @@ kw_result %>% dunn_test(p_adjust = "holm")
 #> 
 #> ---------------------------------------------------------------------------- 
 #>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.402     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.465     <.001   <.001 *** 
-#>         Basic Secondary             University -11.159     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.048   * 
-#>  Intermediate Secondary             University  -4.539     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.790     0.005   0.011   * 
+#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
+#>         Basic Secondary             University -11.545     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.041   * 
+#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.886     0.004   0.008  ** 
 #> ---------------------------------------------------------------------------- 
 #> 
 #> 
@@ -206,12 +206,12 @@ kw_result %>% dunn_test(p_adjust = "BH")
 #> 
 #> ---------------------------------------------------------------------------- 
 #>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.402     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.465     <.001   <.001 *** 
-#>         Basic Secondary             University -11.159     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.048   * 
-#>  Intermediate Secondary             University  -4.539     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.790     0.005   0.006  ** 
+#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
+#>         Basic Secondary             University -11.545     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.041   * 
+#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.886     0.004   0.005  ** 
 #> ---------------------------------------------------------------------------- 
 #> 
 #> 
@@ -271,12 +271,12 @@ kw_multi %>% dunn_test()
 #> 
 #> ---------------------------------------------------------------------------- 
 #>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.402     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.465     <.001   <.001 *** 
-#>         Basic Secondary             University -11.159     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.973     0.048   0.291     
-#>  Intermediate Secondary             University  -4.539     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.790     0.005   0.032   * 
+#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
+#>         Basic Secondary             University -11.545     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
+#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.886     0.004   0.023   * 
 #> ---------------------------------------------------------------------------- 
 #> 
 #> 
@@ -284,12 +284,12 @@ kw_multi %>% dunn_test()
 #> 
 #> --------------------------------------------------------------------------- 
 #>                 Group 1                Group 2      Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  0.955     0.340   1.000     
-#>         Basic Secondary     Academic Secondary  0.552     0.581   1.000     
-#>         Basic Secondary             University -0.037     0.971   1.000     
-#>  Intermediate Secondary     Academic Secondary -0.378     0.706   1.000     
-#>  Intermediate Secondary             University -0.821     0.411   1.000     
-#>      Academic Secondary             University -0.490     0.624   1.000     
+#>         Basic Secondary Intermediate Secondary  0.983     0.325   1.000     
+#>         Basic Secondary     Academic Secondary  0.569     0.570   1.000     
+#>         Basic Secondary             University -0.038     0.970   1.000     
+#>  Intermediate Secondary     Academic Secondary -0.389     0.697   1.000     
+#>  Intermediate Secondary             University -0.846     0.398   1.000     
+#>      Academic Secondary             University -0.504     0.614   1.000     
 #> --------------------------------------------------------------------------- 
 #> 
 #> 
@@ -320,12 +320,12 @@ kw_grouped %>% dunn_test()
 #> 
 #> --------------------------------------------------------------------------- 
 #>                 Group 1                Group 2      Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary -1.886     0.059   0.356     
-#>         Basic Secondary     Academic Secondary -3.158     0.002   0.010  ** 
-#>         Basic Secondary             University -3.429     <.001   0.004  ** 
-#>  Intermediate Secondary     Academic Secondary -1.230     0.219   1.000     
-#>  Intermediate Secondary             University -1.705     0.088   0.529     
-#>      Academic Secondary             University -0.592     0.554   1.000     
+#>         Basic Secondary Intermediate Secondary -1.949     0.051   0.308     
+#>         Basic Secondary     Academic Secondary -3.263     0.001   0.007  ** 
+#>         Basic Secondary             University -3.543     <.001   0.002  ** 
+#>  Intermediate Secondary     Academic Secondary -1.271     0.204   1.000     
+#>  Intermediate Secondary             University -1.762     0.078   0.469     
+#>      Academic Secondary             University -0.612     0.540   1.000     
 #> --------------------------------------------------------------------------- 
 #> 
 #> 
@@ -336,12 +336,12 @@ kw_grouped %>% dunn_test()
 #> 
 #> ---------------------------------------------------------------------------- 
 #>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.345     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.023     <.001   <.001 *** 
-#>         Basic Secondary             University -10.774     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.587     0.113   0.675     
-#>  Intermediate Secondary             University  -4.226     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.830     0.005   0.028   * 
+#>         Basic Secondary Intermediate Secondary  -7.601     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.338     <.001   <.001 *** 
+#>         Basic Secondary             University -11.151     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -1.642     0.101   0.603     
+#>  Intermediate Secondary             University  -4.373     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.929     0.003   0.020   * 
 #> ---------------------------------------------------------------------------- 
 #> 
 #> 

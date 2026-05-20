@@ -1,6 +1,7 @@
 # Labels and Missing Values
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -20,19 +21,19 @@ mariposa provides 10 functions for inspecting, modifying, and converting
 labelled data — plus tools for declaring missing values and searching
 variables.
 
-| Function                                                                              | Purpose                                   |
-|---------------------------------------------------------------------------------------|-------------------------------------------|
-| [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md)       | Get or set variable labels                |
-| [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md)     | Get or set value labels                   |
-| [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md)         | Search variables by name or label pattern |
-| [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)         | Convert labelled → factor                 |
-| [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md) | Convert labelled → character              |
-| [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md)     | Convert factor/labelled → numeric         |
-| [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)   | Convert factor/character → labelled       |
-| [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)             | Declare values as missing (tagged NAs)    |
-| [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md)           | Strip all label metadata                  |
-| [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md)   | Restore labels after dplyr operations     |
-| [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md)   | Remove unused value labels                |
+| Function | Purpose |
+|----|----|
+| [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md) | Get or set variable labels |
+| [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md) | Get or set value labels |
+| [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md) | Search variables by name or label pattern |
+| [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md) | Convert labelled → factor |
+| [`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md) | Convert labelled → character |
+| [`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md) | Convert factor/labelled → numeric |
+| [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md) | Convert factor/character → labelled |
+| [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md) | Declare values as missing (tagged NAs) |
+| [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md) | Strip all label metadata |
+| [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md) | Restore labels after dplyr operations |
+| [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md) | Remove unused value labels |
 
 ## Inspecting Labels
 
@@ -43,6 +44,7 @@ Variable labels describe what each column contains. Use
 to retrieve them:
 
 ``` r
+
 # Get labels for specific variables
 var_label(survey_data, gender, education, life_satisfaction)
 #>                                            gender 
@@ -54,6 +56,7 @@ var_label(survey_data, gender, education, life_satisfaction)
 ```
 
 ``` r
+
 # Get labels for all variables
 var_label(survey_data)
 #>                                                id 
@@ -97,12 +100,14 @@ Value labels map numeric codes to meaningful text. Use
 to retrieve them:
 
 ``` r
+
 # Get value labels for a single variable
 val_labels(survey_data, gender)
 #> NULL
 ```
 
 ``` r
+
 # Get value labels for multiple variables
 val_labels(survey_data, education, employment)
 #> $education
@@ -120,6 +125,7 @@ Use
 to search by name or label:
 
 ``` r
+
 # Search in both names and labels (default)
 find_var(survey_data, "trust")
 #>   col             name                                    label
@@ -129,6 +135,7 @@ find_var(survey_data, "trust")
 ```
 
 ``` r
+
 # Search only in variable labels
 find_var(survey_data, "satisfaction", search = "label")
 #>   col              name                                           label
@@ -136,6 +143,7 @@ find_var(survey_data, "satisfaction", search = "label")
 ```
 
 ``` r
+
 # Search only in variable names
 find_var(survey_data, "age|income", search = "name")
 #>   col   name                          label
@@ -148,6 +156,7 @@ find_var(survey_data, "age|income", search = "name")
 ### Setting Variable Labels
 
 ``` r
+
 # Set labels for specific variables
 labeled_data <- var_label(survey_data,
   age = "Age of respondent in years",
@@ -163,6 +172,7 @@ var_label(labeled_data, age, income)
 ### Setting Value Labels
 
 ``` r
+
 # Set value labels
 labeled_data <- val_labels(survey_data,
   gender = c("Male" = 1, "Female" = 2)
@@ -175,6 +185,7 @@ val_labels(labeled_data, gender)
 ```
 
 ``` r
+
 # Add labels without replacing existing ones
 labeled_data <- val_labels(survey_data,
   gender = c("Diverse" = 3),
@@ -198,6 +209,7 @@ Use
 when you need factors for plotting or statistical models:
 
 ``` r
+
 # Convert gender from labelled to factor
 factor_data <- to_label(survey_data, gender, education)
 
@@ -212,6 +224,7 @@ head(factor_data$gender)
 ```
 
 ``` r
+
 # Create ordered factors (useful for ordinal variables)
 ordered_data <- to_label(survey_data, education, ordered = TRUE)
 levels(ordered_data$education)
@@ -226,6 +239,7 @@ Use
 for string-based operations:
 
 ``` r
+
 char_data <- to_character(survey_data, gender, region)
 head(char_data$gender)
 #> [1] "Female" "Male"   "Male"   "Female" "Male"   "Female"
@@ -238,6 +252,7 @@ Use
 to convert factors or labelled vectors back to numbers:
 
 ``` r
+
 # First convert to factor, then back to numeric
 factor_data <- to_label(survey_data, education)
 
@@ -254,6 +269,7 @@ Use
 to add labels to plain numeric or factor columns:
 
 ``` r
+
 # Convert a factor back to haven_labelled
 plain_data <- data.frame(
   gender = factor(c("Male", "Female", "Male")),
@@ -274,6 +290,7 @@ Use
 to declare specific numeric codes as missing values:
 
 ``` r
+
 # After importing SPSS data where -9 = refused, -8 = don't know
 data <- read_spss("survey.sav", tag.na = FALSE)
 
@@ -295,6 +312,7 @@ Use
 when you need plain numeric data without any label metadata:
 
 ``` r
+
 # Strip all labels from entire dataset
 plain_data <- unlabel(survey_data)
 
@@ -317,6 +335,7 @@ dplyr operations like
 strip label attributes from columns:
 
 ``` r
+
 filtered <- survey_data %>%
   filter(age >= 30) %>%
   select(gender, education, income)
@@ -331,6 +350,7 @@ Use
 to restore labels from the original data:
 
 ``` r
+
 # Restore labels from the source dataset
 filtered <- copy_labels(filtered, survey_data)
 
@@ -348,6 +368,7 @@ data. Use
 to clean them up:
 
 ``` r
+
 # Subset to one region only
 subset_data <- survey_data %>% filter(region == 1)
 
@@ -362,6 +383,7 @@ val_labels(clean_data, region)
 A typical workflow for preparing SPSS data for analysis:
 
 ``` r
+
 # 1. Import SPSS file
 data <- read_spss("survey_2024.sav")
 

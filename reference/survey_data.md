@@ -128,7 +128,7 @@ survey_data %>% describe(age, income, weights = sampling_weight)
 #> -------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>       age   50.514     50   17.084    77   25    0.159      2468.8
-#>    income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
+#>    income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
 #> ----------------------------------------
 
 # Frequency analysis
@@ -171,8 +171,8 @@ survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> [region = 1]
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(484.9) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488
+#>   t(484.7) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488
 #> [region = 2]
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(1902.0) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949
+#>   t(1901.1) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949
 ```

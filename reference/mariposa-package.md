@@ -1,4 +1,4 @@
-# mariposa: Marburg Initiative for Political and Social Analysis - Statistical Tools for Survey Data
+# mariposa: SPSS-Compatible Statistical Tools for Survey Data
 
 Professional statistical analysis of survey data with full support for
 survey weights, grouped operations, and tidyverse integration. Provides
@@ -27,3 +27,7 @@ Useful links:
 ## Author
 
 **Maintainer**: Yannick Diehl <yannick.diehl@gmail.com>
+
+Authors:
+
+- Yannick Diehl <yannick.diehl@gmail.com>

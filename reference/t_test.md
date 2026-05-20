@@ -238,7 +238,7 @@ survey_data %>%
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 
 # Multiple variables
 survey_data %>%
@@ -246,7 +246,7 @@ survey_data %>%
 #> t-Test: age by region [Weighted]
 #>   t(763.8) = 2.551, p = 0.011 *, g = 0.130 (negligible), N = 2516
 #> t-Test: income by region [Weighted]
-#>   t(712.5) = 0.299, p = 0.765 , g = 0.016 (negligible), N = 2200
+#>   t(713.7) = 0.299, p = 0.765 , g = 0.016 (negligible), N = 2200
 #> t-Test: life_satisfaction by region [Weighted]
 #>   t(721.0) = -0.031, p = 0.975 , g = -0.002 (negligible), N = 2437
 
@@ -254,7 +254,7 @@ survey_data %>%
 survey_data %>%
   t_test(life_satisfaction, mu = 5, weights = sampling_weight)
 #> t-Test: life_satisfaction [Weighted]
-#>   t(2436.0) = -58.925, p < 0.001 ***
+#>   t(2435.6) = -58.916, p < 0.001 ***
 
 # Grouped analysis
 survey_data %>%
@@ -262,10 +262,10 @@ survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> [region = 1]
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(484.9) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488
+#>   t(484.7) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488
 #> [region = 2]
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(1902.0) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949
+#>   t(1901.1) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949
 
 # Equal variance assumption
 survey_data %>%
@@ -283,9 +283,9 @@ survey_data %>%
 survey_data %>%
   t_test(starts_with("trust"), group = gender, weights = sampling_weight)
 #> t-Test: trust_government by gender [Weighted]
-#>   t(2322.7) = -0.682, p = 0.495 , g = -0.028 (negligible), N = 2371
+#>   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371
 #> t-Test: trust_media by gender [Weighted]
-#>   t(2350.2) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
+#>   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
 #> t-Test: trust_science by gender [Weighted]
 #>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414
 
@@ -294,7 +294,7 @@ result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 print(result)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2390.8) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
 
 # --- Three-layer output ---
 result <- t_test(survey_data, life_satisfaction, group = gender)

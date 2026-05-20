@@ -249,7 +249,7 @@ survey_data %>%
 #>   Weighted Test Statistics:
 #>   -------------------------------------------
 #>       N Chi-Square df p value Kendall's W sig
-#>    2150    846.423  2       0       0.197 ***
+#>    2150   1012.084  2       0       0.235 ***
 #>   -------------------------------------------
 #> 
 #> Note: Weighted analysis uses frequency-weighted ranks.

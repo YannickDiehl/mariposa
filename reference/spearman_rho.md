@@ -37,9 +37,12 @@ spearman_rho(
 
 - weights:
 
-  Optional survey weights for population-representative results. Note:
-  SPSS may not apply weights to Spearman's rho; our implementation uses
-  weighted ranks for mathematically correct survey analysis.
+  Optional survey weights. Following the SPSS NONPAR CORR convention,
+  weights are used only to filter cases (rows with weight \<= 0 or NA
+  are dropped); the rank correlation itself is computed unweighted on
+  the remaining sample. For design-based weighted Spearman use
+  [`survey::svyolr()`](https://rdrr.io/pkg/survey/man/svyolr.html) or
+  `wCorr::weightedCorr(method = "Spearman")`.
 
 - alternative:
 

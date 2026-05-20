@@ -1,6 +1,7 @@
 # Scale Analysis
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -27,20 +28,21 @@ reliably measures a concept. The typical workflow is:
 This guide uses the trust items from `survey_data` (trust in government,
 media, and science).
 
-| Function                                                                            | Purpose                                          |
-|-------------------------------------------------------------------------------------|--------------------------------------------------|
-| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Internal consistency (Cronbach’s Alpha)          |
-| [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)                 | Discover underlying dimensions (factor analysis) |
-| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md)     | Row-wise mean indices                            |
-| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)       | Row-wise sums                                    |
-| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md)     | Count specific values per row                    |
-| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)             | Percent of Maximum Possible Scores (0–100)       |
+| Function | Purpose |
+|----|----|
+| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Internal consistency (Cronbach’s Alpha) |
+| [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md) | Discover underlying dimensions (factor analysis) |
+| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Row-wise mean indices |
+| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md) | Row-wise sums |
+| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md) | Count specific values per row |
+| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md) | Percent of Maximum Possible Scores (0–100) |
 
 ## Reliability Analysis
 
 ### Basic Usage
 
 ``` r
+
 reliability(survey_data, trust_government, trust_media, trust_science)
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), N = 2135
@@ -49,6 +51,7 @@ reliability(survey_data, trust_government, trust_media, trust_science)
 ### Detailed Output
 
 ``` r
+
 rel <- reliability(survey_data, trust_government, trust_media, trust_science)
 summary(rel)
 #> 
@@ -113,6 +116,7 @@ increases when you remove an item, that item weakens the scale.
 ### With Survey Weights
 
 ``` r
+
 reliability(survey_data, trust_government, trust_media, trust_science,
             weights = sampling_weight)
 #> Reliability Analysis: 3 items [Weighted]
@@ -122,6 +126,7 @@ reliability(survey_data, trust_government, trust_media, trust_science,
 ### Using tidyselect
 
 ``` r
+
 reliability(survey_data, starts_with("trust"))
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), N = 2135
@@ -132,6 +137,7 @@ reliability(survey_data, starts_with("trust"))
 Check whether reliability holds across subgroups:
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   reliability(trust_government, trust_media, trust_science)
@@ -155,6 +161,7 @@ When you have many items,
 reveals how they group into underlying dimensions:
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science)
@@ -165,6 +172,7 @@ efa(survey_data,
 ### Detailed Output
 
 ``` r
+
 efa_result <- efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science)
@@ -244,7 +252,7 @@ analysis:
 - 0.60 – 0.80: Acceptable
 - Below 0.60: Factor analysis may not be appropriate
 
-**Bartlett’s Test** should be significant ($p < .05$), confirming that
+**Bartlett’s Test** should be significant ($`p < .05`$), confirming that
 meaningful correlations exist.
 
 **Eigenvalues** show variance explained per component. By default,
@@ -261,6 +269,7 @@ components with eigenvalue \> 1 are retained (Kaiser criterion).
 **Varimax** (default) — assumes uncorrelated factors:
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -273,6 +282,7 @@ efa(survey_data,
 matrices:
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -284,6 +294,7 @@ efa(survey_data,
 **Oblimin** — another oblique rotation, common in psychology:
 
 ``` r
+
 # Requires GPArotation package
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
@@ -299,6 +310,7 @@ PCA (Principal Component Analysis). For a true factor analysis model,
 use Maximum Likelihood:
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -312,6 +324,7 @@ multiple correlations) as initial communalities. Combine any extraction
 with any rotation:
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -323,6 +336,7 @@ efa(survey_data,
 ### Fixing the Number of Factors
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -334,6 +348,7 @@ efa(survey_data,
 ### With Survey Weights
 
 ``` r
+
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
@@ -357,6 +372,7 @@ see
 ### Quick Scale Construction
 
 ``` r
+
 # Create mean index
 survey_data <- survey_data %>%
   mutate(m_trust = row_means(., trust_government, trust_media, trust_science,
@@ -381,14 +397,16 @@ survey_data %>%
 ### Using the Scale in Analysis
 
 ``` r
+
 # Group comparison
 survey_data %>%
   t_test(m_trust, group = gender, weights = sampling_weight)
 #> t-Test: m_trust by gender [Weighted]
-#>   t(2457.2) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499
+#>   t(2457.6) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499
 ```
 
 ``` r
+
 # As a predictor in regression
 survey_data %>%
   linear_regression(life_satisfaction ~ m_trust + age + income,
@@ -400,6 +418,7 @@ survey_data %>%
 ## Complete Example
 
 ``` r
+
 # 1. Check reliability
 rel <- reliability(survey_data, trust_government, trust_media, trust_science)
 rel
@@ -472,8 +491,8 @@ survey_data %>%
 #> ----------------------------------
 #> ----------------------------------------
 #>     Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>      m_trust  2.924      3  0.696     4   1    0.023       829.7
-#>  trust_pomps 48.093     50 17.390   100  25    0.023       829.7
+#>      m_trust  2.924      3  0.696     4   1    0.024       829.7
+#>  trust_pomps 48.093     50 17.390   100  25    0.024       829.7
 #> ----------------------------------------
 #> 
 #> Group: education = Intermediate Secondary
@@ -496,8 +515,8 @@ survey_data %>%
 #> -----------------------------
 #> ----------------------------------------
 #>     Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>      m_trust  2.885      3  0.686     4   1    0.062       389.6
-#>  trust_pomps 47.132     50 17.157   100  25    0.062       389.6
+#>      m_trust  2.885      3  0.686     4   1    0.063       389.6
+#>  trust_pomps 47.132     50 17.157   100  25    0.063       389.6
 #> ----------------------------------------
 ```
 

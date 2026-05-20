@@ -1,6 +1,7 @@
 # Understanding Relationships: Correlation Analysis
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -11,11 +12,11 @@ data(survey_data)
 Correlation measures how two variables move together. mariposa provides
 three methods for different situations:
 
-| Method            | Function                                                                              | Best for                                                     |
-|-------------------|---------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| Pearson’s *r*     | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)   | Linear relationships between continuous variables            |
-| Spearman’s $\rho$ | [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) | Monotonic relationships, ordinal data, or data with outliers |
-| Kendall’s $\tau$  | [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)   | Ordinal data, small samples, or many tied values             |
+| Method | Function | Best for |
+|----|----|----|
+| Pearson’s *r* | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md) | Linear relationships between continuous variables |
+| Spearman’s $`\rho`$ | [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) | Monotonic relationships, ordinal data, or data with outliers |
+| Kendall’s $`\tau`$ | [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md) | Ordinal data, small samples, or many tied values |
 
 All three support survey weights, multiple variables (correlation
 matrices), and grouped analysis.
@@ -25,6 +26,7 @@ matrices), and grouped analysis.
 ### Basic Usage
 
 ``` r
+
 survey_data %>%
   pearson_cor(age, income)
 #> Pearson Correlation: age x income
@@ -33,13 +35,14 @@ survey_data %>%
 
 Interpretation of *r*:
 
-- $r = 1$: Perfect positive correlation
-- $r = 0$: No linear relationship
-- $r = - 1$: Perfect negative correlation
+- $`r = 1`$: Perfect positive correlation
+- $`r = 0`$: No linear relationship
+- $`r = -1`$: Perfect negative correlation
 
 ### With Survey Weights
 
 ``` r
+
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> Pearson Correlation: age x income [Weighted]
@@ -51,6 +54,7 @@ survey_data %>%
 Pass multiple variables to get all pairwise correlations:
 
 ``` r
+
 survey_data %>%
   pearson_cor(trust_government, trust_media, trust_science,
               weights = sampling_weight)
@@ -64,6 +68,7 @@ survey_data %>%
 ### Detailed Output
 
 ``` r
+
 result <- survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 
@@ -89,6 +94,7 @@ summary(result)
 ### Grouped Analysis
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
@@ -102,11 +108,12 @@ survey_data %>%
 
 ## Spearman Correlation
 
-Use Spearman’s $\rho$ when the relationship is monotonic but not
+Use Spearman’s $`\rho`$ when the relationship is monotonic but not
 necessarily linear, or when working with ordinal data or data with
 outliers:
 
 ``` r
+
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                weights = sampling_weight)
@@ -117,6 +124,7 @@ survey_data %>%
 ### Multiple Variables
 
 ``` r
+
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                life_satisfaction, trust_government,
@@ -133,11 +141,12 @@ survey_data %>%
 
 ## Kendall’s Tau
 
-Use Kendall’s $\tau$ for ordinal data, small samples ($n < 30$), or data
-with many tied values. It is more robust than Spearman but typically
-produces smaller absolute values:
+Use Kendall’s $`\tau`$ for ordinal data, small samples ($`n < 30`$), or
+data with many tied values. It is more robust than Spearman but
+typically produces smaller absolute values:
 
 ``` r
+
 survey_data %>%
   kendall_tau(political_orientation, life_satisfaction,
               weights = sampling_weight)
@@ -172,6 +181,7 @@ If Pearson and Spearman give very different results, the relationship
 may be non-linear:
 
 ``` r
+
 pearson_result <- survey_data %>%
   pearson_cor(life_satisfaction, income, weights = sampling_weight)
 
@@ -209,6 +219,7 @@ A significant correlation does not mean one variable causes the other:
 ## Complete Example
 
 ``` r
+
 # 1. Correlation matrix for key variables
 cor_result <- survey_data %>%
   pearson_cor(age, income, life_satisfaction,
@@ -271,7 +282,7 @@ sample size:
     Pearson and works with both continuous and ordinal data.
 
 3.  **Report the magnitude, not just significance.** With large samples,
-    even $r = .05$ can be significant but is practically meaningless.
+    even $`r = .05`$ can be significant but is practically meaningless.
 
 4.  **Use correlation matrices to prioritize.** Before regression, check
     which variables are most strongly related to your outcome.

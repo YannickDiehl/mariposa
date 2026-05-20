@@ -1,6 +1,7 @@
 # Data Transformation
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -13,16 +14,16 @@ recode responses, create dummy variables, standardize scales, or compute
 row-wise indices. mariposa provides a set of functions that handle these
 tasks with a clean, survey-oriented syntax.
 
-| Function                                                                        | Purpose                                                 |
-|---------------------------------------------------------------------------------|---------------------------------------------------------|
-| [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md)             | Recode values using a string syntax                     |
-| [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md)   | Create dummy (0/1) variables from categorical columns   |
-| [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md)             | Z-standardize variables (4 methods)                     |
-| [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md)       | Mean-center variables (grand-mean or group-mean)        |
-| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Compute row-wise means across items                     |
-| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md)   | Compute row-wise sums across items                      |
-| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md) | Count specific values per row                           |
-| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)         | Transform to Percent of Maximum Possible Scores (0–100) |
+| Function | Purpose |
+|----|----|
+| [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md) | Recode values using a string syntax |
+| [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md) | Create dummy (0/1) variables from categorical columns |
+| [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md) | Z-standardize variables (4 methods) |
+| [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md) | Mean-center variables (grand-mean or group-mean) |
+| [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Compute row-wise means across items |
+| [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md) | Compute row-wise sums across items |
+| [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md) | Count specific values per row |
+| [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md) | Transform to Percent of Maximum Possible Scores (0–100) |
 
 ## Recoding with rec()
 
@@ -36,6 +37,7 @@ supports ranges, reverse-coding, and inline value labels.
 Collapse categories by mapping old values to new values:
 
 ``` r
+
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
   suffix = "_group", as.factor = TRUE
@@ -70,6 +72,7 @@ Reverse the direction of a Likert scale. Useful when some items in a
 scale are negatively worded:
 
 ``` r
+
 survey_data <- rec(survey_data, trust_government,
   rules = "rev", suffix = "_rev"
 )
@@ -94,6 +97,7 @@ head(data.frame(
 Split a variable at its median into two groups:
 
 ``` r
+
 survey_data <- rec(survey_data, income,
   rules = "dicho", suffix = "_dicho"
 )
@@ -123,6 +127,7 @@ frequency(survey_data, income_dicho)
 Other split options:
 
 ``` r
+
 # Split at the mean
 survey_data <- rec(survey_data, income,
   rules = "mean", suffix = "_mean_split"
@@ -140,6 +145,7 @@ Use `copy` to keep values that are not explicitly recoded, and `else`
 for a catch-all:
 
 ``` r
+
 survey_data <- rec(survey_data, education,
   rules = "1:2=1 [Lower]; else=2 [Higher]",
   suffix = "_binary", as.factor = TRUE
@@ -172,6 +178,7 @@ known as one-hot encoding.
 ### Basic Usage
 
 ``` r
+
 # Create dummy variables for region
 dummies <- to_dummy(survey_data, region, append = FALSE)
 head(dummies)
@@ -192,6 +199,7 @@ Use `suffix = "label"` to name columns after the value labels instead of
 numeric codes:
 
 ``` r
+
 dummies <- to_dummy(survey_data, gender, suffix = "label", append = FALSE)
 head(dummies)
 #> # A tibble: 6 × 2
@@ -211,6 +219,7 @@ For regression analysis, you typically need n-1 dummies (one category
 omitted as reference):
 
 ``` r
+
 dummies <- to_dummy(survey_data, education, ref = 1, append = FALSE)
 head(dummies)
 #> # A tibble: 6 × 4
@@ -232,6 +241,7 @@ head(dummies)
 By default, dummy columns are appended to the original data:
 
 ``` r
+
 survey_data <- to_dummy(survey_data, gender, suffix = "label")
 # Adds gender_Male, gender_Female to the data frame
 ```
@@ -245,6 +255,7 @@ This is useful for comparing variables on different scales.
 ### Basic Standardization
 
 ``` r
+
 survey_data <- survey_data %>%
   std(age, income)
 
@@ -266,6 +277,7 @@ survey_data %>%
 supports four methods:
 
 ``` r
+
 # Default: divide by SD
 survey_data_methods <- survey_data %>%
   std(life_satisfaction, method = "sd", suffix = "_sd") %>%
@@ -286,7 +298,7 @@ survey_data_methods %>%
 ```
 
 - **`"sd"`** (default): Classic z-standardization
-  ($\frac{x - \bar{x}}{SD}$)
+  ($`\frac{x - \bar{x}}{SD}`$)
 - **`"2sd"`**: Gelman’s (2008) recommendation — divides by 2 SD, making
   coefficients comparable to untransformed binary predictors
 - **`"mad"`**: Robust standardization using median and MAD (resistant to
@@ -296,6 +308,7 @@ survey_data_methods %>%
 ### Weighted Standardization
 
 ``` r
+
 survey_data <- survey_data %>%
   std(income, weights = sampling_weight, suffix = "_wstd")
 
@@ -314,6 +327,7 @@ survey_data %>%
 Standardize within subgroups:
 
 ``` r
+
 survey_data <- survey_data %>%
   group_by(region) %>%
   std(income, suffix = "_gstd") %>%
@@ -329,6 +343,7 @@ mean is zero while preserving the original scale.
 ### Grand-Mean Centering
 
 ``` r
+
 survey_data <- survey_data %>%
   center(age, income, suffix = "_c")
 
@@ -349,6 +364,7 @@ Center within groups — each observation is expressed as a deviation from
 its group mean:
 
 ``` r
+
 survey_data <- survey_data %>%
   group_by(region) %>%
   center(income, suffix = "_gc") %>%
@@ -380,6 +396,7 @@ survey_data %>%
 ### Weighted Centering
 
 ``` r
+
 survey_data <- survey_data %>%
   center(age, weights = sampling_weight, suffix = "_wc")
 ```
@@ -395,6 +412,7 @@ essential for creating scale scores from multiple survey items.
 computes the arithmetic mean across selected variables for each row:
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
 
@@ -411,6 +429,7 @@ survey_data %>%
 #### Using tidyselect
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(m_trust2 = row_means(., starts_with("trust")))
 ```
@@ -421,6 +440,7 @@ The [`pick()`](https://dplyr.tidyverse.org/reference/pick.html) function
 works with both `%>%` and `|>`:
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(m_trust3 = row_means(
     pick(trust_government, trust_media, trust_science)
@@ -433,6 +453,7 @@ Require a minimum number of non-missing items per row. This matches SPSS
 `MEAN.2()` syntax:
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(m_trust_strict = row_means(
     ., trust_government, trust_media, trust_science,
@@ -451,6 +472,7 @@ works like
 but returns the total:
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(trust_total = row_sums(., trust_government, trust_media, trust_science))
 
@@ -470,6 +492,7 @@ survey_data %>%
 counts how many times a specific value appears in each row:
 
 ``` r
+
 # How many trust items did each person rate as 5 (highest)?
 survey_data <- survey_data %>%
   mutate(n_high_trust = row_count(
@@ -503,6 +526,7 @@ transforms scores to a Percent of Maximum Possible Scores scale (0–100).
 This makes scores from different scales directly comparable:
 
 ``` r
+
 survey_data <- survey_data %>%
   mutate(trust_pomps = pomps(m_trust, scale_min = 1, scale_max = 5))
 
@@ -524,6 +548,7 @@ scale range, not the observed range. This ensures scores are comparable
 across samples.
 
 ``` r
+
 # Transform multiple variables at once
 survey_data <- survey_data %>%
   mutate(across(
@@ -538,6 +563,7 @@ survey_data <- survey_data %>%
 A typical data transformation workflow before analysis:
 
 ``` r
+
 data(survey_data)  # fresh copy
 
 # 1. Recode: create age groups and reverse-code an item
@@ -560,7 +586,7 @@ survey_data <- survey_data %>%
 survey_data %>%
   t_test(m_trust, group = gender, weights = sampling_weight)
 #> t-Test: m_trust by gender [Weighted]
-#>   t(2457.2) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499
+#>   t(2457.6) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499
 
 survey_data %>%
   linear_regression(life_satisfaction ~ age_z + income_z + m_trust,

@@ -1,6 +1,7 @@
 # Working with Survey Weights
 
 ``` r
+
 library(mariposa)
 library(dplyr)
 data(survey_data)
@@ -20,6 +21,7 @@ the effective sample size concept, and best practices.
 ## The Impact of Weights
 
 ``` r
+
 # Without weights (describes the sample)
 unweighted <- survey_data %>%
   summarise(
@@ -53,6 +55,7 @@ mariposa provides 11 `w_*` functions for individual weighted statistics.
 ### Central Tendency
 
 ``` r
+
 # Weighted mean
 w_mean(survey_data, income, weights = sampling_weight)
 #> 
@@ -87,6 +90,7 @@ w_modus(survey_data, education, weights = sampling_weight)
 ### Dispersion
 
 ``` r
+
 # Weighted standard deviation
 w_sd(survey_data, income, weights = sampling_weight)
 #> 
@@ -121,6 +125,7 @@ w_iqr(survey_data, income, weights = sampling_weight)
 ### Distribution Shape
 
 ``` r
+
 # Weighted skewness
 w_skew(survey_data, income, weights = sampling_weight)
 #> 
@@ -145,6 +150,7 @@ w_kurtosis(survey_data, income, weights = sampling_weight)
 ### Precision and Range
 
 ``` r
+
 # Weighted standard error
 w_se(survey_data, income, weights = sampling_weight)
 #> 
@@ -184,6 +190,7 @@ w_range(survey_data, income, weights = sampling_weight)
 All `w_*` functions accept multiple variables:
 
 ``` r
+
 w_mean(survey_data, age, income, life_satisfaction,
        weights = sampling_weight)
 #> 
@@ -206,12 +213,15 @@ w_mean(survey_data, age, income, life_satisfaction,
 ## Effective Sample Size
 
 Weighting reduces statistical precision. The *effective sample size*
-($n_{eff}$) tells you how much information your weighted sample actually
-carries:
+($`n_{eff}`$) tells you how much information your weighted sample
+actually carries:
 
-$$n_{eff} = \frac{\left( \sum w_{i} \right)^{2}}{\sum w_{i}^{2}}$$
+``` math
+n_{eff} = \frac{\left(\sum w_i\right)^2}{\sum w_i^2}
+```
 
 ``` r
+
 actual_n <- nrow(survey_data)
 age_w <- w_mean(survey_data, age, weights = sampling_weight)
 effective_n <- age_w$results$effective_n
@@ -233,6 +243,7 @@ same size.
 Every analysis function in mariposa supports the `weights` argument:
 
 ``` r
+
 # Descriptive statistics
 survey_data %>%
   describe(income, life_satisfaction, weights = sampling_weight)
@@ -240,12 +251,13 @@ survey_data %>%
 #> Weighted Descriptive Statistics
 #> -------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3743.099   3500 1423.966  7200 1900    0.724      2158.9
-#>  life_satisfaction    3.625      4    1.152     4    2   -0.498      2390.9
+#>             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
+#>  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9
 #> ----------------------------------------
 ```
 
 ``` r
+
 # Frequency tables
 survey_data %>%
   frequency(education, weights = sampling_weight)
@@ -269,23 +281,26 @@ survey_data %>%
 ```
 
 ``` r
+
 # t-test
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> t-Test: income by gender [Weighted]
-#>   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
+#>   t(2178.7) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
 ```
 
 ``` r
+
 # ANOVA
 survey_data %>%
   oneway_anova(life_satisfaction, group = education,
                weights = sampling_weight)
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
-#>   F(3, 2433) = 65.359, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
 ``` r
+
 # Chi-square
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
@@ -294,6 +309,7 @@ survey_data %>%
 ```
 
 ``` r
+
 # Correlation
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
@@ -302,6 +318,7 @@ survey_data %>%
 ```
 
 ``` r
+
 # Regression
 survey_data %>%
   linear_regression(life_satisfaction ~ age + income,
@@ -316,6 +333,7 @@ All functions work seamlessly with
 [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html):
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   describe(age, income, life_satisfaction,
@@ -329,8 +347,8 @@ survey_data %>%
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   52.278     53   17.595    77   24    0.098       477.0
-#>             income 3760.687   3600 1388.321  7200 1700    0.718       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.556       457.4
+#>             income 3760.687   3600 1388.321  7200 1700    0.721       421.9
+#>  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4
 #> ----------------------------------------
 #> 
 #> Group: region = West
@@ -338,21 +356,22 @@ survey_data %>%
 #> ----------------------------------------
 #>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
 #>                age   50.067     49   16.927    77   24    0.170      1993.1
-#>             income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#>             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
 #>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
 #> ----------------------------------------
 ```
 
 ``` r
+
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> [region = 1]
 #> t-Test: income by gender [Weighted]
-#>   t(431.6) = 1.676, p = 0.094 , g = 0.158 (negligible), N = 450
+#>   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450
 #> [region = 2]
 #> t-Test: income by gender [Weighted]
-#>   t(1739.9) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+#>   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
 ```
 
 ## Diagnosing Weight Issues
@@ -360,6 +379,7 @@ survey_data %>%
 ### Checking Weight Distribution
 
 ``` r
+
 weight_stats <- survey_data %>%
   summarise(
     min = min(sampling_weight, na.rm = TRUE),
@@ -381,6 +401,7 @@ scheme.
 ### Missing Weights
 
 ``` r
+
 missing <- sum(is.na(survey_data$sampling_weight))
 total <- nrow(survey_data)
 cat("Missing weights:", missing, "/", total,
@@ -394,6 +415,7 @@ If weights are extreme, trim them to reduce variance at the cost of a
 small increase in bias:
 
 ``` r
+
 trimmed <- survey_data %>%
   mutate(
     weight_trimmed = case_when(
@@ -415,6 +437,7 @@ cat("Trimmed weighted mean:", round(trimmed_result$results$weighted_mean, 1), "\
 ## Complete Example
 
 ``` r
+
 # 1. Inspect weight properties
 survey_data %>%
   summarise(
@@ -454,21 +477,21 @@ survey_data %>%
 #> --------------------
 #> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>    income 3760.687   3600 1388.321  7200 1700    0.718       421.9
+#>    income 3760.687   3600 1388.321  7200 1700    0.721       421.9
 #> ----------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
 #> ----------------------------------------
 #>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>    income 3738.586   3500 1433.325  7200 1900    0.726      1738.1
+#>    income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
 #> ----------------------------------------
 
 # 4. Weighted hypothesis test
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> t-Test: income by gender [Weighted]
-#>   t(2178.9) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
+#>   t(2178.7) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
 ```
 
 ## Best Practices
