@@ -221,6 +221,11 @@ articles:
   - regression-analysis
   - survey-weights
 
+- title: "Validation"
+  navbar: ~
+  contents:
+  - spss-compatibility
+
 footer:
   structure:
     left: developed_by
