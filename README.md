@@ -192,4 +192,4 @@ survey_data %>%
 
 ## License
 
-MIT - Yannick Diehl
+MIT © 2026 Yannick Diehl
