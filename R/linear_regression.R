@@ -39,21 +39,33 @@
 #'   variables. The "numeric" mode is required to reproduce SPSS results
 #'   when factor predictors carry ordered meaning (e.g., 4-level education).
 #'
-#' @return An object of class \code{"linear_regression"} containing:
+#' @return For ungrouped + listwise data, an object of class
+#'   \code{c("linear_regression", "lm")} — \strong{the fitted \code{lm}
+#'   itself}, with mariposa-specific slots attached:
 #' \describe{
-#'   \item{coefficients}{Tibble with B, Std.Error, Beta, t, p, CI_lower, CI_upper}
-#'   \item{model_summary}{List with R, R_squared, adj_R_squared, std_error}
-#'   \item{anova}{Tibble with Sum of Squares, df, Mean Square, F, Sig.}
-#'   \item{descriptives}{Tibble with Mean, Std.Deviation, N for all variables}
-#'   \item{model}{The underlying \code{lm} object}
-#'   \item{formula}{The formula used}
-#'   \item{n}{Sample size (listwise complete cases)}
-#'   \item{dependent}{Name of the dependent variable}
-#'   \item{predictor_names}{Names of predictor variables}
-#'   \item{weighted}{Logical indicating whether weights were used}
-#'   \item{weight_name}{Name of the weight variable (or NULL)}
+#'   \item{coef_table}{SPSS-style tibble with B, Std.Error, Beta, t, p,
+#'     CI_lower, CI_upper. For weighted models, SE / t / p are adjusted to
+#'     SPSS's frequency-weight df (see Technical Details).}
+#'   \item{anova_table}{SPSS-style overall-model ANOVA tibble (Source ×
+#'     Sum_of_Squares / df / Mean_Square / F_statistic / Sig).}
+#'   \item{model_summary}{List with R, R_squared, adj_R_squared, std_error.}
+#'   \item{descriptives}{Tibble with Mean, Std.Deviation, N for all variables.}
+#'   \item{n}{Sample size (listwise complete cases; weighted N when weighted).}
+#'   \item{formula, dependent, predictor_names, weighted, weight_name, use, is_grouped, standardized, conf.level}{Call metadata.}
 #' }
-#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
+#'   Because the object inherits from \code{"lm"}, all standard generics
+#'   (\code{predict()}, \code{anova()}, \code{vcov()}, \code{confint()},
+#'   \code{residuals()}, \code{fitted()}, \code{coef()},
+#'   \code{model.matrix()}, \code{broom::tidy()}, \code{broom::glance()},
+#'   \code{broom::augment()}) dispatch natively without unwrapping.
+#'   \code{summary()} returns the SPSS-style mariposa summary; for the
+#'   raw lm summary use \code{stats::summary.lm()} on the same object.
+#'
+#'   For \code{use = "pairwise"} (no single fitted lm available) or for
+#'   grouped data, returns a list of class \code{"linear_regression"}.
+#'   Pairwise results expose the same SPSS-style tables but not the lm
+#'   generics; grouped results hold one fitted lm-inheriting model per
+#'   group under \code{$groups}.
 #'
 #' @details
 #' ## Understanding the Results
@@ -260,6 +272,13 @@ linear_regression <- function(data, formula = NULL,
       gv <- as.list(group_keys[i, , drop = FALSE])
       gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
       result$group_values <- gv
+      # Each listwise group result IS an lm — tag it as linear_regression so
+      # predict()/anova()/broom generics on a single group dispatch natively.
+      if (inherits(result, "lm")) {
+        class(result) <- c("linear_regression", class(result))
+      } else {
+        class(result) <- "linear_regression"
+      }
       result
     })
 
@@ -282,6 +301,8 @@ linear_regression <- function(data, formula = NULL,
   } else {
     result <- .lm_core(data, model_formula, dep_name, pred_names,
                        weights_vec, use, standardized, conf.level, factors)
+    # Listwise: result IS the lm (mariposa slots attached).
+    # Pairwise: result is a custom list (no fitted lm available).
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -291,7 +312,11 @@ linear_regression <- function(data, formula = NULL,
     result$is_grouped <- FALSE
     result$standardized <- standardized
     result$conf.level <- conf.level
-    class(result) <- "linear_regression"
+    if (inherits(result, "lm")) {
+      class(result) <- c("linear_regression", class(result))
+    } else {
+      class(result) <- "linear_regression"
+    }
     result
   }
 }
@@ -508,15 +533,21 @@ linear_regression <- function(data, formula = NULL,
   # ============================================================================
   # RETURN STRUCTURE
   # ============================================================================
+  # The result object IS the fitted lm — we attach mariposa-specific tables as
+  # additional slots so that all base-R and broom generics (predict, anova,
+  # vcov, confint, residuals, fitted, formula, model.matrix, tidy, glance,
+  # augment, ...) dispatch natively through the "lm" class. The SPSS-style
+  # tables live under non-colliding names ($coef_table, $anova_table,
+  # $model_summary, $descriptives). lm's $coefficients stays the numeric
+  # vector that downstream methods expect.
 
-  list(
-    coefficients = coef_table,
-    model_summary = model_stats,
-    anova = anova_table,
-    descriptives = descriptives,
-    model = model,
-    n = n_report
-  )
+  out <- model
+  out$coef_table   <- coef_table
+  out$anova_table  <- anova_table
+  out$model_summary <- model_stats
+  out$descriptives <- descriptives
+  out$n            <- n_report
+  out
 }
 
 
@@ -757,12 +788,14 @@ linear_regression <- function(data, formula = NULL,
     N = round(var_n[all_vars])
   )
 
+  # Pairwise deletion has no single fitted lm object — return a custom list.
+  # predict()/anova()/broom generics that require a fitted model will error
+  # via predict.linear_regression() with a pointer to use = "listwise".
   list(
-    coefficients = coef_table,
+    coef_table = coef_table,
     model_summary = model_stats,
-    anova = anova_table,
+    anova_table = anova_table,
     descriptives = descriptives,
-    model = NULL,
     n = N_eff
   )
 }
@@ -933,10 +966,10 @@ print.linear_regression <- function(x, ...) {
     for (grp in x$groups) {
       grp_label <- paste(names(grp$group_values), "=",
                          unlist(grp$group_values), collapse = ", ")
-      f_stat <- grp$anova$F_statistic[1]
-      f_df1 <- as.integer(round(grp$anova$df[1]))
-      f_df2 <- as.integer(round(grp$anova$df[2]))
-      f_p <- grp$anova$Sig[1]
+      f_stat <- grp$anova_table$F_statistic[1]
+      f_df1 <- as.integer(round(grp$anova_table$df[1]))
+      f_df2 <- as.integer(round(grp$anova_table$df[2]))
+      f_p <- grp$anova_table$Sig[1]
       p_str <- format_p_compact(f_p)
       stars <- add_significance_stars(f_p)
       cat(sprintf("  %s: R2 = %.3f, adj.R2 = %.3f, F(%d, %d) = %.2f, %s %s, N = %d\n",
@@ -948,10 +981,10 @@ print.linear_regression <- function(x, ...) {
     }
   } else {
     cat(sprintf("Linear Regression: %s%s\n", formula_str, weighted_tag))
-    f_stat <- x$anova$F_statistic[1]
-    f_df1 <- as.integer(round(x$anova$df[1]))
-    f_df2 <- as.integer(round(x$anova$df[2]))
-    f_p <- x$anova$Sig[1]
+    f_stat <- x$anova_table$F_statistic[1]
+    f_df1 <- as.integer(round(x$anova_table$df[1]))
+    f_df2 <- as.integer(round(x$anova_table$df[2]))
+    f_p <- x$anova_table$Sig[1]
     p_str <- format_p_compact(f_p)
     stars <- add_significance_stars(f_p)
     cat(sprintf("  R2 = %.3f, adj.R2 = %.3f, F(%d, %d) = %.2f, %s %s, N = %d\n",
@@ -1083,12 +1116,12 @@ print.summary.linear_regression <- function(x, ...) {
 
   if (show_anova) {
     cat("\n")
-    .print_anova_table(x$anova)
+    .print_anova_table(x$anova_table)
   }
 
   if (show_coefs) {
     cat("\n")
-    .print_coefficients_table(x$coefficients, x$standardized)
+    .print_coefficients_table(x$coef_table, x$standardized)
   }
 
   # Show significance legend if any p-value section is visible
@@ -1138,12 +1171,12 @@ print.summary.linear_regression <- function(x, ...) {
 
     if (show_anova) {
       cat("\n")
-      .print_anova_table(grp$anova)
+      .print_anova_table(grp$anova_table)
     }
 
     if (show_coefs) {
       cat("\n")
-      .print_coefficients_table(grp$coefficients, x$standardized)
+      .print_coefficients_table(grp$coef_table, x$standardized)
     }
   }
 
@@ -1272,4 +1305,64 @@ print.summary.linear_regression <- function(x, ...) {
     }
   }
   cat(paste0("  ", strrep("-", w), "\n"))
+}
+
+
+# ============================================================================
+# NATIVE GENERIC SUPPORT (predict / anova / etc.)
+# ============================================================================
+# Listwise + ungrouped linear_regression results inherit from "lm", so
+# predict.lm, anova.lm, vcov.lm, confint.lm, residuals.lm, fitted.lm,
+# formula.lm, model.matrix.lm, broom::tidy.lm, broom::glance.lm, and
+# broom::augment.lm all dispatch natively without further code.
+#
+# Grouped and pairwise results do not have a single fitted lm to dispatch
+# on. These overrides surface actionable error messages instead of letting
+# users hit cryptic failures inside predict.default or similar.
+
+.lr_require_lm <- function(object, generic) {
+  if (isTRUE(object$is_grouped)) {
+    cli_abort(c(
+      "{.code {generic}()} is not supported on a grouped {.cls linear_regression}.",
+      i = "Each element of {.code object$groups} is itself a fitted model.",
+      i = "Use {.code lapply(object$groups, {generic}, ...)} for per-group results."
+    ))
+  }
+  if (identical(object$use, "pairwise") || !inherits(object, "lm")) {
+    cli_abort(c(
+      "{.code {generic}()} is not available for pairwise-deleted regressions.",
+      i = "Pairwise deletion does not produce a fitted {.cls lm} object.",
+      i = "Refit with {.code use = \"listwise\"} to enable {.code {generic}()}."
+    ))
+  }
+}
+
+#' Predict from a linear_regression model
+#'
+#' For listwise + ungrouped results, dispatches to \code{stats::predict.lm}
+#' (the result inherits from \code{"lm"}). For grouped or pairwise results,
+#' raises an informative error.
+#'
+#' @param object A \code{linear_regression} result.
+#' @param ... Passed to \code{stats::predict.lm}.
+#' @export
+#' @method predict linear_regression
+predict.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "predict")
+  NextMethod()
+}
+
+#' ANOVA for a linear_regression model
+#'
+#' For listwise + ungrouped results, dispatches to \code{stats::anova.lm}
+#' (sequential Type-I sum of squares per term). For the SPSS-style
+#' overall-model ANOVA table, use \code{object$anova_table}.
+#'
+#' @param object A \code{linear_regression} result.
+#' @param ... Passed to \code{stats::anova.lm}.
+#' @export
+#' @method anova linear_regression
+anova.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "anova")
+  NextMethod()
 }

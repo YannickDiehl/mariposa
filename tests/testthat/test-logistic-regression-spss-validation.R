@@ -32,25 +32,25 @@ survey_data$is_female <- as.integer(survey_data$gender == "Female")
 
 test_that("Wald = (B/SE)^2 exactly (catches wrapper formula errors)", {
   r <- logistic_regression(survey_data, high_life ~ age + income)
-  for (i in seq_len(nrow(r$coefficients))) {
-    B  <- as.numeric(r$coefficients$B[i])
-    SE <- as.numeric(r$coefficients$S.E.[i])
-    W  <- as.numeric(r$coefficients$Wald[i])
+  for (i in seq_len(nrow(r$coef_table))) {
+    B  <- as.numeric(r$coef_table$B[i])
+    SE <- as.numeric(r$coef_table$S.E.[i])
+    W  <- as.numeric(r$coef_table$Wald[i])
     assert_spss(W, (B / SE)^2,
                 tier = "spec", what = "statistic",
-                label = sprintf("Wald[%s] = (B/SE)^2", r$coefficients$Term[i]))
+                label = sprintf("Wald[%s] = (B/SE)^2", r$coef_table$Term[i]))
   }
 })
 
 
 test_that("Sig = pchisq(Wald, df=1, lower.tail=FALSE) exactly", {
   r <- logistic_regression(survey_data, high_life ~ age + income)
-  for (i in seq_len(nrow(r$coefficients))) {
-    W <- as.numeric(r$coefficients$Wald[i])
-    p <- as.numeric(r$coefficients$Sig.[i])
+  for (i in seq_len(nrow(r$coef_table))) {
+    W <- as.numeric(r$coef_table$Wald[i])
+    p <- as.numeric(r$coef_table$Sig.[i])
     assert_spss(p, pchisq(W, df = 1, lower.tail = FALSE),
                 tier = "spec", what = "p_value",
-                label = sprintf("Sig[%s] from chi-sq", r$coefficients$Term[i]))
+                label = sprintf("Sig[%s] from chi-sq", r$coef_table$Term[i]))
   }
 })
 
@@ -59,12 +59,12 @@ test_that("Exp(B) = exp(B); for binary predictor matches OR from 2x2 table", {
   r <- logistic_regression(survey_data, high_life ~ is_female)
 
   # Exp(B) should equal exp(B) elementwise
-  for (i in seq_len(nrow(r$coefficients))) {
-    expB <- as.numeric(r$coefficients$`Exp(B)`[i])
-    B    <- as.numeric(r$coefficients$B[i])
+  for (i in seq_len(nrow(r$coef_table))) {
+    expB <- as.numeric(r$coef_table$`Exp(B)`[i])
+    B    <- as.numeric(r$coef_table$B[i])
     assert_spss(expB, exp(B),
                 tier = "spec", what = "statistic",
-                label = sprintf("Exp(B) = exp(B) for %s", r$coefficients$Term[i]))
+                label = sprintf("Exp(B) = exp(B) for %s", r$coef_table$Term[i]))
   }
 
   # For the single binary predictor, Exp(B) should equal the odds ratio
@@ -72,7 +72,7 @@ test_that("Exp(B) = exp(B); for binary predictor matches OR from 2x2 table", {
   d <- survey_data[stats::complete.cases(survey_data[, c("high_life", "is_female")]), ]
   tbl <- table(female = d$is_female, high = d$high_life)
   or_2x2 <- (tbl["1", "1"] * tbl["0", "0"]) / (tbl["1", "0"] * tbl["0", "1"])
-  expB_is_female <- as.numeric(r$coefficients$`Exp(B)`[r$coefficients$Term == "is_female"])
+  expB_is_female <- as.numeric(r$coef_table$`Exp(B)`[r$coef_table$Term == "is_female"])
   assert_spss(expB_is_female, or_2x2,
               tier = "display", precision = 4,
               label = "Exp(B) for binary predictor matches 2x2 OR")
@@ -82,15 +82,15 @@ test_that("Exp(B) = exp(B); for binary predictor matches OR from 2x2 table", {
 test_that("CI for Exp(B) = exp(B +/- z_crit * SE)", {
   r <- logistic_regression(survey_data, high_life ~ age + income, conf.level = 0.95)
   z95 <- qnorm(0.975)
-  for (i in seq_len(nrow(r$coefficients))) {
-    B  <- as.numeric(r$coefficients$B[i])
-    SE <- as.numeric(r$coefficients$S.E.[i])
-    lo <- as.numeric(r$coefficients$CI_lower[i])
-    hi <- as.numeric(r$coefficients$CI_upper[i])
+  for (i in seq_len(nrow(r$coef_table))) {
+    B  <- as.numeric(r$coef_table$B[i])
+    SE <- as.numeric(r$coef_table$S.E.[i])
+    lo <- as.numeric(r$coef_table$CI_lower[i])
+    hi <- as.numeric(r$coef_table$CI_upper[i])
     assert_spss(lo, exp(B - z95 * SE), tier = "display", precision = 5,
-                label = sprintf("CI_lower[%s]", r$coefficients$Term[i]))
+                label = sprintf("CI_lower[%s]", r$coef_table$Term[i]))
     assert_spss(hi, exp(B + z95 * SE), tier = "display", precision = 5,
-                label = sprintf("CI_upper[%s]", r$coefficients$Term[i]))
+                label = sprintf("CI_upper[%s]", r$coef_table$Term[i]))
   }
 })
 
@@ -161,8 +161,8 @@ test_that("Classification accuracy reproducible from cutoff 0.5", {
 
 test_that("Structural sanity: single predictor + n + Term names", {
   r <- logistic_regression(survey_data, high_life ~ age)
-  expect_equal(nrow(r$coefficients), 2L)  # intercept + age
-  expect_setequal(r$coefficients$Term, c("(Intercept)", "age"))
+  expect_equal(nrow(r$coef_table), 2L)  # intercept + age
+  expect_setequal(r$coef_table$Term, c("(Intercept)", "age"))
   expect_equal(r$n,
                sum(stats::complete.cases(survey_data[, c("high_life", "age")])))
 })

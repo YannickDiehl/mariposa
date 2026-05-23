@@ -1,3 +1,65 @@
+# mariposa 0.6.3
+
+## Behavior Change — regression results inherit from `lm` / `glm`
+
+`linear_regression()` and `logistic_regression()` results now ARE the
+fitted `lm` / `glm` object (with mariposa-specific tables attached as
+additional slots), instead of wrapping it in `$model`. All base-R and
+`broom` generics dispatch natively:
+
+```r
+r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+coef(r)                                 # named numeric vector
+predict(r, newdata = head(survey_data)) # works directly
+anova(r)                                # sequential SS table
+vcov(r); confint(r); residuals(r); fitted(r)
+broom::tidy(r); broom::glance(r); broom::augment(r)
+```
+
+Class hierarchy is `c("linear_regression", "lm")` for linear and
+`c("logistic_regression", "glm", "lm")` for logistic. `summary(r)`
+still returns the SPSS-style mariposa summary (more specific method
+wins); for the raw `lm`/`glm` summary call `stats::summary.lm(r)` /
+`stats::summary.glm(r)`.
+
+### Slot renames (breaking)
+
+Two slots collided with `lm`/`glm` conventions and were renamed:
+
+| Before        | After          |
+|:------------- |:-------------- |
+| `$coefficients` (tibble) | `$coef_table` (tibble)  |
+| `$anova` (tibble)        | `$anova_table` (tibble) |
+| `$model` (lm/glm)        | the object IS the model — use `r` directly |
+
+Migration:
+
+* `r$coefficients` → `r$coef_table` (SPSS-style tibble) or `coef(r)`
+  (named numeric vector).
+* `r$anova` → `r$anova_table` (SPSS-style overall-model ANOVA tibble)
+  or `anova(r)` (R's per-term sequential SS table).
+* `r$model |> predict(...)` → `predict(r, ...)` directly.
+* `r$model |> broom::tidy()` → `broom::tidy(r)` directly.
+
+### Edge cases
+
+* `use = "pairwise"`: no single fitted lm is available, so the result
+  is a custom list with class `"linear_regression"` only.
+  `predict()`/`anova()` etc. raise an informative error pointing at
+  `use = "listwise"`.
+* Grouped results (top-level): no single model. `predict()`/`anova()`
+  raise an informative error pointing at `lapply(r$groups, predict,
+  ...)`. Each `r$groups[[i]]` is itself an lm-inheriting object, so
+  per-group generics work directly.
+
+## Test Suite
+
+* New test block in `test-linear-regression-spss-validation.R` verifies
+  that `coef()`, `predict()`, `anova()`, `vcov()`, `confint()`,
+  `residuals()`, `fitted()`, `formula()`, `nobs()`, `model.matrix()`
+  all dispatch natively, plus the grouped/pairwise error paths.
+* 1184/1184 tests pass; R CMD check on built tarball: Status OK.
+
 # mariposa 0.6.2
 
 ## Behavior Change

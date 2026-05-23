@@ -115,9 +115,9 @@ test_that("linear_regression pairwise produces valid results", {
                               predictors = c(age, life_satisfaction),
                               use = "pairwise")
   expect_s3_class(result, "linear_regression")
-  expect_true(!is.null(result$coefficients))
+  expect_true(!is.null(result$coef_table))
   expect_true(!is.null(result$model_summary))
-  expect_true(nrow(result$coefficients) >= 2)
+  expect_true(nrow(result$coef_table) >= 2)
 })
 
 test_that("linear_regression pairwise with weights", {
@@ -125,7 +125,7 @@ test_that("linear_regression pairwise with weights", {
                               predictors = c(age, life_satisfaction),
                               use = "pairwise", weights = sampling_weight)
   expect_s3_class(result, "linear_regression")
-  expect_true(!is.null(result$coefficients))
+  expect_true(!is.null(result$coef_table))
 })
 
 test_that("linear_regression pairwise print works", {

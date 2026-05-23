@@ -188,9 +188,9 @@ assert_lm_model <- function(result, spss, scenario) {
 }
 
 assert_lm_anova <- function(result, spss, scenario) {
-  reg <- result$anova[result$anova$Source == "Regression", ]
-  res <- result$anova[result$anova$Source == "Residual", ]
-  tot <- result$anova[result$anova$Source == "Total", ]
+  reg <- result$anova_table[result$anova_table$Source == "Regression", ]
+  res <- result$anova_table[result$anova_table$Source == "Residual", ]
+  tot <- result$anova_table[result$anova_table$Source == "Total", ]
 
   assert_spss(reg$Sum_of_Squares, spss$anova$ss_reg,
               tier = "display", precision = 3, label = sprintf("[%s] SS Reg", scenario))
@@ -220,7 +220,7 @@ assert_lm_anova <- function(result, spss, scenario) {
 }
 
 assert_lm_coef <- function(result, term_label, spss_coef, scenario) {
-  row <- result$coefficients[result$coefficients$Term == term_label, ]
+  row <- result$coef_table[result$coef_table$Term == term_label, ]
   if (nrow(row) == 0) {
     fail(sprintf("[%s] term %s not found in coefficients", scenario, term_label))
     return(invisible(FALSE))
@@ -388,8 +388,8 @@ test_that("factors='dummy' (default) produces L-1 contrasts for unordered factor
   )
   r <- linear_regression(df, y ~ x)
   # Two dummy contrasts + intercept = 3 rows
-  expect_equal(nrow(r$coefficients), 3L)
-  expect_setequal(r$coefficients$Term, c("(Intercept)", "xb", "xc"))
+  expect_equal(nrow(r$coef_table), 3L)
+  expect_setequal(r$coef_table$Term, c("(Intercept)", "xb", "xc"))
 })
 
 test_that("factors='numeric' coerces factor levels to integer codes (single B)", {
@@ -400,8 +400,8 @@ test_that("factors='numeric' coerces factor levels to integer codes (single B)",
   )
   r <- suppressMessages(linear_regression(df, y ~ x, factors = "numeric"))
   # Single ordinal-as-scale slope + intercept = 2 rows
-  expect_equal(nrow(r$coefficients), 2L)
-  expect_setequal(r$coefficients$Term, c("(Intercept)", "x"))
+  expect_equal(nrow(r$coef_table), 2L)
+  expect_setequal(r$coef_table$Term, c("(Intercept)", "x"))
 })
 
 test_that("factors='numeric' emits one-line cli_inform listing coerced variables", {
@@ -420,4 +420,86 @@ test_that("pairwise + dummy + factor predictor errors with actionable message", 
     linear_regression(df, y ~ x, use = "pairwise"),
     regexp = "Pairwise deletion"
   )
+})
+
+
+# =============================================================================
+# Native generic dispatch (the object IS an lm) — added 0.6.3
+# =============================================================================
+
+test_that("listwise+ungrouped result inherits from lm", {
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  expect_true(inherits(r, "lm"))
+  expect_true(inherits(r, "linear_regression"))
+  expect_identical(class(r)[1], "linear_regression")
+})
+
+test_that("coef(r) returns lm-style named numeric vector matching coef_table$B", {
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  cv <- coef(r)
+  expect_type(cv, "double")
+  expect_named(cv)
+  expect_equal(unname(cv), unname(r$coef_table$B))
+})
+
+test_that("predict(r, newdata) dispatches to predict.lm", {
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  nd <- head(survey_data, 5)
+  p <- predict(r, newdata = nd)
+  # Independent recompute via stats::lm on the same complete cases
+  d <- survey_data[stats::complete.cases(
+    survey_data[, c("life_satisfaction","age","income")]), ]
+  expect_equal(unname(p),
+               unname(predict(stats::lm(life_satisfaction ~ age + income, d),
+                              newdata = nd)))
+})
+
+test_that("anova(r) dispatches to anova.lm (sequential SS table)", {
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  a <- anova(r)
+  expect_s3_class(a, "anova")
+  # Three rows: age, income, Residuals
+  expect_equal(nrow(a), 3L)
+})
+
+test_that("vcov / confint / residuals / fitted / formula dispatch natively", {
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  expect_true(is.matrix(vcov(r)))
+  expect_true(is.matrix(confint(r)))
+  expect_type(residuals(r), "double")
+  expect_type(fitted(r), "double")
+  expect_s3_class(formula(r), "formula")
+  expect_equal(nobs(r), r$n)
+})
+
+test_that("model.matrix(r) dispatches natively", {
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  X <- stats::model.matrix(r)
+  expect_true(is.matrix(X))
+  expect_equal(ncol(X), 3L)  # intercept + 2 predictors
+})
+
+test_that("predict() on grouped result errors with actionable message", {
+  rg <- survey_data |>
+    dplyr::group_by(region) |>
+    linear_regression(life_satisfaction ~ age)
+  expect_error(predict(rg), regexp = "grouped")
+})
+
+test_that("predict() on pairwise result errors with actionable message", {
+  rp <- linear_regression(survey_data, life_satisfaction ~ age + income,
+                          use = "pairwise")
+  expect_error(predict(rp), regexp = "pairwise")
+})
+
+test_that("each group element of a grouped result inherits from lm", {
+  rg <- survey_data |>
+    dplyr::group_by(region) |>
+    linear_regression(life_satisfaction ~ age)
+  for (grp in rg$groups) {
+    expect_true(inherits(grp, "lm"))
+    # Per-group predict should work directly
+    nd <- head(survey_data, 3)
+    expect_no_error(predict(grp, newdata = nd))
+  }
 })

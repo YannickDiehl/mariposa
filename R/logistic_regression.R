@@ -32,22 +32,29 @@
 #'   subcommand is given. The "numeric" mode emits a one-line
 #'   \code{cli::cli_inform()} listing the coerced variables.
 #'
-#' @return An object of class \code{"logistic_regression"} containing:
+#' @return For ungrouped data, an object of class
+#'   \code{c("logistic_regression", "glm", "lm")} — \strong{the fitted
+#'   \code{glm} itself}, with mariposa-specific slots attached:
 #' \describe{
-#'   \item{coefficients}{Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper}
+#'   \item{coef_table}{Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper}
 #'   \item{model_summary}{List with minus2LL, cox_snell_r2, nagelkerke_r2, mcfadden_r2}
 #'   \item{omnibus_test}{List with chi_sq, df, p for overall model test}
 #'   \item{classification}{List with table, overall_pct, pct_correct_0, pct_correct_1}
 #'   \item{hosmer_lemeshow}{List with chi_sq, df, p (goodness-of-fit test)}
-#'   \item{model}{The underlying \code{glm} object}
-#'   \item{formula}{The formula used}
-#'   \item{n}{Sample size (listwise complete cases)}
-#'   \item{dependent}{Name of the dependent variable}
-#'   \item{predictor_names}{Names of predictor variables}
-#'   \item{weighted}{Logical indicating whether weights were used}
-#'   \item{weight_name}{Name of the weight variable (or NULL)}
+#'   \item{n}{Sample size (listwise complete cases; weighted N when weighted)}
+#'   \item{formula, dependent, predictor_names, weighted, weight_name, is_grouped, conf.level}{Call metadata.}
 #' }
-#'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
+#'   Because the object inherits from \code{"glm"}, all standard
+#'   generics (\code{predict()}, \code{anova()}, \code{vcov()},
+#'   \code{confint()}, \code{residuals()}, \code{fitted()},
+#'   \code{coef()}, \code{broom::tidy()}, \code{broom::glance()},
+#'   \code{broom::augment()}) dispatch natively without unwrapping.
+#'   \code{summary()} returns the SPSS-style mariposa summary; for
+#'   the raw glm summary use \code{stats::summary.glm()} on the same
+#'   object.
+#'
+#'   For grouped data, returns a list of class \code{"logistic_regression"}
+#'   with \code{$groups} holding one fitted glm-inheriting result per group.
 #'
 #' @details
 #' ## Understanding the Results
@@ -249,6 +256,13 @@ logistic_regression <- function(data, formula = NULL,
       gv <- as.list(group_keys[i, , drop = FALSE])
       gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
       result$group_values <- gv
+      # Each group result IS a glm — tag it so per-group predict/anova/broom
+      # generics dispatch natively.
+      if (inherits(result, "glm")) {
+        class(result) <- c("logistic_regression", class(result))
+      } else {
+        class(result) <- "logistic_regression"
+      }
       result
     })
 
@@ -269,6 +283,7 @@ logistic_regression <- function(data, formula = NULL,
   } else {
     result <- .glm_core(data, model_formula, dep_name, pred_names,
                         weights_vec, conf.level, factors)
+    # result IS the fitted glm (with mariposa slots attached).
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -276,7 +291,11 @@ logistic_regression <- function(data, formula = NULL,
     result$weight_name <- weight_name
     result$is_grouped <- FALSE
     result$conf.level <- conf.level
-    class(result) <- "logistic_regression"
+    if (inherits(result, "glm")) {
+      class(result) <- c("logistic_regression", class(result))
+    } else {
+      class(result) <- "logistic_regression"
+    }
     result
   }
 }
@@ -501,16 +520,20 @@ logistic_regression <- function(data, formula = NULL,
   # ============================================================================
   # RETURN STRUCTURE
   # ============================================================================
+  # The result object IS the fitted glm — mariposa-specific tables are
+  # attached as additional slots so base-R and broom generics (predict,
+  # anova, vcov, confint, residuals, fitted, formula, model.matrix, tidy,
+  # glance, augment, ...) dispatch natively through the "glm"/"lm" classes.
+  # glm's $coefficients stays the numeric vector downstream methods expect.
 
-  list(
-    coefficients = coef_table,
-    model_summary = model_stats,
-    omnibus_test = omnibus,
-    classification = classification,
-    hosmer_lemeshow = hosmer_lemeshow,
-    model = model,
-    n = n_report
-  )
+  out <- model
+  out$coef_table       <- coef_table
+  out$model_summary    <- model_stats
+  out$omnibus_test     <- omnibus
+  out$classification   <- classification
+  out$hosmer_lemeshow  <- hosmer_lemeshow
+  out$n                <- n_report
+  out
 }
 
 
@@ -771,7 +794,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
   if (show_coefs) {
     cat("\n")
-    .print_logistic_coefficients(x$coefficients)
+    .print_logistic_coefficients(x$coef_table)
   }
 
   # Show significance legend if any section with p-values is visible
@@ -832,7 +855,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
     if (show_coefs) {
       cat("\n")
-      .print_logistic_coefficients(grp$coefficients)
+      .print_logistic_coefficients(grp$coef_table)
     }
   }
 
@@ -945,4 +968,60 @@ print.summary.logistic_regression <- function(x, ...) {
     }
   }
   cat(paste0("  ", strrep("-", w), "\n"))
+}
+
+
+# ============================================================================
+# NATIVE GENERIC SUPPORT
+# ============================================================================
+# Listwise + ungrouped logistic_regression results inherit from "glm" /
+# "lm", so predict.glm, anova.glm, vcov.glm, confint.glm, residuals.glm,
+# fitted.glm, formula, model.matrix, broom::tidy.glm, broom::glance.glm,
+# broom::augment.glm dispatch natively. Grouped results need per-group
+# iteration; the overrides below surface actionable errors.
+
+.glr_require_glm <- function(object, generic) {
+  if (isTRUE(object$is_grouped)) {
+    cli_abort(c(
+      "{.code {generic}()} is not supported on a grouped {.cls logistic_regression}.",
+      i = "Each element of {.code object$groups} is itself a fitted model.",
+      i = "Use {.code lapply(object$groups, {generic}, ...)} for per-group results."
+    ))
+  }
+  if (!inherits(object, "glm")) {
+    cli_abort(c(
+      "{.code {generic}()} requires the underlying {.cls glm} object.",
+      i = "Refit without grouping to enable {.code {generic}()}."
+    ))
+  }
+}
+
+#' Predict from a logistic_regression model
+#'
+#' For ungrouped results, dispatches to \code{stats::predict.glm}
+#' (the result inherits from \code{"glm"}). For grouped results, raises
+#' an informative error pointing at \code{object$groups}.
+#'
+#' @param object A \code{logistic_regression} result.
+#' @param ... Passed to \code{stats::predict.glm}.
+#' @export
+#' @method predict logistic_regression
+predict.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "predict")
+  NextMethod()
+}
+
+#' ANOVA for a logistic_regression model
+#'
+#' For ungrouped results, dispatches to \code{stats::anova.glm} (sequential
+#' deviance per term). For the SPSS-style omnibus chi-square test, use
+#' \code{object$omnibus_test}.
+#'
+#' @param object A \code{logistic_regression} result.
+#' @param ... Passed to \code{stats::anova.glm}.
+#' @export
+#' @method anova logistic_regression
+anova.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "anova")
+  NextMethod()
 }

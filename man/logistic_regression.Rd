@@ -42,22 +42,29 @@ subcommand is given. The "numeric" mode emits a one-line
 \code{cli::cli_inform()} listing the coerced variables.}
 }
 \value{
-An object of class \code{"logistic_regression"} containing:
+For ungrouped data, an object of class
+\code{c("logistic_regression", "glm", "lm")} — \strong{the fitted
+\code{glm} itself}, with mariposa-specific slots attached:
 \describe{
-\item{coefficients}{Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper}
+\item{coef_table}{Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper}
 \item{model_summary}{List with minus2LL, cox_snell_r2, nagelkerke_r2, mcfadden_r2}
 \item{omnibus_test}{List with chi_sq, df, p for overall model test}
 \item{classification}{List with table, overall_pct, pct_correct_0, pct_correct_1}
 \item{hosmer_lemeshow}{List with chi_sq, df, p (goodness-of-fit test)}
-\item{model}{The underlying \code{glm} object}
-\item{formula}{The formula used}
-\item{n}{Sample size (listwise complete cases)}
-\item{dependent}{Name of the dependent variable}
-\item{predictor_names}{Names of predictor variables}
-\item{weighted}{Logical indicating whether weights were used}
-\item{weight_name}{Name of the weight variable (or NULL)}
+\item{n}{Sample size (listwise complete cases; weighted N when weighted)}
+\item{formula, dependent, predictor_names, weighted, weight_name, is_grouped, conf.level}{Call metadata.}
 }
-Use \code{summary()} for the full SPSS-style output with toggleable sections.
+Because the object inherits from \code{"glm"}, all standard
+generics (\code{predict()}, \code{anova()}, \code{vcov()},
+\code{confint()}, \code{residuals()}, \code{fitted()},
+\code{coef()}, \code{broom::tidy()}, \code{broom::glance()},
+\code{broom::augment()}) dispatch natively without unwrapping.
+\code{summary()} returns the SPSS-style mariposa summary; for
+the raw glm summary use \code{stats::summary.glm()} on the same
+object.
+
+For grouped data, returns a list of class \code{"logistic_regression"}
+with \code{$groups} holding one fitted glm-inheriting result per group.
 }
 \description{
 \code{logistic_regression()} performs binary logistic regression with

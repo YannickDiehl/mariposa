@@ -53,21 +53,33 @@ variables. The "numeric" mode is required to reproduce SPSS results
 when factor predictors carry ordered meaning (e.g., 4-level education).}
 }
 \value{
-An object of class \code{"linear_regression"} containing:
+For ungrouped + listwise data, an object of class
+\code{c("linear_regression", "lm")} — \strong{the fitted \code{lm}
+itself}, with mariposa-specific slots attached:
 \describe{
-\item{coefficients}{Tibble with B, Std.Error, Beta, t, p, CI_lower, CI_upper}
-\item{model_summary}{List with R, R_squared, adj_R_squared, std_error}
-\item{anova}{Tibble with Sum of Squares, df, Mean Square, F, Sig.}
-\item{descriptives}{Tibble with Mean, Std.Deviation, N for all variables}
-\item{model}{The underlying \code{lm} object}
-\item{formula}{The formula used}
-\item{n}{Sample size (listwise complete cases)}
-\item{dependent}{Name of the dependent variable}
-\item{predictor_names}{Names of predictor variables}
-\item{weighted}{Logical indicating whether weights were used}
-\item{weight_name}{Name of the weight variable (or NULL)}
+\item{coef_table}{SPSS-style tibble with B, Std.Error, Beta, t, p,
+CI_lower, CI_upper. For weighted models, SE / t / p are adjusted to
+SPSS's frequency-weight df (see Technical Details).}
+\item{anova_table}{SPSS-style overall-model ANOVA tibble (Source ×
+Sum_of_Squares / df / Mean_Square / F_statistic / Sig).}
+\item{model_summary}{List with R, R_squared, adj_R_squared, std_error.}
+\item{descriptives}{Tibble with Mean, Std.Deviation, N for all variables.}
+\item{n}{Sample size (listwise complete cases; weighted N when weighted).}
+\item{formula, dependent, predictor_names, weighted, weight_name, use, is_grouped, standardized, conf.level}{Call metadata.}
 }
-Use \code{summary()} for the full SPSS-style output with toggleable sections.
+Because the object inherits from \code{"lm"}, all standard generics
+(\code{predict()}, \code{anova()}, \code{vcov()}, \code{confint()},
+\code{residuals()}, \code{fitted()}, \code{coef()},
+\code{model.matrix()}, \code{broom::tidy()}, \code{broom::glance()},
+\code{broom::augment()}) dispatch natively without unwrapping.
+\code{summary()} returns the SPSS-style mariposa summary; for the
+raw lm summary use \code{stats::summary.lm()} on the same object.
+
+For \code{use = "pairwise"} (no single fitted lm available) or for
+grouped data, returns a list of class \code{"linear_regression"}.
+Pairwise results expose the same SPSS-style tables but not the lm
+generics; grouped results hold one fitted lm-inheriting model per
+group under \code{$groups}.
 }
 \description{
 \code{linear_regression()} performs bivariate or multiple linear regression
