@@ -48,6 +48,14 @@ summary(result)
 #> - Method: ENTER (all predictors)
 #> - N: 2421
 #> 
+#>   Descriptive Statistics
+#>   ----------------------------------------------------------------------
+#>   Variable                                    Mean     Std.Dev.      N
+#>   ----------------------------------------------------------------------
+#>   life_satisfaction                          3.628        1.153   2421
+#>   age                                       50.583       17.000   2421
+#>   ----------------------------------------------------------------------
+#> 
 #>   Model Summary
 #>   ------------------------------------------------------------
 #>   R                              0.029
@@ -124,7 +132,7 @@ linear_regression(survey_data,
                   life_satisfaction ~ age + income,
                   weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age + income [Weighted]
-#>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p < 0.001 ***, N = 2130
+#>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.42, p < 0.001 ***, N = 2130
 ```
 
 Weights are treated as frequency weights, matching SPSS `WEIGHT BY`
@@ -279,7 +287,7 @@ Exp(B) is the odds ratio — the key statistic in logistic regression:
 logistic_regression(survey_data,
                     high_satisfaction ~ age + income + trust_government + education)
 #> Logistic Regression: high_satisfaction ~ age + income + trust_government + education
-#>   Nagelkerke R2 = 0.207, chi2(4) = 333.77, p < 0.001 ***, Accuracy = 68.3%, N = 1995
+#>   Nagelkerke R2 = 0.212, chi2(4) = 341.28, p < 0.001 ***, Accuracy = 68.1%, N = 1995
 ```
 
 ### SPSS-Style Interface
@@ -364,6 +372,16 @@ summary(lm_result)
 #> - N: 2009
 #> - Weights: sampling_weight
 #> 
+#>   Descriptive Statistics
+#>   ----------------------------------------------------------------------
+#>   Variable                                    Mean     Std.Dev.      N
+#>   ----------------------------------------------------------------------
+#>   life_satisfaction                          3.647        1.147   2009
+#>   age                                       50.923       17.121   2009
+#>   income                                  3752.258     1424.703   2009
+#>   trust_government                           2.632        1.157   2009
+#>   ----------------------------------------------------------------------
+#> 
 #>   Model Summary
 #>   ------------------------------------------------------------
 #>   R                              0.448
@@ -376,7 +394,7 @@ summary(lm_result)
 #>   ------------------------------------------------------------------------------
 #>   Source           Sum of Squares    df      Mean Square          F     Sig.
 #>   ------------------------------------------------------------------------------
-#>   Regression              529.253     3          176.418    167.490    0.000 ***
+#>   Regression              529.253     3          176.418    167.491    0.000 ***
 #>   Residual               2111.871  2005            1.053                     
 #>   Total                  2641.124  2008                                      
 #>   ------------------------------------------------------------------------------

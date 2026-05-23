@@ -23,7 +23,7 @@ SPSS-style: linear_regression(data, dependent = life_satisfaction, predictors = 
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +87,8 @@ SPSS REGRESSION output.</p>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  use <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"listwise"</span>, <span class="st">"pairwise"</span><span class="op">)</span>,</span>
 <span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  conf.level <span class="op">=</span> <span class="fl">0.95</span></span>
+<span>  conf.level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dummy"</span>, <span class="st">"numeric"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -135,6 +136,17 @@ coefficients (Beta) are calculated and included in the output.</p></dd>
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
 <dd><p>Confidence level for coefficient intervals (default 0.95).</p></dd>
+
+
+<dt id="arg-factors">factors<a class="anchor" aria-label="anchor" href="#arg-factors"></a></dt>
+<dd><p>How factor predictors are entered into the model:
+<code>"dummy"</code> (default, matches base R <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>) expands a factor
+with <code>L</code> levels into <code>L - 1</code> dummy contrasts; <code>"numeric"</code>
+silently coerces factor levels to their integer codes, matching SPSS
+<code>REGRESSION</code> default behavior (ordinal-as-scale). The "numeric"
+mode emits a one-line <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_inform()</a></code> listing the coerced
+variables. The "numeric" mode is required to reproduce SPSS results
+when factor predictors carry ordered meaning (e.g., 4-level education).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -221,7 +233,16 @@ results closer to SPSS output when data has varying patterns of missingness.</p>
 weights (matching SPSS WEIGHT BY behavior). The model is fitted using weighted
 least squares via <code>lm(weights = ...)</code>.</p>
 <p><strong>Standardized Coefficients</strong>: Beta = B * (SD_x / SD_y). This matches
-the SPSS standardized coefficient output. Not available for the intercept.</p>
+the SPSS standardized coefficient output. Not available for the intercept.
+For dummy-coded factor terms (<code>factors = "dummy"</code>), the SD of the
+contrast column from the design matrix is used.</p>
+<p><strong>Factor Predictors</strong>: By default (<code>factors = "dummy"</code>),
+factor predictors are expanded into <code>L - 1</code> dummy contrasts via
+R's <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">stats::model.matrix()</a></code>, matching base R <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>. Pass
+<code>factors = "numeric"</code> to silently coerce factor levels to their
+integer codes (SPSS <code>REGRESSION</code> default). The "numeric" mode is
+required to reproduce SPSS results for ordinal predictors like
+education or Likert scales that SPSS treats as continuous.</p>
 <p><strong>Grouped Analysis</strong>: When <code>data</code> is grouped via
 <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, a separate regression is run for each group
 (matching SPSS SPLIT FILE BY).</p>
@@ -251,7 +272,7 @@ the SPSS standardized coefficient output. Not available for the intercept.</p>
 <span class="r-in"><span><span class="co"># Multiple regression</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: income ~ age + education + life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.471, adj.R2 = 0.470, F(3, 2111) = 625.48, p &lt; 0.001 ***, N = 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.477, adj.R2 = 0.476, F(5, 2109) = 385.29, p &lt; 0.001 ***, N = 2115</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># SPSS-style interface</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
@@ -273,18 +294,40 @@ the SPSS standardized coefficient output. Not available for the intercept.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   region = East: R2 = 0.002, adj.R2 = -0.000, F(1, 463) = 0.88, p = 0.350 , N = 465</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   region = West: R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274 , N = 1956</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Factor predictors: dummy-coding (default, matches base R lm())</span></span></span>
+<span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: income ~ age + education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.391, adj.R2 = 0.390, F(4, 2181) = 349.72, p &lt; 0.001 ***, N = 2186</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Factor predictors: SPSS-style ordinal-as-scale</span></span></span>
+<span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span>,</span></span>
+<span class="r-in"><span>                  factors <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `education`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: income ~ age + education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.386, adj.R2 = 0.386, F(2, 2183) = 686.59, p &lt; 0.001 ***, N = 2186</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-in"><span><span class="va">result</span>                                  <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ age + income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.201, adj.R2 = 0.200, F(2, 2112) = 265.60, p &lt; 0.001 ***, N = 2115</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed SPSS-style output</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>                         <span class="co"># full detailed SPSS-style output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: life_satisfaction ~ age + income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Method: ENTER (all predictors)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Descriptive Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable                                    Mean     Std.Dev.      N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction                          3.638        1.148   2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                                       50.827       16.995   2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income                                  3757.683     1430.923   2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
@@ -313,7 +356,7 @@ the SPSS standardized coefficient output. Not available for the intercept.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, collinearity <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide VIF/Tolerance</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, descriptives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>   <span class="co"># hide descriptives section</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>

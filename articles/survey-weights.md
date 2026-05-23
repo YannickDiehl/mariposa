@@ -324,7 +324,7 @@ survey_data %>%
   linear_regression(life_satisfaction ~ age + income,
                     weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age + income [Weighted]
-#>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p < 0.001 ***, N = 2130
+#>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.42, p < 0.001 ***, N = 2130
 ```
 
 ## Grouped Weighted Analysis

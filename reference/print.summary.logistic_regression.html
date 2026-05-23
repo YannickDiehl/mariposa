@@ -15,7 +15,7 @@ coefficients with odds ratios, and model comparison (chi-squared test)."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@ coefficients with odds ratios, and model comparison (chi-squared test).</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">survey_data</span><span class="op">$</span><span class="va">high_satisfaction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">life_satisfaction</span> <span class="op">&gt;</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>                              <span class="co"># all sections</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>                         <span class="co"># all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
@@ -152,7 +152,7 @@ coefficients with odds ratios, and model comparison (chi-squared test).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, classification_table <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># hide classification</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, classification <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># hide classification table</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
@@ -181,17 +181,6 @@ coefficients with odds ratios, and model comparison (chi-squared test).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                             150.764     8      0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                           508        380           57.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                           289        938           76.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   68.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>

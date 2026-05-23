@@ -41,7 +41,7 @@ for summary options.
 ``` r
 survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)
 result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
-summary(result)                              # all sections
+summary(result)                         # all sections
 #> 
 #> Logistic Regression Results
 #> ---------------------------
@@ -92,7 +92,7 @@ summary(result)                              # all sections
 #>   -----------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-summary(result, classification_table = FALSE) # hide classification
+summary(result, classification = FALSE) # hide classification table
 #> 
 #> Logistic Regression Results
 #> ---------------------------
@@ -121,17 +121,6 @@ summary(result, classification_table = FALSE) # hide classification
 #>   --------------------------------------------------
 #>                             150.764     8      0.000
 #>   --------------------------------------------------
-#> 
-#>   Classification Table (cutoff = 0.50)
-#>   -----------------------------------------------------------------
-#>                                   Predicted                     
-#>   Observed                      0          1       % Correct
-#>   -----------------------------------------------------------------
-#>   0                           508        380           57.2
-#>   1                           289        938           76.4
-#>   -----------------------------------------------------------------
-#>   Overall Percentage                                   68.4
-#>   -----------------------------------------------------------------
 #> 
 #>   Variables in the Equation
 #>   -----------------------------------------------------------------------------------------------

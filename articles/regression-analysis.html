@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -152,6 +152,14 @@ syntax</li>
 <span><span class="co">#&gt; - Method: ENTER (all predictors)</span></span>
 <span><span class="co">#&gt; - N: 2421</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Descriptive Statistics</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable                                    Mean     Std.Dev.      N</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction                          3.628        1.153   2421</span></span>
+<span><span class="co">#&gt;   age                                       50.583       17.000   2421</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Model Summary</span></span>
 <span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
 <span><span class="co">#&gt;   R                              0.029</span></span>
@@ -237,7 +245,7 @@ significance</li>
 <span>                  <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>,</span>
 <span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age + income [Weighted]</span></span>
-<span><span class="co">#&gt;   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.45, p &lt; 0.001 ***, N = 2130</span></span></code></pre></div>
+<span><span class="co">#&gt;   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.42, p &lt; 0.001 ***, N = 2130</span></span></code></pre></div>
 <p>Weights are treated as frequency weights, matching SPSS
 <code>WEIGHT BY</code> behavior.</p>
 </div>
@@ -397,7 +405,7 @@ regression:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">survey_data</span>,</span>
 <span>                    <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">trust_government</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Logistic Regression: high_satisfaction ~ age + income + trust_government + education</span></span>
-<span><span class="co">#&gt;   Nagelkerke R2 = 0.207, chi2(4) = 333.77, p &lt; 0.001 ***, Accuracy = 68.3%, N = 1995</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nagelkerke R2 = 0.212, chi2(4) = 341.28, p &lt; 0.001 ***, Accuracy = 68.1%, N = 1995</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="spss-style-interface-1">SPSS-Style Interface<a class="anchor" aria-label="anchor" href="#spss-style-interface-1"></a>
@@ -486,6 +494,16 @@ category.</p>
 <span><span class="co">#&gt; - N: 2009</span></span>
 <span><span class="co">#&gt; - Weights: sampling_weight</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Descriptive Statistics</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable                                    Mean     Std.Dev.      N</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction                          3.647        1.147   2009</span></span>
+<span><span class="co">#&gt;   age                                       50.923       17.121   2009</span></span>
+<span><span class="co">#&gt;   income                                  3752.258     1424.703   2009</span></span>
+<span><span class="co">#&gt;   trust_government                           2.632        1.157   2009</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Model Summary</span></span>
 <span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
 <span><span class="co">#&gt;   R                              0.448</span></span>
@@ -498,7 +516,7 @@ category.</p>
 <span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt;   Source           Sum of Squares    df      Mean Square          F     Sig.</span></span>
 <span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Regression              529.253     3          176.418    167.490    0.000 ***</span></span>
+<span><span class="co">#&gt;   Regression              529.253     3          176.418    167.491    0.000 ***</span></span>
 <span><span class="co">#&gt;   Residual               2111.871  2005            1.053                     </span></span>
 <span><span class="co">#&gt;   Total                  2641.124  2008                                      </span></span>
 <span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>

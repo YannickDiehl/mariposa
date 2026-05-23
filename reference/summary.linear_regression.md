@@ -38,7 +38,8 @@ summary(
 
 - descriptives:
 
-  Logical. Reserved for future use. (Default: TRUE)
+  Logical. Show the Descriptive Statistics table (Mean, SD, N for the
+  dependent and predictor variables)? (Default: TRUE)
 
 - digits:
 
@@ -68,6 +69,15 @@ summary(result)
 #> - Formula: life_satisfaction ~ age + trust_government
 #> - Method: ENTER (all predictors)
 #> - N: 2280
+#> 
+#>   Descriptive Statistics
+#>   ----------------------------------------------------------------------
+#>   Variable                                    Mean     Std.Dev.      N
+#>   ----------------------------------------------------------------------
+#>   life_satisfaction                          3.641        1.151   2280
+#>   age                                       50.653       17.013   2280
+#>   trust_government                           2.625        1.166   2280
+#>   ----------------------------------------------------------------------
 #> 
 #>   Model Summary
 #>   ------------------------------------------------------------

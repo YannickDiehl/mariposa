@@ -9,7 +9,7 @@ including model summary, ANOVA table, and coefficient table."><meta property="og
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,8 @@ including model summary, ANOVA table, and coefficient table.</p>
 
 
 <dt id="arg-descriptives">descriptives<a class="anchor" aria-label="anchor" href="#arg-descriptives"></a></dt>
-<dd><p>Logical. Reserved for future use. (Default: TRUE)</p></dd>
+<dd><p>Logical. Show the Descriptive Statistics table
+(Mean, SD, N for the dependent and predictor variables)? (Default: TRUE)</p></dd>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
@@ -124,6 +125,15 @@ including model summary, ANOVA table, and coefficient table.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Formula: life_satisfaction ~ age + trust_government</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Method: ENTER (all predictors)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Descriptive Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable                                    Mean     Std.Dev.      N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction                          3.641        1.151   2280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                                       50.653       17.013   2280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government                           2.625        1.166   2280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>

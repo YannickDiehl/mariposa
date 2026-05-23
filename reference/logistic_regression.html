@@ -23,7 +23,7 @@ SPSS-style: logistic_regression(data, dependent = high_satisfaction, predictors 
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,8 @@ matching SPSS LOGISTIC REGRESSION output.</p>
 <span>  dependent <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  conf.level <span class="op">=</span> <span class="fl">0.95</span></span>
+<span>  conf.level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dummy"</span>, <span class="st">"numeric"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -121,6 +122,16 @@ SPSS WEIGHT BY behavior.</p></dd>
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
 <dd><p>Confidence level for odds ratio intervals (default 0.95).</p></dd>
+
+
+<dt id="arg-factors">factors<a class="anchor" aria-label="anchor" href="#arg-factors"></a></dt>
+<dd><p>How factor predictors are entered into the model:
+<code>"dummy"</code> (default, matches base R <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>) expands a factor
+with <code>L</code> levels into <code>L - 1</code> dummy contrasts; <code>"numeric"</code>
+silently coerces factor levels to their integer codes, matching SPSS
+<code>LOGISTIC REGRESSION</code> default behavior when no <code>/CATEGORICAL</code>
+subcommand is given. The "numeric" mode emits a one-line
+<code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_inform()</a></code> listing the coerced variables.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -209,7 +220,13 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <p><strong>Pseudo R-squared</strong>: Three measures are reported:</p><ul><li><p>Cox &amp; Snell R-squared (bounded below 1)</p></li>
 <li><p>Nagelkerke R-squared (adjusted to reach 1)</p></li>
 <li><p>McFadden R-squared (1 - LL_model/LL_null)</p></li>
-</ul><p><strong>Grouped Analysis</strong>: When <code>data</code> is grouped via
+</ul><p><strong>Factor Predictors</strong>: By default (<code>factors = "dummy"</code>),
+factor predictors are expanded into <code>L - 1</code> dummy contrasts via
+R's <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">stats::model.matrix()</a></code>, matching base R <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. Pass
+<code>factors = "numeric"</code> to silently coerce factor levels to their
+integer codes (SPSS <code>LOGISTIC REGRESSION</code> default without an
+explicit <code>/CATEGORICAL</code> subcommand).</p>
+<p><strong>Grouped Analysis</strong>: When <code>data</code> is grouped via
 <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, a separate regression is run for each group
 (matching SPSS SPLIT FILE BY).</p>
 </div>
@@ -240,7 +257,7 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-in"><span><span class="co"># Multiple logistic regression</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + income + education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.209, chi2(3) = 357.46, p &lt; 0.001 ***, Accuracy = 68.4%, N = 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.213, chi2(3) = 364.62, p &lt; 0.001 ***, Accuracy = 68.3%, N = 2115</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># SPSS-style interface</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
@@ -263,12 +280,25 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   region = East: Nagelkerke R2 = 0.002, chi2(1) = 0.74, p = 0.390 , Accuracy = 58.3%, N = 465</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   region = West: Nagelkerke R2 = 0.000, chi2(1) = 0.03, p = 0.860 , Accuracy = 57.6%, N = 1956</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Factor predictors: dummy-coding (default, matches base R glm())</span></span></span>
+<span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.084, chi2(2) = 156.25, p &lt; 0.001 ***, Accuracy = 63.4%, N = 2421</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Factor predictors: SPSS-style ordinal-as-scale</span></span></span>
+<span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span>,</span></span>
+<span class="r-in"><span>                    factors <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `education`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.078, chi2(2) = 144.84, p &lt; 0.001 ***, Accuracy = 63.4%, N = 2421</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
+<span class="r-in"><span><span class="va">result</span>                                    <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p &lt; 0.001 ***, Accuracy = 68.4%, N = 2115</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed SPSS-style output</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>                           <span class="co"># full detailed SPSS-style output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
@@ -319,7 +349,7 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, classification_table <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide classification</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, classification <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>   <span class="co"># hide classification table</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
@@ -348,17 +378,6 @@ weights (matching SPSS WEIGHT BY behavior).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                             150.764     8      0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Classification Table (cutoff = 0.50)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Predicted                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observed                      0          1       % Correct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0                           508        380           57.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1                           289        938           76.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall Percentage                                   68.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Variables in the Equation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------------</span>

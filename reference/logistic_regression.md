@@ -22,7 +22,8 @@ logistic_regression(
   dependent = NULL,
   predictors = NULL,
   weights = NULL,
-  conf.level = 0.95
+  conf.level = 0.95,
+  factors = c("dummy", "numeric")
 )
 ```
 
@@ -58,6 +59,17 @@ logistic_regression(
 - conf.level:
 
   Confidence level for odds ratio intervals (default 0.95).
+
+- factors:
+
+  How factor predictors are entered into the model: `"dummy"` (default,
+  matches base R [`glm()`](https://rdrr.io/r/stats/glm.html)) expands a
+  factor with `L` levels into `L - 1` dummy contrasts; `"numeric"`
+  silently coerces factor levels to their integer codes, matching SPSS
+  `LOGISTIC REGRESSION` default behavior when no `/CATEGORICAL`
+  subcommand is given. The "numeric" mode emits a one-line
+  [`cli::cli_inform()`](https://cli.r-lib.org/reference/cli_abort.html)
+  listing the coerced variables.
 
 ## Value
 
@@ -177,6 +189,14 @@ weights (matching SPSS WEIGHT BY behavior).
 
 - McFadden R-squared (1 - LL_model/LL_null)
 
+**Factor Predictors**: By default (`factors = "dummy"`), factor
+predictors are expanded into `L - 1` dummy contrasts via R's
+[`stats::model.matrix()`](https://rdrr.io/r/stats/model.matrix.html),
+matching base R [`glm()`](https://rdrr.io/r/stats/glm.html). Pass
+`factors = "numeric"` to silently coerce factor levels to their integer
+codes (SPSS `LOGISTIC REGRESSION` default without an explicit
+`/CATEGORICAL` subcommand).
+
 **Grouped Analysis**: When `data` is grouped via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
 a separate regression is run for each group (matching SPSS SPLIT FILE
@@ -213,7 +233,7 @@ logistic_regression(survey_data, high_satisfaction ~ age)
 # Multiple logistic regression
 logistic_regression(survey_data, high_satisfaction ~ age + income + education)
 #> Logistic Regression: high_satisfaction ~ age + income + education
-#>   Nagelkerke R2 = 0.209, chi2(3) = 357.46, p < 0.001 ***, Accuracy = 68.4%, N = 2115
+#>   Nagelkerke R2 = 0.213, chi2(3) = 364.62, p < 0.001 ***, Accuracy = 68.3%, N = 2115
 
 # SPSS-style interface
 logistic_regression(survey_data,
@@ -236,12 +256,25 @@ survey_data |>
 #>   region = East: Nagelkerke R2 = 0.002, chi2(1) = 0.74, p = 0.390 , Accuracy = 58.3%, N = 465
 #>   region = West: Nagelkerke R2 = 0.000, chi2(1) = 0.03, p = 0.860 , Accuracy = 57.6%, N = 1956
 
+# Factor predictors: dummy-coding (default, matches base R glm())
+logistic_regression(survey_data, high_satisfaction ~ age + education)
+#> Logistic Regression: high_satisfaction ~ age + education
+#>   Nagelkerke R2 = 0.084, chi2(2) = 156.25, p < 0.001 ***, Accuracy = 63.4%, N = 2421
+
+# Factor predictors: SPSS-style ordinal-as-scale
+logistic_regression(survey_data, high_satisfaction ~ age + education,
+                    factors = "numeric")
+#> ℹ Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):
+#> • `education`
+#> Logistic Regression: high_satisfaction ~ age + education
+#>   Nagelkerke R2 = 0.078, chi2(2) = 144.84, p < 0.001 ***, Accuracy = 63.4%, N = 2421
+
 # --- Three-layer output ---
 result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
-result              # compact one-line overview
+result                                    # compact one-line overview
 #> Logistic Regression: high_satisfaction ~ age + income
 #>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p < 0.001 ***, Accuracy = 68.4%, N = 2115
-summary(result)     # full detailed SPSS-style output
+summary(result)                           # full detailed SPSS-style output
 #> 
 #> Logistic Regression Results
 #> ---------------------------
@@ -292,7 +325,7 @@ summary(result)     # full detailed SPSS-style output
 #>   -----------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-summary(result, classification_table = FALSE)  # hide classification
+summary(result, classification = FALSE)   # hide classification table
 #> 
 #> Logistic Regression Results
 #> ---------------------------
@@ -321,17 +354,6 @@ summary(result, classification_table = FALSE)  # hide classification
 #>   --------------------------------------------------
 #>                             150.764     8      0.000
 #>   --------------------------------------------------
-#> 
-#>   Classification Table (cutoff = 0.50)
-#>   -----------------------------------------------------------------
-#>                                   Predicted                     
-#>   Observed                      0          1       % Correct
-#>   -----------------------------------------------------------------
-#>   0                           508        380           57.2
-#>   1                           289        938           76.4
-#>   -----------------------------------------------------------------
-#>   Overall Percentage                                   68.4
-#>   -----------------------------------------------------------------
 #> 
 #>   Variables in the Equation
 #>   -----------------------------------------------------------------------------------------------

@@ -25,7 +25,8 @@ linear_regression(
   weights = NULL,
   use = c("listwise", "pairwise"),
   standardized = TRUE,
-  conf.level = 0.95
+  conf.level = 0.95,
+  factors = c("dummy", "numeric")
 )
 ```
 
@@ -73,6 +74,19 @@ linear_regression(
 - conf.level:
 
   Confidence level for coefficient intervals (default 0.95).
+
+- factors:
+
+  How factor predictors are entered into the model: `"dummy"` (default,
+  matches base R [`lm()`](https://rdrr.io/r/stats/lm.html)) expands a
+  factor with `L` levels into `L - 1` dummy contrasts; `"numeric"`
+  silently coerces factor levels to their integer codes, matching SPSS
+  `REGRESSION` default behavior (ordinal-as-scale). The "numeric" mode
+  emits a one-line
+  [`cli::cli_inform()`](https://cli.r-lib.org/reference/cli_abort.html)
+  listing the coerced variables. The "numeric" mode is required to
+  reproduce SPSS results when factor predictors carry ordered meaning
+  (e.g., 4-level education).
 
 ## Value
 
@@ -184,7 +198,17 @@ weighted least squares via `lm(weights = ...)`.
 
 **Standardized Coefficients**: Beta = B \* (SD_x / SD_y). This matches
 the SPSS standardized coefficient output. Not available for the
-intercept.
+intercept. For dummy-coded factor terms (`factors = "dummy"`), the SD of
+the contrast column from the design matrix is used.
+
+**Factor Predictors**: By default (`factors = "dummy"`), factor
+predictors are expanded into `L - 1` dummy contrasts via R's
+[`stats::model.matrix()`](https://rdrr.io/r/stats/model.matrix.html),
+matching base R [`lm()`](https://rdrr.io/r/stats/lm.html). Pass
+`factors = "numeric"` to silently coerce factor levels to their integer
+codes (SPSS `REGRESSION` default). The "numeric" mode is required to
+reproduce SPSS results for ordinal predictors like education or Likert
+scales that SPSS treats as continuous.
 
 **Grouped Analysis**: When `data` is grouped via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
@@ -222,7 +246,7 @@ linear_regression(survey_data, life_satisfaction ~ age)
 # Multiple regression
 linear_regression(survey_data, income ~ age + education + life_satisfaction)
 #> Linear Regression: income ~ age + education + life_satisfaction
-#>   R2 = 0.471, adj.R2 = 0.470, F(3, 2111) = 625.48, p < 0.001 ***, N = 2115
+#>   R2 = 0.477, adj.R2 = 0.476, F(5, 2109) = 385.29, p < 0.001 ***, N = 2115
 
 # SPSS-style interface
 linear_regression(survey_data,
@@ -244,18 +268,40 @@ survey_data |>
 #>   region = East: R2 = 0.002, adj.R2 = -0.000, F(1, 463) = 0.88, p = 0.350 , N = 465
 #>   region = West: R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274 , N = 1956
 
+# Factor predictors: dummy-coding (default, matches base R lm())
+linear_regression(survey_data, income ~ age + education)
+#> Linear Regression: income ~ age + education
+#>   R2 = 0.391, adj.R2 = 0.390, F(4, 2181) = 349.72, p < 0.001 ***, N = 2186
+
+# Factor predictors: SPSS-style ordinal-as-scale
+linear_regression(survey_data, income ~ age + education,
+                  factors = "numeric")
+#> ℹ Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):
+#> • `education`
+#> Linear Regression: income ~ age + education
+#>   R2 = 0.386, adj.R2 = 0.386, F(2, 2183) = 686.59, p < 0.001 ***, N = 2186
+
 # --- Three-layer output ---
 result <- linear_regression(survey_data, life_satisfaction ~ age + income)
-result              # compact one-line overview
+result                                  # compact one-line overview
 #> Linear Regression: life_satisfaction ~ age + income
 #>   R2 = 0.201, adj.R2 = 0.200, F(2, 2112) = 265.60, p < 0.001 ***, N = 2115
-summary(result)     # full detailed SPSS-style output
+summary(result)                         # full detailed SPSS-style output
 #> 
 #> Linear Regression Results
 #> -------------------------
 #> - Formula: life_satisfaction ~ age + income
 #> - Method: ENTER (all predictors)
 #> - N: 2115
+#> 
+#>   Descriptive Statistics
+#>   ----------------------------------------------------------------------
+#>   Variable                                    Mean     Std.Dev.      N
+#>   ----------------------------------------------------------------------
+#>   life_satisfaction                          3.638        1.148   2115
+#>   age                                       50.827       16.995   2115
+#>   income                                  3757.683     1430.923   2115
+#>   ----------------------------------------------------------------------
 #> 
 #>   Model Summary
 #>   ------------------------------------------------------------
@@ -284,7 +330,7 @@ summary(result)     # full detailed SPSS-style output
 #>   ----------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-summary(result, collinearity = FALSE)  # hide VIF/Tolerance
+summary(result, descriptives = FALSE)   # hide descriptives section
 #> 
 #> Linear Regression Results
 #> -------------------------

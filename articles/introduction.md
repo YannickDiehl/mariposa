@@ -270,7 +270,7 @@ survey_data %>%
   linear_regression(life_satisfaction ~ age + income + m_trust,
                     weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age + income + m_trust [Weighted]
-#>   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.00, p < 0.001 ***, N = 2113
+#>   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.02, p < 0.001 ***, N = 2113
 ```
 
 ## Compact vs. Detailed Output

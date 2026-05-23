@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,42 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.2" id="mariposa-062">mariposa 0.6.2<a class="anchor" aria-label="anchor" href="#mariposa-062"></a></h2>
+<div class="section level3">
+<h3 id="behavior-change-0-6-2">Behavior Change<a class="anchor" aria-label="anchor" href="#behavior-change-0-6-2"></a></h3>
+<div class="section level4">
+<h4 id="linear_regression-and-logistic_regression-factor-predictor-handling-0-6-2">
+<code>linear_regression()</code> and <code>logistic_regression()</code>: factor predictor handling<a class="anchor" aria-label="anchor" href="#linear_regression-and-logistic_regression-factor-predictor-handling-0-6-2"></a></h4>
+<p>Both regression functions now expose a <code>factors</code> argument controlling how factor predictors enter the model. The new default <code>factors = "dummy"</code> matches base R <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> / <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>: a factor with <code>L</code> levels expands into <code>L - 1</code> dummy contrasts via <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">stats::model.matrix()</a></code>. Previous versions silently coerced factor levels to integer codes (SPSS ordinal-as-scale default) with no warning, which surprised users who relied on standard R semantics.</p>
+<p>To restore the previous SPSS-style behavior, pass <code>factors = "numeric"</code> explicitly. That mode emits a one-line <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_inform()</a></code> listing the coerced variables for transparency. The “numeric” mode is required to reproduce SPSS <code>REGRESSION</code> / <code>LOGISTIC REGRESSION</code> output when factor predictors carry ordered meaning (e.g., a 4-level education variable treated as 1–4 ordinal scale).</p>
+<p>Behavioral consequences:</p>
+<ul><li>A model with a 3-level factor predictor that previously returned one coefficient row now returns two dummy-contrast rows under the new default.</li>
+<li>For pairwise missing handling (<code>use = "pairwise"</code>), factor predictors are not supported with <code>factors = "dummy"</code>; the function now errors with an actionable message pointing to either <code>factors = "numeric"</code> or <code>use = "listwise"</code>.</li>
+</ul><p>Migration: scripts that depend on the old SPSS-style coercion should set <code>factors = "numeric"</code> at the call site. The <code>cli_inform()</code> message can be silenced with <code><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages()</a></code> if desired.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="source-code-fixes-weighted-regression-0-6-2">Source-Code Fixes (weighted regression)<a class="anchor" aria-label="anchor" href="#source-code-fixes-weighted-regression-0-6-2"></a></h3>
+<p>Two more functions joined the Charter §5.1 audit list (the “unrounded <code>sum(w)</code>” weighted-statistics convention previously applied to <code>t_test</code>, <code>oneway_anova</code>, and <code>levene_test</code>):</p>
+<ul><li>
+<code><a href="../reference/linear_regression.html">linear_regression()</a></code>: weighted variance, SE, df, F, R², and adjusted-R² now use the unrounded <code>sum(weights)</code> throughout. Earlier versions used <code>n_effective &lt;- round(sum(w))</code> in df and MS calculations, producing systematic drift from SPSS REGRESSION (off by ~0.001 on F, ~0.01 on adj-R² for typical weights). The displayed N is still <code>round(sum(w))</code>.</li>
+<li>
+<code><a href="../reference/logistic_regression.html">logistic_regression()</a></code>: pseudo-R² formulas (Cox &amp; Snell, Nagelkerke, McFadden) now use the unrounded <code>sum(weights)</code> in the exponential denominator. The displayed N and rounded classification counts remain integers.</li>
+</ul><p>These are bug fixes; weighted results may shift slightly toward closer agreement with SPSS v29.</p>
+</div>
+<div class="section level3">
+<h3 id="other-fixes-0-6-2">Other Fixes<a class="anchor" aria-label="anchor" href="#other-fixes-0-6-2"></a></h3>
+<ul><li>
+<code>summary.linear_regression(descriptives = TRUE)</code> now actually prints the Descriptive Statistics table (Variable, Mean, SD, N). Previously the parameter was accepted but documented as “Reserved for future use” and produced no output.</li>
+<li>The compact <code><a href="../reference/print.linear_regression.html">print.linear_regression()</a></code> no longer crashes on weighted models with non-integer df: the F-statistic line now rounds df for display before formatting with <code>%d</code>.</li>
+<li>Roxygen examples for <code>summary.linear_regression</code> (<code>collinearity = FALSE</code>) and <code>summary.logistic_regression</code> (<code>classification_table = FALSE</code>) referenced parameters that do not exist; corrected to <code>descriptives = FALSE</code> and <code>classification = FALSE</code> respectively.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="test-suite-0-6-2">Test Suite<a class="anchor" aria-label="anchor" href="#test-suite-0-6-2"></a></h3>
+<p>The <code>linear_regression</code> SPSS validation test suite expanded from 1 scenario (unweighted bivariate) to 6 scenarios covering all four Charter §8 quadrants — Tests 1a, 1c, 2a, 2c, 3a, and 4a from <code>tests/spss_reference/outputs/linear_regression_output.txt</code>. The weighted scenarios (2a, 2c, 4a) verify the Charter §5.1 fix above. New behavioral tests cover the <code>factors</code> argument (dummy expansion, numeric coercion, pairwise + dummy + factor error path). 222/222 assertions pass.</p>
+</div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.1" id="mariposa-061">mariposa 0.6.1<a class="anchor" aria-label="anchor" href="#mariposa-061"></a></h2>
 <div class="section level3">

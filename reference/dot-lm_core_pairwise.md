@@ -11,6 +11,7 @@ Core pairwise regression computation (matching SPSS /MISSING PAIRWISE)
   pred_names,
   weights_vec,
   standardized,
-  conf.level
+  conf.level,
+  factors = "dummy"
 )
 ```
