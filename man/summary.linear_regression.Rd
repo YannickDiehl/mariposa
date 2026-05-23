@@ -23,7 +23,8 @@
 
 \item{coefficients}{Logical. Show coefficients table? (Default: TRUE)}
 
-\item{descriptives}{Logical. Reserved for future use. (Default: TRUE)}
+\item{descriptives}{Logical. Show the Descriptive Statistics table
+(Mean, SD, N for the dependent and predictor variables)? (Default: TRUE)}
 
 \item{digits}{Number of decimal places for formatting (Default: 3).}
 

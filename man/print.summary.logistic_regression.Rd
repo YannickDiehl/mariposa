@@ -25,8 +25,8 @@ coefficients with odds ratios, and model comparison (chi-squared test).
 \examples{
 survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)
 result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
-summary(result)                              # all sections
-summary(result, classification_table = FALSE) # hide classification
+summary(result)                         # all sections
+summary(result, classification = FALSE) # hide classification table
 
 }
 \seealso{

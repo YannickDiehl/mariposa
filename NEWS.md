@@ -1,3 +1,80 @@
+# mariposa 0.6.2
+
+## Behavior Change
+
+### `linear_regression()` and `logistic_regression()`: factor predictor handling
+
+Both regression functions now expose a `factors` argument controlling how
+factor predictors enter the model. The new default `factors = "dummy"`
+matches base R `lm()` / `glm()`: a factor with `L` levels expands into
+`L - 1` dummy contrasts via `stats::model.matrix()`. Previous versions
+silently coerced factor levels to integer codes (SPSS ordinal-as-scale
+default) with no warning, which surprised users who relied on standard R
+semantics.
+
+To restore the previous SPSS-style behavior, pass `factors = "numeric"`
+explicitly. That mode emits a one-line `cli::cli_inform()` listing the
+coerced variables for transparency. The "numeric" mode is required to
+reproduce SPSS `REGRESSION` / `LOGISTIC REGRESSION` output when factor
+predictors carry ordered meaning (e.g., a 4-level education variable
+treated as 1–4 ordinal scale).
+
+Behavioral consequences:
+
+* A model with a 3-level factor predictor that previously returned one
+  coefficient row now returns two dummy-contrast rows under the new default.
+* For pairwise missing handling (`use = "pairwise"`), factor predictors are
+  not supported with `factors = "dummy"`; the function now errors with an
+  actionable message pointing to either `factors = "numeric"` or
+  `use = "listwise"`.
+
+Migration: scripts that depend on the old SPSS-style coercion should set
+`factors = "numeric"` at the call site. The `cli_inform()` message can be
+silenced with `suppressMessages()` if desired.
+
+## Source-Code Fixes (weighted regression)
+
+Two more functions joined the Charter §5.1 audit list (the "unrounded
+`sum(w)`" weighted-statistics convention previously applied to `t_test`,
+`oneway_anova`, and `levene_test`):
+
+* `linear_regression()`: weighted variance, SE, df, F, R², and adjusted-R²
+  now use the unrounded `sum(weights)` throughout. Earlier versions used
+  `n_effective <- round(sum(w))` in df and MS calculations, producing
+  systematic drift from SPSS REGRESSION (off by ~0.001 on F, ~0.01 on adj-R²
+  for typical weights). The displayed N is still `round(sum(w))`.
+* `logistic_regression()`: pseudo-R² formulas (Cox & Snell, Nagelkerke,
+  McFadden) now use the unrounded `sum(weights)` in the exponential
+  denominator. The displayed N and rounded classification counts remain
+  integers.
+
+These are bug fixes; weighted results may shift slightly toward closer
+agreement with SPSS v29.
+
+## Other Fixes
+
+* `summary.linear_regression(descriptives = TRUE)` now actually prints the
+  Descriptive Statistics table (Variable, Mean, SD, N). Previously the
+  parameter was accepted but documented as "Reserved for future use" and
+  produced no output.
+* The compact `print.linear_regression()` no longer crashes on weighted
+  models with non-integer df: the F-statistic line now rounds df for
+  display before formatting with `%d`.
+* Roxygen examples for `summary.linear_regression` (`collinearity = FALSE`)
+  and `summary.logistic_regression` (`classification_table = FALSE`)
+  referenced parameters that do not exist; corrected to `descriptives =
+  FALSE` and `classification = FALSE` respectively.
+
+## Test Suite
+
+The `linear_regression` SPSS validation test suite expanded from 1
+scenario (unweighted bivariate) to 6 scenarios covering all four Charter §8
+quadrants — Tests 1a, 1c, 2a, 2c, 3a, and 4a from
+`tests/spss_reference/outputs/linear_regression_output.txt`. The weighted
+scenarios (2a, 2c, 4a) verify the Charter §5.1 fix above. New behavioral
+tests cover the `factors` argument (dummy expansion, numeric coercion,
+pairwise + dummy + factor error path). 222/222 assertions pass.
+
 # mariposa 0.6.1
 
 ## Validation

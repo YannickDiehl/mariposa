@@ -12,7 +12,8 @@
   weights_vec,
   use,
   standardized,
-  conf.level
+  conf.level,
+  factors = "dummy"
 )
 }
 \description{

@@ -4,7 +4,15 @@
 \alias{.glm_core}
 \title{Core logistic regression computation}
 \usage{
-.glm_core(data, formula, dep_name, pred_names, weights_vec, conf.level)
+.glm_core(
+  data,
+  formula,
+  dep_name,
+  pred_names,
+  weights_vec,
+  conf.level,
+  factors = "dummy"
+)
 }
 \description{
 Core logistic regression computation

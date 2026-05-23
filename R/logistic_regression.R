@@ -24,6 +24,13 @@
 #'   specified, weighted maximum likelihood estimation is used, matching
 #'   SPSS WEIGHT BY behavior.
 #' @param conf.level Confidence level for odds ratio intervals (default 0.95).
+#' @param factors How factor predictors are entered into the model:
+#'   \code{"dummy"} (default, matches base R \code{glm()}) expands a factor
+#'   with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+#'   silently coerces factor levels to their integer codes, matching SPSS
+#'   \code{LOGISTIC REGRESSION} default behavior when no \code{/CATEGORICAL}
+#'   subcommand is given. The "numeric" mode emits a one-line
+#'   \code{cli::cli_inform()} listing the coerced variables.
 #'
 #' @return An object of class \code{"logistic_regression"} containing:
 #' \describe{
@@ -95,6 +102,13 @@
 #'   \item McFadden R-squared (1 - LL_model/LL_null)
 #' }
 #'
+#' \strong{Factor Predictors}: By default (\code{factors = "dummy"}),
+#' factor predictors are expanded into \code{L - 1} dummy contrasts via
+#' R's \code{stats::model.matrix()}, matching base R \code{glm()}. Pass
+#' \code{factors = "numeric"} to silently coerce factor levels to their
+#' integer codes (SPSS \code{LOGISTIC REGRESSION} default without an
+#' explicit \code{/CATEGORICAL} subcommand).
+#'
 #' \strong{Grouped Analysis}: When \code{data} is grouped via
 #' \code{dplyr::group_by()}, a separate regression is run for each group
 #' (matching SPSS SPLIT FILE BY).
@@ -126,11 +140,18 @@
 #'   dplyr::group_by(region) |>
 #'   logistic_regression(high_satisfaction ~ age)
 #'
+#' # Factor predictors: dummy-coding (default, matches base R glm())
+#' logistic_regression(survey_data, high_satisfaction ~ age + education)
+#'
+#' # Factor predictors: SPSS-style ordinal-as-scale
+#' logistic_regression(survey_data, high_satisfaction ~ age + education,
+#'                     factors = "numeric")
+#'
 #' # --- Three-layer output ---
 #' result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
-#' result              # compact one-line overview
-#' summary(result)     # full detailed SPSS-style output
-#' summary(result, classification_table = FALSE)  # hide classification
+#' result                                    # compact one-line overview
+#' summary(result)                           # full detailed SPSS-style output
+#' summary(result, classification = FALSE)   # hide classification table
 #'
 #' @seealso
 #' \code{\link{linear_regression}} for continuous outcome variables.
@@ -144,7 +165,8 @@
 logistic_regression <- function(data, formula = NULL,
                                 dependent = NULL, predictors = NULL,
                                 weights = NULL,
-                                conf.level = 0.95) {
+                                conf.level = 0.95,
+                                factors = c("dummy", "numeric")) {
 
   # ============================================================================
   # INPUT VALIDATION & FORMULA CONSTRUCTION
@@ -153,6 +175,8 @@ logistic_regression <- function(data, formula = NULL,
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame or tibble.")
   }
+
+  factors <- match.arg(factors)
 
   # Process weights
   weights_quo <- rlang::enquo(weights)
@@ -221,7 +245,7 @@ logistic_regression <- function(data, formula = NULL,
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
 
       result <- .glm_core(grp_data, model_formula, dep_name, pred_names,
-                          grp_weights, conf.level)
+                          grp_weights, conf.level, factors)
       gv <- as.list(group_keys[i, , drop = FALSE])
       gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
       result$group_values <- gv
@@ -244,7 +268,7 @@ logistic_regression <- function(data, formula = NULL,
     )
   } else {
     result <- .glm_core(data, model_formula, dep_name, pred_names,
-                        weights_vec, conf.level)
+                        weights_vec, conf.level, factors)
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -265,7 +289,7 @@ logistic_regression <- function(data, formula = NULL,
 #' Core logistic regression computation
 #' @keywords internal
 .glm_core <- function(data, formula, dep_name, pred_names, weights_vec,
-                      conf.level) {
+                      conf.level, factors = "dummy") {
 
   all_vars <- c(dep_name, pred_names)
 
@@ -282,9 +306,18 @@ logistic_regression <- function(data, formula = NULL,
     cli_abort("Insufficient observations for the number of predictors.")
   }
 
-  # Convert factors to numeric for predictors
-  for (v in pred_names) {
-    if (is.factor(data_complete[[v]])) {
+  # Factor predictor handling — see @param factors documentation.
+  # "dummy" (default): let stats::glm() expand factors into L-1 contrasts.
+  # "numeric": coerce factor levels to integer codes (SPSS LOGISTIC default).
+  factor_vars <- pred_names[
+    vapply(data_complete[pred_names], is.factor, logical(1))
+  ]
+  if (length(factor_vars) > 0 && factors == "numeric") {
+    cli::cli_inform(c(
+      i = "Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):",
+      "*" = "{.var {factor_vars}}"
+    ))
+    for (v in factor_vars) {
       data_complete[[v]] <- as.numeric(data_complete[[v]])
     }
   }
@@ -336,11 +369,17 @@ logistic_regression <- function(data, formula = NULL,
   # SPSS-COMPATIBLE STATISTICS
   # ============================================================================
 
-  # N: SPSS uses weighted N when WEIGHT BY is active
+  # N: SPSS uses weighted N when WEIGHT BY is active.
+  # Per Validation Charter §5.1: use UNROUNDED sum(w) in formulas
+  # (Cox & Snell denominator, classification percentages), round only for
+  # the displayed N. Fixed in 0.7.0.
   if (!is.null(weights_vec)) {
-    n_report <- round(sum(weights_vec))
+    sw <- sum(weights_vec)
+    n_internal <- sw                # unrounded; for pseudo-R^2 formulas
+    n_report   <- round(sw)         # rounded; for $n display
   } else {
-    n_report <- n_actual
+    n_internal <- n_actual
+    n_report   <- n_actual
   }
 
   # -2 Log Likelihood
@@ -356,12 +395,12 @@ logistic_regression <- function(data, formula = NULL,
   omnibus_df <- length(pred_names)
   omnibus_p <- stats::pchisq(omnibus_chi_sq, df = omnibus_df, lower.tail = FALSE)
 
-  # Pseudo R-squared measures
+  # Pseudo R-squared measures (use unrounded n_internal per Charter §5.1)
   # Cox & Snell R²: 1 - (L0/L1)^(2/n)
-  cox_snell <- 1 - exp((minus2LL_model - minus2LL_null) / n_report)
+  cox_snell <- 1 - exp((minus2LL_model - minus2LL_null) / n_internal)
 
   # Max Cox & Snell (for Nagelkerke adjustment)
-  cox_snell_max <- 1 - exp(minus2LL_null / n_report * (-1))
+  cox_snell_max <- 1 - exp(minus2LL_null / n_internal * (-1))
 
   # Nagelkerke R²: Cox & Snell / max(Cox & Snell)
   nagelkerke <- cox_snell / cox_snell_max
@@ -670,8 +709,8 @@ summary.logistic_regression <- function(object, omnibus_test = TRUE,
 #' @examples
 #' survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)
 #' result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
-#' summary(result)                              # all sections
-#' summary(result, classification_table = FALSE) # hide classification
+#' summary(result)                         # all sections
+#' summary(result, classification = FALSE) # hide classification table
 #'
 #' @seealso \code{\link{logistic_regression}} for the main analysis,
 #'   \code{\link{summary.logistic_regression}} for summary options.

@@ -10,7 +10,8 @@
   pred_names,
   weights_vec,
   standardized,
-  conf.level
+  conf.level,
+  factors = "dummy"
 )
 }
 \description{

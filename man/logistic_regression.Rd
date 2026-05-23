@@ -10,7 +10,8 @@ logistic_regression(
   dependent = NULL,
   predictors = NULL,
   weights = NULL,
-  conf.level = 0.95
+  conf.level = 0.95,
+  factors = c("dummy", "numeric")
 )
 }
 \arguments{
@@ -31,6 +32,14 @@ specified, weighted maximum likelihood estimation is used, matching
 SPSS WEIGHT BY behavior.}
 
 \item{conf.level}{Confidence level for odds ratio intervals (default 0.95).}
+
+\item{factors}{How factor predictors are entered into the model:
+\code{"dummy"} (default, matches base R \code{glm()}) expands a factor
+with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+silently coerces factor levels to their integer codes, matching SPSS
+\code{LOGISTIC REGRESSION} default behavior when no \code{/CATEGORICAL}
+subcommand is given. The "numeric" mode emits a one-line
+\code{cli::cli_inform()} listing the coerced variables.}
 }
 \value{
 An object of class \code{"logistic_regression"} containing:
@@ -117,6 +126,13 @@ weights (matching SPSS WEIGHT BY behavior).
 \item McFadden R-squared (1 - LL_model/LL_null)
 }
 
+\strong{Factor Predictors}: By default (\code{factors = "dummy"}),
+factor predictors are expanded into \code{L - 1} dummy contrasts via
+R's \code{stats::model.matrix()}, matching base R \code{glm()}. Pass
+\code{factors = "numeric"} to silently coerce factor levels to their
+integer codes (SPSS \code{LOGISTIC REGRESSION} default without an
+explicit \code{/CATEGORICAL} subcommand).
+
 \strong{Grouped Analysis}: When \code{data} is grouped via
 \code{dplyr::group_by()}, a separate regression is run for each group
 (matching SPSS SPLIT FILE BY).
@@ -149,11 +165,18 @@ survey_data |>
   dplyr::group_by(region) |>
   logistic_regression(high_satisfaction ~ age)
 
+# Factor predictors: dummy-coding (default, matches base R glm())
+logistic_regression(survey_data, high_satisfaction ~ age + education)
+
+# Factor predictors: SPSS-style ordinal-as-scale
+logistic_regression(survey_data, high_satisfaction ~ age + education,
+                    factors = "numeric")
+
 # --- Three-layer output ---
 result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
-result              # compact one-line overview
-summary(result)     # full detailed SPSS-style output
-summary(result, classification_table = FALSE)  # hide classification
+result                                    # compact one-line overview
+summary(result)                           # full detailed SPSS-style output
+summary(result, classification = FALSE)   # hide classification table
 
 }
 \seealso{

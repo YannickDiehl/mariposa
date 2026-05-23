@@ -30,6 +30,14 @@
 #' @param standardized Logical. If \code{TRUE} (default), standardized
 #'   coefficients (Beta) are calculated and included in the output.
 #' @param conf.level Confidence level for coefficient intervals (default 0.95).
+#' @param factors How factor predictors are entered into the model:
+#'   \code{"dummy"} (default, matches base R \code{lm()}) expands a factor
+#'   with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+#'   silently coerces factor levels to their integer codes, matching SPSS
+#'   \code{REGRESSION} default behavior (ordinal-as-scale). The "numeric"
+#'   mode emits a one-line \code{cli::cli_inform()} listing the coerced
+#'   variables. The "numeric" mode is required to reproduce SPSS results
+#'   when factor predictors carry ordered meaning (e.g., 4-level education).
 #'
 #' @return An object of class \code{"linear_regression"} containing:
 #' \describe{
@@ -97,6 +105,16 @@
 #'
 #' \strong{Standardized Coefficients}: Beta = B * (SD_x / SD_y). This matches
 #' the SPSS standardized coefficient output. Not available for the intercept.
+#' For dummy-coded factor terms (\code{factors = "dummy"}), the SD of the
+#' contrast column from the design matrix is used.
+#'
+#' \strong{Factor Predictors}: By default (\code{factors = "dummy"}),
+#' factor predictors are expanded into \code{L - 1} dummy contrasts via
+#' R's \code{stats::model.matrix()}, matching base R \code{lm()}. Pass
+#' \code{factors = "numeric"} to silently coerce factor levels to their
+#' integer codes (SPSS \code{REGRESSION} default). The "numeric" mode is
+#' required to reproduce SPSS results for ordinal predictors like
+#' education or Likert scales that SPSS treats as continuous.
 #'
 #' \strong{Grouped Analysis}: When \code{data} is grouped via
 #' \code{dplyr::group_by()}, a separate regression is run for each group
@@ -125,11 +143,18 @@
 #'   dplyr::group_by(region) |>
 #'   linear_regression(life_satisfaction ~ age)
 #'
+#' # Factor predictors: dummy-coding (default, matches base R lm())
+#' linear_regression(survey_data, income ~ age + education)
+#'
+#' # Factor predictors: SPSS-style ordinal-as-scale
+#' linear_regression(survey_data, income ~ age + education,
+#'                   factors = "numeric")
+#'
 #' # --- Three-layer output ---
 #' result <- linear_regression(survey_data, life_satisfaction ~ age + income)
-#' result              # compact one-line overview
-#' summary(result)     # full detailed SPSS-style output
-#' summary(result, collinearity = FALSE)  # hide VIF/Tolerance
+#' result                                  # compact one-line overview
+#' summary(result)                         # full detailed SPSS-style output
+#' summary(result, descriptives = FALSE)   # hide descriptives section
 #'
 #' @seealso
 #' \code{\link{logistic_regression}} for binary outcome variables.
@@ -147,7 +172,8 @@ linear_regression <- function(data, formula = NULL,
                               weights = NULL,
                               use = c("listwise", "pairwise"),
                               standardized = TRUE,
-                              conf.level = 0.95) {
+                              conf.level = 0.95,
+                              factors = c("dummy", "numeric")) {
 
   # ============================================================================
   # INPUT VALIDATION & FORMULA CONSTRUCTION
@@ -158,6 +184,7 @@ linear_regression <- function(data, formula = NULL,
   }
 
   use <- match.arg(use)
+  factors <- match.arg(factors)
 
   # Process weights
   weights_quo <- rlang::enquo(weights)
@@ -229,7 +256,7 @@ linear_regression <- function(data, formula = NULL,
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
 
       result <- .lm_core(grp_data, model_formula, dep_name, pred_names,
-                         grp_weights, use, standardized, conf.level)
+                         grp_weights, use, standardized, conf.level, factors)
       gv <- as.list(group_keys[i, , drop = FALSE])
       gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
       result$group_values <- gv
@@ -254,7 +281,7 @@ linear_regression <- function(data, formula = NULL,
     )
   } else {
     result <- .lm_core(data, model_formula, dep_name, pred_names,
-                       weights_vec, use, standardized, conf.level)
+                       weights_vec, use, standardized, conf.level, factors)
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -277,12 +304,12 @@ linear_regression <- function(data, formula = NULL,
 #' Core linear regression computation
 #' @keywords internal
 .lm_core <- function(data, formula, dep_name, pred_names, weights_vec,
-                     use, standardized, conf.level) {
+                     use, standardized, conf.level, factors = "dummy") {
 
   # Dispatch to pairwise implementation if requested
   if (use == "pairwise") {
     return(.lm_core_pairwise(data, dep_name, pred_names, weights_vec,
-                             standardized, conf.level))
+                             standardized, conf.level, factors))
   }
 
   all_vars <- c(dep_name, pred_names)
@@ -300,11 +327,25 @@ linear_regression <- function(data, formula = NULL,
     cli_abort("Insufficient observations for the number of predictors.")
   }
 
-  # Convert factors to numeric (matching SPSS behavior: ordered factor -> integer codes)
-  for (v in all_vars) {
-    if (is.factor(data_complete[[v]])) {
+  # Factor predictor handling — see @param factors documentation.
+  # "dummy" (default): let stats::lm() expand factors into L-1 contrasts.
+  # "numeric": coerce factor levels to integer codes (SPSS REGRESSION default).
+  factor_vars <- pred_names[
+    vapply(data_complete[pred_names], is.factor, logical(1))
+  ]
+  if (length(factor_vars) > 0 && factors == "numeric") {
+    cli::cli_inform(c(
+      i = "Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):",
+      "*" = "{.var {factor_vars}}"
+    ))
+    for (v in factor_vars) {
       data_complete[[v]] <- as.numeric(data_complete[[v]])
     }
+  }
+  # The dependent variable is always coerced to numeric (it is the response,
+  # never categorical — use logistic_regression() for binary outcomes).
+  if (is.factor(data_complete[[dep_name]])) {
+    data_complete[[dep_name]] <- as.numeric(data_complete[[dep_name]])
   }
 
   # ============================================================================
@@ -339,7 +380,14 @@ linear_regression <- function(data, formula = NULL,
   k <- length(pred_names)  # number of predictors
 
   if (!is.null(weights_vec)) {
-    n_effective <- round(sum(weights_vec))
+    # SPSS WEIGHT BY for REGRESSION: WLS with sum(w) as effective N.
+    # Per Validation Charter §5.1: use UNROUNDED sum(w) in all internal
+    # calculations (variance, SE, df, t/F, R^2). Round only for the displayed
+    # N column. Earlier mariposa versions rounded too early via
+    # `n_effective <- round(sum(w))`, producing systematic drift in df, F,
+    # and CI bounds. Fixed in 0.7.0.
+    sw <- sum(weights_vec)            # unrounded; for all calculations
+    n_display <- round(sw)            # rounded; only for $n display
 
     # Weighted residual SS: sum(w * e^2) -- already computed by lm(weights=)
     residuals_raw <- stats::residuals(model)
@@ -351,10 +399,10 @@ linear_regression <- function(data, formula = NULL,
     ss_total <- sum(weights_vec * (y - wm_y)^2)
     ss_regression <- ss_total - ss_residual
 
-    # Degrees of freedom (SPSS uses weighted N)
+    # Degrees of freedom (SPSS uses unrounded weighted N)
     df_regression <- k
-    df_residual <- n_effective - k - 1
-    df_total <- n_effective - 1
+    df_residual <- sw - k - 1         # non-integer for weighted data
+    df_total <- sw - 1
 
     # Mean squares and F
     ms_regression <- ss_regression / df_regression
@@ -394,26 +442,29 @@ linear_regression <- function(data, formula = NULL,
       std_error = sigma_spss
     )
 
+    # df column stays numeric (non-integer for weighted); print rounds for SPSS display
     anova_table <- tibble::tibble(
       Source = c("Regression", "Residual", "Total"),
       Sum_of_Squares = c(ss_regression, ss_residual, ss_total),
-      df = as.integer(c(df_regression, df_residual, df_total)),
+      df = c(df_regression, df_residual, df_total),
       Mean_Square = c(ms_regression, ms_residual, NA_real_),
       F_statistic = c(f_stat, NA_real_, NA_real_),
       Sig = c(f_p, NA_real_, NA_real_)
     )
 
-    # Standardized coefficients
+    # Standardized coefficients (uses model.matrix to support dummy-coded factor terms)
     term_names <- rownames(coefs_raw)
     beta <- rep(NA_real_, length(term_names))
     if (standardized) {
       w <- weights_vec
-      sd_y <- sqrt(sum(w * (y - wm_y)^2) / (sum(w) - 1))
+      X <- stats::model.matrix(model)
+      sd_y <- sqrt(sum(w * (y - wm_y)^2) / (sw - 1))
       for (i in seq_along(term_names)) {
         tn <- term_names[i]
         if (tn == "(Intercept)") next
-        x <- data_complete[[tn]]
-        sd_x <- sqrt(sum(w * (x - stats::weighted.mean(x, w))^2) / (sum(w) - 1))
+        x_col <- X[, tn]
+        wm_x <- stats::weighted.mean(x_col, w)
+        sd_x <- sqrt(sum(w * (x_col - wm_x)^2) / (sw - 1))
         beta[i] <- coefs_raw[i, "Estimate"] * sd_x / sd_y
       }
     }
@@ -429,7 +480,7 @@ linear_regression <- function(data, formula = NULL,
       CI_upper = ci_upper
     )
 
-    n_report <- n_effective
+    n_report <- n_display
 
   } else {
     # Unweighted: use standard lm() output directly
@@ -476,16 +527,28 @@ linear_regression <- function(data, formula = NULL,
 #' Core pairwise regression computation (matching SPSS /MISSING PAIRWISE)
 #' @keywords internal
 .lm_core_pairwise <- function(data, dep_name, pred_names, weights_vec,
-                               standardized, conf.level) {
+                               standardized, conf.level, factors = "dummy") {
 
   all_vars <- c(dep_name, pred_names)
   k <- length(pred_names)
   p <- length(all_vars)
   has_weights <- !is.null(weights_vec)
 
-  # Convert factors to numeric (matching SPSS behavior)
-  for (v in all_vars) {
-    if (is.factor(data[[v]])) {
+  # Pairwise deletion operates on a numeric correlation matrix, so factor
+  # predictors cannot be dummy-expanded here. Either coerce (factors="numeric")
+  # or refuse to proceed.
+  factor_vars <- all_vars[vapply(data[all_vars], is.factor, logical(1))]
+  if (length(factor_vars) > 0) {
+    if (factors == "dummy") {
+      cli_abort(c(
+        "Pairwise deletion ({.code use = \"pairwise\"}) does not support \\
+         dummy-coded factor predictors.",
+        "*" = "Affected: {.var {factor_vars}}",
+        "i" = "Either use {.code use = \"listwise\"} (supports dummy contrasts) \\
+               or {.code factors = \"numeric\"} (SPSS-style ordinal coercion)."
+      ))
+    }
+    for (v in factor_vars) {
       data[[v]] <- as.numeric(data[[v]])
     }
   }
@@ -710,18 +773,27 @@ linear_regression <- function(data, formula = NULL,
 # ============================================================================
 
 #' Compute descriptive statistics for regression variables
+#'
+#' For factor predictors entered as dummies (the default), this still reports
+#' Mean/SD of the integer-coded factor levels — that matches what SPSS
+#' \code{REGRESSION} prints in its Descriptive Statistics block (ordinal-as-
+#' scale summary), regardless of how the factor is entered into the model.
 #' @keywords internal
 .lm_descriptives <- function(data, var_names, weights_vec) {
   desc_list <- lapply(var_names, function(v) {
     x <- data[[v]]
+    if (is.factor(x)) {
+      # Descriptives are informational; coerce only here, model uses dummy coding
+      x <- as.numeric(x)
+    }
     if (!is.null(weights_vec)) {
       # Weighted descriptives (matching SPSS WEIGHT BY behavior)
       w <- weights_vec
       wm <- stats::weighted.mean(x, w)
-      # Weighted SD: SPSS uses frequency-weighted SD
-      # SD = sqrt(sum(w * (x - wm)^2) / (sum(w) - 1))
-      wsd <- sqrt(sum(w * (x - wm)^2) / (sum(w) - 1))
-      wn <- round(sum(w))  # SPSS shows weighted N as integer
+      # Weighted SD using unrounded sum(w) — Charter §5.1
+      sw <- sum(w)
+      wsd <- sqrt(sum(w * (x - wm)^2) / (sw - 1))
+      wn <- round(sw)
       tibble::tibble(Variable = v, Mean = wm, Std.Deviation = wsd, N = wn)
     } else {
       tibble::tibble(Variable = v, Mean = mean(x), Std.Deviation = stats::sd(x),
@@ -782,11 +854,13 @@ linear_regression <- function(data, formula = NULL,
   term_names <- rownames(coefs)
   n_terms <- length(term_names)
 
-  # Standardized coefficients (Beta)
+  # Standardized coefficients (Beta) — uses the design matrix column so dummy-
+  # encoded factor terms (e.g. "educationhigh") resolve correctly.
   beta <- rep(NA_real_, n_terms)
 
   if (standardized) {
     y <- data[[dep_name]]
+    X <- stats::model.matrix(model)
 
     if (!is.null(weights_vec)) {
       w <- weights_vec
@@ -799,12 +873,13 @@ linear_regression <- function(data, formula = NULL,
       tn <- term_names[i]
       if (tn == "(Intercept)") next
 
-      x <- data[[tn]]
+      x_col <- X[, tn]
       if (!is.null(weights_vec)) {
         w <- weights_vec
-        sd_x <- sqrt(sum(w * (x - stats::weighted.mean(x, w))^2) / (sum(w) - 1))
+        wm_x <- stats::weighted.mean(x_col, w)
+        sd_x <- sqrt(sum(w * (x_col - wm_x)^2) / (sum(w) - 1))
       } else {
-        sd_x <- stats::sd(x)
+        sd_x <- stats::sd(x_col)
       }
 
       beta[i] <- coefs[i, "Estimate"] * sd_x / sd_y
@@ -859,8 +934,8 @@ print.linear_regression <- function(x, ...) {
       grp_label <- paste(names(grp$group_values), "=",
                          unlist(grp$group_values), collapse = ", ")
       f_stat <- grp$anova$F_statistic[1]
-      f_df1 <- grp$anova$df[1]
-      f_df2 <- grp$anova$df[2]
+      f_df1 <- as.integer(round(grp$anova$df[1]))
+      f_df2 <- as.integer(round(grp$anova$df[2]))
       f_p <- grp$anova$Sig[1]
       p_str <- format_p_compact(f_p)
       stars <- add_significance_stars(f_p)
@@ -874,8 +949,8 @@ print.linear_regression <- function(x, ...) {
   } else {
     cat(sprintf("Linear Regression: %s%s\n", formula_str, weighted_tag))
     f_stat <- x$anova$F_statistic[1]
-    f_df1 <- x$anova$df[1]
-    f_df2 <- x$anova$df[2]
+    f_df1 <- as.integer(round(x$anova$df[1]))
+    f_df2 <- as.integer(round(x$anova$df[2]))
     f_p <- x$anova$Sig[1]
     p_str <- format_p_compact(f_p)
     stars <- add_significance_stars(f_p)
@@ -904,7 +979,8 @@ print.linear_regression <- function(x, ...) {
 #' @param model_summary Logical. Show model summary (R, R-squared)? (Default: TRUE)
 #' @param anova_table Logical. Show ANOVA table? (Default: TRUE)
 #' @param coefficients Logical. Show coefficients table? (Default: TRUE)
-#' @param descriptives Logical. Reserved for future use. (Default: TRUE)
+#' @param descriptives Logical. Show the Descriptive Statistics table
+#'   (Mean, SD, N for the dependent and predictor variables)? (Default: TRUE)
 #' @param digits Number of decimal places for formatting (Default: 3).
 #' @param ... Additional arguments (not used).
 #' @return A \code{summary.linear_regression} object.
@@ -993,6 +1069,12 @@ print.summary.linear_regression <- function(x, ...) {
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+  show_desc  <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
+
+  if (show_desc) {
+    cat("\n")
+    .print_descriptives_table(x$descriptives)
+  }
 
   if (show_model) {
     cat("\n")
@@ -1036,12 +1118,18 @@ print.summary.linear_regression <- function(x, ...) {
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+  show_desc  <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
 
   for (grp in x$groups) {
     cat("\n")
     print_group_header(grp$group_values)
 
     cat(sprintf("  N: %d\n", grp$n))
+
+    if (show_desc) {
+      cat("\n")
+      .print_descriptives_table(grp$descriptives)
+    }
 
     if (show_model) {
       cat("\n")
@@ -1096,7 +1184,8 @@ print.summary.linear_regression <- function(x, ...) {
 
   for (i in seq_len(nrow(anova))) {
     ss_str <- format(round(anova$Sum_of_Squares[i], 3), big.mark = "", nsmall = 3)
-    df_str <- format(anova$df[i])
+    # df may be non-integer for weighted models — SPSS rounds for display
+    df_str <- format(round(anova$df[i]))
 
     if (i <= 2) {
       ms_str <- format(round(anova$Mean_Square[i], 3), big.mark = "", nsmall = 3)
@@ -1116,6 +1205,27 @@ print.summary.linear_regression <- function(x, ...) {
 
     cat(sprintf("  %-14s %16s %5s %16s %10s %8s %s\n",
                 anova$Source[i], ss_str, df_str, ms_str, f_str, p_str, stars))
+  }
+  cat(paste0("  ", strrep("-", w), "\n"))
+}
+
+
+#' Print descriptive statistics table
+#' @keywords internal
+.print_descriptives_table <- function(desc) {
+  if (is.null(desc) || nrow(desc) == 0) return(invisible(NULL))
+  cat("  Descriptive Statistics\n")
+  w <- 70
+  cat(paste0("  ", strrep("-", w), "\n"))
+  cat(sprintf("  %-35s %12s %12s %6s\n",
+              "Variable", "Mean", "Std.Dev.", "N"))
+  cat(paste0("  ", strrep("-", w), "\n"))
+  for (i in seq_len(nrow(desc))) {
+    v <- desc$Variable[i]
+    if (nchar(v) > 35) v <- paste0(substr(v, 1, 32), "...")
+    cat(sprintf("  %-35s %12.3f %12.3f %6d\n",
+                v, desc$Mean[i], desc$Std.Deviation[i],
+                as.integer(round(desc$N[i]))))
   }
   cat(paste0("  ", strrep("-", w), "\n"))
 }

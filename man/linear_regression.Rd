@@ -12,7 +12,8 @@ linear_regression(
   weights = NULL,
   use = c("listwise", "pairwise"),
   standardized = TRUE,
-  conf.level = 0.95
+  conf.level = 0.95,
+  factors = c("dummy", "numeric")
 )
 }
 \arguments{
@@ -41,6 +42,15 @@ covariance/correlation matrix, retaining more cases (matching SPSS
 coefficients (Beta) are calculated and included in the output.}
 
 \item{conf.level}{Confidence level for coefficient intervals (default 0.95).}
+
+\item{factors}{How factor predictors are entered into the model:
+\code{"dummy"} (default, matches base R \code{lm()}) expands a factor
+with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+silently coerces factor levels to their integer codes, matching SPSS
+\code{REGRESSION} default behavior (ordinal-as-scale). The "numeric"
+mode emits a one-line \code{cli::cli_inform()} listing the coerced
+variables. The "numeric" mode is required to reproduce SPSS results
+when factor predictors carry ordered meaning (e.g., 4-level education).}
 }
 \value{
 An object of class \code{"linear_regression"} containing:
@@ -123,6 +133,16 @@ least squares via \code{lm(weights = ...)}.
 
 \strong{Standardized Coefficients}: Beta = B * (SD_x / SD_y). This matches
 the SPSS standardized coefficient output. Not available for the intercept.
+For dummy-coded factor terms (\code{factors = "dummy"}), the SD of the
+contrast column from the design matrix is used.
+
+\strong{Factor Predictors}: By default (\code{factors = "dummy"}),
+factor predictors are expanded into \code{L - 1} dummy contrasts via
+R's \code{stats::model.matrix()}, matching base R \code{lm()}. Pass
+\code{factors = "numeric"} to silently coerce factor levels to their
+integer codes (SPSS \code{REGRESSION} default). The "numeric" mode is
+required to reproduce SPSS results for ordinal predictors like
+education or Likert scales that SPSS treats as continuous.
 
 \strong{Grouped Analysis}: When \code{data} is grouped via
 \code{dplyr::group_by()}, a separate regression is run for each group
@@ -152,11 +172,18 @@ survey_data |>
   dplyr::group_by(region) |>
   linear_regression(life_satisfaction ~ age)
 
+# Factor predictors: dummy-coding (default, matches base R lm())
+linear_regression(survey_data, income ~ age + education)
+
+# Factor predictors: SPSS-style ordinal-as-scale
+linear_regression(survey_data, income ~ age + education,
+                  factors = "numeric")
+
 # --- Three-layer output ---
 result <- linear_regression(survey_data, life_satisfaction ~ age + income)
-result              # compact one-line overview
-summary(result)     # full detailed SPSS-style output
-summary(result, collinearity = FALSE)  # hide VIF/Tolerance
+result                                  # compact one-line overview
+summary(result)                         # full detailed SPSS-style output
+summary(result, descriptives = FALSE)   # hide descriptives section
 
 }
 \seealso{
