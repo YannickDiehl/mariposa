@@ -1,3 +1,39 @@
+# mariposa 0.6.3.1
+
+## broom tidiers now work natively
+
+Adds explicit `tidy()`, `glance()`, and `augment()` methods for both
+`linear_regression` and `logistic_regression` results, registered via
+the standard `s3_register()` pattern (broom in Suggests, no hard dep).
+
+Reason: with `class(r) = c("linear_regression", "lm")`, `broom::tidy.lm()`
+and `broom::glance.lm()` dispatched as expected, but internally called
+`summary(x)` — which (because of our specialised
+`summary.linear_regression()` overriding `summary.lm`) returned the
+mariposa SPSS-style summary instead of the lm summary broom needs.
+The visible failures:
+
+* `broom::glance(r)` raised `object 'r.squared' not found` because
+  mariposa's summary stores it as `R_squared`.
+* `broom::tidy(r, conf.int = TRUE)` returned only 4 columns
+  (`term`, `estimate`, `conf.low`, `conf.high`) instead of the expected
+  6+ (`term`, `estimate`, `std.error`, `statistic`, `p.value`,
+  `conf.low`, `conf.high`).
+
+The new methods strip our `linear_regression` / `logistic_regression`
+class before delegating to `broom::tidy.lm` / `tidy.glm` etc., so the
+inner `summary()` call dispatches to `summary.lm` / `summary.glm` and
+broom receives its expected shape. The user-facing `summary(r)` still
+returns mariposa's SPSS-style output (more specific method wins).
+
+Edge cases stay consistent with the rest of the lm-generic surface:
+`broom::tidy()` / `glance()` / `augment()` on a grouped or pairwise
+result raise an actionable error pointing at `lapply(r$groups, ...)`
+or `use = "listwise"`.
+
+New tests in `test-broom-methods.R` cover all three tidiers for both
+regression types, plus the grouped/pairwise error paths.
+
 # mariposa 0.6.3
 
 ## Behavior Change — regression results inherit from `lm` / `glm`
