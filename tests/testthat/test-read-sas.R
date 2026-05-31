@@ -81,8 +81,11 @@ test_that("read_xpt verbose mode prints summary", {
   on.exit(unlink(tmp), add = TRUE)
   haven::write_xpt(df, tmp)
 
-  msgs <- capture.output(read_xpt(tmp, verbose = TRUE), type = "message")
-  expect_true(any(grepl("tagged missing values", msgs)))
+  # Use expect_message() (condition handler) rather than
+  # capture.output(type = "message") (stream sink): only one diversion of the
+  # message stream can be active at a time, so the sink-based approach is
+  # unreliable when run under a testthat reporter that already sinks messages.
+  expect_message(read_xpt(tmp, verbose = TRUE), "tagged missing values")
 })
 
 test_that("read_xpt with no tagged NAs sets no attributes", {

@@ -77,8 +77,11 @@ test_that("read_stata verbose mode prints summary", {
   on.exit(unlink(tmp), add = TRUE)
   haven::write_dta(df, tmp)
 
-  msgs <- capture.output(read_stata(tmp, verbose = TRUE), type = "message")
-  expect_true(any(grepl("tagged missing values", msgs)))
+  # Use expect_message() (condition handler) rather than
+  # capture.output(type = "message") (stream sink): only one diversion of the
+  # message stream can be active at a time, so the sink-based approach is
+  # unreliable when run under a testthat reporter that already sinks messages.
+  expect_message(read_stata(tmp, verbose = TRUE), "tagged missing values")
 })
 
 test_that("read_stata with no tagged NAs sets no attributes", {
