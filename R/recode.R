@@ -63,6 +63,13 @@
 #'
 #' Rules are evaluated in order — the first matching rule wins.
 #'
+#' ## Decimal Values
+#'
+#' Both single values and ranges accept decimals (e.g. \code{"3.6=2"} or
+#' \code{"2.5:3.5=1"}). Single-value matching compares values as strings
+#' (rounded to 15 significant digits), so decimal codes match reliably even
+#' when stored with floating-point representation error.
+#'
 #' ## Inline Value Labels
 #'
 #' You can attach value labels directly in the rules string using
@@ -421,6 +428,11 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 #' @noRd
 .apply_rec_rules <- function(x, parsed) {
   x_num <- suppressWarnings(as.numeric(x))
+  # Character form for single-value matching. as.character() rounds to 15
+  # significant digits, which absorbs floating-point representation error so
+  # decimal codes (e.g. 3.6, or a computed 0.1 + 0.2) match reliably. Mirrors
+  # sjmisc::rec(). Ranges below stay numeric (>=/<=), which is already robust.
+  x_chr <- as.character(x_num)
   result <- rep(NA_real_, length(x))
   matched <- rep(FALSE, length(x))
 
@@ -458,7 +470,7 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
     available <- !is.na(x_num) & !matched
 
     if (rule$type == "value") {
-      mask <- available & x_num == rule$from
+      mask <- available & x_chr == as.character(rule$from)
       if (any(mask)) {
         if (identical(rule$new, "copy")) {
           result[mask] <- x_num[mask]

@@ -75,6 +75,14 @@ Rules are specified as a semicolon-separated string of
 Rules are evaluated in order — the first matching rule wins.
 }
 
+\subsection{Decimal Values}{
+
+Both single values and ranges accept decimals (e.g. \code{"3.6=2"} or
+\code{"2.5:3.5=1"}). Single-value matching compares values as strings
+(rounded to 15 significant digits), so decimal codes match reliably even
+when stored with floating-point representation error.
+}
+
 \subsection{Inline Value Labels}{
 
 You can attach value labels directly in the rules string using

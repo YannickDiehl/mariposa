@@ -63,6 +63,30 @@ test_that("rec supports min/max in ranges", {
 })
 
 # ============================================================================
+# rec() — DECIMAL VALUES
+# ============================================================================
+
+test_that("rec recodes decimal single values", {
+  x <- c(1, 2.5, 3.6, 3.6, 4)
+  result <- rec(x, rules = "3.6=2; else=copy")
+  expect_equal(result, c(1, 2.5, 2, 2, 4))
+})
+
+test_that("rec matches decimals with floating-point representation error", {
+  # 0.1 + 0.2 is stored as 0.30000000000000004, not exactly 0.3.
+  # String-based matching (15 sig digits) must still match the rule "0.3".
+  x <- c(0.1 + 0.2, 1, 2)
+  result <- rec(x, rules = "0.3=99; else=copy")
+  expect_equal(result, c(99, 1, 2))
+})
+
+test_that("rec recodes decimal ranges", {
+  x <- c(1, 2.5, 3.6, 4)
+  result <- rec(x, rules = "2.5:3.6=1; else=copy")
+  expect_equal(result, c(1, 1, 1, 4))
+})
+
+# ============================================================================
 # rec() — ELSE RULE
 # ============================================================================
 

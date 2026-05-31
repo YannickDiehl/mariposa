@@ -1,3 +1,20 @@
+# mariposa 0.6.3.2
+
+## `rec()` reliably matches decimal single values
+
+Single-value recode rules now match decimal codes (e.g. `"3.6=2"`) even
+when the stored value carries floating-point representation error. The
+single-value comparison was changed from exact numeric equality
+(`x == value`) to a string comparison (`as.character(x) == as.character(value)`),
+which rounds to 15 significant digits and thereby absorbs the error.
+
+Reason: a value such as `0.1 + 0.2` is stored as `0.30000000000000004`,
+so the previous exact `==` test silently failed to match a rule `"0.3=..."`.
+This mirrors the behaviour of `sjmisc::rec()`, on which `rec()`'s string
+syntax is modelled. Range rules were already robust (they use `>=`/`<=`)
+and are unchanged.
+
+
 # mariposa 0.6.3.1
 
 ## broom tidiers now work natively
