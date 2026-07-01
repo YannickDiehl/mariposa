@@ -241,7 +241,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       # W is the rank sum of the group with smaller U (SPSS convention)
       W_report <- if(U1 < U2) R1 else R2
       
-      # Calculate Z statistic using U with continuity correction
+      # Calculate Z statistic from U (no continuity correction, per SPSS)
       expected_U <- n1 * n2 / 2
       
       # Check for ties and calculate corrected variance (SPSS method)
@@ -257,10 +257,12 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       # Effect size
       r <- abs(Z) / sqrt(n1 + n2)
       
-      # Get p-value from wilcox.test for accuracy
+      # Get p-value from wilcox.test. correct = FALSE: SPSS applies no
+      # continuity correction to the asymptotic Mann-Whitney p-value, and
+      # the Z reported above is computed without it - p and Z must agree.
       test_result <- wilcox.test(x1, x2, alternative = alternative,
-                               mu = mu, exact = FALSE, conf.int = TRUE,
-                               conf.level = conf.level)
+                               mu = mu, exact = FALSE, correct = FALSE,
+                               conf.int = TRUE, conf.level = conf.level)
       p_value <- test_result$p.value
       
       group_stats <- list(
@@ -279,7 +281,14 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
       n <- length(x)
 
-      # 1. Weighted midranks (Horvitz-Thompson estimator)
+      # 1. Weighted midranks (Horvitz-Thompson estimator).
+      # NOTE: deliberately cumsum(w) - w/2 and NOT .weighted_midranks().
+      # This is a design-based estimator (rankhat/N estimates F-hat at the
+      # midpoint), the exact convention survey::svyranktest() uses - the
+      # equivalence is validated to display precision in the test suite.
+      # The frequency-expansion mid-ranks used by the frequency-weighted
+      # tests (wilcoxon_test, kruskal_wallis, dunn_test) are a different
+      # estimator and would break that equivalence for fractional weights.
       ii <- order(x)
       N_pop <- sum(w)
       rankhat <- numeric(n)
