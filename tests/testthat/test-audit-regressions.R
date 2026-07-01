@@ -104,6 +104,80 @@ test_that("kruskal_wallis reports its H/(N-1) effect size as epsilon_squared", {
   expect_equal(res$epsilon_squared[1], res$H[1] / (90 - 1), tolerance = 1e-10)
 })
 
+# --- Phase 2: honest API contracts -------------------------------------------
+
+test_that("weighted t_test honors var.equal for the primary result", {
+  # Audit finding: the weighted two-sample path always reported Welch
+  # values regardless of var.equal.
+  set.seed(5)
+  d <- dplyr::tibble(
+    v = rnorm(100, 10, rep(c(2, 6), 50)),
+    g = factor(rep(c("A", "B"), 50)),
+    w = runif(100, 0.5, 1.5)
+  )
+  te <- t_test(d, v, group = g, weights = w, var.equal = TRUE)$results
+  tu <- t_test(d, v, group = g, weights = w, var.equal = FALSE)$results
+  # Student df = sum(w) - 2 (constant), Welch df is Satterthwaite - they differ
+  expect_false(isTRUE(all.equal(te$df[1], tu$df[1])))
+  expect_equal(te$df[1], sum(d$w) - 2, tolerance = 1e-8)
+})
+
+test_that("ss_type = 2 warns and computes Type III", {
+  # Audit finding: ss_type = 2 was accepted, stored, and echoed in the
+  # header while Type III was silently computed.
+  set.seed(9)
+  d <- dplyr::tibble(
+    dv = rnorm(90),
+    A = factor(sample(c("x", "y"), 90, replace = TRUE, prob = c(0.7, 0.3))),
+    B = factor(sample(c("p", "q", "r"), 90, replace = TRUE))
+  )
+  expect_warning(
+    fa2 <- factorial_anova(d, dv = dv, between = c(A, B), ss_type = 2),
+    "Type II"
+  )
+  fa3 <- factorial_anova(d, dv = dv, between = c(A, B), ss_type = 3)
+  expect_equal(fa2$anova_table$ss, fa3$anova_table$ss, tolerance = 1e-10)
+})
+
+test_that("oneway_anova warns that var.equal is deprecated and ignored", {
+  data(survey_data)
+  expect_warning(
+    oneway_anova(survey_data, life_satisfaction, group = education,
+                 var.equal = FALSE),
+    "var.equal"
+  )
+})
+
+test_that("linear_regression reports SPSS-style Tolerance/VIF", {
+  # Audit finding: collinearity diagnostics were documented but not
+  # implemented anywhere.
+  data(survey_data)
+  lr <- linear_regression(survey_data,
+                          life_satisfaction ~ age + income + trust_government)
+  X <- stats::model.matrix(lr)[, -1]
+  vif_manual <- diag(solve(stats::cor(X)))
+  expect_equal(unname(lr$coef_table$VIF[-1]), unname(vif_manual),
+               tolerance = 1e-10)
+  expect_equal(lr$coef_table$Tolerance[-1], 1 / lr$coef_table$VIF[-1],
+               tolerance = 1e-12)
+  out <- capture.output(print(summary(lr)))
+  expect_true(any(grepl("Collinearity Statistics", out)))
+  out2 <- capture.output(print(summary(lr, collinearity = FALSE)))
+  expect_false(any(grepl("Collinearity Statistics", out2)))
+})
+
+test_that("phi/cramers_v/goodman_gamma return the effect size, not a test object", {
+  # Audit finding: the three helpers were bare aliases of chi_square().
+  data(survey_data)
+  full <- chi_square(survey_data, gender, region)
+  expect_equal(unname(phi(survey_data, gender, region)),
+               full$results$phi[1])
+  expect_equal(unname(cramers_v(survey_data, gender, region)),
+               full$results$cramers_v[1])
+  expect_equal(unname(goodman_gamma(survey_data, gender, region)),
+               full$results$gamma[1])
+})
+
 test_that("weighted mann_whitney stays equivalent to the design-based svyranktest convention", {
   # The weighted MW path is a design-based Lumley-Scott estimator and uses
   # Horvitz-Thompson mid-ranks (cumsum(w) - w/2) on purpose - NOT the
