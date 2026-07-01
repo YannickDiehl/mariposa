@@ -24,8 +24,8 @@
 #'   (factor, character, or labelled numeric).
 #' @param weights Optional survey weights for population-representative results
 #'   (unquoted variable name)
-#' @param ss_type Type of Sum of Squares: 3 (default, SPSS standard) or 2.
-#'   Type III is recommended for unbalanced designs.
+#' @param ss_type Deprecated; only 3 (Type III, the SPSS default) is
+#'   implemented. Passing 2 issues a warning and computes Type III.
 #'
 #' @return An object of class \code{"factorial_anova"} containing:
 #' \describe{
@@ -140,8 +140,14 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     cli_abort("{.arg data} must be a data frame.")
   }
 
-  if (!ss_type %in% c(2, 3)) {
-    cli_abort("{.arg ss_type} must be 2 or 3.")
+  if (ss_type %in% c(2, 2L)) {
+    cli_warn(c(
+      "!" = "Type II sums of squares are not implemented; computing Type III (the SPSS default).",
+      "i" = "The {.arg ss_type} argument is deprecated and will be removed in a future release."
+    ))
+    ss_type <- 3
+  } else if (!ss_type %in% c(3, 3L)) {
+    cli_abort("{.arg ss_type} must be 3 (Type III, the SPSS default).")
   }
 
   # Process DV
