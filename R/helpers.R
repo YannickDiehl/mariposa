@@ -294,3 +294,24 @@ get_value_labels <- function(x, freq_names) {
 }
 
 
+
+#' Weighted mid-ranks (frequency-weight convention)
+#'
+#' Mid-ranks each case would receive if it were replicated according to its
+#' frequency weight: a tie group with total weight W_g occupying cumulative
+#' weight positions (end - W_g, end] gets the mid-rank end - W_g + (W_g+1)/2.
+#' For unit weights this reproduces rank(x, ties.method = "average") exactly,
+#' and for integer weights it equals the mid-ranks of the expanded data set
+#' (the SPSS WEIGHT BY convention). Used by all weighted rank tests.
+#'
+#' @param x Numeric vector of values to rank
+#' @param w Numeric vector of weights (same length, no NAs)
+#' @return Numeric vector of weighted mid-ranks
+#' @keywords internal
+.weighted_midranks <- function(x, w) {
+  f <- factor(x)  # levels sort ascending for numeric input
+  group_w <- as.numeric(tapply(w, f, sum))
+  group_end <- cumsum(group_w)
+  group_mid <- group_end - group_w + (group_w + 1) / 2
+  group_mid[as.integer(f)]
+}

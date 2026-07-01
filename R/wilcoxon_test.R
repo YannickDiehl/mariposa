@@ -212,21 +212,24 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
     } else {
       # ------------------------------------------------------------------
-      # Weighted Wilcoxon Signed-Rank Test (frequency-weighted approx.)
+      # Weighted Wilcoxon Signed-Rank Test (frequency weights)
       # ------------------------------------------------------------------
       # NOTE: Substitutes sum(w) for n in the standard variance formula.
-      # NOT a design-based estimator. With sampling_weight ≈ 1.0 results
-      # match the unweighted Z to ~3 decimals; for weights far from 1.0
-      # use the survey package instead.
+      # For integer frequency weights this reproduces the expanded-data
+      # Wilcoxon statistic exactly (weights == 1 is identical to the
+      # unweighted test); fractional weights are a continuous extension.
+      # NOT a design-based estimator - for complex sampling designs use
+      # the survey package instead.
 
       w_no_ties <- w[!tie_idx]
 
-      # Weighted mid-ranks of absolute differences
+      # Weighted mid-ranks of absolute differences (frequency-expansion
+      # convention). For integer weights this makes V, E(V), and the tie
+      # correction exactly equal to the expanded-data Wilcoxon statistic;
+      # the former rank - 1/2 convention biased Z downward by
+      # sum(w_pos)/2 standard units relative to E(V) = N(N+1)/4.
       abs_d <- abs(d_no_ties)
-      ii <- order(abs_d)
-      rankhat <- numeric(length(abs_d))
-      rankhat[ii] <- ave(cumsum(w_no_ties[ii]) - w_no_ties[ii] / 2,
-                         factor(abs_d[ii]))
+      rankhat <- .weighted_midranks(abs_d, w_no_ties)
 
       # Assign ranks to positive and negative groups
       pos_in_ranked <- d_no_ties > 0

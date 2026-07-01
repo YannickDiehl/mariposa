@@ -280,26 +280,32 @@ test_that("Test 3b: KW income by employment, grouped by region — matches SPSS"
 # SPSS NPAR TESTS /K-W does not honor WEIGHT BY (verified at 10 reference
 # comparisons in kruskal_wallis_output.txt). See header note for details.
 #
-# The baselines below are mariposa-only weighted KW values, captured
-# 2026-05-19 from R/kruskal_wallis.R. The weighted implementation is a
-# frequency-weighted approximation (substitutes sum(w) for n in the
-# standard H formula) — NOT design-based / Lumley-Scott. They guard
-# against R-side algorithmic regressions, not SPSS equivalence and not
-# survey-design correctness. For sampling weights far from 1.0 prefer
-# survey::svyranktest().
+# The baselines below are mariposa-only weighted KW values from
+# R/kruskal_wallis.R. The weighted implementation is a frequency-weighted
+# approximation (substitutes sum(w) for n in the standard H formula) — NOT
+# design-based / Lumley-Scott. They guard against R-side algorithmic
+# regressions, not SPSS equivalence and not survey-design correctness.
+# For sampling weights far from 1.0 prefer survey::svyranktest().
+#
+# Re-captured 2026-07-01 (0.7.0): weighted mid-ranks switched to the
+# frequency-expansion convention (.weighted_midranks) shared with
+# wilcoxon_test/dunn_test; for integer weights this equals the mid-ranks
+# of the expanded data set (SPSS WEIGHT BY convention). The effect size
+# was also renamed eta_squared -> epsilon_squared (H/(N-1) is Tomczak &
+# Tomczak's epsilon-squared; the old name mislabeled it).
 # =============================================================================
 
 r_only_baselines <- list(
   life_satisfaction_x_education = list(
-    H = 167.1485, df = 3L, p_value = 0.000000, eta_squared = 0.068616,
+    H = 167.076793, df = 3L, p_value = 0.000000, epsilon_squared = 0.0685865,
     n_total = 2437L
   ),
   income_x_employment = list(
-    H = 30.3525, df = 4L, p_value = 0.000004, eta_squared = 0.013797,
+    H = 30.354100, df = 4L, p_value = 0.0000041, epsilon_squared = 0.0137973,
     n_total = 2201L
   ),
   trust_government_x_education = list(
-    H = 1.1832, df = 3L, p_value = 0.757044, eta_squared = 0.000499,
+    H = 1.181919, df = 3L, p_value = 0.7573440, epsilon_squared = 0.0004987,
     n_total = 2371L
   )
 )

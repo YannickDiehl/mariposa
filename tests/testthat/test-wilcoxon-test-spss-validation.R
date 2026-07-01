@@ -221,14 +221,20 @@ test_that("Test 3b: Wilcoxon trust_gov / trust_science, grouped by region — ma
 # SPSS NPAR /WILCOXON does not honor WEIGHT BY. mariposa baselines from
 # the frequency-weighted approximation in R/wilcoxon_test.R (substitutes
 # sum(w) for n in the standard variance formula — NOT a design-based
-# estimator). Captured 2026-05-19. For sampling weights far from 1.0,
-# users should prefer survey::svyranktest().
+# estimator). For sampling weights far from 1.0, users should prefer
+# survey::svyranktest().
+#
+# Re-captured 2026-07-01 (0.7.0): weighted mid-ranks switched to the
+# frequency-expansion convention (.weighted_midranks), fixing a systematic
+# downward bias in Z — the former rank - 1/2 convention was inconsistent
+# with E(V) = N(N+1)/4. With weights == 1 the weighted path now reproduces
+# the unweighted statistic exactly (asserted below).
 # =============================================================================
 
 r_only_baselines <- list(
-  gov_media    = list(Z = -5.0326,  p_value = 0.0000005, r_effect = 0.120820, n_total = 2242L),
-  gov_science  = list(Z = 25.9969,  p_value = 0.0000000, r_effect = 0.614462, n_total = 2271L),
-  media_science = list(Z = 29.0949, p_value = 0.0000000, r_effect = 0.669424, n_total = 2286L)
+  gov_media    = list(Z = -5.034890, p_value = 0.0000005, r_effect = 0.120876, n_total = 2242L),
+  gov_science  = list(Z = 26.035233, p_value = 0.0000000, r_effect = 0.615368, n_total = 2271L),
+  media_science = list(Z = 29.129375, p_value = 0.0000000, r_effect = 0.670217, n_total = 2286L)
 )
 
 compare_weighted_baseline <- function(row, baseline, scenario) {

@@ -216,10 +216,8 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
       N <- sum(w)
       tie_correct <- 0
 
-      # Weighted mid-ranks (same approach as kruskal_wallis.R)
-      ii <- order(y)
-      rankhat <- numeric(length(y))
-      rankhat[ii] <- ave(cumsum(w[ii]) - w[ii] / 2, factor(y[ii]))
+      # Weighted mid-ranks (frequency-expansion convention, shared helper)
+      rankhat <- .weighted_midranks(y, w)
 
       # Group-level statistics (weighted)
       group_n <- numeric(length(group_levels))

@@ -28,7 +28,7 @@
 #' - H statistic (Kruskal-Wallis chi-square test statistic)
 #' - Degrees of freedom (number of groups minus 1)
 #' - P-value (are groups different?)
-#' - Effect size eta-squared (how big is the group effect?)
+#' - Effect size epsilon-squared (how big is the group effect?)
 #' - Mean rank for each group (which groups are higher/lower?)
 #'
 #' @details
@@ -40,7 +40,7 @@
 #' - p < 0.05: Moderate evidence of group differences
 #' - p > 0.05: No significant group differences found
 #'
-#' **Effect Size Eta-squared** (How much do groups matter?):
+#' **Effect Size Epsilon-squared** (How much do groups matter?):
 #' - < 0.01: Negligible effect
 #' - 0.01-0.06: Small effect
 #' - 0.06-0.14: Medium effect
@@ -228,10 +228,10 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
       N_pop <- sum(w)
 
-      # Weighted mid-ranks (Horvitz-Thompson style, matching mann_whitney)
-      ii <- order(x)
-      rankhat <- numeric(length(x))
-      rankhat[ii] <- ave(cumsum(w[ii]) - w[ii] / 2, factor(x[ii]))
+      # Weighted mid-ranks (frequency-expansion convention, shared helper).
+      # H is invariant to the former rank offset; the displayed rank means
+      # now match SPSS's expanded-data mid-ranks.
+      rankhat <- .weighted_midranks(x, w)
 
       # Group-level statistics
       group_stats <- lapply(g_levels, function(lvl) {
@@ -271,14 +271,14 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
       n_total <- round(N_pop)
     }
 
-    # Effect size: Eta-squared = H / (N - 1)
-    eta_squared <- H / (n_total - 1)
+    # Effect size: Epsilon-squared = H / (N - 1)
+    epsilon_squared <- H / (n_total - 1)
 
     return(list(
       H = H,
       df = df,
       p_value = p_value,
-      eta_squared = eta_squared,
+      epsilon_squared = epsilon_squared,
       n_total = n_total,
       group_stats = group_stats
     ))
@@ -297,7 +297,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
           H = result$H,
           df = result$df,
           p_value = result$p_value,
-          eta_squared = result$eta_squared,
+          epsilon_squared = result$epsilon_squared,
           n_total = result$n_total,
           group_stats = list(result$group_stats)
         )
@@ -309,7 +309,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
           H = NA_real_,
           df = NA_integer_,
           p_value = NA_real_,
-          eta_squared = NA_real_,
+          epsilon_squared = NA_real_,
           n_total = NA_integer_,
           group_stats = list(NULL)
         )
@@ -410,7 +410,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     `Kruskal-Wallis H` = round(row_data$H, digits),
     df = as.integer(row_data$df),
     `p value` = round(row_data$p_value, digits),
-    `Eta-squared` = round(row_data$eta_squared, digits),
+    `Epsilon-squared` = round(row_data$epsilon_squared, digits),
     sig = row_data$sig,
     check.names = FALSE,
     stringsAsFactors = FALSE
@@ -466,7 +466,7 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
   if (is_grouped_data) {
     # Get unique groups
     group_vars <- setdiff(names(x$results), c("Variable", "H", "df", "p_value",
-                                               "eta_squared", "n_total",
+                                               "epsilon_squared", "n_total",
                                                "group_stats", "sig"))
     groups <- unique(x$results[group_vars])
 
@@ -513,7 +513,7 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
 
   print_significance_legend()
 
-  cat("\nEffect Size Interpretation (Eta-squared):\n")
+  cat("\nEffect Size Interpretation (Epsilon-squared):\n")
   cat("- Small effect: 0.01 - 0.06\n")
   cat("- Medium effect: 0.06 - 0.14\n")
   cat("- Large effect: > 0.14\n")

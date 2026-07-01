@@ -213,12 +213,10 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
 
       w_no_ties <- w[!tie_idx]
 
-      # Weighted mid-ranks of absolute differences
+      # Weighted mid-ranks of absolute differences (frequency-expansion
+      # convention, shared helper; see wilcoxon_test.R for the rationale)
       abs_d <- abs(d_no_ties)
-      ii <- order(abs_d)
-      rankhat <- numeric(length(abs_d))
-      rankhat[ii] <- ave(cumsum(w_no_ties[ii]) - w_no_ties[ii] / 2,
-                         factor(abs_d[ii]))
+      rankhat <- .weighted_midranks(abs_d, w_no_ties)
 
       # Assign ranks to positive and negative groups
       pos_in_ranked <- d_no_ties > 0
