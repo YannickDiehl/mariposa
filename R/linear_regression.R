@@ -402,7 +402,12 @@ linear_regression <- function(data, formula = NULL,
   # - sigma, Std.Error, t, F are all based on weighted df
   # R's lm(weights=) uses actual N for df, so we must adjust.
 
-  k <- length(pred_names)  # number of predictors
+  # Number of estimated model terms excluding the intercept. Must be counted
+  # on the fitted model, not on pred_names: a factor with L levels expands to
+  # L-1 dummy terms and formula operators (interactions, poly()) add terms,
+  # all of which consume regression df. model$rank also excludes aliased
+  # coefficients in rank-deficient fits.
+  k <- model$rank - attr(stats::terms(model), "intercept")
 
   if (!is.null(weights_vec)) {
     # SPSS WEIGHT BY for REGRESSION: WLS with sum(w) as effective N.

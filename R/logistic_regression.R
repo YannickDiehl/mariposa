@@ -411,7 +411,10 @@ logistic_regression <- function(data, formula = NULL,
 
   # Omnibus test (Model chi-square)
   omnibus_chi_sq <- minus2LL_null - minus2LL_model
-  omnibus_df <- length(pred_names)
+  # df = difference in estimated parameters between model and null model.
+  # Counted on the fitted models (not pred_names): dummy-expanded factors
+  # and interaction terms each consume one df.
+  omnibus_df <- model$df.null - model$df.residual
   omnibus_p <- stats::pchisq(omnibus_chi_sq, df = omnibus_df, lower.tail = FALSE)
 
   # Pseudo R-squared measures (use unrounded n_internal per Charter §5.1)
