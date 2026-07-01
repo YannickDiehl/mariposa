@@ -22,9 +22,9 @@
 #' @param group The categorical variable that defines your groups (e.g., education,
 #'   region, age_group). Must have at least 3 groups for ANOVA.
 #' @param weights Optional survey weights for population-representative results
-#' @param var.equal Should we assume all groups have similar variance? (Default: TRUE)
-#'   - TRUE: Standard ANOVA (assumes equal variances)
-#'   - FALSE: Welch's ANOVA (allows unequal variances)
+#' @param var.equal Deprecated and ignored (a warning is issued when set to
+#'   FALSE). Like SPSS ONEWAY, the classical ANOVA table and Welch's robust
+#'   test are always both computed and displayed.
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #'
 #' @return ANOVA results showing whether groups differ, including:
@@ -59,11 +59,12 @@
 #' - You want to know if group averages differ
 #' - Your data is roughly normally distributed within groups
 #'
-#' ## Choosing Variance Assumptions
+#' ## Variance Assumptions
 #'
-#' - **Standard ANOVA** (var.equal = TRUE): Use when group variances are similar
-#' - **Welch's ANOVA** (var.equal = FALSE): Use when group variances differ or you're unsure
-#' - The function shows both results for comparison
+#' Like SPSS ONEWAY, both results are always shown for comparison:
+#' - **Standard ANOVA**: valid when group variances are similar
+#' - **Welch's ANOVA**: robust when group variances differ
+#' - Use \code{\link{levene_test}} to check which situation applies
 #'
 #' ## What Comes Next?
 #'
@@ -127,10 +128,6 @@
 #'   group_by(region) %>%
 #'   oneway_anova(life_satisfaction, group = education)
 #' 
-#' # Unequal variances (Welch's ANOVA)
-#' survey_data %>%
-#'   oneway_anova(income, group = education, var.equal = FALSE)
-#' 
 #' # Store results for post-hoc analysis
 #' result <- survey_data %>%
 #'   oneway_anova(life_satisfaction, group = education)
@@ -157,7 +154,14 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   if (conf.level <= 0 || conf.level >= 1) {
     cli_abort("{.arg conf.level} must be between 0 and 1.")
   }
-  
+
+  if (!isTRUE(var.equal)) {
+    cli_warn(c(
+      "!" = "{.arg var.equal} has no effect: like SPSS ONEWAY, the classical ANOVA table and Welch's robust test are always both computed and displayed.",
+      "i" = "The argument is deprecated and will be removed in a future release."
+    ))
+  }
+
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
@@ -391,7 +395,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
       ms_between <- ss_between / df_between
       ms_within <- ss_within / df_within
       f_stat <- ms_between / ms_within
-      p_value <- 1 - pf(f_stat, df_between, df_within)
+      p_value <- pf(f_stat, df_between, df_within, lower.tail = FALSE)
       
       # Weighted Welch test (SPSS-optimized)
       # Calculate group statistics for SPSS-compatible Welch test
