@@ -535,6 +535,12 @@ linear_regression <- function(data, formula = NULL,
                                    standardized, conf.level)
   }
 
+  # Collinearity diagnostics (SPSS REGRESSION: Tolerance, VIF per term)
+  collin <- .lm_collinearity(model, weights_vec)
+  idx <- match(coef_table$Term, collin$term)
+  coef_table$Tolerance <- collin$tolerance[idx]
+  coef_table$VIF <- collin$vif[idx]
+
   # ============================================================================
   # RETURN STRUCTURE
   # ============================================================================
@@ -769,6 +775,11 @@ linear_regression <- function(data, formula = NULL,
     CI_lower = all_CI_lower,
     CI_upper = all_CI_upper
   )
+
+  # Collinearity from the pairwise correlation matrix: VIF = diag(R_XX^-1)
+  vif_pair <- tryCatch(diag(solve(R_XX)), error = function(e) rep(NA_real_, k))
+  coef_table$Tolerance <- c(NA_real_, 1 / vif_pair)
+  coef_table$VIF <- c(NA_real_, vif_pair)
 
   model_stats <- list(
     R = R_mult,
@@ -1017,6 +1028,8 @@ print.linear_regression <- function(x, ...) {
 #' @param model_summary Logical. Show model summary (R, R-squared)? (Default: TRUE)
 #' @param anova_table Logical. Show ANOVA table? (Default: TRUE)
 #' @param coefficients Logical. Show coefficients table? (Default: TRUE)
+#' @param collinearity Logical. Show collinearity diagnostics (Tolerance,
+#'   VIF per model term)? (Default: TRUE)
 #' @param descriptives Logical. Show the Descriptive Statistics table
 #'   (Mean, SD, N for the dependent and predictor variables)? (Default: TRUE)
 #' @param digits Number of decimal places for formatting (Default: 3).
@@ -1034,6 +1047,7 @@ print.linear_regression <- function(x, ...) {
 summary.linear_regression <- function(object, model_summary = TRUE,
                                        anova_table = TRUE,
                                        coefficients = TRUE,
+                                       collinearity = TRUE,
                                        descriptives = TRUE,
                                        digits = 3, ...) {
   build_summary_object(
@@ -1041,6 +1055,7 @@ summary.linear_regression <- function(object, model_summary = TRUE,
     show       = list(model_summary = model_summary,
                       anova_table   = anova_table,
                       coefficients  = coefficients,
+                      collinearity  = collinearity,
                       descriptives  = descriptives),
     digits     = digits,
     class_name = "summary.linear_regression"
@@ -1107,6 +1122,7 @@ print.summary.linear_regression <- function(x, ...) {
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+  show_collin <- if (!is.null(x$show)) isTRUE(x$show$collinearity) else TRUE
   show_desc  <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
 
   if (show_desc) {
@@ -1127,6 +1143,10 @@ print.summary.linear_regression <- function(x, ...) {
   if (show_coefs) {
     cat("\n")
     .print_coefficients_table(x$coef_table, x$standardized)
+  }
+
+  if (show_collin) {
+    .print_collinearity_table(x$coef_table)
   }
 
   # Show significance legend if any p-value section is visible
@@ -1156,6 +1176,7 @@ print.summary.linear_regression <- function(x, ...) {
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+  show_collin <- if (!is.null(x$show)) isTRUE(x$show$collinearity) else TRUE
   show_desc  <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
 
   for (grp in x$groups) {
@@ -1182,6 +1203,10 @@ print.summary.linear_regression <- function(x, ...) {
     if (show_coefs) {
       cat("\n")
       .print_coefficients_table(grp$coef_table, x$standardized)
+    }
+
+    if (show_collin) {
+      .print_collinearity_table(grp$coef_table)
     }
   }
 
@@ -1271,6 +1296,67 @@ print.summary.linear_regression <- function(x, ...) {
 
 #' Print coefficients table
 #' @keywords internal
+#' Collinearity diagnostics per model term
+#'
+#' Tolerance and VIF as SPSS REGRESSION reports them: VIF_j = j-th diagonal
+#' of the inverse correlation matrix of the model-matrix columns (excluding
+#' the intercept), Tolerance = 1/VIF. For weighted fits the weighted
+#' correlation matrix is used, consistent with the frequency-weight
+#' convention elsewhere in the file.
+#'
+#' @return tibble with columns term, tolerance, vif (NA when the
+#'   correlation matrix is singular, e.g. aliased terms)
+#' @noRd
+.lm_collinearity <- function(model, weights_vec = NULL) {
+  X <- stats::model.matrix(model)
+  terms_keep <- setdiff(colnames(X), "(Intercept)")
+  if (length(terms_keep) == 0) {
+    return(tibble::tibble(term = character(0), tolerance = numeric(0),
+                          vif = numeric(0)))
+  }
+  if (length(terms_keep) == 1) {
+    return(tibble::tibble(term = terms_keep, tolerance = 1, vif = 1))
+  }
+  Xk <- X[, terms_keep, drop = FALSE]
+  cor_mat <- tryCatch({
+    if (!is.null(weights_vec)) {
+      stats::cov.wt(Xk, wt = weights_vec, cor = TRUE)$cor
+    } else {
+      stats::cor(Xk)
+    }
+  }, error = function(e) NULL)
+  vif <- rep(NA_real_, length(terms_keep))
+  if (!is.null(cor_mat)) {
+    inv <- tryCatch(solve(cor_mat), error = function(e) NULL)
+    if (!is.null(inv)) vif <- diag(inv)
+  }
+  tibble::tibble(term = terms_keep, tolerance = 1 / vif, vif = vif)
+}
+
+
+#' Print collinearity statistics block (Tolerance / VIF)
+#' @noRd
+.print_collinearity_table <- function(coefs) {
+  if (!"VIF" %in% names(coefs)) return(invisible(NULL))
+  rows <- which(!is.na(coefs$VIF))
+  if (length(rows) == 0) return(invisible(NULL))
+
+  cat("\n  Collinearity Statistics\n")
+  w <- 50
+  cat(paste0("  ", strrep("-", w), "\n"))
+  cat(sprintf("  %-25s %10s %10s\n", "Term", "Tolerance", "VIF"))
+  cat(paste0("  ", strrep("-", w), "\n"))
+  for (i in rows) {
+    term <- coefs$Term[i]
+    if (nchar(term) > 25) term <- paste0(substr(term, 1, 22), "...")
+    cat(sprintf("  %-25s %10.3f %10.3f\n",
+                term, coefs$Tolerance[i], coefs$VIF[i]))
+  }
+  cat(paste0("  ", strrep("-", w), "\n"))
+  cat("  VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.\n")
+}
+
+
 .print_coefficients_table <- function(coefs, show_beta) {
   cat("  Coefficients\n")
 
