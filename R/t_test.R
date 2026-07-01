@@ -495,7 +495,10 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           estimate = c(mu_x, mu_y)
         )
         
-        test_result <- test_unequal_weighted  # Use unequal as primary
+        # Honor var.equal for the primary result (both variants stay
+        # available for the SPSS-style two-row output), matching the
+        # unweighted path.
+        test_result <- if (var.equal) test_equal_weighted else test_unequal_weighted
         test_result$equal_var_result <- test_equal_weighted
         test_result$unequal_var_result <- test_unequal_weighted
         
