@@ -163,19 +163,35 @@ test_that("linear_regression standardized=FALSE omits Beta", {
 # ===========================================================================
 # 5. Effect size aliases: phi(), cramers_v(), goodman_gamma()
 # ===========================================================================
-test_that("phi() works and returns chi_square class", {
+test_that("phi() returns the scalar effect size and matches chi_square()", {
   result <- phi(survey_data, gender, region)
-  expect_s3_class(result, "chi_square")
+  full <- chi_square(survey_data, gender, region)
+  expect_type(result, "double")
+  expect_length(result, 1)
+  expect_equal(unname(result), full$results$phi[1])
 })
 
-test_that("cramers_v() works and returns chi_square class", {
+test_that("cramers_v() returns the scalar effect size and matches chi_square()", {
   result <- cramers_v(survey_data, education, region)
-  expect_s3_class(result, "chi_square")
+  full <- chi_square(survey_data, education, region)
+  expect_type(result, "double")
+  expect_equal(unname(result), full$results$cramers_v[1])
 })
 
-test_that("goodman_gamma() works and returns chi_square class", {
+test_that("goodman_gamma() returns the scalar effect size and matches chi_square()", {
   result <- goodman_gamma(survey_data, gender, region)
-  expect_s3_class(result, "chi_square")
+  full <- chi_square(survey_data, gender, region)
+  expect_type(result, "double")
+  expect_equal(unname(result), full$results$gamma[1])
+})
+
+test_that("effect-size helpers name results by group for grouped data", {
+  result <- survey_data %>%
+    dplyr::group_by(region) %>%
+    cramers_v(gender, education)
+  expect_type(result, "double")
+  expect_equal(length(result), 2)
+  expect_false(is.null(names(result)))
 })
 
 # ===========================================================================

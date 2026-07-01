@@ -712,14 +712,62 @@ print.summary.chi_square <- function(x, ...) {
 }
 
 
-#' @rdname chi_square
-#' @export
-phi <- chi_square
+# Extract a single effect-size column from a chi_square result as a plain
+# numeric vector, named by the group values for grouped input.
+.extract_chi_effect_size <- function(res, column) {
+  df <- res$results
+  out <- df[[column]]
+  if (isTRUE(res$is_grouped) && length(res$groups) > 0 && nrow(df) > 1) {
+    label_cols <- intersect(res$groups, names(df))
+    if (length(label_cols) > 0) {
+      names(out) <- apply(df[label_cols], 1, paste, collapse = ":")
+    }
+  }
+  out
+}
 
-#' @rdname chi_square
+#' Effect Sizes for Contingency Tables
+#'
+#' @description
+#' Convenience helpers that run \code{\link{chi_square}} and return just the
+#' requested effect size as a numeric value (named by group for grouped
+#' data): \code{phi()} for 2x2 tables, \code{cramers_v()} for larger tables,
+#' and \code{goodman_gamma()} for ordinal variables.
+#'
+#' For the full test output (chi-square statistic, p-value, all effect
+#' sizes), call \code{\link{chi_square}} directly.
+#'
+#' @param data Your survey data (a data frame or tibble)
+#' @param ... Exactly two categorical variables, as in \code{chi_square()}
+#' @param weights Optional survey weights
+#'
+#' @return A numeric vector with the effect size (one element per group for
+#'   grouped data).
+#'
+#' @examples
+#' data(survey_data)
+#' phi(survey_data, gender, region)
+#' cramers_v(survey_data, education, region)
+#' goodman_gamma(survey_data, education, life_satisfaction)
+#'
+#' @seealso \code{\link{chi_square}}
+#' @family effect_sizes
 #' @export
-cramers_v <- chi_square
+phi <- function(data, ..., weights = NULL) {
+  res <- chi_square(data, ..., weights = {{ weights }})
+  .extract_chi_effect_size(res, "phi")
+}
 
-#' @rdname chi_square
+#' @rdname phi
 #' @export
-goodman_gamma <- chi_square
+cramers_v <- function(data, ..., weights = NULL) {
+  res <- chi_square(data, ..., weights = {{ weights }})
+  .extract_chi_effect_size(res, "cramers_v")
+}
+
+#' @rdname phi
+#' @export
+goodman_gamma <- function(data, ..., weights = NULL) {
+  res <- chi_square(data, ..., weights = {{ weights }})
+  .extract_chi_effect_size(res, "gamma")
+}
