@@ -316,14 +316,21 @@ kendall_tau <- function(data, ..., weights = NULL,
         var_tau <- (4 * n + 10) / (9 * n * (n - 1))
       } else {
         # Large sample with tie correction
+        # Var(S) per Kendall & Gibbons (1990), eq. 4.12 (same formula as
+        # SPSS and stats::cor.test):
+        #   Var(S) = [n(n-1)(2n+5) - sum t(t-1)(2t+5) - sum u(u-1)(2u+5)] / 18
+        #          + [sum t(t-1)(t-2) * sum u(u-1)(u-2)] / [9n(n-1)(n-2)]
+        #          + [sum t(t-1) * sum u(u-1)] / [2n(n-1)]
         var0 <- n * (n - 1) * (2 * n + 5) / 18
         var1 <- sum(x_freq * (x_freq - 1) * (2 * x_freq + 5)) / 18
         var2 <- sum(y_freq * (y_freq - 1) * (2 * y_freq + 5)) / 18
-        var3 <- sum(x_freq * (x_freq - 1) * (x_freq - 2)) / (9 * n * (n - 1) * (n - 2))
-        var4 <- sum(y_freq * (y_freq - 1) * (y_freq - 2)) / (9 * n * (n - 1) * (n - 2))
-        var5 <- sum(x_freq * (x_freq - 1)) * sum(y_freq * (y_freq - 1)) / (2 * n * (n - 1))
+        var3 <- sum(x_freq * (x_freq - 1) * (x_freq - 2)) *
+          sum(y_freq * (y_freq - 1) * (y_freq - 2)) /
+          (9 * n * (n - 1) * (n - 2))
+        var4 <- sum(x_freq * (x_freq - 1)) * sum(y_freq * (y_freq - 1)) /
+          (2 * n * (n - 1))
 
-        var_tau <- (var0 - var1 - var2) + var3 * var4 + var5
+        var_tau <- (var0 - var1 - var2) + var3 + var4
         var_tau <- var_tau / ((n0 - Tx - Txy) * (n0 - Ty - Txy))
       }
 
