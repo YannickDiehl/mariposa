@@ -94,7 +94,7 @@ survey_data \%>\% w_quantile(income, weights = sampling_weight, probs = c(0.1, 0
 # Multiple variables
 survey_data \%>\% w_quantile(age, income, weights = sampling_weight)
 
-# Grouped data  
+# Grouped data
 survey_data \%>\% group_by(region) \%>\% w_quantile(age, weights = sampling_weight)
 
 # Unweighted (for comparison)
