@@ -1,3 +1,35 @@
+# mariposa 0.6.10
+
+Result-column harmonization (theme: one statistic, one column name).
+A style audit found the same statistic carrying different result-column
+names across sibling functions; the drifted names now converge on the
+canonical spelling, with the old columns kept as duplicates for one
+release.
+
+## Improvements
+
+* The `$results` columns for shared statistics are harmonized on the
+  canonical names already used elsewhere in the package:
+  - Chi-square statistic: `chi_squared` (as in `chi_square()`) - now
+    also in `chisq_gof()`, `friedman_test()`, and `mcnemar_test()`
+  - Effect size r: `r_effect` (as in `wilcoxon_test()`) - now also in
+    `mann_whitney()`
+  - F statistic: `F_statistic` (as in `levene_test()`) - now also in
+    `oneway_anova()`
+  Print and summary methods read the canonical columns; the statistical
+  values are unchanged.
+
+## Deprecations
+
+* The old result-column names remain available as duplicated columns
+  (positioned right after their canonical counterpart) for one release
+  and will be removed in 0.6.11:
+  - `chisq_gof()`, `friedman_test()`: `chi_sq` (use `chi_squared`)
+  - `mcnemar_test()`: `statistic` (use `chi_squared`)
+  - `mann_whitney()`: `effect_size_r` (use `r_effect`)
+  - `oneway_anova()`: `F_stat` (use `F_statistic`)
+
+
 # mariposa 0.6.9
 
 API-cleanup completion (theme: the 0.6.8 bridges come out, the last
