@@ -564,7 +564,7 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
         result_df$is_weighted <- anova_result$is_weighted
         result_df
       }, error = function(e) {
-        stop(e$message)
+        cli_abort("oneway_anova() failed: {e$message}", parent = e)
       })
     })
     

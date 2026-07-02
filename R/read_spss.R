@@ -73,12 +73,7 @@
 #'
 #' @export
 read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for SPSS import.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("SPSS import")
 
   # Read with user_na = TRUE to preserve missing value metadata as attributes
   # (haven_labelled_spss class keeps values but marks them via na_range/na_values)
@@ -125,12 +120,7 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
 #'
 #' @export
 read_por <- function(path, tag.na = TRUE, verbose = FALSE) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for SPSS portable import.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("SPSS portable import")
 
   data <- haven::read_por(file = path, user_na = tag.na)
 
@@ -366,6 +356,41 @@ read_por <- function(path, tag.na = TRUE, verbose = FALSE) {
 }
 
 
+#' Detect native extended missing values across all columns
+#'
+#' Shared step-1 of read_stata()/read_sas()/read_xpt(): scans every numeric
+#' column for native tagged missing values (.a-.z / .A-.Z) and attaches the
+#' na_tag_map attribute where found. Previously copy-pasted in three files.
+#'
+#' @param data Imported data frame
+#' @param format "stata" or "sas"
+#' @param verbose Announce the number of tagged variables?
+#' @return The data frame with na_tag_map attributes attached
+#' @noRd
+.detect_native_tags <- function(data, format, verbose = TRUE) {
+  n_vars_tagged <- 0L
+
+  for (i in seq_len(ncol(data))) {
+    x <- data[[i]]
+    if (!is.numeric(x)) next
+
+    result <- .build_na_tag_map_from_native(x, format)
+
+    if (!is.null(attr(result, "na_tag_map"))) {
+      data[[i]] <- result
+      n_vars_tagged <- n_vars_tagged + 1L
+    }
+  }
+
+  if (verbose && n_vars_tagged > 0L) {
+    cli::cli_inform(
+      "Found native tagged missing values in {n_vars_tagged} variable{?s}."
+    )
+  }
+
+  data
+}
+
 #' Build na_tag_map from native tagged NAs (Stata/SAS)
 #'
 #' For formats that have native tagged NAs (Stata .a-.z, SAS .A-.Z/._),
@@ -442,12 +467,7 @@ read_por <- function(path, tag.na = TRUE, verbose = FALSE) {
 #' @family data-import
 #' @export
 na_frequencies <- function(x) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for tagged NA inspection.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("tagged NA inspection")
   if (!is.numeric(x)) {
     cli::cli_abort("{.arg x} must be a numeric vector.")
   }
@@ -533,12 +553,7 @@ na_frequencies <- function(x) {
 #' @family data-import
 #' @export
 untag_na <- function(x) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for tagged NA recovery.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("tagged NA recovery")
 
   tag_map <- attr(x, "na_tag_map")
   if (is.null(tag_map)) return(as.double(x))

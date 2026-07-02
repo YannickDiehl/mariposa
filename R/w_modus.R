@@ -98,8 +98,9 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
     
     # Calculate weighted or unweighted mode
-    if (.are_weights(weights_vec)) .check_weights(weights_vec)
-    if (!.are_weights(weights_vec)) {
+    weighted <- .are_weights(weights_vec)
+    if (weighted) .check_weights(weights_vec)
+    if (!weighted) {
       # Unweighted calculation
       if (na.rm) {
         x <- x[!is.na(x)]
@@ -134,9 +135,9 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
       } else {
         # Calculate weighted mode
         unique_vals <- unique(x)
-        weighted_freqs <- sapply(unique_vals, function(val) {
+        weighted_freqs <- vapply(unique_vals, function(val) {
           sum(weights_vec[x == val])
-        })
+        }, numeric(1))
         
         max_weight <- max(weighted_freqs)
         modes <- unique_vals[weighted_freqs == max_weight]
@@ -217,9 +218,9 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
               eff_n <- 0
             } else {
               unique_vals <- unique(x)
-              weighted_freqs <- sapply(unique_vals, function(val) {
+              weighted_freqs <- vapply(unique_vals, function(val) {
                 sum(w[x == val])
-              })
+              }, numeric(1))
               max_weight <- max(weighted_freqs)
               modes <- unique_vals[weighted_freqs == max_weight]
               stat_val <- modes[1]
@@ -283,9 +284,9 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
           eff_n <- 0
         } else {
           unique_vals <- unique(x)
-          weighted_freqs <- sapply(unique_vals, function(val) {
+          weighted_freqs <- vapply(unique_vals, function(val) {
             sum(w[x == val])
-          })
+          }, numeric(1))
           max_weight <- max(weighted_freqs)
           modes <- unique_vals[weighted_freqs == max_weight]
           stat_val <- modes[1]

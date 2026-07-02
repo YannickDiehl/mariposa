@@ -1,3 +1,24 @@
+# mariposa 0.7.1
+
+Housekeeping release (theme: package hygiene). No statistical results
+change.
+
+* Slimmer dependencies: removed the unused tidyr import and pruned unused
+  `importFrom` entries.
+* Error chains: failures inside grouped analyses are re-thrown with
+  `cli_abort(parent = ...)` so the original condition is preserved;
+  the haven requirement is enforced by one central guard that reports
+  the calling function instead of an internal helper.
+* Import internals: the native-missing-value detection shared by
+  `read_stata()`, `read_sas()` and `read_xpt()` now lives in one helper
+  instead of three copies.
+* Mechanical polish: remaining `sapply()` calls in the oldest files
+  converted to type-stable `vapply()`; pkgdown reference now lists
+  `phi()`, `cramers_v()`, `goodman_gamma()`.
+* Test suite: removed a legacy tolerance registry that contradicted the
+  Validation Charter and was no longer used by any test.
+
+
 # mariposa 0.7.0
 
 A quality release. Following an in-depth internal review of the entire

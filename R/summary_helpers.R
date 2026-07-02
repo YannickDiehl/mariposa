@@ -2,7 +2,7 @@
 # SUMMARY METHOD HELPER FUNCTIONS
 # =============================================================================
 # Centralized helpers for all summary.* and print.summary.* methods.
-# See the plan at .claude/plans/ for the full style guide.
+# See .claude/SUMMARY_METHOD_STYLE_GUIDE.md for the full style guide.
 #
 # Pattern:
 #   summary.{class}()         -> builds summary object with $show booleans

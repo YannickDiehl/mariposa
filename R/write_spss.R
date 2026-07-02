@@ -67,12 +67,7 @@
 #'
 #' @export
 write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for SPSS export.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("SPSS export")
 
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame.")

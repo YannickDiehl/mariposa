@@ -8,38 +8,6 @@
 library(dplyr)
 
 # =============================================================================
-# SPSS VALIDATION TOLERANCES
-# =============================================================================
-# Centralized tolerance definitions for SPSS comparison tests.
-# Reference: SPSS 29.0.0.0
-
-spss_tolerance <- list(
-  # Exact match
-  count       = 0,
-
-
-  # Rounding differences
-  percentage  = 0.1,
-  p_value     = 0.001,
-
-  # Calculation precision
-  statistic   = 0.00001,
-  mean        = 0.01,
-  sd          = 0.01,
-  variance    = 1,
-  se          = 0.001,
-  skewness    = 0.01,
-  kurtosis    = 0.01,
-  median      = 0.5,
-  quantile    = 0.5,
-  correlation = 0.0001,
-  conf_int    = 0.01,
-
-  # Weighted totals
-  weighted_n  = 1
-)
-
-# =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
 

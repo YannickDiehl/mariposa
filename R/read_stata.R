@@ -77,12 +77,7 @@
 #'
 #' @export
 read_stata <- function(path, encoding = NULL, tag.na = NULL, verbose = FALSE) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for Stata import.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("Stata import")
 
   if (!is.null(tag.na) && !is.numeric(tag.na)) {
     cli::cli_abort("{.arg tag.na} must be a numeric vector of missing value codes.")
@@ -90,26 +85,8 @@ read_stata <- function(path, encoding = NULL, tag.na = NULL, verbose = FALSE) {
 
   data <- haven::read_dta(file = path, encoding = encoding)
 
-  # Step 1: Detect native Stata extended missing values (.a through .z)
-  n_vars_tagged <- 0L
-
-  for (i in seq_len(ncol(data))) {
-    x <- data[[i]]
-    if (!is.numeric(x)) next
-
-    result <- .build_na_tag_map_from_native(x, "stata")
-
-    if (!is.null(attr(result, "na_tag_map"))) {
-      data[[i]] <- result
-      n_vars_tagged <- n_vars_tagged + 1L
-    }
-  }
-
-  if (verbose && n_vars_tagged > 0L) {
-    cli::cli_inform(
-      "Found native tagged missing values in {n_vars_tagged} variable{?s}."
-    )
-  }
+  # Step 1: detect native extended missing values (shared helper)
+  data <- .detect_native_tags(data, "stata", verbose)
 
   # Step 2: Convert user-specified missing values to tagged NAs
   if (!is.null(tag.na)) {

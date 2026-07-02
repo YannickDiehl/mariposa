@@ -638,7 +638,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         result_df$is_weighted <- test_result$is_weighted
         result_df
       }, error = function(e) {
-        stop(e$message)
+        cli_abort("t_test() failed: {e$message}", parent = e)
       })
     })
     

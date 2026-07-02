@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
 Title: SPSS-Compatible Statistical Tools for Survey Data
-Version: 0.7.0
+Version: 0.7.1
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
@@ -31,8 +31,7 @@ Imports:
     dplyr,
     rlang,
     tidyselect,
-    tibble,
-    tidyr
+    tibble
 Suggests:
     testthat (>= 3.0.0),
     knitr,

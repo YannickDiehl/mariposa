@@ -446,12 +446,7 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
 #'
 #' @export
 to_labelled <- function(data, ..., labels = NULL, label = NULL) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for {.fn to_labelled}.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("{.fn to_labelled}")
 
   if (!is.data.frame(data)) {
     return(.to_labelled_vec(data, labels, label))

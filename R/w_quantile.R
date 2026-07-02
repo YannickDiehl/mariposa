@@ -105,8 +105,9 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
     weights_arg <- substitute(weights)
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
     
-    if (.are_weights(weights_vec)) .check_weights(weights_vec)
-    if (!.are_weights(weights_vec)) {
+    weighted <- .are_weights(weights_vec)
+    if (weighted) .check_weights(weights_vec)
+    if (!weighted) {
       # Unweighted calculation
       if (na.rm) x <- x[!is.na(x)]
       # Type 6 = SPSS HAVERAGE (R default type 7 is NOT SPSS-compatible)
@@ -310,14 +311,14 @@ print.w_quantile <- function(x, digits = 3, ...) {
       group_values <- groups[i, , drop = FALSE]
       
       # Format group info with factor levels if available
-      group_info <- sapply(names(group_values), function(g) {
+      group_info <- vapply(names(group_values), function(g) {
         val <- group_values[[g]]
         if (is.factor(val)) {
           paste(g, "=", levels(val)[val])
         } else {
           paste(g, "=", val)
         }
-      })
+      }, character(1))
       group_info <- paste(group_info, collapse = ", ")
       
       # Filter results for current group

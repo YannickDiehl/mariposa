@@ -62,12 +62,7 @@
 #'
 #' @export
 write_xpt <- function(data, path, version = 5, name = NULL) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for SAS transport export.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("SAS transport export")
 
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame.")

@@ -65,12 +65,7 @@
 #'
 #' @export
 write_stata <- function(data, path, version = 14) {
-  if (!requireNamespace("haven", quietly = TRUE)) {
-    cli::cli_abort(c(
-      "Package {.pkg haven} is required for Stata export.",
-      "i" = "Install it with: {.code install.packages(\"haven\")}"
-    ))
-  }
+  .check_haven("Stata export")
 
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame.")

@@ -119,6 +119,9 @@ reference:
   - ancova
   - mann_whitney
   - chi_square
+  - phi
+  - cramers_v
+  - goodman_gamma
   - fisher_test
   - chisq_gof
   - mcnemar_test

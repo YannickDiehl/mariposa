@@ -126,7 +126,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
 
   # Handle show.labels logic: auto-detect or use explicit user setting
   if (show.labels == "auto") {
-    has_meaningful_labels <- any(sapply(var_names, function(var) {
+    has_meaningful_labels <- any(vapply(var_names, function(var) {
       x <- data[[var]]
       
       # For factors, check if levels are different from their numeric representation
@@ -164,7 +164,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
       # This is just a variable description, not value labels
       
       return(FALSE)
-    }))
+    }, logical(1)))
     
     # Set show.labels based on auto-detection
     show.labels <- has_meaningful_labels
@@ -189,10 +189,10 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
     groups = grp_vars,
     is_grouped = is_grouped,
     options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels, show.unused = show.unused),
-    labels = sapply(var_names, function(var) {
-      lbl <- attr(data[[var]], "label")
+    labels = vapply(var_names, function(var) {
+      lbl <- attr(data[[var]], "label", exact = TRUE)
       if (is.null(lbl)) var else paste(as.character(lbl), collapse = " | ")
-    })
+    }, character(1))
   ), class = "frequency")
 }
 
@@ -260,7 +260,7 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
       x_valid <- x[valid_idx]
       w_valid <- w[valid_idx]
       unique_vals <- sort(unique(x_valid))
-      freq_weighted <- sapply(unique_vals, function(val) sum(w_valid[x_valid == val]))
+      freq_weighted <- vapply(unique_vals, function(val) sum(w_valid[x_valid == val]), numeric(1))
       n_eff <- (sum(w_valid))^2 / sum(w_valid^2)
     } else {
       unique_vals <- numeric(0)

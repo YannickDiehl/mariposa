@@ -40,8 +40,9 @@
     weights_arg <- substitute(weights)
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
 
-    if (.are_weights(weights_vec)) .check_weights(weights_vec)
-    if (!.are_weights(weights_vec)) {
+    weighted <- .are_weights(weights_vec)
+    if (weighted) .check_weights(weights_vec)
+    if (!weighted) {
       # Unweighted
       if (na.rm) x <- x[!is.na(x)]
       return(stat_fn(x, w = NULL))

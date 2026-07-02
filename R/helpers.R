@@ -380,3 +380,20 @@ get_value_labels <- function(x, freq_names) {
   list(rankhat = rankhat, V = V, E_V = E_V, Var_V = Var_V, Z = Z,
        p_value = 2 * stats::pnorm(abs(Z), lower.tail = FALSE), N_pop = N_pop)
 }
+
+#' Require the haven package for an import/export feature
+#'
+#' Central guard replacing 20+ hand-rolled requireNamespace blocks
+#' (pattern borrowed from .check_openxlsx2 in write_xlsx.R).
+#'
+#' @param purpose Short text naming the feature, e.g. "SPSS import"
+#' @keywords internal
+.check_haven <- function(purpose) {
+  if (!requireNamespace("haven", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Package {.pkg haven} is required for {purpose}.",
+      "i" = "Install it with: {.code install.packages(\"haven\")}"
+    ), call = rlang::caller_env())
+  }
+  invisible(TRUE)
+}
