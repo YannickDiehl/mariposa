@@ -317,13 +317,13 @@ test_that("Test 3c: Mann-Whitney age by gender, grouped by region — matches SP
 r_only_baselines <- list(
   life_satisfaction = list(U = 722281.0998, W = 1383240.4633,
                             Z = 1.0201, p_value = 0.307792,
-                            effect_size_r = 0.020736),
+                            r_effect = 0.020736),
   income            = list(U = 592273.4323, W = 1257619.3267,
                             Z = -0.7552, p_value = 0.450199,
-                            effect_size_r = 0.016158),
+                            r_effect = 0.016158),
   age               = list(U = 784976.7372, W = 1658760.4203,
                             Z = -0.2023, p_value = 0.839703,
-                            effect_size_r = 0.004047)
+                            r_effect = 0.004047)
 )
 
 compare_weighted_baseline <- function(row, baseline, scenario) {

@@ -24,11 +24,15 @@
 #' @param ... Additional arguments (currently unused)
 #'
 #' @return Test results showing whether paired proportions changed, including:
-#' - McNemar chi-square statistic (with continuity correction)
+#' - McNemar chi-square statistic (\code{chi_squared}, with continuity
+#'   correction)
 #' - Asymptotic p-value
 #' - Exact binomial p-value (two-sided)
 #' - 2x2 contingency table
 #' - Discordant pair counts (b and c)
+#'
+#' Note: the \code{statistic} results column is a deprecated duplicate of
+#' \code{chi_squared} and will be removed in mariposa 0.6.11.
 #'
 #' @details
 #' ## Understanding the Results
@@ -218,7 +222,8 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
         cbind(
           group_keys_df[i, , drop = FALSE],
           data.frame(
-            statistic = res$statistic,
+            chi_squared = res$statistic,
+            statistic = res$statistic,  # deprecated duplicate, remove in 0.6.11
             p_value = res$p_value,
             exact_p = res$exact_p,
             n = res$n,
@@ -231,7 +236,8 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
         cbind(
           group_keys_df[i, , drop = FALSE],
           data.frame(
-            statistic = NA_real_,
+            chi_squared = NA_real_,
+            statistic = NA_real_,  # deprecated duplicate, remove in 0.6.11
             p_value = NA_real_,
             exact_p = NA_real_,
             n = NA_integer_,
@@ -266,7 +272,8 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
     res <- perform_single_mcnemar(data)
 
     results_df <- data.frame(
-      statistic = res$statistic,
+      chi_squared = res$statistic,
+      statistic = res$statistic,  # deprecated duplicate, remove in 0.6.11
       p_value = res$p_value,
       exact_p = res$exact_p,
       n = res$n,
@@ -349,7 +356,7 @@ print.mcnemar_test <- function(x, digits = 3, ...) {
       if (nrow(group_results) == 0) next
 
       cat(sprintf("McNemar Test: %s%s\n", pair_label, weighted_tag))
-      print_row(group_results$statistic[1], group_results$p_value[1],
+      print_row(group_results$chi_squared[1], group_results$p_value[1],
                 group_results$exact_p[1], group_results$n[1])
     }
   } else {
@@ -467,7 +474,7 @@ print.summary.mcnemar_test <- function(x, ...) {
           sig <- add_significance_stars(group_results$exact_p[1])
 
           display <- data.frame(
-            `Chi-Sq` = round(group_results$statistic[1], 3),
+            `Chi-Sq` = round(group_results$chi_squared[1], 3),
             `p (asymp)` = ifelse(group_results$p_value[1] < 0.001, "<.001",
                                  format(round(group_results$p_value[1], digits),
                                         nsmall = digits)),

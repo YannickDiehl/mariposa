@@ -34,9 +34,12 @@
 #' @return Test results showing whether groups differ, including:
 #' - U and W statistics (test statistics)
 #' - Z-score and p-value (are groups different?)
-#' - Effect size r (how big is the difference?)
+#' - Effect size r (\code{r_effect}, how big is the difference?)
 #' - Rank means for each group (which group is higher?)
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
+#'
+#' Note: the \code{effect_size_r} results column is a deprecated duplicate of
+#' \code{r_effect} and will be removed in mariposa 0.6.11.
 #'
 #' @details
 #' ## Understanding the Results
@@ -380,7 +383,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
           W = result$W,
           Z = result$Z,
           p_value = result$p_value,
-          effect_size_r = result$effect_size_r,
+          r_effect = result$effect_size_r,
+          effect_size_r = result$effect_size_r,  # deprecated duplicate, remove in 0.6.11
           rank_mean_diff = result$rank_mean_diff,
           group_stats = list(result$group_stats)
         )
@@ -393,7 +397,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
           W = NA_real_,
           Z = NA_real_,
           p_value = NA_real_,
-          effect_size_r = NA_real_,
+          r_effect = NA_real_,
+          effect_size_r = NA_real_,  # deprecated duplicate, remove in 0.6.11
           rank_mean_diff = NA_real_,
           group_stats = list(NULL)
         )
@@ -469,7 +474,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
                  format(round(row_data$W, 0), big.mark = ",")),
       Z = round(row_data$Z, digits),
       p_value = round(row_data$p_value, digits),
-      effect_r = round(row_data$effect_size_r, digits),
+      effect_r = round(row_data$r_effect, digits),
       sig = row_data$sig,
       stringsAsFactors = FALSE
     )
@@ -491,7 +496,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   # Effect size detail (gated by effect_sizes toggle, only in summary output)
   if (show_effect_sizes && !show_results) {
     # Stand-alone effect size when results table is hidden
-    r_val <- row_data$effect_size_r
+    r_val <- row_data$r_effect
     if (!is.na(r_val)) {
       r_interp <- if (abs(r_val) < 0.1) "negligible"
                   else if (abs(r_val) < 0.3) "small"
@@ -509,7 +514,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   U_val    <- results$U[i]
   Z_val    <- results$Z[i]
   p_val    <- as.numeric(results$p_value[i])
-  r_val    <- results$effect_size_r[i]
+  r_val    <- results$r_effect[i]
 
   cat(sprintf("Mann-Whitney U Test: %s%s%s\n", var_name, group_tag, weighted_tag))
 
@@ -570,8 +575,8 @@ print.mann_whitney <- function(x, digits = 3, ...) {
 
   if (isTRUE(x$is_grouped)) {
     group_vars <- setdiff(names(results), c("Variable", "U", "W", "Z", "p_value",
-                                             "effect_size_r", "rank_mean_diff",
-                                             "group_stats"))
+                                             "r_effect", "effect_size_r",
+                                             "rank_mean_diff", "group_stats"))
     groups <- unique(results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -700,8 +705,9 @@ print.summary.mann_whitney <- function(x, ...) {
   if (is_grouped_data) {
     # Get unique groups
     group_vars <- setdiff(names(x$results), c("Variable", "U", "W", "Z", "p_value",
-                                               "effect_size_r", "rank_mean_diff",
-                                               "group_stats", "sig"))
+                                               "r_effect", "effect_size_r",
+                                               "rank_mean_diff", "group_stats",
+                                               "sig"))
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {

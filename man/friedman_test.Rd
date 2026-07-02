@@ -20,12 +20,15 @@ them individually or use helpers like \code{starts_with("trust_")}}
 \value{
 Test results showing whether the measurements differ, including:
 \itemize{
-\item Chi-Square statistic (Friedman test statistic)
+\item Chi-Square statistic (\code{chi_squared}, the Friedman test statistic)
 \item Degrees of freedom (number of measurements minus 1)
 \item P-value (are measurements different?)
 \item Kendall's W (effect size: how strong is the overall pattern?)
 \item Mean rank for each measurement (which measurements are higher/lower?)
 }
+
+Note: the \code{chi_sq} results column is a deprecated duplicate of
+\code{chi_squared} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{friedman_test()} compares three or more related measurements from the

@@ -21,11 +21,14 @@ proportions are assumed.}
 Test results showing whether observed frequencies match expected,
 including:
 \itemize{
-\item Chi-square statistic and p-value for each variable
+\item Chi-square statistic (\code{chi_squared}) and p-value for each variable
 \item Degrees of freedom
 \item Frequency table with observed, expected, and residual counts
 \item Sample size (N)
 }
+
+Note: the \code{chi_sq} results column is a deprecated duplicate of
+\code{chi_squared} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{chisq_gof()} tests whether observed frequencies of a categorical

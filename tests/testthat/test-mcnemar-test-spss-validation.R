@@ -6,7 +6,7 @@
 # Reference output: tests/spss_reference/outputs/mcnemar_test_output.txt
 #
 # SPSS uses derived binary variables (trust_*_high = trust_* >= 4).
-# mariposa exposes: statistic (chi²), p_value (asymptotic), exact_p, N, b, c.
+# mariposa exposes: chi_squared, p_value (asymptotic), exact_p, N, b, c.
 # =============================================================================
 
 library(testthat)

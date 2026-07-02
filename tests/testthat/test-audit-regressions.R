@@ -532,3 +532,51 @@ test_that("t_test results carry conf_int_* and no duplicated CI_* aliases", {
   expect_true(all(c("conf_int_lower", "conf_int_upper") %in% names(res$results)))
   expect_false(any(c("CI_lower", "CI_upper") %in% names(res$results)))
 })
+
+# --- Stage 6: column harmonization (0.6.10) -------------------------------------
+# Canonical result-column names with the old name kept as a deprecated
+# duplicate for one release (removed in 0.6.11, per VERSIONING_POLICY §4.3).
+
+test_that("chisq_gof results carry chi_squared with chi_sq as deprecated duplicate", {
+  res <- chisq_gof(survey_data, gender)
+  cols <- names(res$results)
+  expect_true(all(c("chi_squared", "chi_sq") %in% cols))
+  expect_identical(res$results$chi_squared, res$results$chi_sq)
+  # canonical column comes first (chi_sq is the trailing duplicate)
+  expect_lt(match("chi_squared", cols), match("chi_sq", cols))
+})
+
+test_that("friedman_test results carry chi_squared with chi_sq as deprecated duplicate", {
+  res <- friedman_test(survey_data, trust_government, trust_media, trust_science)
+  cols <- names(res$results)
+  expect_true(all(c("chi_squared", "chi_sq") %in% cols))
+  expect_identical(res$results$chi_squared, res$results$chi_sq)
+  expect_lt(match("chi_squared", cols), match("chi_sq", cols))
+})
+
+test_that("mcnemar_test results carry chi_squared with statistic as deprecated duplicate", {
+  test_data <- transform(survey_data,
+    trust_gov_high = as.integer(trust_government >= 4),
+    trust_media_high = as.integer(trust_media >= 4))
+  res <- mcnemar_test(test_data, var1 = trust_gov_high, var2 = trust_media_high)
+  cols <- names(res$results)
+  expect_true(all(c("chi_squared", "statistic") %in% cols))
+  expect_identical(res$results$chi_squared, res$results$statistic)
+  expect_lt(match("chi_squared", cols), match("statistic", cols))
+})
+
+test_that("mann_whitney results carry r_effect with effect_size_r as deprecated duplicate", {
+  res <- mann_whitney(survey_data, life_satisfaction, group = gender)
+  cols <- names(res$results)
+  expect_true(all(c("r_effect", "effect_size_r") %in% cols))
+  expect_identical(res$results$r_effect, res$results$effect_size_r)
+  expect_lt(match("r_effect", cols), match("effect_size_r", cols))
+})
+
+test_that("oneway_anova results carry F_statistic with F_stat as deprecated duplicate", {
+  res <- oneway_anova(survey_data, life_satisfaction, group = education)
+  cols <- names(res$results)
+  expect_true(all(c("F_statistic", "F_stat") %in% cols))
+  expect_identical(res$results$F_statistic, res$results$F_stat)
+  expect_lt(match("F_statistic", cols), match("F_stat", cols))
+})

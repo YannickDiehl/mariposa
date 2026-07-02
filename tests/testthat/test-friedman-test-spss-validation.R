@@ -108,7 +108,7 @@ spss_values <- list(
 # =============================================================================
 
 compare_friedman <- function(row, spss, scenario) {
-  assert_spss(as.numeric(row$chi_sq), spss$chi_sq,
+  assert_spss(as.numeric(row$chi_squared), spss$chi_sq,
               tier = "display", precision = 3,
               label = sprintf("[%s] Chi-Square", scenario))
   assert_spss_count(as.numeric(row$df), spss$df,
@@ -132,8 +132,8 @@ compare_friedman <- function(row, spss, scenario) {
 
 extract_grouped_row <- function(result, group_value) {
   r <- result$results
-  group_cols <- setdiff(names(r), c("chi_sq", "df", "p_value", "kendall_w",
-                                     "n", "k", "mean_ranks"))
+  group_cols <- setdiff(names(r), c("chi_squared", "chi_sq", "df", "p_value",
+                                     "kendall_w", "n", "k", "mean_ranks"))
   if (length(group_cols) == 0L) stop("not a grouped result")
   # Just take the first group column
   gc <- group_cols[1]
@@ -225,8 +225,8 @@ test_that("Test 5b: Friedman longitudinal, grouped by treatment group — matche
 # =============================================================================
 
 r_only_baselines <- list(
-  trust     = list(chi_sq = 1012.0840, df = 2L, p_value = 0.0000000, n = 2150L),
-  lifestyle = list(chi_sq =  551.7114, df = 2L, p_value = 0.0000000, n = 2152L)
+  trust     = list(chi_squared = 1012.0840, df = 2L, p_value = 0.0000000, n = 2150L),
+  lifestyle = list(chi_squared =  551.7114, df = 2L, p_value = 0.0000000, n = 2152L)
 )
 
 compare_weighted_baseline <- function(row, baseline, scenario) {

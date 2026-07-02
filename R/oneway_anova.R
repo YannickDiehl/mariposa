@@ -28,11 +28,14 @@
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #'
 #' @return ANOVA results showing whether groups differ, including:
-#' - F-statistic and p-value (are groups different?)
+#' - F-statistic (\code{F_statistic}) and p-value (are groups different?)
 #' - Effect sizes (how much do groups matter?)
 #' - Group statistics (means and standard deviations)
 #' - Both standard and Welch ANOVA results
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
+#'
+#' Note: the \code{F_stat} results column is a deprecated duplicate of
+#' \code{F_statistic} and will be removed in mariposa 0.6.11.
 #'
 #' @details
 #' ## Understanding the Results
@@ -238,7 +241,8 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
           # Create error data frame with explicit dimensions
           error_df <- data.frame(
             Variable = var_name_safe,
-            F_stat = NA,
+            F_statistic = NA,
+            F_stat = NA,  # deprecated duplicate, remove in 0.6.11
             df1 = NA,
             df2 = NA,
             p_value = NA,
@@ -589,7 +593,8 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
 .anova_result_row <- function(anova_result, var_name, group_info = NULL) {
   cols <- list(
     Variable = var_name,
-    F_stat = anova_result$f_stat,
+    F_statistic = anova_result$f_stat,
+    F_stat = anova_result$f_stat,  # deprecated duplicate, remove in 0.6.11
     df1 = anova_result$df1,
     df2 = anova_result$df2,
     p_value = anova_result$p_value,
@@ -668,7 +673,7 @@ print.oneway_anova <- function(x, digits = 3, ...) {
 #' @noRd
 .print_oneway_anova_compact <- function(results, i, group_tag, weighted_tag, digits) {
   var_name <- results$Variable[i]
-  f_val    <- results$F_stat[i]
+  f_val    <- results$F_statistic[i]
   df1_val  <- results$df1[i]
   df2_val  <- results$df2[i]
   p_val    <- as.numeric(results$p_value[i])

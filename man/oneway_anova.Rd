@@ -33,12 +33,15 @@ test are always both computed and displayed.}
 \value{
 ANOVA results showing whether groups differ, including:
 \itemize{
-\item F-statistic and p-value (are groups different?)
+\item F-statistic (\code{F_statistic}) and p-value (are groups different?)
 \item Effect sizes (how much do groups matter?)
 \item Group statistics (means and standard deviations)
 \item Both standard and Welch ANOVA results
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
+
+Note: the \code{F_stat} results column is a deprecated duplicate of
+\code{F_statistic} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{oneway_anova()} helps you determine if average values differ across

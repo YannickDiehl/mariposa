@@ -26,10 +26,13 @@
 #'
 #' @return Test results showing whether observed frequencies match expected,
 #'   including:
-#' - Chi-square statistic and p-value for each variable
+#' - Chi-square statistic (\code{chi_squared}) and p-value for each variable
 #' - Degrees of freedom
 #' - Frequency table with observed, expected, and residual counts
 #' - Sample size (N)
+#'
+#' Note: the \code{chi_sq} results column is a deprecated duplicate of
+#' \code{chi_squared} and will be removed in mariposa 0.6.11.
 #'
 #' @details
 #' ## Understanding the Results
@@ -245,7 +248,8 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
             group_keys_df[i, , drop = FALSE],
             data.frame(
               Variable = vn,
-              chi_sq = res$chi_sq,
+              chi_squared = res$chi_sq,
+              chi_sq = res$chi_sq,  # deprecated duplicate, remove in 0.6.11
               df = res$df,
               p_value = res$p_value,
               n = res$n,
@@ -257,7 +261,8 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
             group_keys_df[i, , drop = FALSE],
             data.frame(
               Variable = vn,
-              chi_sq = NA_real_,
+              chi_squared = NA_real_,
+              chi_sq = NA_real_,  # deprecated duplicate, remove in 0.6.11
               df = NA_integer_,
               p_value = NA_real_,
               n = NA_integer_,
@@ -290,7 +295,8 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
         list(
           row = data.frame(
             Variable = vn,
-            chi_sq = res$chi_sq,
+            chi_squared = res$chi_sq,
+            chi_sq = res$chi_sq,  # deprecated duplicate, remove in 0.6.11
             df = res$df,
             p_value = res$p_value,
             n = res$n,
@@ -302,7 +308,8 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
         list(
           row = data.frame(
             Variable = vn,
-            chi_sq = NA_real_,
+            chi_squared = NA_real_,
+            chi_sq = NA_real_,  # deprecated duplicate, remove in 0.6.11
             df = NA_integer_,
             p_value = NA_real_,
             n = NA_integer_,
@@ -344,7 +351,7 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
               results$Variable[i], weighted_tag))
   cat(sprintf("  chi2(%s) = %s, %s %s, N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
-              fmt_num(results$chi_sq[i], digits),
+              fmt_num(results$chi_squared[i], digits),
               fmt_p(results$p_value[i], digits, style = "compact"),
               add_significance_stars(results$p_value[i]),
               formatC(as.integer(results$n[i]), format = "d")))
@@ -536,7 +543,7 @@ print.summary.chisq_gof <- function(x, ...) {
 .print_gof_table <- function(results_df, digits = 4) {
   display <- data.frame(
     Variable = results_df$Variable,
-    `Chi-Square` = round(results_df$chi_sq, 3),
+    `Chi-Square` = round(results_df$chi_squared, 3),
     df = as.integer(results_df$df),
     `p-value` = ifelse(results_df$p_value < 0.001, "<.001",
                        format(round(results_df$p_value, digits),

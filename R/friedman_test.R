@@ -24,11 +24,14 @@
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95 percent)
 #'
 #' @return Test results showing whether the measurements differ, including:
-#' - Chi-Square statistic (Friedman test statistic)
+#' - Chi-Square statistic (\code{chi_squared}, the Friedman test statistic)
 #' - Degrees of freedom (number of measurements minus 1)
 #' - P-value (are measurements different?)
 #' - Kendall's W (effect size: how strong is the overall pattern?)
 #' - Mean rank for each measurement (which measurements are higher/lower?)
+#'
+#' Note: the \code{chi_sq} results column is a deprecated duplicate of
+#' \code{chi_squared} and will be removed in mariposa 0.6.11.
 #'
 #' @details
 #' ## Understanding the Results
@@ -234,7 +237,8 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
       result <- perform_single_friedman(data, var_names, w_name)
 
       tibble(
-        chi_sq = result$chi_sq,
+        chi_squared = result$chi_sq,
+        chi_sq = result$chi_sq,  # deprecated duplicate, remove in 0.6.11
         df = result$df,
         p_value = result$p_value,
         kendall_w = result$kendall_w,
@@ -245,7 +249,8 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
     }, error = function(e) {
       cli_warn("Friedman test failed: {e$message}")
       tibble(
-        chi_sq = NA_real_,
+        chi_squared = NA_real_,
+        chi_sq = NA_real_,  # deprecated duplicate, remove in 0.6.11
         df = NA_integer_,
         p_value = NA_real_,
         kendall_w = NA_real_,
@@ -310,7 +315,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
   if (show_results) {
     test_df <- data.frame(
       N = as.integer(row_data$n),
-      `Chi-Square` = round(row_data$chi_sq, digits),
+      `Chi-Square` = round(row_data$chi_squared, digits),
       df = as.integer(row_data$df),
       `p value` = round(row_data$p_value, digits),
       `Kendall's W` = round(row_data$kendall_w, digits),
@@ -339,7 +344,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
   cat(sprintf("Friedman Test: %s%s\n", var_label, weighted_tag))
   cat(sprintf("  chi2(%s) = %s, %s %s, W = %s, N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
-              fmt_num(results$chi_sq[i], digits),
+              fmt_num(results$chi_squared[i], digits),
               fmt_p(results$p_value[i], digits, style = "compact"),
               add_significance_stars(results$p_value[i]),
               fmt_num(results$kendall_w[i], digits),
@@ -376,8 +381,8 @@ print.friedman_test <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("chi_sq", "df", "p_value",
-                                            "kendall_w", "n", "k",
+    group_vars <- setdiff(names(results), c("chi_squared", "chi_sq", "df",
+                                            "p_value", "kendall_w", "n", "k",
                                             "mean_ranks"))
     groups <- unique(results[group_vars])
 
@@ -490,9 +495,9 @@ print.summary.friedman_test <- function(x, ...) {
 
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("chi_sq", "df", "p_value",
-                                                "kendall_w", "n", "k",
-                                                "mean_ranks", "sig"))
+    group_vars <- setdiff(names(x$results), c("chi_squared", "chi_sq", "df",
+                                                "p_value", "kendall_w", "n",
+                                                "k", "mean_ranks", "sig"))
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {

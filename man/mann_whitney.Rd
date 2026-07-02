@@ -41,10 +41,13 @@ Test results showing whether groups differ, including:
 \itemize{
 \item U and W statistics (test statistics)
 \item Z-score and p-value (are groups different?)
-\item Effect size r (how big is the difference?)
+\item Effect size r (\code{r_effect}, how big is the difference?)
 \item Rank means for each group (which group is higher?)
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
+
+Note: the \code{effect_size_r} results column is a deprecated duplicate of
+\code{r_effect} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{mann_whitney()} compares two groups when your data isn't normally

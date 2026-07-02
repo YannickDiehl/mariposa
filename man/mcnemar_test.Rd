@@ -22,12 +22,16 @@ mcnemar_test(data, var1, var2, weights = NULL, correct = TRUE, ...)
 \value{
 Test results showing whether paired proportions changed, including:
 \itemize{
-\item McNemar chi-square statistic (with continuity correction)
+\item McNemar chi-square statistic (\code{chi_squared}, with continuity
+correction)
 \item Asymptotic p-value
 \item Exact binomial p-value (two-sided)
 \item 2x2 contingency table
 \item Discordant pair counts (b and c)
 }
+
+Note: the \code{statistic} results column is a deprecated duplicate of
+\code{chi_squared} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{mcnemar_test()} tests whether paired proportions have changed between

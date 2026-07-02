@@ -27,7 +27,7 @@ data(survey_data, envir = environment())
 
 
 compare_gof <- function(row, spss, scenario) {
-  assert_spss(as.numeric(row$chi_sq), spss$chi_sq,
+  assert_spss(as.numeric(row$chi_squared), spss$chi_sq,
               tier = "display", precision = 3,
               label = sprintf("[%s] chi²", scenario))
   assert_spss_count(as.numeric(row$df), spss$df,
@@ -68,5 +68,5 @@ test_that("Test 5: chisq_gof interview_mode — matches SPSS", {
 test_that("Test grouped: chisq_gof gender grouped by region — structural", {
   r <- survey_data |> group_by(region) |> chisq_gof(gender)
   expect_equal(nrow(r$results), 2L)
-  expect_true(all(r$results$chi_sq > 0))
+  expect_true(all(r$results$chi_squared > 0))
 })
