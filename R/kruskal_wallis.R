@@ -368,11 +368,12 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
 # Helper: print a single variable block (rank table + test statistics)
 #' @noRd
-.print_kw_variable_block <- function(var_name, row_data, stats, weights, digits) {
+.print_kw_variable_block <- function(var_name, row_data, stats, weights, digits,
+                                     show_ranks = TRUE, show_results = TRUE) {
   print_header(var_name, newline_before = FALSE)
 
-  # Print group rank table
-  if (!is.null(stats)) {
+  # Print group rank table (gated by ranks toggle)
+  if (show_ranks && !is.null(stats)) {
     cat("  Ranks:\n")
     rank_df <- data.frame(
       Group = sapply(stats, function(s) s$name),
@@ -405,44 +406,167 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     cat("  ", border, "\n\n", sep = "")
   }
 
-  # Print test statistics table
-  test_df <- data.frame(
-    `Kruskal-Wallis H` = round(row_data$H, digits),
-    df = as.integer(row_data$df),
-    `p value` = round(row_data$p_value, digits),
-    `Epsilon-squared` = round(row_data$epsilon_squared, digits),
-    sig = row_data$sig,
-    check.names = FALSE,
-    stringsAsFactors = FALSE
-  )
+  # Print test statistics table (gated by results toggle)
+  if (show_results) {
+    test_df <- data.frame(
+      `Kruskal-Wallis H` = round(row_data$H, digits),
+      df = as.integer(row_data$df),
+      `p value` = round(row_data$p_value, digits),
+      `Epsilon-squared` = round(row_data$epsilon_squared, digits),
+      sig = row_data$sig,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
 
-  label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
-  cat(sprintf("  %s\n", label))
-  output <- capture.output(print(test_df, row.names = FALSE))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
+    label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
+    cat(sprintf("  %s\n", label))
+    output <- capture.output(print(test_df, row.names = FALSE))
+    border_width <- max(nchar(output), na.rm = TRUE)
+    border <- paste(rep("-", border_width), collapse = "")
 
-  cat("  ", border, "\n", sep = "")
-  for (line in output) {
-    cat("  ", line, "\n", sep = "")
+    cat("  ", border, "\n", sep = "")
+    for (line in output) {
+      cat("  ", line, "\n", sep = "")
+    }
+    cat("  ", border, "\n\n", sep = "")
   }
-  cat("  ", border, "\n\n", sep = "")
 }
 
-#' Print method for Kruskal-Wallis test results
+# Internal: compact one-line summary for a single Kruskal-Wallis variable
+#' @noRd
+.print_kw_compact <- function(results, i, group_tag, weighted_tag, digits) {
+  cat(sprintf("Kruskal-Wallis Test: %s%s%s\n",
+              results$Variable[i], group_tag, weighted_tag))
+  cat(sprintf("  H(%s) = %s, %s %s, eps2 = %s, N = %s\n",
+              formatC(as.integer(results$df[i]), format = "d"),
+              fmt_num(results$H[i], digits),
+              fmt_p(results$p_value[i], digits, style = "compact"),
+              add_significance_stars(results$p_value[i]),
+              fmt_num(results$epsilon_squared[i], digits),
+              formatC(as.integer(results$n_total[i]), format = "d")))
+}
+
+#' Print Kruskal-Wallis test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"kruskal_wallis"}.
+#' Shows a one-line summary per variable with the H statistic, p-value,
+#' effect size (epsilon-squared), and sample size.
+#'
+#' For the full detailed output (rank tables, test statistics), use
+#' \code{summary()}.
 #'
 #' @param x A kruskal_wallis object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- kruskal_wallis(survey_data, life_satisfaction, group = education)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
 #' @method print kruskal_wallis
 print.kruskal_wallis <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_tag <- if (!is.null(x$group)) paste0(" by ", x$group) else ""
+  results <- x$results
+  results$p_value <- as.numeric(results$p_value)
+
+  if (isTRUE(x$is_grouped)) {
+    group_vars <- setdiff(names(results), c("Variable", "H", "df", "p_value",
+                                            "epsilon_squared", "n_total",
+                                            "group_stats"))
+    groups <- unique(results[group_vars])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      group_results <- group_results[!is.na(group_results$Variable), ]
+      for (j in seq_len(nrow(group_results))) {
+        .print_kw_compact(group_results, j, group_tag, weighted_tag, digits)
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(results))) {
+      if (is.na(results$Variable[i])) next
+      .print_kw_compact(results, i, group_tag, weighted_tag, digits)
+    }
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for Kruskal-Wallis test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including rank statistics per group and the test statistics table with
+#' H, degrees of freedom, p-value, and epsilon-squared.
+#'
+#' @param object A \code{kruskal_wallis} result object.
+#' @param ranks Logical. Show rank statistics per group? (Default: TRUE)
+#' @param results Logical. Show test statistics table? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.kruskal_wallis} object.
+#'
+#' @examples
+#' result <- kruskal_wallis(survey_data, life_satisfaction, group = education)
+#' summary(result)
+#' summary(result, ranks = FALSE)
+#'
+#' @seealso \code{\link{kruskal_wallis}} for the main analysis function.
+#' @export
+#' @method summary kruskal_wallis
+summary.kruskal_wallis <- function(object, ranks = TRUE, results = TRUE,
+                                   digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(ranks = ranks, results = results),
+    digits     = digits,
+    class_name = "summary.kruskal_wallis"
+  )
+}
+
+#' Print summary of Kruskal-Wallis test results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a Kruskal-Wallis test, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.kruskal_wallis}}.  Sections include the per-group
+#' rank table and the test statistics table with effect size.
+#'
+#' @param x A \code{summary.kruskal_wallis} object created by
+#'   \code{\link{summary.kruskal_wallis}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- kruskal_wallis(survey_data, life_satisfaction, group = education)
+#' summary(result)                # all sections
+#' summary(result, ranks = FALSE) # hide rank tables
+#'
+#' @seealso \code{\link{kruskal_wallis}} for the main analysis,
+#'   \code{\link{summary.kruskal_wallis}} for summary options.
+#' @export
+#' @method print summary.kruskal_wallis
+print.summary.kruskal_wallis <- function(x, ...) {
+  digits <- x$digits
 
   # Determine test type using standardized helper
   weights_name <- x$weights
   test_type <- get_standard_title("Kruskal-Wallis Test", weights_name, "Results")
-  print_header(test_type)
+  print_header(test_type, newline_before = FALSE)
 
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
@@ -450,7 +574,10 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
   # Add significance stars
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
 
-  # Template Standard: Dual grouped data detection
+  # Resolve show toggles
+  show_ranks   <- isTRUE(x$show$ranks)
+  show_results <- isTRUE(x$show$results)
+
   is_grouped_data <- isTRUE(x$is_grouped)
 
   # Print info section
@@ -489,7 +616,9 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
           row_data = group_results[j, ],
           stats    = group_results$group_stats[[j]],
           weights  = x$weights,
-          digits   = digits
+          digits   = digits,
+          show_ranks   = show_ranks,
+          show_results = show_results
         )
       }
     }
@@ -502,21 +631,25 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
         row_data = valid_results[i, ],
         stats    = valid_results$group_stats[[i]],
         weights  = x$weights,
-        digits   = digits
+        digits   = digits,
+        show_ranks   = show_ranks,
+        show_results = show_results
       )
     }
   }
 
-  if (!is.null(x$weights)) {
+  if (!is.null(x$weights) && (show_ranks || show_results)) {
     cat("Note: Weighted analysis uses frequency-weighted ranks.\n")
   }
 
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
 
-  cat("\nEffect Size Interpretation (Epsilon-squared):\n")
-  cat("- Small effect: 0.01 - 0.06\n")
-  cat("- Medium effect: 0.06 - 0.14\n")
-  cat("- Large effect: > 0.14\n")
+    cat("\nEffect Size Interpretation (Epsilon-squared):\n")
+    cat("- Small effect: 0.01 - 0.06\n")
+    cat("- Medium effect: 0.06 - 0.14\n")
+    cat("- Large effect: > 0.14\n")
+  }
 
   invisible(x)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/wilcoxon_test.R
 \name{print.wilcoxon_test}
 \alias{print.wilcoxon_test}
-\title{Print method for Wilcoxon signed-rank test results}
+\title{Print Wilcoxon signed-rank test results (compact)}
 \usage{
 \method{print}{wilcoxon_test}(x, digits = 3, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for Wilcoxon signed-rank test results
+Compact print method for objects of class \code{"wilcoxon_test"}.
+Shows a one-line summary per comparison with the Z statistic, p-value,
+effect size r, and sample size.
+
+For the full detailed output (rank tables, test statistics), use
+\code{summary()}.
+}
+\examples{
+result <- wilcoxon_test(survey_data, x = trust_government, y = trust_media)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

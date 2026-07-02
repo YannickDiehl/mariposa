@@ -2,7 +2,7 @@
 % Please edit documentation in R/kruskal_wallis.R
 \name{print.kruskal_wallis}
 \alias{print.kruskal_wallis}
-\title{Print method for Kruskal-Wallis test results}
+\title{Print Kruskal-Wallis test results (compact)}
 \usage{
 \method{print}{kruskal_wallis}(x, digits = 3, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for Kruskal-Wallis test results
+Compact print method for objects of class \code{"kruskal_wallis"}.
+Shows a one-line summary per variable with the H statistic, p-value,
+effect size (epsilon-squared), and sample size.
+
+For the full detailed output (rank tables, test statistics), use
+\code{summary()}.
+}
+\examples{
+result <- kruskal_wallis(survey_data, life_satisfaction, group = education)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

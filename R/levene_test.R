@@ -639,21 +639,174 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
   ))
 }
 
-#' Print method for Levene test results
+# Internal: compact one-line summary for a single Levene test row
+#' @noRd
+.print_levene_compact <- function(rows, i, group_tag, weighted_tag, digits) {
+  F_val <- rows$F_statistic[i]
+  df1   <- rows$df1[i]
+  df2   <- rows$df2[i]
+  p_val <- as.numeric(rows$p_value[i])
+  concl <- if ("conclusion" %in% names(rows)) rows$conclusion[i] else NA_character_
+
+  df2_str <- if (is.na(df2)) {
+    "NA"
+  } else if (abs(df2 - round(df2)) < 1e-8) {
+    formatC(as.integer(round(df2)), format = "d")
+  } else {
+    fmt_num(df2, 1)
+  }
+
+  concl_str <- if (!is.na(concl) && nzchar(concl)) {
+    paste0(", ", tolower(concl))
+  } else {
+    ""
+  }
+
+  cat(sprintf("Levene's Test: %s%s%s\n", rows$Variable[i], group_tag, weighted_tag))
+  cat(sprintf("  F(%s, %s) = %s, %s %s%s\n",
+              formatC(as.integer(df1), format = "d"), df2_str,
+              fmt_num(F_val, digits),
+              fmt_p(p_val, digits, style = "compact"),
+              add_significance_stars(p_val),
+              concl_str))
+}
+
+#' Print Levene test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"levene_test"}.
+#' Shows a one-line summary per variable with the F statistic, degrees of
+#' freedom, p-value, and the equal/unequal variances conclusion.
+#'
+#' For the full detailed output (results tables, interpretation,
+#' recommendation), use \code{summary()}.
 #'
 #' @param x A levene_test object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- levene_test(survey_data, life_satisfaction, group = education)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
 #' @method print levene_test
 print.levene_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_name <- x$group_var %||% x$group
+  group_tag <- if (!is.null(group_name)) paste0(" by ", group_name) else ""
+  results <- x$results
+
+  if (isTRUE(x$is_grouped) && "Group" %in% names(results)) {
+    # Direct grouped analysis: Group column like "region = East"
+    for (i in seq_len(nrow(results))) {
+      cat(sprintf("[%s]\n", results$Group[i]))
+      .print_levene_compact(results, i, group_tag, weighted_tag, digits)
+    }
+  } else if (isTRUE(x$is_grouped) && !is.null(x$groups) && length(x$groups) > 0 &&
+             all(x$groups %in% names(results))) {
+    # Grouped analysis with separate group columns
+    groups <- unique(results[x$groups])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      group_results <- group_results[!is.na(group_results$Variable), ]
+      for (j in seq_len(nrow(group_results))) {
+        .print_levene_compact(group_results, j, group_tag, weighted_tag, digits)
+      }
+    }
+  } else {
+    valid_results <- results[!is.na(results$Variable), ]
+    for (i in seq_len(nrow(valid_results))) {
+      .print_levene_compact(valid_results, i, group_tag, weighted_tag, digits)
+    }
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for Levene test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the per-variable results tables, the interpretation of the
+#' homogeneity-of-variance test, and the follow-up recommendation.
+#'
+#' @param object A \code{levene_test} result object.
+#' @param results Logical. Show the test results tables? (Default: TRUE)
+#' @param interpretation Logical. Show the interpretation section?
+#'   (Default: TRUE)
+#' @param recommendation Logical. Show the recommendation section (when
+#'   available)? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.levene_test} object.
+#'
+#' @examples
+#' result <- levene_test(survey_data, life_satisfaction, group = education)
+#' summary(result)
+#' summary(result, interpretation = FALSE)
+#'
+#' @seealso \code{\link{levene_test}} for the main analysis function.
+#' @export
+#' @method summary levene_test
+summary.levene_test <- function(object, results = TRUE, interpretation = TRUE,
+                                recommendation = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(results = results, interpretation = interpretation,
+                      recommendation = recommendation),
+    digits     = digits,
+    class_name = "summary.levene_test"
+  )
+}
+
+#' Print summary of Levene test results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for Levene's test of homogeneity of
+#' variance, with sections controlled by the boolean parameters passed to
+#' \code{\link{summary.levene_test}}.  Sections include the results
+#' tables, interpretation, and recommendation.
+#'
+#' @param x A \code{summary.levene_test} object created by
+#'   \code{\link{summary.levene_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- levene_test(survey_data, life_satisfaction, group = education)
+#' summary(result)                          # all sections
+#' summary(result, interpretation = FALSE)  # hide interpretation
+#'
+#' @seealso \code{\link{levene_test}} for the main analysis,
+#'   \code{\link{summary.levene_test}} for summary options.
+#' @export
+#' @method print summary.levene_test
+print.summary.levene_test <- function(x, ...) {
+  digits <- x$digits
 
   # Determine test type using standardized helper
   weights_name <- x$weights
   test_type <- get_standard_title("Levene's Test for Homogeneity of Variance", weights_name, "")
-  print_header(test_type)
-  
+  print_header(test_type, newline_before = FALSE)
+
+  # Resolve show toggles
+  show_results        <- isTRUE(x$show$results)
+  show_interpretation <- isTRUE(x$show$interpretation)
+  show_recommendation <- isTRUE(x$show$recommendation)
+
   # Print test information using standardized helpers
   cat("\n")
   group_name <- x$group_var %||% x$group
@@ -665,13 +818,13 @@ print.levene_test <- function(x, digits = 3, ...) {
   )
   print_info_section(test_info)
   cat("\n")
-  
+
   # Add significance stars
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
-  
+
   # Check if this is grouped data
   is_grouped_data <- isTRUE(x$is_grouped)
-    if (is_grouped_data) {
+  if (show_results && is_grouped_data) {
     # Handle grouped results - group by group identity, then show all variables for each group
     
     # Get unique groups
@@ -766,7 +919,7 @@ print.levene_test <- function(x, digits = 3, ...) {
       }
     }
     
-  } else {
+  } else if (show_results) {
     # Handle ungrouped results (original behavior)
     valid_results <- x$results[!is.na(x$results$Variable), ]
     
@@ -808,32 +961,38 @@ print.levene_test <- function(x, digits = 3, ...) {
     }
   }
   
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
+  }
 
-  cat("\nInterpretation:\n")
-  cat("- p > 0.05: Variances are homogeneous (equal variances assumed)\n")
-  cat("- p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)\n")
-  
-  # Always show recommendation for grouped data
-  if (is_grouped_data) {
-    cat("\nRecommendation based on Levene test:\n")
-    unequal_groups <- sum(x$results$p_value <= 0.05, na.rm = TRUE)
-    if (unequal_groups > 0) {
-      cat(sprintf("- %d group(s) show unequal variances (p <= 0.05)\n", unequal_groups))
-      cat("- Consider using Welch's t-test for groups with unequal variances\n")
-    } else {
-      cat("- All groups show equal variances (p > 0.05)\n")
-      cat("- Standard t-test assumptions are met for all groups\n")
-    }
-  } else if (!is.null(x$original_test)) {
-    cat("\nRecommendation based on Levene test:\n")
-    if (any(x$results$p_value <= 0.05, na.rm = TRUE)) {
-      cat("- Use Welch's t-test (unequal variances)\n")
-    } else {
-      cat("- Student's t-test or Welch's t-test both appropriate\n")
+  if (show_interpretation) {
+    cat("\nInterpretation:\n")
+    cat("- p > 0.05: Variances are homogeneous (equal variances assumed)\n")
+    cat("- p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)\n")
+  }
+
+  # Always show recommendation for grouped data (gated by recommendation toggle)
+  if (show_recommendation) {
+    if (is_grouped_data) {
+      cat("\nRecommendation based on Levene test:\n")
+      unequal_groups <- sum(x$results$p_value <= 0.05, na.rm = TRUE)
+      if (unequal_groups > 0) {
+        cat(sprintf("- %d group(s) show unequal variances (p <= 0.05)\n", unequal_groups))
+        cat("- Consider using Welch's t-test for groups with unequal variances\n")
+      } else {
+        cat("- All groups show equal variances (p > 0.05)\n")
+        cat("- Standard t-test assumptions are met for all groups\n")
+      }
+    } else if (!is.null(x$original_test)) {
+      cat("\nRecommendation based on Levene test:\n")
+      if (any(x$results$p_value <= 0.05, na.rm = TRUE)) {
+        cat("- Use Welch's t-test (unequal variances)\n")
+      } else {
+        cat("- Student's t-test or Welch's t-test both appropriate\n")
+      }
     }
   }
-  
+
   invisible(x)
 }
 

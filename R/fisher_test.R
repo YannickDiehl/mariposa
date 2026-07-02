@@ -250,17 +250,130 @@ fisher_test <- function(data, row, col, weights = NULL, ...) {
   return(result)
 }
 
-#' Print Fisher's exact test results
+#' Print Fisher's exact test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"fisher_test"}.
+#' Shows a one-line summary with the exact p-value, significance stars,
+#' and sample size.
+#'
+#' For the full detailed output (contingency table, test results), use
+#' \code{summary()}.
 #'
 #' @param x An object of class \code{"fisher_test"}
 #' @param digits Number of decimal places (default: 4)
 #' @param ... Additional arguments (currently unused)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- fisher_test(survey_data, row = gender, col = region)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
 print.fisher_test <- function(x, digits = 4, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  pair_label <- paste(x$row_var, "x", x$col_var)
+
+  print_row <- function(p_val, n_val) {
+    cat(sprintf("  %s %s, N = %s\n",
+                fmt_p(p_val, digits, style = "compact"),
+                add_significance_stars(p_val),
+                formatC(as.integer(n_val), format = "d")))
+  }
+
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(x$results[x$groups])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- x$results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      if (nrow(group_results) == 0) next
+
+      cat(sprintf("Fisher's Exact Test: %s%s\n", pair_label, weighted_tag))
+      print_row(group_results$p_value[1], group_results$n[1])
+    }
+  } else {
+    cat(sprintf("Fisher's Exact Test: %s%s\n", pair_label, weighted_tag))
+    print_row(x$p_value, x$n)
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for Fisher's exact test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the contingency table of observed frequencies and the test
+#' results table with method, exact p-value, and sample size.
+#'
+#' @param object A \code{fisher_test} result object.
+#' @param contingency_table Logical. Show the contingency table?
+#'   (Default: TRUE)
+#' @param results Logical. Show the test results table? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.fisher_test} object.
+#'
+#' @examples
+#' result <- fisher_test(survey_data, row = gender, col = region)
+#' summary(result)
+#' summary(result, contingency_table = FALSE)
+#'
+#' @seealso \code{\link{fisher_test}} for the main analysis function.
+#' @export
+#' @method summary fisher_test
+summary.fisher_test <- function(object, contingency_table = TRUE,
+                                results = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(contingency_table = contingency_table,
+                      results = results),
+    digits     = digits,
+    class_name = "summary.fisher_test"
+  )
+}
+
+#' Print summary of Fisher's exact test results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for Fisher's exact test, with sections
+#' controlled by the boolean parameters passed to
+#' \code{\link{summary.fisher_test}}.  Sections include the contingency
+#' table and the test results table.
+#'
+#' @param x A \code{summary.fisher_test} object created by
+#'   \code{\link{summary.fisher_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- fisher_test(survey_data, row = gender, col = region)
+#' summary(result)                            # all sections
+#' summary(result, contingency_table = FALSE) # hide contingency table
+#'
+#' @seealso \code{\link{fisher_test}} for the main analysis,
+#'   \code{\link{summary.fisher_test}} for summary options.
+#' @export
+#' @method print summary.fisher_test
+print.summary.fisher_test <- function(x, ...) {
+  digits <- x$digits
   weights_name <- x$weights
   test_type <- get_standard_title("Fisher's Exact Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
+
+  # Resolve show toggles
+  show_table   <- isTRUE(x$show$contingency_table)
+  show_results <- isTRUE(x$show$results)
 
   cat("\n")
   test_info <- list(
@@ -283,7 +396,7 @@ print.fisher_test <- function(x, digits = 4, ...) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
 
-      if (nrow(group_results) > 0) {
+      if (nrow(group_results) > 0 && show_results) {
         p_val <- group_results$p_value[1]
         sig <- add_significance_stars(p_val)
 
@@ -304,8 +417,8 @@ print.fisher_test <- function(x, digits = 4, ...) {
       }
     }
   } else {
-    # Print contingency table if available
-    if (!is.null(x$table)) {
+    # Print contingency table if available (gated by contingency_table toggle)
+    if (show_table && !is.null(x$table)) {
       cat("Contingency Table:\n")
       border <- paste(rep("-", 40), collapse = "")
       cat(border, "\n")
@@ -313,27 +426,31 @@ print.fisher_test <- function(x, digits = 4, ...) {
       cat(border, "\n\n")
     }
 
-    p_val <- x$p_value
-    sig <- add_significance_stars(p_val)
+    if (show_results) {
+      p_val <- x$p_value
+      sig <- add_significance_stars(p_val)
 
-    cat("Test Results:\n")
-    display <- data.frame(
-      Method = x$method,
-      `p-value` = ifelse(p_val < 0.001, "<.001",
-                         format(round(p_val, digits), nsmall = digits)),
-      N = x$n,
-      Sig = as.character(sig),
-      check.names = FALSE,
-      stringsAsFactors = FALSE
-    )
+      cat("Test Results:\n")
+      display <- data.frame(
+        Method = x$method,
+        `p-value` = ifelse(p_val < 0.001, "<.001",
+                           format(round(p_val, digits), nsmall = digits)),
+        N = x$n,
+        Sig = as.character(sig),
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+      )
 
-    output <- capture.output(print(display, row.names = FALSE))
-    border <- paste(rep("-", max(nchar(output))), collapse = "")
-    cat(border, "\n")
-    for (line in output) cat(line, "\n")
-    cat(border, "\n")
+      output <- capture.output(print(display, row.names = FALSE))
+      border <- paste(rep("-", max(nchar(output))), collapse = "")
+      cat(border, "\n")
+      for (line in output) cat(line, "\n")
+      cat(border, "\n")
+    }
   }
 
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
+  }
   invisible(x)
 }

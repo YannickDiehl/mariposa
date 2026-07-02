@@ -2,7 +2,7 @@
 % Please edit documentation in R/friedman_test.R
 \name{print.friedman_test}
 \alias{print.friedman_test}
-\title{Print method for Friedman test results}
+\title{Print Friedman test results (compact)}
 \usage{
 \method{print}{friedman_test}(x, digits = 3, ...)
 }
@@ -17,5 +17,17 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for Friedman test results
+Compact print method for objects of class \code{"friedman_test"}.
+Shows a one-line summary with the chi-square statistic, p-value,
+Kendall's W, and sample size.
+
+For the full detailed output (rank tables, test statistics), use
+\code{summary()}.
+}
+\examples{
+result <- friedman_test(survey_data, trust_government, trust_media,
+                        trust_science)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

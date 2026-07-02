@@ -337,18 +337,135 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
   return(result)
 }
 
-#' Print chi-square goodness-of-fit test results
+# Internal: compact one-line summary for a single GoF test row
+#' @noRd
+.print_gof_compact <- function(results, i, weighted_tag, digits) {
+  cat(sprintf("Chi-Square Goodness-of-Fit Test: %s%s\n",
+              results$Variable[i], weighted_tag))
+  cat(sprintf("  chi2(%s) = %s, %s %s, N = %s\n",
+              formatC(as.integer(results$df[i]), format = "d"),
+              fmt_num(results$chi_sq[i], digits),
+              fmt_p(results$p_value[i], digits, style = "compact"),
+              add_significance_stars(results$p_value[i]),
+              formatC(as.integer(results$n[i]), format = "d")))
+}
+
+#' Print chi-square goodness-of-fit test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"chisq_gof"}.
+#' Shows a one-line summary per variable with the chi-square statistic,
+#' degrees of freedom, p-value, and sample size.
+#'
+#' For the full detailed output (frequency tables with observed, expected,
+#' and residual counts), use \code{summary()}.
 #'
 #' @param x An object of class \code{"chisq_gof"}
-#' @param digits Number of decimal places (default: 4)
+#' @param digits Number of decimal places (default: 3)
 #' @param ... Additional arguments (currently unused)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- chisq_gof(survey_data, gender)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
-print.chisq_gof <- function(x, digits = 4, ...) {
+print.chisq_gof <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(x$results[x$groups])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- x$results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      for (j in seq_len(nrow(group_results))) {
+        .print_gof_compact(group_results, j, weighted_tag, digits)
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(x$results))) {
+      .print_gof_compact(x$results, i, weighted_tag, digits)
+    }
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for chi-square goodness-of-fit test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the frequency table with observed, expected, and residual
+#' counts, and the test statistics table.
+#'
+#' @param object A \code{chisq_gof} result object.
+#' @param frequency_table Logical. Show the frequency table with observed,
+#'   expected, and residual counts? (Default: TRUE)
+#' @param results Logical. Show the test statistics table? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.chisq_gof} object.
+#'
+#' @examples
+#' result <- chisq_gof(survey_data, gender)
+#' summary(result)
+#' summary(result, frequency_table = FALSE)
+#'
+#' @seealso \code{\link{chisq_gof}} for the main analysis function.
+#' @export
+#' @method summary chisq_gof
+summary.chisq_gof <- function(object, frequency_table = TRUE, results = TRUE,
+                              digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(frequency_table = frequency_table, results = results),
+    digits     = digits,
+    class_name = "summary.chisq_gof"
+  )
+}
+
+#' Print summary of chi-square goodness-of-fit results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for a chi-square goodness-of-fit test, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.chisq_gof}}.  Sections include per-variable
+#' frequency tables and the test statistics table.
+#'
+#' @param x A \code{summary.chisq_gof} object created by
+#'   \code{\link{summary.chisq_gof}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- chisq_gof(survey_data, gender)
+#' summary(result)                          # all sections
+#' summary(result, frequency_table = FALSE) # hide frequency tables
+#'
+#' @seealso \code{\link{chisq_gof}} for the main analysis,
+#'   \code{\link{summary.chisq_gof}} for summary options.
+#' @export
+#' @method print summary.chisq_gof
+print.summary.chisq_gof <- function(x, ...) {
+  digits <- x$digits
   weights_name <- x$weights
   test_type <- get_standard_title("Chi-Square Goodness-of-Fit Test",
                                   weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
+
+  # Resolve show toggles
+  show_freq    <- isTRUE(x$show$frequency_table)
+  show_results <- isTRUE(x$show$results)
 
   cat("\n")
   test_info <- list(
@@ -372,13 +489,13 @@ print.chisq_gof <- function(x, digits = 4, ...) {
         group_results <- group_results[group_results[[g]] == group_values[[g]], ]
       }
 
-      if (nrow(group_results) > 0) {
+      if (nrow(group_results) > 0 && show_results) {
         .print_gof_table(group_results, digits)
       }
     }
   } else {
-    # Print frequency tables if available
-    if (!is.null(x$frequencies)) {
+    # Print frequency tables if available (gated by frequency_table toggle)
+    if (show_freq && !is.null(x$frequencies)) {
       if (is.data.frame(x$frequencies)) {
         # Single variable case
         cat(sprintf("  %s - Frequency Table:\n", x$variables[1]))
@@ -403,11 +520,15 @@ print.chisq_gof <- function(x, digits = 4, ...) {
       }
     }
 
-    # Print test statistics
-    .print_gof_table(x$results, digits)
+    # Print test statistics (gated by results toggle)
+    if (show_results) {
+      .print_gof_table(x$results, digits)
+    }
   }
 
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
+  }
   invisible(x)
 }
 

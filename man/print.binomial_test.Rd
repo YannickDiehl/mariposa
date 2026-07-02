@@ -2,7 +2,7 @@
 % Please edit documentation in R/binomial_test.R
 \name{print.binomial_test}
 \alias{print.binomial_test}
-\title{Print method for binomial test results}
+\title{Print binomial test results (compact)}
 \usage{
 \method{print}{binomial_test}(x, digits = 3, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for binomial test results
+Compact print method for objects of class \code{"binomial_test"}.
+Shows a one-line summary per variable with the observed vs. test
+proportion, p-value, and sample size.
+
+For the full detailed output (category table, test statistics with
+confidence interval), use \code{summary()}.
+}
+\examples{
+result <- binomial_test(survey_data, gender, p = 0.50)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

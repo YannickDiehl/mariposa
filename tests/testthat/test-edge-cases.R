@@ -428,7 +428,10 @@ test_that("chisq_gof with custom expected proportions", {
   result <- chisq_gof(survey_data, gender, expected = c(0.6, 0.4))
   expect_s3_class(result, "chisq_gof")
   output <- capture.output(print(result))
-  expect_true(any(grepl("expected", output, ignore.case = TRUE)))
+  expect_true(length(output) > 0)
+  # Expected proportions shown in the detailed summary() output
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(any(grepl("expected", summary_output, ignore.case = TRUE)))
 })
 
 # ===========================================================================

@@ -250,10 +250,12 @@ test_that("print.chi_square: grouped", {
 # ===========================================================================
 # 9. fisher_test()
 # ===========================================================================
-test_that("print.fisher_test: ungrouped", {
+test_that("print.fisher_test: ungrouped (compact)", {
   result <- fisher_test(survey_data, row = gender, col = region)
   output <- expect_prints(result, "Fisher")
-  expect_true(any(grepl("Contingency Table", output, fixed = TRUE)))
+  expect_true(any(grepl("p ", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.fisher_test: grouped", {
@@ -271,10 +273,12 @@ test_that("print.fisher_test: weighted", {
 # ===========================================================================
 # 10. chisq_gof()
 # ===========================================================================
-test_that("print.chisq_gof: single variable, equal proportions", {
+test_that("print.chisq_gof: single variable, equal proportions (compact)", {
   result <- chisq_gof(survey_data, gender)
   output <- expect_prints(result, "Goodness-of-Fit")
-  expect_true(any(grepl("observed", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2(", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.chisq_gof: multiple variables", {
@@ -305,7 +309,9 @@ test_that("print.mcnemar_test: ungrouped", {
   result <- mcnemar_test(test_data, var1 = trust_gov_high,
                          var2 = trust_media_high)
   output <- expect_prints(result, "McNemar")
-  expect_true(any(grepl("Contingency Table", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2 = ", output, fixed = TRUE)))
+  expect_true(any(grepl("(exact)", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.mcnemar_test: grouped", {
@@ -452,10 +458,12 @@ test_that("print.mann_whitney: grouped", {
 # ===========================================================================
 # 16. kruskal_wallis()
 # ===========================================================================
-test_that("print.kruskal_wallis: ungrouped, unweighted", {
+test_that("print.kruskal_wallis: ungrouped, unweighted (compact)", {
   result <- kruskal_wallis(survey_data, life_satisfaction, group = education)
   output <- expect_prints(result, "Kruskal-Wallis")
-  expect_true(any(grepl("Ranks", output, fixed = TRUE)))
+  expect_true(any(grepl("H(", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.kruskal_wallis: ungrouped, weighted", {
@@ -479,10 +487,12 @@ test_that("print.kruskal_wallis: grouped", {
 # ===========================================================================
 # 17. wilcoxon_test()
 # ===========================================================================
-test_that("print.wilcoxon_test: ungrouped, unweighted", {
+test_that("print.wilcoxon_test: ungrouped, unweighted (compact)", {
   result <- wilcoxon_test(survey_data, x = trust_government, y = trust_media)
   output <- expect_prints(result, "Wilcoxon")
-  expect_true(any(grepl("Ranks", output, fixed = TRUE)))
+  expect_true(any(grepl("Z = ", output, fixed = TRUE)))
+  expect_true(any(grepl("N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.wilcoxon_test: ungrouped, weighted", {
@@ -500,11 +510,13 @@ test_that("print.wilcoxon_test: grouped", {
 # ===========================================================================
 # 18. friedman_test()
 # ===========================================================================
-test_that("print.friedman_test: ungrouped, unweighted", {
+test_that("print.friedman_test: ungrouped, unweighted (compact)", {
   result <- friedman_test(survey_data, trust_government, trust_media,
                           trust_science)
   output <- expect_prints(result, "Friedman")
-  expect_true(any(grepl("Ranks", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2(", output, fixed = TRUE)))
+  expect_true(any(grepl("W = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.friedman_test: ungrouped, weighted", {
@@ -522,11 +534,13 @@ test_that("print.friedman_test: grouped", {
 # ===========================================================================
 # 19. binomial_test()
 # ===========================================================================
-test_that("print.binomial_test: ungrouped, unweighted", {
+test_that("print.binomial_test: ungrouped, unweighted (compact)", {
   result <- binomial_test(survey_data, gender, p = 0.50)
   output <- expect_prints(result, "Binomial")
   expect_true(any(grepl("Category", output, ignore.case = TRUE) |
                     grepl("Group", output, fixed = TRUE)))
+  expect_true(any(grepl("prop = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.binomial_test: ungrouped, weighted", {
@@ -544,10 +558,12 @@ test_that("print.binomial_test: grouped", {
 # ===========================================================================
 # 20. levene_test()
 # ===========================================================================
-test_that("print.levene_test: ungrouped, unweighted (direct)", {
+test_that("print.levene_test: ungrouped, unweighted (direct, compact)", {
   result <- levene_test(survey_data, life_satisfaction, group = education)
   output <- expect_prints(result, "Levene")
   expect_true(any(grepl("Variance", output, ignore.case = TRUE)))
+  expect_true(any(grepl("F(", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.levene_test: ungrouped, weighted (direct)", {
@@ -572,8 +588,10 @@ test_that("print.levene_test: multi-variable", {
 test_that("print.levene_test: piped from t_test", {
   result <- t_test(survey_data, life_satisfaction, group = gender) %>%
     levene_test()
-  output <- expect_prints(result, "Levene")
-  expect_true(any(grepl("Recommendation", output, fixed = TRUE)))
+  expect_prints(result, "Levene")
+  # Recommendation section moved to summary() output
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Recommendation", summary_output, fixed = TRUE)))
 })
 
 # ===========================================================================

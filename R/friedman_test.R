@@ -280,74 +280,201 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 
 # Helper: print the rank table and test statistics for a Friedman test
 #' @noRd
-.print_friedman_block <- function(row_data, var_names, weights, digits) {
-  # Print rank table
-  cat("  Ranks:\n")
-  mean_ranks <- row_data$mean_ranks[[1]]
+.print_friedman_block <- function(row_data, var_names, weights, digits,
+                                  show_ranks = TRUE, show_results = TRUE) {
+  # Print rank table (gated by ranks toggle)
+  if (show_ranks) {
+    cat("  Ranks:\n")
+    mean_ranks <- row_data$mean_ranks[[1]]
 
-  rank_df <- data.frame(
-    Variable = var_names,
-    `Mean Rank` = sapply(var_names, function(v) round(mean_ranks[[v]], 2)),
-    check.names = FALSE,
-    stringsAsFactors = FALSE,
-    row.names = NULL
-  )
+    rank_df <- data.frame(
+      Variable = var_names,
+      `Mean Rank` = sapply(var_names, function(v) round(mean_ranks[[v]], 2)),
+      check.names = FALSE,
+      stringsAsFactors = FALSE,
+      row.names = NULL
+    )
 
-  output <- capture.output(print(rank_df, row.names = FALSE))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
+    output <- capture.output(print(rank_df, row.names = FALSE))
+    border_width <- max(nchar(output), na.rm = TRUE)
+    border <- paste(rep("-", border_width), collapse = "")
 
-  cat("  ", border, "\n", sep = "")
-  for (line in output) {
-    cat("  ", line, "\n", sep = "")
+    cat("  ", border, "\n", sep = "")
+    for (line in output) {
+      cat("  ", line, "\n", sep = "")
+    }
+    cat("  ", border, "\n\n", sep = "")
   }
-  cat("  ", border, "\n\n", sep = "")
 
-  # Print test statistics table
-  test_df <- data.frame(
-    N = as.integer(row_data$n),
-    `Chi-Square` = round(row_data$chi_sq, digits),
-    df = as.integer(row_data$df),
-    `p value` = round(row_data$p_value, digits),
-    `Kendall's W` = round(row_data$kendall_w, digits),
-    sig = row_data$sig,
-    check.names = FALSE,
-    stringsAsFactors = FALSE
-  )
+  # Print test statistics table (gated by results toggle)
+  if (show_results) {
+    test_df <- data.frame(
+      N = as.integer(row_data$n),
+      `Chi-Square` = round(row_data$chi_sq, digits),
+      df = as.integer(row_data$df),
+      `p value` = round(row_data$p_value, digits),
+      `Kendall's W` = round(row_data$kendall_w, digits),
+      sig = row_data$sig,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
 
-  label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
-  cat(sprintf("  %s\n", label))
-  output <- capture.output(print(test_df, row.names = FALSE))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
+    label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
+    cat(sprintf("  %s\n", label))
+    output <- capture.output(print(test_df, row.names = FALSE))
+    border_width <- max(nchar(output), na.rm = TRUE)
+    border <- paste(rep("-", border_width), collapse = "")
 
-  cat("  ", border, "\n", sep = "")
-  for (line in output) {
-    cat("  ", line, "\n", sep = "")
+    cat("  ", border, "\n", sep = "")
+    for (line in output) {
+      cat("  ", line, "\n", sep = "")
+    }
+    cat("  ", border, "\n\n", sep = "")
   }
-  cat("  ", border, "\n\n", sep = "")
 }
 
-#' Print method for Friedman test results
+# Internal: compact one-line summary for a single Friedman test row
+#' @noRd
+.print_friedman_compact <- function(results, i, var_label, weighted_tag, digits) {
+  cat(sprintf("Friedman Test: %s%s\n", var_label, weighted_tag))
+  cat(sprintf("  chi2(%s) = %s, %s %s, W = %s, N = %s\n",
+              formatC(as.integer(results$df[i]), format = "d"),
+              fmt_num(results$chi_sq[i], digits),
+              fmt_p(results$p_value[i], digits, style = "compact"),
+              add_significance_stars(results$p_value[i]),
+              fmt_num(results$kendall_w[i], digits),
+              formatC(as.integer(results$n[i]), format = "d")))
+}
+
+#' Print Friedman test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"friedman_test"}.
+#' Shows a one-line summary with the chi-square statistic, p-value,
+#' Kendall's W, and sample size.
+#'
+#' For the full detailed output (rank tables, test statistics), use
+#' \code{summary()}.
 #'
 #' @param x A friedman_test object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- friedman_test(survey_data, trust_government, trust_media,
+#'                         trust_science)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
 #' @method print friedman_test
 print.friedman_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  var_label <- paste(x$variables, collapse = ", ")
+  results <- x$results
+  results$p_value <- as.numeric(results$p_value)
+
+  if (isTRUE(x$is_grouped)) {
+    group_vars <- setdiff(names(results), c("chi_sq", "df", "p_value",
+                                            "kendall_w", "n", "k",
+                                            "mean_ranks"))
+    groups <- unique(results[group_vars])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      if (nrow(group_results) == 0) next
+      .print_friedman_compact(group_results, 1, var_label, weighted_tag, digits)
+    }
+  } else {
+    .print_friedman_compact(results, 1, var_label, weighted_tag, digits)
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for Friedman test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the mean rank table per measurement and the test statistics
+#' table with chi-square, p-value, and Kendall's W.
+#'
+#' @param object A \code{friedman_test} result object.
+#' @param ranks Logical. Show the mean rank table? (Default: TRUE)
+#' @param results Logical. Show test statistics table? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.friedman_test} object.
+#'
+#' @examples
+#' result <- friedman_test(survey_data, trust_government, trust_media,
+#'                         trust_science)
+#' summary(result)
+#' summary(result, ranks = FALSE)
+#'
+#' @seealso \code{\link{friedman_test}} for the main analysis function.
+#' @export
+#' @method summary friedman_test
+summary.friedman_test <- function(object, ranks = TRUE, results = TRUE,
+                                  digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(ranks = ranks, results = results),
+    digits     = digits,
+    class_name = "summary.friedman_test"
+  )
+}
+
+#' Print summary of Friedman test results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a Friedman test, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.friedman_test}}.  Sections include the mean rank
+#' table and the test statistics table with effect size interpretation.
+#'
+#' @param x A \code{summary.friedman_test} object created by
+#'   \code{\link{summary.friedman_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- friedman_test(survey_data, trust_government, trust_media,
+#'                         trust_science)
+#' summary(result)                # all sections
+#' summary(result, ranks = FALSE) # hide rank table
+#'
+#' @seealso \code{\link{friedman_test}} for the main analysis,
+#'   \code{\link{summary.friedman_test}} for summary options.
+#' @export
+#' @method print summary.friedman_test
+print.summary.friedman_test <- function(x, ...) {
+  digits <- x$digits
 
   # Determine test type using standardized helper
   weights_name <- x$weights
   test_type <- get_standard_title("Friedman Test", weights_name, "Results")
-  print_header(test_type)
+  print_header(test_type, newline_before = FALSE)
 
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
 
   # Add significance stars
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
+
+  # Resolve show toggles
+  show_ranks   <- isTRUE(x$show$ranks)
+  show_results <- isTRUE(x$show$results)
 
   is_grouped_data <- isTRUE(x$is_grouped)
 
@@ -384,7 +511,9 @@ print.friedman_test <- function(x, digits = 3, ...) {
         row_data = group_results[1, ],
         var_names = x$variables,
         weights = x$weights,
-        digits = digits
+        digits = digits,
+        show_ranks = show_ranks,
+        show_results = show_results
       )
     }
   } else {
@@ -392,20 +521,24 @@ print.friedman_test <- function(x, digits = 3, ...) {
       row_data = x$results[1, ],
       var_names = x$variables,
       weights = x$weights,
-      digits = digits
+      digits = digits,
+      show_ranks = show_ranks,
+      show_results = show_results
     )
   }
 
-  if (!is.null(x$weights)) {
+  if (!is.null(x$weights) && (show_ranks || show_results)) {
     cat("Note: Weighted analysis uses frequency-weighted ranks.\n")
   }
 
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
 
-  cat("\nEffect Size Interpretation (Kendall's W):\n")
-  cat("- Weak agreement: 0.1 - 0.3\n")
-  cat("- Moderate agreement: 0.3 - 0.5\n")
-  cat("- Strong agreement: > 0.5\n")
+    cat("\nEffect Size Interpretation (Kendall's W):\n")
+    cat("- Weak agreement: 0.1 - 0.3\n")
+    cat("- Moderate agreement: 0.3 - 0.5\n")
+    cat("- Strong agreement: > 0.5\n")
+  }
 
   invisible(x)
 }

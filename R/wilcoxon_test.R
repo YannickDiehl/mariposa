@@ -329,83 +329,224 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
 # Helper: print the rank table and test statistics for one comparison
 #' @noRd
-.print_wt_block <- function(row_data, x_name, y_name, weights, digits) {
+.print_wt_block <- function(row_data, x_name, y_name, weights, digits,
+                            show_ranks = TRUE, show_results = TRUE) {
   print_header(paste(y_name, "-", x_name), newline_before = FALSE)
 
-  # Rank table
-  cat("  Ranks:\n")
-  rank_df <- data.frame(
-    ` ` = c("Negative Ranks", "Positive Ranks", "Ties", "Total"),
-    N = c(as.integer(row_data$n_neg), as.integer(row_data$n_pos),
-          as.integer(row_data$n_ties), as.integer(row_data$n_total)),
-    `Mean Rank` = c(round(row_data$mean_rank_neg, 2),
-                    round(row_data$mean_rank_pos, 2),
-                    NA, NA),
-    `Sum of Ranks` = c(round(row_data$sum_rank_neg, 2),
-                       round(row_data$sum_rank_pos, 2),
-                       NA, NA),
-    check.names = FALSE,
-    stringsAsFactors = FALSE
-  )
+  # Rank table (gated by ranks toggle)
+  if (show_ranks) {
+    cat("  Ranks:\n")
+    rank_df <- data.frame(
+      ` ` = c("Negative Ranks", "Positive Ranks", "Ties", "Total"),
+      N = c(as.integer(row_data$n_neg), as.integer(row_data$n_pos),
+            as.integer(row_data$n_ties), as.integer(row_data$n_total)),
+      `Mean Rank` = c(round(row_data$mean_rank_neg, 2),
+                      round(row_data$mean_rank_pos, 2),
+                      NA, NA),
+      `Sum of Ranks` = c(round(row_data$sum_rank_neg, 2),
+                         round(row_data$sum_rank_pos, 2),
+                         NA, NA),
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
 
-  output <- capture.output(print(rank_df, row.names = FALSE, na.print = ""))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
+    output <- capture.output(print(rank_df, row.names = FALSE, na.print = ""))
+    border_width <- max(nchar(output), na.rm = TRUE)
+    border <- paste(rep("-", border_width), collapse = "")
 
-  cat("  ", border, "\n", sep = "")
-  for (line in output) {
-    cat("  ", line, "\n", sep = "")
+    cat("  ", border, "\n", sep = "")
+    for (line in output) {
+      cat("  ", line, "\n", sep = "")
+    }
+    cat("  ", border, "\n\n", sep = "")
+
+    # Direction note
+    cat(sprintf("  a %s < %s\n", y_name, x_name))
+    cat(sprintf("  b %s > %s\n", y_name, x_name))
+    cat(sprintf("  c %s = %s\n\n", y_name, x_name))
   }
-  cat("  ", border, "\n\n", sep = "")
 
-  # Direction note
-  cat(sprintf("  a %s < %s\n", y_name, x_name))
-  cat(sprintf("  b %s > %s\n", y_name, x_name))
-  cat(sprintf("  c %s = %s\n\n", y_name, x_name))
+  # Test statistics table (gated by results toggle)
+  if (show_results) {
+    test_df <- data.frame(
+      Z = round(row_data$Z, digits),
+      `p value` = round(row_data$p_value, digits),
+      `Effect r` = round(row_data$r_effect, digits),
+      sig = row_data$sig,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
 
-  # Test statistics table
-  test_df <- data.frame(
-    Z = round(row_data$Z, digits),
-    `p value` = round(row_data$p_value, digits),
-    `Effect r` = round(row_data$r_effect, digits),
-    sig = row_data$sig,
-    check.names = FALSE,
-    stringsAsFactors = FALSE
-  )
+    label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
+    cat(sprintf("  %s\n", label))
+    output <- capture.output(print(test_df, row.names = FALSE))
+    border_width <- max(nchar(output), na.rm = TRUE)
+    border <- paste(rep("-", border_width), collapse = "")
 
-  label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
-  cat(sprintf("  %s\n", label))
-  output <- capture.output(print(test_df, row.names = FALSE))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
-
-  cat("  ", border, "\n", sep = "")
-  for (line in output) {
-    cat("  ", line, "\n", sep = "")
+    cat("  ", border, "\n", sep = "")
+    for (line in output) {
+      cat("  ", line, "\n", sep = "")
+    }
+    cat("  ", border, "\n\n", sep = "")
   }
-  cat("  ", border, "\n\n", sep = "")
 }
 
-#' Print method for Wilcoxon signed-rank test results
+# Internal: compact one-line summary for a single Wilcoxon comparison
+#' @noRd
+.print_wt_compact <- function(results, i, pair_label, weighted_tag, digits) {
+  Z_val <- results$Z[i]
+  p_val <- as.numeric(results$p_value[i])
+  r_val <- results$r_effect[i]
+
+  cat(sprintf("Wilcoxon Signed-Rank Test: %s%s\n", pair_label, weighted_tag))
+
+  if (!is.na(r_val)) {
+    r_interp <- if (abs(r_val) < 0.1) "negligible"
+                else if (abs(r_val) < 0.3) "small"
+                else if (abs(r_val) < 0.5) "medium"
+                else "large"
+    cat(sprintf("  Z = %s, %s %s, r = %s (%s), N = %s\n",
+                fmt_num(Z_val, digits),
+                fmt_p(p_val, digits, style = "compact"),
+                add_significance_stars(p_val),
+                fmt_num(r_val, digits), r_interp,
+                formatC(as.integer(results$n_total[i]), format = "d")))
+  } else {
+    cat(sprintf("  Z = %s, %s %s\n",
+                fmt_num(Z_val, digits),
+                fmt_p(p_val, digits, style = "compact"),
+                add_significance_stars(p_val)))
+  }
+}
+
+#' Print Wilcoxon signed-rank test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"wilcoxon_test"}.
+#' Shows a one-line summary per comparison with the Z statistic, p-value,
+#' effect size r, and sample size.
+#'
+#' For the full detailed output (rank tables, test statistics), use
+#' \code{summary()}.
 #'
 #' @param x A wilcoxon_test object
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments (not used)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- wilcoxon_test(survey_data, x = trust_government, y = trust_media)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
 #' @method print wilcoxon_test
 print.wilcoxon_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  pair_label <- paste(x$y_name, "-", x$x_name)
+  results <- x$results
+  results$p_value <- as.numeric(results$p_value)
+
+  if (isTRUE(x$is_grouped)) {
+    group_vars <- setdiff(names(results), c("pair", "Z", "p_value", "r_effect",
+                                            "n_neg", "n_pos", "n_ties",
+                                            "n_total", "mean_rank_neg",
+                                            "mean_rank_pos", "sum_rank_neg",
+                                            "sum_rank_pos", "V"))
+    groups <- unique(results[group_vars])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      if (nrow(group_results) == 0) next
+      .print_wt_compact(group_results, 1, pair_label, weighted_tag, digits)
+    }
+  } else {
+    .print_wt_compact(results, 1, pair_label, weighted_tag, digits)
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for Wilcoxon signed-rank test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the rank table (negative/positive ranks, ties) and the test
+#' statistics table with Z, p-value, and effect size r.
+#'
+#' @param object A \code{wilcoxon_test} result object.
+#' @param ranks Logical. Show the rank table? (Default: TRUE)
+#' @param results Logical. Show test statistics table? (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.wilcoxon_test} object.
+#'
+#' @examples
+#' result <- wilcoxon_test(survey_data, x = trust_government, y = trust_media)
+#' summary(result)
+#' summary(result, ranks = FALSE)
+#'
+#' @seealso \code{\link{wilcoxon_test}} for the main analysis function.
+#' @export
+#' @method summary wilcoxon_test
+summary.wilcoxon_test <- function(object, ranks = TRUE, results = TRUE,
+                                  digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(ranks = ranks, results = results),
+    digits     = digits,
+    class_name = "summary.wilcoxon_test"
+  )
+}
+
+#' Print summary of Wilcoxon signed-rank test results (detailed output)
+#'
+#' @description
+#' Displays the detailed SPSS-style output for a Wilcoxon signed-rank test,
+#' with sections controlled by the boolean parameters passed to
+#' \code{\link{summary.wilcoxon_test}}.  Sections include the rank table
+#' and the test statistics table with effect size interpretation.
+#'
+#' @param x A \code{summary.wilcoxon_test} object created by
+#'   \code{\link{summary.wilcoxon_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- wilcoxon_test(survey_data, x = trust_government, y = trust_media)
+#' summary(result)                # all sections
+#' summary(result, ranks = FALSE) # hide rank table
+#'
+#' @seealso \code{\link{wilcoxon_test}} for the main analysis,
+#'   \code{\link{summary.wilcoxon_test}} for summary options.
+#' @export
+#' @method print summary.wilcoxon_test
+print.summary.wilcoxon_test <- function(x, ...) {
+  digits <- x$digits
 
   # Determine test type using standardized helper
   weights_name <- x$weights
   test_type <- get_standard_title("Wilcoxon Signed-Rank Test", weights_name, "Results")
-  print_header(test_type)
+  print_header(test_type, newline_before = FALSE)
 
   # Ensure p-values are numeric
   x$results$p_value <- as.numeric(x$results$p_value)
 
   # Add significance stars
   x$results$sig <- sapply(x$results$p_value, add_significance_stars)
+
+  # Resolve show toggles
+  show_ranks   <- isTRUE(x$show$ranks)
+  show_results <- isTRUE(x$show$results)
 
   is_grouped_data <- isTRUE(x$is_grouped)
 
@@ -443,7 +584,9 @@ print.wilcoxon_test <- function(x, digits = 3, ...) {
         x_name = x$x_name,
         y_name = x$y_name,
         weights = x$weights,
-        digits = digits
+        digits = digits,
+        show_ranks = show_ranks,
+        show_results = show_results
       )
     }
   } else {
@@ -452,20 +595,24 @@ print.wilcoxon_test <- function(x, digits = 3, ...) {
       x_name = x$x_name,
       y_name = x$y_name,
       weights = x$weights,
-      digits = digits
+      digits = digits,
+      show_ranks = show_ranks,
+      show_results = show_results
     )
   }
 
-  if (!is.null(x$weights)) {
+  if (!is.null(x$weights) && (show_ranks || show_results)) {
     cat("Note: Weighted analysis uses frequency-weighted ranks.\n")
   }
 
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
 
-  cat("\nEffect Size Interpretation (r):\n")
-  cat("- Small effect: 0.1 - 0.3\n")
-  cat("- Medium effect: 0.3 - 0.5\n")
-  cat("- Large effect: > 0.5\n")
+    cat("\nEffect Size Interpretation (r):\n")
+    cat("- Small effect: 0.1 - 0.3\n")
+    cat("- Medium effect: 0.3 - 0.5\n")
+    cat("- Large effect: > 0.5\n")
+  }
 
   invisible(x)
 }

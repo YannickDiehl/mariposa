@@ -2,14 +2,14 @@
 % Please edit documentation in R/chisq_gof.R
 \name{print.chisq_gof}
 \alias{print.chisq_gof}
-\title{Print chi-square goodness-of-fit test results}
+\title{Print chi-square goodness-of-fit test results (compact)}
 \usage{
-\method{print}{chisq_gof}(x, digits = 4, ...)
+\method{print}{chisq_gof}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"chisq_gof"}}
 
-\item{digits}{Number of decimal places (default: 4)}
+\item{digits}{Number of decimal places (default: 3)}
 
 \item{...}{Additional arguments (currently unused)}
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print chi-square goodness-of-fit test results
+Compact print method for objects of class \code{"chisq_gof"}.
+Shows a one-line summary per variable with the chi-square statistic,
+degrees of freedom, p-value, and sample size.
+
+For the full detailed output (frequency tables with observed, expected,
+and residual counts), use \code{summary()}.
+}
+\examples{
+result <- chisq_gof(survey_data, gender)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fisher_test.R
 \name{print.fisher_test}
 \alias{print.fisher_test}
-\title{Print Fisher's exact test results}
+\title{Print Fisher's exact test results (compact)}
 \usage{
 \method{print}{fisher_test}(x, digits = 4, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print Fisher's exact test results
+Compact print method for objects of class \code{"fisher_test"}.
+Shows a one-line summary with the exact p-value, significance stars,
+and sample size.
+
+For the full detailed output (contingency table, test results), use
+\code{summary()}.
+}
+\examples{
+result <- fisher_test(survey_data, row = gender, col = region)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

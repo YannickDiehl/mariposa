@@ -296,17 +296,150 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
   return(result)
 }
 
-#' Print McNemar test results
+#' Print McNemar test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"mcnemar_test"}.
+#' Shows a one-line summary with the McNemar chi-square statistic, the
+#' asymptotic and exact p-values, and sample size.
+#'
+#' For the full detailed output (2x2 contingency table, test results,
+#' discordant pairs), use \code{summary()}.
 #'
 #' @param x An object of class \code{"mcnemar_test"}
-#' @param digits Number of decimal places (default: 4)
+#' @param digits Number of decimal places (default: 3)
 #' @param ... Additional arguments (currently unused)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' test_data <- transform(survey_data,
+#'   trust_gov_high = as.integer(trust_government >= 4),
+#'   trust_media_high = as.integer(trust_media >= 4))
+#' result <- mcnemar_test(test_data, var1 = trust_gov_high,
+#'                        var2 = trust_media_high)
+#' result              # compact one-line overview
+#' summary(result)     # full detailed output
+#'
 #' @export
-print.mcnemar_test <- function(x, digits = 4, ...) {
+print.mcnemar_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  pair_label <- paste(x$var1_name, "x", x$var2_name)
+
+  print_row <- function(stat, p_asymp, p_exact, n_val) {
+    cat(sprintf("  chi2 = %s, %s (asymp), %s (exact) %s, N = %s\n",
+                fmt_num(stat, digits),
+                fmt_p(p_asymp, digits, style = "compact"),
+                fmt_p(p_exact, digits, style = "compact"),
+                add_significance_stars(p_exact),
+                formatC(as.integer(n_val), format = "d")))
+  }
+
+  if (isTRUE(x$is_grouped)) {
+    groups <- unique(x$results[x$groups])
+
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+
+      group_results <- x$results
+      for (g in names(group_values)) {
+        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+      }
+      if (nrow(group_results) == 0) next
+
+      cat(sprintf("McNemar Test: %s%s\n", pair_label, weighted_tag))
+      print_row(group_results$statistic[1], group_results$p_value[1],
+                group_results$exact_p[1], group_results$n[1])
+    }
+  } else {
+    cat(sprintf("McNemar Test: %s%s\n", pair_label, weighted_tag))
+    print_row(x$statistic, x$p_value, x$exact_p, x$n)
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for McNemar test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the 2x2 contingency table, the test results table with
+#' asymptotic and exact p-values, and the discordant pair counts.
+#'
+#' @param object A \code{mcnemar_test} result object.
+#' @param contingency_table Logical. Show the 2x2 contingency table?
+#'   (Default: TRUE)
+#' @param results Logical. Show the test results table? (Default: TRUE)
+#' @param discordant_pairs Logical. Show the discordant pair counts?
+#'   (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.mcnemar_test} object.
+#'
+#' @examples
+#' test_data <- transform(survey_data,
+#'   trust_gov_high = as.integer(trust_government >= 4),
+#'   trust_media_high = as.integer(trust_media >= 4))
+#' result <- mcnemar_test(test_data, var1 = trust_gov_high,
+#'                        var2 = trust_media_high)
+#' summary(result)
+#' summary(result, contingency_table = FALSE)
+#'
+#' @seealso \code{\link{mcnemar_test}} for the main analysis function.
+#' @export
+#' @method summary mcnemar_test
+summary.mcnemar_test <- function(object, contingency_table = TRUE,
+                                 results = TRUE, discordant_pairs = TRUE,
+                                 digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(contingency_table = contingency_table,
+                      results = results,
+                      discordant_pairs = discordant_pairs),
+    digits     = digits,
+    class_name = "summary.mcnemar_test"
+  )
+}
+
+#' Print summary of McNemar test results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for a McNemar test, with sections
+#' controlled by the boolean parameters passed to
+#' \code{\link{summary.mcnemar_test}}.  Sections include the 2x2
+#' contingency table, the test results table, and the discordant pairs.
+#'
+#' @param x A \code{summary.mcnemar_test} object created by
+#'   \code{\link{summary.mcnemar_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' test_data <- transform(survey_data,
+#'   trust_gov_high = as.integer(trust_government >= 4),
+#'   trust_media_high = as.integer(trust_media >= 4))
+#' result <- mcnemar_test(test_data, var1 = trust_gov_high,
+#'                        var2 = trust_media_high)
+#' summary(result)                            # all sections
+#' summary(result, discordant_pairs = FALSE)  # hide discordant pairs
+#'
+#' @seealso \code{\link{mcnemar_test}} for the main analysis,
+#'   \code{\link{summary.mcnemar_test}} for summary options.
+#' @export
+#' @method print summary.mcnemar_test
+print.summary.mcnemar_test <- function(x, ...) {
+  digits <- x$digits
   weights_name <- x$weights
   test_type <- get_standard_title("McNemar Test", weights_name, "Results")
   print_header(test_type, newline_before = FALSE)
+
+  # Resolve show toggles
+  show_table      <- isTRUE(x$show$contingency_table)
+  show_results    <- isTRUE(x$show$results)
+  show_discordant <- isTRUE(x$show$discordant_pairs)
 
   cat("\n")
   test_info <- list(
@@ -330,32 +463,39 @@ print.mcnemar_test <- function(x, digits = 4, ...) {
       }
 
       if (nrow(group_results) > 0) {
-        sig <- add_significance_stars(group_results$exact_p[1])
+        if (show_results) {
+          sig <- add_significance_stars(group_results$exact_p[1])
 
-        display <- data.frame(
-          `Chi-Sq` = round(group_results$statistic[1], 3),
-          `p (asymp)` = ifelse(group_results$p_value[1] < 0.001, "<.001",
-                               format(round(group_results$p_value[1], digits),
-                                      nsmall = digits)),
-          `p (exact)` = ifelse(group_results$exact_p[1] < 0.001, "<.001",
-                               format(round(group_results$exact_p[1], digits),
-                                      nsmall = digits)),
-          N = group_results$n[1],
-          Sig = as.character(sig),
-          check.names = FALSE,
-          stringsAsFactors = FALSE
-        )
+          display <- data.frame(
+            `Chi-Sq` = round(group_results$statistic[1], 3),
+            `p (asymp)` = ifelse(group_results$p_value[1] < 0.001, "<.001",
+                                 format(round(group_results$p_value[1], digits),
+                                        nsmall = digits)),
+            `p (exact)` = ifelse(group_results$exact_p[1] < 0.001, "<.001",
+                                 format(round(group_results$exact_p[1], digits),
+                                        nsmall = digits)),
+            N = group_results$n[1],
+            Sig = as.character(sig),
+            check.names = FALSE,
+            stringsAsFactors = FALSE
+          )
 
-        output <- capture.output(print(display, row.names = FALSE))
-        border <- paste(rep("-", max(nchar(output))), collapse = "")
-        cat(border, "\n")
-        for (line in output) cat(line, "\n")
-        cat(border, "\n\n")
+          output <- capture.output(print(display, row.names = FALSE))
+          border <- paste(rep("-", max(nchar(output))), collapse = "")
+          cat(border, "\n")
+          for (line in output) cat(line, "\n")
+          cat(border, "\n\n")
+        }
+
+        if (show_discordant) {
+          cat(sprintf("Discordant pairs: b = %d, c = %d\n\n",
+                      group_results$b[1], group_results$c[1]))
+        }
       }
     }
   } else {
-    # Print 2x2 table if available
-    if (!is.null(x$table)) {
+    # Print 2x2 table if available (gated by contingency_table toggle)
+    if (show_table && !is.null(x$table)) {
       cat("2x2 Contingency Table:\n")
       border <- paste(rep("-", 40), collapse = "")
       cat(border, "\n")
@@ -363,30 +503,36 @@ print.mcnemar_test <- function(x, digits = 4, ...) {
       cat(border, "\n\n")
     }
 
-    sig <- add_significance_stars(x$exact_p)
+    if (show_results) {
+      sig <- add_significance_stars(x$exact_p)
 
-    cat("Test Results:\n")
-    display <- data.frame(
-      `Chi-Sq (cc)` = round(x$statistic, 3),
-      `p (asymp)` = ifelse(x$p_value < 0.001, "<.001",
-                           format(round(x$p_value, digits), nsmall = digits)),
-      `p (exact)` = ifelse(x$exact_p < 0.001, "<.001",
-                           format(round(x$exact_p, digits), nsmall = digits)),
-      N = x$n,
-      Sig = as.character(sig),
-      check.names = FALSE,
-      stringsAsFactors = FALSE
-    )
+      cat("Test Results:\n")
+      display <- data.frame(
+        `Chi-Sq (cc)` = round(x$statistic, 3),
+        `p (asymp)` = ifelse(x$p_value < 0.001, "<.001",
+                             format(round(x$p_value, digits), nsmall = digits)),
+        `p (exact)` = ifelse(x$exact_p < 0.001, "<.001",
+                             format(round(x$exact_p, digits), nsmall = digits)),
+        N = x$n,
+        Sig = as.character(sig),
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+      )
 
-    output <- capture.output(print(display, row.names = FALSE))
-    border <- paste(rep("-", max(nchar(output))), collapse = "")
-    cat(border, "\n")
-    for (line in output) cat(line, "\n")
-    cat(border, "\n")
+      output <- capture.output(print(display, row.names = FALSE))
+      border <- paste(rep("-", max(nchar(output))), collapse = "")
+      cat(border, "\n")
+      for (line in output) cat(line, "\n")
+      cat(border, "\n")
+    }
 
-    cat(sprintf("\nDiscordant pairs: b = %d, c = %d\n", x$b, x$c))
+    if (show_discordant) {
+      cat(sprintf("\nDiscordant pairs: b = %d, c = %d\n", x$b, x$c))
+    }
   }
 
-  print_significance_legend()
+  if (show_results) {
+    print_significance_legend()
+  }
   invisible(x)
 }

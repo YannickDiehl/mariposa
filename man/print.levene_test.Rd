@@ -2,7 +2,7 @@
 % Please edit documentation in R/levene_test.R
 \name{print.levene_test}
 \alias{print.levene_test}
-\title{Print method for Levene test results}
+\title{Print Levene test results (compact)}
 \usage{
 \method{print}{levene_test}(x, digits = 3, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for Levene test results
+Compact print method for objects of class \code{"levene_test"}.
+Shows a one-line summary per variable with the F statistic, degrees of
+freedom, p-value, and the equal/unequal variances conclusion.
+
+For the full detailed output (results tables, interpretation,
+recommendation), use \code{summary()}.
+}
+\examples{
+result <- levene_test(survey_data, life_satisfaction, group = education)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }

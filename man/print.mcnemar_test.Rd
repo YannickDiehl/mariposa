@@ -2,14 +2,14 @@
 % Please edit documentation in R/mcnemar_test.R
 \name{print.mcnemar_test}
 \alias{print.mcnemar_test}
-\title{Print McNemar test results}
+\title{Print McNemar test results (compact)}
 \usage{
-\method{print}{mcnemar_test}(x, digits = 4, ...)
+\method{print}{mcnemar_test}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"mcnemar_test"}}
 
-\item{digits}{Number of decimal places (default: 4)}
+\item{digits}{Number of decimal places (default: 3)}
 
 \item{...}{Additional arguments (currently unused)}
 }
@@ -17,5 +17,20 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print McNemar test results
+Compact print method for objects of class \code{"mcnemar_test"}.
+Shows a one-line summary with the McNemar chi-square statistic, the
+asymptotic and exact p-values, and sample size.
+
+For the full detailed output (2x2 contingency table, test results,
+discordant pairs), use \code{summary()}.
+}
+\examples{
+test_data <- transform(survey_data,
+  trust_gov_high = as.integer(trust_government >= 4),
+  trust_media_high = as.integer(trust_media >= 4))
+result <- mcnemar_test(test_data, var1 = trust_gov_high,
+                       var2 = trust_media_high)
+result              # compact one-line overview
+summary(result)     # full detailed output
+
 }
