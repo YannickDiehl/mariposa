@@ -1,3 +1,35 @@
+# mariposa 0.9.0
+
+API-unification release (theme: snake_case arguments). One release-long
+deprecation bridge per the versioning policy - old names keep working
+and warn once per session; they will be removed in 0.10.0.
+
+## Breaking changes (with bridge)
+
+* Dot-case arguments renamed to snake_case:
+  - `frequency()`/`fre()`: `sort_frq`, `show_na`, `show_prc`,
+    `show_valid`, `show_sum`, `show_labels`, `show_unused`
+  - `rec()`: `as_factor`, `var_label`, `val_labels`
+  - `to_label()`/`to_character()`/`to_numeric()`: `drop_na`,
+    `drop_unused`, `add_non_labelled`, `use_labels`, `start_at`,
+    `keep_labels`
+  - `read_spss()`/`read_por()`/`read_stata()`/`read_sas()`/`read_xpt()`:
+    `tag_na`
+  Base-R-universal names (`na.rm`, `conf.level`, `var.equal`) are kept.
+
+## Breaking changes (no bridge)
+
+* `t_test()` results no longer carry the duplicated `CI_lower`/`CI_upper`
+  alias columns; `conf_int_lower`/`conf_int_upper` are the contract.
+
+## Improvements
+
+* `sort_frq` is validated (`"none"/"asc"/"desc"`) - typos used to
+  silently produce an unsorted table; `show_labels` validates its
+  `TRUE`/`FALSE`/`"auto"` values with a clear error.
+* Vignettes showcase the new argument names.
+
+
 # mariposa 0.8.0
 
 Output-layer release (theme: uniform three-layer output). Statistical
