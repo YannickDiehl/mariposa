@@ -17,8 +17,8 @@ codes), falls back to \code{\link[=strip_tags]{strip_tags()}} behavior with a wa
 }
 \description{
 Replaces tagged NAs with their original missing value codes. Works with
-data imported via \code{\link[=read_spss]{read_spss()}} (with \code{tag.na = TRUE}) or any reader
-that used the \code{tag.na} parameter (\code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}},
+data imported via \code{\link[=read_spss]{read_spss()}} (with \code{tag_na = TRUE}) or any reader
+that used the \code{tag_na} parameter (\code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}},
 \code{\link[=read_xpt]{read_xpt()}}). For native Stata/SAS tagged NAs (e.g., \code{.a}, \code{.A}) that
 have no numeric codes to recover, use \code{\link[=strip_tags]{strip_tags()}} instead.
 }
@@ -28,8 +28,8 @@ have no numeric codes to recover, use \code{\link[=strip_tags]{strip_tags()}} in
 data <- read_spss("survey.sav")
 original <- untag_na(data$satisfaction)
 
-# Stata data with tag.na
-data <- read_stata("survey.dta", tag.na = c(-9, -8, -42))
+# Stata data with tag_na
+data <- read_stata("survey.dta", tag_na = c(-9, -8, -42))
 original <- untag_na(data$income)
 }
 

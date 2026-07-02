@@ -9,8 +9,9 @@ read_sas(
   catalog_file = NULL,
   encoding = NULL,
   catalog_encoding = NULL,
-  tag.na = NULL,
-  verbose = FALSE
+  tag_na = NULL,
+  verbose = FALSE,
+  tag.na = NULL
 )
 }
 \arguments{
@@ -25,7 +26,7 @@ default encoding detection is used.}
 \item{catalog_encoding}{Character encoding for the catalog file. If \code{NULL},
 the same encoding as the data file is used.}
 
-\item{tag.na}{Numeric vector of values to treat as missing (e.g.,
+\item{tag_na}{Numeric vector of values to treat as missing (e.g.,
 \code{c(-9, -8, -42)}). These values will be converted to tagged NAs across
 all numeric variables. Use this when SAS files contain missing codes
 stored as regular values. Default: \code{NULL} (only detect native SAS
@@ -33,6 +34,9 @@ special missing values).}
 
 \item{verbose}{If \code{TRUE}, prints a message summarizing how many variables
 contain tagged missing values.}
+
+\item{tag.na}{Deprecated dot-case argument name. See the "Deprecated
+arguments" section below.}
 }
 \value{
 A tibble with the SAS data. Variables with missing value codes
@@ -50,12 +54,20 @@ system. Handles two scenarios:
 \enumerate{
 \item \strong{Native special missing values} (\code{.A} through \code{.Z}, \code{._}):
 Automatically detected and annotated.
-\item \strong{Numeric missing codes} (e.g., -9, -42): When \code{tag.na} is
+\item \strong{Numeric missing codes} (e.g., -9, -42): When \code{tag_na} is
 provided, these regular values are converted to tagged NAs, giving the
-same result as \code{\link[=read_spss]{read_spss()}} with \code{tag.na = TRUE}.
+same result as \code{\link[=read_spss]{read_spss()}} with \code{tag_na = TRUE}.
 }
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument name \code{tag.na} is deprecated; use the snake_case
+equivalent \code{tag_na} instead. The old name still works but issues a
+deprecation warning (once per session) and will be removed in a future
+release.
+}
+
 \subsection{Native Special Missing Values}{
 
 SAS supports 28 distinct missing value types: \code{.} (system missing), \code{.A}
@@ -64,14 +76,14 @@ as tagged NAs automatically. \code{read_sas()} adds the \code{na_tag_map} attrib
 so that mariposa's tagged NA functions work seamlessly.
 }
 
-\subsection{Numeric Missing Codes (tag.na)}{
+\subsection{Numeric Missing Codes (tag_na)}{
 
 Some SAS files store missing value codes as regular numeric values (e.g.,
--9 = "No answer"). The \code{tag.na} parameter converts these to tagged NAs,
+-9 = "No answer"). The \code{tag_na} parameter converts these to tagged NAs,
 enabling proper handling in \code{\link[=frequency]{frequency()}}, \code{\link[=codebook]{codebook()}}, and other
 functions.
 
-When \code{tag.na} is used, \code{\link[=untag_na]{untag_na()}} can recover the original numeric codes.
+When \code{tag_na} is used, \code{\link[=untag_na]{untag_na()}} can recover the original numeric codes.
 }
 }
 \examples{
@@ -83,7 +95,7 @@ data <- read_sas("survey.sas7bdat")
 data <- read_sas("survey.sas7bdat", catalog_file = "formats.sas7bcat")
 
 # Read SAS file with numeric missing codes
-data <- read_sas("survey.sas7bdat", tag.na = c(-9, -8, -42))
+data <- read_sas("survey.sas7bdat", tag_na = c(-9, -8, -42))
 
 # Check what types of missing values exist
 na_frequencies(data$income)

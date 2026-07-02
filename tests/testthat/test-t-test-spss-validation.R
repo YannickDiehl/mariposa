@@ -688,7 +688,7 @@ spss_values <- list(
 #'
 #' mariposa's t_test() result$results columns for one-sample:
 #'   - t_stat, df, p_value, mean_diff (the OBSERVED mean, not the difference),
-#'     conf_int_lower/upper, CI_lower/upper (the OBSERVED-mean CI)
+#'     conf_int_lower/upper (the OBSERVED-mean CI)
 #'
 #' SPSS's "Mean Difference" = observed_mean - mu, so we adjust on the R side.
 #'
@@ -740,8 +740,8 @@ compare_one_sample <- function(r_result, spss, scenario) {
               label = sprintf("[%s] Mean Difference", scenario))
 
   # ---- CI for Mean Difference (= R's CI - mu) ----------------------------
-  r_ci_lower <- r$CI_lower - mu
-  r_ci_upper <- r$CI_upper - mu
+  r_ci_lower <- r$conf_int_lower - mu
+  r_ci_upper <- r$conf_int_upper - mu
 
   ci_precision <- if (abs(spss$ci_lower) >= 100) 4L else 2L
   assert_spss(r_ci_lower, spss$ci_lower,

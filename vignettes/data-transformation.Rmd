@@ -48,7 +48,7 @@ Collapse categories by mapping old values to new values:
 ```{r}
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
-  suffix = "_group", as.factor = TRUE
+  suffix = "_group", as_factor = TRUE
 )
 
 frequency(survey_data, age_group)
@@ -106,7 +106,7 @@ Use `copy` to keep values that are not explicitly recoded, and `else` for a catc
 ```{r}
 survey_data <- rec(survey_data, education,
   rules = "1:2=1 [Lower]; else=2 [Higher]",
-  suffix = "_binary", as.factor = TRUE
+  suffix = "_binary", as_factor = TRUE
 )
 
 frequency(survey_data, education_binary)
@@ -356,7 +356,7 @@ data(survey_data)  # fresh copy
 # 1. Recode: create age groups and reverse-code an item
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
-  suffix = "_group", as.factor = TRUE)
+  suffix = "_group", as_factor = TRUE)
 survey_data <- rec(survey_data, trust_government,
   rules = "rev", suffix = "_rev")
 

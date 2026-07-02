@@ -8,7 +8,7 @@
 #' standard R operations.
 #'
 #' @param path Path to an SPSS `.sav` file.
-#' @param tag.na If `TRUE` (the default), user-defined missing values are
+#' @param tag_na If `TRUE` (the default), user-defined missing values are
 #'   converted to tagged NAs using [haven::tagged_na()]. If `FALSE`, the file
 #'   is read with standard `haven::read_sav()` behavior (all missing values
 #'   become regular `NA`).
@@ -16,8 +16,10 @@
 #'   encoding detection is used.
 #' @param verbose If `TRUE`, prints a message summarizing how many values were
 #'   converted.
+#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
+#'   arguments" section below.
 #'
-#' @return A tibble with the SPSS data. When `tag.na = TRUE`:
+#' @return A tibble with the SPSS data. When `tag_na = TRUE`:
 #'   \itemize{
 #'     \item User-defined missing values are stored as tagged NAs
 #'     \item `is.na()` returns `TRUE` for these values (standard R behavior)
@@ -28,6 +30,13 @@
 #'   }
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument name `tag.na` is deprecated; use the snake_case
+#' equivalent `tag_na` instead. The old name still works but issues a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' SPSS allows defining specific values as "user-defined missing values"
 #' (e.g., -9 = "no answer", -8 = "don't know"). When reading `.sav` files
 #' with `haven::read_sav()`, these are silently converted to `NA`, losing the
@@ -72,14 +81,21 @@
 #' }
 #'
 #' @export
-read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
+read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE,
+                      tag.na = NULL) {
   .check_haven("SPSS import")
+
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(tag.na)) {
+    .warn_deprecated_arg("tag.na", "tag_na")
+    if (missing(tag_na)) tag_na <- tag.na
+  }
 
   # Read with user_na = TRUE to preserve missing value metadata as attributes
   # (haven_labelled_spss class keeps values but marks them via na_range/na_values)
-  data <- haven::read_sav(file = path, encoding = encoding, user_na = tag.na)
+  data <- haven::read_sav(file = path, encoding = encoding, user_na = tag_na)
 
-  if (!tag.na) return(data)
+  if (!tag_na) return(data)
 
   .tag_spss_missing_values(data, verbose)
 }
@@ -93,16 +109,25 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
 #' `.sav` files.
 #'
 #' @param path Path to an SPSS `.por` file.
-#' @param tag.na If `TRUE` (the default), user-defined missing values are
+#' @param tag_na If `TRUE` (the default), user-defined missing values are
 #'   converted to tagged NAs using [haven::tagged_na()]. If `FALSE`, the file
 #'   is read with standard `haven::read_por()` behavior.
 #' @param verbose If `TRUE`, prints a message summarizing how many values were
 #'   converted.
+#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
+#'   arguments" section below.
 #'
 #' @return A tibble with the SPSS data. See [read_spss()] for details on
 #'   tagged NA handling.
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument name `tag.na` is deprecated; use the snake_case
+#' equivalent `tag_na` instead. The old name still works but issues a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' The SPSS portable format (`.por`) is an older, platform-independent format.
 #' Unlike `.sav` files, the portable format does not support specifying a
 #' character encoding. Tagged NA handling is identical to [read_spss()].
@@ -119,12 +144,18 @@ read_spss <- function(path, tag.na = TRUE, encoding = NULL, verbose = FALSE) {
 #' }
 #'
 #' @export
-read_por <- function(path, tag.na = TRUE, verbose = FALSE) {
+read_por <- function(path, tag_na = TRUE, verbose = FALSE, tag.na = NULL) {
   .check_haven("SPSS portable import")
 
-  data <- haven::read_por(file = path, user_na = tag.na)
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(tag.na)) {
+    .warn_deprecated_arg("tag.na", "tag_na")
+    if (missing(tag_na)) tag_na <- tag.na
+  }
 
-  if (!tag.na) return(data)
+  data <- haven::read_por(file = path, user_na = tag_na)
+
+  if (!tag_na) return(data)
 
   .tag_spss_missing_values(data, verbose)
 }
@@ -268,7 +299,7 @@ read_por <- function(path, tag.na = TRUE, verbose = FALSE) {
   tag_pool <- c(letters, LETTERS, as.character(0:9))
   if (length(missing_values) > length(tag_pool)) {
     cli::cli_warn(
-      "{.arg tag.na} has {length(missing_values)} values; only the first {length(tag_pool)} will be tagged."
+      "{.arg tag_na} has {length(missing_values)} values; only the first {length(tag_pool)} will be tagged."
     )
     missing_values <- missing_values[seq_len(length(tag_pool))]
   }
@@ -525,8 +556,8 @@ na_frequencies <- function(x) {
 #'
 #' @description
 #' Replaces tagged NAs with their original missing value codes. Works with
-#' data imported via [read_spss()] (with `tag.na = TRUE`) or any reader
-#' that used the `tag.na` parameter ([read_stata()], [read_sas()],
+#' data imported via [read_spss()] (with `tag_na = TRUE`) or any reader
+#' that used the `tag_na` parameter ([read_stata()], [read_sas()],
 #' [read_xpt()]). For native Stata/SAS tagged NAs (e.g., `.a`, `.A`) that
 #' have no numeric codes to recover, use [strip_tags()] instead.
 #'
@@ -543,8 +574,8 @@ na_frequencies <- function(x) {
 #' data <- read_spss("survey.sav")
 #' original <- untag_na(data$satisfaction)
 #'
-#' # Stata data with tag.na
-#' data <- read_stata("survey.dta", tag.na = c(-9, -8, -42))
+#' # Stata data with tag_na
+#' data <- read_stata("survey.dta", tag_na = c(-9, -8, -42))
 #' original <- untag_na(data$income)
 #' }
 #'
@@ -558,7 +589,7 @@ untag_na <- function(x) {
   tag_map <- attr(x, "na_tag_map")
   if (is.null(tag_map)) return(as.double(x))
 
-  # Check if tag_map contains recoverable numeric codes (from tag.na)
+  # Check if tag_map contains recoverable numeric codes (from tag_na)
   # vs native format codes (character strings like ".a", ".A")
   has_numeric_codes <- is.numeric(tag_map)
 

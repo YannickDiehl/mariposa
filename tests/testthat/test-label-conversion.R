@@ -76,21 +76,21 @@ test_that("to_label() with ordered = TRUE creates ordered factor", {
   expect_true(is.ordered(result))
 })
 
-test_that("to_label() with drop.unused removes empty levels", {
+test_that("to_label() with drop_unused removes empty levels", {
   skip_if_not_installed("haven")
   x <- haven::labelled(
     c(1, 1, 1),
     labels = c("A" = 1, "B" = 2, "C" = 3)
   )
 
-  result_keep <- to_label(x, drop.unused = FALSE)
+  result_keep <- to_label(x, drop_unused = FALSE)
   expect_equal(length(levels(result_keep)), 3)
 
-  result_drop <- to_label(x, drop.unused = TRUE)
+  result_drop <- to_label(x, drop_unused = TRUE)
   expect_equal(length(levels(result_drop)), 1)
 })
 
-test_that("to_label() with add.non.labelled includes unlabelled values", {
+test_that("to_label() with add_non_labelled includes unlabelled values", {
   skip_if_not_installed("haven")
   x <- haven::labelled(
     c(1, 2, 99),
@@ -100,18 +100,18 @@ test_that("to_label() with add.non.labelled includes unlabelled values", {
   result_default <- to_label(x)
   expect_true(is.na(result_default[3]))
 
-  result_add <- to_label(x, add.non.labelled = TRUE)
+  result_add <- to_label(x, add_non_labelled = TRUE)
   expect_equal(as.character(result_add[3]), "99")
 })
 
-test_that("to_label() handles tagged NAs with drop.na = TRUE", {
+test_that("to_label() handles tagged NAs with drop_na = TRUE", {
   skip_if_not_installed("haven")
   x <- haven::labelled(
     c(1, 2, haven::tagged_na("a")),
     labels = c("Yes" = 1, "No" = 2, "Missing" = haven::tagged_na("a"))
   )
 
-  result <- to_label(x, drop.na = TRUE)
+  result <- to_label(x, drop_na = TRUE)
   expect_true(is.na(result[3]))
   expect_false("Missing" %in% levels(result))
 })
@@ -189,21 +189,21 @@ test_that("to_numeric() converts text factor to sequential integers", {
   expect_equal(result, c(2, 1, 3, 2))  # alphabetical: high=1, low=2, medium=3
 })
 
-test_that("to_numeric() with use.labels = FALSE uses indices", {
+test_that("to_numeric() with use_labels = FALSE uses indices", {
   f <- factor(c("10", "20", "30"), levels = c("10", "20", "30"))
-  result <- to_numeric(f, use.labels = FALSE)
+  result <- to_numeric(f, use_labels = FALSE)
   expect_equal(result, c(1, 2, 3))
 })
 
-test_that("to_numeric() with start.at adjusts range", {
+test_that("to_numeric() with start_at adjusts range", {
   f <- factor(c("a", "b", "c"))
-  result <- to_numeric(f, start.at = 0)
+  result <- to_numeric(f, start_at = 0)
   expect_equal(result, c(0, 1, 2))
 })
 
-test_that("to_numeric() with keep.labels stores former levels", {
+test_that("to_numeric() with keep_labels stores former levels", {
   f <- factor(c("Yes", "No", "Yes"))
-  result <- to_numeric(f, keep.labels = TRUE)
+  result <- to_numeric(f, keep_labels = TRUE)
   labels <- attr(result, "labels")
   expect_true("Yes" %in% names(labels))
   expect_true("No" %in% names(labels))

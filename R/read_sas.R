@@ -6,9 +6,9 @@
 #' \enumerate{
 #'   \item **Native special missing values** (`.A` through `.Z`, `._`):
 #'     Automatically detected and annotated.
-#'   \item **Numeric missing codes** (e.g., -9, -42): When `tag.na` is
+#'   \item **Numeric missing codes** (e.g., -9, -42): When `tag_na` is
 #'     provided, these regular values are converted to tagged NAs, giving the
-#'     same result as [read_spss()] with `tag.na = TRUE`.
+#'     same result as [read_spss()] with `tag_na = TRUE`.
 #' }
 #'
 #' @param path Path to a SAS `.sas7bdat` data file.
@@ -18,13 +18,15 @@
 #'   default encoding detection is used.
 #' @param catalog_encoding Character encoding for the catalog file. If `NULL`,
 #'   the same encoding as the data file is used.
-#' @param tag.na Numeric vector of values to treat as missing (e.g.,
+#' @param tag_na Numeric vector of values to treat as missing (e.g.,
 #'   `c(-9, -8, -42)`). These values will be converted to tagged NAs across
 #'   all numeric variables. Use this when SAS files contain missing codes
 #'   stored as regular values. Default: `NULL` (only detect native SAS
 #'   special missing values).
 #' @param verbose If `TRUE`, prints a message summarizing how many variables
 #'   contain tagged missing values.
+#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
+#'   arguments" section below.
 #'
 #' @return A tibble with the SAS data. Variables with missing value codes
 #'   have:
@@ -36,6 +38,13 @@
 #'   }
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument name `tag.na` is deprecated; use the snake_case
+#' equivalent `tag_na` instead. The old name still works but issues a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' ## Native Special Missing Values
 #'
 #' SAS supports 28 distinct missing value types: `.` (system missing), `.A`
@@ -43,14 +52,14 @@
 #' as tagged NAs automatically. `read_sas()` adds the `na_tag_map` attribute
 #' so that mariposa's tagged NA functions work seamlessly.
 #'
-#' ## Numeric Missing Codes (tag.na)
+#' ## Numeric Missing Codes (tag_na)
 #'
 #' Some SAS files store missing value codes as regular numeric values (e.g.,
-#' -9 = "No answer"). The `tag.na` parameter converts these to tagged NAs,
+#' -9 = "No answer"). The `tag_na` parameter converts these to tagged NAs,
 #' enabling proper handling in [frequency()], [codebook()], and other
 #' functions.
 #'
-#' When `tag.na` is used, [untag_na()] can recover the original numeric codes.
+#' When `tag_na` is used, [untag_na()] can recover the original numeric codes.
 #'
 #' @seealso [read_xpt()], [na_frequencies()], [strip_tags()], [untag_na()],
 #'   [read_spss()], [read_stata()], [haven::read_sas()]
@@ -66,7 +75,7 @@
 #' data <- read_sas("survey.sas7bdat", catalog_file = "formats.sas7bcat")
 #'
 #' # Read SAS file with numeric missing codes
-#' data <- read_sas("survey.sas7bdat", tag.na = c(-9, -8, -42))
+#' data <- read_sas("survey.sas7bdat", tag_na = c(-9, -8, -42))
 #'
 #' # Check what types of missing values exist
 #' na_frequencies(data$income)
@@ -78,19 +87,26 @@
 #'
 #' @export
 read_sas <- function(path, catalog_file = NULL, encoding = NULL,
-                     catalog_encoding = NULL, tag.na = NULL, verbose = FALSE) {
+                     catalog_encoding = NULL, tag_na = NULL, verbose = FALSE,
+                     tag.na = NULL) {
   .check_haven("SAS import")
+
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(tag.na)) {
+    .warn_deprecated_arg("tag.na", "tag_na")
+    if (missing(tag_na)) tag_na <- tag.na
+  }
 
   # Automatically delegate .xpt files to read_xpt()
   if (grepl("\\.xpt$", path, ignore.case = TRUE)) {
     cli::cli_alert_info(
       "Detected {.file .xpt} file. Using {.fn read_xpt} instead of {.fn read_sas}."
     )
-    return(read_xpt(path = path, tag.na = tag.na, verbose = verbose))
+    return(read_xpt(path = path, tag_na = tag_na, verbose = verbose))
   }
 
-  if (!is.null(tag.na) && !is.numeric(tag.na)) {
-    cli::cli_abort("{.arg tag.na} must be a numeric vector of missing value codes.")
+  if (!is.null(tag_na) && !is.numeric(tag_na)) {
+    cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")
   }
 
   data <- haven::read_sas(
@@ -104,8 +120,8 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
   data <- .detect_native_tags(data, "sas", verbose)
 
   # Step 2: Convert user-specified missing values to tagged NAs
-  if (!is.null(tag.na)) {
-    data <- .tag_user_missing_values(data, tag.na, "sas", verbose)
+  if (!is.null(tag_na)) {
+    data <- .tag_user_missing_values(data, tag_na, "sas", verbose)
   }
 
   data
@@ -117,27 +133,36 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
 #' @description
 #' Reads a SAS transport file (`.xpt`) and integrates with mariposa's tagged
 #' NA system. Handles both native SAS special missing values and user-specified
-#' numeric missing codes (via `tag.na`). Transport files are a
+#' numeric missing codes (via `tag_na`). Transport files are a
 #' platform-independent SAS data format commonly used for FDA submissions and
 #' data exchange.
 #'
 #' @param path Path to a SAS transport file (`.xpt`).
-#' @param tag.na Numeric vector of values to treat as missing (e.g.,
+#' @param tag_na Numeric vector of values to treat as missing (e.g.,
 #'   `c(-9, -8, -42)`). These values will be converted to tagged NAs across
 #'   all numeric variables. Default: `NULL` (only detect native SAS special
 #'   missing values).
 #' @param verbose If `TRUE`, prints a message summarizing how many variables
 #'   contain tagged missing values.
+#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
+#'   arguments" section below.
 #'
 #' @return A tibble with the SAS data. See [read_sas()] for details on
 #'   tagged NA handling.
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument name `tag.na` is deprecated; use the snake_case
+#' equivalent `tag_na` instead. The old name still works but issues a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' SAS transport files support the same special missing values as
 #' `.sas7bdat` files (`.A`-`.Z`, `._`). This format is self-contained and
 #' does not require a separate catalog file for value labels.
 #'
-#' When `tag.na` is used, [untag_na()] can recover the original numeric codes.
+#' When `tag_na` is used, [untag_na()] can recover the original numeric codes.
 #'
 #' @seealso [read_sas()], [na_frequencies()], [strip_tags()], [untag_na()],
 #'   [haven::read_xpt()]
@@ -150,17 +175,23 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
 #' data <- read_xpt("survey.xpt")
 #'
 #' # Read with numeric missing codes
-#' data <- read_xpt("survey.xpt", tag.na = c(-9, -8, -42))
+#' data <- read_xpt("survey.xpt", tag_na = c(-9, -8, -42))
 #'
 #' na_frequencies(data$income)
 #' }
 #'
 #' @export
-read_xpt <- function(path, tag.na = NULL, verbose = FALSE) {
+read_xpt <- function(path, tag_na = NULL, verbose = FALSE, tag.na = NULL) {
   .check_haven("SAS transport import")
 
-  if (!is.null(tag.na) && !is.numeric(tag.na)) {
-    cli::cli_abort("{.arg tag.na} must be a numeric vector of missing value codes.")
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(tag.na)) {
+    .warn_deprecated_arg("tag.na", "tag_na")
+    if (missing(tag_na)) tag_na <- tag.na
+  }
+
+  if (!is.null(tag_na) && !is.numeric(tag_na)) {
+    cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")
   }
 
   data <- haven::read_xpt(file = path)
@@ -169,8 +200,8 @@ read_xpt <- function(path, tag.na = NULL, verbose = FALSE) {
   data <- .detect_native_tags(data, "sas", verbose)
 
   # Step 2: Convert user-specified missing values to tagged NAs
-  if (!is.null(tag.na)) {
-    data <- .tag_user_missing_values(data, tag.na, "sas", verbose)
+  if (!is.null(tag_na)) {
+    data <- .tag_user_missing_values(data, tag_na, "sas", verbose)
   }
 
   data

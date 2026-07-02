@@ -8,8 +8,11 @@ rec(
   data,
   ...,
   rules,
-  as.factor = FALSE,
+  as_factor = FALSE,
   suffix = NULL,
+  var_label = NULL,
+  val_labels = NULL,
+  as.factor = NULL,
   var.label = NULL,
   val.labels = NULL
 )
@@ -23,21 +26,24 @@ is a data frame.}
 
 \item{rules}{A character string defining the recoding rules (see Details).}
 
-\item{as.factor}{If \code{TRUE}, return the result as a factor. Default:
+\item{as_factor}{If \code{TRUE}, return the result as a factor. Default:
 \code{FALSE}.}
 
 \item{suffix}{A character string appended to the column names for the
 recoded variables (e.g., \code{"_r"}). If \code{NULL} (default), the
 original columns are overwritten in-place.}
 
-\item{var.label}{A new variable label. If \code{NULL}, the existing label
+\item{var_label}{A new variable label. If \code{NULL}, the existing label
 is kept with \code{" (recoded)"} appended.}
 
-\item{val.labels}{A named character vector of value labels for the new
+\item{val_labels}{A named character vector of value labels for the new
 values (e.g., \code{c("1" = "Low", "2" = "Medium", "3" = "High")}).
 If \code{NULL}, labels are taken from inline \code{[Label]} syntax in
-\code{rules} (if present). Explicit \code{val.labels} always override
+\code{rules} (if present). Explicit \code{val_labels} always override
 inline labels.}
+
+\item{as.factor, var.label, val.labels}{Deprecated dot-case argument names.
+See the "Deprecated arguments" section below.}
 }
 \value{
 If \code{data} is a vector, a recoded vector is returned. If
@@ -50,6 +56,15 @@ It consolidates recoding, reversing, dichotomizing, and missing value handling
 in a single function — the R equivalent of SPSS's \code{RECODE} command.
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument names \code{as.factor}, \code{var.label}, and
+\code{val.labels} are deprecated; use the snake_case equivalents
+\code{as_factor}, \code{var_label}, and \code{val_labels} instead. The
+old names still work but issue a deprecation warning (once per session)
+and will be removed in a future release.
+}
+
 \subsection{Recoding Syntax}{
 
 Rules are specified as a semicolon-separated string of
@@ -91,9 +106,9 @@ square brackets after the new value:
 \code{"1:2=1 [Low]; 3=2 [Medium]; 4:5=3 [High]"}
 
 This is equivalent to specifying
-\code{val.labels = c("1" = "Low", "2" = "Medium", "3" = "High")}
+\code{val_labels = c("1" = "Low", "2" = "Medium", "3" = "High")}
 but more compact and self-documenting. If both inline labels and
-\code{val.labels} are provided, \code{val.labels} takes precedence.
+\code{val_labels} are provided, \code{val_labels} takes precedence.
 }
 
 \subsection{Special Modes}{

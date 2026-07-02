@@ -7,7 +7,7 @@
 #' @description
 #' Writes a data frame to an SPSS `.sav` file, preserving variable labels,
 #' value labels, and user-defined missing values. When exporting data that
-#' was imported with [read_spss()] (with `tag.na = TRUE`), the tagged NAs are
+#' was imported with [read_spss()] (with `tag_na = TRUE`), the tagged NAs are
 #' automatically converted back to SPSS user-defined missing values, enabling
 #' full roundtrip fidelity.
 #'

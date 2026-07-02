@@ -63,10 +63,10 @@ SPSS allows researchers to define multiple types of missing values (e.g., -9 = "
 
 ```{r, eval = FALSE}
 # Tagged NAs are on by default
-data <- read_spss("survey.sav", tag.na = TRUE)
+data <- read_spss("survey.sav", tag_na = TRUE)
 
 # Turn off if you just want regular NAs
-data <- read_spss("survey.sav", tag.na = FALSE)
+data <- read_spss("survey.sav", tag_na = FALSE)
 ```
 
 ### Working with Tagged NAs

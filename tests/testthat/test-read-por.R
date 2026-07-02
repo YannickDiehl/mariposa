@@ -13,14 +13,14 @@ test_that("read_por has correct signature", {
   expect_true(is.function(read_por))
   args <- formals(read_por)
   expect_true("path" %in% names(args))
-  expect_true("tag.na" %in% names(args))
+  expect_true("tag_na" %in% names(args))
   expect_true("verbose" %in% names(args))
 
   # read_por should NOT have encoding parameter
   expect_false("encoding" %in% names(args))
 
   # Defaults
-  expect_true(args$tag.na)
+  expect_true(args$tag_na)
   expect_false(args$verbose)
 })
 

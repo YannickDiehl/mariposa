@@ -242,8 +242,6 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
             glass_delta = NA,
             conf_int_lower = NA,
             conf_int_upper = NA,
-            CI_lower = NA,
-            CI_upper = NA,
             n1 = NA,
             n2 = NA,
             group_stats = list(NULL),
@@ -644,9 +642,6 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     glass_delta = if (is.list(test_result$cohens_d)) test_result$cohens_d$glass_delta else test_result$cohens_d,
     conf_int_lower = test_result$conf_int[1],
     conf_int_upper = test_result$conf_int[2],
-    # Test-compatible CI column aliases
-    CI_lower = test_result$conf_int[1],
-    CI_upper = test_result$conf_int[2],
     # Sample size columns for test compatibility
     n1 = if (!is.null(test_result$group_stats)) {
       if (!is.null(test_result$group_stats$group1)) test_result$group_stats$group1$n else test_result$group_stats$n

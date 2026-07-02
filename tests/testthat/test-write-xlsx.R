@@ -675,8 +675,8 @@ test_that("write_xlsx.frequency handles NAs with Total Valid/Missing", {
   tmp <- tempfile(fileext = ".xlsx")
   on.exit(unlink(tmp), add = TRUE)
 
-  # Force show.labels = TRUE so the Label column is present
-  f <- frequency(survey_data, life_satisfaction, show.labels = TRUE)
+  # Force show_labels = TRUE so the Label column is present
+  f <- frequency(survey_data, life_satisfaction, show_labels = TRUE)
   write_xlsx(f, tmp)
 
   data <- openxlsx2::read_xlsx(tmp, sheet = "Frequency", col_names = FALSE)
@@ -732,12 +732,12 @@ test_that("write_xlsx.frequency handles tagged NAs", {
   expect_true("Total Missing" %in% all_labels)
 })
 
-test_that("write_xlsx.frequency respects show.labels = FALSE", {
+test_that("write_xlsx.frequency respects show_labels = FALSE", {
   skip_if_not_installed("openxlsx2")
   tmp <- tempfile(fileext = ".xlsx")
   on.exit(unlink(tmp), add = TRUE)
 
-  f <- frequency(survey_data, gender, show.labels = FALSE)
+  f <- frequency(survey_data, gender, show_labels = FALSE)
   write_xlsx(f, tmp)
 
   data <- openxlsx2::read_xlsx(tmp, sheet = "Frequency", col_names = FALSE)

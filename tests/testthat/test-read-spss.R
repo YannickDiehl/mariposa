@@ -189,7 +189,7 @@ test_that("strip_tags preserves variable label", {
 # ============================================================================
 
 # Create a temporary .sav file for testing read_spss() itself
-test_that("read_spss with tag.na=TRUE creates tagged NAs", {
+test_that("read_spss with tag_na=TRUE creates tagged NAs", {
   skip_if_not_installed("haven")
 
   # Create a small test dataset
@@ -217,7 +217,7 @@ test_that("read_spss with tag.na=TRUE creates tagged NAs", {
   on.exit(unlink(tmp), add = TRUE)
   haven::write_sav(df, tmp)
 
-  data_tagged <- read_spss(tmp, tag.na = TRUE, verbose = FALSE)
+  data_tagged <- read_spss(tmp, tag_na = TRUE, verbose = FALSE)
 
   # Check that tagged NAs exist and are properly NA
   age <- data_tagged$age
@@ -237,7 +237,7 @@ test_that("read_spss with tag.na=TRUE creates tagged NAs", {
   expect_equal(total_missing, 3L)
 })
 
-test_that("read_spss with tag.na=FALSE behaves like haven::read_sav", {
+test_that("read_spss with tag_na=FALSE behaves like haven::read_sav", {
   skip_if_not_installed("haven")
 
   df <- data.frame(
@@ -253,7 +253,7 @@ test_that("read_spss with tag.na=FALSE behaves like haven::read_sav", {
   on.exit(unlink(tmp), add = TRUE)
   haven::write_sav(df, tmp)
 
-  data_notag <- read_spss(tmp, tag.na = FALSE)
+  data_notag <- read_spss(tmp, tag_na = FALSE)
 
   # -9 should be a regular NA (no tag)
   expect_equal(sum(is.na(data_notag$score)), 1L)
@@ -277,7 +277,7 @@ test_that("read_spss verbose mode prints summary", {
   haven::write_sav(df, tmp)
 
   expect_message(
-    read_spss(tmp, tag.na = TRUE, verbose = TRUE),
+    read_spss(tmp, tag_na = TRUE, verbose = TRUE),
     "Converted"
   )
 })
@@ -354,9 +354,9 @@ test_that("frequency print does not error with tagged NAs", {
   expect_no_error(capture.output(print(summary(result))))
 })
 
-test_that("frequency with show.unused and tagged NAs works together", {
+test_that("frequency with show_unused and tagged NAs works together", {
   df <- make_tagged_df()
-  result <- frequency(df, satisfaction, show.unused = TRUE)
+  result <- frequency(df, satisfaction, show_unused = TRUE)
   tbl <- result$results
 
   # All 5 valid values should be present
@@ -366,9 +366,9 @@ test_that("frequency with show.unused and tagged NAs works together", {
   expect_true(all(1:5 %in% non_na_vals))
 })
 
-test_that("frequency with show.na=FALSE hides tagged NA rows", {
+test_that("frequency with show_na=FALSE hides tagged NA rows", {
   df <- make_tagged_df()
-  result <- frequency(df, satisfaction, show.na = FALSE)
+  result <- frequency(df, satisfaction, show_na = FALSE)
   tbl <- result$results
 
   # Should not have any NA rows or tagged NA expansion

@@ -4,17 +4,20 @@
 \alias{read_por}
 \title{Read SPSS Portable Data with Tagged Missing Values}
 \usage{
-read_por(path, tag.na = TRUE, verbose = FALSE)
+read_por(path, tag_na = TRUE, verbose = FALSE, tag.na = NULL)
 }
 \arguments{
 \item{path}{Path to an SPSS \code{.por} file.}
 
-\item{tag.na}{If \code{TRUE} (the default), user-defined missing values are
+\item{tag_na}{If \code{TRUE} (the default), user-defined missing values are
 converted to tagged NAs using \code{\link[haven:tagged_na]{haven::tagged_na()}}. If \code{FALSE}, the file
 is read with standard \code{haven::read_por()} behavior.}
 
 \item{verbose}{If \code{TRUE}, prints a message summarizing how many values were
 converted.}
+
+\item{tag.na}{Deprecated dot-case argument name. See the "Deprecated
+arguments" section below.}
 }
 \value{
 A tibble with the SPSS data. See \code{\link[=read_spss]{read_spss()}} for details on
@@ -26,9 +29,17 @@ as tagged NAs. This is the portable format equivalent of \code{\link[=read_spss]
 \code{.sav} files.
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument name \code{tag.na} is deprecated; use the snake_case
+equivalent \code{tag_na} instead. The old name still works but issues a
+deprecation warning (once per session) and will be removed in a future
+release.
+
 The SPSS portable format (\code{.por}) is an older, platform-independent format.
 Unlike \code{.sav} files, the portable format does not support specifying a
 character encoding. Tagged NA handling is identical to \code{\link[=read_spss]{read_spss()}}.
+}
 }
 \examples{
 \dontrun{

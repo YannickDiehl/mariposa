@@ -216,10 +216,10 @@ test_that("rec quart returns only values 1-4", {
   expect_true(all(result$x[!is.na(result$x)] %in% 1:4))
 })
 
-test_that("rec quart works with val.labels", {
+test_that("rec quart works with val_labels", {
   simple <- tibble::tibble(x = 1:20)
   result <- rec(simple, x, rules = "quart",
-                val.labels = c("1" = "Q1", "2" = "Q2", "3" = "Q3", "4" = "Q4"))
+                val_labels = c("1" = "Q1", "2" = "Q2", "3" = "Q3", "4" = "Q4"))
   labels <- attr(result$x, "labels")
   expect_false(is.null(labels))
   expect_equal(unname(labels["Q1"]), 1)
@@ -235,10 +235,10 @@ test_that("rec quart works with suffix", {
   expect_equal(result$x, 1:20)
 })
 
-test_that("rec quart works with as.factor", {
+test_that("rec quart works with as_factor", {
   simple <- tibble::tibble(x = 1:20)
-  result <- rec(simple, x, rules = "quart", as.factor = TRUE,
-                val.labels = c("1" = "Q1", "2" = "Q2", "3" = "Q3", "4" = "Q4"))
+  result <- rec(simple, x, rules = "quart", as_factor = TRUE,
+                val_labels = c("1" = "Q1", "2" = "Q2", "3" = "Q3", "4" = "Q4"))
   expect_true(is.factor(result$x))
   expect_equal(levels(result$x), c("Q1", "Q2", "Q3", "Q4"))
 })
@@ -277,10 +277,10 @@ test_that("rec mean handles NA", {
   expect_true(all(!is.na(result$x[c(1, 3, 4)])))
 })
 
-test_that("rec mean works with suffix and val.labels", {
+test_that("rec mean works with suffix and val_labels", {
   simple <- tibble::tibble(x = c(1, 2, 3, 4, 5))
   result <- rec(simple, x, rules = "mean", suffix = "_m",
-                val.labels = c("0" = "Low", "1" = "High"))
+                val_labels = c("0" = "Low", "1" = "High"))
   expect_true("x_m" %in% names(result))
   labels <- attr(result$x_m, "labels")
   expect_equal(unname(labels["Low"]), 0)
@@ -314,9 +314,9 @@ test_that("rec without suffix overwrites in-place", {
   expect_false("score_r" %in% names(result))
 })
 
-test_that("rec var.label is applied", {
+test_that("rec var_label is applied", {
   result <- rec(test_data, score, rules = "rev", suffix = "_r",
-                var.label = "Reversed satisfaction")
+                var_label = "Reversed satisfaction")
   expect_equal(attr(result$score_r, "label"), "Reversed satisfaction")
 })
 
@@ -325,9 +325,9 @@ test_that("rec auto-appends (recoded) to variable label", {
   expect_equal(attr(result$score, "label"), "Satisfaction score (recoded)")
 })
 
-test_that("rec val.labels sets value labels", {
+test_that("rec val_labels sets value labels", {
   result <- rec(test_data, score, rules = "1:2=1; 3=2; 4:5=3",
-                val.labels = c("1" = "Low", "2" = "Medium", "3" = "High"))
+                val_labels = c("1" = "Low", "2" = "Medium", "3" = "High"))
   labels <- attr(result$score, "labels")
   expect_false(is.null(labels))
   expect_equal(unname(labels["Low"]), 1)
@@ -418,11 +418,11 @@ test_that("rec without copy does not preserve original labels", {
   expect_true(is.null(labels))
 })
 
-test_that("rec explicit val.labels override copy-preserved labels", {
+test_that("rec explicit val_labels override copy-preserved labels", {
   labelled <- tibble::tibble(x = c(1, 2, 3))
   attr(labelled$x, "labels") <- c("A" = 1, "B" = 2, "C" = 3)
   result <- rec(labelled, x, rules = "else=copy",
-                val.labels = c("1" = "X", "2" = "Y", "3" = "Z"))
+                val_labels = c("1" = "X", "2" = "Y", "3" = "Z"))
   labels <- attr(result$x, "labels")
   expect_equal(unname(labels["X"]), 1)
   expect_equal(unname(labels["Y"]), 2)
@@ -453,10 +453,10 @@ test_that("rec inline labels work with single values", {
   expect_equal(unname(labels["Divers"]), 3)
 })
 
-test_that("rec explicit val.labels override inline labels", {
+test_that("rec explicit val_labels override inline labels", {
   result <- rec(test_data, score,
                 rules = "1:2=1 [Low]; 3=2 [Medium]; 4:5=3 [High]",
-                val.labels = c("1" = "Niedrig", "2" = "Mittel", "3" = "Hoch"))
+                val_labels = c("1" = "Niedrig", "2" = "Mittel", "3" = "Hoch"))
   labels <- attr(result$score, "labels")
   expect_equal(unname(labels["Niedrig"]), 1)
   expect_equal(unname(labels["Mittel"]), 2)
@@ -503,10 +503,10 @@ test_that("rec inline labels with spaces in label text", {
   expect_equal(unname(labels["Strongly Agree"]), 3)
 })
 
-test_that("rec inline labels with as.factor uses labels as levels", {
+test_that("rec inline labels with as_factor uses labels as levels", {
   result <- rec(test_data, score,
                 rules = "1:2=1 [Low]; 3=2 [Medium]; 4:5=3 [High]",
-                as.factor = TRUE)
+                as_factor = TRUE)
   expect_true(is.factor(result$score))
   expect_equal(levels(result$score), c("Low", "Medium", "High"))
 })
@@ -521,13 +521,13 @@ test_that("rec inline labels are not set for copy or NA rules", {
 })
 
 # ============================================================================
-# rec() — as.factor
+# rec() — as_factor
 # ============================================================================
 
-test_that("rec as.factor returns factor", {
+test_that("rec as_factor returns factor", {
   result <- rec(test_data, score, rules = "1:2=1; 3=2; 4:5=3",
-                as.factor = TRUE,
-                val.labels = c("1" = "Low", "2" = "Medium", "3" = "High"))
+                as_factor = TRUE,
+                val_labels = c("1" = "Low", "2" = "Medium", "3" = "High"))
   expect_true(is.factor(result$score))
   expect_equal(levels(result$score), c("Low", "Medium", "High"))
 })

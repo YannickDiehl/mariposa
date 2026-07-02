@@ -9,18 +9,26 @@ frequency(
   data,
   ...,
   weights = NULL,
-  sort.frq = "none",
-  show.na = TRUE,
-  show.prc = TRUE,
-  show.valid = TRUE,
-  show.sum = TRUE,
-  show.labels = "auto",
-  show.unused = FALSE
+  sort_frq = "none",
+  show_na = TRUE,
+  show_prc = TRUE,
+  show_valid = TRUE,
+  show_sum = TRUE,
+  show_labels = "auto",
+  show_unused = FALSE,
+  sort.frq = NULL,
+  show.na = NULL,
+  show.prc = NULL,
+  show.valid = NULL,
+  show.sum = NULL,
+  show.labels = NULL,
+  show.unused = NULL
 )
 
-fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
-  show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto",
-  show.unused = FALSE)
+fre(data, ..., weights = NULL, sort_frq = "none", show_na = TRUE,
+  show_prc = TRUE, show_valid = TRUE, show_sum = TRUE, show_labels = "auto",
+  show_unused = FALSE, sort.frq = NULL, show.na = NULL, show.prc = NULL,
+  show.valid = NULL, show.sum = NULL, show.labels = NULL, show.unused = NULL)
 }
 \arguments{
 \item{data}{Your survey data (a data frame or tibble)}
@@ -32,30 +40,33 @@ variables separated by commas, or use helpers like \code{starts_with("trust")}}
 Without weights, you get sample frequencies. With weights, you get
 population estimates.}
 
-\item{sort.frq}{How to order the results:
+\item{sort_frq}{How to order the results:
 \itemize{
 \item \code{"none"} (default): Keep original order
 \item \code{"asc"}: Sort from lowest to highest frequency
 \item \code{"desc"}: Sort from highest to lowest frequency
 }}
 
-\item{show.na}{Include missing values in the table? (Default: TRUE)}
+\item{show_na}{Include missing values in the table? (Default: TRUE)}
 
-\item{show.prc}{Show raw percentages including missing values? (Default: TRUE)}
+\item{show_prc}{Show raw percentages including missing values? (Default: TRUE)}
 
-\item{show.valid}{Show percentages excluding missing values? (Default: TRUE)}
+\item{show_valid}{Show percentages excluding missing values? (Default: TRUE)}
 
-\item{show.sum}{Show cumulative totals? (Default: TRUE)}
+\item{show_sum}{Show cumulative totals? (Default: TRUE)}
 
-\item{show.labels}{Show category labels if available? (Default: "auto" - shows
+\item{show_labels}{Show category labels if available? (Default: "auto" - shows
 labels when they exist)}
 
-\item{show.unused}{Show all defined value labels, even those with zero
+\item{show_unused}{Show all defined value labels, even those with zero
 observations? (Default: FALSE). When TRUE, values that have labels defined
 (e.g., from statistical software files) but no cases in the data are
 included with frequency 0. This is useful for labelled datasets where
 unused categories should still appear in the output. Automatically enables
 label display.}
+
+\item{sort.frq, show.na, show.prc, show.valid, show.sum, show.labels, show.unused}{Deprecated dot-case argument names. See the "Deprecated arguments"
+section below.}
 }
 \value{
 A frequency table showing counts and percentages for each category
@@ -73,6 +84,16 @@ Think of it as creating a summary table that shows:
 }
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument names \code{sort.frq}, \code{show.na}, \code{show.prc},
+\code{show.valid}, \code{show.sum}, \code{show.labels}, and \code{show.unused} are deprecated;
+use the snake_case equivalents \code{sort_frq}, \code{show_na}, \code{show_prc},
+\code{show_valid}, \code{show_sum}, \code{show_labels}, and \code{show_unused} instead.
+The old names still work but issue a deprecation warning (once per
+session) and will be removed in a future release.
+}
+
 \subsection{Understanding the Results}{
 
 The frequency table shows:
@@ -104,8 +125,8 @@ population values. Always use weights for population inference.
 \subsection{Tagged Missing Values}{
 
 When data is imported with tagged NAs (e.g., via \code{\link[=read_spss]{read_spss()}} with
-\code{tag.na = TRUE}, or \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}} with the
-\code{tag.na} parameter), \code{frequency()} automatically expands the missing value
+\code{tag_na = TRUE}, or \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}}, \code{\link[=read_xpt]{read_xpt()}} with the
+\code{tag_na} parameter), \code{frequency()} automatically expands the missing value
 section to show each missing type individually (with its original missing
 value code and label), plus summary rows for \strong{Total Valid} and \strong{Total
 Missing}.
@@ -128,11 +149,11 @@ survey_data \%>\%
   frequency(gender, weights = sampling_weight)
 
 # Education levels with sorting
-survey_data \%>\% frequency(education, sort.frq = "desc")
+survey_data \%>\% frequency(education, sort_frq = "desc")
 
 # Employment status with custom display options
 survey_data \%>\% frequency(employment, weights = sampling_weight, 
-                         show.na = TRUE, show.sum = TRUE)
+                         show_na = TRUE, show_sum = TRUE)
 
 }
 \seealso{

@@ -202,7 +202,7 @@ test_that("codebook works with Stata tagged NAs", {
 })
 
 # ============================================================================
-# Tests for tag.na parameter in read_stata()
+# Tests for tag_na parameter in read_stata()
 # ============================================================================
 
 # Helper: Create Stata file with numeric missing codes (no native tagged NAs)
@@ -222,11 +222,11 @@ make_stata_with_numeric_missings <- function() {
   tmp
 }
 
-test_that("read_stata with tag.na converts numeric values to tagged NAs", {
+test_that("read_stata with tag_na converts numeric values to tagged NAs", {
   tmp <- make_stata_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_stata(tmp, tag.na = c(-9, -8))
+  data <- read_stata(tmp, tag_na = c(-9, -8))
 
   tag_map <- attr(data$income, "na_tag_map")
   expect_false(is.null(tag_map))
@@ -247,27 +247,27 @@ test_that("read_stata with tag.na converts numeric values to tagged NAs", {
   expect_equal(sort(valid), c(1000, 2000, 3000, 4000))
 })
 
-test_that("read_stata tag.na verbose prints conversion count", {
+test_that("read_stata tag_na verbose prints conversion count", {
   tmp <- make_stata_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
   expect_message(
-    read_stata(tmp, tag.na = c(-9, -8), verbose = TRUE),
+    read_stata(tmp, tag_na = c(-9, -8), verbose = TRUE),
     "Converted"
   )
 })
 
-test_that("read_stata tag.na validates input", {
+test_that("read_stata tag_na validates input", {
   tmp <- make_stata_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
   expect_error(
-    read_stata(tmp, tag.na = "not_numeric"),
+    read_stata(tmp, tag_na = "not_numeric"),
     "numeric vector"
   )
 })
 
-test_that("read_stata tag.na skips columns with native tagged NAs", {
+test_that("read_stata tag_na skips columns with native tagged NAs", {
   # Create file with native tagged NAs
   df <- tibble::tibble(
     x = c(1, 2, haven::tagged_na("a"), NA)
@@ -280,8 +280,8 @@ test_that("read_stata tag.na skips columns with native tagged NAs", {
   on.exit(unlink(tmp), add = TRUE)
   haven::write_dta(df, tmp)
 
-  # tag.na should not overwrite native tags
-  data <- read_stata(tmp, tag.na = c(-9))
+  # tag_na should not overwrite native tags
+  data <- read_stata(tmp, tag_na = c(-9))
 
   tag_map <- attr(data$x, "na_tag_map")
   # Should still have native character-based tag_map
@@ -289,13 +289,13 @@ test_that("read_stata tag.na skips columns with native tagged NAs", {
 })
 
 # ============================================================================
-# Tests for untag_na() with tag.na data (should recover codes)
+# Tests for untag_na() with tag_na data (should recover codes)
 # ============================================================================
-test_that("untag_na recovers numeric codes from tag.na Stata data", {
+test_that("untag_na recovers numeric codes from tag_na Stata data", {
   tmp <- make_stata_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_stata(tmp, tag.na = c(-9, -8))
+  data <- read_stata(tmp, tag_na = c(-9, -8))
 
   # untag_na should recover codes WITHOUT warning
   expect_no_warning(result <- untag_na(data$income))
@@ -306,13 +306,13 @@ test_that("untag_na recovers numeric codes from tag.na Stata data", {
 })
 
 # ============================================================================
-# Tests for frequency() with tag.na Stata data
+# Tests for frequency() with tag_na Stata data
 # ============================================================================
-test_that("frequency shows tagged NA codes from tag.na Stata data", {
+test_that("frequency shows tagged NA codes from tag_na Stata data", {
   tmp <- make_stata_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_stata(tmp, tag.na = c(-9, -8))
+  data <- read_stata(tmp, tag_na = c(-9, -8))
 
   result <- frequency(data, income)
   tbl <- result$results
@@ -326,13 +326,13 @@ test_that("frequency shows tagged NA codes from tag.na Stata data", {
 })
 
 # ============================================================================
-# Tests for codebook() with tag.na Stata data
+# Tests for codebook() with tag_na Stata data
 # ============================================================================
-test_that("codebook works with tag.na Stata data", {
+test_that("codebook works with tag_na Stata data", {
   tmp <- make_stata_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_stata(tmp, tag.na = c(-9, -8))
+  data <- read_stata(tmp, tag_na = c(-9, -8))
 
   expect_no_error(result <- codebook(data))
   expect_s3_class(result, "codebook")

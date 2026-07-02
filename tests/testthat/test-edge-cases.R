@@ -474,11 +474,11 @@ test_that("levene_test dispatches from factorial_anova", {
 })
 
 # ===========================================================================
-# 24. frequency: show.valid and show.sum toggles
+# 24. frequency: show_valid and show_sum toggles
 # ===========================================================================
-test_that("frequency with show.valid=FALSE, show.sum=FALSE", {
+test_that("frequency with show_valid=FALSE, show_sum=FALSE", {
   result <- frequency(survey_data, gender,
-                      show.valid = FALSE, show.sum = FALSE)
+                      show_valid = FALSE, show_sum = FALSE)
   output <- capture.output(print(result))
   expect_true(length(output) > 0)
   # Valid % and Cum. % should not appear (full table lives in summary())
@@ -487,8 +487,8 @@ test_that("frequency with show.valid=FALSE, show.sum=FALSE", {
   expect_false(any(grepl("Valid %", summary_output, fixed = TRUE)))
 })
 
-test_that("frequency with show.labels=TRUE", {
-  result <- frequency(survey_data, gender, show.labels = TRUE)
+test_that("frequency with show_labels=TRUE", {
+  result <- frequency(survey_data, gender, show_labels = TRUE)
   output <- capture.output(print(result))
   expect_true(length(output) > 0)
 })

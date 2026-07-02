@@ -200,7 +200,7 @@ Use `set_na()` to declare specific numeric codes as missing values:
 
 ```{r, eval = FALSE}
 # After importing SPSS data where -9 = refused, -8 = don't know
-data <- read_spss("survey.sav", tag.na = FALSE)
+data <- read_spss("survey.sav", tag_na = FALSE)
 
 # Declare -9 and -8 as missing across all numeric columns
 data <- set_na(data, -9, -8, tag = TRUE)

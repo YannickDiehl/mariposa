@@ -215,7 +215,7 @@ test_that("correlation functions return NA for constant variables instead of cra
   expect_true(is.na(k$tau[1]) && is.na(k$p_value[1]))
 })
 
-test_that("frequency(show.unused = TRUE) works on set_na-tagged variables", {
+test_that("frequency(show_unused = TRUE) works on set_na-tagged variables", {
   # Audit finding: injected zero-frequency rows lacked the na_display_value
   # column added by tagged-NA expansion -> rbind column mismatch crash.
   v <- haven::labelled(
@@ -223,15 +223,15 @@ test_that("frequency(show.unused = TRUE) works on set_na-tagged variables", {
     labels = c(Low = 1, Mid = 2, High = 3, Unused = 4, Refused = 7, DK = 8)
   )
   d <- set_na(dplyr::tibble(v = v), v = c(7, 8))
-  expect_no_error(res <- frequency(d, v, show.unused = TRUE))
+  expect_no_error(res <- frequency(d, v, show_unused = TRUE))
   expect_true(4 %in% res$results$value)  # unused label row present
 })
 
-test_that("sort.frq sorts by frequency and keeps cumulative percent monotone", {
+test_that("sort_frq sorts by frequency and keeps cumulative percent monotone", {
   # Audit finding: sorting was by value (contradicting the docs) and left
   # the pre-sort cumulative percentages in place (non-monotone output).
   d <- dplyr::tibble(v = c(1, 1, 1, 2, 2, 3))
-  res <- frequency(d, v, sort.frq = "desc")$results
+  res <- frequency(d, v, sort_frq = "desc")$results
   expect_equal(res$freq[1:3], c(3, 2, 1))
   expect_true(all(diff(res$cum_prc[1:3]) >= 0))
   expect_equal(res$cum_prc[3], 100, tolerance = 1e-10)
@@ -351,4 +351,123 @@ test_that("weighted mann_whitney stays equivalent to the design-based svyranktes
   # |Z| only: the unweighted path reports Z from the min-U convention
   # (always <= 0, as SPSS does), the design-based path keeps the natural sign.
   expect_lt(abs(abs(ww$Z[1]) - abs(uw$Z[1])), 0.05)
+})
+
+# --- Stage 4: API renames ------------------------------------------------------
+# The sjmisc-heritage dot-case argument names were renamed to snake_case with
+# a soft-deprecation bridge (VERSIONING_POLICY.md, section 4): the old dot
+# name still works but warns (once per session), the new name works silently,
+# and both produce identical results.
+
+test_that("frequency: deprecated sort.frq warns and matches sort_frq", {
+  rlang::reset_warning_verbosity("mariposa_sort.frq")
+  expect_warning(
+    old <- frequency(survey_data, education, sort.frq = "desc"),
+    "deprecated"
+  )
+  expect_no_warning(
+    new <- frequency(survey_data, education, sort_frq = "desc")
+  )
+  expect_identical(old$results, new$results)
+  expect_identical(old$options, new$options)
+})
+
+test_that("frequency: deprecated show.na warns and matches show_na", {
+  rlang::reset_warning_verbosity("mariposa_show.na")
+  expect_warning(
+    old <- frequency(survey_data, education, show.na = FALSE),
+    "deprecated"
+  )
+  expect_no_warning(
+    new <- frequency(survey_data, education, show_na = FALSE)
+  )
+  expect_identical(old$results, new$results)
+  expect_identical(old$options, new$options)
+})
+
+test_that("frequency: sort_frq typo errors instead of silently not sorting", {
+  # match.arg error text is locale-dependent; match on the choices instead
+  expect_error(
+    frequency(survey_data, education, sort_frq = "dsc"),
+    "none"
+  )
+})
+
+test_that("frequency: show_labels rejects values other than TRUE/FALSE/'auto'", {
+  expect_error(
+    frequency(survey_data, education, show_labels = "yes"),
+    "show_labels"
+  )
+  expect_no_error(frequency(survey_data, education, show_labels = TRUE))
+  expect_no_error(frequency(survey_data, education, show_labels = FALSE))
+  expect_no_error(frequency(survey_data, education, show_labels = "auto"))
+})
+
+test_that("rec: deprecated dot-case args warn and match the snake_case names", {
+  rlang::reset_warning_verbosity("mariposa_as.factor")
+  rlang::reset_warning_verbosity("mariposa_var.label")
+  rlang::reset_warning_verbosity("mariposa_val.labels")
+
+  expect_warning(
+    old_af <- rec(survey_data, trust_government,
+                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+                  as.factor = TRUE),
+    "deprecated"
+  )
+  expect_no_warning(
+    new_af <- rec(survey_data, trust_government,
+                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+                  as_factor = TRUE)
+  )
+  expect_identical(old_af$trust_government_r, new_af$trust_government_r)
+
+  expect_warning(
+    old_vl <- rec(survey_data, trust_government,
+                  rules = "rev", suffix = "_r",
+                  var.label = "Reversed trust"),
+    "deprecated"
+  )
+  expect_no_warning(
+    new_vl <- rec(survey_data, trust_government,
+                  rules = "rev", suffix = "_r",
+                  var_label = "Reversed trust")
+  )
+  expect_identical(old_vl$trust_government_r, new_vl$trust_government_r)
+
+  expect_warning(
+    old_ll <- rec(survey_data, trust_government,
+                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+                  val.labels = c("1" = "Low", "2" = "Mid", "3" = "High")),
+    "deprecated"
+  )
+  expect_no_warning(
+    new_ll <- rec(survey_data, trust_government,
+                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+                  val_labels = c("1" = "Low", "2" = "Mid", "3" = "High"))
+  )
+  expect_identical(old_ll$trust_government_r, new_ll$trust_government_r)
+})
+
+test_that("to_label/to_numeric: deprecated dot-case args warn and match", {
+  skip_if_not_installed("haven")
+  rlang::reset_warning_verbosity("mariposa_add.non.labelled")
+  x <- haven::labelled(c(1, 2, 3, 2), labels = c(Low = 1, High = 2))
+  expect_warning(
+    old <- to_label(x, add.non.labelled = TRUE),
+    "deprecated"
+  )
+  expect_no_warning(new <- to_label(x, add_non_labelled = TRUE))
+  expect_identical(old, new)
+
+  rlang::reset_warning_verbosity("mariposa_start.at")
+  f <- factor(c("2", "4", "6"))
+  expect_warning(old_n <- to_numeric(f, start.at = 0), "deprecated")
+  expect_no_warning(new_n <- to_numeric(f, start_at = 0))
+  expect_identical(old_n, new_n)
+})
+
+test_that("t_test results carry conf_int_* and no duplicated CI_* aliases", {
+  res <- t_test(survey_data, life_satisfaction, group = gender)
+  expect_true(all(c("conf_int_lower", "conf_int_upper") %in% names(res$results)))
+  expect_false(any(c("CI_lower", "CI_upper") %in% names(res$results)))
 })

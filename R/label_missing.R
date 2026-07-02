@@ -39,7 +39,7 @@
 #' When `tag = TRUE` (default), each missing value code gets a unique tag
 #' character, so you can distinguish between "No answer" (-9) and "Not
 #' applicable" (-8) in downstream analysis. This is the same system used by
-#' [read_spss()] with `tag.na = TRUE`.
+#' [read_spss()] with `tag_na = TRUE`.
 #'
 #' When `tag = FALSE`, all specified values become regular `NA` and the
 #' distinction between different missing types is lost.

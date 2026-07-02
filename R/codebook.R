@@ -382,9 +382,9 @@ codebook <- function(data, ..., weights = NULL,
     if (is_categorical || has_few_values) {
       freq_list[[vn]] <- calculate_single_frequency(
         x, w_vec,
-        sort.frq = "none",
-        show.na = (show.na && has_tagged),
-        show.unused = show.unused
+        sort_frq = "none",
+        show_na = (show.na && has_tagged),
+        show_unused = show.unused
       )
     }
   }

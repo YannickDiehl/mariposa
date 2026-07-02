@@ -20,19 +20,29 @@
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
 #'   empty, converts all `haven_labelled` columns.
 #' @param ordered If `TRUE`, creates an ordered factor. Default: `FALSE`.
-#' @param drop.na If `TRUE` (default), tagged NAs are converted to regular
+#' @param drop_na If `TRUE` (default), tagged NAs are converted to regular
 #'   `NA` (excluded from factor levels). If `FALSE`, tagged NAs are kept as
 #'   factor levels with their label text.
-#' @param drop.unused If `TRUE`, removes factor levels with zero observations.
+#' @param drop_unused If `TRUE`, removes factor levels with zero observations.
 #'   Default: `FALSE`.
-#' @param add.non.labelled If `TRUE`, values without labels are included as
+#' @param add_non_labelled If `TRUE`, values without labels are included as
 #'   factor levels using their numeric value as the level name.
 #'   Default: `FALSE` (unlabelled values become `NA`).
+#' @param drop.na,drop.unused,add.non.labelled Deprecated dot-case argument
+#'   names. See the "Deprecated arguments" section below.
 #'
 #' @return The input with labelled variables converted to factors. For
 #'   single vector input, returns a factor.
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument names `drop.na`, `drop.unused`, and
+#' `add.non.labelled` are deprecated; use the snake_case equivalents
+#' `drop_na`, `drop_unused`, and `add_non_labelled` instead. The old names
+#' still work but issue a deprecation warning (once per session) and will
+#' be removed in a future release.
+#'
 #' For each labelled variable, the numeric codes are replaced by their
 #' associated value labels. The resulting factor levels are ordered by the
 #' original numeric values (not alphabetically).
@@ -62,14 +72,30 @@
 #' data <- to_label(survey_data)
 #'
 #' # Keep values without labels as factor levels
-#' to_label(survey_data$life_satisfaction, add.non.labelled = TRUE)
+#' to_label(survey_data$life_satisfaction, add_non_labelled = TRUE)
 #'
 #' @export
-to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
-                     drop.unused = FALSE, add.non.labelled = FALSE) {
+to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
+                     drop_unused = FALSE, add_non_labelled = FALSE,
+                     drop.na = NULL, drop.unused = NULL,
+                     add.non.labelled = NULL) {
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(drop.na)) {
+    .warn_deprecated_arg("drop.na", "drop_na")
+    if (missing(drop_na)) drop_na <- drop.na
+  }
+  if (!is.null(drop.unused)) {
+    .warn_deprecated_arg("drop.unused", "drop_unused")
+    if (missing(drop_unused)) drop_unused <- drop.unused
+  }
+  if (!is.null(add.non.labelled)) {
+    .warn_deprecated_arg("add.non.labelled", "add_non_labelled")
+    if (missing(add_non_labelled)) add_non_labelled <- add.non.labelled
+  }
+
   if (!is.data.frame(data)) {
-    return(.to_label_vec(data, ordered, drop.na, drop.unused,
-                         add.non.labelled))
+    return(.to_label_vec(data, ordered, drop_na, drop_unused,
+                         add_non_labelled))
   }
 
   dots <- rlang::enexprs(...)
@@ -81,8 +107,8 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
   }
 
   for (i in cols) {
-    data[[i]] <- .to_label_vec(data[[i]], ordered, drop.na, drop.unused,
-                                add.non.labelled)
+    data[[i]] <- .to_label_vec(data[[i]], ordered, drop_na, drop_unused,
+                                add_non_labelled)
   }
 
   data
@@ -91,8 +117,8 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
 
 #' Internal: convert a single vector to factor using labels
 #' @noRd
-.to_label_vec <- function(x, ordered = FALSE, drop.na = TRUE,
-                          drop.unused = FALSE, add.non.labelled = FALSE) {
+.to_label_vec <- function(x, ordered = FALSE, drop_na = TRUE,
+                          drop_unused = FALSE, add_non_labelled = FALSE) {
   # Already a factor? Return as-is
   if (is.factor(x)) return(x)
 
@@ -123,7 +149,7 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
   }
 
   # Handle tagged NAs
-  if (!isTRUE(drop.na) && length(na_labels) > 0L &&
+  if (!isTRUE(drop_na) && length(na_labels) > 0L &&
       requireNamespace("haven", quietly = TRUE)) {
     na_idx <- which(is.na(raw))
     for (k in na_idx) {
@@ -141,7 +167,7 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
   }
 
   # Handle unlabelled values
-  if (isTRUE(add.non.labelled)) {
+  if (isTRUE(add_non_labelled)) {
     unlabelled_mask <- is.na(mapped) & !is.na(raw)
     if (any(unlabelled_mask)) {
       unlabelled_vals <- sort(unique(raw[unlabelled_mask]))
@@ -153,7 +179,7 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
 
   result <- factor(mapped, levels = unique(level_names), ordered = ordered)
 
-  if (isTRUE(drop.unused)) {
+  if (isTRUE(drop_unused)) {
     result <- droplevels(result)
   }
 
@@ -179,14 +205,24 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
 #' @param data A data frame, tibble, or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
 #'   empty, converts all `haven_labelled` columns.
-#' @param drop.na If `TRUE` (default), tagged NAs become regular `NA`.
-#' @param add.non.labelled If `TRUE`, unlabelled values are included as
+#' @param drop_na If `TRUE` (default), tagged NAs become regular `NA`.
+#' @param add_non_labelled If `TRUE`, unlabelled values are included as
 #'   their numeric string representation. Default: `FALSE`.
+#' @param drop.na,add.non.labelled Deprecated dot-case argument names. See
+#'   the "Deprecated arguments" section below.
 #'
 #' @return The input with labelled variables converted to character. For
 #'   single vector input, returns a character vector.
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument names `drop.na` and `add.non.labelled` are
+#' deprecated; use the snake_case equivalents `drop_na` and
+#' `add_non_labelled` instead. The old names still work but issue a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' This is a convenience wrapper around [to_label()] that calls
 #' `as.character()` on the result. Use this when you need character output
 #' (e.g., for string operations) rather than factor output.
@@ -205,12 +241,23 @@ to_label <- function(data, ..., ordered = FALSE, drop.na = TRUE,
 #' data <- to_character(survey_data, gender, region)
 #'
 #' @export
-to_character <- function(data, ..., drop.na = TRUE,
-                         add.non.labelled = FALSE) {
+to_character <- function(data, ..., drop_na = TRUE,
+                         add_non_labelled = FALSE,
+                         drop.na = NULL, add.non.labelled = NULL) {
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(drop.na)) {
+    .warn_deprecated_arg("drop.na", "drop_na")
+    if (missing(drop_na)) drop_na <- drop.na
+  }
+  if (!is.null(add.non.labelled)) {
+    .warn_deprecated_arg("add.non.labelled", "add_non_labelled")
+    if (missing(add_non_labelled)) add_non_labelled <- add.non.labelled
+  }
+
   if (!is.data.frame(data)) {
-    result <- .to_label_vec(data, ordered = FALSE, drop.na = drop.na,
-                            drop.unused = FALSE,
-                            add.non.labelled = add.non.labelled)
+    result <- .to_label_vec(data, ordered = FALSE, drop_na = drop_na,
+                            drop_unused = FALSE,
+                            add_non_labelled = add_non_labelled)
     out <- as.character(result)
     var_lbl <- attr(data, "label", exact = TRUE)
     if (!is.null(var_lbl)) attr(out, "label") <- var_lbl
@@ -225,9 +272,9 @@ to_character <- function(data, ..., drop.na = TRUE,
   }
 
   for (i in cols) {
-    result <- .to_label_vec(data[[i]], ordered = FALSE, drop.na = drop.na,
-                            drop.unused = FALSE,
-                            add.non.labelled = add.non.labelled)
+    result <- .to_label_vec(data[[i]], ordered = FALSE, drop_na = drop_na,
+                            drop_unused = FALSE,
+                            add_non_labelled = add_non_labelled)
     var_lbl <- attr(data[[i]], "label", exact = TRUE)
     data[[i]] <- as.character(result)
     if (!is.null(var_lbl)) attr(data[[i]], "label") <- var_lbl
@@ -252,24 +299,34 @@ to_character <- function(data, ..., drop.na = TRUE,
 #' @param data A data frame, tibble, or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
 #'   empty, converts all factor columns.
-#' @param use.labels If `TRUE` (default), attempts to use the numeric value
+#' @param use_labels If `TRUE` (default), attempts to use the numeric value
 #'   of factor levels (e.g., level `"3"` becomes `3`). If `FALSE`, uses
 #'   sequential integers (1, 2, 3, ...).
-#' @param start.at If not `NULL`, the lowest numeric value in the output
+#' @param start_at If not `NULL`, the lowest numeric value in the output
 #'   starts at this number. Default: `NULL` (use original values).
-#' @param keep.labels If `TRUE`, the former factor levels are stored as
+#' @param keep_labels If `TRUE`, the former factor levels are stored as
 #'   value labels on the result. Default: `FALSE`.
+#' @param use.labels,start.at,keep.labels Deprecated dot-case argument
+#'   names. See the "Deprecated arguments" section below.
 #'
 #' @return The input with variables converted to numeric. For single vector
 #'   input, returns a numeric vector.
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument names `use.labels`, `start.at`, and `keep.labels`
+#' are deprecated; use the snake_case equivalents `use_labels`, `start_at`,
+#' and `keep_labels` instead. The old names still work but issue a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' This function handles three input types:
 #' \enumerate{
 #'   \item **Numeric factors** (levels like `"1"`, `"2"`, `"3"`): Extracts
 #'     the numeric values from the level names.
 #'   \item **Text factors** (levels like `"Male"`, `"Female"`): Converts
-#'     to sequential integers by default; use `use.labels = FALSE` to force
+#'     to sequential integers by default; use `use_labels = FALSE` to force
 #'     this behavior even for numeric-looking levels.
 #'   \item **haven_labelled**: Extracts the underlying numeric vector,
 #'     stripping the labelled class.
@@ -287,17 +344,33 @@ to_character <- function(data, ..., drop.na = TRUE,
 #' # [1] 1 3 5 3
 #'
 #' # Sequential integers
-#' to_numeric(x, use.labels = FALSE)
+#' to_numeric(x, use_labels = FALSE)
 #' # [1] 1 2 3 2
 #'
 #' # Haven labelled → plain numeric
 #' to_numeric(survey_data$life_satisfaction)
 #'
 #' @export
-to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
-                       keep.labels = FALSE) {
+to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
+                       keep_labels = FALSE,
+                       use.labels = NULL, start.at = NULL,
+                       keep.labels = NULL) {
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(use.labels)) {
+    .warn_deprecated_arg("use.labels", "use_labels")
+    if (missing(use_labels)) use_labels <- use.labels
+  }
+  if (!is.null(start.at)) {
+    .warn_deprecated_arg("start.at", "start_at")
+    if (missing(start_at)) start_at <- start.at
+  }
+  if (!is.null(keep.labels)) {
+    .warn_deprecated_arg("keep.labels", "keep_labels")
+    if (missing(keep_labels)) keep_labels <- keep.labels
+  }
+
   if (!is.data.frame(data)) {
-    return(.to_numeric_vec(data, use.labels, start.at, keep.labels))
+    return(.to_numeric_vec(data, use_labels, start_at, keep_labels))
   }
 
   dots <- rlang::enexprs(...)
@@ -310,8 +383,8 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
   }
 
   for (i in cols) {
-    data[[i]] <- .to_numeric_vec(data[[i]], use.labels, start.at,
-                                  keep.labels)
+    data[[i]] <- .to_numeric_vec(data[[i]], use_labels, start_at,
+                                  keep_labels)
   }
 
   data
@@ -320,8 +393,8 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
 
 #' Internal: convert a single vector to numeric
 #' @noRd
-.to_numeric_vec <- function(x, use.labels = TRUE, start.at = NULL,
-                            keep.labels = FALSE) {
+.to_numeric_vec <- function(x, use_labels = TRUE, start_at = NULL,
+                            keep_labels = FALSE) {
   var_lbl <- attr(x, "label", exact = TRUE)
 
   # haven_labelled → extract underlying numeric
@@ -329,7 +402,7 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
     old_labels <- attr(x, "labels", exact = TRUE)
     result <- as.double(x)
     if (!is.null(var_lbl)) attr(result, "label") <- var_lbl
-    if (isTRUE(keep.labels) && !is.null(old_labels)) {
+    if (isTRUE(keep_labels) && !is.null(old_labels)) {
       attr(result, "labels") <- old_labels
     }
     return(result)
@@ -339,7 +412,7 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
   if (is.factor(x)) {
     lvls <- levels(x)
 
-    if (isTRUE(use.labels)) {
+    if (isTRUE(use_labels)) {
       # Try to parse levels as numbers
       numeric_lvls <- suppressWarnings(as.numeric(lvls))
       if (!any(is.na(numeric_lvls))) {
@@ -353,23 +426,23 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
       result <- as.integer(x)
     }
 
-    # Apply start.at offset
-    if (!is.null(start.at)) {
+    # Apply start_at offset
+    if (!is.null(start_at)) {
       min_val <- min(result, na.rm = TRUE)
-      result <- result - min_val + start.at
+      result <- result - min_val + start_at
     }
 
     if (!is.null(var_lbl)) attr(result, "label") <- var_lbl
 
-    if (isTRUE(keep.labels)) {
-      vals <- if (isTRUE(use.labels)) {
+    if (isTRUE(keep_labels)) {
+      vals <- if (isTRUE(use_labels)) {
         numeric_lvls <- suppressWarnings(as.numeric(lvls))
         if (!any(is.na(numeric_lvls))) numeric_lvls else seq_along(lvls)
       } else {
         seq_along(lvls)
       }
-      if (!is.null(start.at)) {
-        vals <- vals - min(vals, na.rm = TRUE) + start.at
+      if (!is.null(start_at)) {
+        vals <- vals - min(vals, na.rm = TRUE) + start_at
       }
       attr(result, "labels") <- stats::setNames(vals, lvls)
     }
@@ -379,9 +452,9 @@ to_numeric <- function(data, ..., use.labels = TRUE, start.at = NULL,
 
   # Already numeric
   if (is.numeric(x)) {
-    if (!is.null(start.at)) {
+    if (!is.null(start_at)) {
       min_val <- min(x, na.rm = TRUE)
-      x <- x - min_val + start.at
+      x <- x - min_val + start_at
     }
     return(as.double(x))
   }

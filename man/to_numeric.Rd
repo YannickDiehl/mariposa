@@ -4,7 +4,16 @@
 \alias{to_numeric}
 \title{Convert Factors or Labelled Variables to Numeric}
 \usage{
-to_numeric(data, ..., use.labels = TRUE, start.at = NULL, keep.labels = FALSE)
+to_numeric(
+  data,
+  ...,
+  use_labels = TRUE,
+  start_at = NULL,
+  keep_labels = FALSE,
+  use.labels = NULL,
+  start.at = NULL,
+  keep.labels = NULL
+)
 }
 \arguments{
 \item{data}{A data frame, tibble, or a single vector.}
@@ -12,15 +21,18 @@ to_numeric(data, ..., use.labels = TRUE, start.at = NULL, keep.labels = FALSE)
 \item{...}{Optional: unquoted variable names (tidyselect supported). If
 empty, converts all factor columns.}
 
-\item{use.labels}{If \code{TRUE} (default), attempts to use the numeric value
+\item{use_labels}{If \code{TRUE} (default), attempts to use the numeric value
 of factor levels (e.g., level \code{"3"} becomes \code{3}). If \code{FALSE}, uses
 sequential integers (1, 2, 3, ...).}
 
-\item{start.at}{If not \code{NULL}, the lowest numeric value in the output
+\item{start_at}{If not \code{NULL}, the lowest numeric value in the output
 starts at this number. Default: \code{NULL} (use original values).}
 
-\item{keep.labels}{If \code{TRUE}, the former factor levels are stored as
+\item{keep_labels}{If \code{TRUE}, the former factor levels are stored as
 value labels on the result. Default: \code{FALSE}.}
+
+\item{use.labels, start.at, keep.labels}{Deprecated dot-case argument
+names. See the "Deprecated arguments" section below.}
 }
 \value{
 The input with variables converted to numeric. For single vector
@@ -33,15 +45,24 @@ numeric strings). For labelled variables, extracts the underlying numeric
 values.
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument names \code{use.labels}, \code{start.at}, and \code{keep.labels}
+are deprecated; use the snake_case equivalents \code{use_labels}, \code{start_at},
+and \code{keep_labels} instead. The old names still work but issue a
+deprecation warning (once per session) and will be removed in a future
+release.
+
 This function handles three input types:
 \enumerate{
 \item \strong{Numeric factors} (levels like \code{"1"}, \code{"2"}, \code{"3"}): Extracts
 the numeric values from the level names.
 \item \strong{Text factors} (levels like \code{"Male"}, \code{"Female"}): Converts
-to sequential integers by default; use \code{use.labels = FALSE} to force
+to sequential integers by default; use \code{use_labels = FALSE} to force
 this behavior even for numeric-looking levels.
 \item \strong{haven_labelled}: Extracts the underlying numeric vector,
 stripping the labelled class.
+}
 }
 }
 \examples{
@@ -51,7 +72,7 @@ to_numeric(x)
 # [1] 1 3 5 3
 
 # Sequential integers
-to_numeric(x, use.labels = FALSE)
+to_numeric(x, use_labels = FALSE)
 # [1] 1 2 3 2
 
 # Haven labelled → plain numeric

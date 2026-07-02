@@ -22,7 +22,7 @@ Invisibly returns the file path.
 \description{
 Writes a data frame to an SPSS \code{.sav} file, preserving variable labels,
 value labels, and user-defined missing values. When exporting data that
-was imported with \code{\link[=read_spss]{read_spss()}} (with \code{tag.na = TRUE}), the tagged NAs are
+was imported with \code{\link[=read_spss]{read_spss()}} (with \code{tag_na = TRUE}), the tagged NAs are
 automatically converted back to SPSS user-defined missing values, enabling
 full roundtrip fidelity.
 }

@@ -39,7 +39,7 @@ declared as missing after import.
 When \code{tag = TRUE} (default), each missing value code gets a unique tag
 character, so you can distinguish between "No answer" (-9) and "Not
 applicable" (-8) in downstream analysis. This is the same system used by
-\code{\link[=read_spss]{read_spss()}} with \code{tag.na = TRUE}.
+\code{\link[=read_spss]{read_spss()}} with \code{tag_na = TRUE}.
 
 When \code{tag = FALSE}, all specified values become regular \code{NA} and the
 distinction between different missing types is lost.

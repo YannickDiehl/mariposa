@@ -4,18 +4,21 @@
 \alias{read_xpt}
 \title{Read SAS Transport File with Tagged Missing Values}
 \usage{
-read_xpt(path, tag.na = NULL, verbose = FALSE)
+read_xpt(path, tag_na = NULL, verbose = FALSE, tag.na = NULL)
 }
 \arguments{
 \item{path}{Path to a SAS transport file (\code{.xpt}).}
 
-\item{tag.na}{Numeric vector of values to treat as missing (e.g.,
+\item{tag_na}{Numeric vector of values to treat as missing (e.g.,
 \code{c(-9, -8, -42)}). These values will be converted to tagged NAs across
 all numeric variables. Default: \code{NULL} (only detect native SAS special
 missing values).}
 
 \item{verbose}{If \code{TRUE}, prints a message summarizing how many variables
 contain tagged missing values.}
+
+\item{tag.na}{Deprecated dot-case argument name. See the "Deprecated
+arguments" section below.}
 }
 \value{
 A tibble with the SAS data. See \code{\link[=read_sas]{read_sas()}} for details on
@@ -24,16 +27,24 @@ tagged NA handling.
 \description{
 Reads a SAS transport file (\code{.xpt}) and integrates with mariposa's tagged
 NA system. Handles both native SAS special missing values and user-specified
-numeric missing codes (via \code{tag.na}). Transport files are a
+numeric missing codes (via \code{tag_na}). Transport files are a
 platform-independent SAS data format commonly used for FDA submissions and
 data exchange.
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument name \code{tag.na} is deprecated; use the snake_case
+equivalent \code{tag_na} instead. The old name still works but issues a
+deprecation warning (once per session) and will be removed in a future
+release.
+
 SAS transport files support the same special missing values as
 \code{.sas7bdat} files (\code{.A}-\code{.Z}, \code{._}). This format is self-contained and
 does not require a separate catalog file for value labels.
 
-When \code{tag.na} is used, \code{\link[=untag_na]{untag_na()}} can recover the original numeric codes.
+When \code{tag_na} is used, \code{\link[=untag_na]{untag_na()}} can recover the original numeric codes.
+}
 }
 \examples{
 \dontrun{
@@ -41,7 +52,7 @@ When \code{tag.na} is used, \code{\link[=untag_na]{untag_na()}} can recover the 
 data <- read_xpt("survey.xpt")
 
 # Read with numeric missing codes
-data <- read_xpt("survey.xpt", tag.na = c(-9, -8, -42))
+data <- read_xpt("survey.xpt", tag_na = c(-9, -8, -42))
 
 na_frequencies(data$income)
 }

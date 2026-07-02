@@ -298,11 +298,11 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 
   # Determine active columns based on options
   col_headers <- "Value"
-  if (isTRUE(opts$show.labels)) col_headers <- c(col_headers, "Label")
+  if (isTRUE(opts$show_labels)) col_headers <- c(col_headers, "Label")
   col_headers <- c(col_headers, "N")
-  if (isTRUE(opts$show.prc))   col_headers <- c(col_headers, "Raw %")
-  if (isTRUE(opts$show.valid)) col_headers <- c(col_headers, "Valid %")
-  if (isTRUE(opts$show.sum))   col_headers <- c(col_headers, "Cum. %")
+  if (isTRUE(opts$show_prc))   col_headers <- c(col_headers, "Raw %")
+  if (isTRUE(opts$show_valid)) col_headers <- c(col_headers, "Valid %")
+  if (isTRUE(opts$show_sum))   col_headers <- c(col_headers, "Cum. %")
 
   ncols <- length(col_headers)
   cur_row <- 1L
@@ -459,7 +459,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   na_idx <- is.na(results$value)
   valid_rows <- results[!na_idx, , drop = FALSE]
   na_rows    <- results[na_idx, , drop = FALSE]
-  has_na <- nrow(na_rows) > 0L && isTRUE(opts$show.na)
+  has_na <- nrow(na_rows) > 0L && isTRUE(opts$show_na)
 
   # Write valid data rows
   for (i in seq_len(nrow(valid_rows))) {
@@ -595,7 +595,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   .write_cell(wb, sheet, row, col_idx, val)
 
   # Label
-  if (isTRUE(opts$show.labels)) {
+  if (isTRUE(opts$show_labels)) {
     col_idx <- col_idx + 1L
     lbl <- if (is.na(data_row$label) || data_row$label == "") "" else as.character(data_row$label)
     .write_cell(wb, sheet, row, col_idx, lbl)
@@ -606,21 +606,21 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   .write_cell(wb, sheet, row, col_idx, round(data_row$freq))
 
   # Raw %
-  if (isTRUE(opts$show.prc)) {
+  if (isTRUE(opts$show_prc)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx,
                 if (is.na(data_row$prc)) "" else round(data_row$prc, 2))
   }
 
   # Valid %
-  if (isTRUE(opts$show.valid)) {
+  if (isTRUE(opts$show_valid)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx,
                 if (is.na(data_row$valid_prc)) "" else round(data_row$valid_prc, 2))
   }
 
   # Cum. %
-  if (isTRUE(opts$show.sum)) {
+  if (isTRUE(opts$show_sum)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx,
                 if (is.na(data_row$cum_prc)) "" else round(data_row$cum_prc, 2))
@@ -650,7 +650,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   .write_cell(wb, sheet, row, col_idx, value)
 
   # Label column: "Total Valid" / "Total Missing" / ""
-  if (isTRUE(opts$show.labels)) {
+  if (isTRUE(opts$show_labels)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx, sublabel)
   }
@@ -660,21 +660,21 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   .write_cell(wb, sheet, row, col_idx, round(freq))
 
   # Raw %
-  if (isTRUE(opts$show.prc)) {
+  if (isTRUE(opts$show_prc)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx,
                 if (is.na(prc)) "" else round(prc, 2))
   }
 
   # Valid %
-  if (isTRUE(opts$show.valid)) {
+  if (isTRUE(opts$show_valid)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx,
                 if (is.na(valid_prc)) "" else round(valid_prc, 2))
   }
 
   # Cum. %
-  if (isTRUE(opts$show.sum)) {
+  if (isTRUE(opts$show_sum)) {
     col_idx <- col_idx + 1L
     .write_cell(wb, sheet, row, col_idx,
                 if (is.na(cum_prc)) "" else round(cum_prc, 2))

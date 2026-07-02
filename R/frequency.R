@@ -16,28 +16,40 @@
 #' @param weights Optional survey weights for population-representative results.
 #'   Without weights, you get sample frequencies. With weights, you get
 #'   population estimates.
-#' @param sort.frq How to order the results:
+#' @param sort_frq How to order the results:
 #'   \itemize{
 #'     \item \code{"none"} (default): Keep original order
 #'     \item \code{"asc"}: Sort from lowest to highest frequency
 #'     \item \code{"desc"}: Sort from highest to lowest frequency
 #'   }
-#' @param show.na Include missing values in the table? (Default: TRUE)
-#' @param show.prc Show raw percentages including missing values? (Default: TRUE)
-#' @param show.valid Show percentages excluding missing values? (Default: TRUE)
-#' @param show.sum Show cumulative totals? (Default: TRUE)
-#' @param show.labels Show category labels if available? (Default: "auto" - shows
+#' @param show_na Include missing values in the table? (Default: TRUE)
+#' @param show_prc Show raw percentages including missing values? (Default: TRUE)
+#' @param show_valid Show percentages excluding missing values? (Default: TRUE)
+#' @param show_sum Show cumulative totals? (Default: TRUE)
+#' @param show_labels Show category labels if available? (Default: "auto" - shows
 #'   labels when they exist)
-#' @param show.unused Show all defined value labels, even those with zero
+#' @param show_unused Show all defined value labels, even those with zero
 #'   observations? (Default: FALSE). When TRUE, values that have labels defined
 #'   (e.g., from statistical software files) but no cases in the data are
 #'   included with frequency 0. This is useful for labelled datasets where
 #'   unused categories should still appear in the output. Automatically enables
 #'   label display.
+#' @param sort.frq,show.na,show.prc,show.valid,show.sum,show.labels,show.unused
+#'   Deprecated dot-case argument names. See the "Deprecated arguments"
+#'   section below.
 #'
 #' @return A frequency table showing counts and percentages for each category
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument names `sort.frq`, `show.na`, `show.prc`,
+#' `show.valid`, `show.sum`, `show.labels`, and `show.unused` are deprecated;
+#' use the snake_case equivalents `sort_frq`, `show_na`, `show_prc`,
+#' `show_valid`, `show_sum`, `show_labels`, and `show_unused` instead.
+#' The old names still work but issue a deprecation warning (once per
+#' session) and will be removed in a future release.
+#'
 #' ## Understanding the Results
 #'
 #' The frequency table shows:
@@ -62,8 +74,8 @@
 #' ## Tagged Missing Values
 #'
 #' When data is imported with tagged NAs (e.g., via [read_spss()] with
-#' `tag.na = TRUE`, or [read_stata()], [read_sas()], [read_xpt()] with the
-#' `tag.na` parameter), `frequency()` automatically expands the missing value
+#' `tag_na = TRUE`, or [read_stata()], [read_sas()], [read_xpt()] with the
+#' `tag_na` parameter), `frequency()` automatically expands the missing value
 #' section to show each missing type individually (with its original missing
 #' value code and label), plus summary rows for **Total Valid** and **Total
 #' Missing**.
@@ -85,11 +97,11 @@
 #'   frequency(gender, weights = sampling_weight)
 #' 
 #' # Education levels with sorting
-#' survey_data %>% frequency(education, sort.frq = "desc")
+#' survey_data %>% frequency(education, sort_frq = "desc")
 #' 
 #' # Employment status with custom display options
 #' survey_data %>% frequency(employment, weights = sampling_weight, 
-#'                          show.na = TRUE, show.sum = TRUE)
+#'                          show_na = TRUE, show_sum = TRUE)
 #'
 #' @seealso
 #' \code{\link[base]{table}} for base R frequency tables.
@@ -102,10 +114,54 @@
 #'
 #' @family descriptive
 #' @export
-frequency <- function(data, ..., weights = NULL, sort.frq = "none",
-                     show.na = TRUE, show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto", show.unused = FALSE) {
-  
+frequency <- function(data, ..., weights = NULL, sort_frq = "none",
+                     show_na = TRUE, show_prc = TRUE, show_valid = TRUE, show_sum = TRUE, show_labels = "auto", show_unused = FALSE,
+                     sort.frq = NULL, show.na = NULL, show.prc = NULL,
+                     show.valid = NULL, show.sum = NULL, show.labels = NULL,
+                     show.unused = NULL) {
+
   if (!is.data.frame(data)) cli_abort("{.arg data} must be a data frame.")
+
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(sort.frq)) {
+    .warn_deprecated_arg("sort.frq", "sort_frq")
+    if (missing(sort_frq)) sort_frq <- sort.frq
+  }
+  if (!is.null(show.na)) {
+    .warn_deprecated_arg("show.na", "show_na")
+    if (missing(show_na)) show_na <- show.na
+  }
+  if (!is.null(show.prc)) {
+    .warn_deprecated_arg("show.prc", "show_prc")
+    if (missing(show_prc)) show_prc <- show.prc
+  }
+  if (!is.null(show.valid)) {
+    .warn_deprecated_arg("show.valid", "show_valid")
+    if (missing(show_valid)) show_valid <- show.valid
+  }
+  if (!is.null(show.sum)) {
+    .warn_deprecated_arg("show.sum", "show_sum")
+    if (missing(show_sum)) show_sum <- show.sum
+  }
+  if (!is.null(show.labels)) {
+    .warn_deprecated_arg("show.labels", "show_labels")
+    if (missing(show_labels)) show_labels <- show.labels
+  }
+  if (!is.null(show.unused)) {
+    .warn_deprecated_arg("show.unused", "show_unused")
+    if (missing(show_unused)) show_unused <- show.unused
+  }
+
+  # Validate sort_frq: typos error instead of silently not sorting
+  sort_frq <- match.arg(sort_frq, choices = c("none", "asc", "desc"))
+
+  # Validate show_labels: only TRUE, FALSE, or "auto" are accepted
+  if (!(isTRUE(show_labels) || isFALSE(show_labels) ||
+        identical(show_labels, "auto"))) {
+    cli_abort(
+      "{.arg show_labels} must be {.val TRUE}, {.val FALSE}, or {.val auto}."
+    )
+  }
 
   # Check grouping and get variable names
   is_grouped <- inherits(data, "grouped_df")
@@ -119,13 +175,13 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
   weights_info <- .process_weights(data, rlang::enquo(weights))
   w_name <- weights_info$name
   
-  # When show.unused is TRUE, force labels on (unused labels without label column make no sense)
-  if (show.unused && show.labels == "auto") {
-    show.labels <- TRUE
+  # When show_unused is TRUE, force labels on (unused labels without label column make no sense)
+  if (show_unused && show_labels == "auto") {
+    show_labels <- TRUE
   }
 
-  # Handle show.labels logic: auto-detect or use explicit user setting
-  if (show.labels == "auto") {
+  # Handle show_labels logic: auto-detect or use explicit user setting
+  if (show_labels == "auto") {
     has_meaningful_labels <- any(vapply(var_names, function(var) {
       x <- data[[var]]
       
@@ -166,18 +222,18 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
       return(FALSE)
     }, logical(1)))
     
-    # Set show.labels based on auto-detection
-    show.labels <- has_meaningful_labels
+    # Set show_labels based on auto-detection
+    show_labels <- has_meaningful_labels
   } else {
     # Use explicit user setting (TRUE or FALSE)
-    show.labels <- as.logical(show.labels)
+    show_labels <- as.logical(show_labels)
   }
   
   # Calculate frequencies
   if (is_grouped) {
-    results <- calculate_grouped_frequencies(data, var_names, w_name, sort.frq, show.na, show.unused)
+    results <- calculate_grouped_frequencies(data, var_names, w_name, sort_frq, show_na, show_unused)
   } else {
-    results <- calculate_ungrouped_frequencies(data, var_names, w_name, sort.frq, show.na, show.unused)
+    results <- calculate_ungrouped_frequencies(data, var_names, w_name, sort_frq, show_na, show_unused)
   }
   
   # Create S3 object
@@ -188,7 +244,7 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
     weights = w_name,
     groups = grp_vars,
     is_grouped = is_grouped,
-    options = list(show.na = show.na, show.prc = show.prc, show.valid = show.valid, show.sum = show.sum, show.labels = show.labels, show.unused = show.unused),
+    options = list(show_na = show_na, show_prc = show_prc, show_valid = show_valid, show_sum = show_sum, show_labels = show_labels, show_unused = show_unused),
     labels = vapply(var_names, function(var) {
       lbl <- attr(data[[var]], "label", exact = TRUE)
       if (is.null(lbl)) var else paste(as.character(lbl), collapse = " | ")
@@ -197,21 +253,21 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
 }
 
 # Helper function: Calculate frequency statistics for a single variable
-calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na = TRUE, show.unused = FALSE) {
+calculate_single_frequency <- function(x, w = NULL, sort_frq = "none", show_na = TRUE, show_unused = FALSE) {
   # Check for tagged NAs (from read_spss, read_stata, read_sas, etc.)
   has_tagged_na <- !is.null(attr(x, "na_tag_map")) &&
     requireNamespace("haven", quietly = TRUE)
 
   if (is.null(w)) {
     # Unweighted frequencies
-    freq_table <- table(x, useNA = if (show.na) "ifany" else "no")
+    freq_table <- table(x, useNA = if (show_na) "ifany" else "no")
     total <- sum(freq_table)
     na_idx <- is.na(names(freq_table))
     valid_total <- sum(freq_table[!na_idx])
 
-    # For unweighted: if show.na is TRUE, total includes missing
+    # For unweighted: if show_na is TRUE, total includes missing
     # Raw % should always include missing in denominator
-    total_all <- if (show.na) total else (total + sum(is.na(x)))
+    total_all <- if (show_na) total else (total + sum(is.na(x)))
 
     prc <- as.numeric(freq_table) / total_all * 100
     # Valid % calculation - only for non-NA values
@@ -249,7 +305,7 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
   } else {
     # Weighted frequencies
     valid_idx <- !is.na(x) & !is.na(w)
-    if (!any(valid_idx) && !show.na) {
+    if (!any(valid_idx) && !show_na) {
       return(data.frame(value = numeric(0), label = character(0), freq = numeric(0),
                        prc = numeric(0), valid_prc = numeric(0), cum_freq = numeric(0),
                        cum_prc = numeric(0), n_eff = numeric(0), stringsAsFactors = FALSE))
@@ -268,8 +324,8 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
       n_eff <- NA
     }
 
-    # Add NA values if show.na = TRUE and there are missing values
-    if (show.na && any(is.na(x))) {
+    # Add NA values if show_na = TRUE and there are missing values
+    if (show_na && any(is.na(x))) {
       na_freq <- sum(w[is.na(x) & !is.na(w)])
       if (na_freq > 0 || any(is.na(x))) {  # Include NA row if there are any NA values
         unique_vals <- c(unique_vals, NA)
@@ -320,13 +376,13 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
   }
 
   # --- Tagged NA expansion: split single NA row into per-tag rows + total ---
-  if (has_tagged_na && show.na && any(is.na(x))) {
+  if (has_tagged_na && show_na && any(is.na(x))) {
     result <- .expand_tagged_na_rows(result, x, w)
   }
 
   # Inject unused value labels as rows with freq=0
   # (skip labels that are tagged NAs - those are already expanded above)
-  if (show.unused && !is.null(attr(x, "labels"))) {
+  if (show_unused && !is.null(attr(x, "labels"))) {
     all_labels <- attr(x, "labels")  # named numeric: c("LINKS" = 1, "RECHTS" = 10, ...)
 
     # Filter out NA labels (tagged NAs) - they are handled by tagged NA expansion
@@ -379,12 +435,12 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
   # Sort if requested: by frequency (as documented, SPSS /FORMAT=AFREQ|DFREQ).
   # NA/total rows keep their position at the bottom; cumulative statistics
   # are recomputed in display order so the Cum. % column stays monotone.
-  if (sort.frq %in% c("asc", "desc")) {
+  if (sort_frq %in% c("asc", "desc")) {
     is_value_row <- !is.na(result$value)
     value_rows <- result[is_value_row, , drop = FALSE]
     other_rows <- result[!is_value_row, , drop = FALSE]
     value_rows <- value_rows[order(value_rows$freq,
-                                   decreasing = (sort.frq == "desc")), ,
+                                   decreasing = (sort_frq == "desc")), ,
                              drop = FALSE]
     value_rows$cum_freq <- cumsum(value_rows$freq)
     value_rows$cum_prc <- cumsum(value_rows$valid_prc)
@@ -398,7 +454,7 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
 # Helper: Expand the single NA row into per-tag rows + a total row
 # Called when tagged NAs are detected (any format: SPSS, Stata, SAS)
 .expand_tagged_na_rows <- function(result, x, w) {
-  tag_map <- attr(x, "na_tag_map")  # named numeric (SPSS/tag.na): c("a" = -42), or character (native): c("a" = ".a")
+  tag_map <- attr(x, "na_tag_map")  # named numeric (SPSS/tag_na): c("a" = -42), or character (native): c("a" = ".a")
   labels  <- attr(x, "labels")
   has_n_eff <- "n_eff" %in% names(result)
 
@@ -614,7 +670,7 @@ calculate_single_stats <- function(x, w = NULL) {
 }
 
 # Helper function: Process variables for a dataset
-process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE, show.unused = FALSE, group_info = NULL) {
+process_variables <- function(data, var_names, w_name, sort_frq, show_na = TRUE, show_unused = FALSE, group_info = NULL) {
   frequencies_list <- list()
   stats_list <- list()
   
@@ -623,7 +679,7 @@ process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE,
     w <- if (!is.null(w_name)) data[[w_name]] else NULL
     
     # Calculate frequencies and stats
-    freq_result <- calculate_single_frequency(x, w, sort.frq, show.na, show.unused)
+    freq_result <- calculate_single_frequency(x, w, sort_frq, show_na, show_unused)
     freq_result$Variable <- var_name
     
     stats <- calculate_single_stats(x, w)
@@ -660,17 +716,17 @@ process_variables <- function(data, var_names, w_name, sort.frq, show.na = TRUE,
 }
 
 # Helper function: Calculate frequencies for ungrouped data
-calculate_ungrouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE, show.unused = FALSE) {
-  process_variables(data, var_names, w_name, sort.frq, show.na, show.unused)
+calculate_ungrouped_frequencies <- function(data, var_names, w_name, sort_frq, show_na = TRUE, show_unused = FALSE) {
+  process_variables(data, var_names, w_name, sort_frq, show_na, show_unused)
 }
 
 # Helper function: Calculate frequencies for grouped data
-calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, show.na = TRUE, show.unused = FALSE) {
+calculate_grouped_frequencies <- function(data, var_names, w_name, sort_frq, show_na = TRUE, show_unused = FALSE) {
   data_list <- dplyr::group_split(data)
   group_keys <- dplyr::group_keys(data)
 
   results_list <- lapply(seq_along(data_list), function(i) {
-    process_variables(data_list[[i]], var_names, w_name, sort.frq, show.na, show.unused, group_keys[i, , drop = FALSE])
+    process_variables(data_list[[i]], var_names, w_name, sort_frq, show_na, show_unused, group_keys[i, , drop = FALSE])
   })
   
   freq_parts <- lapply(results_list, `[[`, "frequencies")
@@ -972,7 +1028,7 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
   headers <- c("Value")
   width_names <- c("Value")
 
-  if (options$show.labels) {
+  if (options$show_labels) {
     headers <- c(headers, "Label")
     width_names <- c(width_names, "Label")
   }
@@ -980,17 +1036,17 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
   headers <- c(headers, "N")
   width_names <- c(width_names, "N")
 
-  if (options$show.prc) {
+  if (options$show_prc) {
     headers <- c(headers, "Raw %")
     width_names <- c(width_names, "Raw")
   }
 
-  if (options$show.valid) {
+  if (options$show_valid) {
     headers <- c(headers, "Valid %")
     width_names <- c(width_names, "Valid")
   }
 
-  if (options$show.sum) {
+  if (options$show_sum) {
     headers <- c(headers, "Cum. %")
     width_names <- c(width_names, "Cum")
   }
@@ -1000,11 +1056,11 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
 
   # Build alignment vector: all columns right-aligned
   aligns <- c("right")  # Value
-  if (options$show.labels) aligns <- c(aligns, "right")  # Label
+  if (options$show_labels) aligns <- c(aligns, "right")  # Label
   aligns <- c(aligns, "right")  # N
-  if (options$show.prc) aligns <- c(aligns, "right")  # Raw %
-  if (options$show.valid) aligns <- c(aligns, "right")  # Valid %
-  if (options$show.sum) aligns <- c(aligns, "right")  # Cum. %
+  if (options$show_prc) aligns <- c(aligns, "right")  # Raw %
+  if (options$show_valid) aligns <- c(aligns, "right")  # Valid %
+  if (options$show_sum) aligns <- c(aligns, "right")  # Cum. %
 
   # Check if we have tagged NA rows (expanded missing types)
   has_tagged_rows <- "na_display_value" %in% names(results) &&
@@ -1026,11 +1082,11 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
     cum_str <- if (is.na(row$cum_prc)) "NA" else sprintf(pct_fmt, row$cum_prc)
 
     values <- c(display_value)
-    if (options$show.labels) values <- c(values, display_label)
+    if (options$show_labels) values <- c(values, display_label)
     values <- c(values, freq_str)
-    if (options$show.prc) values <- c(values, prc_str)
-    if (options$show.valid) values <- c(values, valid_str)
-    if (options$show.sum) values <- c(values, cum_str)
+    if (options$show_prc) values <- c(values, prc_str)
+    if (options$show_valid) values <- c(values, valid_str)
+    if (options$show_sum) values <- c(values, cum_str)
 
     print_row(values, active_widths, aligns)
   }
@@ -1038,11 +1094,11 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
   # Helper: render a summary row (Total Valid / Total Missing / Total)
   render_summary_row <- function(label, freq, prc, valid_prc_str = "NA", cum_str = "", sublabel = "") {
     values <- c(label)
-    if (options$show.labels) values <- c(values, sublabel)
+    if (options$show_labels) values <- c(values, sublabel)
     values <- c(values, sprintf("%.0f", round(freq)))
-    if (options$show.prc) values <- c(values, sprintf(pct_fmt, prc))
-    if (options$show.valid) values <- c(values, valid_prc_str)
-    if (options$show.sum) values <- c(values, cum_str)
+    if (options$show_prc) values <- c(values, sprintf(pct_fmt, prc))
+    if (options$show_valid) values <- c(values, valid_prc_str)
+    if (options$show_sum) values <- c(values, cum_str)
     print_row(values, active_widths, aligns)
   }
 
@@ -1073,7 +1129,7 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
     na_idx <- is.na(results$value)
     valid_rows <- results[!na_idx, , drop = FALSE]
     na_rows <- results[na_idx, , drop = FALSE]
-    has_na <- nrow(na_rows) > 0 && options$show.na
+    has_na <- nrow(na_rows) > 0 && options$show_na
 
     # Print valid data rows
     for (i in seq_len(nrow(valid_rows))) {
@@ -1110,9 +1166,10 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
 }
 
 #' @rdname frequency
-#' @usage fre(data, ..., weights = NULL, sort.frq = "none", show.na = TRUE,
-#'   show.prc = TRUE, show.valid = TRUE, show.sum = TRUE, show.labels = "auto",
-#'   show.unused = FALSE)
+#' @usage fre(data, ..., weights = NULL, sort_frq = "none", show_na = TRUE,
+#'   show_prc = TRUE, show_valid = TRUE, show_sum = TRUE, show_labels = "auto",
+#'   show_unused = FALSE, sort.frq = NULL, show.na = NULL, show.prc = NULL,
+#'   show.valid = NULL, show.sum = NULL, show.labels = NULL, show.unused = NULL)
 #' @export
 fre <- frequency
 

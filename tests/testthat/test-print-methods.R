@@ -83,7 +83,7 @@ test_that("print.frequency: multiple variables", {
 })
 
 test_that("print.frequency: toggled columns", {
-  result <- frequency(survey_data, gender, show.labels = FALSE, show.prc = FALSE)
+  result <- frequency(survey_data, gender, show_labels = FALSE, show_prc = FALSE)
   expect_prints(result, "Frequency")
 })
 

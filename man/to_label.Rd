@@ -8,9 +8,12 @@ to_label(
   data,
   ...,
   ordered = FALSE,
-  drop.na = TRUE,
-  drop.unused = FALSE,
-  add.non.labelled = FALSE
+  drop_na = TRUE,
+  drop_unused = FALSE,
+  add_non_labelled = FALSE,
+  drop.na = NULL,
+  drop.unused = NULL,
+  add.non.labelled = NULL
 )
 }
 \arguments{
@@ -21,16 +24,19 @@ empty, converts all \code{haven_labelled} columns.}
 
 \item{ordered}{If \code{TRUE}, creates an ordered factor. Default: \code{FALSE}.}
 
-\item{drop.na}{If \code{TRUE} (default), tagged NAs are converted to regular
+\item{drop_na}{If \code{TRUE} (default), tagged NAs are converted to regular
 \code{NA} (excluded from factor levels). If \code{FALSE}, tagged NAs are kept as
 factor levels with their label text.}
 
-\item{drop.unused}{If \code{TRUE}, removes factor levels with zero observations.
+\item{drop_unused}{If \code{TRUE}, removes factor levels with zero observations.
 Default: \code{FALSE}.}
 
-\item{add.non.labelled}{If \code{TRUE}, values without labels are included as
+\item{add_non_labelled}{If \code{TRUE}, values without labels are included as
 factor levels using their numeric value as the level name.
 Default: \code{FALSE} (unlabelled values become \code{NA}).}
+
+\item{drop.na, drop.unused, add.non.labelled}{Deprecated dot-case argument
+names. See the "Deprecated arguments" section below.}
 }
 \value{
 The input with labelled variables converted to factors. For
@@ -42,9 +48,19 @@ factor levels. This is the primary function for making labelled survey
 data ready for plotting, cross-tabulation, and regression analysis.
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument names \code{drop.na}, \code{drop.unused}, and
+\code{add.non.labelled} are deprecated; use the snake_case equivalents
+\code{drop_na}, \code{drop_unused}, and \code{add_non_labelled} instead. The old names
+still work but issue a deprecation warning (once per session) and will
+be removed in a future release.
+
 For each labelled variable, the numeric codes are replaced by their
 associated value labels. The resulting factor levels are ordered by the
 original numeric values (not alphabetically).
+}
+
 \subsection{When to Use This}{
 
 Use \code{to_label()} when you:
@@ -66,7 +82,7 @@ data <- to_label(survey_data, gender, region)
 data <- to_label(survey_data)
 
 # Keep values without labels as factor levels
-to_label(survey_data$life_satisfaction, add.non.labelled = TRUE)
+to_label(survey_data$life_satisfaction, add_non_labelled = TRUE)
 
 }
 \seealso{

@@ -21,24 +21,34 @@
 #' @param ... Variables to recode (tidyselect). Only used when \code{data}
 #'   is a data frame.
 #' @param rules A character string defining the recoding rules (see Details).
-#' @param as.factor If \code{TRUE}, return the result as a factor. Default:
+#' @param as_factor If \code{TRUE}, return the result as a factor. Default:
 #'   \code{FALSE}.
 #' @param suffix A character string appended to the column names for the
 #'   recoded variables (e.g., \code{"_r"}). If \code{NULL} (default), the
 #'   original columns are overwritten in-place.
-#' @param var.label A new variable label. If \code{NULL}, the existing label
+#' @param var_label A new variable label. If \code{NULL}, the existing label
 #'   is kept with \code{" (recoded)"} appended.
-#' @param val.labels A named character vector of value labels for the new
+#' @param val_labels A named character vector of value labels for the new
 #'   values (e.g., \code{c("1" = "Low", "2" = "Medium", "3" = "High")}).
 #'   If \code{NULL}, labels are taken from inline \code{[Label]} syntax in
-#'   \code{rules} (if present). Explicit \code{val.labels} always override
+#'   \code{rules} (if present). Explicit \code{val_labels} always override
 #'   inline labels.
+#' @param as.factor,var.label,val.labels Deprecated dot-case argument names.
+#'   See the "Deprecated arguments" section below.
 #'
 #' @return If \code{data} is a vector, a recoded vector is returned. If
 #'   \code{data} is a data frame, the modified data frame is returned
 #'   (invisibly).
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument names \code{as.factor}, \code{var.label}, and
+#' \code{val.labels} are deprecated; use the snake_case equivalents
+#' \code{as_factor}, \code{var_label}, and \code{val_labels} instead. The
+#' old names still work but issue a deprecation warning (once per session)
+#' and will be removed in a future release.
+#'
 #' ## Recoding Syntax
 #'
 #' Rules are specified as a semicolon-separated string of
@@ -78,9 +88,9 @@
 #' \code{"1:2=1 [Low]; 3=2 [Medium]; 4:5=3 [High]"}
 #'
 #' This is equivalent to specifying
-#' \code{val.labels = c("1" = "Low", "2" = "Medium", "3" = "High")}
+#' \code{val_labels = c("1" = "Low", "2" = "Medium", "3" = "High")}
 #' but more compact and self-documenting. If both inline labels and
-#' \code{val.labels} are provided, \code{val.labels} takes precedence.
+#' \code{val_labels} are provided, \code{val_labels} takes precedence.
 #'
 #' ## Special Modes
 #'
@@ -140,8 +150,23 @@
 #'
 #' @family recode
 #' @export
-rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
-                var.label = NULL, val.labels = NULL) {
+rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
+                var_label = NULL, val_labels = NULL,
+                as.factor = NULL, var.label = NULL, val.labels = NULL) {
+
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(as.factor)) {
+    .warn_deprecated_arg("as.factor", "as_factor")
+    if (missing(as_factor)) as_factor <- as.factor
+  }
+  if (!is.null(var.label)) {
+    .warn_deprecated_arg("var.label", "var_label")
+    if (missing(var_label)) var_label <- var.label
+  }
+  if (!is.null(val.labels)) {
+    .warn_deprecated_arg("val.labels", "val_labels")
+    if (missing(val_labels)) val_labels <- val.labels
+  }
 
   # ============================================================================
   # VECTOR INPUT
@@ -151,8 +176,8 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
     if (!is.atomic(data)) {
       cli::cli_abort("{.arg data} must be a data frame, vector, or factor.")
     }
-    return(.rec_vec(data, rules = rules, as.factor = as.factor,
-                    var.label = var.label, val.labels = val.labels))
+    return(.rec_vec(data, rules = rules, as_factor = as_factor,
+                    var_label = var_label, val_labels = val_labels))
   }
 
   # ============================================================================
@@ -167,8 +192,8 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 
   for (i in vars) {
     col_name <- names(data)[i]
-    result <- .rec_vec(data[[i]], rules = rules, as.factor = as.factor,
-                       var.label = var.label, val.labels = val.labels)
+    result <- .rec_vec(data[[i]], rules = rules, as_factor = as_factor,
+                       var_label = var_label, val_labels = val_labels)
 
     out_name <- if (!is.null(suffix)) paste0(col_name, suffix) else col_name
     data[[out_name]] <- result
@@ -183,8 +208,8 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.rec_vec <- function(x, rules, as.factor = FALSE, var.label = NULL,
-                     val.labels = NULL) {
+.rec_vec <- function(x, rules, as_factor = FALSE, var_label = NULL,
+                     val_labels = NULL) {
 
   if (!is.character(rules) || length(rules) != 1L) {
     cli::cli_abort("{.arg rules} must be a single character string.")
@@ -192,7 +217,7 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 
   # Preserve variable label
   orig_label <- attr(x, "label", exact = TRUE)
-  new_label <- var.label %||% {
+  new_label <- var_label %||% {
     if (!is.null(orig_label)) paste0(orig_label, " (recoded)") else NULL
   }
 
@@ -203,7 +228,7 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
   if (rules_trimmed == "rev") {
     result <- .apply_rev(x)
     if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as.factor)) result <- .rec_to_factor(result, val.labels)
+    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
     return(result)
   }
 
@@ -216,25 +241,25 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
         cli::cli_abort("Invalid cut-point in {.val {rules}}.")
       }
     }
-    result <- .apply_dicho(x, cut_point = cut_point, val.labels = val.labels)
+    result <- .apply_dicho(x, cut_point = cut_point, val_labels = val_labels)
     if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as.factor)) result <- .rec_to_factor(result, val.labels)
+    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
     return(result)
   }
 
   if (rules_trimmed == "quart") {
-    result <- .apply_quart(x, val.labels = val.labels)
+    result <- .apply_quart(x, val_labels = val_labels)
     if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as.factor)) result <- .rec_to_factor(result, val.labels)
+    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
     return(result)
   }
 
   if (rules_trimmed == "mean") {
     x_num <- suppressWarnings(as.numeric(x))
     cut_point <- mean(x_num, na.rm = TRUE)
-    result <- .apply_dicho(x, cut_point = cut_point, val.labels = val.labels)
+    result <- .apply_dicho(x, cut_point = cut_point, val_labels = val_labels)
     if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as.factor)) result <- .rec_to_factor(result, val.labels)
+    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
     return(result)
   }
 
@@ -243,14 +268,14 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
   parsed <- .parse_rec_rules(rules, x)
   result <- .apply_rec_rules(x, parsed)
 
-  # Apply value labels: explicit val.labels > inline + preserved originals > none
-  effective_labels <- val.labels
+  # Apply value labels: explicit val_labels > inline + preserved originals > none
+  effective_labels <- val_labels
 
-  if (!is.null(val.labels)) {
-    # Explicit val.labels always take full precedence
+  if (!is.null(val_labels)) {
+    # Explicit val_labels always take full precedence
     attr(result, "labels") <- stats::setNames(
-      as.numeric(names(val.labels)),
-      unname(val.labels)
+      as.numeric(names(val_labels)),
+      unname(val_labels)
     )
   } else {
     # Collect inline labels from parsed rules
@@ -314,7 +339,7 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
   if (!is.null(new_label)) attr(result, "label") <- new_label
 
   # Optional factor conversion
-  if (isTRUE(as.factor)) result <- .rec_to_factor(result, effective_labels)
+  if (isTRUE(as_factor)) result <- .rec_to_factor(result, effective_labels)
 
   result
 }
@@ -541,7 +566,7 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.apply_dicho <- function(x, cut_point = NULL, val.labels = NULL) {
+.apply_dicho <- function(x, cut_point = NULL, val_labels = NULL) {
   x_num <- suppressWarnings(as.numeric(x))
 
   if (is.null(cut_point)) {
@@ -552,10 +577,10 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
                    ifelse(x_num <= cut_point, 0, 1))
 
   # Apply value labels
-  if (!is.null(val.labels)) {
+  if (!is.null(val_labels)) {
     attr(result, "labels") <- stats::setNames(
-      as.numeric(names(val.labels)),
-      unname(val.labels)
+      as.numeric(names(val_labels)),
+      unname(val_labels)
     )
   }
 
@@ -568,7 +593,7 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.apply_quart <- function(x, val.labels = NULL) {
+.apply_quart <- function(x, val_labels = NULL) {
   x_num <- suppressWarnings(as.numeric(x))
 
   q <- stats::quantile(x_num, probs = c(0.25, 0.50, 0.75), na.rm = TRUE)
@@ -579,10 +604,10 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
                    ifelse(x_num <= q[3], 3, 4))))
 
   # Apply value labels
-  if (!is.null(val.labels)) {
+  if (!is.null(val_labels)) {
     attr(result, "labels") <- stats::setNames(
-      as.numeric(names(val.labels)),
-      unname(val.labels)
+      as.numeric(names(val_labels)),
+      unname(val_labels)
     )
   }
 
@@ -595,10 +620,10 @@ rec <- function(data, ..., rules, as.factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.rec_to_factor <- function(x, val.labels = NULL) {
-  if (!is.null(val.labels)) {
-    lvls <- as.numeric(names(val.labels))
-    lbl_text <- unname(val.labels)
+.rec_to_factor <- function(x, val_labels = NULL) {
+  if (!is.null(val_labels)) {
+    lvls <- as.numeric(names(val_labels))
+    lbl_text <- unname(val_labels)
     result <- factor(x, levels = lvls, labels = lbl_text)
   } else {
     result <- factor(x)

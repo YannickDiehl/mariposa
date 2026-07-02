@@ -245,3 +245,26 @@ get_value_labels <- function(x, freq_names) {
   }
   invisible(TRUE)
 }
+
+#' Warn (once per session) that a dot-case argument is deprecated
+#'
+#' Soft-deprecation bridge for the sjmisc-heritage dot-case argument names
+#' renamed to snake_case (see VERSIONING_POLICY.md, section 4). Callers pass
+#' the old value through when the new argument was not supplied:
+#'
+#'   if (!is.null(sort.frq)) {
+#'     .warn_deprecated_arg("sort.frq", "sort_frq")
+#'     if (missing(sort_frq)) sort_frq <- sort.frq
+#'   }
+#'
+#' @param old_name The deprecated dot-case argument name (string)
+#' @param new_name The replacement snake_case argument name (string)
+#' @noRd
+.warn_deprecated_arg <- function(old_name, new_name) {
+  cli::cli_warn(
+    "The {.arg {old_name}} argument is deprecated; use {.arg {new_name}} instead.",
+    .frequency = "once",
+    .frequency_id = paste0("mariposa_", old_name)
+  )
+  invisible(NULL)
+}

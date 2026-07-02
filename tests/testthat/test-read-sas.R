@@ -32,7 +32,7 @@ test_that("read_sas has correct signature", {
   expect_true("catalog_file" %in% names(args))
   expect_true("encoding" %in% names(args))
   expect_true("catalog_encoding" %in% names(args))
-  expect_true("tag.na" %in% names(args))
+  expect_true("tag_na" %in% names(args))
   expect_true("verbose" %in% names(args))
 })
 
@@ -187,19 +187,19 @@ test_that("codebook works with SAS tagged NAs", {
 })
 
 # ============================================================================
-# Tests for tag.na parameter in read_sas() and read_xpt()
+# Tests for tag_na parameter in read_sas() and read_xpt()
 # ============================================================================
 
-test_that("read_sas has tag.na parameter", {
+test_that("read_sas has tag_na parameter", {
   args <- formals(read_sas)
-  expect_true("tag.na" %in% names(args))
-  expect_null(args$tag.na)
+  expect_true("tag_na" %in% names(args))
+  expect_null(args$tag_na)
 })
 
-test_that("read_sas tag.na validates input", {
+test_that("read_sas tag_na validates input", {
   # Validation happens before file read
   expect_error(
-    read_sas("any_path.sas7bdat", tag.na = "not_numeric"),
+    read_sas("any_path.sas7bdat", tag_na = "not_numeric"),
     "numeric vector"
   )
 })
@@ -218,11 +218,11 @@ make_xpt_with_numeric_missings <- function() {
   tmp
 }
 
-test_that("read_xpt with tag.na converts numeric values to tagged NAs", {
+test_that("read_xpt with tag_na converts numeric values to tagged NAs", {
   tmp <- make_xpt_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_xpt(tmp, tag.na = c(-9, -8))
+  data <- read_xpt(tmp, tag_na = c(-9, -8))
 
   tag_map <- attr(data$SCORE, "na_tag_map")
   expect_false(is.null(tag_map))
@@ -240,31 +240,31 @@ test_that("read_xpt with tag.na converts numeric values to tagged NAs", {
   expect_equal(sort(valid), c(10, 20, 30))
 })
 
-test_that("read_xpt tag.na verbose prints conversion count", {
+test_that("read_xpt tag_na verbose prints conversion count", {
   tmp <- make_xpt_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
   expect_message(
-    read_xpt(tmp, tag.na = c(-9, -8), verbose = TRUE),
+    read_xpt(tmp, tag_na = c(-9, -8), verbose = TRUE),
     "Converted"
   )
 })
 
-test_that("read_xpt tag.na validates input", {
+test_that("read_xpt tag_na validates input", {
   tmp <- make_xpt_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
   expect_error(
-    read_xpt(tmp, tag.na = "not_numeric"),
+    read_xpt(tmp, tag_na = "not_numeric"),
     "numeric vector"
   )
 })
 
-test_that("untag_na recovers numeric codes from tag.na XPT data", {
+test_that("untag_na recovers numeric codes from tag_na XPT data", {
   tmp <- make_xpt_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_xpt(tmp, tag.na = c(-9, -8))
+  data <- read_xpt(tmp, tag_na = c(-9, -8))
 
   # Should recover without warning
   expect_no_warning(result <- untag_na(data$SCORE))
@@ -273,11 +273,11 @@ test_that("untag_na recovers numeric codes from tag.na XPT data", {
                sort(c(10, 20, 30, -9, -8)))
 })
 
-test_that("frequency shows tagged NA codes from tag.na XPT data", {
+test_that("frequency shows tagged NA codes from tag_na XPT data", {
   tmp <- make_xpt_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_xpt(tmp, tag.na = c(-9, -8))
+  data <- read_xpt(tmp, tag_na = c(-9, -8))
 
   result <- frequency(data, SCORE)
   tbl <- result$results
@@ -288,11 +288,11 @@ test_that("frequency shows tagged NA codes from tag.na XPT data", {
   expect_true("-8" %in% na_display_vals)
 })
 
-test_that("codebook works with tag.na XPT data", {
+test_that("codebook works with tag_na XPT data", {
   tmp <- make_xpt_with_numeric_missings()
   on.exit(unlink(tmp), add = TRUE)
 
-  data <- read_xpt(tmp, tag.na = c(-9, -8))
+  data <- read_xpt(tmp, tag_na = c(-9, -8))
 
   expect_no_error(result <- codebook(data))
   expect_s3_class(result, "codebook")

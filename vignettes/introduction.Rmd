@@ -76,7 +76,7 @@ survey_data %>%
 # Create age groups
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
-  suffix = "_group", as.factor = TRUE)
+  suffix = "_group", as_factor = TRUE)
 
 # Build a trust scale
 survey_data <- survey_data %>%
