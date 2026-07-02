@@ -1,3 +1,32 @@
+# mariposa 0.8.0
+
+Output-layer release (theme: uniform three-layer output). Statistical
+results are unchanged; what changed is how results present themselves.
+
+## Uniform three-layer output (visible change)
+
+Every analysis class now follows the documented pattern that t_test and
+chi_square pioneered: `result` prints a compact overview (headline
+statistic, p-value, significance stars, one line per test), and
+`summary(result)` carries the full detailed output behind boolean
+section toggles. Newly migrated: kruskal_wallis, wilcoxon_test,
+friedman_test, binomial_test, fisher_test, chisq_gof, mcnemar_test,
+levene_test, tukey_test, scheffe_test, dunn_test, pairwise_wilcoxon,
+frequency, crosstab (describe was already compact and gained the
+summary layer for uniformity). Nothing was removed - everything the
+old print() showed is in summary(), verified line-by-line.
+
+## Internal architecture
+
+* One shared engine for the three correlation functions
+  (pearson/spearman/kendall results verified byte-identical across 21
+  scenarios; ~500 lines removed).
+* The w_* factory now supports multi-value and non-numeric statistics;
+  w_quantile() and w_modus() are ordinary plugins instead of pipeline
+  reimplementations (~420 lines removed, results identical across 31
+  scenarios).
+
+
 # mariposa 0.7.2
 
 Internal-architecture release (theme: shared cores and formatting
