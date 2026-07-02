@@ -77,10 +77,13 @@ The package has few users; breaking changes are acceptable but never casual:
 | Core output utilities + behavior-neutral convergence (table formatter, group iterator, number formatters, kernels file, tukey/scheffe engine, closure hoisting, roxygen standardization) | 0.6.6 | PATCH |
 | Print-layer completion: three-layer migration of the remaining verbose print() classes; correlation engine; w_factory generalization | 0.6.7 | PATCH (visible output changes, declared) |
 | API unification: dot → snake_case argument renames (with deprecation bridge), result-column harmonization, CI-alias removal | 0.6.8 | PATCH (breaking, with bridge, declared) |
-| Deprecation removals + remaining SPSS validation gaps closed | 0.6.9 | PATCH |
+| Deprecation removals + remaining SPSS validation gaps closed - done | 0.6.9 | PATCH |
 | Result-column harmonization (canonical names, old kept as duplicate for one release) - done | 0.6.10 | PATCH (with duplicate bridge, declared) |
-| Deprecation cleanup: remove 0.6.9 argument bridges + 0.6.10 duplicate columns | 0.6.11 | PATCH (breaking, bridges expired, declared) |
-| API freeze | 1.0.0 | MAJOR |
+| Deprecation cleanup: remove 0.6.9 argument bridges + 0.6.10 duplicate columns - done | 0.6.11 | PATCH (breaking, bridges expired, declared) |
+| Weighted-rank correctness (kendall_tau tau-b, kruskal_wallis grand mean rank) + w == 1 invariance suite + accurate claims - done | 0.6.12 | PATCH |
+| SPSS v29 reference runs for the Tier-4/order-statistics gaps (weighted quantiles/median/IQR, tied Kendall, weighted regression w/ categorical predictor) — maintainer runs `.claude/spss-syntax-0.6.4-references.sps`, results pasted into the validation tests | 0.6.x | PATCH (needs maintainer + SPSS v29) |
+| Optional polish: format_stat_table adoption, snapshot-test migration, remaining BACKLOG.md quality items | 0.6.x | PATCH/MICRO |
+| API freeze + full SPSS validation coverage per Charter §9 | 1.0.0 | MAJOR |
 
 ---
 
