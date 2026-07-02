@@ -76,6 +76,14 @@
 #'
 #' \code{\link{describe}} for comprehensive descriptive statistics including IQR.
 #'
+#'
+#' ## Validation status
+#'
+#' Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
+#' apply the HAVERAGE position to cumulative weights with linear
+#' interpolation - an R-internal extension (Tier 4 of the Validation
+#' Charter); SPSS reference validation for weighted percentiles is
+#' pending.
 #' @references
 #' IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 #'

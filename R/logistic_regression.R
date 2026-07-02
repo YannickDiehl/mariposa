@@ -306,8 +306,6 @@ logistic_regression <- function(data, formula = NULL,
 # CORE COMPUTATION
 # ============================================================================
 
-#' Core logistic regression computation
-#' @keywords internal
 # Fit a glm while muffling ONLY the expected fractional-frequency-weight
 # warning. suppressWarnings() would also swallow separation and
 # non-convergence warnings ("fitted probabilities numerically 0 or 1
@@ -325,6 +323,8 @@ logistic_regression <- function(data, formula = NULL,
 }
 
 
+#' Core logistic regression computation
+#' @keywords internal
 .glm_core <- function(data, formula, dep_name, pred_names, weights_vec,
                       conf.level, factors = "dummy") {
 

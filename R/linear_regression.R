@@ -1295,8 +1295,6 @@ print.summary.linear_regression <- function(x, ...) {
 }
 
 
-#' Print coefficients table
-#' @keywords internal
 #' Collinearity diagnostics per model term
 #'
 #' Tolerance and VIF as SPSS REGRESSION reports them: VIF_j = j-th diagonal
@@ -1358,6 +1356,8 @@ print.summary.linear_regression <- function(x, ...) {
 }
 
 
+#' Print coefficients table
+#' @keywords internal
 .print_coefficients_table <- function(coefs, show_beta) {
   cat("  Coefficients\n")
 

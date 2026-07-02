@@ -25,7 +25,7 @@ Test results showing whether groups differ, including:
 \item H statistic (Kruskal-Wallis chi-square test statistic)
 \item Degrees of freedom (number of groups minus 1)
 \item P-value (are groups different?)
-\item Effect size eta-squared (how big is the group effect?)
+\item Effect size epsilon-squared (how big is the group effect?)
 \item Mean rank for each group (which groups are higher/lower?)
 }
 }
@@ -59,7 +59,7 @@ The test tells you:
 \item p > 0.05: No significant group differences found
 }
 
-\strong{Effect Size Eta-squared} (How much do groups matter?):
+\strong{Effect Size Epsilon-squared} (How much do groups matter?):
 \itemize{
 \item < 0.01: Negligible effect
 \item 0.01-0.06: Small effect

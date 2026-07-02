@@ -21,8 +21,8 @@ for. Use \code{c(age, income)} for multiple covariates.}
 \item{weights}{Optional survey weights for population-representative results
 (unquoted variable name)}
 
-\item{ss_type}{Type of Sum of Squares: 3 (default, SPSS standard) or 2.
-Type III is recommended for unbalanced designs.}
+\item{ss_type}{Deprecated; only 3 (Type III, the SPSS default) is
+implemented. Passing 2 issues a warning and computes Type III.}
 }
 \value{
 An object of class \code{"ancova"} containing:

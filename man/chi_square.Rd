@@ -2,18 +2,9 @@
 % Please edit documentation in R/chi_square.R
 \name{chi_square}
 \alias{chi_square}
-\alias{phi}
-\alias{cramers_v}
-\alias{goodman_gamma}
 \title{Test If Two Categories Are Related}
 \usage{
 chi_square(data, ..., weights = NULL, correct = FALSE)
-
-phi(data, ..., weights = NULL, correct = FALSE)
-
-cramers_v(data, ..., weights = NULL, correct = FALSE)
-
-goodman_gamma(data, ..., weights = NULL, correct = FALSE)
 }
 \arguments{
 \item{data}{Your survey data (a data frame or tibble)}

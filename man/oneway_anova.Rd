@@ -24,11 +24,9 @@ region, age_group). Must have at least 3 groups for ANOVA.}
 
 \item{weights}{Optional survey weights for population-representative results}
 
-\item{var.equal}{Should we assume all groups have similar variance? (Default: TRUE)
-\itemize{
-\item TRUE: Standard ANOVA (assumes equal variances)
-\item FALSE: Welch's ANOVA (allows unequal variances)
-}}
+\item{var.equal}{Deprecated and ignored (a warning is issued when set to
+FALSE). Like SPSS ONEWAY, the classical ANOVA table and Welch's robust
+test are always both computed and displayed.}
 
 \item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 }
@@ -96,11 +94,13 @@ Use ANOVA when:
 }
 }
 
-\subsection{Choosing Variance Assumptions}{
+\subsection{Variance Assumptions}{
+
+Like SPSS ONEWAY, both results are always shown for comparison:
 \itemize{
-\item \strong{Standard ANOVA} (var.equal = TRUE): Use when group variances are similar
-\item \strong{Welch's ANOVA} (var.equal = FALSE): Use when group variances differ or you're unsure
-\item The function shows both results for comparison
+\item \strong{Standard ANOVA}: valid when group variances are similar
+\item \strong{Welch's ANOVA}: robust when group variances differ
+\item Use \code{\link{levene_test}} to check which situation applies
 }
 }
 
@@ -149,10 +149,6 @@ survey_data \%>\%
 survey_data \%>\%
   group_by(region) \%>\%
   oneway_anova(life_satisfaction, group = education)
-
-# Unequal variances (Welch's ANOVA)
-survey_data \%>\%
-  oneway_anova(income, group = education, var.equal = FALSE)
 
 # Store results for post-hoc analysis
 result <- survey_data \%>\%

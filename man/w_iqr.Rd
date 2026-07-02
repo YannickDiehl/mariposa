@@ -96,6 +96,14 @@ IBM Corp. (2023). IBM SPSS Statistics 29 Algorithms. IBM Corporation.
 \code{\link{w_range}} for the full weighted range.
 
 \code{\link{describe}} for comprehensive descriptive statistics including IQR.
+\subsection{Validation status}{
+
+Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
+apply the HAVERAGE position to cumulative weights with linear
+interpolation - an R-internal extension (Tier 4 of the Validation
+Charter); SPSS reference validation for weighted percentiles is
+pending.
+}
 
 Other weighted_statistics:
 \code{\link[=w_kurtosis]{w_kurtosis()}},

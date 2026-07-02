@@ -59,10 +59,13 @@ Use \code{w_median()} when:
 
 \subsection{Formula}{
 
-The weighted median is calculated using cumulative weights: observations are
-sorted by value, weights are accumulated, and the median is the value where
-the cumulative weight reaches 50\% of the total weight. Linear interpolation
-is used when the 50\% point falls between two observations.
+The weighted median is the weighted 50th percentile, computed with the
+SPSS HAVERAGE (quantile Type 6) position h = 0.5 * (W + 1) on the
+cumulative weights, with linear interpolation between bracketing
+observations. It is identical to \code{w_quantile(x, probs = 0.5)} by
+construction. Unweighted values match SPSS FREQUENCIES; weighted values
+with non-integer weights are an R-internal extension of the HAVERAGE
+rule (Tier 4 of the Validation Charter) pending SPSS reference runs.
 }
 }
 \examples{

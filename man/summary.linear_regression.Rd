@@ -9,6 +9,7 @@
   model_summary = TRUE,
   anova_table = TRUE,
   coefficients = TRUE,
+  collinearity = TRUE,
   descriptives = TRUE,
   digits = 3,
   ...
@@ -22,6 +23,9 @@
 \item{anova_table}{Logical. Show ANOVA table? (Default: TRUE)}
 
 \item{coefficients}{Logical. Show coefficients table? (Default: TRUE)}
+
+\item{collinearity}{Logical. Show collinearity diagnostics (Tolerance,
+VIF per model term)? (Default: TRUE)}
 
 \item{descriptives}{Logical. Show the Descriptive Statistics table
 (Mean, SD, N for the dependent and predictor variables)? (Default: TRUE)}
