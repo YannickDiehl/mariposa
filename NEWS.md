@@ -1,3 +1,27 @@
+# mariposa 0.7.2
+
+Internal-architecture release (theme: shared cores and formatting
+utilities). No statistical results change; table rendering in the
+Tukey/Scheffe output is now aligned and uses SPSS-style p display.
+
+* One home for every weighted formula: the new weighted-statistics
+  kernel file backs describe(), frequency(), the w_* functions and the
+  rank tests; the weighted variance formula previously existed in six
+  files.
+* New internal output utilities (bordered table renderer, grouped-results
+  iterator, unified number/p formatting) - the building blocks the print
+  style guide documented; adoption started with the post-hoc tests.
+* Tukey and Scheffe now share one engine and one print implementation
+  (results verified byte-identical); t_test() and oneway_anova() were
+  restructured from 500-line nested-closure bodies into short
+  orchestrators with file-level helpers (byte-identical results).
+* Weights in summarise() context are captured as quosures
+  (enquo/eval_tidy) instead of frame-walking; shared validators report
+  errors at the user-facing call site.
+* Documentation internals standardized on @noRd (man/ shrinks by ~120
+  internal pages).
+
+
 # mariposa 0.7.1
 
 Housekeeping release (theme: package hygiene). No statistical results
