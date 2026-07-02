@@ -197,8 +197,13 @@ kendall_tau <- function(data, ..., weights = NULL,
     }
 
     # Calculate tau-b (adjusted for ties)
+    # Pairs tied on BOTH variables (ties_both) must be excluded from each
+    # factor, mirroring the unweighted (n0 - Tx - Txy) * (n0 - Ty - Txy)
+    # denominator below. With weights == 1 this reduces exactly to the
+    # unweighted tau-b.
     numerator <- concordant - discordant
-    denominator <- sqrt((total_weight - ties_x) * (total_weight - ties_y))
+    denominator <- sqrt((total_weight - ties_x - ties_both) *
+                          (total_weight - ties_y - ties_both))
 
     if (denominator == 0) {
       # Undefined coefficient (a variable with no untied pairs); NA, not 0
@@ -287,6 +292,10 @@ kendall_tau <- function(data, ..., weights = NULL,
     # Weighted: simplified no-ties approximation with n_eff = sum(w).
     # (The former small/large-n branch was algebraically identical:
     # 2*(2n+5) == 4n+10.)
+    # NOTE: the weighted tau itself is exact (tie-corrected tau-b), but this
+    # z score and the resulting p-value are APPROXIMATE - the variance omits
+    # tie corrections and treats sum(w) as a sample size. Do not expect the
+    # weighted z/p to equal the unweighted values at weights == 1.
     se_tau <- sqrt((4 * n_eff + 10) / (9 * n_eff * (n_eff - 1)))
   } else {
     # For unweighted, use SPSS-compatible variance calculation with tie corrections

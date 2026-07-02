@@ -245,8 +245,13 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
       # Weighted H statistic
       # H = (12 / (N*(N+1))) * sum(n_j * (Rbar_j - Rbar)^2)
-      # where Rbar = (N+1)/2, but using weighted ranks we compute directly
-      grand_mean_rank <- N_pop / 2  # expected mid-rank under H0
+      # Grand mean rank derived from the data: Rbar = sum(w * rank) / N.
+      # Invariant: under the frequency-expansion mid-rank convention
+      # (.weighted_midranks) this equals the closed form (N_pop + 1) / 2,
+      # and it stays correct even if the rank convention changes again
+      # (the former hard-coded N_pop / 2 belonged to the pre-0.6.4
+      # convention and inflated H).
+      grand_mean_rank <- sum(w * rankhat) / N_pop
       H_numerator <- 0
       for (lvl in g_levels) {
         idx <- g == lvl

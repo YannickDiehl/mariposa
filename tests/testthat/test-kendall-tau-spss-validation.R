@@ -96,14 +96,21 @@ test_that("Test 2a: Kendall weighted ungrouped — R-only Tier-4 baseline", {
   # behaviour), but SPSS NONPAR CORR /KENDALL ignores WEIGHT BY. The two
   # implementations diverge meaningfully here. mariposa's weighted output
   # is a separate Tier-4 baseline.
+  #
+  # Re-captured 2026-07: the weighted tau-b denominator previously omitted
+  # double-tied pairs (ties_both) from both factors, deflating |tau|. Fixed
+  # to mirror the unweighted (n0 - Tx - Txy)(n0 - Ty - Txy) formula; the
+  # weights == 1 reduction to unweighted tau is now guarded by the
+  # invariance suite in test-weights-invariance.R. Weighted p remains a
+  # documented no-ties approximation.
   r <- survey_data |>
     kendall_tau(life_satisfaction, political_orientation, trust_media,
                 weights = sampling_weight)
   m <- r$matrices[[1]]
   baseline <- list(
-    life_political_tau  = -0.004197,  life_political_p  = 0.7659,  life_political_n  = 2241L,
-    life_trust_tau      = 0.020913,   life_trust_p      = 0.1323,  life_trust_n      = 2305L,
-    political_trust_tau = 0.003395,   political_trust_p = 0.8118,  political_trust_n = 2190L,
+    life_political_tau  = -0.004541,  life_political_p  = 0.7473,  life_political_n  = 2241L,
+    life_trust_tau      = 0.022552,   life_trust_p      = 0.1046,  life_trust_n      = 2305L,
+    political_trust_tau = 0.003664,   political_trust_p = 0.7972,  political_trust_n = 2190L,
     diag_n_life = 2437L, diag_n_pol = 2312L, diag_n_tm = 2382L
   )
   assert_spss(m$tau["life_satisfaction","political_orientation"],
@@ -142,10 +149,11 @@ test_that("Test 4a: Kendall weighted grouped by region — R-only Tier-4 baselin
                 weights = sampling_weight)
   regions_in_order <- unique(r$correlations$region)
 
-  # Region-ordered baselines, captured 2026-05-19
+  # Region-ordered baselines, captured 2026-05-19; re-captured 2026-07
+  # after the weighted tau-b double-tie denominator fix (see Test 2a).
   baselines <- list(
-    East = list(life_political_tau = 0.005548, n_diag_life = 488L),
-    West = list(life_political_tau = -0.006821, n_diag_life = 1949L)
+    East = list(life_political_tau = 0.005992, n_diag_life = 488L),
+    West = list(life_political_tau = -0.007363, n_diag_life = 1949L)
   )
 
   for (i in seq_along(r$matrices)) {

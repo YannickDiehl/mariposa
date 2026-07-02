@@ -78,6 +78,8 @@ The package has few users; breaking changes are acceptable but never casual:
 | Print-layer completion: three-layer migration of the remaining verbose print() classes; correlation engine; w_factory generalization | 0.6.7 | PATCH (visible output changes, declared) |
 | API unification: dot → snake_case argument renames (with deprecation bridge), result-column harmonization, CI-alias removal | 0.6.8 | PATCH (breaking, with bridge, declared) |
 | Deprecation removals + remaining SPSS validation gaps closed | 0.6.9 | PATCH |
+| Result-column harmonization (canonical names, old kept as duplicate for one release) - done | 0.6.10 | PATCH (with duplicate bridge, declared) |
+| Deprecation cleanup: remove 0.6.9 argument bridges + 0.6.10 duplicate columns | 0.6.11 | PATCH (breaking, bridges expired, declared) |
 | API freeze | 1.0.0 | MAJOR |
 
 ---

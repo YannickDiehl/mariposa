@@ -79,7 +79,9 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
       if (is.null(w)) {
         mean(x, na.rm = FALSE)  # NA already removed by factory
       } else {
-        sum(x * w) / sum(w)
+        sw <- sum(w)
+        if (sw == 0) return(NA_real_)  # all-zero weights: NA, not 0/0 = NaN
+        sum(x * w) / sw
       }
     },
     stat_name = "mean",

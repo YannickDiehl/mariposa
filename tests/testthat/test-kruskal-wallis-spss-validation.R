@@ -293,19 +293,27 @@ test_that("Test 3b: KW income by employment, grouped by region — matches SPSS"
 # of the expanded data set (SPSS WEIGHT BY convention). The effect size
 # was also renamed eta_squared -> epsilon_squared (H/(N-1) is Tomczak &
 # Tomczak's epsilon-squared; the old name mislabeled it).
+#
+# Re-captured 2026-07 (grand-mean fix): the weighted H formula previously
+# hard-coded grand_mean_rank = N/2, a leftover of the pre-0.6.4 rank
+# convention; under the frequency-expansion mid-ranks the grand mean is
+# (N+1)/2, now derived from the data as sum(w * rank) / N. The previous
+# baselines froze the slightly inflated H values. With weights == 1 the
+# weighted H now reduces exactly to stats::kruskal.test(); that reduction
+# is guarded by the invariance suite in test-weights-invariance.R.
 # =============================================================================
 
 r_only_baselines <- list(
   life_satisfaction_x_education = list(
-    H = 167.076793, df = 3L, p_value = 0.000000, epsilon_squared = 0.0685865,
+    H = 167.075475, df = 3L, p_value = 0.000000, epsilon_squared = 0.0685860,
     n_total = 2437L
   ),
   income_x_employment = list(
-    H = 30.354100, df = 4L, p_value = 0.0000041, epsilon_squared = 0.0137973,
+    H = 30.352737, df = 4L, p_value = 0.0000041, epsilon_squared = 0.0137967,
     n_total = 2201L
   ),
   trust_government_x_education = list(
-    H = 1.181919, df = 3L, p_value = 0.7573440, epsilon_squared = 0.0004987,
+    H = 1.180577, df = 3L, p_value = 0.7576664, epsilon_squared = 0.0004981,
     n_total = 2371L
   )
 )

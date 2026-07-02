@@ -547,3 +547,7 @@ test_that("factory handles zero-length data gracefully in weighted mode", {
   result <- w_mean(test_data, x, weights = w)
   expect_true(is.na(result$results$weighted_mean))
 })
+
+test_that("w_mean with all-zero weights returns NA, not NaN (0/0 guard)", {
+  expect_identical(w_mean(c(1, 2, 3), weights = c(0, 0, 0)), NA_real_)
+})
