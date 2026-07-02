@@ -136,28 +136,28 @@ library(dplyr)
 data(survey_data)
 
 # Basic correlation between two variables
-survey_data \%>\% 
+survey_data \%>\%
   pearson_cor(age, income)
 
 # Correlation matrix for multiple variables
-survey_data \%>\% 
+survey_data \%>\%
   pearson_cor(age, income, life_satisfaction)
 
 # Weighted correlations
-survey_data \%>\% 
+survey_data \%>\%
   pearson_cor(age, income, weights = sampling_weight)
 
 # Grouped correlations
-survey_data \%>\% 
-  group_by(region) \%>\% 
+survey_data \%>\%
+  group_by(region) \%>\%
   pearson_cor(age, income, life_satisfaction)
 
 # Using tidyselect helpers
-survey_data \%>\% 
+survey_data \%>\%
   pearson_cor(where(is.numeric), weights = sampling_weight)
 
 # Listwise deletion for missing data
-survey_data \%>\% 
+survey_data \%>\%
   pearson_cor(age, income, use = "listwise")
 
 # --- Three-layer output ---
