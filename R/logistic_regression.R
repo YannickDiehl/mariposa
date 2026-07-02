@@ -409,7 +409,7 @@ logistic_regression <- function(data, formula = NULL,
   # N: SPSS uses weighted N when WEIGHT BY is active.
   # Per Validation Charter §5.1: use UNROUNDED sum(w) in formulas
   # (Cox & Snell denominator, classification percentages), round only for
-  # the displayed N. Fixed in 0.7.0.
+  # the displayed N. Fixed in 0.6.4.
   if (!is.null(weights_vec)) {
     sw <- sum(weights_vec)
     n_internal <- sw                # unrounded; for pseudo-R^2 formulas

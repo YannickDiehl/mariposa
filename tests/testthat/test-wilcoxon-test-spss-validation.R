@@ -224,7 +224,7 @@ test_that("Test 3b: Wilcoxon trust_gov / trust_science, grouped by region — ma
 # estimator). For sampling weights far from 1.0, users should prefer
 # survey::svyranktest().
 #
-# Re-captured 2026-07-01 (0.7.0): weighted mid-ranks switched to the
+# Re-captured 2026-07-01 (0.6.4): weighted mid-ranks switched to the
 # frequency-expansion convention (.weighted_midranks), fixing a systematic
 # downward bias in Z — the former rank - 1/2 convention was inconsistent
 # with E(V) = N(N+1)/4. With weights == 1 the weighted path now reproduces

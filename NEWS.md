@@ -1,8 +1,8 @@
-# mariposa 0.9.0
+# mariposa 0.6.8
 
 API-unification release (theme: snake_case arguments). One release-long
 deprecation bridge per the versioning policy - old names keep working
-and warn once per session; they will be removed in 0.10.0.
+and warn once per session; they will be removed in 0.6.9.
 
 ## Breaking changes (with bridge)
 
@@ -30,7 +30,7 @@ and warn once per session; they will be removed in 0.10.0.
 * Vignettes showcase the new argument names.
 
 
-# mariposa 0.8.0
+# mariposa 0.6.7
 
 Output-layer release (theme: uniform three-layer output). Statistical
 results are unchanged; what changed is how results present themselves.
@@ -59,7 +59,7 @@ old print() showed is in summary(), verified line-by-line.
   scenarios).
 
 
-# mariposa 0.7.2
+# mariposa 0.6.6
 
 Internal-architecture release (theme: shared cores and formatting
 utilities). No statistical results change; table rendering in the
@@ -83,7 +83,7 @@ Tukey/Scheffe output is now aligned and uses SPSS-style p display.
   internal pages).
 
 
-# mariposa 0.7.1
+# mariposa 0.6.5
 
 Housekeeping release (theme: package hygiene). No statistical results
 change.
@@ -104,7 +104,7 @@ change.
   Validation Charter and was no longer used by any test.
 
 
-# mariposa 0.7.0
+# mariposa 0.6.4
 
 A quality release. Following an in-depth internal review of the entire
 statistical codebase, this version sharpens the accuracy of several

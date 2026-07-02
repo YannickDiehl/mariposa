@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
 Title: SPSS-Compatible Statistical Tools for Survey Data
-Version: 0.9.0
+Version: 0.6.8
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",

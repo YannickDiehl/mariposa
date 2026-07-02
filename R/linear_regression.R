@@ -416,7 +416,7 @@ linear_regression <- function(data, formula = NULL,
     # calculations (variance, SE, df, t/F, R^2). Round only for the displayed
     # N column. Earlier mariposa versions rounded too early via
     # `n_effective <- round(sum(w))`, producing systematic drift in df, F,
-    # and CI bounds. Fixed in 0.7.0.
+    # and CI bounds. Fixed in 0.6.4.
     sw <- sum(weights_vec)            # unrounded; for all calculations
     n_display <- round(sw)            # rounded; only for $n display
 

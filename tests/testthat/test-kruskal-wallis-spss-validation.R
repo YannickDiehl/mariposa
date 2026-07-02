@@ -287,7 +287,7 @@ test_that("Test 3b: KW income by employment, grouped by region — matches SPSS"
 # regressions, not SPSS equivalence and not survey-design correctness.
 # For sampling weights far from 1.0 prefer survey::svyranktest().
 #
-# Re-captured 2026-07-01 (0.7.0): weighted mid-ranks switched to the
+# Re-captured 2026-07-01 (0.6.4): weighted mid-ranks switched to the
 # frequency-expansion convention (.weighted_midranks) shared with
 # wilcoxon_test/dunn_test; for integer weights this equals the mid-ranks
 # of the expanded data set (SPSS WEIGHT BY convention). The effect size
