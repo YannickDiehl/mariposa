@@ -1,3 +1,38 @@
+# mariposa 0.6.11
+
+Deprecation cleanup (theme: the due bridges come out). Two batches of
+deprecations reached their removal release together: the 0.6.9 argument
+bridges (originally slated for 0.6.10) and the 0.6.10 duplicate result
+columns. Removing both here keeps the run-up to the 1.0 API freeze tidy.
+
+## Breaking changes
+
+* The 0.6.9 dot-case argument bridges are removed as announced. The old
+  names no longer warn-and-work; they now error (falling through to
+  tidyselect or SET-mode validation):
+  - `codebook()`: `show.id`, `show.type`, `show.labels`, `show.values`,
+    `show.freq`, `show.na`, `show.unused`, `max.values`, `max.len`,
+    `sort.by.name` (use `show_id`, `show_type`, `show_labels`,
+    `show_values`, `show_freq`, `show_na`, `show_unused`, `max_values`,
+    `max_len`, `sort_by_name`)
+  - `val_labels()`: `drop.na` (use `drop_na`)
+  - `drop_labels()`: `drop.na` (use `drop_na`)
+  These bridges were originally slated for removal in 0.6.10 and are
+  batched into this release. The `frequency()`/`rec()`/`to_label()`
+  family of removed-argument errors introduced in 0.6.9 remain in place
+  as permanent guidance (their `...` consumes tidyselect, so a clear
+  error beats a silent misinterpretation).
+
+* The deprecated duplicate result columns kept for one release in 0.6.10
+  are removed; only the canonical column remains:
+  - `chisq_gof()`, `friedman_test()`: `chi_sq` removed (use `chi_squared`)
+  - `mcnemar_test()`: `statistic` removed (use `chi_squared`)
+  - `mann_whitney()`: `effect_size_r` removed (use `r_effect`)
+  - `oneway_anova()`: `F_stat` removed (use `F_statistic`)
+  The statistical values are unchanged; only the redundant column names
+  go away.
+
+
 # mariposa 0.6.10
 
 Result-column harmonization (theme: one statistic, one column name).
