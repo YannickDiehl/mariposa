@@ -4,7 +4,7 @@
 \alias{read_xpt}
 \title{Read SAS Transport File with Tagged Missing Values}
 \usage{
-read_xpt(path, tag_na = NULL, verbose = FALSE, tag.na = NULL)
+read_xpt(path, tag_na = NULL, verbose = FALSE)
 }
 \arguments{
 \item{path}{Path to a SAS transport file (\code{.xpt}).}
@@ -16,9 +16,6 @@ missing values).}
 
 \item{verbose}{If \code{TRUE}, prints a message summarizing how many variables
 contain tagged missing values.}
-
-\item{tag.na}{Deprecated dot-case argument name. See the "Deprecated
-arguments" section below.}
 }
 \value{
 A tibble with the SAS data. See \code{\link[=read_sas]{read_sas()}} for details on
@@ -32,19 +29,11 @@ platform-independent SAS data format commonly used for FDA submissions and
 data exchange.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument name \code{tag.na} is deprecated; use the snake_case
-equivalent \code{tag_na} instead. The old name still works but issues a
-deprecation warning (once per session) and will be removed in a future
-release.
-
 SAS transport files support the same special missing values as
 \code{.sas7bdat} files (\code{.A}-\code{.Z}, \code{._}). This format is self-contained and
 does not require a separate catalog file for value labels.
 
 When \code{tag_na} is used, \code{\link[=untag_na]{untag_na()}} can recover the original numeric codes.
-}
 }
 \examples{
 \dontrun{

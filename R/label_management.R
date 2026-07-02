@@ -176,8 +176,10 @@ var_label <- function(data, ...) {
 #'   Use `NULL` to remove all value labels from a variable.
 #' @param .add If `TRUE`, adds labels to any existing ones instead of
 #'   replacing them. Default: `FALSE`.
-#' @param drop.na If `TRUE` (default), tagged NA labels are excluded from
+#' @param drop_na If `TRUE` (default), tagged NA labels are excluded from
 #'   GET results.
+#' @param drop.na Deprecated dot-case argument name. See the "Deprecated
+#'   arguments" section below.
 #'
 #' @return
 #' \itemize{
@@ -191,6 +193,13 @@ var_label <- function(data, ...) {
 #' }
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument name `drop.na` is deprecated; use the snake_case
+#' equivalent `drop_na` instead. The old name still works but issues a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' Value labels are stored as the `"labels"` attribute in haven's format:
 #' a named numeric vector where names are the label text and values are
 #' the numeric codes. This is the standard used by [read_spss()],
@@ -229,7 +238,14 @@ var_label <- function(data, ...) {
 #' data <- val_labels(data, gender = NULL)
 #'
 #' @export
-val_labels <- function(data, ..., .add = FALSE, drop.na = TRUE) {
+val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE,
+                       drop.na = NULL) {
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(drop.na)) {
+    .warn_deprecated_arg("drop.na", "drop_na")
+    if (missing(drop_na)) drop_na <- drop.na
+  }
+
   # --- Single vector input ---
   if (!is.data.frame(data)) {
     dots <- rlang::enexprs(...)
@@ -237,7 +253,7 @@ val_labels <- function(data, ..., .add = FALSE, drop.na = TRUE) {
       cli::cli_abort("{.fn val_labels} does not accept {.arg ...} when {.arg data} is a vector. Use a data frame for SET mode.")
     }
     labels <- attr(data, "labels", exact = TRUE)
-    if (!is.null(labels) && isTRUE(drop.na)) {
+    if (!is.null(labels) && isTRUE(drop_na)) {
       labels <- labels[!is.na(labels)]
     }
     return(labels)
@@ -247,7 +263,7 @@ val_labels <- function(data, ..., .add = FALSE, drop.na = TRUE) {
 
   # No arguments → GET all labelled variables
   if (length(dots) == 0L) {
-    return(.get_val_labels_all(data, drop.na))
+    return(.get_val_labels_all(data, drop_na))
   }
 
   # Detect mode
@@ -261,7 +277,7 @@ val_labels <- function(data, ..., .add = FALSE, drop.na = TRUE) {
     col_names <- names(data)[pos]
     result <- lapply(col_names, function(nm) {
       labels <- attr(data[[nm]], "labels", exact = TRUE)
-      if (!is.null(labels) && isTRUE(drop.na)) {
+      if (!is.null(labels) && isTRUE(drop_na)) {
         labels <- labels[!is.na(labels)]
       }
       labels
@@ -322,7 +338,7 @@ val_labels <- function(data, ..., .add = FALSE, drop.na = TRUE) {
 
 #' Internal: get value labels from all labelled columns
 #' @noRd
-.get_val_labels_all <- function(data, drop.na = TRUE) {
+.get_val_labels_all <- function(data, drop_na = TRUE) {
   has_labels <- vapply(data, function(x) {
     !is.null(attr(x, "labels", exact = TRUE)) || is.factor(x)
   }, logical(1))
@@ -338,7 +354,7 @@ val_labels <- function(data, ..., .add = FALSE, drop.na = TRUE) {
       stats::setNames(seq_along(lvls), lvls)
     } else {
       labels <- attr(x, "labels", exact = TRUE)
-      if (!is.null(labels) && isTRUE(drop.na)) {
+      if (!is.null(labels) && isTRUE(drop_na)) {
         labels <- labels[!is.na(labels)]
       }
       labels
@@ -447,19 +463,28 @@ copy_labels <- function(data, source) {
 #' @param data A data frame or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
 #'   empty, applies to all labelled columns.
-#' @param drop.na If `TRUE`, also removes tagged NA labels. Default: `FALSE`
+#' @param drop_na If `TRUE`, also removes tagged NA labels. Default: `FALSE`
 #'   (tagged NA labels are preserved even if no tagged NAs of that type exist).
+#' @param drop.na Deprecated dot-case argument name. See the "Deprecated
+#'   arguments" section below.
 #'
 #' @return The data with unused labels removed.
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument name `drop.na` is deprecated; use the snake_case
+#' equivalent `drop_na` instead. The old name still works but issues a
+#' deprecation warning (once per session) and will be removed in a future
+#' release.
+#'
 #' This is useful after subsetting data (e.g., filtering out a category).
 #' The removed category's label still exists on the variable, which can
 #' cause confusing output in [frequency()] or [codebook()].
 #' `drop_labels()` cleans this up by keeping only labels for values
 #' actually present in the data.
 #'
-#' By default, tagged NA labels are preserved (`drop.na = FALSE`) because
+#' By default, tagged NA labels are preserved (`drop_na = FALSE`) because
 #' they represent missing value types, not substantive categories.
 #'
 #' @seealso [val_labels()], [copy_labels()]
@@ -472,10 +497,16 @@ copy_labels <- function(data, source) {
 #' data_clean <- drop_labels(data_subset)
 #'
 #' @export
-drop_labels <- function(data, ..., drop.na = FALSE) {
+drop_labels <- function(data, ..., drop_na = FALSE, drop.na = NULL) {
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(drop.na)) {
+    .warn_deprecated_arg("drop.na", "drop_na")
+    if (missing(drop_na)) drop_na <- drop.na
+  }
+
   if (!is.data.frame(data)) {
     # Single vector
-    return(.drop_labels_vec(data, drop.na))
+    return(.drop_labels_vec(data, drop_na))
   }
 
   dots <- rlang::enexprs(...)
@@ -486,7 +517,7 @@ drop_labels <- function(data, ..., drop.na = FALSE) {
   }
 
   for (i in cols) {
-    data[[i]] <- .drop_labels_vec(data[[i]], drop.na)
+    data[[i]] <- .drop_labels_vec(data[[i]], drop_na)
   }
 
   data
@@ -495,7 +526,7 @@ drop_labels <- function(data, ..., drop.na = FALSE) {
 
 #' Internal: drop unused labels from a single vector
 #' @noRd
-.drop_labels_vec <- function(x, drop.na = FALSE) {
+.drop_labels_vec <- function(x, drop_na = FALSE) {
   labels <- attr(x, "labels", exact = TRUE)
   if (is.null(labels) || length(labels) == 0L) return(x)
 
@@ -511,7 +542,7 @@ drop_labels <- function(data, ..., drop.na = FALSE) {
   }
 
   # Optionally drop NA labels too
-  if (isTRUE(drop.na) && length(na_labels) > 0L) {
+  if (isTRUE(drop_na) && length(na_labels) > 0L) {
     # Keep only tagged NA labels whose tags exist in the data
     if (requireNamespace("haven", quietly = TRUE)) {
       data_tags <- unique(vapply(

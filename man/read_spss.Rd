@@ -4,7 +4,7 @@
 \alias{read_spss}
 \title{Read SPSS Data with Tagged Missing Values}
 \usage{
-read_spss(path, tag_na = TRUE, encoding = NULL, verbose = FALSE, tag.na = NULL)
+read_spss(path, tag_na = TRUE, encoding = NULL, verbose = FALSE)
 }
 \arguments{
 \item{path}{Path to an SPSS \code{.sav} file.}
@@ -19,9 +19,6 @@ encoding detection is used.}
 
 \item{verbose}{If \code{TRUE}, prints a message summarizing how many values were
 converted.}
-
-\item{tag.na}{Deprecated dot-case argument name. See the "Deprecated
-arguments" section below.}
 }
 \value{
 A tibble with the SPSS data. When \code{tag_na = TRUE}:
@@ -42,13 +39,6 @@ distinguish between different types of missing data (e.g., "no answer",
 standard R operations.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument name \code{tag.na} is deprecated; use the snake_case
-equivalent \code{tag_na} instead. The old name still works but issues a
-deprecation warning (once per session) and will be removed in a future
-release.
-
 SPSS allows defining specific values as "user-defined missing values"
 (e.g., -9 = "no answer", -8 = "don't know"). When reading \code{.sav} files
 with \code{haven::read_sav()}, these are silently converted to \code{NA}, losing the
@@ -64,7 +54,6 @@ Use the companion functions to work with the tagged NAs:
 \item \code{\link[=na_frequencies]{na_frequencies()}} - Frequency table of missing types
 \item \code{\link[=untag_na]{untag_na()}} - Convert tagged NAs back to original SPSS codes
 \item \code{\link[=strip_tags]{strip_tags()}} - Convert tagged NAs to regular NAs (drop tags)
-}
 }
 }
 \examples{

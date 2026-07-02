@@ -35,8 +35,11 @@ Default: \code{FALSE}.}
 factor levels using their numeric value as the level name.
 Default: \code{FALSE} (unlabelled values become \code{NA}).}
 
-\item{drop.na, drop.unused, add.non.labelled}{Deprecated dot-case argument
-names. See the "Deprecated arguments" section below.}
+\item{drop.na, drop.unused, add.non.labelled}{Defunct dot-case argument
+names, removed in mariposa 0.6.9. Calling the function with any of
+them is an error; use the snake_case equivalents instead. (The formals
+are retained only so that the old names error clearly instead of being
+swallowed by \code{...}.)}
 }
 \value{
 The input with labelled variables converted to factors. For
@@ -48,19 +51,9 @@ factor levels. This is the primary function for making labelled survey
 data ready for plotting, cross-tabulation, and regression analysis.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument names \code{drop.na}, \code{drop.unused}, and
-\code{add.non.labelled} are deprecated; use the snake_case equivalents
-\code{drop_na}, \code{drop_unused}, and \code{add_non_labelled} instead. The old names
-still work but issue a deprecation warning (once per session) and will
-be removed in a future release.
-
 For each labelled variable, the numeric codes are replaced by their
 associated value labels. The resulting factor levels are ordered by the
 original numeric values (not alphabetically).
-}
-
 \subsection{When to Use This}{
 
 Use \code{to_label()} when you:

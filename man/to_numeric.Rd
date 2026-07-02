@@ -31,8 +31,11 @@ starts at this number. Default: \code{NULL} (use original values).}
 \item{keep_labels}{If \code{TRUE}, the former factor levels are stored as
 value labels on the result. Default: \code{FALSE}.}
 
-\item{use.labels, start.at, keep.labels}{Deprecated dot-case argument
-names. See the "Deprecated arguments" section below.}
+\item{use.labels, start.at, keep.labels}{Defunct dot-case argument names,
+removed in mariposa 0.6.9. Calling the function with any of them is an
+error; use the snake_case equivalents instead. (The formals are
+retained only so that the old names error clearly instead of being
+swallowed by \code{...}.)}
 }
 \value{
 The input with variables converted to numeric. For single vector
@@ -45,14 +48,6 @@ numeric strings). For labelled variables, extracts the underlying numeric
 values.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument names \code{use.labels}, \code{start.at}, and \code{keep.labels}
-are deprecated; use the snake_case equivalents \code{use_labels}, \code{start_at},
-and \code{keep_labels} instead. The old names still work but issue a
-deprecation warning (once per session) and will be removed in a future
-release.
-
 This function handles three input types:
 \enumerate{
 \item \strong{Numeric factors} (levels like \code{"1"}, \code{"2"}, \code{"3"}): Extracts
@@ -62,7 +57,6 @@ to sequential integers by default; use \code{use_labels = FALSE} to force
 this behavior even for numeric-looking levels.
 \item \strong{haven_labelled}: Extracts the underlying numeric vector,
 stripping the labelled class.
-}
 }
 }
 \examples{

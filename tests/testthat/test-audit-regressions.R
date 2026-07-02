@@ -354,35 +354,33 @@ test_that("weighted mann_whitney stays equivalent to the design-based svyranktes
 })
 
 # --- Stage 4: API renames ------------------------------------------------------
-# The sjmisc-heritage dot-case argument names were renamed to snake_case with
-# a soft-deprecation bridge (VERSIONING_POLICY.md, section 4): the old dot
-# name still works but warns (once per session), the new name works silently,
-# and both produce identical results.
+# The sjmisc-heritage dot-case argument names were renamed to snake_case in
+# 0.6.8 with a one-release soft-deprecation bridge (VERSIONING_POLICY.md,
+# section 4); the bridges were removed in 0.6.9. In functions whose `...` is
+# consumed by tidyselect (frequency, rec, to_label, to_character, to_numeric)
+# the old names now hard-error via a retained sentinel formal - a full
+# removal would let them be silently swallowed as variable selections. In
+# the readers (no tidyselect dots) the formals are gone entirely, so the old
+# names fail as unused arguments.
 
-test_that("frequency: deprecated sort.frq warns and matches sort_frq", {
-  rlang::reset_warning_verbosity("mariposa_sort.frq")
-  expect_warning(
-    old <- frequency(survey_data, education, sort.frq = "desc"),
-    "deprecated"
+test_that("frequency: removed sort.frq errors and sort_frq works silently", {
+  expect_error(
+    frequency(survey_data, education, sort.frq = "desc"),
+    "removed"
   )
   expect_no_warning(
-    new <- frequency(survey_data, education, sort_frq = "desc")
+    frequency(survey_data, education, sort_frq = "desc")
   )
-  expect_identical(old$results, new$results)
-  expect_identical(old$options, new$options)
 })
 
-test_that("frequency: deprecated show.na warns and matches show_na", {
-  rlang::reset_warning_verbosity("mariposa_show.na")
-  expect_warning(
-    old <- frequency(survey_data, education, show.na = FALSE),
-    "deprecated"
+test_that("frequency: removed show.na errors and show_na works silently", {
+  expect_error(
+    frequency(survey_data, education, show.na = FALSE),
+    "removed"
   )
   expect_no_warning(
-    new <- frequency(survey_data, education, show_na = FALSE)
+    frequency(survey_data, education, show_na = FALSE)
   )
-  expect_identical(old$results, new$results)
-  expect_identical(old$options, new$options)
 })
 
 test_that("frequency: sort_frq typo errors instead of silently not sorting", {
@@ -403,67 +401,130 @@ test_that("frequency: show_labels rejects values other than TRUE/FALSE/'auto'", 
   expect_no_error(frequency(survey_data, education, show_labels = "auto"))
 })
 
-test_that("rec: deprecated dot-case args warn and match the snake_case names", {
-  rlang::reset_warning_verbosity("mariposa_as.factor")
-  rlang::reset_warning_verbosity("mariposa_var.label")
-  rlang::reset_warning_verbosity("mariposa_val.labels")
-
-  expect_warning(
-    old_af <- rec(survey_data, trust_government,
-                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
-                  as.factor = TRUE),
-    "deprecated"
+test_that("rec: removed dot-case args error and snake_case names work silently", {
+  expect_error(
+    rec(survey_data, trust_government,
+        rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+        as.factor = TRUE),
+    "removed"
   )
   expect_no_warning(
-    new_af <- rec(survey_data, trust_government,
-                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
-                  as_factor = TRUE)
+    rec(survey_data, trust_government,
+        rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+        as_factor = TRUE)
   )
-  expect_identical(old_af$trust_government_r, new_af$trust_government_r)
 
-  expect_warning(
-    old_vl <- rec(survey_data, trust_government,
-                  rules = "rev", suffix = "_r",
-                  var.label = "Reversed trust"),
-    "deprecated"
+  expect_error(
+    rec(survey_data, trust_government,
+        rules = "rev", suffix = "_r",
+        var.label = "Reversed trust"),
+    "removed"
   )
   expect_no_warning(
-    new_vl <- rec(survey_data, trust_government,
-                  rules = "rev", suffix = "_r",
-                  var_label = "Reversed trust")
+    rec(survey_data, trust_government,
+        rules = "rev", suffix = "_r",
+        var_label = "Reversed trust")
   )
-  expect_identical(old_vl$trust_government_r, new_vl$trust_government_r)
 
-  expect_warning(
-    old_ll <- rec(survey_data, trust_government,
-                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
-                  val.labels = c("1" = "Low", "2" = "Mid", "3" = "High")),
-    "deprecated"
+  expect_error(
+    rec(survey_data, trust_government,
+        rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+        val.labels = c("1" = "Low", "2" = "Mid", "3" = "High")),
+    "removed"
   )
   expect_no_warning(
-    new_ll <- rec(survey_data, trust_government,
-                  rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
-                  val_labels = c("1" = "Low", "2" = "Mid", "3" = "High"))
+    rec(survey_data, trust_government,
+        rules = "1:2=1; 3=2; 4:5=3", suffix = "_r",
+        val_labels = c("1" = "Low", "2" = "Mid", "3" = "High"))
   )
-  expect_identical(old_ll$trust_government_r, new_ll$trust_government_r)
 })
 
-test_that("to_label/to_numeric: deprecated dot-case args warn and match", {
+test_that("to_label/to_numeric: removed dot-case args error, snake_case works", {
   skip_if_not_installed("haven")
-  rlang::reset_warning_verbosity("mariposa_add.non.labelled")
   x <- haven::labelled(c(1, 2, 3, 2), labels = c(Low = 1, High = 2))
-  expect_warning(
-    old <- to_label(x, add.non.labelled = TRUE),
-    "deprecated"
+  expect_error(to_label(x, add.non.labelled = TRUE), "removed")
+  expect_error(to_label(x, drop.na = FALSE), "removed")
+  expect_no_warning(to_label(x, add_non_labelled = TRUE))
+
+  expect_error(to_character(x, drop.na = FALSE), "removed")
+  expect_no_warning(to_character(x, drop_na = FALSE))
+
+  f <- factor(c("2", "4", "6"))
+  expect_error(to_numeric(f, start.at = 0), "removed")
+  expect_no_warning(to_numeric(f, start_at = 0))
+})
+
+test_that("readers: removed tag.na fails as unused argument", {
+  skip_if_not_installed("haven")
+  # The readers have no tidyselect dots, so the formal is gone entirely and
+  # R's argument matching rejects the old name before any file is touched.
+  expect_error(read_spss("nofile.sav", tag.na = TRUE), "unused argument")
+  expect_error(read_por("nofile.por", tag.na = TRUE), "unused argument")
+  expect_error(read_stata("nofile.dta", tag.na = c(-9)), "unused argument")
+  expect_error(read_sas("nofile.sas7bdat", tag.na = c(-9)), "unused argument")
+  expect_error(read_xpt("nofile.xpt", tag.na = c(-9)), "unused argument")
+})
+
+# --- Stage 5: 0.6.9 renames (codebook, val_labels, drop_labels) ----------------
+# Fresh soft-deprecation bridges (removal planned for 0.6.10): the old dot
+# name still works but warns (once per session), the new name works silently,
+# and both produce identical results.
+
+test_that("codebook: deprecated dot-case args warn and match snake_case", {
+  df <- data.frame(a = c(1, 2, 2, 3), b = letters[1:4])
+
+  rlang::reset_warning_verbosity("mariposa_show.freq")
+  expect_warning(old <- codebook(df, show.freq = FALSE), "deprecated")
+  expect_no_warning(new <- codebook(df, show_freq = FALSE))
+  expect_identical(old$codebook, new$codebook)
+  expect_identical(old$options, new$options)
+  expect_false(new$options$show_freq)
+
+  rlang::reset_warning_verbosity("mariposa_max.values")
+  expect_warning(old_mv <- codebook(df, max.values = 2), "deprecated")
+  expect_no_warning(new_mv <- codebook(df, max_values = 2))
+  expect_identical(old_mv$codebook, new_mv$codebook)
+  expect_identical(old_mv$options, new_mv$options)
+
+  rlang::reset_warning_verbosity("mariposa_sort.by.name")
+  expect_warning(old_s <- codebook(df, sort.by.name = TRUE), "deprecated")
+  expect_no_warning(new_s <- codebook(df, sort_by_name = TRUE))
+  expect_identical(old_s$codebook, new_s$codebook)
+})
+
+test_that("val_labels: deprecated drop.na warns and matches drop_na", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(
+    c(1, 2, haven::tagged_na("a")),
+    labels = c(Low = 1, High = 2, "No answer" = haven::tagged_na("a"))
   )
-  expect_no_warning(new <- to_label(x, add_non_labelled = TRUE))
+
+  rlang::reset_warning_verbosity("mariposa_drop.na")
+  expect_warning(old <- val_labels(x, drop.na = FALSE), "deprecated")
+  expect_no_warning(new <- val_labels(x, drop_na = FALSE))
+  expect_identical(old, new)
+  expect_length(new, 3L)
+
+  # Default (drop_na = TRUE) excludes the tagged NA label, silently
+  expect_no_warning(dropped <- val_labels(x))
+  expect_length(dropped, 2L)
+})
+
+test_that("drop_labels: deprecated drop.na warns and matches drop_na", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(
+    c(1, 2, 2),
+    labels = c(Low = 1, High = 2, Unused = 3,
+               "No answer" = haven::tagged_na("a"))
+  )
+
+  rlang::reset_warning_verbosity("mariposa_drop.na")
+  expect_warning(old <- drop_labels(x, drop.na = TRUE), "deprecated")
+  expect_no_warning(new <- drop_labels(x, drop_na = TRUE))
   expect_identical(old, new)
 
-  rlang::reset_warning_verbosity("mariposa_start.at")
-  f <- factor(c("2", "4", "6"))
-  expect_warning(old_n <- to_numeric(f, start.at = 0), "deprecated")
-  expect_no_warning(new_n <- to_numeric(f, start_at = 0))
-  expect_identical(old_n, new_n)
+  # drop_na = TRUE removes the unused tagged NA label as well
+  expect_false("No answer" %in% names(attr(new, "labels")))
 })
 
 test_that("t_test results carry conf_int_* and no duplicated CI_* aliases", {

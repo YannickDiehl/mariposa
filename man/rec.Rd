@@ -42,8 +42,11 @@ If \code{NULL}, labels are taken from inline \code{[Label]} syntax in
 \code{rules} (if present). Explicit \code{val_labels} always override
 inline labels.}
 
-\item{as.factor, var.label, val.labels}{Deprecated dot-case argument names.
-See the "Deprecated arguments" section below.}
+\item{as.factor, var.label, val.labels}{Defunct dot-case argument names,
+removed in mariposa 0.6.9. Calling the function with any of them is an
+error; use the snake_case equivalents instead. (The formals are
+retained only so that the old names error clearly instead of being
+swallowed by \code{...}.)}
 }
 \value{
 If \code{data} is a vector, a recoded vector is returned. If
@@ -56,15 +59,6 @@ It consolidates recoding, reversing, dichotomizing, and missing value handling
 in a single function — the R equivalent of SPSS's \code{RECODE} command.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument names \code{as.factor}, \code{var.label}, and
-\code{val.labels} are deprecated; use the snake_case equivalents
-\code{as_factor}, \code{var_label}, and \code{val_labels} instead. The
-old names still work but issue a deprecation warning (once per session)
-and will be removed in a future release.
-}
-
 \subsection{Recoding Syntax}{
 
 Rules are specified as a semicolon-separated string of

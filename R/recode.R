@@ -33,22 +33,17 @@
 #'   If \code{NULL}, labels are taken from inline \code{[Label]} syntax in
 #'   \code{rules} (if present). Explicit \code{val_labels} always override
 #'   inline labels.
-#' @param as.factor,var.label,val.labels Deprecated dot-case argument names.
-#'   See the "Deprecated arguments" section below.
+#' @param as.factor,var.label,val.labels Defunct dot-case argument names,
+#'   removed in mariposa 0.6.9. Calling the function with any of them is an
+#'   error; use the snake_case equivalents instead. (The formals are
+#'   retained only so that the old names error clearly instead of being
+#'   swallowed by \code{...}.)
 #'
 #' @return If \code{data} is a vector, a recoded vector is returned. If
 #'   \code{data} is a data frame, the modified data frame is returned
 #'   (invisibly).
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument names \code{as.factor}, \code{var.label}, and
-#' \code{val.labels} are deprecated; use the snake_case equivalents
-#' \code{as_factor}, \code{var_label}, and \code{val_labels} instead. The
-#' old names still work but issue a deprecation warning (once per session)
-#' and will be removed in a future release.
-#'
 #' ## Recoding Syntax
 #'
 #' Rules are specified as a semicolon-separated string of
@@ -154,19 +149,13 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
                 var_label = NULL, val_labels = NULL,
                 as.factor = NULL, var.label = NULL, val.labels = NULL) {
 
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(as.factor)) {
-    .warn_deprecated_arg("as.factor", "as_factor")
-    if (missing(as_factor)) as_factor <- as.factor
-  }
-  if (!is.null(var.label)) {
-    .warn_deprecated_arg("var.label", "var_label")
-    if (missing(var_label)) var_label <- var.label
-  }
-  if (!is.null(val.labels)) {
-    .warn_deprecated_arg("val.labels", "val_labels")
-    if (missing(val_labels)) val_labels <- val.labels
-  }
+  # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
+  # The formals stay as NULL sentinels because `...` is consumed by
+  # tidyselect: without them, an old dot-case name would silently be
+  # misinterpreted as a variable selection.
+  if (!is.null(as.factor)) .stop_removed_arg("as.factor", "as_factor")
+  if (!is.null(var.label)) .stop_removed_arg("var.label", "var_label")
+  if (!is.null(val.labels)) .stop_removed_arg("val.labels", "val_labels")
 
   # ============================================================================
   # VECTOR INPUT

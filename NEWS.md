@@ -1,3 +1,40 @@
+# mariposa 0.6.9
+
+API-cleanup completion (theme: the 0.6.8 bridges come out, the last
+dot-case stragglers get theirs). One step closer to the 1.0 API freeze.
+
+## Breaking changes
+
+* The 0.6.8 deprecation bridges are removed as announced. The dot-case
+  argument names now error instead of warning:
+  - `frequency()`/`fre()`: `sort.frq`, `show.na`, `show.prc`,
+    `show.valid`, `show.sum`, `show.labels`, `show.unused`
+  - `rec()`: `as.factor`, `var.label`, `val.labels`
+  - `to_label()`/`to_character()`/`to_numeric()`: `drop.na`,
+    `drop.unused`, `add.non.labelled`, `use.labels`, `start.at`,
+    `keep.labels`
+  - `read_spss()`/`read_por()`/`read_stata()`/`read_sas()`/`read_xpt()`:
+    `tag.na`
+  Before: `frequency(data, x, sort.frq = "desc")` warned and worked.
+  After: it errors with a pointer to `sort_frq`. In the functions whose
+  `...` selects variables, the old names raise a clear "removed in
+  0.6.9" error instead of being silently swallowed by tidyselect; in
+  the readers they fail as unused arguments.
+
+## Deprecations
+
+* The remaining dot-case arguments are renamed to snake_case with the
+  usual one-release bridge (old names warn once per session; removal
+  planned for 0.6.10):
+  - `codebook()`: `show_id`, `show_type`, `show_labels`, `show_values`,
+    `show_freq`, `show_na`, `show_unused`, `max_values`, `max_len`,
+    `sort_by_name`
+  - `val_labels()`: `drop_na`
+  - `drop_labels()`: `drop_na`
+  The display options stored on codebook results (`result$options`) use
+  the snake_case keys as well.
+
+
 # mariposa 0.6.8
 
 API-unification release (theme: snake_case arguments). One release-long

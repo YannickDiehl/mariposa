@@ -990,12 +990,12 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 
   # Determine columns based on codebook options
   headers <- c()
-  if (isTRUE(opts$show.id)) headers <- c(headers, "ID")
+  if (isTRUE(opts$show_id)) headers <- c(headers, "ID")
   headers <- c(headers, "Name")
-  if (isTRUE(opts$show.type)) headers <- c(headers, "Type")
-  if (isTRUE(opts$show.labels)) headers <- c(headers, "Label")
-  if (isTRUE(opts$show.values)) headers <- c(headers, "Values", "Value Labels")
-  if (isTRUE(opts$show.freq)) headers <- c(headers, "Freq.")
+  if (isTRUE(opts$show_type)) headers <- c(headers, "Type")
+  if (isTRUE(opts$show_labels)) headers <- c(headers, "Label")
+  if (isTRUE(opts$show_values)) headers <- c(headers, "Values", "Value Labels")
+  if (isTRUE(opts$show_freq)) headers <- c(headers, "Freq.")
 
   ncols <- length(headers)
 
@@ -1014,7 +1014,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
     col_idx <- 0L
 
     # --- ID ---
-    if (isTRUE(opts$show.id)) {
+    if (isTRUE(opts$show_id)) {
       col_idx <- col_idx + 1L
       .write_cell(wb, sheet, row_idx, col_idx, tbl$position[i])
     }
@@ -1024,30 +1024,30 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
     .write_cell(wb, sheet, row_idx, col_idx, tbl$name[i])
 
     # --- Type ---
-    if (isTRUE(opts$show.type)) {
+    if (isTRUE(opts$show_type)) {
       col_idx <- col_idx + 1L
       .write_cell(wb, sheet, row_idx, col_idx, tbl$type_short[i])
     }
 
     # --- Label ---
-    if (isTRUE(opts$show.labels)) {
+    if (isTRUE(opts$show_labels)) {
       col_idx <- col_idx + 1L
       lbl <- if (!is.na(tbl$label[i])) tbl$label[i] else ""
       .write_cell(wb, sheet, row_idx, col_idx, lbl)
     }
 
     # --- Values, Value Labels, Freq (stacked cells) ---
-    if (isTRUE(opts$show.values) || isTRUE(opts$show.freq)) {
+    if (isTRUE(opts$show_values) || isTRUE(opts$show_freq)) {
       stacked <- .build_stacked_cells(tbl, i, freq_list, opts)
 
-      if (isTRUE(opts$show.values)) {
+      if (isTRUE(opts$show_values)) {
         col_idx <- col_idx + 1L
         .write_cell(wb, sheet, row_idx, col_idx, stacked$values, wrap = TRUE)
         col_idx <- col_idx + 1L
         .write_cell(wb, sheet, row_idx, col_idx, stacked$labels, wrap = TRUE)
       }
 
-      if (isTRUE(opts$show.freq)) {
+      if (isTRUE(opts$show_freq)) {
         col_idx <- col_idx + 1L
         .write_cell(wb, sheet, row_idx, col_idx, stacked$freqs, wrap = TRUE)
       }
@@ -1058,7 +1058,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   wb$set_col_widths(sheet = sheet, cols = seq_len(ncols), widths = "auto")
 
   # Widen value/label/freq columns since auto-width doesn't handle \n well
-  if (isTRUE(opts$show.values)) {
+  if (isTRUE(opts$show_values)) {
     val_col <- which(headers == "Values")
     lbl_col <- which(headers == "Value Labels")
     if (length(val_col) > 0L) {
@@ -1068,7 +1068,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
       wb$set_col_widths(sheet = sheet, cols = lbl_col, widths = 28)
     }
   }
-  if (isTRUE(opts$show.freq)) {
+  if (isTRUE(opts$show_freq)) {
     freq_col <- which(headers == "Freq.")
     if (length(freq_col) > 0L) {
       wb$set_col_widths(sheet = sheet, cols = freq_col, widths = 10)
@@ -1139,7 +1139,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   }
 
   # Tagged NA section (below separator)
-  if (isTRUE(opts$show.na) && length(na_vals) > 0L) {
+  if (isTRUE(opts$show_na) && length(na_vals) > 0L) {
     sep <- "\u2500\u2500\u2500"  # "───" thin horizontal line
     val_lines <- c(val_lines, sep)
     lbl_lines <- c(lbl_lines, sep)

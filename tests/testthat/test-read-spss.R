@@ -414,16 +414,16 @@ test_that("codebook result contains na_values metadata", {
   expect_equal(cb$n_system_na[1], 1L)
 })
 
-test_that("codebook with show.na=FALSE has empty na-related freq expansion", {
+test_that("codebook with show_na=FALSE has empty na-related freq expansion", {
   df <- make_tagged_df()
-  result <- codebook(df, show.na = FALSE)
+  result <- codebook(df, show_na = FALSE)
 
   # Frequencies should NOT have na_display_value column
   freq <- result$frequencies[["satisfaction"]]
   expect_false("na_display_value" %in% names(freq))
 })
 
-test_that("codebook with show.unused=TRUE includes all value labels", {
+test_that("codebook with show_unused=TRUE includes all value labels", {
   # Create a vector where value 4 ("Agree") has zero observations
   raw <- c(1, 2, 3, 5, 1, 2, 3, 5)
   labels <- c(
@@ -436,7 +436,7 @@ test_that("codebook with show.unused=TRUE includes all value labels", {
   x <- haven::labelled(raw, labels = labels, label = "Test")
   df <- data.frame(test_var = x)
 
-  result <- codebook(df, show.unused = TRUE)
+  result <- codebook(df, show_unused = TRUE)
   freq <- result$frequencies[["test_var"]]
 
   # Value 4 should appear with freq = 0 in frequency table
@@ -449,7 +449,7 @@ test_that("codebook with show.unused=TRUE includes all value labels", {
   expect_true(grepl("Agree", html_str))
 })
 
-test_that("codebook with show.unused=FALSE hides unused value labels", {
+test_that("codebook with show_unused=FALSE hides unused value labels", {
   raw <- c(1, 2, 3, 5, 1, 2, 3, 5)
   labels <- c(
     "Strongly disagree" = 1,
@@ -461,8 +461,8 @@ test_that("codebook with show.unused=FALSE hides unused value labels", {
   x <- haven::labelled(raw, labels = labels, label = "Test")
   df <- data.frame(test_var = x)
 
-  # Default: show.unused = FALSE
-  result <- codebook(df, show.unused = FALSE)
+  # Default: show_unused = FALSE
+  result <- codebook(df, show_unused = FALSE)
 
   # Value 4 should NOT appear in frequency table
   freq <- result$frequencies[["test_var"]]

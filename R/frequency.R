@@ -35,21 +35,14 @@
 #'   unused categories should still appear in the output. Automatically enables
 #'   label display.
 #' @param sort.frq,show.na,show.prc,show.valid,show.sum,show.labels,show.unused
-#'   Deprecated dot-case argument names. See the "Deprecated arguments"
-#'   section below.
+#'   Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
+#'   the function with any of them is an error; use the snake_case
+#'   equivalents instead. (The formals are retained only so that the old
+#'   names error clearly instead of being swallowed by `...`.)
 #'
 #' @return A frequency table showing counts and percentages for each category
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument names `sort.frq`, `show.na`, `show.prc`,
-#' `show.valid`, `show.sum`, `show.labels`, and `show.unused` are deprecated;
-#' use the snake_case equivalents `sort_frq`, `show_na`, `show_prc`,
-#' `show_valid`, `show_sum`, `show_labels`, and `show_unused` instead.
-#' The old names still work but issue a deprecation warning (once per
-#' session) and will be removed in a future release.
-#'
 #' ## Understanding the Results
 #'
 #' The frequency table shows:
@@ -122,35 +115,17 @@ frequency <- function(data, ..., weights = NULL, sort_frq = "none",
 
   if (!is.data.frame(data)) cli_abort("{.arg data} must be a data frame.")
 
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(sort.frq)) {
-    .warn_deprecated_arg("sort.frq", "sort_frq")
-    if (missing(sort_frq)) sort_frq <- sort.frq
-  }
-  if (!is.null(show.na)) {
-    .warn_deprecated_arg("show.na", "show_na")
-    if (missing(show_na)) show_na <- show.na
-  }
-  if (!is.null(show.prc)) {
-    .warn_deprecated_arg("show.prc", "show_prc")
-    if (missing(show_prc)) show_prc <- show.prc
-  }
-  if (!is.null(show.valid)) {
-    .warn_deprecated_arg("show.valid", "show_valid")
-    if (missing(show_valid)) show_valid <- show.valid
-  }
-  if (!is.null(show.sum)) {
-    .warn_deprecated_arg("show.sum", "show_sum")
-    if (missing(show_sum)) show_sum <- show.sum
-  }
-  if (!is.null(show.labels)) {
-    .warn_deprecated_arg("show.labels", "show_labels")
-    if (missing(show_labels)) show_labels <- show.labels
-  }
-  if (!is.null(show.unused)) {
-    .warn_deprecated_arg("show.unused", "show_unused")
-    if (missing(show_unused)) show_unused <- show.unused
-  }
+  # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
+  # The formals stay as NULL sentinels because `...` is consumed by
+  # tidyselect: without them, an old dot-case name would silently be
+  # misinterpreted as a variable selection.
+  if (!is.null(sort.frq)) .stop_removed_arg("sort.frq", "sort_frq")
+  if (!is.null(show.na)) .stop_removed_arg("show.na", "show_na")
+  if (!is.null(show.prc)) .stop_removed_arg("show.prc", "show_prc")
+  if (!is.null(show.valid)) .stop_removed_arg("show.valid", "show_valid")
+  if (!is.null(show.sum)) .stop_removed_arg("show.sum", "show_sum")
+  if (!is.null(show.labels)) .stop_removed_arg("show.labels", "show_labels")
+  if (!is.null(show.unused)) .stop_removed_arg("show.unused", "show_unused")
 
   # Validate sort_frq: typos error instead of silently not sorting
   sort_frq <- match.arg(sort_frq, choices = c("none", "asc", "desc"))

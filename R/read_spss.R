@@ -16,8 +16,6 @@
 #'   encoding detection is used.
 #' @param verbose If `TRUE`, prints a message summarizing how many values were
 #'   converted.
-#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return A tibble with the SPSS data. When `tag_na = TRUE`:
 #'   \itemize{
@@ -30,13 +28,6 @@
 #'   }
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `tag.na` is deprecated; use the snake_case
-#' equivalent `tag_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' SPSS allows defining specific values as "user-defined missing values"
 #' (e.g., -9 = "no answer", -8 = "don't know"). When reading `.sav` files
 #' with `haven::read_sav()`, these are silently converted to `NA`, losing the
@@ -81,15 +72,8 @@
 #' }
 #'
 #' @export
-read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE,
-                      tag.na = NULL) {
+read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE) {
   .check_haven("SPSS import")
-
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(tag.na)) {
-    .warn_deprecated_arg("tag.na", "tag_na")
-    if (missing(tag_na)) tag_na <- tag.na
-  }
 
   # Read with user_na = TRUE to preserve missing value metadata as attributes
   # (haven_labelled_spss class keeps values but marks them via na_range/na_values)
@@ -114,20 +98,11 @@ read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE,
 #'   is read with standard `haven::read_por()` behavior.
 #' @param verbose If `TRUE`, prints a message summarizing how many values were
 #'   converted.
-#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return A tibble with the SPSS data. See [read_spss()] for details on
 #'   tagged NA handling.
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `tag.na` is deprecated; use the snake_case
-#' equivalent `tag_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' The SPSS portable format (`.por`) is an older, platform-independent format.
 #' Unlike `.sav` files, the portable format does not support specifying a
 #' character encoding. Tagged NA handling is identical to [read_spss()].
@@ -144,14 +119,8 @@ read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE,
 #' }
 #'
 #' @export
-read_por <- function(path, tag_na = TRUE, verbose = FALSE, tag.na = NULL) {
+read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
   .check_haven("SPSS portable import")
-
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(tag.na)) {
-    .warn_deprecated_arg("tag.na", "tag_na")
-    if (missing(tag_na)) tag_na <- tag.na
-  }
 
   data <- haven::read_por(file = path, user_na = tag_na)
 

@@ -65,8 +65,10 @@ included with frequency 0. This is useful for labelled datasets where
 unused categories should still appear in the output. Automatically enables
 label display.}
 
-\item{sort.frq, show.na, show.prc, show.valid, show.sum, show.labels, show.unused}{Deprecated dot-case argument names. See the "Deprecated arguments"
-section below.}
+\item{sort.frq, show.na, show.prc, show.valid, show.sum, show.labels, show.unused}{Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
+the function with any of them is an error; use the snake_case
+equivalents instead. (The formals are retained only so that the old
+names error clearly instead of being swallowed by \code{...}.)}
 }
 \value{
 A frequency table showing counts and percentages for each category
@@ -84,16 +86,6 @@ Think of it as creating a summary table that shows:
 }
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument names \code{sort.frq}, \code{show.na}, \code{show.prc},
-\code{show.valid}, \code{show.sum}, \code{show.labels}, and \code{show.unused} are deprecated;
-use the snake_case equivalents \code{sort_frq}, \code{show_na}, \code{show_prc},
-\code{show_valid}, \code{show_sum}, \code{show_labels}, and \code{show_unused} instead.
-The old names still work but issue a deprecation warning (once per
-session) and will be removed in a future release.
-}
-
 \subsection{Understanding the Results}{
 
 The frequency table shows:

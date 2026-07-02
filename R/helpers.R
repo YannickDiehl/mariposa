@@ -268,3 +268,22 @@ get_value_labels <- function(x, freq_names) {
   )
   invisible(NULL)
 }
+
+#' Error because a removed dot-case argument was used
+#'
+#' Hard-error stub for dot-case argument names whose deprecation bridge was
+#' removed (see VERSIONING_POLICY.md, section 4). Used only in functions
+#' whose `...` is consumed by tidyselect: full removal of the formal would
+#' let the old name land silently in `...` and be misinterpreted as a
+#' variable selection. Keeping the formal as a `NULL` sentinel guarantees a
+#' clear error instead.
+#'
+#' @param old_name The removed dot-case argument name (string)
+#' @param new_name The replacement snake_case argument name (string)
+#' @noRd
+.stop_removed_arg <- function(old_name, new_name) {
+  cli::cli_abort(
+    "The {.arg {old_name}} argument was removed in mariposa 0.6.9; use {.arg {new_name}} instead.",
+    call = rlang::caller_env()
+  )
+}

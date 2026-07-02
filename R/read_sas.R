@@ -25,8 +25,6 @@
 #'   special missing values).
 #' @param verbose If `TRUE`, prints a message summarizing how many variables
 #'   contain tagged missing values.
-#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return A tibble with the SAS data. Variables with missing value codes
 #'   have:
@@ -38,13 +36,6 @@
 #'   }
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `tag.na` is deprecated; use the snake_case
-#' equivalent `tag_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' ## Native Special Missing Values
 #'
 #' SAS supports 28 distinct missing value types: `.` (system missing), `.A`
@@ -87,15 +78,8 @@
 #'
 #' @export
 read_sas <- function(path, catalog_file = NULL, encoding = NULL,
-                     catalog_encoding = NULL, tag_na = NULL, verbose = FALSE,
-                     tag.na = NULL) {
+                     catalog_encoding = NULL, tag_na = NULL, verbose = FALSE) {
   .check_haven("SAS import")
-
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(tag.na)) {
-    .warn_deprecated_arg("tag.na", "tag_na")
-    if (missing(tag_na)) tag_na <- tag.na
-  }
 
   # Automatically delegate .xpt files to read_xpt()
   if (grepl("\\.xpt$", path, ignore.case = TRUE)) {
@@ -144,20 +128,11 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
 #'   missing values).
 #' @param verbose If `TRUE`, prints a message summarizing how many variables
 #'   contain tagged missing values.
-#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return A tibble with the SAS data. See [read_sas()] for details on
 #'   tagged NA handling.
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `tag.na` is deprecated; use the snake_case
-#' equivalent `tag_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' SAS transport files support the same special missing values as
 #' `.sas7bdat` files (`.A`-`.Z`, `._`). This format is self-contained and
 #' does not require a separate catalog file for value labels.
@@ -181,14 +156,8 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
 #' }
 #'
 #' @export
-read_xpt <- function(path, tag_na = NULL, verbose = FALSE, tag.na = NULL) {
+read_xpt <- function(path, tag_na = NULL, verbose = FALSE) {
   .check_haven("SAS transport import")
-
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(tag.na)) {
-    .warn_deprecated_arg("tag.na", "tag_na")
-    if (missing(tag_na)) tag_na <- tag.na
-  }
 
   if (!is.null(tag_na) && !is.numeric(tag_na)) {
     cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")

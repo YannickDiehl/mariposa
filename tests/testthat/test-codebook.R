@@ -153,7 +153,7 @@ test_that("empirical values for numeric with few values show all values", {
 
 test_that("empirical values for numeric with many values show range", {
   df <- data.frame(x = 1:100)
-  result <- codebook(df, max.values = 10)
+  result <- codebook(df, max_values = 10)
   emp <- result$codebook$empirical_values[[1]]
   expect_true(grepl("-", emp))
   expect_true(result$codebook$is_range[1])
@@ -194,9 +194,9 @@ test_that("factor levels appear as value labels", {
   expect_equal(length(val_labels), 3)
 })
 
-test_that("max.values truncates long value lists", {
+test_that("max_values truncates long value lists", {
   df <- data.frame(x = factor(letters))
-  result <- codebook(df, max.values = 5)
+  result <- codebook(df, max_values = 5)
   val_labels <- result$codebook$value_labels[[1]]
   expect_equal(length(val_labels), 5)
   expect_true(result$codebook$truncated[1])
@@ -231,15 +231,15 @@ test_that("frequencies computed for numeric with few unique values", {
 
 test_that("frequencies not computed for high-cardinality numeric", {
   df <- data.frame(x = rnorm(100))
-  result <- codebook(df, max.values = 10)
+  result <- codebook(df, max_values = 10)
   # x has ~100 unique values, should not have frequencies
   expect_true(is.null(result$frequencies$x) || length(result$frequencies$x) == 0)
 })
 
-test_that("show.freq = FALSE suppresses freq column in options", {
+test_that("show_freq = FALSE suppresses freq column in options", {
   df <- data.frame(x = factor(c("a", "b", "a")))
-  result <- codebook(df, show.freq = FALSE)
-  expect_false(result$options$show.freq)
+  result <- codebook(df, show_freq = FALSE)
+  expect_false(result$options$show_freq)
 })
 
 
@@ -397,8 +397,8 @@ test_that("codebook handles single-row dataset", {
 test_that("codebook handles long labels with truncation", {
   df <- data.frame(x = 1:5)
   attr(df$x, "label") <- paste(rep("A", 100), collapse = "")
-  result <- codebook(df, max.len = 20)
-  expect_equal(result$options$max.len, 20)
+  result <- codebook(df, max_len = 20)
+  expect_equal(result$options$max_len, 20)
 })
 
 test_that("codebook rejects non-data.frame input", {

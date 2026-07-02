@@ -28,21 +28,16 @@
 #' @param add_non_labelled If `TRUE`, values without labels are included as
 #'   factor levels using their numeric value as the level name.
 #'   Default: `FALSE` (unlabelled values become `NA`).
-#' @param drop.na,drop.unused,add.non.labelled Deprecated dot-case argument
-#'   names. See the "Deprecated arguments" section below.
+#' @param drop.na,drop.unused,add.non.labelled Defunct dot-case argument
+#'   names, removed in mariposa 0.6.9. Calling the function with any of
+#'   them is an error; use the snake_case equivalents instead. (The formals
+#'   are retained only so that the old names error clearly instead of being
+#'   swallowed by `...`.)
 #'
 #' @return The input with labelled variables converted to factors. For
 #'   single vector input, returns a factor.
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument names `drop.na`, `drop.unused`, and
-#' `add.non.labelled` are deprecated; use the snake_case equivalents
-#' `drop_na`, `drop_unused`, and `add_non_labelled` instead. The old names
-#' still work but issue a deprecation warning (once per session) and will
-#' be removed in a future release.
-#'
 #' For each labelled variable, the numeric codes are replaced by their
 #' associated value labels. The resulting factor levels are ordered by the
 #' original numeric values (not alphabetically).
@@ -79,18 +74,14 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
                      drop_unused = FALSE, add_non_labelled = FALSE,
                      drop.na = NULL, drop.unused = NULL,
                      add.non.labelled = NULL) {
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(drop.na)) {
-    .warn_deprecated_arg("drop.na", "drop_na")
-    if (missing(drop_na)) drop_na <- drop.na
-  }
-  if (!is.null(drop.unused)) {
-    .warn_deprecated_arg("drop.unused", "drop_unused")
-    if (missing(drop_unused)) drop_unused <- drop.unused
-  }
+  # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
+  # The formals stay as NULL sentinels because `...` is consumed by
+  # tidyselect: without them, an old dot-case name would silently be
+  # misinterpreted as a variable selection.
+  if (!is.null(drop.na)) .stop_removed_arg("drop.na", "drop_na")
+  if (!is.null(drop.unused)) .stop_removed_arg("drop.unused", "drop_unused")
   if (!is.null(add.non.labelled)) {
-    .warn_deprecated_arg("add.non.labelled", "add_non_labelled")
-    if (missing(add_non_labelled)) add_non_labelled <- add.non.labelled
+    .stop_removed_arg("add.non.labelled", "add_non_labelled")
   }
 
   if (!is.data.frame(data)) {
@@ -208,21 +199,16 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
 #' @param drop_na If `TRUE` (default), tagged NAs become regular `NA`.
 #' @param add_non_labelled If `TRUE`, unlabelled values are included as
 #'   their numeric string representation. Default: `FALSE`.
-#' @param drop.na,add.non.labelled Deprecated dot-case argument names. See
-#'   the "Deprecated arguments" section below.
+#' @param drop.na,add.non.labelled Defunct dot-case argument names, removed
+#'   in mariposa 0.6.9. Calling the function with any of them is an error;
+#'   use the snake_case equivalents instead. (The formals are retained only
+#'   so that the old names error clearly instead of being swallowed by
+#'   `...`.)
 #'
 #' @return The input with labelled variables converted to character. For
 #'   single vector input, returns a character vector.
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument names `drop.na` and `add.non.labelled` are
-#' deprecated; use the snake_case equivalents `drop_na` and
-#' `add_non_labelled` instead. The old names still work but issue a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' This is a convenience wrapper around [to_label()] that calls
 #' `as.character()` on the result. Use this when you need character output
 #' (e.g., for string operations) rather than factor output.
@@ -244,14 +230,13 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
 to_character <- function(data, ..., drop_na = TRUE,
                          add_non_labelled = FALSE,
                          drop.na = NULL, add.non.labelled = NULL) {
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(drop.na)) {
-    .warn_deprecated_arg("drop.na", "drop_na")
-    if (missing(drop_na)) drop_na <- drop.na
-  }
+  # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
+  # The formals stay as NULL sentinels because `...` is consumed by
+  # tidyselect: without them, an old dot-case name would silently be
+  # misinterpreted as a variable selection.
+  if (!is.null(drop.na)) .stop_removed_arg("drop.na", "drop_na")
   if (!is.null(add.non.labelled)) {
-    .warn_deprecated_arg("add.non.labelled", "add_non_labelled")
-    if (missing(add_non_labelled)) add_non_labelled <- add.non.labelled
+    .stop_removed_arg("add.non.labelled", "add_non_labelled")
   }
 
   if (!is.data.frame(data)) {
@@ -306,21 +291,16 @@ to_character <- function(data, ..., drop_na = TRUE,
 #'   starts at this number. Default: `NULL` (use original values).
 #' @param keep_labels If `TRUE`, the former factor levels are stored as
 #'   value labels on the result. Default: `FALSE`.
-#' @param use.labels,start.at,keep.labels Deprecated dot-case argument
-#'   names. See the "Deprecated arguments" section below.
+#' @param use.labels,start.at,keep.labels Defunct dot-case argument names,
+#'   removed in mariposa 0.6.9. Calling the function with any of them is an
+#'   error; use the snake_case equivalents instead. (The formals are
+#'   retained only so that the old names error clearly instead of being
+#'   swallowed by `...`.)
 #'
 #' @return The input with variables converted to numeric. For single vector
 #'   input, returns a numeric vector.
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument names `use.labels`, `start.at`, and `keep.labels`
-#' are deprecated; use the snake_case equivalents `use_labels`, `start_at`,
-#' and `keep_labels` instead. The old names still work but issue a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' This function handles three input types:
 #' \enumerate{
 #'   \item **Numeric factors** (levels like `"1"`, `"2"`, `"3"`): Extracts
@@ -355,19 +335,13 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
                        keep_labels = FALSE,
                        use.labels = NULL, start.at = NULL,
                        keep.labels = NULL) {
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(use.labels)) {
-    .warn_deprecated_arg("use.labels", "use_labels")
-    if (missing(use_labels)) use_labels <- use.labels
-  }
-  if (!is.null(start.at)) {
-    .warn_deprecated_arg("start.at", "start_at")
-    if (missing(start_at)) start_at <- start.at
-  }
-  if (!is.null(keep.labels)) {
-    .warn_deprecated_arg("keep.labels", "keep_labels")
-    if (missing(keep_labels)) keep_labels <- keep.labels
-  }
+  # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
+  # The formals stay as NULL sentinels because `...` is consumed by
+  # tidyselect: without them, an old dot-case name would silently be
+  # misinterpreted as a variable selection.
+  if (!is.null(use.labels)) .stop_removed_arg("use.labels", "use_labels")
+  if (!is.null(start.at)) .stop_removed_arg("start.at", "start_at")
+  if (!is.null(keep.labels)) .stop_removed_arg("keep.labels", "keep_labels")
 
   if (!is.data.frame(data)) {
     return(.to_numeric_vec(data, use_labels, start_at, keep_labels))

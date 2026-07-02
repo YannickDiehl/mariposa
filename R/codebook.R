@@ -225,27 +225,30 @@
 #' @param ... Optional: specific variables to include. If empty, all variables
 #'   are shown. Supports tidyselect helpers like `starts_with("trust")`.
 #' @param weights Optional survey weights for weighted frequency calculations
-#' @param show.id Show variable position number? (Default: TRUE)
-#' @param show.type Show data type? (Default: TRUE)
-#' @param show.labels Show variable labels? (Default: TRUE)
-#' @param show.values Show empirical values and value labels? (Default: TRUE)
-#' @param show.freq Show frequency counts? (Default: TRUE)
-#' @param show.na Show tagged missing value types in the codebook? (Default:
+#' @param show_id Show variable position number? (Default: TRUE)
+#' @param show_type Show data type? (Default: TRUE)
+#' @param show_labels Show variable labels? (Default: TRUE)
+#' @param show_values Show empirical values and value labels? (Default: TRUE)
+#' @param show_freq Show frequency counts? (Default: TRUE)
+#' @param show_na Show tagged missing value types in the codebook? (Default:
 #'   TRUE). When data was imported with [read_spss()], [read_stata()],
 #'   [read_sas()], or [read_xpt()] using tagged NAs, they are displayed
 #'   with their original missing value codes, labels, and frequencies below
 #'   the valid values, separated by a thin gray line.
-#' @param show.unused Show all defined value labels, even those with zero
+#' @param show_unused Show all defined value labels, even those with zero
 #'   observations? (Default: FALSE). Useful for seeing the full codebook
 #'   including response options that no respondent selected.
-#' @param max.values Maximum number of values to display per variable
+#' @param max_values Maximum number of values to display per variable
 #'   before truncating or showing a range (Default: 10)
-#' @param max.len Maximum character width for labels before truncation
+#' @param max_len Maximum character width for labels before truncation
 #'   (Default: 50)
-#' @param sort.by.name Sort variables alphabetically instead of by position?
+#' @param sort_by_name Sort variables alphabetically instead of by position?
 #'   (Default: FALSE)
 #' @param file Path to save the HTML codebook. If NULL (default), a temporary
 #'   file is used and the codebook opens in the Viewer.
+#' @param show.id,show.type,show.labels,show.values,show.freq,show.na,show.unused,max.values,max.len,sort.by.name
+#'   Deprecated dot-case argument names. See the "Deprecated arguments"
+#'   section below.
 #'
 #' @return Invisibly returns a list of class `"codebook"` containing:
 #'   \describe{
@@ -258,6 +261,16 @@
 #'   }
 #'
 #' @details
+#' ## Deprecated arguments
+#'
+#' The dot-case argument names `show.id`, `show.type`, `show.labels`,
+#' `show.values`, `show.freq`, `show.na`, `show.unused`, `max.values`,
+#' `max.len`, and `sort.by.name` are deprecated; use the snake_case
+#' equivalents `show_id`, `show_type`, `show_labels`, `show_values`,
+#' `show_freq`, `show_na`, `show_unused`, `max_values`, `max_len`, and
+#' `sort_by_name` instead. The old names still work but issue a deprecation
+#' warning (once per session) and will be removed in a future release.
+#'
 #' ## What the Codebook Shows
 #'
 #' For each variable, the codebook displays (depending on options):
@@ -304,16 +317,63 @@
 #'
 #' @export
 codebook <- function(data, ..., weights = NULL,
-                     show.id = TRUE, show.type = TRUE, show.labels = TRUE,
-                     show.values = TRUE, show.freq = TRUE,
-                     show.na = TRUE, show.unused = FALSE,
-                     max.values = 10, max.len = 50,
-                     sort.by.name = FALSE,
-                     file = NULL) {
+                     show_id = TRUE, show_type = TRUE, show_labels = TRUE,
+                     show_values = TRUE, show_freq = TRUE,
+                     show_na = TRUE, show_unused = FALSE,
+                     max_values = 10, max_len = 50,
+                     sort_by_name = FALSE,
+                     file = NULL,
+                     show.id = NULL, show.type = NULL, show.labels = NULL,
+                     show.values = NULL, show.freq = NULL,
+                     show.na = NULL, show.unused = NULL,
+                     max.values = NULL, max.len = NULL,
+                     sort.by.name = NULL) {
 
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
+  }
+
+  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
+  if (!is.null(show.id)) {
+    .warn_deprecated_arg("show.id", "show_id")
+    if (missing(show_id)) show_id <- show.id
+  }
+  if (!is.null(show.type)) {
+    .warn_deprecated_arg("show.type", "show_type")
+    if (missing(show_type)) show_type <- show.type
+  }
+  if (!is.null(show.labels)) {
+    .warn_deprecated_arg("show.labels", "show_labels")
+    if (missing(show_labels)) show_labels <- show.labels
+  }
+  if (!is.null(show.values)) {
+    .warn_deprecated_arg("show.values", "show_values")
+    if (missing(show_values)) show_values <- show.values
+  }
+  if (!is.null(show.freq)) {
+    .warn_deprecated_arg("show.freq", "show_freq")
+    if (missing(show_freq)) show_freq <- show.freq
+  }
+  if (!is.null(show.na)) {
+    .warn_deprecated_arg("show.na", "show_na")
+    if (missing(show_na)) show_na <- show.na
+  }
+  if (!is.null(show.unused)) {
+    .warn_deprecated_arg("show.unused", "show_unused")
+    if (missing(show_unused)) show_unused <- show.unused
+  }
+  if (!is.null(max.values)) {
+    .warn_deprecated_arg("max.values", "max_values")
+    if (missing(max_values)) max_values <- max.values
+  }
+  if (!is.null(max.len)) {
+    .warn_deprecated_arg("max.len", "max_len")
+    if (missing(max_len)) max_len <- max.len
+  }
+  if (!is.null(sort.by.name)) {
+    .warn_deprecated_arg("sort.by.name", "sort_by_name")
+    if (missing(sort_by_name)) sort_by_name <- sort.by.name
   }
 
   # Capture data name before any modifications
@@ -339,13 +399,13 @@ codebook <- function(data, ..., weights = NULL,
   }
 
   # Optionally sort alphabetically
-  if (sort.by.name) var_names <- sort(var_names)
+  if (sort_by_name) var_names <- sort(var_names)
 
   # Extract metadata for each variable
   metadata_list <- lapply(seq_along(var_names), function(i) {
     vn <- var_names[i]
     pos <- match(vn, names(data))
-    .extract_var_metadata(data[[vn]], vn, pos, max.values)
+    .extract_var_metadata(data[[vn]], vn, pos, max_values)
   })
 
   # Combine into tibble
@@ -377,14 +437,14 @@ codebook <- function(data, ..., weights = NULL,
     n_unique_var <- codebook_df$n_unique[codebook_df$name == vn]
     is_categorical <- is.factor(x) || is.character(x) || is.logical(x) ||
       !is.null(attr(x, "labels"))
-    has_few_values <- n_unique_var <= max.values
+    has_few_values <- n_unique_var <= max_values
     has_tagged <- !is.null(attr(x, "na_tag_map"))
     if (is_categorical || has_few_values) {
       freq_list[[vn]] <- calculate_single_frequency(
         x, w_vec,
         sort_frq = "none",
-        show_na = (show.na && has_tagged),
-        show_unused = show.unused
+        show_na = (show_na && has_tagged),
+        show_unused = show_unused
       )
     }
   }
@@ -405,10 +465,10 @@ codebook <- function(data, ..., weights = NULL,
 
   # Store options
   opts <- list(
-    show.id = show.id, show.type = show.type, show.labels = show.labels,
-    show.values = show.values, show.freq = show.freq,
-    show.na = show.na, show.unused = show.unused,
-    max.values = max.values, max.len = max.len
+    show_id = show_id, show_type = show_type, show_labels = show_labels,
+    show_values = show_values, show_freq = show_freq,
+    show_na = show_na, show_unused = show_unused,
+    max_values = max_values, max_len = max_len
   )
 
   # Build result
@@ -566,24 +626,24 @@ codebook <- function(data, ..., weights = NULL,
 
   # Header columns: ID | Name | Type | Label | Values | Value Labels | Freq.
   header_cells <- list()
-  if (opts$show.id) header_cells <- c(header_cells, list(htmltools::tags$th("ID")))
+  if (opts$show_id) header_cells <- c(header_cells, list(htmltools::tags$th("ID")))
   header_cells <- c(header_cells, list(htmltools::tags$th("Name")))
-  if (opts$show.type) header_cells <- c(header_cells, list(htmltools::tags$th("Type")))
-  if (opts$show.labels) header_cells <- c(header_cells, list(htmltools::tags$th("Label")))
-  if (opts$show.values) {
+  if (opts$show_type) header_cells <- c(header_cells, list(htmltools::tags$th("Type")))
+  if (opts$show_labels) header_cells <- c(header_cells, list(htmltools::tags$th("Label")))
+  if (opts$show_values) {
     header_cells <- c(header_cells, list(
       htmltools::tags$th("Values"),
       htmltools::tags$th("Value Labels")
     ))
   }
-  if (opts$show.freq) header_cells <- c(header_cells, list(htmltools::tags$th("Freq.")))
+  if (opts$show_freq) header_cells <- c(header_cells, list(htmltools::tags$th("Freq.")))
 
   # Build rows
   rows <- lapply(seq_len(nrow(cb)), function(i) {
     cells <- list()
 
     # ID
-    if (opts$show.id) {
+    if (opts$show_id) {
       cells <- c(cells, list(htmltools::tags$td(class = "num-col", cb$position[i])))
     }
 
@@ -591,7 +651,7 @@ codebook <- function(data, ..., weights = NULL,
     cells <- c(cells, list(htmltools::tags$td(class = "var-name", cb$name[i])))
 
     # Type (with color badge)
-    if (opts$show.type) {
+    if (opts$show_type) {
       type_class <- if (grepl("^(dbl|int|num)", cb$type_short[i])) {
         "type-badge type-num"
       } else if (grepl("^(fct|ord)", cb$type_short[i])) {
@@ -613,9 +673,9 @@ codebook <- function(data, ..., weights = NULL,
     }
 
     # Label
-    if (opts$show.labels) {
+    if (opts$show_labels) {
       lbl <- if (!is.na(cb$label[i])) {
-        .truncate_labels(cb$label[i], opts$max.len)
+        .truncate_labels(cb$label[i], opts$max_len)
       } else {
         ""
       }
@@ -624,13 +684,13 @@ codebook <- function(data, ..., weights = NULL,
 
     # Values + Value Labels + Freq columns
     # Build all three column div-lists in parallel, then create <td> cells
-    if (opts$show.values || opts$show.freq) {
+    if (opts$show_values || opts$show_freq) {
       emp_vals <- cb$empirical_values[[i]]
       val_labels <- cb$value_labels[[i]]
       is_rng <- cb$is_range[i]
 
-      # When show.unused is TRUE, add value label keys not yet in emp_vals
-      if (opts$show.unused && !is_rng && !is.null(val_labels) &&
+      # When show_unused is TRUE, add value label keys not yet in emp_vals
+      if (opts$show_unused && !is_rng && !is.null(val_labels) &&
           length(val_labels) > 0) {
         label_keys <- names(val_labels)
         # Filter out NA-valued label keys (tagged NA labels map to "NA")
@@ -660,13 +720,13 @@ codebook <- function(data, ..., weights = NULL,
 
       if (is_rng) {
         # Range display (single line, e.g., "18 - 95")
-        if (opts$show.values) {
+        if (opts$show_values) {
           cells <- c(cells, list(
             htmltools::tags$td(class = "values-cell range-text", emp_vals),
             htmltools::tags$td("")  # empty Value Labels for range
           ))
         }
-        if (opts$show.freq) {
+        if (opts$show_freq) {
           cells <- c(cells, list(htmltools::tags$td("")))
         }
       } else {
@@ -675,7 +735,7 @@ codebook <- function(data, ..., weights = NULL,
 
         lbl_divs <- lapply(emp_vals, function(v) {
           lbl_text <- if (!is.null(val_labels) && v %in% names(val_labels)) {
-            .truncate_labels(unname(val_labels[v]), opts$max.len)
+            .truncate_labels(unname(val_labels[v]), opts$max_len)
           } else {
             "\u00A0"
           }
@@ -699,7 +759,7 @@ codebook <- function(data, ..., weights = NULL,
         if (!is.null(val_labels) && cb$truncated[i]) {
           trunc_note <- htmltools::tags$div(
             class = "truncated-note",
-            paste0("... (", cb$n_labels[i] - opts$max.values, " more)")
+            paste0("... (", cb$n_labels[i] - opts$max_values, " more)")
           )
           val_divs <- c(val_divs, list(htmltools::tags$div("\u00A0")))
           lbl_divs <- c(lbl_divs, list(trunc_note))
@@ -707,7 +767,7 @@ codebook <- function(data, ..., weights = NULL,
         }
 
         # Append tagged NA rows (separator + per-NA-code rows + system NA)
-        if (opts$show.na && length(na_vals) > 0) {
+        if (opts$show_na && length(na_vals) > 0) {
           # Thin separator
           sep_div <- htmltools::tags$div(class = "na-separator", "\u00A0")
           val_divs <- c(val_divs, list(sep_div))
@@ -720,7 +780,7 @@ codebook <- function(data, ..., weights = NULL,
               htmltools::tags$div(class = "na-value", nav)
             ))
             na_lbl_text <- if (nav %in% names(na_lbls)) {
-              .truncate_labels(unname(na_lbls[nav]), opts$max.len)
+              .truncate_labels(unname(na_lbls[nav]), opts$max_len)
             } else {
               ""
             }
@@ -773,7 +833,7 @@ codebook <- function(data, ..., weights = NULL,
         }
 
         # Create the <td> cells
-        if (opts$show.values) {
+        if (opts$show_values) {
           cells <- c(cells, list(
             htmltools::tags$td(class = "values-cell", htmltools::tagList(val_divs))
           ))
@@ -781,7 +841,7 @@ codebook <- function(data, ..., weights = NULL,
             cells <- c(cells, list(
               htmltools::tags$td(class = "labels-cell", htmltools::tagList(lbl_divs))
             ))
-          } else if (opts$show.na && length(na_vals) > 0) {
+          } else if (opts$show_na && length(na_vals) > 0) {
             # Has NA labels but no valid value labels
             cells <- c(cells, list(
               htmltools::tags$td(class = "labels-cell", htmltools::tagList(lbl_divs))
@@ -791,7 +851,7 @@ codebook <- function(data, ..., weights = NULL,
           }
         }
 
-        if (opts$show.freq) {
+        if (opts$show_freq) {
           if (!is.null(freq_data)) {
             cells <- c(cells, list(
               htmltools::tags$td(class = "freq-cell", htmltools::tagList(freq_divs))
@@ -983,7 +1043,7 @@ print.summary.codebook <- function(x, ...) {
 
       if (!is.na(cb$label[i])) {
         cat(sprintf("    Label: %s\n",
-                    .truncate_labels(cb$label[i], opts$max.len)))
+                    .truncate_labels(cb$label[i], opts$max_len)))
       }
 
       # Empirical values
@@ -1004,12 +1064,12 @@ print.summary.codebook <- function(x, ...) {
         if (!is.null(val_labels) && length(val_labels) > 0) {
           cat("    Value labels:\n")
           for (j in seq_along(val_labels)) {
-            lbl <- .truncate_labels(unname(val_labels[j]), opts$max.len)
+            lbl <- .truncate_labels(unname(val_labels[j]), opts$max_len)
             cat(sprintf("      %s = %s\n", names(val_labels)[j], lbl))
           }
           if (cb$truncated[i]) {
             cat(sprintf("      ... (%d more)\n",
-                        cb$n_labels[i] - opts$max.values))
+                        cb$n_labels[i] - opts$max_values))
           }
         }
       }

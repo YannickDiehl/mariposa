@@ -8,17 +8,27 @@ codebook(
   data,
   ...,
   weights = NULL,
-  show.id = TRUE,
-  show.type = TRUE,
-  show.labels = TRUE,
-  show.values = TRUE,
-  show.freq = TRUE,
-  show.na = TRUE,
-  show.unused = FALSE,
-  max.values = 10,
-  max.len = 50,
-  sort.by.name = FALSE,
-  file = NULL
+  show_id = TRUE,
+  show_type = TRUE,
+  show_labels = TRUE,
+  show_values = TRUE,
+  show_freq = TRUE,
+  show_na = TRUE,
+  show_unused = FALSE,
+  max_values = 10,
+  max_len = 50,
+  sort_by_name = FALSE,
+  file = NULL,
+  show.id = NULL,
+  show.type = NULL,
+  show.labels = NULL,
+  show.values = NULL,
+  show.freq = NULL,
+  show.na = NULL,
+  show.unused = NULL,
+  max.values = NULL,
+  max.len = NULL,
+  sort.by.name = NULL
 )
 }
 \arguments{
@@ -29,37 +39,40 @@ are shown. Supports tidyselect helpers like \code{starts_with("trust")}.}
 
 \item{weights}{Optional survey weights for weighted frequency calculations}
 
-\item{show.id}{Show variable position number? (Default: TRUE)}
+\item{show_id}{Show variable position number? (Default: TRUE)}
 
-\item{show.type}{Show data type? (Default: TRUE)}
+\item{show_type}{Show data type? (Default: TRUE)}
 
-\item{show.labels}{Show variable labels? (Default: TRUE)}
+\item{show_labels}{Show variable labels? (Default: TRUE)}
 
-\item{show.values}{Show empirical values and value labels? (Default: TRUE)}
+\item{show_values}{Show empirical values and value labels? (Default: TRUE)}
 
-\item{show.freq}{Show frequency counts? (Default: TRUE)}
+\item{show_freq}{Show frequency counts? (Default: TRUE)}
 
-\item{show.na}{Show tagged missing value types in the codebook? (Default:
+\item{show_na}{Show tagged missing value types in the codebook? (Default:
 TRUE). When data was imported with \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stata]{read_stata()}},
 \code{\link[=read_sas]{read_sas()}}, or \code{\link[=read_xpt]{read_xpt()}} using tagged NAs, they are displayed
 with their original missing value codes, labels, and frequencies below
 the valid values, separated by a thin gray line.}
 
-\item{show.unused}{Show all defined value labels, even those with zero
+\item{show_unused}{Show all defined value labels, even those with zero
 observations? (Default: FALSE). Useful for seeing the full codebook
 including response options that no respondent selected.}
 
-\item{max.values}{Maximum number of values to display per variable
+\item{max_values}{Maximum number of values to display per variable
 before truncating or showing a range (Default: 10)}
 
-\item{max.len}{Maximum character width for labels before truncation
+\item{max_len}{Maximum character width for labels before truncation
 (Default: 50)}
 
-\item{sort.by.name}{Sort variables alphabetically instead of by position?
+\item{sort_by_name}{Sort variables alphabetically instead of by position?
 (Default: FALSE)}
 
 \item{file}{Path to save the HTML codebook. If NULL (default), a temporary
 file is used and the codebook opens in the Viewer.}
+
+\item{show.id, show.type, show.labels, show.values, show.freq, show.na, show.unused, max.values, max.len, sort.by.name}{Deprecated dot-case argument names. See the "Deprecated arguments"
+section below.}
 }
 \value{
 Invisibly returns a list of class \code{"codebook"} containing:
@@ -83,6 +96,17 @@ useful when working with labelled survey data imported from SPSS, Stata,
 or SAS.
 }
 \details{
+\subsection{Deprecated arguments}{
+
+The dot-case argument names \code{show.id}, \code{show.type}, \code{show.labels},
+\code{show.values}, \code{show.freq}, \code{show.na}, \code{show.unused}, \code{max.values},
+\code{max.len}, and \code{sort.by.name} are deprecated; use the snake_case
+equivalents \code{show_id}, \code{show_type}, \code{show_labels}, \code{show_values},
+\code{show_freq}, \code{show_na}, \code{show_unused}, \code{max_values}, \code{max_len}, and
+\code{sort_by_name} instead. The old names still work but issue a deprecation
+warning (once per session) and will be removed in a future release.
+}
+
 \subsection{What the Codebook Shows}{
 
 For each variable, the codebook displays (depending on options):

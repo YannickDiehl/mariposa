@@ -22,8 +22,6 @@
 #'   extended missing values).
 #' @param verbose If `TRUE`, prints a message summarizing how many variables
 #'   contain tagged missing values.
-#' @param tag.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return A tibble with the Stata data. Variables with missing value codes
 #'   have:
@@ -35,13 +33,6 @@
 #'   }
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `tag.na` is deprecated; use the snake_case
-#' equivalent `tag_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' ## Native Extended Missing Values
 #'
 #' Stata supports 27 distinct missing value types: `.` (system missing) and
@@ -85,15 +76,8 @@
 #' }
 #'
 #' @export
-read_stata <- function(path, encoding = NULL, tag_na = NULL, verbose = FALSE,
-                       tag.na = NULL) {
+read_stata <- function(path, encoding = NULL, tag_na = NULL, verbose = FALSE) {
   .check_haven("Stata import")
-
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(tag.na)) {
-    .warn_deprecated_arg("tag.na", "tag_na")
-    if (missing(tag_na)) tag_na <- tag.na
-  }
 
   if (!is.null(tag_na) && !is.numeric(tag_na)) {
     cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")

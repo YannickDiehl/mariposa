@@ -10,8 +10,7 @@ read_sas(
   encoding = NULL,
   catalog_encoding = NULL,
   tag_na = NULL,
-  verbose = FALSE,
-  tag.na = NULL
+  verbose = FALSE
 )
 }
 \arguments{
@@ -34,9 +33,6 @@ special missing values).}
 
 \item{verbose}{If \code{TRUE}, prints a message summarizing how many variables
 contain tagged missing values.}
-
-\item{tag.na}{Deprecated dot-case argument name. See the "Deprecated
-arguments" section below.}
 }
 \value{
 A tibble with the SAS data. Variables with missing value codes
@@ -60,14 +56,6 @@ same result as \code{\link[=read_spss]{read_spss()}} with \code{tag_na = TRUE}.
 }
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument name \code{tag.na} is deprecated; use the snake_case
-equivalent \code{tag_na} instead. The old name still works but issues a
-deprecation warning (once per session) and will be removed in a future
-release.
-}
-
 \subsection{Native Special Missing Values}{
 
 SAS supports 28 distinct missing value types: \code{.} (system missing), \code{.A}

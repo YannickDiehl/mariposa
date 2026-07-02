@@ -24,8 +24,11 @@ empty, converts all \code{haven_labelled} columns.}
 \item{add_non_labelled}{If \code{TRUE}, unlabelled values are included as
 their numeric string representation. Default: \code{FALSE}.}
 
-\item{drop.na, add.non.labelled}{Deprecated dot-case argument names. See
-the "Deprecated arguments" section below.}
+\item{drop.na, add.non.labelled}{Defunct dot-case argument names, removed
+in mariposa 0.6.9. Calling the function with any of them is an error;
+use the snake_case equivalents instead. (The formals are retained only
+so that the old names error clearly instead of being swallowed by
+\code{...}.)}
 }
 \value{
 The input with labelled variables converted to character. For
@@ -37,20 +40,11 @@ labels as text. Same as \code{\link[=to_label]{to_label()}} but returns characte
 factor.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument names \code{drop.na} and \code{add.non.labelled} are
-deprecated; use the snake_case equivalents \code{drop_na} and
-\code{add_non_labelled} instead. The old names still work but issue a
-deprecation warning (once per session) and will be removed in a future
-release.
-
 This is a convenience wrapper around \code{\link[=to_label]{to_label()}} that calls
 \code{as.character()} on the result. Use this when you need character output
 (e.g., for string operations) rather than factor output.
 
 The variable label (\code{"label"} attribute) is preserved on the output.
-}
 }
 \examples{
 # Convert a single variable to character
