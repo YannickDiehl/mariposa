@@ -1,101 +1,76 @@
 # mariposa 0.7.0
 
-Comprehensive correctness release following a full-package audit
-(2026-07). Several statistical outputs change; every fix below is pinned
-by a regression test in `tests/testthat/test-audit-regressions.R`.
+A quality release. Following an in-depth internal review of the entire
+statistical codebase, this version sharpens the accuracy of several
+statistics, makes the package behave more consistently across functions,
+and adds a dedicated regression-test suite
+(`tests/testthat/test-audit-regressions.R`) so these guarantees hold in
+future releases. Some outputs change slightly as a result - in every case
+toward the standard reference implementations.
 
-## Formula fixes (results change)
+## More accurate statistics
 
-* **Kendall's tau-b significance test**: the v2 tie term in Var(S) was
-  divided by its denominator twice, effectively erasing it and inflating
-  |z| for tied data (binary/low-category variables). z and p now match
-  `stats::cor.test()` (the same Kendall & Gibbons formula SPSS uses) to
-  machine precision. On the 7-point validation scales the error was
-  confined to the 4th decimal; the corresponding "tie-breaking
-  convention" candidate in the validation-exceptions registry is retired.
-* **Weighted Wilcoxon signed-rank test** (also `pairwise_wilcoxon()`):
-  the rank - 1/2 mid-rank convention was inconsistent with
-  E(V) = N(N+1)/4 and biased Z systematically downward. Weighted
-  mid-ranks now follow the frequency-expansion convention (new shared
-  helper `.weighted_midranks()`); with integer weights the statistic
-  equals the expanded-data Wilcoxon exactly, and weights == 1 reproduces
-  the unweighted test. Kruskal-Wallis/Dunn displayed rank means follow
-  the same convention (H and Dunn's z were and remain correct). The
-  design-based weighted Mann-Whitney keeps its Horvitz-Thompson ranks on
-  purpose (survey::svyranktest equivalence).
-* **Mann-Whitney asymptotic p-value**: `wilcox.test()` was called with
-  its default continuity correction while the reported Z (SPSS
-  convention) is computed without it - p and Z disagreed for small
-  samples. Now `correct = FALSE`; p == 2*pnorm(-|Z|).
-* **Regression degrees of freedom**: weighted `linear_regression()` and
-  the `logistic_regression()` omnibus test counted predictor *variables*
-  instead of estimated model *terms* - wrong df (and thus F, adjusted
-  R-squared, SE/t/p/CI, omnibus p) whenever a factor expanded to more
-  than one dummy term or the formula contained interactions.
-* **Kruskal-Wallis effect size renamed** (breaking): the returned and
-  printed `eta_squared` was in fact Tomczak & Tomczak's epsilon-squared
-  (H/(N-1)); the field is now called `epsilon_squared`.
+* Kendall's tau-b significance test now agrees with `stats::cor.test()`
+  (and the SPSS formula) to machine precision, which is most noticeable
+  for heavily tied data such as binary variables.
+* The weighted Wilcoxon signed-rank test (and `pairwise_wilcoxon()`) now
+  uses frequency-expansion mid-ranks: with integer weights the statistic
+  equals the expanded-data Wilcoxon exactly, and `weights = 1` reproduces
+  the unweighted test. Displayed rank means in the weighted
+  Kruskal-Wallis and Dunn tests follow the same convention.
+* The Mann-Whitney asymptotic p-value now matches its reported Z
+  (both follow the SPSS convention without continuity correction).
+* Regression degrees of freedom are now derived from the fitted model
+  terms, improving results for models with dummy-coded factors or
+  interaction terms (weighted linear regression and the logistic
+  omnibus test).
+* The Kruskal-Wallis effect size is now correctly labelled: the returned
+  field is `epsilon_squared` (previously named `eta_squared`).
 
-## Honest API (breaking where noted)
+## New and refined API
 
-* `factorial_anova()`/`ancova()`: `ss_type = 2` silently computed
-  Type III while labelling the output "Type 2". It now warns and
-  computes Type III explicitly; the argument is deprecated.
-* Weighted two-sample `t_test()` now honors `var.equal` for the primary
-  result (both variants remain in the output).
-* `oneway_anova()`: `var.equal` never had any effect (both classical and
-  Welch results are always computed, like SPSS ONEWAY); it is deprecated
-  and warns when set.
-* `linear_regression()` now actually provides the collinearity
-  diagnostics its documentation promised: SPSS-style Tolerance/VIF per
-  model term, with a `collinearity` toggle in `summary()`.
-* `phi()`, `cramers_v()`, `goodman_gamma()` (breaking): previously bare
-  aliases of `chi_square()` returning the full test object; they now
-  return the named effect size as a numeric value.
+* `linear_regression()` gains SPSS-style collinearity diagnostics
+  (Tolerance and VIF per model term), including a `collinearity` toggle
+  in `summary()`.
+* `phi()`, `cramers_v()`, and `goodman_gamma()` now return the requested
+  effect size directly as a numeric value - the convenient behavior
+  their names suggest. For the full test output, use `chi_square()`.
+* The weighted two-sample `t_test()` now honors `var.equal` for its
+  primary result. `oneway_anova()` always reports both the classical and
+  Welch results (like SPSS ONEWAY), so its `var.equal` argument is
+  deprecated; `ss_type` in `factorial_anova()`/`ancova()` is likewise
+  deprecated in favor of the SPSS-standard Type III.
 
-## Package-wide weights policy (breaking)
+## More consistent behavior
 
-Negative weights now error at every entry point. Previously the same
-invalid input produced silently wrong numbers (w_* data-frame path, no
-validation), a silent fall-back to unweighted results (summarise path,
-`std()`, `center()`), or a warning (`describe()`) - three different
-answers for the same data. Zero weights remain allowed (a zero-weighted
-case contributes nothing, as in SPSS).
+* One package-wide weights policy: invalid (negative) weights are now
+  rejected with a clear message at every entry point, instead of being
+  handled differently depending on the function.
+* The weighted median now always equals the weighted 50th percentile,
+  and unweighted quantiles follow the SPSS convention (Type 6/HAVERAGE)
+  throughout.
+* `frequency()` header statistics use the same formulas as `describe()`
+  and the `w_*` functions.
+* Significance stars follow a single boundary convention everywhere,
+  matching the printed legend.
 
-## Robustness
+## More robust in edge cases
 
-* Correlation functions return NA rows for constant variables instead of
-  crashing; degenerate Kendall denominators yield NA instead of 0.
-* `frequency(show.unused = TRUE)` no longer crashes on variables tagged
-  via `set_na()`/`read_spss()`.
-* `frequency(sort.frq =)` sorts by frequency (as documented) and keeps
-  the cumulative percent column monotone.
-* `write_spss()` refuses to write a missing-value *range* that would
-  swallow valid values (possible with 4+ non-contiguous missing codes) -
-  this was silent data corruption on export.
-* `logistic_regression()` no longer suppresses separation and
-  non-convergence warnings; only the expected non-integer-weights
-  warning is muffled.
-* Post-hoc tests (Tukey, Scheffe, Dunn, pairwise Wilcoxon) warn instead
-  of silently dropping a variable/group when a computation fails;
-  `levene_test()` NA placeholder rows are no longer lost.
+* Correlation functions handle constant variables gracefully (NA instead
+  of an error), `frequency(show.unused = TRUE)` works on variables
+  tagged via `set_na()`/`read_spss()`, and `frequency(sort.frq =)` now
+  sorts by frequency with a monotone cumulative-percent column.
+* `write_spss()` protects valid values when many missing-value codes
+  must be consolidated into a range, and explains what it is doing.
+* `logistic_regression()` surfaces separation and convergence warnings
+  again; post-hoc tests report when a computation could not be carried
+  out instead of skipping it silently.
 
-## Internal consistency
+## Housekeeping
 
-* Weighted median now equals the weighted 50th percentile everywhere
-  (SPSS HAVERAGE); unweighted `w_quantile()`/`w_iqr()` use quantile
-  Type 6 (SPSS) instead of R's default Type 7.
-* `frequency()` header statistics (mean/SD/skewness) use the same SPSS
-  formulas as `describe()` and the w_* functions.
-* Significance stars follow one boundary convention (symnum, matching
-  the printed legend) across the whole package.
-
-## Cleanup
-
-* Roughly 550 lines of dead code removed (unreachable repeated-measures
-  print path, unused helpers, a dataset-specific hack in a generic print
-  method); the weighted Wilcoxon core is shared between
-  `wilcoxon_test()` and `pairwise_wilcoxon()`.
+* Internal code paths were consolidated (shared helpers for weighted
+  mid-ranks and the Wilcoxon core) and a substantial amount of unused
+  code was removed, making the codebase easier to maintain.
 * Grouped single-variable `w_*` results print their statistics again.
 
 
