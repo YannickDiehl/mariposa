@@ -178,6 +178,159 @@ test_that("phi/cramers_v/goodman_gamma return the effect size, not a test object
                full$results$gamma[1])
 })
 
+# --- Phase 3: robustness and the package-wide weights policy -----------------
+
+test_that("negative weights error consistently across entry points", {
+  # Audit finding: the w_* data-frame path performed no weight validation
+  # (negative weights produced silently wrong numbers) while the summarise
+  # path silently fell back to unweighted - same input, two different
+  # wrong answers.
+  d <- dplyr::tibble(v = c(1, 2, 3, 4), wt = c(1, 1, -5, 1))
+  expect_error(w_mean(d, v, weights = wt), "negative")
+  expect_error(dplyr::summarise(d, m = w_mean(v, weights = wt)), "negative")
+  expect_error(frequency(d, v, weights = wt), "negative")
+  expect_error(std(d, v, weights = wt), "negative")
+  expect_error(describe(d, v, weights = wt), "negative")
+})
+
+test_that("std() with a zero weight stays weighted instead of silently falling back", {
+  d <- dplyr::tibble(v = c(10, 20, 30, 40), w = c(1, 1, 0, 1))
+  r <- std(d, v, weights = w, suffix = "_z")
+  keep <- d$w > 0
+  wm <- stats::weighted.mean(d$v[keep], d$w[keep])
+  ws <- sqrt(sum(d$w[keep] * (d$v[keep] - wm)^2) / (sum(d$w[keep]) - 1))
+  expect_equal(r$v_z, (d$v - wm) / ws, tolerance = 1e-10)
+})
+
+test_that("correlation functions return NA for constant variables instead of crashing", {
+  set.seed(3)
+  d <- dplyr::tibble(a = rnorm(50), b = rep(5, 50))
+  suppressWarnings({
+    p <- pearson_cor(d, a, b)$correlations
+    s <- spearman_rho(d, a, b)$correlations
+    k <- kendall_tau(d, a, b)$correlations
+  })
+  expect_true(is.na(p$correlation[1]) && is.na(p$p_value[1]))
+  expect_true(is.na(s$rho[1]) && is.na(s$p_value[1]))
+  expect_true(is.na(k$tau[1]) && is.na(k$p_value[1]))
+})
+
+test_that("frequency(show.unused = TRUE) works on set_na-tagged variables", {
+  # Audit finding: injected zero-frequency rows lacked the na_display_value
+  # column added by tagged-NA expansion -> rbind column mismatch crash.
+  v <- haven::labelled(
+    c(1, 2, 2, 3, 7, 8, NA),
+    labels = c(Low = 1, Mid = 2, High = 3, Unused = 4, Refused = 7, DK = 8)
+  )
+  d <- set_na(dplyr::tibble(v = v), v = c(7, 8))
+  expect_no_error(res <- frequency(d, v, show.unused = TRUE))
+  expect_true(4 %in% res$results$value)  # unused label row present
+})
+
+test_that("sort.frq sorts by frequency and keeps cumulative percent monotone", {
+  # Audit finding: sorting was by value (contradicting the docs) and left
+  # the pre-sort cumulative percentages in place (non-monotone output).
+  d <- dplyr::tibble(v = c(1, 1, 1, 2, 2, 3))
+  res <- frequency(d, v, sort.frq = "desc")$results
+  expect_equal(res$freq[1:3], c(3, 2, 1))
+  expect_true(all(diff(res$cum_prc[1:3]) >= 0))
+  expect_equal(res$cum_prc[3], 100, tolerance = 1e-10)
+})
+
+test_that("write_spss refuses a na_range that would swallow valid values", {
+  # Audit finding: 4+ missing codes fell back to a min-max na_range without
+  # checking whether valid values lie inside - silent data corruption.
+  v <- haven::labelled(c(1, 2, 3, 4, 5, 6, 0, 7, 8, 9),
+                       labels = c(One = 1, Six = 6))
+  d <- set_na(dplyr::tibble(v = v), v = c(0, 7, 8, 9))
+  expect_error(write_spss(d, tempfile(fileext = ".sav")), "valid value")
+
+  # Contiguous codes: allowed, but announced
+  v2 <- haven::labelled(c(1, 2, 3, 6, 7, 8, 9), labels = c(One = 1))
+  d2 <- set_na(dplyr::tibble(v = v2), v = c(6, 7, 8, 9))
+  expect_warning(
+    suppressMessages(write_spss(d2, tempfile(fileext = ".sav"))),
+    "missing range"
+  )
+})
+
+test_that("logistic_regression surfaces separation warnings", {
+  # Audit finding: blanket suppressWarnings() around glm() also swallowed
+  # 'fitted probabilities numerically 0 or 1' - with fractional weights
+  # only the non-integer-weights warning may be muffled.
+  set.seed(4)
+  n <- 40
+  x <- rnorm(n)
+  y <- as.integer(x > 0)  # perfectly separated
+  d <- dplyr::tibble(y = y, x = x, w = runif(n, 0.5, 1.5))
+  expect_warning(
+    logistic_regression(d, y ~ x, weights = w),
+    "probabilities|converge"
+  )
+})
+
+# --- Phase 5: cleanup regressions ---------------------------------------------
+
+test_that("grouped single-variable w_* results print the statistics", {
+  # Audit finding: single-variable results had no Variable column, so the
+  # grouped print iterated over nothing and emitted group headers with no
+  # statistics (plus 'Unknown or uninitialised column' warnings).
+  data(survey_data)
+  gw <- dplyr::group_by(survey_data, region) |>
+    w_mean(age, weights = sampling_weight)
+  expect_true("Variable" %in% names(gw$results))
+  out <- expect_no_warning(capture.output(print(gw)))
+  expect_true(any(grepl("weighted_mean", out)))
+  expect_true(any(grepl("52.278", out, fixed = TRUE)))
+})
+
+# --- Phase 4: internal consistency --------------------------------------------
+
+test_that("weighted median equals the weighted 50th percentile", {
+  # Audit finding: .w_median used a cumulative-weight step function while
+  # .w_quantile used Type-6/HAVERAGE - describe() could show Median != Q50
+  # in the same row.
+  x <- c(1, 2, 3, 4)
+  w <- c(0.5, 1.5, 0.8, 1.2)
+  expect_equal(mariposa:::.w_median(x, w),
+               unname(mariposa:::.w_quantile(x, w, probs = 0.5)),
+               tolerance = 1e-12)
+})
+
+test_that("unweighted quantiles use SPSS Type 6 (HAVERAGE)", {
+  # Audit finding: the exported w_quantile/w_iqr fell back to R's default
+  # Type 7 while claiming SPSS compatibility.
+  x <- 1:10
+  q <- dplyr::summarise(dplyr::tibble(x = x),
+                        q = w_quantile(x, probs = 0.25))$q
+  expect_equal(unname(q), unname(stats::quantile(x, 0.25, type = 6)))
+  iqr <- dplyr::summarise(dplyr::tibble(x = x), i = w_iqr(x))$i
+  q6 <- stats::quantile(x, c(0.25, 0.75), type = 6)
+  expect_equal(unname(iqr), unname(q6[2] - q6[1]))
+})
+
+test_that("frequency header skewness agrees with describe()", {
+  # Audit finding: frequency() reimplemented skewness with a Type-1
+  # population formula, contradicting describe() on the same variable.
+  data(survey_data)
+  fr_stats <- mariposa:::calculate_single_stats(survey_data$age)
+  de <- describe(survey_data, age, show = c("skew"))$results
+  expect_equal(fr_stats$skewness, de$age_Skewness[1], tolerance = 1e-10)
+})
+
+test_that("significance stars follow the symnum boundary convention", {
+  # Audit finding: cut(right = FALSE) gave p = 0.001 two stars and p = 0.05
+  # no star, contradicting the printed legend; three different boundary
+  # conventions coexisted across the correlation files.
+  stars <- mariposa:::add_significance_stars
+  expect_identical(stars(0.001), "***")
+  expect_identical(stars(0.01), "**")
+  expect_identical(stars(0.05), "*")
+  expect_identical(stars(0.051), "")
+  expect_identical(stars(NA_real_), "")
+  expect_type(stars(c(0.001, 0.2)), "character")
+})
+
 test_that("weighted mann_whitney stays equivalent to the design-based svyranktest convention", {
   # The weighted MW path is a design-based Lumley-Scott estimator and uses
   # Horvitz-Thompson mid-ranks (cumsum(w) - w/2) on purpose - NOT the

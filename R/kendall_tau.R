@@ -227,7 +227,8 @@ kendall_tau <- function(data, ..., weights = NULL,
       denominator <- sqrt((total_weight - ties_x) * (total_weight - ties_y))
 
       if (denominator == 0) {
-        tau <- 0
+        # Undefined coefficient (a variable with no untied pairs); NA, not 0
+        tau <- NA_real_
       } else {
         tau <- numerator / denominator
       }
@@ -285,7 +286,8 @@ kendall_tau <- function(data, ..., weights = NULL,
       denominator <- sqrt((n0 - Tx - Txy) * (n0 - Ty - Txy))
 
       if (denominator == 0) {
-        tau <- 0
+        # Undefined coefficient (a variable with no untied pairs); NA, not 0
+        tau <- NA_real_
       } else {
         tau <- (P - Q) / denominator
       }
@@ -293,17 +295,25 @@ kendall_tau <- function(data, ..., weights = NULL,
       n_eff <- n
     }
 
+    # Undefined coefficient (e.g. constant variable): return NA row
+    if (is.na(tau)) {
+      return(list(
+        tau = NA_real_,
+        p_value = NA_real_,
+        z_score = NA_real_,
+        n = n_eff
+      ))
+    }
+
     # Ensure tau is within valid range
     tau <- max(-1, min(1, tau))
 
     # Calculate z-score for significance test using SPSS-compatible method
     if (!is.null(w)) {
-      # For weighted, use simplified approximation
-      if (n_eff < 10) {
-        se_tau <- sqrt(2 * (2 * n_eff + 5) / (9 * n_eff * (n_eff - 1)))
-      } else {
-        se_tau <- sqrt((4 * n_eff + 10) / (9 * n_eff * (n_eff - 1)))
-      }
+      # Weighted: simplified no-ties approximation with n_eff = sum(w).
+      # (The former small/large-n branch was algebraically identical:
+      # 2*(2n+5) == 4n+10.)
+      se_tau <- sqrt((4 * n_eff + 10) / (9 * n_eff * (n_eff - 1)))
     } else {
       # For unweighted, use SPSS-compatible variance calculation with tie corrections
       # Get frequency tables for tie corrections
@@ -337,10 +347,10 @@ kendall_tau <- function(data, ..., weights = NULL,
       se_tau <- sqrt(var_tau)
     }
 
-    if (se_tau > 0) {
+    if (!is.na(se_tau) && se_tau > 0) {
       z_score <- tau / se_tau
     } else {
-      z_score <- 0
+      z_score <- NA_real_
     }
 
     # Calculate p-value based on alternative hypothesis
@@ -537,10 +547,7 @@ kendall_tau <- function(data, ..., weights = NULL,
   }
 
   # Add significance indicators (standard three-level style)
-  correlations_df$sig <- cut(correlations_df$p_value,
-                             breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                             labels = c("***", "**", "*", ""),
-                             right = TRUE)
+  correlations_df$sig <- add_significance_stars(correlations_df$p_value)
 
   # Create result object
   result <- list(

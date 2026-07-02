@@ -40,7 +40,8 @@
     weights_arg <- substitute(weights)
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
 
-    if (!.are_weights(weights_vec) || !.validate_weights(weights_vec, verbose = FALSE)) {
+    if (.are_weights(weights_vec)) .check_weights(weights_vec)
+    if (!.are_weights(weights_vec)) {
       # Unweighted
       if (na.rm) x <- x[!is.na(x)]
       return(stat_fn(x, w = NULL))
@@ -74,6 +75,7 @@
       cli_abort("Weights variable {.var {weights_name}} not found in data.")
     }
     weights_vec <- data[[weights_name]]
+    .check_weights(weights_vec, weights_name)
   }
 
   is_grouped <- inherits(data, "grouped_df")
@@ -225,18 +227,23 @@
     dplyr::bind_rows(results_long)
 
   } else {
-    # Single variable: direct column mapping
+    # Single variable: direct column mapping. The Variable column is
+    # included here too - the grouped print path iterates over it, and
+    # omitting it made grouped single-variable results print group headers
+    # with no statistics at all (audit finding).
     var_name <- var_names[1]
 
     if (!is.null(weights_name)) {
       results %>%
         dplyr::mutate(
+          Variable = var_name,
           !!weighted_col := !!rlang::sym(var_name),
           effective_n = !!rlang::sym(paste0(var_name, "_eff_n"))
         )
     } else {
       results %>%
         dplyr::mutate(
+          Variable = var_name,
           !!unweighted_col := !!rlang::sym(var_name),
           n = !!rlang::sym(paste0(var_name, "_n"))
         )

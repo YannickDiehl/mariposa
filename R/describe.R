@@ -269,15 +269,12 @@ describe <- function(data, ..., weights = NULL,
   
   # Basic validation checks
   if (length(weights) != length(x)) {
-    cli_warn("Length of weights does not match length of data. Using unweighted calculation.")
-    return(list(x = x, weights = NULL, valid = FALSE))
+    cli_abort("Length of weights ({length(weights)}) does not match length of data ({length(x)}).")
   }
-  
-  if (any(weights < 0, na.rm = TRUE)) {
-    cli_warn("Negative weights found. Using unweighted calculation.")
-    return(list(x = x, weights = NULL, valid = FALSE))
-  }
-  
+
+  # Package-wide policy: negative weights are an error, never a fallback
+  .check_weights(weights)
+
   if (all(is.na(weights))) {
     cli_warn("All weights are missing. Using unweighted calculation.")
     return(list(x = x, weights = NULL, valid = FALSE))
@@ -317,37 +314,11 @@ describe <- function(data, ..., weights = NULL,
 #' Weighted median using cumulative weights approach
 #' @keywords internal
 .w_median <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    return(median(cleaned$x, na.rm = na.rm))
-  }
-  
-  x_clean <- cleaned$x
-  w_clean <- cleaned$weights
-  
-  if (length(x_clean) == 0) return(NA_real_)
-  
-  # Sort by x values and calculate cumulative weights
-  ord <- order(x_clean)
-  x_sorted <- x_clean[ord]
-  w_sorted <- w_clean[ord]
-  cum_w <- cumsum(w_sorted)
-  total_w <- sum(w_sorted)
-  median_pos <- total_w / 2
-  
-  # Find median value using cumulative weights
-  if (any(cum_w == median_pos)) {
-    idx <- which(cum_w == median_pos)[1]
-    if (idx < length(x_sorted)) {
-      return((x_sorted[idx] + x_sorted[idx + 1]) / 2)
-    } else {
-      return(x_sorted[idx])
-    }
-  } else {
-    idx <- which(cum_w > median_pos)[1]
-    return(x_sorted[idx])
-  }
+  # SPSS's median IS the HAVERAGE (Type-6) 50th percentile. Delegating to
+  # .w_quantile() guarantees Median == Q50 in every output; the former
+  # cumulative-weight step function disagreed with .w_quantile(0.5) for
+  # fractional weights (audit finding).
+  unname(.w_quantile(x, weights = weights, probs = 0.5, na.rm = na.rm))
 }
 
 #' Weighted variance with Bessel's correction

@@ -228,6 +228,17 @@ spearman_rho <- function(data, ..., weights = NULL,
       n_eff <- n
     }
 
+    # Undefined correlation (zero variance, e.g. a constant variable):
+    # return NA instead of crashing on the abs(rho) check below.
+    if (is.na(rho)) {
+      return(list(
+        rho = NA_real_,
+        p_value = NA_real_,
+        t_stat = NA_real_,
+        n = n
+      ))
+    }
+
     # Significance testing using t-distribution
     # For Spearman's rho: t = rho * sqrt((n-2)/(1-rho^2))
     if (abs(rho) == 1) {
@@ -283,12 +294,9 @@ spearman_rho <- function(data, ..., weights = NULL,
         # Calculate correlation
         result <- calculate_spearman_rho(x, y, w, alternative)
 
-        # Add significance symbols (standard three-level style)
-        sig <- if (is.na(result$p_value)) ""
-              else if (result$p_value < 0.001) "***"
-              else if (result$p_value < 0.01) "**"
-              else if (result$p_value < 0.05) "*"
-              else ""
+        # Significance symbols via the shared helper (uniform boundary
+        # convention across the whole package)
+        sig <- add_significance_stars(result$p_value)
 
         # Store results
         all_results[[paste(var1, var2, sep = "_")]] <- data.frame(

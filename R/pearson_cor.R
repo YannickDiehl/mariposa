@@ -223,8 +223,6 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
       r <- cov_xy / sqrt(var_x * var_y)
       
       # SPSS compatibility: use sum of weights for significance testing
-      # Also calculate true effective sample size for reference
-      n_eff_true <- .effective_n(w)  # Statistically correct effective sample size
       n_eff <- sum(w)  # SPSS uses sum of weights for df calculation
       
     } else {
@@ -248,9 +246,22 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
       n_eff <- n
     }
     
+    # Undefined correlation (zero variance in x or y, as with a constant
+    # variable): return NA instead of crashing on the abs(r) check below.
+    # SPSS leaves the cell blank in this situation.
+    if (is.na(r)) {
+      return(list(
+        correlation = NA_real_,
+        p_value = NA_real_,
+        conf_int = c(NA_real_, NA_real_),
+        n = if (!is.null(w)) round(n_eff) else n,
+        df = NA_integer_
+      ))
+    }
+
     # Ensure correlation is within valid range
     r <- max(-1, min(1, r))
-    
+
     # Calculate t-statistic for significance test
     df <- n_eff - 2
     if (abs(r) == 1) {
@@ -479,10 +490,7 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
   }
   
   # Add significance indicators
-  correlations_df$sig <- cut(correlations_df$p_value,
-                             breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                             labels = c("***", "**", "*", ""),
-                             right = FALSE)
+  correlations_df$sig <- add_significance_stars(correlations_df$p_value)
   
   # Calculate r-squared for effect size
   correlations_df$r_squared <- correlations_df$correlation^2

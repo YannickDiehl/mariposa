@@ -98,7 +98,8 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
     
     # Calculate weighted or unweighted mode
-    if (!.are_weights(weights_vec) || !.validate_weights(weights_vec, verbose = FALSE)) {
+    if (.are_weights(weights_vec)) .check_weights(weights_vec)
+    if (!.are_weights(weights_vec)) {
       # Unweighted calculation
       if (na.rm) {
         x <- x[!is.na(x)]
@@ -146,11 +147,6 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
     }
     
     return(result)
-  }
-  
-  # Data frame handling
-  if (!is.data.frame(data)) {
-    cli_abort("{.arg data} must be a data frame.")
   }
   
   # Get variables and weights

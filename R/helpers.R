@@ -26,14 +26,46 @@ NULL
   if (!.are_weights(weights)) {
     return(FALSE)
   }
-  
+
   pos <- all(weights > 0, na.rm = TRUE)
-  
+
   if (isTRUE(!pos) && isTRUE(verbose)) {
     cli_warn("Some weights were negative or zero. Weighting not carried out.")
   }
-  
+
   pos
+}
+
+#' Enforce the package-wide weights policy
+#'
+#' Single policy applied by every weighted entry point: weights must be
+#' numeric and non-negative, otherwise the call errors. Zero weights are
+#' allowed (the case contributes nothing to weighted sums; SPSS likewise
+#' excludes zero-weighted cases), NA weights are handled by each caller's
+#' na.rm logic. This replaces the historical mix of silent
+#' fall-back-to-unweighted, warn-and-continue, and no validation at all,
+#' which produced different results for the same input depending on the
+#' entry point.
+#'
+#' @param weights Numeric vector of weights (NULL is allowed and ignored)
+#' @param name Optional display name of the weights variable for messages
+#' @return invisible(TRUE); errors on violation
+#' @keywords internal
+.check_weights <- function(weights, name = NULL) {
+  if (is.null(weights)) return(invisible(TRUE))
+  label <- if (!is.null(name)) paste0("Weights variable {.var ", name, "}") else "Weights"
+  if (!is.numeric(weights)) {
+    cli_abort(paste0(label, " must be numeric, not {.cls {class(weights)[1]}}."))
+  }
+  n_neg <- sum(weights < 0, na.rm = TRUE)
+  if (n_neg > 0) {
+    cli_abort(c(
+      paste0(label, " must not contain negative values."),
+      "x" = "{n_neg} negative weight{?s} found.",
+      "i" = "Negative weights are not meaningful for survey analysis."
+    ))
+  }
+  invisible(TRUE)
 }
 
 #' Evaluate weights in summarise() context
@@ -117,6 +149,8 @@ NULL
   if (!is.numeric(weights_vec)) {
     cli_abort("Weights variable {.var {weights_name}} must be numeric.")
   }
+
+  .check_weights(weights_vec, weights_name)
 
   list(vector = weights_vec, name = weights_name)
 }
@@ -314,4 +348,35 @@ get_value_labels <- function(x, freq_names) {
   group_end <- cumsum(group_w)
   group_mid <- group_end - group_w + (group_w + 1) / 2
   group_mid[as.integer(f)]
+}
+
+#' Weighted Wilcoxon signed-rank core (frequency-weight convention)
+#'
+#' Shared implementation used by wilcoxon_test() and pairwise_wilcoxon() so
+#' the two cannot drift apart (they previously duplicated this block and a
+#' bias fix had to be applied twice). Substitutes sum(w) for n in the
+#' standard variance formula; exact for integer frequency weights.
+#'
+#' @param d_no_ties Paired differences with zero differences removed
+#' @param w_no_ties Corresponding weights
+#' @return list with rankhat, V, E_V, Var_V, Z, p_value (two-sided), N_pop
+#' @keywords internal
+.weighted_signed_rank_z <- function(d_no_ties, w_no_ties) {
+  abs_d <- abs(d_no_ties)
+  rankhat <- .weighted_midranks(abs_d, w_no_ties)
+
+  pos_in_ranked <- d_no_ties > 0
+  V <- sum(w_no_ties[pos_in_ranked] * rankhat[pos_in_ranked])
+
+  N_pop <- sum(w_no_ties)
+  E_V <- N_pop * (N_pop + 1) / 4
+
+  tie_groups_w <- tapply(w_no_ties, factor(abs_d), sum)
+  tie_correction <- sum(tie_groups_w^3 - tie_groups_w)
+  Var_V <- N_pop * (N_pop + 1) * (2 * N_pop + 1) / 24 - tie_correction / 48
+
+  Z <- if (Var_V > 0) (V - E_V) / sqrt(Var_V) else 0
+
+  list(rankhat = rankhat, V = V, E_V = E_V, Var_V = Var_V, Z = Z,
+       p_value = 2 * stats::pnorm(abs(Z), lower.tail = FALSE), N_pop = N_pop)
 }

@@ -174,10 +174,13 @@ crosstab.data.frame <- function(data, row, col,
 
   # Create contingency table
   if (is_weighted) {
-    # Use actual decimal weights (not rounded)
-    # SPSS applies decimal weights and rounds results, not weights
+    # Documented deviation from SPSS: SPSS CROSSTABS' default is
+    # /COUNT ROUND CELL (cell counts are rounded BEFORE percentages are
+    # computed), which is what chi_square() reproduces. crosstab() keeps
+    # the unrounded decimal cell counts, so weighted counts/percentages can
+    # differ from SPSS within the rounding margin. Validated within the
+    # Display-tier tolerances; revisit if a /COUNT option is ever added.
     tab <- xtabs(weights_vec ~ row_data + col_data)
-    # Note: Results can be rounded later for display if needed
   } else {
     # Create unweighted table
     tab <- table(row_data, col_data)

@@ -97,10 +97,12 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
     weights_arg <- substitute(weights)
     weights_vec <- .evaluate_weights(weights_arg, parent.frame())
     
-    if (!.are_weights(weights_vec) || !.validate_weights(weights_vec, verbose = FALSE)) {
+    if (.are_weights(weights_vec)) .check_weights(weights_vec)
+    if (!.are_weights(weights_vec)) {
       # Unweighted calculation
       if (na.rm) x <- x[!is.na(x)]
-      return(quantile(x, probs = probs, na.rm = na.rm))
+      # Type 6 = SPSS HAVERAGE (R default type 7 is NOT SPSS-compatible)
+      return(quantile(x, probs = probs, na.rm = na.rm, type = 6))
     } else {
       # Weighted calculation
       if (na.rm) {
@@ -164,7 +166,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
           if (is.null(weights_vec)) {
             # Unweighted calculation
             if (na.rm) x <- x[!is.na(x)]
-            quantiles <- quantile(x, probs = probs, na.rm = na.rm)
+            quantiles <- quantile(x, probs = probs, na.rm = na.rm, type = 6)  # SPSS HAVERAGE
             names(quantiles) <- quantile_labels
             n_val <- length(x[!is.na(x)])
             eff_n <- n_val
@@ -213,7 +215,7 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
       if (is.null(weights_vec)) {
         # Unweighted calculation
         if (na.rm) x <- x[!is.na(x)]
-        quantiles <- quantile(x, probs = probs, na.rm = na.rm)
+        quantiles <- quantile(x, probs = probs, na.rm = na.rm, type = 6)  # SPSS HAVERAGE
         names(quantiles) <- quantile_labels
         n_val <- length(x[!is.na(x)])
         eff_n <- n_val

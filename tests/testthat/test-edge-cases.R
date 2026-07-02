@@ -197,12 +197,12 @@ test_that("effect-size helpers name results by group for grouped data", {
 # ===========================================================================
 # 6. describe: weight validation warnings
 # ===========================================================================
-test_that("describe warns on negative weights", {
+test_that("describe errors on negative weights (package-wide policy)", {
   bad_data <- survey_data
   bad_data$neg_wt <- rep(-1, nrow(bad_data))
-  expect_warning(
+  expect_error(
     describe(bad_data, age, weights = neg_wt),
-    "Negative|negative|unweighted"
+    "negative"
   )
 })
 

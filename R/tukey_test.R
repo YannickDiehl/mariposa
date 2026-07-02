@@ -221,12 +221,8 @@ tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
       })
       names(group_stats) <- group_levels
       
-      # Calculate MSE (Mean Square Error) using SPSS approach
-      # Use the classical Welch formula components from the ANOVA results
-      anova_result <- x$anova_results
-      
-      # Get MSE from classical ANOVA (within-group variance)
-      # For weighted data, we need to calculate weighted MSE
+      # Calculate MSE (Mean Square Error) using SPSS approach:
+      # pooled within-group variance from the weighted group statistics
       total_weighted_ss <- 0
       total_weighted_df <- 0
       
@@ -264,7 +260,7 @@ tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
         df <- total_weighted_df
         
         # Critical value from studentized range distribution
-        q_crit <- qtukey(1 - (1 - conf.level), n_groups, df) / sqrt(2)
+        q_crit <- qtukey(conf.level, n_groups, df) / sqrt(2)
         
         # Confidence interval
         margin <- q_crit * se
@@ -322,7 +318,7 @@ tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
             all_results <- append(all_results, list(result_with_groups))
           }
         }, error = function(e) {
-          # Skip this combination if error occurs
+          cli_warn("Tukey test failed for variable {.var {var_name}} in group {paste(unlist(group_info), collapse = ', ')}: {e$message}")
         })
       }
     }
@@ -337,7 +333,7 @@ tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
           all_results <- append(all_results, list(tukey_result))
         }
       }, error = function(e) {
-        # Skip this variable if error occurs
+        cli_warn("Tukey test failed for variable {.var {var_name}}: {e$message}")
       })
     }
   }

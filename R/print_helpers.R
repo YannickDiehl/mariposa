@@ -45,8 +45,13 @@ print_info_section <- function(info, indent = 0) {
 add_significance_stars <- function(p_value,
                                   breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
                                   labels = c("***", "**", "*", "")) {
-  if (is.na(p_value)) return("")
-  cut(p_value, breaks = breaks, labels = labels, right = FALSE)
+  # right = TRUE: boundary values follow the symnum convention printed in
+  # the legend (p = 0.001 -> '***', p = 0.05 -> '*'). Vectorized; returns
+  # character, NA p-values map to "".
+  out <- as.character(cut(p_value, breaks = breaks, labels = labels,
+                          right = TRUE))
+  out[is.na(out)] <- ""
+  out
 }
 
 #' Print significance codes legend

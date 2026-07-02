@@ -108,25 +108,26 @@ test_that("add_significance_stars returns *** for p < 0.001", {
   expect_equal(as.character(result), "***")
 })
 
-test_that("add_significance_stars returns ** for p in [0.001, 0.01)", {
+test_that("add_significance_stars returns ** for p in (0.001, 0.01]", {
   result <- mariposa:::add_significance_stars(0.005)
   expect_equal(as.character(result), "**")
 
-  result_boundary <- mariposa:::add_significance_stars(0.001)
+  # Boundary values follow the symnum convention printed in the legend
+  result_boundary <- mariposa:::add_significance_stars(0.01)
   expect_equal(as.character(result_boundary), "**")
 })
 
-test_that("add_significance_stars returns * for p in [0.01, 0.05)", {
+test_that("add_significance_stars returns * for p in (0.01, 0.05]", {
 
   result <- mariposa:::add_significance_stars(0.03)
   expect_equal(as.character(result), "*")
 
-  result_boundary <- mariposa:::add_significance_stars(0.01)
+  result_boundary <- mariposa:::add_significance_stars(0.05)
   expect_equal(as.character(result_boundary), "*")
 })
 
-test_that("add_significance_stars returns empty for p >= 0.05", {
-  result <- mariposa:::add_significance_stars(0.05)
+test_that("add_significance_stars returns empty for p > 0.05", {
+  result <- mariposa:::add_significance_stars(0.051)
   expect_equal(as.character(result), "")
 
   result_high <- mariposa:::add_significance_stars(0.99)

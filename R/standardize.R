@@ -182,7 +182,8 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 .std_vec <- function(x, method = "sd", w = NULL, na.rm = TRUE) {
 
   # Weighted path
-  if (!is.null(w) && .validate_weights(w, verbose = FALSE)) {
+  if (!is.null(w)) .check_weights(w)
+  if (!is.null(w)) {
 
     if (method %in% c("mad", "gmd")) {
       cli::cli_abort(
@@ -380,7 +381,8 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
 
 #' @noRd
 .center_vec <- function(x, w = NULL, na.rm = TRUE) {
-  if (!is.null(w) && .validate_weights(w, verbose = FALSE)) {
+  if (!is.null(w)) .check_weights(w)
+  if (!is.null(w)) {
     if (isTRUE(na.rm)) {
       valid <- !is.na(x) & !is.na(w)
       xv <- x[valid]

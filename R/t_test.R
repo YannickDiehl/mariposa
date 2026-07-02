@@ -673,15 +673,6 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   )
 }
 
-#' Get table border for t-test formatting (similar to describe function)
-#' @keywords internal
-.get_t_test_border <- function(df) {
-  col_widths <- sapply(names(df), function(col) {
-    max(nchar(as.character(df[[col]])), nchar(col), na.rm = TRUE)
-  })
-  total_width <- sum(col_widths) + length(col_widths) - 1
-  return(paste(rep("-", total_width), collapse = ""))
-}
 
 #' Create effect size data frame
 #' @keywords internal

@@ -317,7 +317,7 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
             all_results <- append(all_results, list(result_with_groups))
           }
         }, error = function(e) {
-          # Skip this combination if error occurs
+          cli_warn("Scheffe test failed for variable {.var {var_name}} in group {paste(unlist(group_info), collapse = ', ')}: {e$message}")
         })
       }
     }
@@ -332,7 +332,7 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
           all_results <- append(all_results, list(scheffe_result))
         }
       }, error = function(e) {
-        # Skip this variable if error occurs
+        cli_warn("Scheffe test failed for variable {.var {var_name}}: {e$message}")
       })
     }
   }

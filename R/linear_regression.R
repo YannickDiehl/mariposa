@@ -210,6 +210,7 @@ linear_regression <- function(data, formula = NULL,
       cli_abort("Weight variable {.var {weight_name}} not found in data.")
     }
     weights_vec <- data[[weight_name]]
+    .check_weights(weights_vec, weight_name)
   }
 
   # Build formula

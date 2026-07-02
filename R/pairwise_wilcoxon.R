@@ -211,36 +211,10 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
       # Weighted Wilcoxon Signed-Rank Test
       # ----------------------------------------------------------------
 
-      w_no_ties <- w[!tie_idx]
-
-      # Weighted mid-ranks of absolute differences (frequency-expansion
-      # convention, shared helper; see wilcoxon_test.R for the rationale)
-      abs_d <- abs(d_no_ties)
-      rankhat <- .weighted_midranks(abs_d, w_no_ties)
-
-      # Assign ranks to positive and negative groups
-      pos_in_ranked <- d_no_ties > 0
-
-      # Weighted rank sums
-      sum_rank_pos <- sum(w_no_ties[pos_in_ranked] * rankhat[pos_in_ranked])
-
-      V <- sum_rank_pos
-      N_pop <- sum(w_no_ties)
-
-      E_V <- N_pop * (N_pop + 1) / 4
-
-      tie_groups_w <- tapply(w_no_ties, factor(abs_d), sum)
-      tie_correction <- sum(tie_groups_w^3 - tie_groups_w)
-      Var_V <- N_pop * (N_pop + 1) * (2 * N_pop + 1) / 24 -
-        tie_correction / 48
-
-      if (Var_V > 0) {
-        Z <- (V - E_V) / sqrt(Var_V)
-      } else {
-        Z <- 0
-      }
-
-      p_value <- 2 * pnorm(abs(Z), lower.tail = FALSE)
+      # Shared core (identical math to wilcoxon_test's weighted branch)
+      core <- .weighted_signed_rank_z(d_no_ties, w[!tie_idx])
+      Z <- core$Z
+      p_value <- core$p_value
     }
 
     return(list(z = Z, p = p_value))
@@ -284,7 +258,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
             stringsAsFactors = FALSE
           )
         }, error = function(e) {
-          # Skip on error
+          cli_warn("Pairwise Wilcoxon failed for {.var {vars[v1]}} vs {.var {vars[v2]}}: {e$message}")
         })
       }
 
@@ -324,7 +298,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
           stringsAsFactors = FALSE
         )
       }, error = function(e) {
-        # Skip on error
+        cli_warn("Pairwise Wilcoxon failed for {.var {vars[v1]}} vs {.var {vars[v2]}}: {e$message}")
       })
     }
 

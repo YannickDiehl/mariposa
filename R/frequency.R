@@ -196,47 +196,6 @@ frequency <- function(data, ..., weights = NULL, sort.frq = "none",
   ), class = "frequency")
 }
 
-# Note: get_value_labels() moved to helpers.R for shared use across the package
-
-# Helper function: Adjust rounded frequencies using largest remainder method
-# Ensures sum of rounded frequencies equals the rounded sum
-adjust_rounded_frequencies <- function(raw_freqs, target_sum = NULL) {
-  if (is.null(target_sum)) {
-    target_sum <- round(sum(raw_freqs))
-  }
-  
-  # Start with floor of all values
-  floored <- floor(raw_freqs)
-  remainders <- raw_freqs - floored
-  
-  # How many values need to be rounded up?
-  n_to_round_up <- target_sum - sum(floored)
-  
-  if (n_to_round_up > 0) {
-    # Sort by remainder size (descending) and round up the largest remainders
-    order_idx <- order(remainders, decreasing = TRUE)
-    adjusted <- floored
-    for(i in 1:min(n_to_round_up, length(order_idx))) {
-      adjusted[order_idx[i]] <- adjusted[order_idx[i]] + 1
-    }
-    return(adjusted)
-  } else if (n_to_round_up < 0) {
-    # This shouldn't happen with proper rounding, but handle it
-    # Round down the smallest remainders
-    order_idx <- order(remainders, decreasing = FALSE)
-    adjusted <- floored
-    for(i in 1:min(abs(n_to_round_up), length(order_idx))) {
-      if (adjusted[order_idx[i]] > 0) {
-        adjusted[order_idx[i]] <- adjusted[order_idx[i]] - 1
-      }
-    }
-    return(adjusted)
-  } else {
-    # Sum already matches
-    return(floored)
-  }
-}
-
 # Helper function: Calculate frequency statistics for a single variable
 calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na = TRUE, show.unused = FALSE) {
   # Check for tagged NAs (from read_spss, read_stata, read_sas, etc.)
@@ -393,6 +352,9 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
       if ("is_na_row" %in% names(result)) {
         unused_rows$is_na_row <- FALSE
       }
+      if ("na_display_value" %in% names(result)) {
+        unused_rows$na_display_value <- NA_character_
+      }
 
       # Separate NA rows, merge non-NA rows, re-sort, re-append NA rows
       na_rows <- result[is.na(result$value), , drop = FALSE]
@@ -414,9 +376,20 @@ calculate_single_frequency <- function(x, w = NULL, sort.frq = "none", show.na =
     }
   }
 
-  # Sort if requested
+  # Sort if requested: by frequency (as documented, SPSS /FORMAT=AFREQ|DFREQ).
+  # NA/total rows keep their position at the bottom; cumulative statistics
+  # are recomputed in display order so the Cum. % column stays monotone.
   if (sort.frq %in% c("asc", "desc")) {
-    result <- result[order(result$value, decreasing = (sort.frq == "desc")), ]
+    is_value_row <- !is.na(result$value)
+    value_rows <- result[is_value_row, , drop = FALSE]
+    other_rows <- result[!is_value_row, , drop = FALSE]
+    value_rows <- value_rows[order(value_rows$freq,
+                                   decreasing = (sort.frq == "desc")), ,
+                             drop = FALSE]
+    value_rows$cum_freq <- cumsum(value_rows$freq)
+    value_rows$cum_prc <- cumsum(value_rows$valid_prc)
+    result <- rbind(value_rows, other_rows)
+    rownames(result) <- NULL
   }
 
   return(result)
@@ -592,11 +565,14 @@ calculate_single_stats <- function(x, w = NULL) {
     x_valid <- x[!is.na(x)]
     n <- length(x_valid)
     
-    # For numeric variables, calculate mean and sd
+    # For numeric variables, calculate mean and sd.
+    # Skewness via the shared SPSS Type-2 helper so the header line agrees
+    # with describe() and w_skew() (it previously used a Type-1 population
+    # formula - audit finding).
     if (is.numeric(x_valid)) {
       mean_val <- mean(x_valid)
       sd_val <- sd(x_valid)
-      skewness <- if (n > 2 && sd_val > 0) (sum((x_valid - mean_val)^3) / n) / (sd_val^3) else NA
+      skewness <- if (n > 2 && sd_val > 0) .calc_skewness(x_valid) else NA
     } else {
       # For factors or other non-numeric variables
       mean_val <- NA
@@ -612,13 +588,18 @@ calculate_single_stats <- function(x, w = NULL) {
     x_valid <- x[valid_idx]
     w_valid <- w[valid_idx]
     
-    # For numeric variables, calculate weighted mean and sd
+    # Weighted mean/sd/skewness via the shared SPSS frequency-weight
+    # formulas (sum(w)-1 denominator, Type-2 skewness) so the header line
+    # agrees with describe() and the w_* functions (it previously used
+    # population formulas - audit finding).
     if (is.numeric(x_valid)) {
-      w_norm <- w_valid / sum(w_valid)
-      mean_val <- sum(x_valid * w_norm)
-      sd_val <- sqrt(sum(w_norm * (x_valid - mean_val)^2))
-      skewness <- if (length(x_valid) > 2 && sd_val > 0) {
-        sum(w_norm * ((x_valid - mean_val) / sd_val)^3)
+      w_sum <- sum(w_valid)
+      mean_val <- sum(x_valid * w_valid) / w_sum
+      sd_val <- if (w_sum > 1) {
+        sqrt(sum(w_valid * (x_valid - mean_val)^2) / (w_sum - 1))
+      } else NA
+      skewness <- if (length(x_valid) > 2 && !is.na(sd_val) && sd_val > 0) {
+        .calc_skewness(x_valid, w_valid)
       } else NA
     } else {
       # For factors or other non-numeric variables

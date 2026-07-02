@@ -197,6 +197,7 @@ logistic_regression <- function(data, formula = NULL,
       cli_abort("Weight variable {.var {weight_name}} not found in data.")
     }
     weights_vec <- data[[weight_name]]
+    .check_weights(weights_vec, weight_name)
   }
 
   # Build formula
@@ -307,6 +308,23 @@ logistic_regression <- function(data, formula = NULL,
 
 #' Core logistic regression computation
 #' @keywords internal
+# Fit a glm while muffling ONLY the expected fractional-frequency-weight
+# warning. suppressWarnings() would also swallow separation and
+# non-convergence warnings ("fitted probabilities numerically 0 or 1
+# occurred", "algorithm did not converge") - exactly the pathologies a
+# survey analyst must see.
+.glm_quiet_weights <- function(expr) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("non-integer #successes", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+
+
 .glm_core <- function(data, formula, dep_name, pred_names, weights_vec,
                       conf.level, factors = "dummy") {
 
@@ -364,7 +382,7 @@ logistic_regression <- function(data, formula = NULL,
   # This is expected behavior matching SPSS WEIGHT BY
   if (!is.null(weights_vec)) {
     data_complete$.wt <- weights_vec
-    model <- suppressWarnings(
+    model <- .glm_quiet_weights(
       stats::glm(formula, data = data_complete, family = stats::binomial(),
                  weights = .wt)
     )
@@ -375,7 +393,7 @@ logistic_regression <- function(data, formula = NULL,
   # Also fit null model for pseudo R-squared calculations
   null_formula <- stats::as.formula(paste(dep_name, "~ 1"))
   if (!is.null(weights_vec)) {
-    null_model <- suppressWarnings(
+    null_model <- .glm_quiet_weights(
       stats::glm(null_formula, data = data_complete,
                  family = stats::binomial(), weights = .wt)
     )

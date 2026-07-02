@@ -89,7 +89,9 @@ w_iqr <- function(data, ..., weights = NULL, na.rm = TRUE) {
     stat_fn = function(x, w) {
       if (length(x) == 0) return(NA_real_)
       if (is.null(w)) {
-        unname(stats::IQR(x))
+        # Type 6 = SPSS HAVERAGE quartiles (stats::IQR defaults to type 7)
+        q <- stats::quantile(x, probs = c(0.25, 0.75), type = 6)
+        unname(q[2] - q[1])
       } else {
         q <- .w_quantile(x, w, probs = c(0.25, 0.75), na.rm = FALSE)
         unname(q[2] - q[1])

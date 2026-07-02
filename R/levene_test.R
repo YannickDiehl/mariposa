@@ -185,7 +185,9 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
       
     }, error = function(e) {
       cli_warn("Levene test failed for variable {.var {var_name}}: {e$message}")
-      results_list[[var_name]] <- tibble(
+      # <<-: plain <- inside the error handler assigns into the
+      # handler frame and the NA placeholder row would be lost
+      results_list[[var_name]] <<- tibble(
         Variable = var_name,
         F_statistic = NA_real_,
         df1 = NA_integer_,
@@ -290,7 +292,9 @@ levene_test.oneway_anova <- function(x, center = c("mean", "median"), ...) {
         
       }, error = function(e) {
         cli_warn("Levene test failed for variable {.var {var_name}}: {e$message}")
-        results_list[[var_name]] <- tibble(
+        # <<-: plain <- inside the error handler assigns into the
+        # handler frame and the NA placeholder row would be lost
+        results_list[[var_name]] <<- tibble(
           Variable = var_name,
           F_statistic = NA_real_,
           df1 = NA_integer_,
@@ -506,136 +510,6 @@ levene_test.grouped_df <- function(x, variable, group = NULL, weights = NULL, ce
   return(result_obj)
 }
 
-# SPSS-compatible helper function for grouped Levene tests
-perform_grouped_levene_test <- function(data, var_name, group_name, weight_name = NULL, center = "mean") {
-  
-  # SPSS-compatible grouped Levene test
-  # In SPSS, when doing grouped analysis, the Levene test is performed on the complete
-  # dataset within each group, using all available data for that group
-  
-  # Get the variable values
-  x <- data[[var_name]]
-  g <- data[[group_name]]
-  
-  # Remove NA values
-  valid_indices <- !is.na(x) & !is.na(g)
-  if (!is.null(weight_name)) {
-    w <- data[[weight_name]]
-    valid_indices <- valid_indices & !is.na(w)
-    w <- w[valid_indices]
-  }
-  x <- x[valid_indices]
-  g <- g[valid_indices]
-  
-  # Get unique groups
-  if (is.factor(g)) {
-    all_levels <- levels(g)
-    g_levels <- all_levels[all_levels %in% unique(g)]
-  } else {
-    g_levels <- unique(g)
-  }
-  
-  if (length(g_levels) < 2) {
-    cli_abort(c("Levene test requires at least 2 groups.", "x" = "Found {length(g_levels)} group{?s}."))
-  }
-  
-  # Calculate deviations from group centers
-  z_values <- numeric(length(x))
-  
-  # For weighted tests, use weighted group centers
-  if (!is.null(weight_name)) {
-    for (level in g_levels) {
-      group_indices <- g == level
-      group_data <- x[group_indices]
-      group_weights <- w[group_indices]
-      
-      if (center == "median") {
-        # For weighted median, use a simple approximation
-        group_center <- median(group_data, na.rm = TRUE)
-      } else {
-        # Weighted mean
-        group_center <- sum(group_data * group_weights) / sum(group_weights)
-      }
-      
-      z_values[group_indices] <- abs(group_data - group_center)
-    }
-    
-    # SPSS-compatible weighted Levene test for grouped data
-    # Calculate effective sample sizes per group (sum of weights)
-    group_eff_n <- sapply(g_levels, function(level) {
-      group_indices <- g == level
-      sum(w[group_indices])
-    })
-    
-    # Calculate weighted group means of absolute deviations
-    z_group_means <- sapply(g_levels, function(level) {
-      group_indices <- g == level
-      sum(z_values[group_indices] * w[group_indices]) / sum(w[group_indices])
-    })
-    names(z_group_means) <- as.character(g_levels)
-    
-    # Calculate overall weighted mean of absolute deviations
-    z_overall_mean <- sum(z_values * w) / sum(w)
-    
-    # Between-groups sum of squares (SPSS method)
-    ss_between <- sum(group_eff_n * (z_group_means - z_overall_mean)^2)
-    
-    # Within-groups sum of squares (SPSS method)
-    ss_within <- 0
-    for (i in seq_along(z_values)) {
-      group_level <- as.character(g[i])
-      group_mean <- z_group_means[group_level]
-      ss_within <- ss_within + w[i] * (z_values[i] - group_mean)^2
-    }
-    
-    # SPSS Levene df: df1 = k - 1, df2 = sum(w) - k (UNROUNDED).
-    # Empirical verification against SPSS v29 (2026-05-19): Levene's test
-    # in SPSS is part of the T-TEST procedure output and inherits T-TEST's
-    # unrounded-sum(w) convention, NOT ONEWAY's floor() convention.
-    # Verified across Tests 2b (life_sat) and 4b (income, East) where
-    # floor() would match one but not the other; unrounded matches both.
-    # See VALIDATION_CHARTER.md §5.1.
-    df1 <- length(g_levels) - 1
-    df2 <- sum(w) - length(g_levels)
-    
-    # Calculate F-statistic (SPSS method)
-    F_stat <- (ss_between / df1) / (ss_within / df2)
-    p_value <- pf(F_stat, df1, df2, lower.tail = FALSE)
-    
-  } else {
-    # Unweighted case
-    for (level in g_levels) {
-      group_indices <- g == level
-      group_data <- x[group_indices]
-      
-      if (center == "median") {
-        group_center <- median(group_data, na.rm = TRUE)
-      } else {
-        group_center <- mean(group_data, na.rm = TRUE)
-      }
-      
-      z_values[group_indices] <- abs(group_data - group_center)
-    }
-    
-    # Unweighted Levene test for grouped data
-    # SPSS uses N - k for degrees of freedom
-    test_data <- data.frame(z = z_values, group = g)
-    anova_result <- aov(z ~ group, data = test_data)
-    anova_summary <- summary(anova_result)
-    
-    F_stat <- anova_summary[[1]][["F value"]][1]
-    df1 <- anova_summary[[1]][["Df"]][1]
-    df2 <- length(z_values) - length(g_levels)  # SPSS method: N - k
-    p_value <- anova_summary[[1]][["Pr(>F)"]][1]
-  }
-  
-  return(list(
-    F_stat = F_stat,
-    df1 = df1,
-    df2 = df2,
-    p_value = p_value
-  ))
-}
 
 # Helper function to perform Levene test for a single variable (non-grouped)
 perform_single_levene_test <- function(data, var_name, group_name, weight_name = NULL, center = "mean") {
@@ -834,9 +708,8 @@ print.levene_test <- function(x, digits = 3, ...) {
       
       # Filter results for current group
       if ("Group" %in% names(x$results)) {
-        # Direct group column - find rows with this group label (with tolerance for formatting)
-        original_group_name <- gsub("eastwest = ", "eastwest=", group_label)
-        group_results <- x$results[x$results$Group == original_group_name, ]
+        # Direct group column - group_label is the raw Group value
+        group_results <- x$results[x$results$Group == group_label, ]
       } else if (!is.null(x$groups) && length(x$groups) > 0) {
         # For multi-column grouping, match all group columns
         group_results <- x$results

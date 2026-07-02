@@ -169,6 +169,26 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
     } else {
       # Use a range covering all missing codes
       na_rng <- c(min(na_codes), max(na_codes))
+
+      # Guard: the min-max range must not swallow valid values. With codes
+      # like c(0, 7, 8, 9) the range 0-9 would silently mark every valid
+      # value 1-6 as user-missing in the exported file - data corruption,
+      # not a formatting detail.
+      observed_valid <- unique(raw[!is.na(raw) & !(raw %in% na_codes)])
+      caught <- observed_valid[observed_valid >= na_rng[1] &
+                                 observed_valid <= na_rng[2]]
+      if (length(caught) > 0) {
+        cli::cli_abort(c(
+          "Cannot export missing-value codes of {.var {names(data)[i]}} to SPSS.",
+          "x" = "SPSS allows at most 3 discrete missing codes; the {length(na_codes)} codes ({paste(sort(na_codes), collapse = ', ')}) would be written as range {na_rng[1]}-{na_rng[2]}, which contains the valid value{?s} {paste(sort(caught), collapse = ', ')}.",
+          "i" = "Recode the missing codes to a contiguous block (e.g. with {.fn rec}) or reduce them to 3 codes before exporting."
+        ))
+      }
+      cli::cli_warn(c(
+        "Variable {.var {names(data)[i]}}: {length(na_codes)} discrete missing codes exceed SPSS's limit of 3.",
+        "i" = "Writing them as missing range {na_rng[1]}-{na_rng[2]} instead."
+      ))
+
       data[[i]] <- haven::labelled_spss(
         raw,
         labels = labels,
