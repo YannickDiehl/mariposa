@@ -211,440 +211,69 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
   w_name <- weights_info$name
-  
 
-
-
-
-  # Helper function to calculate Cohen's d (following sjstats approach exactly)
-  calculate_cohens_d <- function(x1, x2, w1 = NULL, w2 = NULL) {
-    if (is.null(w1) || is.null(w2)) {
-      # Unweighted Cohen's d
-      x1 <- x1[!is.na(x1)]
-      x2 <- x2[!is.na(x2)]
-      
-      d <- mean(x1) - mean(x2)
-      s1 <- sd(x1)
-      s2 <- sd(x2)
-      n1 <- length(x1)
-      n2 <- length(x2)
-      
-      # Pooled standard deviation
-      s <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
-      cohens_d <- d / s
-      
-      # Glass' Delta (uses only control group SD - first group)
-      glass_delta <- d / s1
-      
-      # Hedges' bias correction (methodologically superior)
-      # J = 1 - 3/(4*(n1+n2-2)-1) 
-      hedges_j <- 1 - (3 / (4 * (n1 + n2 - 2) - 1))
-      hedges_g <- cohens_d * hedges_j
-      
-    } else {
-      # Weighted Cohen's d using proper weighted means and pooled SD
-      # Remove NA values
-      valid1 <- !is.na(x1) & !is.na(w1)
-      valid2 <- !is.na(x2) & !is.na(w2)
-      x1 <- x1[valid1]
-      x2 <- x2[valid2]
-      w1 <- w1[valid1]
-      w2 <- w2[valid2]
-
-      # Weighted means
-      w_mean1 <- sum(w1 * x1) / sum(w1)
-      w_mean2 <- sum(w2 * x2) / sum(w2)
-      d <- w_mean1 - w_mean2
-
-      # Weighted sum of squares per group
-      ss1 <- sum(w1 * (x1 - w_mean1)^2)
-      ss2 <- sum(w2 * (x2 - w_mean2)^2)
-      V1_1 <- sum(w1)
-      V1_2 <- sum(w2)
-      V1_total <- V1_1 + V1_2
-
-      # Weighted pooled SD (SPSS frequency weights formula)
-      s_pooled <- sqrt((ss1 + ss2) / (V1_total - 2))
-      cohens_d <- d / s_pooled
-
-      # Glass' Delta (uses only control group weighted SD)
-      s1_weighted <- sqrt(ss1 / (V1_1 - 1))
-      glass_delta <- d / s1_weighted
-
-      # Hedges' bias correction using effective N
-      eff_n1 <- sum(w1)^2 / sum(w1^2)
-      eff_n2 <- sum(w2)^2 / sum(w2^2)
-      hedges_j <- 1 - (3 / (4 * (eff_n1 + eff_n2 - 2) - 1))
-      hedges_g <- cohens_d * hedges_j
-    }
-    
-    return(list(cohens_d = cohens_d, hedges_g = hedges_g, glass_delta = glass_delta))
-  }
-
-  # Helper function to perform t-test for a single variable
-  perform_single_t_test <- function(data, var_name, group_name = NULL, weight_name = NULL) {
-    # Get the variable values
-    x <- data[[var_name]]
-    
-    # Remove NA values
-    valid_indices <- !is.na(x)
-    if (!is.null(group_name)) {
-      g_temp <- data[[group_name]]
-      valid_indices <- valid_indices & !is.na(g_temp)
-    }
-    if (!is.null(weight_name)) {
-      w <- data[[weight_name]]
-      valid_indices <- valid_indices & !is.na(w)
-      w <- w[valid_indices]
-    }
-    x <- x[valid_indices]
-    
-    if (is.null(group_name)) {
-      # One-sample t-test
-      if (is.null(weight_name)) {
-        test_result <- t.test(x, mu = mu, alternative = alternative, conf.level = conf.level)
-        group_stats <- list(means = mean(x, na.rm = TRUE), n = length(x))
-      } else {
-        # Weighted one-sample t-test (SPSS frequency-weights convention)
-        #
-        # SPSS uses the UNROUNDED sum of weights as the sample-size proxy in
-        # the variance/SE/df denominators, and rounds only for the displayed
-        # N column. Earlier mariposa versions rounded too early (n_eff =
-        # round(sum(w))), which produced t-statistics drifting ~0.005 from
-        # SPSS even though all other components matched. Validated against
-        # SPSS v29 t-test output 2026-05.
-        weighted_mean <- sum(x * w) / sum(w)
-        sw <- sum(w)                     # unrounded; used in all calculations
-        n_display <- round(sw)           # rounded; only for display/N column
-
-        # Variance using sum(w) - 1 in denominator (SPSS frequency weights)
-        numerator <- sum(w * (x - weighted_mean)^2)
-        weighted_var <- numerator / (sw - 1)
-
-        weighted_sd <- sqrt(weighted_var)
-        se <- weighted_sd / sqrt(sw)
-
-        # t-statistic, df from unrounded sw
-        t_stat <- (weighted_mean - mu) / se
-        df <- sw - 1
-
-        if (alternative == "two.sided") {
-          p_value <- 2 * pt(-abs(t_stat), df)
-        } else if (alternative == "less") {
-          p_value <- pt(t_stat, df)
-        } else {
-          p_value <- pt(t_stat, df, lower.tail = FALSE)
-        }
-
-        conf_int <- weighted_mean + c(-1, 1) * qt((1 + conf.level)/2, df) * se
-
-        test_result <- list(
-          statistic = t_stat,
-          parameter = df,
-          p.value = p_value,
-          conf.int = conf_int,
-          estimate = weighted_mean
-        )
-        # group_stats reports the SPSS-displayed (rounded) N
-        group_stats <- list(means = weighted_mean, n = n_display)
-      }
-      
-      return(list(
-        t_stat = as.numeric(test_result$statistic),
-        df = as.numeric(test_result$parameter),
-        p_value = as.numeric(test_result$p.value),
-        mean_diff = as.numeric(test_result$estimate),
-        conf_int = as.numeric(test_result$conf.int),
-        cohens_d = list(cohens_d = NA, hedges_g = NA, glass_delta = NA),
-        group_levels = NULL,
-        group_stats = group_stats,
-        equal_var_result = NULL,  # Not applicable for one-sample
-        unequal_var_result = NULL,  # Not applicable for one-sample
-        is_weighted = !is.null(weight_name)
-      ))
-      
-    } else {
-      # Two-sample t-test
-      g <- data[[group_name]][valid_indices]
-      
-      # Get unique levels preserving factor order
-      if (is.factor(g)) {
-        all_levels <- levels(g)
-        g_levels <- all_levels[all_levels %in% unique(g)]
-      } else {
-        g_levels <- unique(g)
-      }
-      
-      if (length(g_levels) != 2) {
-        cli_abort(c(
-          "Grouping variable {.var {group_name}} must have exactly 2 levels.",
-          "x" = "Found {length(g_levels)} level{?s}."
-        ))
-      }
-      
-      # Split data by groups
-      x1 <- x[g == g_levels[1]]
-      x2 <- x[g == g_levels[2]]
-      w1 <- if (!is.null(weight_name)) w[g == g_levels[1]] else NULL
-      w2 <- if (!is.null(weight_name)) w[g == g_levels[2]] else NULL
-      
-      if (is.null(weight_name)) {
-        # Unweighted two-sample t-test - SPSS style (both equal and unequal variance)
-        # Calculate both variants like SPSS does
-        test_equal <- t.test(x1, x2, var.equal = TRUE, alternative = alternative, 
-                            conf.level = conf.level, mu = mu)
-        test_unequal <- t.test(x1, x2, var.equal = FALSE, alternative = alternative, 
-                              conf.level = conf.level, mu = mu)
-        
-        # Use the variant specified by var.equal parameter as primary result
-        test_result <- if (var.equal) test_equal else test_unequal
-        
-        # Store both results for SPSS-style display
-        test_result$equal_var_result <- test_equal
-        test_result$unequal_var_result <- test_unequal
-        
-        cohens_d <- calculate_cohens_d(x1, x2)
-        
-        group_stats <- list(
-          group1 = list(name = as.character(g_levels[1]), mean = mean(x1, na.rm = TRUE), n = length(x1)),
-          group2 = list(name = as.character(g_levels[2]), mean = mean(x2, na.rm = TRUE), n = length(x2))
-        )
-        
-      } else {
-        # Weighted two-sample t-test (SPSS frequency-weights convention)
-        #
-        # SPSS uses UNROUNDED sums of weights in all variance/SE/df
-        # calculations and rounds only for the displayed N. Earlier mariposa
-        # versions rounded too early (n1_eff = round(sum(w1))), which produced
-        # systematic drift from SPSS in weighted scenarios — t-stat off by
-        # ~0.002, df off by ~0.5, CI bounds off by ~0.004. Validated against
-        # SPSS v29 t-test output 2026-05.
-        mu_x <- sum(x1 * w1) / sum(w1)  # weighted mean group 1
-        mu_y <- sum(x2 * w2) / sum(w2)  # weighted mean group 2
-
-        sw1 <- sum(w1)                  # unrounded; for calculation
-        sw2 <- sum(w2)
-        n1_display <- round(sw1)        # rounded; for display N column
-        n2_display <- round(sw2)
-
-        # Variances with unrounded sw in denominator
-        var_x <- sum(w1 * (x1 - mu_x)^2) / (sw1 - 1)
-        var_y <- sum(w2 * (x2 - mu_y)^2) / (sw2 - 1)
-
-        sd_x <- sqrt(var_x)
-        sd_y <- sqrt(var_y)
-
-        mean_diff <- mu_x - mu_y
-
-        # === EQUAL VARIANCE (Student's t-test) ===
-        pooled_var <- ((sw1 - 1) * var_x + (sw2 - 1) * var_y) / (sw1 + sw2 - 2)
-        pooled_sd <- sqrt(pooled_var)
-        se_equal <- pooled_sd * sqrt(1/sw1 + 1/sw2)
-        t_stat_equal <- (mean_diff - mu) / se_equal
-        df_equal <- sw1 + sw2 - 2
-
-        # === UNEQUAL VARIANCE (Welch's t-test) ===
-        se_x <- sd_x / sqrt(sw1)
-        se_y <- sd_y / sqrt(sw2)
-        se_unequal <- sqrt(se_x^2 + se_y^2)
-        t_stat_unequal <- (mean_diff - mu) / se_unequal
-
-        # Welch-Satterthwaite degrees of freedom (uses unrounded sw1/sw2)
-        df_unequal <- (se_x^2 + se_y^2)^2 / (se_x^4 / (sw1 - 1) + se_y^4 / (sw2 - 1))
-
-        # Calculate p-values for both methods
-        if (alternative == "two.sided") {
-          p_value_equal <- 2 * pt(-abs(t_stat_equal), df_equal)
-          p_value_unequal <- 2 * pt(-abs(t_stat_unequal), df_unequal)
-        } else if (alternative == "less") {
-          p_value_equal <- pt(t_stat_equal, df_equal)
-          p_value_unequal <- pt(t_stat_unequal, df_unequal)
-        } else {
-          p_value_equal <- pt(t_stat_equal, df_equal, lower.tail = FALSE)
-          p_value_unequal <- pt(t_stat_unequal, df_unequal, lower.tail = FALSE)
-        }
-
-        # Calculate confidence intervals for both methods
-        if (alternative == "two.sided") {
-          conf_int_equal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_equal) * se_equal
-          conf_int_unequal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_unequal) * se_unequal
-        } else if (alternative == "less") {
-          conf_int_equal <- c(-Inf, mean_diff + qt(conf.level, df_equal) * se_equal)
-          conf_int_unequal <- c(-Inf, mean_diff + qt(conf.level, df_unequal) * se_unequal)
-        } else {
-          conf_int_equal <- c(mean_diff - qt(conf.level, df_equal) * se_equal, Inf)
-          conf_int_unequal <- c(mean_diff - qt(conf.level, df_unequal) * se_unequal, Inf)
-        }
-
-        # Calculate Cohen's d using weighted data
-        cohens_d <- calculate_cohens_d(x1, x2, w1, w2)
-
-        test_equal_weighted <- list(
-          statistic = t_stat_equal,
-          parameter = df_equal,
-          p.value = p_value_equal,
-          conf.int = conf_int_equal,
-          estimate = c(mu_x, mu_y)
-        )
-
-        test_unequal_weighted <- list(
-          statistic = t_stat_unequal,
-          parameter = df_unequal,
-          p.value = p_value_unequal,
-          conf.int = conf_int_unequal,
-          estimate = c(mu_x, mu_y)
-        )
-        
-        # Honor var.equal for the primary result (both variants stay
-        # available for the SPSS-style two-row output), matching the
-        # unweighted path.
-        test_result <- if (var.equal) test_equal_weighted else test_unequal_weighted
-        test_result$equal_var_result <- test_equal_weighted
-        test_result$unequal_var_result <- test_unequal_weighted
-        
-        # Group statistics carry the SPSS-displayed (rounded) N
-        group_stats <- list(
-          group1 = list(name = as.character(g_levels[1]), mean = mu_x, n = n1_display),
-          group2 = list(name = as.character(g_levels[2]), mean = mu_y, n = n2_display)
-        )
-      }
-      
-      return(list(
-        t_stat = test_result$statistic,
-        df = test_result$parameter,
-        p_value = test_result$p.value,
-        mean_diff = if (length(test_result$estimate) > 1) {
-          test_result$estimate[1] - test_result$estimate[2]
-        } else {
-          test_result$estimate
-        },
-        conf_int = test_result$conf.int,
-        cohens_d = cohens_d,
-        group_levels = g_levels,
-        group_stats = group_stats,
-        # Store both variance assumptions for SPSS-style display (now for all tests)
-        equal_var_result = test_result$equal_var_result,
-        unequal_var_result = test_result$unequal_var_result,
-        is_weighted = !is.null(weight_name)
-      ))
-    }
-  }
-  
   # Main execution logic
   if (is_grouped) {
     # Split data by groups
     data_list <- dplyr::group_split(data)
     group_keys <- dplyr::group_keys(data)
-    
+
     # Perform t-tests for each group
     results_list <- lapply(seq_along(data_list), function(i) {
       group_data <- data_list[[i]]
       group_info <- group_keys[i, , drop = FALSE]
-      
+
       # Regular t-tests for each variable in this group
-        group_results <- lapply(var_names, function(var_name) {
-          tryCatch({
-            test_result <- perform_single_t_test(group_data, var_name, g_name, w_name)
-            
-            result_df <- data.frame(
-              group_info,
-              Variable = var_name,
-              t_stat = test_result$t_stat,
-              df = test_result$df,
-              p_value = test_result$p_value,
-              mean_diff = test_result$mean_diff,
-              cohens_d = if(is.list(test_result$cohens_d)) test_result$cohens_d$cohens_d else test_result$cohens_d,
-              hedges_g = if(is.list(test_result$cohens_d)) test_result$cohens_d$hedges_g else test_result$cohens_d,
-              glass_delta = if(is.list(test_result$cohens_d)) test_result$cohens_d$glass_delta else test_result$cohens_d,
-              conf_int_lower = test_result$conf_int[1],
-              conf_int_upper = test_result$conf_int[2],
-              # Add test-compatible CI column aliases
-              CI_lower = test_result$conf_int[1],
-              CI_upper = test_result$conf_int[2],
-              # Add sample size columns for test compatibility
-              n1 = if(!is.null(test_result$group_stats)) {
-                if(!is.null(test_result$group_stats$group1)) test_result$group_stats$group1$n else test_result$group_stats$n
-              } else NA,
-              n2 = if(!is.null(test_result$group_stats)) {
-                if(!is.null(test_result$group_stats$group2)) test_result$group_stats$group2$n else NA
-              } else NA
-            )
-            result_df$group_stats <- list(test_result$group_stats)
-            result_df$equal_var_result <- list(test_result$equal_var_result)
-            result_df$unequal_var_result <- list(test_result$unequal_var_result)
-            result_df$is_weighted <- test_result$is_weighted
-            result_df
-          }, error = function(e) {
-            data.frame(
-              group_info,
-              Variable = var_name,
-              t_stat = NA,
-              df = NA,
-              p_value = NA,
-              mean_diff = NA,
-              cohens_d = NA,
-              hedges_g = NA,
-              glass_delta = NA,
-              conf_int_lower = NA,
-              conf_int_upper = NA,
-              CI_lower = NA,
-              CI_upper = NA,
-              n1 = NA,
-              n2 = NA,
-              group_stats = list(NULL),
-              equal_var_result = list(NULL),
-              unequal_var_result = list(NULL),
-              is_weighted = NA
-            )
-          })
+      group_results <- lapply(var_names, function(var_name) {
+        tryCatch({
+          test_result <- .t_test_single(group_data, var_name, g_name, w_name,
+                                        var.equal, mu, alternative, conf.level)
+          .t_test_result_row(test_result, var_name, group_info)
+        }, error = function(e) {
+          data.frame(
+            group_info,
+            Variable = var_name,
+            t_stat = NA,
+            df = NA,
+            p_value = NA,
+            mean_diff = NA,
+            cohens_d = NA,
+            hedges_g = NA,
+            glass_delta = NA,
+            conf_int_lower = NA,
+            conf_int_upper = NA,
+            CI_lower = NA,
+            CI_upper = NA,
+            n1 = NA,
+            n2 = NA,
+            group_stats = list(NULL),
+            equal_var_result = list(NULL),
+            unequal_var_result = list(NULL),
+            is_weighted = NA
+          )
         })
-        
-        do.call(rbind, group_results)
+      })
+
+      do.call(rbind, group_results)
     })
-    
+
     results_df <- do.call(rbind, results_list)
-    
+
   } else {
     # Perform t-tests for each variable (ungrouped)
     results_list <- lapply(var_names, function(var_name) {
       tryCatch({
-        test_result <- perform_single_t_test(data, var_name, g_name, w_name)
-        
-        result_df <- data.frame(
-          Variable = var_name,
-          t_stat = test_result$t_stat,
-          df = test_result$df,
-          p_value = test_result$p_value,
-          mean_diff = test_result$mean_diff,
-          cohens_d = if(is.list(test_result$cohens_d)) test_result$cohens_d$cohens_d else test_result$cohens_d,
-          hedges_g = if(is.list(test_result$cohens_d)) test_result$cohens_d$hedges_g else test_result$cohens_d,
-          glass_delta = if(is.list(test_result$cohens_d)) test_result$cohens_d$glass_delta else test_result$cohens_d,
-          conf_int_lower = test_result$conf_int[1],
-          conf_int_upper = test_result$conf_int[2],
-          # Add test-compatible CI column aliases
-          CI_lower = test_result$conf_int[1],
-          CI_upper = test_result$conf_int[2],
-          # Add sample size columns for test compatibility
-          n1 = if(!is.null(test_result$group_stats)) {
-            if(!is.null(test_result$group_stats$group1)) test_result$group_stats$group1$n else test_result$group_stats$n
-          } else NA,
-          n2 = if(!is.null(test_result$group_stats)) {
-            if(!is.null(test_result$group_stats$group2)) test_result$group_stats$group2$n else NA
-          } else NA
-        )
-        result_df$group_stats <- list(test_result$group_stats)
-        result_df$equal_var_result <- list(test_result$equal_var_result)
-        result_df$unequal_var_result <- list(test_result$unequal_var_result)
-        result_df$is_weighted <- test_result$is_weighted
-        result_df
+        test_result <- .t_test_single(data, var_name, g_name, w_name,
+                                      var.equal, mu, alternative, conf.level)
+        .t_test_result_row(test_result, var_name)
       }, error = function(e) {
         cli_abort("t_test() failed: {e$message}", parent = e)
       })
     })
-    
+
     results_df <- do.call(rbind, results_list)
   }
-  
+
   # Create S3 object
   structure(
     list(
@@ -673,6 +302,369 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   )
 }
 
+# ==============================================================================
+# INTERNAL HELPERS
+# ==============================================================================
+
+#' Calculate Cohen's d, Hedges' g, and Glass' Delta for two groups
+#' (following sjstats approach exactly)
+#' @noRd
+.t_test_cohens_d <- function(x1, x2, w1 = NULL, w2 = NULL) {
+  if (is.null(w1) || is.null(w2)) {
+    # Unweighted Cohen's d
+    x1 <- x1[!is.na(x1)]
+    x2 <- x2[!is.na(x2)]
+
+    d <- mean(x1) - mean(x2)
+    s1 <- sd(x1)
+    s2 <- sd(x2)
+    n1 <- length(x1)
+    n2 <- length(x2)
+
+    # Pooled standard deviation
+    s <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
+    cohens_d <- d / s
+
+    # Glass' Delta (uses only control group SD - first group)
+    glass_delta <- d / s1
+
+    # Hedges' bias correction (methodologically superior)
+    # J = 1 - 3/(4*(n1+n2-2)-1) 
+    hedges_j <- 1 - (3 / (4 * (n1 + n2 - 2) - 1))
+    hedges_g <- cohens_d * hedges_j
+
+  } else {
+    # Weighted Cohen's d using proper weighted means and pooled SD
+    # Remove NA values
+    valid1 <- !is.na(x1) & !is.na(w1)
+    valid2 <- !is.na(x2) & !is.na(w2)
+    x1 <- x1[valid1]
+    x2 <- x2[valid2]
+    w1 <- w1[valid1]
+    w2 <- w2[valid2]
+
+    # Weighted means
+    w_mean1 <- sum(w1 * x1) / sum(w1)
+    w_mean2 <- sum(w2 * x2) / sum(w2)
+    d <- w_mean1 - w_mean2
+
+    # Weighted sum of squares per group
+    ss1 <- sum(w1 * (x1 - w_mean1)^2)
+    ss2 <- sum(w2 * (x2 - w_mean2)^2)
+    V1_1 <- sum(w1)
+    V1_2 <- sum(w2)
+    V1_total <- V1_1 + V1_2
+
+    # Weighted pooled SD (SPSS frequency weights formula)
+    s_pooled <- sqrt((ss1 + ss2) / (V1_total - 2))
+    cohens_d <- d / s_pooled
+
+    # Glass' Delta (uses only control group weighted SD)
+    s1_weighted <- sqrt(ss1 / (V1_1 - 1))
+    glass_delta <- d / s1_weighted
+
+    # Hedges' bias correction using effective N
+    eff_n1 <- sum(w1)^2 / sum(w1^2)
+    eff_n2 <- sum(w2)^2 / sum(w2^2)
+    hedges_j <- 1 - (3 / (4 * (eff_n1 + eff_n2 - 2) - 1))
+    hedges_g <- cohens_d * hedges_j
+  }
+
+  return(list(cohens_d = cohens_d, hedges_g = hedges_g, glass_delta = glass_delta))
+}
+
+#' Perform a one- or two-sample t-test for a single variable
+#'
+#' Returns the raw test components (statistics, confidence intervals,
+#' effect sizes, group statistics) consumed by .t_test_result_row().
+#' @noRd
+.t_test_single <- function(data, var_name, group_name, weight_name,
+                           var.equal, mu, alternative, conf.level) {
+  # Get the variable values
+  x <- data[[var_name]]
+
+  # Remove NA values
+  valid_indices <- !is.na(x)
+  if (!is.null(group_name)) {
+    g_temp <- data[[group_name]]
+    valid_indices <- valid_indices & !is.na(g_temp)
+  }
+  if (!is.null(weight_name)) {
+    w <- data[[weight_name]]
+    valid_indices <- valid_indices & !is.na(w)
+    w <- w[valid_indices]
+  }
+  x <- x[valid_indices]
+
+  if (is.null(group_name)) {
+    # One-sample t-test
+    if (is.null(weight_name)) {
+      test_result <- t.test(x, mu = mu, alternative = alternative, conf.level = conf.level)
+      group_stats <- list(means = mean(x, na.rm = TRUE), n = length(x))
+    } else {
+      # Weighted one-sample t-test (SPSS frequency-weights convention)
+      #
+      # SPSS uses the UNROUNDED sum of weights as the sample-size proxy in
+      # the variance/SE/df denominators, and rounds only for the displayed
+      # N column. Earlier mariposa versions rounded too early (n_eff =
+      # round(sum(w))), which produced t-statistics drifting ~0.005 from
+      # SPSS even though all other components matched. Validated against
+      # SPSS v29 t-test output 2026-05.
+      weighted_mean <- sum(x * w) / sum(w)
+      sw <- sum(w)                     # unrounded; used in all calculations
+      n_display <- round(sw)           # rounded; only for display/N column
+
+      # Variance using sum(w) - 1 in denominator (SPSS frequency weights)
+      numerator <- sum(w * (x - weighted_mean)^2)
+      weighted_var <- numerator / (sw - 1)
+
+      weighted_sd <- sqrt(weighted_var)
+      se <- weighted_sd / sqrt(sw)
+
+      # t-statistic, df from unrounded sw
+      t_stat <- (weighted_mean - mu) / se
+      df <- sw - 1
+
+      if (alternative == "two.sided") {
+        p_value <- 2 * pt(-abs(t_stat), df)
+      } else if (alternative == "less") {
+        p_value <- pt(t_stat, df)
+      } else {
+        p_value <- pt(t_stat, df, lower.tail = FALSE)
+      }
+
+      conf_int <- weighted_mean + c(-1, 1) * qt((1 + conf.level)/2, df) * se
+
+      test_result <- list(
+        statistic = t_stat,
+        parameter = df,
+        p.value = p_value,
+        conf.int = conf_int,
+        estimate = weighted_mean
+      )
+      # group_stats reports the SPSS-displayed (rounded) N
+      group_stats <- list(means = weighted_mean, n = n_display)
+    }
+
+    return(list(
+      t_stat = as.numeric(test_result$statistic),
+      df = as.numeric(test_result$parameter),
+      p_value = as.numeric(test_result$p.value),
+      mean_diff = as.numeric(test_result$estimate),
+      conf_int = as.numeric(test_result$conf.int),
+      cohens_d = list(cohens_d = NA, hedges_g = NA, glass_delta = NA),
+      group_levels = NULL,
+      group_stats = group_stats,
+      equal_var_result = NULL,  # Not applicable for one-sample
+      unequal_var_result = NULL,  # Not applicable for one-sample
+      is_weighted = !is.null(weight_name)
+    ))
+
+  } else {
+    # Two-sample t-test
+    g <- data[[group_name]][valid_indices]
+
+    # Get unique levels preserving factor order
+    if (is.factor(g)) {
+      all_levels <- levels(g)
+      g_levels <- all_levels[all_levels %in% unique(g)]
+    } else {
+      g_levels <- unique(g)
+    }
+
+    if (length(g_levels) != 2) {
+      cli_abort(c(
+        "Grouping variable {.var {group_name}} must have exactly 2 levels.",
+        "x" = "Found {length(g_levels)} level{?s}."
+      ))
+    }
+
+    # Split data by groups
+    x1 <- x[g == g_levels[1]]
+    x2 <- x[g == g_levels[2]]
+    w1 <- if (!is.null(weight_name)) w[g == g_levels[1]] else NULL
+    w2 <- if (!is.null(weight_name)) w[g == g_levels[2]] else NULL
+
+    if (is.null(weight_name)) {
+      # Unweighted two-sample t-test - SPSS style (both equal and unequal variance)
+      # Calculate both variants like SPSS does
+      test_equal <- t.test(x1, x2, var.equal = TRUE, alternative = alternative, 
+                          conf.level = conf.level, mu = mu)
+      test_unequal <- t.test(x1, x2, var.equal = FALSE, alternative = alternative, 
+                            conf.level = conf.level, mu = mu)
+
+      # Use the variant specified by var.equal parameter as primary result
+      test_result <- if (var.equal) test_equal else test_unequal
+
+      # Store both results for SPSS-style display
+      test_result$equal_var_result <- test_equal
+      test_result$unequal_var_result <- test_unequal
+
+      cohens_d <- .t_test_cohens_d(x1, x2)
+
+      group_stats <- list(
+        group1 = list(name = as.character(g_levels[1]), mean = mean(x1, na.rm = TRUE), n = length(x1)),
+        group2 = list(name = as.character(g_levels[2]), mean = mean(x2, na.rm = TRUE), n = length(x2))
+      )
+
+    } else {
+      # Weighted two-sample t-test (SPSS frequency-weights convention)
+      #
+      # SPSS uses UNROUNDED sums of weights in all variance/SE/df
+      # calculations and rounds only for the displayed N. Earlier mariposa
+      # versions rounded too early (n1_eff = round(sum(w1))), which produced
+      # systematic drift from SPSS in weighted scenarios — t-stat off by
+      # ~0.002, df off by ~0.5, CI bounds off by ~0.004. Validated against
+      # SPSS v29 t-test output 2026-05.
+      mu_x <- sum(x1 * w1) / sum(w1)  # weighted mean group 1
+      mu_y <- sum(x2 * w2) / sum(w2)  # weighted mean group 2
+
+      sw1 <- sum(w1)                  # unrounded; for calculation
+      sw2 <- sum(w2)
+      n1_display <- round(sw1)        # rounded; for display N column
+      n2_display <- round(sw2)
+
+      # Variances with unrounded sw in denominator
+      var_x <- sum(w1 * (x1 - mu_x)^2) / (sw1 - 1)
+      var_y <- sum(w2 * (x2 - mu_y)^2) / (sw2 - 1)
+
+      sd_x <- sqrt(var_x)
+      sd_y <- sqrt(var_y)
+
+      mean_diff <- mu_x - mu_y
+
+      # === EQUAL VARIANCE (Student's t-test) ===
+      pooled_var <- ((sw1 - 1) * var_x + (sw2 - 1) * var_y) / (sw1 + sw2 - 2)
+      pooled_sd <- sqrt(pooled_var)
+      se_equal <- pooled_sd * sqrt(1/sw1 + 1/sw2)
+      t_stat_equal <- (mean_diff - mu) / se_equal
+      df_equal <- sw1 + sw2 - 2
+
+      # === UNEQUAL VARIANCE (Welch's t-test) ===
+      se_x <- sd_x / sqrt(sw1)
+      se_y <- sd_y / sqrt(sw2)
+      se_unequal <- sqrt(se_x^2 + se_y^2)
+      t_stat_unequal <- (mean_diff - mu) / se_unequal
+
+      # Welch-Satterthwaite degrees of freedom (uses unrounded sw1/sw2)
+      df_unequal <- (se_x^2 + se_y^2)^2 / (se_x^4 / (sw1 - 1) + se_y^4 / (sw2 - 1))
+
+      # Calculate p-values for both methods
+      if (alternative == "two.sided") {
+        p_value_equal <- 2 * pt(-abs(t_stat_equal), df_equal)
+        p_value_unequal <- 2 * pt(-abs(t_stat_unequal), df_unequal)
+      } else if (alternative == "less") {
+        p_value_equal <- pt(t_stat_equal, df_equal)
+        p_value_unequal <- pt(t_stat_unequal, df_unequal)
+      } else {
+        p_value_equal <- pt(t_stat_equal, df_equal, lower.tail = FALSE)
+        p_value_unequal <- pt(t_stat_unequal, df_unequal, lower.tail = FALSE)
+      }
+
+      # Calculate confidence intervals for both methods
+      if (alternative == "two.sided") {
+        conf_int_equal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_equal) * se_equal
+        conf_int_unequal <- mean_diff + c(-1, 1) * qt((1 + conf.level)/2, df_unequal) * se_unequal
+      } else if (alternative == "less") {
+        conf_int_equal <- c(-Inf, mean_diff + qt(conf.level, df_equal) * se_equal)
+        conf_int_unequal <- c(-Inf, mean_diff + qt(conf.level, df_unequal) * se_unequal)
+      } else {
+        conf_int_equal <- c(mean_diff - qt(conf.level, df_equal) * se_equal, Inf)
+        conf_int_unequal <- c(mean_diff - qt(conf.level, df_unequal) * se_unequal, Inf)
+      }
+
+      # Calculate Cohen's d using weighted data
+      cohens_d <- .t_test_cohens_d(x1, x2, w1, w2)
+
+      test_equal_weighted <- list(
+        statistic = t_stat_equal,
+        parameter = df_equal,
+        p.value = p_value_equal,
+        conf.int = conf_int_equal,
+        estimate = c(mu_x, mu_y)
+      )
+
+      test_unequal_weighted <- list(
+        statistic = t_stat_unequal,
+        parameter = df_unequal,
+        p.value = p_value_unequal,
+        conf.int = conf_int_unequal,
+        estimate = c(mu_x, mu_y)
+      )
+
+      # Honor var.equal for the primary result (both variants stay
+      # available for the SPSS-style two-row output), matching the
+      # unweighted path.
+      test_result <- if (var.equal) test_equal_weighted else test_unequal_weighted
+      test_result$equal_var_result <- test_equal_weighted
+      test_result$unequal_var_result <- test_unequal_weighted
+
+      # Group statistics carry the SPSS-displayed (rounded) N
+      group_stats <- list(
+        group1 = list(name = as.character(g_levels[1]), mean = mu_x, n = n1_display),
+        group2 = list(name = as.character(g_levels[2]), mean = mu_y, n = n2_display)
+      )
+    }
+
+    return(list(
+      t_stat = test_result$statistic,
+      df = test_result$parameter,
+      p_value = test_result$p.value,
+      mean_diff = if (length(test_result$estimate) > 1) {
+        test_result$estimate[1] - test_result$estimate[2]
+      } else {
+        test_result$estimate
+      },
+      conf_int = test_result$conf.int,
+      cohens_d = cohens_d,
+      group_levels = g_levels,
+      group_stats = group_stats,
+      # Store both variance assumptions for SPSS-style display (now for all tests)
+      equal_var_result = test_result$equal_var_result,
+      unequal_var_result = test_result$unequal_var_result,
+      is_weighted = !is.null(weight_name)
+    ))
+  }
+}
+
+#' Build one row of the t_test results data frame
+#'
+#' Shared by the grouped and ungrouped assembly paths; group_info (a
+#' one-row data frame of group keys) is prepended for grouped results.
+#' @noRd
+.t_test_result_row <- function(test_result, var_name, group_info = NULL) {
+  cols <- list(
+    Variable = var_name,
+    t_stat = test_result$t_stat,
+    df = test_result$df,
+    p_value = test_result$p_value,
+    mean_diff = test_result$mean_diff,
+    cohens_d = if (is.list(test_result$cohens_d)) test_result$cohens_d$cohens_d else test_result$cohens_d,
+    hedges_g = if (is.list(test_result$cohens_d)) test_result$cohens_d$hedges_g else test_result$cohens_d,
+    glass_delta = if (is.list(test_result$cohens_d)) test_result$cohens_d$glass_delta else test_result$cohens_d,
+    conf_int_lower = test_result$conf_int[1],
+    conf_int_upper = test_result$conf_int[2],
+    # Test-compatible CI column aliases
+    CI_lower = test_result$conf_int[1],
+    CI_upper = test_result$conf_int[2],
+    # Sample size columns for test compatibility
+    n1 = if (!is.null(test_result$group_stats)) {
+      if (!is.null(test_result$group_stats$group1)) test_result$group_stats$group1$n else test_result$group_stats$n
+    } else NA,
+    n2 = if (!is.null(test_result$group_stats)) {
+      if (!is.null(test_result$group_stats$group2)) test_result$group_stats$group2$n else NA
+    } else NA
+  )
+  if (!is.null(group_info)) {
+    cols <- c(list(group_info), cols)
+  }
+  result_df <- do.call(data.frame, cols)
+  result_df$group_stats <- list(test_result$group_stats)
+  result_df$equal_var_result <- list(test_result$equal_var_result)
+  result_df$unequal_var_result <- list(test_result$unequal_var_result)
+  result_df$is_weighted <- test_result$is_weighted
+  result_df
+}
 
 #' Create effect size data frame
 #' @noRd
@@ -1010,5 +1002,4 @@ print.summary.t_test <- function(x, ...) {
   .print_t_test_impl(x, digits)
   invisible(x)
 }
-
 

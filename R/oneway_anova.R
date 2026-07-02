@@ -215,302 +215,22 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   }
   
   # Perform standard between-subjects ANOVA
-  return(perform_between_subjects_anova(data, var_names, g_name, w_name, conf.level, var.equal, 
-                                      is_grouped, grp_vars, g_levels))
-}
-
-# Helper function to perform standard between-subjects ANOVA  
-perform_between_subjects_anova <- function(data, var_names, group_name, weight_name, conf.level, var.equal, is_grouped, grp_vars, g_levels) {
-  
-  # Helper function to perform single ANOVA
-  perform_single_anova <- function(data, var_name, group_name, weight_name = NULL) {
-    # Get the variable values
-    y <- data[[var_name]]
-    g <- data[[group_name]]
-    
-    # Remove NA values
-    valid_indices <- !is.na(y) & !is.na(g)
-    if (!is.null(weight_name)) {
-      w <- data[[weight_name]]
-      valid_indices <- valid_indices & !is.na(w) & w > 0
-      w <- w[valid_indices]
-    }
-    y <- y[valid_indices]
-    g <- g[valid_indices]
-    
-    if (length(unique(g)) < 2) {
-      cli_abort("Variable {.var {var_name}}: After removing NAs, grouping variable must have at least 2 levels.")
-    }
-    
-    # Get group levels
-    if (is.factor(g)) {
-      group_levels <- levels(g)[levels(g) %in% unique(g)]
-    } else {
-      group_levels <- unique(g)
-    }
-    
-    if (is.null(weight_name)) {
-      # Unweighted ANOVA
-      
-      # Descriptive statistics by group
-      group_stats <- lapply(group_levels, function(level) {
-        group_data <- y[g == level]
-        n <- length(group_data)
-        mean_val <- mean(group_data)
-        sd_val <- sd(group_data)
-        se_val <- sd_val / sqrt(n)
-
-        # Confidence interval for mean
-        t_val <- qt((1 + conf.level) / 2, df = n - 1)
-        ci_lower <- mean_val - t_val * se_val
-        ci_upper <- mean_val + t_val * se_val
-
-        list(
-          level = level,
-          n = n,
-          mean = mean_val,
-          sd = sd_val,
-          se = se_val,
-          ci_lower = ci_lower,
-          ci_upper = ci_upper
-        )
-      })
-      names(group_stats) <- group_levels
-      
-      # Standard ANOVA
-      aov_result <- aov(y ~ g)
-      aov_summary <- summary(aov_result)[[1]]
-      
-      # Extract ANOVA components
-      ss_between <- aov_summary["g", "Sum Sq"]
-      ss_within <- aov_summary["Residuals", "Sum Sq"]
-      ss_total <- ss_between + ss_within
-      df_between <- aov_summary["g", "Df"]
-      df_within <- aov_summary["Residuals", "Df"]
-      ms_between <- aov_summary["g", "Mean Sq"]
-      ms_within <- aov_summary["Residuals", "Mean Sq"]
-      f_stat <- aov_summary["g", "F value"]
-      p_value <- aov_summary["g", "Pr(>F)"]
-      
-      # Welch's ANOVA (robust test)
-      welch_result <- oneway.test(y ~ g, var.equal = FALSE)
-      
-      # Effect sizes
-      eta_squared <- ss_between / ss_total
-      epsilon_squared <- (ss_between - (df_between * ms_within)) / ss_total
-      omega_squared <- (ss_between - (df_between * ms_within)) / (ss_total + ms_within)
-      
-      # Ensure effect sizes are non-negative
-      epsilon_squared <- max(0, epsilon_squared)
-      omega_squared <- max(0, omega_squared)
-      
-    } else {
-      # Weighted ANOVA
-      
-      # Weighted descriptive statistics by group (SPSS frequency-weights spec)
-      #
-      # Earlier versions of this block had three bugs that produced systematic
-      # drift from SPSS in weighted ANOVA descriptives:
-      #   1. Variance divisor was sum(w) (population formula); SPSS uses
-      #      (sum(w) - 1) sample formula.
-      #   2. SE used sqrt(physical n); SPSS uses sqrt(sum(w)).
-      #   3. CI t-critical-value used Kish design effective N; SPSS uses
-      #      df = sum(w) - 1.
-      # Fixed 2026-05-19. See VALIDATION_CHARTER.md §5.1.
-      group_stats <- lapply(group_levels, function(level) {
-        group_indices <- g == level
-        group_data <- y[group_indices]
-        group_weights <- w[group_indices]
-
-        n <- length(group_data)              # physical count (for output)
-        sw <- sum(group_weights)             # unrounded weighted N
-        weighted_n_display <- round(sw)      # for display N column
-
-        # Weighted mean
-        weighted_mean <- sum(group_data * group_weights) / sw
-
-        # Sample-formula weighted variance (divisor sw - 1)
-        weighted_var <- sum(group_weights * (group_data - weighted_mean)^2) / (sw - 1)
-        weighted_sd <- sqrt(weighted_var)
-
-        # SE = SD / sqrt(weighted N)
-        weighted_se <- weighted_sd / sqrt(sw)
-
-        # CI with df = sw - 1 (SPSS sample-formula convention)
-        t_val <- qt((1 + conf.level) / 2, df = sw - 1)
-        ci_lower <- weighted_mean - t_val * weighted_se
-        ci_upper <- weighted_mean + t_val * weighted_se
-
-        list(
-          level = level,
-          n = n,
-          weighted_n = weighted_n_display,
-          mean = weighted_mean,
-          sd = weighted_sd,
-          se = weighted_se,
-          ci_lower = ci_lower,
-          ci_upper = ci_upper
-        )
-      })
-      names(group_stats) <- group_levels
-      
-      # Weighted ANOVA calculations
-      # Overall weighted mean
-      grand_mean <- sum(y * w) / sum(w)
-      
-      # Between-group sum of squares (weighted)
-      ss_between <- 0
-      for (level in group_levels) {
-        group_indices <- g == level
-        group_weights <- w[group_indices]
-        group_mean <- sum(y[group_indices] * group_weights) / sum(group_weights)
-        ss_between <- ss_between + sum(group_weights) * (group_mean - grand_mean)^2
-      }
-      
-      # Within-group sum of squares (weighted)
-      ss_within <- 0
-      for (level in group_levels) {
-        group_indices <- g == level
-        group_data <- y[group_indices]
-        group_weights <- w[group_indices]
-        group_mean <- sum(group_data * group_weights) / sum(group_weights)
-        ss_within <- ss_within + sum(group_weights * (group_data - group_mean)^2)
-      }
-      
-      ss_total <- ss_between + ss_within
-      df_between <- length(group_levels) - 1
-
-      # For weighted analyses, df_within = floor(sum(w)) - k.
-      # NB: SPSS ONEWAY uses floor(sum(w)) (truncation) here, NOT
-      # round(sum(w)) and NOT unrounded sum(w). Empirically verified against
-      # SPSS v29 ONEWAY output 2026-05-19 — see VALIDATION_CHARTER.md §5.1.
-      # This differs from t_test's convention (which uses unrounded sum(w));
-      # the inconsistency is a SPSS quirk reproduced here for compatibility.
-      if (!is.null(weight_name)) {
-        df_within <- floor(sum(w)) - length(group_levels)
-      } else {
-        df_within <- length(y) - length(group_levels)
-      }
-      
-      ms_between <- ss_between / df_between
-      ms_within <- ss_within / df_within
-      f_stat <- ms_between / ms_within
-      p_value <- pf(f_stat, df_between, df_within, lower.tail = FALSE)
-      
-      # Weighted Welch test (SPSS-optimized)
-      # Calculate group statistics for SPSS-compatible Welch test
-      w_total_groups <- numeric(length(group_levels))
-      group_means_welch <- numeric(length(group_levels))
-      group_vars_welch <- numeric(length(group_levels))
-      
-      for (i in seq_along(group_levels)) {
-        level <- group_levels[i]
-        group_indices <- g == level
-        group_data <- y[group_indices]
-        group_weights <- w[group_indices]
-        
-        w_total_groups[i] <- sum(group_weights)
-        group_means_welch[i] <- sum(group_data * group_weights) / sum(group_weights)
-        
-        # SPSS-compatible variance calculation
-        group_vars_welch[i] <- sum(group_weights * (group_data - group_means_welch[i])^2) / (sum(group_weights) - 1)
-      }
-      
-      # Classical Welch ANOVA with frequency weights (SPSS-compatible).
-      # Welch weights = n_i / s_i^2; the Welch-weighted grand mean is used
-      # as the centre for the F-statistic numerator (NOT the unweighted
-      # grand mean).
-      welch_weights    <- w_total_groups / group_vars_welch
-      grand_mean_welch <- sum(welch_weights * group_means_welch) / sum(welch_weights)
-      
-      # Classical Welch F-statistic
-      numerator_welch <- sum(welch_weights * (group_means_welch - grand_mean_welch)^2) / (length(group_levels) - 1)
-      denominator_welch <- sum((1 - welch_weights / sum(welch_weights))^2 / (w_total_groups - 1))
-      welch_f <- numerator_welch / (1 + 2 * (length(group_levels) - 2) / (length(group_levels)^2 - 1) * denominator_welch)
-      
-      df1_welch <- length(group_levels) - 1
-      
-      # Satterthwaite degrees of freedom approximation
-      df2_welch <- (length(group_levels)^2 - 1) / (3 * denominator_welch)
-      
-      welch_p <- pf(welch_f, df1_welch, df2_welch, lower.tail = FALSE)
-      
-              welch_result <- list(
-          statistic = welch_f,
-          parameter = c(df1_welch, df2_welch),
-          p.value = welch_p,
-          method = "Weighted Welch ANOVA (Classical Formula)"
-        )
-      
-      # Effect sizes (weighted)
-      eta_squared <- ss_between / ss_total
-      epsilon_squared <- (ss_between - (df_between * ms_within)) / ss_total
-      omega_squared <- (ss_between - (df_between * ms_within)) / (ss_total + ms_within)
-      
-      # Ensure effect sizes are non-negative
-      epsilon_squared <- max(0, epsilon_squared)
-      omega_squared <- max(0, omega_squared)
-    }
-    
-    # ANOVA table - always show classical ANOVA values like SPSS
-    anova_table <- data.frame(
-      Source = c("Between Groups", "Within Groups", "Total"),
-      Sum_Squares = c(ss_between, ss_within, ss_total),
-      df = c(df_between, df_within, df_between + df_within),
-      Mean_Square = c(ms_between, ms_within, ""),
-      F = c(f_stat, "", ""),
-      p_value = c(p_value, "", ""),
-      stringsAsFactors = FALSE
-    )
-    
-    # Always return classical ANOVA as primary (like SPSS), Welch test is separate
-    return(list(
-      f_stat = f_stat,
-      df1 = df_between,
-      df2 = df_within,
-      p_value = p_value,
-      eta_squared = eta_squared,
-      epsilon_squared = epsilon_squared,
-      omega_squared = omega_squared,
-      group_stats = group_stats,
-      anova_table = anova_table,
-      welch_result = welch_result,
-      is_weighted = !is.null(weight_name)
-    ))
-  }
-  
-  # Main execution logic
   if (is_grouped) {
     # Split data by groups
     data_list <- dplyr::group_split(data)
     group_keys <- dplyr::group_keys(data)
-    
+
     # Perform ANOVA for each group
     results_list <- lapply(seq_along(data_list), function(i) {
       group_data <- data_list[[i]]
       group_info <- group_keys[i, , drop = FALSE]
-      
+
       # Perform ANOVA for each variable in this group
       group_results <- lapply(var_names, function(var_name) {
         tryCatch({
-          anova_result <- perform_single_anova(group_data, var_name, group_name, weight_name)
-          
-          result_df <- data.frame(
-            group_info,
-            Variable = var_name,
-            F_stat = anova_result$f_stat,
-            df1 = anova_result$df1,
-            df2 = anova_result$df2,
-            p_value = anova_result$p_value,
-            eta_squared = anova_result$eta_squared,
-            epsilon_squared = anova_result$epsilon_squared,
-            omega_squared = anova_result$omega_squared
-          )
-          result_df$group_stats <- list(anova_result$group_stats)
-          result_df$anova_table <- list(anova_result$anova_table)
-          result_df$welch_result <- list(anova_result$welch_result)
-          result_df$is_weighted <- anova_result$is_weighted
-          result_df
+          anova_result <- .anova_single(group_data, var_name, g_name, w_name,
+                                        conf.level)
+          .anova_result_row(anova_result, var_name, group_info)
         }, error = function(e) {
           # Ensure var_name is scalar
           var_name_safe <- if(length(var_name) == 0) "unknown" else as.character(var_name[1])
@@ -536,58 +256,358 @@ perform_between_subjects_anova <- function(data, var_names, group_name, weight_n
           cbind(group_info, error_df)
         })
       })
-      
+
       do.call(rbind, group_results)
     })
-    
+
     results_df <- do.call(rbind, results_list)
-    
+
   } else {
     # Perform ANOVA for each variable (ungrouped)
     results_list <- lapply(var_names, function(var_name) {
       tryCatch({
-        anova_result <- perform_single_anova(data, var_name, group_name, weight_name)
-        
-        result_df <- data.frame(
-          Variable = var_name,
-          F_stat = anova_result$f_stat,
-          df1 = anova_result$df1,
-          df2 = anova_result$df2,
-          p_value = anova_result$p_value,
-          eta_squared = anova_result$eta_squared,
-          epsilon_squared = anova_result$epsilon_squared,
-          omega_squared = anova_result$omega_squared
-        )
-        result_df$group_stats <- list(anova_result$group_stats)
-        result_df$anova_table <- list(anova_result$anova_table)
-        result_df$welch_result <- list(anova_result$welch_result)
-        result_df$is_weighted <- anova_result$is_weighted
-        result_df
+        anova_result <- .anova_single(data, var_name, g_name, w_name,
+                                      conf.level)
+        .anova_result_row(anova_result, var_name)
       }, error = function(e) {
         cli_abort("oneway_anova() failed: {e$message}", parent = e)
       })
     })
-    
+
     results_df <- do.call(rbind, results_list)
   }
-  
+
   # Create S3 object
   structure(
     list(
       results = results_df,
       variables = var_names,
-      group = group_name,
-      weights = weight_name,
+      group = g_name,
+      weights = w_name,
       var.equal = var.equal,
       groups = grp_vars,
       is_grouped = is_grouped,
       conf.level = conf.level,
       group_levels = g_levels,
-      data = data[, unique(c(var_names, group_name, weight_name, grp_vars)), drop = FALSE]
+      data = data[, unique(c(var_names, g_name, w_name, grp_vars)), drop = FALSE]
     ),
     class = "oneway_anova"
   )
 }
+
+# ==============================================================================
+# INTERNAL HELPERS
+# ==============================================================================
+
+#' Descriptive statistics by group for a one-way ANOVA
+#' @noRd
+.anova_descriptives <- function(y, g, w, group_levels, conf.level) {
+  if (is.null(w)) {
+    # Descriptive statistics by group
+    group_stats <- lapply(group_levels, function(level) {
+      group_data <- y[g == level]
+      n <- length(group_data)
+      mean_val <- mean(group_data)
+      sd_val <- sd(group_data)
+      se_val <- sd_val / sqrt(n)
+
+      # Confidence interval for mean
+      t_val <- qt((1 + conf.level) / 2, df = n - 1)
+      ci_lower <- mean_val - t_val * se_val
+      ci_upper <- mean_val + t_val * se_val
+
+      list(
+        level = level,
+        n = n,
+        mean = mean_val,
+        sd = sd_val,
+        se = se_val,
+        ci_lower = ci_lower,
+        ci_upper = ci_upper
+      )
+    })
+  } else {
+    # Weighted descriptive statistics by group (SPSS frequency-weights spec)
+    #
+    # Earlier versions of this block had three bugs that produced systematic
+    # drift from SPSS in weighted ANOVA descriptives:
+    #   1. Variance divisor was sum(w) (population formula); SPSS uses
+    #      (sum(w) - 1) sample formula.
+    #   2. SE used sqrt(physical n); SPSS uses sqrt(sum(w)).
+    #   3. CI t-critical-value used Kish design effective N; SPSS uses
+    #      df = sum(w) - 1.
+    # Fixed 2026-05-19. See VALIDATION_CHARTER.md §5.1.
+    group_stats <- lapply(group_levels, function(level) {
+      group_indices <- g == level
+      group_data <- y[group_indices]
+      group_weights <- w[group_indices]
+
+      n <- length(group_data)              # physical count (for output)
+      sw <- sum(group_weights)             # unrounded weighted N
+      weighted_n_display <- round(sw)      # for display N column
+
+      # Weighted mean
+      weighted_mean <- sum(group_data * group_weights) / sw
+
+      # Sample-formula weighted variance (divisor sw - 1)
+      weighted_var <- sum(group_weights * (group_data - weighted_mean)^2) / (sw - 1)
+      weighted_sd <- sqrt(weighted_var)
+
+      # SE = SD / sqrt(weighted N)
+      weighted_se <- weighted_sd / sqrt(sw)
+
+      # CI with df = sw - 1 (SPSS sample-formula convention)
+      t_val <- qt((1 + conf.level) / 2, df = sw - 1)
+      ci_lower <- weighted_mean - t_val * weighted_se
+      ci_upper <- weighted_mean + t_val * weighted_se
+
+      list(
+        level = level,
+        n = n,
+        weighted_n = weighted_n_display,
+        mean = weighted_mean,
+        sd = weighted_sd,
+        se = weighted_se,
+        ci_lower = ci_lower,
+        ci_upper = ci_upper
+      )
+    })
+  }
+  names(group_stats) <- group_levels
+  group_stats
+}
+
+#' Classical one-way ANOVA: sums of squares, F test, and effect sizes
+#' @noRd
+.anova_classical <- function(y, g, w, group_levels) {
+  if (is.null(w)) {
+    # Standard ANOVA
+    aov_result <- aov(y ~ g)
+    aov_summary <- summary(aov_result)[[1]]
+
+    # Extract ANOVA components
+    ss_between <- aov_summary["g", "Sum Sq"]
+    ss_within <- aov_summary["Residuals", "Sum Sq"]
+    ss_total <- ss_between + ss_within
+    df_between <- aov_summary["g", "Df"]
+    df_within <- aov_summary["Residuals", "Df"]
+    ms_between <- aov_summary["g", "Mean Sq"]
+    ms_within <- aov_summary["Residuals", "Mean Sq"]
+    f_stat <- aov_summary["g", "F value"]
+    p_value <- aov_summary["g", "Pr(>F)"]
+  } else {
+    # Weighted ANOVA calculations
+    # Overall weighted mean
+    grand_mean <- sum(y * w) / sum(w)
+
+    # Between-group sum of squares (weighted)
+    ss_between <- 0
+    for (level in group_levels) {
+      group_indices <- g == level
+      group_weights <- w[group_indices]
+      group_mean <- sum(y[group_indices] * group_weights) / sum(group_weights)
+      ss_between <- ss_between + sum(group_weights) * (group_mean - grand_mean)^2
+    }
+
+    # Within-group sum of squares (weighted)
+    ss_within <- 0
+    for (level in group_levels) {
+      group_indices <- g == level
+      group_data <- y[group_indices]
+      group_weights <- w[group_indices]
+      group_mean <- sum(group_data * group_weights) / sum(group_weights)
+      ss_within <- ss_within + sum(group_weights * (group_data - group_mean)^2)
+    }
+
+    ss_total <- ss_between + ss_within
+    df_between <- length(group_levels) - 1
+
+    # For weighted analyses, df_within = floor(sum(w)) - k.
+    # NB: SPSS ONEWAY uses floor(sum(w)) (truncation) here, NOT
+    # round(sum(w)) and NOT unrounded sum(w). Empirically verified against
+    # SPSS v29 ONEWAY output 2026-05-19 — see VALIDATION_CHARTER.md §5.1.
+    # This differs from t_test's convention (which uses unrounded sum(w));
+    # the inconsistency is a SPSS quirk reproduced here for compatibility.
+    df_within <- floor(sum(w)) - length(group_levels)
+
+    ms_between <- ss_between / df_between
+    ms_within <- ss_within / df_within
+    f_stat <- ms_between / ms_within
+    p_value <- pf(f_stat, df_between, df_within, lower.tail = FALSE)
+  }
+
+  # Effect sizes
+  eta_squared <- ss_between / ss_total
+  epsilon_squared <- (ss_between - (df_between * ms_within)) / ss_total
+  omega_squared <- (ss_between - (df_between * ms_within)) / (ss_total + ms_within)
+
+  # Ensure effect sizes are non-negative
+  epsilon_squared <- max(0, epsilon_squared)
+  omega_squared <- max(0, omega_squared)
+
+  list(
+    ss_between = ss_between,
+    ss_within = ss_within,
+    ss_total = ss_total,
+    df_between = df_between,
+    df_within = df_within,
+    ms_between = ms_between,
+    ms_within = ms_within,
+    f_stat = f_stat,
+    p_value = p_value,
+    eta_squared = eta_squared,
+    epsilon_squared = epsilon_squared,
+    omega_squared = omega_squared
+  )
+}
+
+#' Weighted Welch robust test for equality of means (SPSS-compatible)
+#' @noRd
+.anova_welch_weighted <- function(y, g, w, group_levels) {
+  # Weighted Welch test (SPSS-optimized)
+  # Calculate group statistics for SPSS-compatible Welch test
+  w_total_groups <- numeric(length(group_levels))
+  group_means_welch <- numeric(length(group_levels))
+  group_vars_welch <- numeric(length(group_levels))
+
+  for (i in seq_along(group_levels)) {
+    level <- group_levels[i]
+    group_indices <- g == level
+    group_data <- y[group_indices]
+    group_weights <- w[group_indices]
+
+    w_total_groups[i] <- sum(group_weights)
+    group_means_welch[i] <- sum(group_data * group_weights) / sum(group_weights)
+
+    # SPSS-compatible variance calculation
+    group_vars_welch[i] <- sum(group_weights * (group_data - group_means_welch[i])^2) / (sum(group_weights) - 1)
+  }
+
+  # Classical Welch ANOVA with frequency weights (SPSS-compatible).
+  # Welch weights = n_i / s_i^2; the Welch-weighted grand mean is used
+  # as the centre for the F-statistic numerator (NOT the unweighted
+  # grand mean).
+  welch_weights    <- w_total_groups / group_vars_welch
+  grand_mean_welch <- sum(welch_weights * group_means_welch) / sum(welch_weights)
+
+  # Classical Welch F-statistic
+  numerator_welch <- sum(welch_weights * (group_means_welch - grand_mean_welch)^2) / (length(group_levels) - 1)
+  denominator_welch <- sum((1 - welch_weights / sum(welch_weights))^2 / (w_total_groups - 1))
+  welch_f <- numerator_welch / (1 + 2 * (length(group_levels) - 2) / (length(group_levels)^2 - 1) * denominator_welch)
+
+  df1_welch <- length(group_levels) - 1
+
+  # Satterthwaite degrees of freedom approximation
+  df2_welch <- (length(group_levels)^2 - 1) / (3 * denominator_welch)
+
+  welch_p <- pf(welch_f, df1_welch, df2_welch, lower.tail = FALSE)
+
+  list(
+    statistic = welch_f,
+    parameter = c(df1_welch, df2_welch),
+    p.value = welch_p,
+    method = "Weighted Welch ANOVA (Classical Formula)"
+  )
+}
+
+#' One-way ANOVA for a single dependent variable
+#'
+#' Orchestrates .anova_descriptives(), .anova_classical(), and the Welch
+#' robust test (weighted or unweighted), and assembles the SPSS-style
+#' ANOVA table.
+#' @noRd
+.anova_single <- function(data, var_name, group_name, weight_name, conf.level) {
+  # Get the variable values
+  y <- data[[var_name]]
+  g <- data[[group_name]]
+
+  # Remove NA values
+  valid_indices <- !is.na(y) & !is.na(g)
+  w <- NULL
+  if (!is.null(weight_name)) {
+    w <- data[[weight_name]]
+    valid_indices <- valid_indices & !is.na(w) & w > 0
+    w <- w[valid_indices]
+  }
+  y <- y[valid_indices]
+  g <- g[valid_indices]
+
+  if (length(unique(g)) < 2) {
+    cli_abort("Variable {.var {var_name}}: After removing NAs, grouping variable must have at least 2 levels.")
+  }
+
+  # Get group levels
+  if (is.factor(g)) {
+    group_levels <- levels(g)[levels(g) %in% unique(g)]
+  } else {
+    group_levels <- unique(g)
+  }
+
+  group_stats <- .anova_descriptives(y, g, w, group_levels, conf.level)
+  classical <- .anova_classical(y, g, w, group_levels)
+
+  if (is.null(weight_name)) {
+    # Welch's ANOVA (robust test)
+    welch_result <- oneway.test(y ~ g, var.equal = FALSE)
+  } else {
+    welch_result <- .anova_welch_weighted(y, g, w, group_levels)
+  }
+
+  # ANOVA table - always show classical ANOVA values like SPSS
+  anova_table <- data.frame(
+    Source = c("Between Groups", "Within Groups", "Total"),
+    Sum_Squares = c(classical$ss_between, classical$ss_within, classical$ss_total),
+    df = c(classical$df_between, classical$df_within,
+           classical$df_between + classical$df_within),
+    Mean_Square = c(classical$ms_between, classical$ms_within, ""),
+    F = c(classical$f_stat, "", ""),
+    p_value = c(classical$p_value, "", ""),
+    stringsAsFactors = FALSE
+  )
+
+  # Always return classical ANOVA as primary (like SPSS), Welch test is separate
+  list(
+    f_stat = classical$f_stat,
+    df1 = classical$df_between,
+    df2 = classical$df_within,
+    p_value = classical$p_value,
+    eta_squared = classical$eta_squared,
+    epsilon_squared = classical$epsilon_squared,
+    omega_squared = classical$omega_squared,
+    group_stats = group_stats,
+    anova_table = anova_table,
+    welch_result = welch_result,
+    is_weighted = !is.null(weight_name)
+  )
+}
+
+#' Build one row of the oneway_anova results data frame
+#'
+#' Shared by the grouped and ungrouped assembly paths; group_info (a
+#' one-row data frame of group keys) is prepended for grouped results.
+#' @noRd
+.anova_result_row <- function(anova_result, var_name, group_info = NULL) {
+  cols <- list(
+    Variable = var_name,
+    F_stat = anova_result$f_stat,
+    df1 = anova_result$df1,
+    df2 = anova_result$df2,
+    p_value = anova_result$p_value,
+    eta_squared = anova_result$eta_squared,
+    epsilon_squared = anova_result$epsilon_squared,
+    omega_squared = anova_result$omega_squared
+  )
+  if (!is.null(group_info)) {
+    cols <- c(list(group_info), cols)
+  }
+  result_df <- do.call(data.frame, cols)
+  result_df$group_stats <- list(anova_result$group_stats)
+  result_df$anova_table <- list(anova_result$anova_table)
+  result_df$welch_result <- list(anova_result$welch_result)
+  result_df$is_weighted <- anova_result$is_weighted
+  result_df
+}
+
 #' Print ANOVA test results (compact)
 #'
 #' @description
