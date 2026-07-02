@@ -490,7 +490,7 @@ print.dunn_test <- function(x, digits = 3, ...) {
 #' Print a Dunn test comparison table
 #' @param var_results Data frame with comparison results for one variable
 #' @param digits Number of decimal places
-#' @keywords internal
+#' @noRd
 .print_dunn_table <- function(var_results, digits = 3) {
   display_table <- data.frame(
     `Group 1` = var_results$group1,

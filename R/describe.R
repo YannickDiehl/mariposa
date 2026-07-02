@@ -161,7 +161,7 @@ describe <- function(data, ..., weights = NULL,
 # ============================================================================
 
 #' Calculate statistics for ungrouped data
-#' @keywords internal
+#' @noRd
 .calculate_ungrouped_stats <- function(data, vars, weights_info, show, probs, na.rm, excess) {
   results_list <- list()
   
@@ -184,7 +184,7 @@ describe <- function(data, ..., weights = NULL,
 }
 
 #' Calculate statistics for grouped data
-#' @keywords internal
+#' @noRd
 .calculate_grouped_stats <- function(data, vars, weights_info, show, probs, na.rm, excess) {
   results <- data %>%
     dplyr::group_modify(~ {
@@ -213,7 +213,7 @@ describe <- function(data, ..., weights = NULL,
 }
 
 #' Calculate all requested statistics for a single variable
-#' @keywords internal
+#' @noRd
 .calculate_variable_stats <- function(x, w, var_name, show, probs, na.rm, excess) {
   stats_list <- list()
   
@@ -257,258 +257,6 @@ describe <- function(data, ..., weights = NULL,
 }
 
 # ============================================================================
-# STATISTICAL CALCULATION FUNCTIONS
-# ============================================================================
-
-#' Validate and clean weights - central validation function
-#' @keywords internal
-.validate_and_clean_weights <- function(x, weights, na.rm = TRUE) {
-  if (is.null(weights)) {
-    return(list(x = x, weights = NULL, valid = TRUE))
-  }
-  
-  # Basic validation checks
-  if (length(weights) != length(x)) {
-    cli_abort("Length of weights ({length(weights)}) does not match length of data ({length(x)}).")
-  }
-
-  # Package-wide policy: negative weights are an error, never a fallback
-  .check_weights(weights)
-
-  if (all(is.na(weights))) {
-    cli_warn("All weights are missing. Using unweighted calculation.")
-    return(list(x = x, weights = NULL, valid = FALSE))
-  }
-  
-  # Remove missing values if requested
-  if (na.rm) {
-    complete_cases <- !is.na(x) & !is.na(weights)
-    x_clean <- x[complete_cases]
-    weights_clean <- weights[complete_cases]
-  } else {
-    x_clean <- x
-    weights_clean <- weights
-  }
-  
-  return(list(x = x_clean, weights = weights_clean, valid = TRUE))
-}
-
-# .effective_n() is defined in helpers.R — no local redefinition needed
-
-#' Weighted mean
-#' @keywords internal
-.w_mean <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    return(mean(cleaned$x, na.rm = na.rm))
-  }
-  
-  if (sum(cleaned$weights, na.rm = TRUE) == 0) {
-    return(NA_real_)
-  }
-  
-  return(sum(cleaned$x * cleaned$weights, na.rm = na.rm) / sum(cleaned$weights, na.rm = na.rm))
-}
-
-#' Weighted median using cumulative weights approach
-#' @keywords internal
-.w_median <- function(x, weights = NULL, na.rm = TRUE) {
-  # SPSS's median IS the HAVERAGE (Type-6) 50th percentile. Delegating to
-  # .w_quantile() guarantees Median == Q50 in every output; the former
-  # cumulative-weight step function disagreed with .w_quantile(0.5) for
-  # fractional weights (audit finding).
-  unname(.w_quantile(x, weights = weights, probs = 0.5, na.rm = na.rm))
-}
-
-#' Weighted variance with Bessel's correction
-#' @keywords internal
-.w_var <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    return(var(cleaned$x, na.rm = na.rm))
-  }
-  
-  x_clean <- cleaned$x
-  w_clean <- cleaned$weights
-  
-  if (length(x_clean) <= 1) return(NA_real_)
-  
-  # Calculate weighted variance using SPSS formula
-  # SPSS uses: variance = sum(w * (x - w_mean)^2) / (V1 - 1)
-  # where V1 = sum of weights
-  w_mean <- .w_mean(x_clean, w_clean, na.rm = na.rm)
-  V1 <- sum(w_clean, na.rm = na.rm)  # Sum of weights
-  
-  if (V1 <= 1) return(NA_real_)  # Need V1 > 1 for denominator
-  
-  numerator <- sum(w_clean * (x_clean - w_mean)^2, na.rm = na.rm)
-  denominator <- V1 - 1  # SPSS formula: V1 - 1
-  
-  return(numerator / denominator)
-}
-
-#' Weighted standard deviation
-#' @keywords internal
-.w_sd <- function(x, weights = NULL, na.rm = TRUE) {
-  return(sqrt(.w_var(x, weights, na.rm)))
-}
-
-#' Weighted standard error using SPSS formula
-#' @keywords internal
-.w_se <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    n <- sum(!is.na(x))
-    return(sd(x, na.rm = na.rm) / sqrt(n))
-  }
-  
-  # Calculate weighted standard error using SPSS formula
-  # SPSS uses: SE = SD / sqrt(V1) where V1 = sum of weights
-  V1 <- sum(cleaned$weights, na.rm = na.rm)
-  
-  if (V1 <= 0) return(NA_real_)
-  
-  w_sd <- .w_sd(cleaned$x, cleaned$weights, na.rm = na.rm)
-  return(w_sd / sqrt(V1))  # SPSS formula: SD / sqrt(V1)
-}
-
-#' Weighted range (uses actual data range)
-#' @keywords internal
-.w_range <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    return(diff(range(cleaned$x, na.rm = na.rm)))
-  }
-  
-  # For weighted range, we still use the actual range of values
-  return(diff(range(cleaned$x, na.rm = na.rm)))
-}
-
-#' Weighted IQR using weighted quantiles
-#' @keywords internal
-.w_iqr <- function(x, weights = NULL, na.rm = TRUE) {
-  q75 <- .w_quantile(x, weights, probs = 0.75, na.rm = na.rm)
-  q25 <- .w_quantile(x, weights, probs = 0.25, na.rm = na.rm)
-  return(q75 - q25)
-}
-
-#' Weighted quantiles (SPSS Type-6 HAVERAGE with linear interpolation)
-#'
-#' For weighted data, weights are treated as frequency multipliers. The
-#' Type-6 position is h = p * (W + 1) where W = sum(w). The percentile is
-#' linearly interpolated between the values whose cumulative weights bracket h.
-#' Matches IBM SPSS FREQUENCIES /PERCENTILES (HAVERAGE) algorithm.
-#'
-#' For unweighted data, delegates to stats::quantile(type = 6) which is the
-#' SPSS-compatible default (HAVERAGE) — base R's default is type = 7.
-#'
-#' @keywords internal
-.w_quantile <- function(x, weights = NULL, probs = 0.5, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    # SPSS uses Type-6 (HAVERAGE), not R's default Type-7
-    return(quantile(cleaned$x, probs = probs, na.rm = na.rm, type = 6))
-  }
-
-  x_clean <- cleaned$x
-  w_clean <- cleaned$weights
-
-  if (length(x_clean) == 0) return(rep(NA_real_, length(probs)))
-
-  ord      <- order(x_clean)
-  x_sorted <- x_clean[ord]
-  w_sorted <- w_clean[ord]
-  cum_w    <- cumsum(w_sorted)
-  W        <- sum(w_sorted)
-
-  result <- vapply(probs, function(p) {
-    # Type-6 position
-    h <- p * (W + 1)
-
-    if (h <= cum_w[1])               return(x_sorted[1])
-    if (h >= cum_w[length(cum_w)])   return(x_sorted[length(x_sorted)])
-
-    # Find the bracket: cum_w[j-1] < h <= cum_w[j]
-    j <- which(cum_w >= h)[1]
-    if (j == 1L) return(x_sorted[1])
-
-    lo_w <- cum_w[j - 1]
-    hi_w <- cum_w[j]
-    if (hi_w == lo_w) return(x_sorted[j])
-
-    # Linear interpolation between adjacent observations
-    frac <- (h - lo_w) / (hi_w - lo_w)
-    x_sorted[j - 1] + frac * (x_sorted[j] - x_sorted[j - 1])
-  }, numeric(1))
-
-  names(result) <- paste0(probs * 100, "%")
-  result
-}
-
-#' Weighted skewness with bias correction
-#' @keywords internal
-.w_skew <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    xc <- if (na.rm) x[!is.na(x)] else x
-    if (length(xc) < 3) return(NA_real_)
-    return(.calc_skewness(xc, w = NULL))
-  }
-  if (length(cleaned$x) < 3) return(NA_real_)
-  .calc_skewness(cleaned$x, w = cleaned$weights)
-}
-
-#' Weighted kurtosis (SPSS Type-2; delegates to .calc_kurtosis)
-#' @keywords internal
-.w_kurtosis <- function(x, weights = NULL, na.rm = TRUE, excess = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    xc <- if (na.rm) x[!is.na(x)] else x
-    if (length(xc) < 4) return(NA_real_)
-    return(.calc_kurtosis(xc, w = NULL, excess = excess))
-  }
-  if (length(cleaned$x) < 4) return(NA_real_)
-  .calc_kurtosis(cleaned$x, w = cleaned$weights, excess = excess)
-}
-
-#' Weighted mode (most frequent value by weight)
-#' @keywords internal
-.w_mode <- function(x, weights = NULL, na.rm = TRUE) {
-  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    # Unweighted mode
-    x_clean <- if (na.rm) x[!is.na(x)] else x
-    if (length(x_clean) == 0) return(NA_real_)
-    
-    freq_table <- table(x_clean)
-    mode_val <- as.numeric(names(freq_table)[which.max(freq_table)])
-    return(mode_val)
-  }
-  
-  # Weighted mode
-  x_clean <- cleaned$x
-  w_clean <- cleaned$weights
-  
-  if (length(x_clean) == 0) return(NA_real_)
-  
-  unique_vals <- unique(x_clean)
-  weighted_freqs <- numeric(length(unique_vals))
-  
-  for (i in seq_along(unique_vals)) {
-    weighted_freqs[i] <- sum(w_clean[x_clean == unique_vals[i]], na.rm = na.rm)
-  }
-  
-  mode_val <- unique_vals[which.max(weighted_freqs)]
-  return(mode_val)
-}
-
-# ============================================================================
 # PRINT METHOD AND FORMATTING
 # ============================================================================
 
@@ -545,7 +293,7 @@ print.describe <- function(x, digits = 3, ...) {
 # Note: .print_header function removed - using standardized print_header from print_helpers.R
 
 #' Print results for ungrouped data
-#' @keywords internal
+#' @noRd
 .print_ungrouped_results <- function(x, is_weighted, digits = 3) {
   output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted, digits = digits)
   print(output_df, row.names = FALSE)
@@ -555,7 +303,7 @@ print.describe <- function(x, digits = 3, ...) {
 }
 
 #' Print results for grouped data
-#' @keywords internal
+#' @noRd
 .print_grouped_results <- function(x, is_weighted, digits = 3) {
   group_vars <- x$group_vars
   results_df <- x$results
@@ -586,7 +334,7 @@ print.describe <- function(x, digits = 3, ...) {
 }
 
 #' Create formatted output data frame for printing
-#' @keywords internal
+#' @noRd
 .create_output_df <- function(results_df, variables, show, is_weighted, digits = 3) {
   output_rows <- list()
   

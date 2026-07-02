@@ -614,7 +614,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 }
 
 #' Print compact kendall_tau output for one group or ungrouped
-#' @keywords internal
+#' @noRd
 .print_kendall_compact <- function(x, corrs, weighted_tag, digits) {
   n_vars <- length(x$variables)
 
@@ -751,7 +751,7 @@ print.summary.kendall_tau <- function(x, ...) {
 }
 
 #' Print verbose kendall_tau output for one group
-#' @keywords internal
+#' @noRd
 .print_kendall_verbose <- function(x, corrs, matrix_idx, show_cor, show_p, show_n, digits) {
   n_vars <- length(x$variables)
 

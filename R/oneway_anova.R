@@ -645,7 +645,7 @@ print.oneway_anova <- function(x, digits = 3, ...) {
 }
 
 #' Print a compact one-line summary for a single ANOVA variable
-#' @keywords internal
+#' @noRd
 .print_oneway_anova_compact <- function(results, i, group_tag, weighted_tag, digits) {
   var_name <- results$Variable[i]
   f_val    <- results$F_stat[i]

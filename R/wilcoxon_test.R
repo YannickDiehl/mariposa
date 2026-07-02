@@ -328,7 +328,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 }
 
 # Helper: print the rank table and test statistics for one comparison
-#' @keywords internal
+#' @noRd
 .print_wt_block <- function(row_data, x_name, y_name, weights, digits) {
   print_header(paste(y_name, "-", x_name), newline_before = FALSE)
 

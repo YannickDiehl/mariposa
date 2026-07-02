@@ -324,7 +324,7 @@ logistic_regression <- function(data, formula = NULL,
 
 
 #' Core logistic regression computation
-#' @keywords internal
+#' @noRd
 .glm_core <- function(data, formula, dep_name, pred_names, weights_vec,
                       conf.level, factors = "dummy") {
 
@@ -563,7 +563,7 @@ logistic_regression <- function(data, formula = NULL,
 # ============================================================================
 
 #' Hosmer-Lemeshow goodness-of-fit test
-#' @keywords internal
+#' @noRd
 .hosmer_lemeshow_test <- function(observed, predicted, weights_vec = NULL,
                                  n_groups = 10) {
   # Sort by predicted probability
@@ -771,7 +771,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
 
 #' Print ungrouped logistic regression summary (verbose)
-#' @keywords internal
+#' @noRd
 .print_summary_logistic_ungrouped <- function(x) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
@@ -826,7 +826,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
 
 #' Print grouped logistic regression summary (verbose)
-#' @keywords internal
+#' @noRd
 .print_summary_logistic_grouped <- function(x) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
@@ -891,7 +891,7 @@ print.summary.logistic_regression <- function(x, ...) {
 # ============================================================================
 
 #' Print omnibus test of model coefficients
-#' @keywords internal
+#' @noRd
 .print_omnibus_test <- function(omnibus) {
   cat("  Omnibus Tests of Model Coefficients\n")
   w <- 50
@@ -906,7 +906,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
 
 #' Print logistic model summary
-#' @keywords internal
+#' @noRd
 .print_logistic_model_summary <- function(ms) {
   cat("  Model Summary\n")
   w <- 60
@@ -920,7 +920,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
 
 #' Print Hosmer-Lemeshow test
-#' @keywords internal
+#' @noRd
 .print_hosmer_lemeshow <- function(hl) {
   cat("  Hosmer and Lemeshow Test\n")
   w <- 50
@@ -934,7 +934,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
 
 #' Print classification table
-#' @keywords internal
+#' @noRd
 .print_classification_table <- function(cls) {
   cat("  Classification Table (cutoff = 0.50)\n")
   w <- 65
@@ -959,7 +959,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
 
 #' Print logistic regression coefficients table
-#' @keywords internal
+#' @noRd
 .print_logistic_coefficients <- function(coefs) {
   cat("  Variables in the Equation\n")
   w <- 95

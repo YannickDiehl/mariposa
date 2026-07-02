@@ -20,7 +20,7 @@
 #' @param digits Number of decimal places for formatting
 #' @param class_name Summary class name (e.g. \code{"summary.t_test"})
 #' @return A list with class \code{class_name}
-#' @keywords internal
+#' @noRd
 build_summary_object <- function(object, show, digits, class_name) {
   out <- object
   out$show <- show
@@ -37,7 +37,7 @@ build_summary_object <- function(object, show, digits, class_name) {
 #' @param p Numeric p-value
 #' @param digits Decimal places (default 3)
 #' @return Character string
-#' @keywords internal
+#' @noRd
 format_p_compact <- function(p, digits = 3) {
   if (is.na(p)) return("p = NA")
   if (p < 0.001) return("p < 0.001")

@@ -333,7 +333,7 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 # ==============================================================================
 
 #' Build ANCOVA table from lm model and drop1 results
-#' @keywords internal
+#' @noRd
 .build_ancova_table <- function(model, type3, between_names, covariate_names,
                                  dv_name, n_total, w_name) {
 
@@ -441,7 +441,7 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 
 
 #' Compute parameter estimates from the model
-#' @keywords internal
+#' @noRd
 .compute_parameter_estimates <- function(model, w_name) {
 
   coefs <- summary(model)$coefficients
@@ -474,7 +474,7 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 
 
 #' Compute estimated marginal means (adjusted for covariates at their grand mean)
-#' @keywords internal
+#' @noRd
 .compute_estimated_marginal_means <- function(model, data, dv_name,
                                                between_names, covariate_names,
                                                w_name) {

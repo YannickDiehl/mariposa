@@ -29,16 +29,22 @@
 #' @param class_name S3 class name (e.g., "w_mean")
 #' @param extra_args Named list of extra arguments stored in the result object
 #' @return S3 object of class `class_name`, or scalar in summarise context
-#' @keywords internal
+#' @noRd
 .w_statistic <- function(data, ..., weights = NULL, na.rm = TRUE,
                          stat_fn, stat_name, weighted_col, unweighted_col,
                          class_name, extra_args = list()) {
 
+  # Capture the weights expression once as a quosure. Because the w_*
+  # wrappers pass weights = {{ weights }}, this quosure carries the
+  # *original* caller environment - inside summarise() that is the data
+  # mask, so eval_tidy() resolves bare column names without any
+  # parent.frame() walking (which the previous implementation relied on).
+  weights_quo <- rlang::enquo(weights)
+
   # --- Summarise context: data is a numeric vector, not a data frame ---------
   if (is.numeric(data) && !is.data.frame(data)) {
     x <- data
-    weights_arg <- substitute(weights)
-    weights_vec <- .evaluate_weights(weights_arg, parent.frame())
+    weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
 
     weighted <- .are_weights(weights_vec)
     if (weighted) .check_weights(weights_vec)
@@ -66,7 +72,6 @@
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
 
-  weights_quo <- rlang::enquo(weights)
   if (rlang::quo_is_null(weights_quo)) {
     weights_vec <- NULL
     weights_name <- NULL
@@ -168,7 +173,7 @@
 #' @param weighted_col Name for weighted statistic column
 #' @param unweighted_col Name for unweighted statistic column
 #' @return Formatted tibble
-#' @keywords internal
+#' @noRd
 .w_format_results <- function(results, var_names, weights_name, is_grouped,
                               weighted_col, unweighted_col) {
 
@@ -262,7 +267,7 @@
 #' @param weighted_col Column name for weighted values
 #' @param unweighted_col Column name for unweighted values
 #' @param digits Number of decimal places to display (default: 3)
-#' @keywords internal
+#' @noRd
 .print_w_statistic <- function(x, stat_label, weighted_col, unweighted_col,
                                digits = 3) {
   test_type <- get_standard_title(stat_label, x$weights, "Statistics")

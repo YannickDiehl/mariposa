@@ -279,7 +279,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 }
 
 # Helper: print the rank table and test statistics for a Friedman test
-#' @keywords internal
+#' @noRd
 .print_friedman_block <- function(row_data, var_names, weights, digits) {
   # Print rank table
   cat("  Ranks:\n")

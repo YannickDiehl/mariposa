@@ -16,7 +16,7 @@
 #' Print standardized header with title and separator
 #' @param title Character string for the title
 #' @param newline_before Logical, whether to print newline before header
-#' @keywords internal
+#' @noRd
 print_header <- function(title, newline_before = TRUE) {
   if (newline_before) cat("\n")
   cat(title, "\n", sep = "")
@@ -26,7 +26,7 @@ print_header <- function(title, newline_before = TRUE) {
 #' Print test information section
 #' @param info Named list of information to display
 #' @param indent Number of spaces to indent
-#' @keywords internal
+#' @noRd
 print_info_section <- function(info, indent = 0) {
   prefix <- paste(rep(" ", indent), collapse = "")
   for (name in names(info)) {
@@ -41,7 +41,7 @@ print_info_section <- function(info, indent = 0) {
 #' @param p_value Numeric p-value
 #' @param breaks Cut points for significance levels
 #' @param labels Significance symbols
-#' @keywords internal
+#' @noRd
 add_significance_stars <- function(p_value,
                                   breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
                                   labels = c("***", "**", "*", "")) {
@@ -57,7 +57,7 @@ add_significance_stars <- function(p_value,
 
 #' Print significance codes legend
 #' @param show Logical, whether to show the legend
-#' @keywords internal
+#' @noRd
 print_significance_legend <- function(show = TRUE) {
   if (show) {
     cat("\n")
@@ -68,7 +68,7 @@ print_significance_legend <- function(show = TRUE) {
 #' Print grouped data header
 #' @param group_values Named vector or data frame of group values
 #' @param prefix Text to print before group info
-#' @keywords internal
+#' @noRd
 print_group_header <- function(group_values, prefix = "Group") {
   if (is.data.frame(group_values)) {
     group_str <- paste(sapply(names(group_values), function(g) {
@@ -93,7 +93,7 @@ print_group_header <- function(group_values, prefix = "Group") {
 #' @param width Target display width
 #' @param align "left" for left-aligned (default), "right" for right-aligned
 #' @return Padded character string
-#' @keywords internal
+#' @noRd
 pad_utf8 <- function(text, width, align = "left") {
   text <- as.character(text)
   if (is.na(text)) text <- "NA"
@@ -109,7 +109,7 @@ pad_utf8 <- function(text, width, align = "left") {
 #' Calculate dynamic table width
 #' @param df Data frame to be printed
 #' @param min_width Minimum table width
-#' @keywords internal
+#' @noRd
 get_table_width <- function(df, min_width = 40) {
   if (is.null(df) || nrow(df) == 0) return(min_width)
 
@@ -123,7 +123,7 @@ get_table_width <- function(df, min_width = 40) {
 
 #' Print horizontal separator line
 #' @param ... Ignored (retained for backward compatibility)
-#' @keywords internal
+#' @noRd
 print_separator <- function(...) {
   cat(paste(rep("-", 40), collapse = ""), "\n", sep = "")
 }
@@ -132,7 +132,7 @@ print_separator <- function(...) {
 #' @param x Numeric value
 #' @param digits Number of decimal places
 #' @param scientific Whether to use scientific notation for small p-values
-#' @keywords internal
+#' @noRd
 format_number <- function(x, digits = 3, scientific = FALSE) {
   if (is.na(x)) return("NA")
   if (scientific && abs(x) < 0.0001) {
@@ -145,7 +145,7 @@ format_number <- function(x, digits = 3, scientific = FALSE) {
 #' @param test_name Name of the statistical test
 #' @param weights Weights variable name or NULL
 #' @param suffix "Results" or "Statistics"
-#' @keywords internal
+#' @noRd
 get_standard_title <- function(test_name, weights = NULL, suffix = "Results") {
   prefix <- if (!is.null(weights)) "Weighted " else ""
   paste0(prefix, test_name, " ", suffix)
@@ -153,7 +153,7 @@ get_standard_title <- function(test_name, weights = NULL, suffix = "Results") {
 
 #' Print standard test parameters
 #' @param params List of parameters (conf.level, alternative, etc.)
-#' @keywords internal
+#' @noRd
 print_test_parameters <- function(params) {
   if (!is.null(params$conf.level)) {
     cat("- Confidence level: ", sprintf("%.1f%%", params$conf.level * 100), "\n", sep = "")
@@ -169,7 +169,7 @@ print_test_parameters <- function(params) {
 #' Format variable name or label
 #' @param var Variable name
 #' @param label Optional label
-#' @keywords internal
+#' @noRd
 format_variable_name <- function(var, label = NULL) {
   if (!is.null(label) && !is.na(label) && label != "" && label != var) {
     sprintf("%s (%s)", var, label)
@@ -183,7 +183,7 @@ format_variable_name <- function(var, label = NULL) {
 #' @param digits Number of decimal places
 #' @param title Section title printed above the matrix
 #' @param type One of "correlation", "pvalue", or "n"
-#' @keywords internal
+#' @noRd
 .print_cor_matrix <- function(mat, digits = 3, title = "Correlation Matrix:",
                               type = "correlation") {
   old_width <- getOption("width")
@@ -251,7 +251,7 @@ format_variable_name <- function(var, label = NULL) {
 #' @param ci_lower_col Column name for CI lower bound (NULL to skip)
 #' @param ci_upper_col Column name for CI upper bound (NULL to skip)
 #' @param alternative NULL or "two.sided"/"less"/"greater" - shown as suffix on p-value
-#' @keywords internal
+#' @noRd
 .print_single_pair <- function(corr_row, stat_label, stat_col,
                                corr_name = "Correlation",
                                secondary_label = NULL, secondary_col = NULL,

@@ -367,7 +367,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 }
 
 # Helper: print a single variable block (rank table + test statistics)
-#' @keywords internal
+#' @noRd
 .print_kw_variable_block <- function(var_name, row_data, stats, weights, digits) {
   print_header(var_name, newline_before = FALSE)
 

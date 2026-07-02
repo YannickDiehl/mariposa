@@ -317,7 +317,7 @@ efa <- function(data, ...,
 # ============================================================================
 
 #' Compute EFA for a single group
-#' @keywords internal
+#' @noRd
 .efa_core <- function(data, var_names, weights_vec, n_factors, rotation,
                       extraction, use, sort, blank, na.rm) {
 
@@ -503,7 +503,7 @@ efa <- function(data, ...,
 
 #' PCA extraction for EFA
 #' @description Extracts components using eigenvalue decomposition (SPSS /EXTRACTION PC)
-#' @keywords internal
+#' @noRd
 .efa_extract_pca <- function(cor_mat, k, n_factors, var_names) {
   eig <- eigen(cor_mat, symmetric = TRUE)
   eigenvalues <- eig$values
@@ -559,7 +559,7 @@ efa <- function(data, ...,
 #' ML extraction for EFA
 #' @description Maximum Likelihood extraction using stats::factanal()
 #'   (SPSS /EXTRACTION ML). Provides goodness-of-fit testing.
-#' @keywords internal
+#' @noRd
 .efa_extract_ml <- function(cor_mat, k, n_factors, n_obs, var_names) {
   # Eigenvalues from correlation matrix (for variance explained table)
   eig <- eigen(cor_mat, symmetric = TRUE)
@@ -657,7 +657,7 @@ efa <- function(data, ...,
 #' Compute maximum number of factors for ML extraction
 #' @description ML requires non-negative degrees of freedom:
 #'   df = ((p - f)^2 - p - f) / 2 >= 0
-#' @keywords internal
+#' @noRd
 .ml_max_factors <- function(p) {
   for (f in seq_len(p)) {
     dof <- ((p - f)^2 - p - f) / 2
@@ -672,7 +672,7 @@ efa <- function(data, ...,
 # ============================================================================
 
 #' Compute pairwise correlation matrix (SPSS default for FACTOR)
-#' @keywords internal
+#' @noRd
 .efa_pairwise_cor <- function(data, var_names, weights_vec) {
   k <- length(var_names)
 
@@ -740,7 +740,7 @@ efa <- function(data, ...,
 }
 
 #' Compute listwise correlation matrix
-#' @keywords internal
+#' @noRd
 .efa_listwise_cor <- function(data, var_names, weights_vec, na.rm) {
   item_data <- data[, var_names, drop = FALSE]
   complete <- stats::complete.cases(item_data)
@@ -776,7 +776,7 @@ efa <- function(data, ...,
 #' @description
 #' KMO measures the proportion of variance among variables that might be
 #' common variance. SPSS-compatible implementation.
-#' @keywords internal
+#' @noRd
 .compute_kmo <- function(cor_mat) {
   # Anti-image approach (SPSS method)
   # 1. Compute inverse of correlation matrix
@@ -824,7 +824,7 @@ efa <- function(data, ...,
 #' @description
 #' Tests whether the correlation matrix is significantly different from
 #' an identity matrix. SPSS-compatible formula.
-#' @keywords internal
+#' @noRd
 .compute_bartlett <- function(cor_mat, n, k) {
   # Bartlett's test: chi_sq = -((n - 1) - (2*k + 5)/6) * log(det(R))
   log_det <- determinant(cor_mat, logarithm = TRUE)
@@ -852,7 +852,7 @@ efa <- function(data, ...,
 # ============================================================================
 
 #' Compute per-item descriptive statistics for EFA
-#' @keywords internal
+#' @noRd
 .efa_item_stats <- function(data, var_names, weights_vec) {
   stats_list <- lapply(var_names, function(v) {
     x <- data[[v]]
@@ -890,7 +890,7 @@ efa <- function(data, ...,
 # ============================================================================
 
 #' Interpret KMO value
-#' @keywords internal
+#' @noRd
 .kmo_interpretation <- function(kmo) {
   if (is.na(kmo)) return("")
   if (kmo >= 0.90) return("Marvelous")
@@ -962,7 +962,7 @@ print.efa <- function(x, digits = 3, ...) {
 }
 
 #' Print compact one-liner for a single EFA result
-#' @keywords internal
+#' @noRd
 .print_efa_compact <- function(res, n_vars, extraction_label, rotation_label,
                                weighted_tag, digits) {
   n_factors <- res$n_factors
@@ -1090,7 +1090,7 @@ print.summary.efa <- function(x, ...) {
 }
 
 #' Print EFA results for ungrouped data
-#' @keywords internal
+#' @noRd
 .print_efa_ungrouped <- function(x, digits = 3) {
   show_kmo <- if (!is.null(x$show)) isTRUE(x$show$kmo_bartlett) else TRUE
   show_comm <- if (!is.null(x$show)) isTRUE(x$show$communalities) else TRUE
@@ -1253,7 +1253,7 @@ print.summary.efa <- function(x, ...) {
 }
 
 #' Print EFA results for grouped data
-#' @keywords internal
+#' @noRd
 .print_efa_grouped <- function(x, digits = 3) {
 
   for (group_result in x$groups) {
@@ -1274,7 +1274,7 @@ print.summary.efa <- function(x, ...) {
 }
 
 #' Print a loading matrix with blank suppression and optional sorting
-#' @keywords internal
+#' @noRd
 .print_loading_matrix <- function(mat, blank = 0.40, sort_loadings = TRUE, digits = 3) {
   k <- nrow(mat)
   n_f <- ncol(mat)

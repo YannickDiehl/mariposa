@@ -443,7 +443,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 }
 
 # Helper: print a single variable block (rank means + test table)
-#' @keywords internal
+#' @noRd
 .print_mw_variable_block <- function(var_name, row_data, stats, weights, digits,
                                      show_ranks = TRUE, show_results = TRUE,
                                      show_effect_sizes = TRUE) {
@@ -503,7 +503,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 }
 
 # Internal: compact one-line summary for a single Mann-Whitney variable
-#' @keywords internal
+#' @noRd
 .print_mw_compact <- function(results, i, group_tag, weighted_tag, digits) {
   var_name <- results$Variable[i]
   U_val    <- results$U[i]

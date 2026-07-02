@@ -441,7 +441,7 @@ print.pairwise_wilcoxon <- function(x, digits = 3, ...) {
 #' Print a pairwise Wilcoxon comparison table
 #' @param pw_results Data frame with comparison results
 #' @param digits Number of decimal places
-#' @keywords internal
+#' @noRd
 .print_pw_table <- function(pw_results, digits = 3) {
   display_table <- data.frame(
     `Var 1` = pw_results$var1,

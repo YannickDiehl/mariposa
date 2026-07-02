@@ -411,7 +411,7 @@ print.chisq_gof <- function(x, digits = 4, ...) {
   invisible(x)
 }
 
-#' @keywords internal
+#' @noRd
 .print_gof_table <- function(results_df, digits = 4) {
   display <- data.frame(
     Variable = results_df$Variable,

@@ -468,7 +468,7 @@ print.spearman_rho <- function(x, digits = 3, ...) {
 }
 
 #' Print compact spearman_rho output for one group or ungrouped
-#' @keywords internal
+#' @noRd
 .print_spearman_compact <- function(x, corrs, weighted_tag, digits) {
   n_vars <- length(x$variables)
 
@@ -608,7 +608,7 @@ print.summary.spearman_rho <- function(x, ...) {
 }
 
 #' Print verbose spearman_rho output for one group
-#' @keywords internal
+#' @noRd
 .print_spearman_verbose <- function(x, corrs, matrix_idx, show_cor, show_p, show_n, digits) {
   n_vars <- length(x$variables)
 

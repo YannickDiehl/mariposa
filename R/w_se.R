@@ -86,15 +86,7 @@ w_se <- function(data, ..., weights = NULL, na.rm = TRUE) {
     na.rm = na.rm,
     stat_fn = function(x, w) {
       if (length(x) < 2) return(NA_real_)
-      if (is.null(w)) {
-        stats::sd(x) / sqrt(length(x))
-      } else {
-        V1 <- sum(w)
-        if (V1 <= 1) return(NA_real_)
-        w_mean <- sum(x * w) / V1
-        w_sd <- sqrt(sum(w * (x - w_mean)^2) / (V1 - 1))
-        w_sd / sqrt(V1)
-      }
+      .w_se(x, weights = w, na.rm = FALSE)  # shared kernel
     },
     stat_name = "se",
     weighted_col = "weighted_se",

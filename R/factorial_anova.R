@@ -333,7 +333,7 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
 #' @param between_quo Quosure from enquo(between)
 #' @param data Data frame for validation
 #' @return Character vector of factor names
-#' @keywords internal
+#' @noRd
 .parse_between_factors <- function(between_quo, data) {
   # Handle c(var1, var2) syntax
   between_expr <- rlang::quo_get_expr(between_quo)
@@ -363,7 +363,7 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
 }
 
 #' Build ANOVA table from lm model and drop1 results
-#' @keywords internal
+#' @noRd
 .build_factorial_anova_table <- function(model, type3, between_names, dv_name,
                                           n_total, w_name) {
 
@@ -488,7 +488,7 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
 
 
 #' Compute descriptive statistics for factorial design
-#' @keywords internal
+#' @noRd
 .compute_factorial_descriptives <- function(data, dv_name, between_names, w_name) {
 
   y <- data[[dv_name]]
@@ -535,7 +535,7 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
 
 
 #' Compute Levene's test for factorial design
-#' @keywords internal
+#' @noRd
 .compute_factorial_levene <- function(data, dv_name, between_names, w_name) {
 
   y <- data[[dv_name]]

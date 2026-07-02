@@ -92,14 +92,7 @@ w_sd <- function(data, ..., weights = NULL, na.rm = TRUE) {
     na.rm = na.rm,
     stat_fn = function(x, w) {
       if (length(x) < 2) return(NA_real_)
-      if (is.null(w)) {
-        stats::sd(x)
-      } else {
-        V1 <- sum(w)
-        if (V1 <= 1) return(NA_real_)
-        w_mean <- sum(x * w) / V1
-        sqrt(sum(w * (x - w_mean)^2) / (V1 - 1))
-      }
+      .w_sd(x, weights = w, na.rm = FALSE)  # shared kernel
     },
     stat_name = "sd",
     weighted_col = "weighted_sd",

@@ -328,7 +328,7 @@ linear_regression <- function(data, formula = NULL,
 # ============================================================================
 
 #' Core linear regression computation
-#' @keywords internal
+#' @noRd
 .lm_core <- function(data, formula, dep_name, pred_names, weights_vec,
                      use, standardized, conf.level, factors = "dummy") {
 
@@ -568,7 +568,7 @@ linear_regression <- function(data, formula = NULL,
 # ============================================================================
 
 #' Core pairwise regression computation (matching SPSS /MISSING PAIRWISE)
-#' @keywords internal
+#' @noRd
 .lm_core_pairwise <- function(data, dep_name, pred_names, weights_vec,
                                standardized, conf.level, factors = "dummy") {
 
@@ -828,7 +828,7 @@ linear_regression <- function(data, formula = NULL,
 #' Mean/SD of the integer-coded factor levels — that matches what SPSS
 #' \code{REGRESSION} prints in its Descriptive Statistics block (ordinal-as-
 #' scale summary), regardless of how the factor is entered into the model.
-#' @keywords internal
+#' @noRd
 .lm_descriptives <- function(data, var_names, weights_vec) {
   desc_list <- lapply(var_names, function(v) {
     x <- data[[v]]
@@ -859,7 +859,7 @@ linear_regression <- function(data, formula = NULL,
 # ============================================================================
 
 #' Compute ANOVA table for linear regression
-#' @keywords internal
+#' @noRd
 .lm_anova <- function(model, model_summary) {
   anova_result <- stats::anova(model)
 
@@ -893,7 +893,7 @@ linear_regression <- function(data, formula = NULL,
 # ============================================================================
 
 #' Compute coefficients table with standardized coefficients
-#' @keywords internal
+#' @noRd
 .lm_coefficients <- function(model, model_summary, data, dep_name, pred_names,
                              weights_vec, standardized, conf.level) {
 
@@ -1099,7 +1099,7 @@ print.summary.linear_regression <- function(x, ...) {
 
 
 #' Print ungrouped linear regression summary (verbose)
-#' @keywords internal
+#' @noRd
 .print_summary_lm_ungrouped <- function(x) {
   # Header
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
@@ -1158,7 +1158,7 @@ print.summary.linear_regression <- function(x, ...) {
 
 
 #' Print grouped linear regression summary (verbose)
-#' @keywords internal
+#' @noRd
 .print_summary_lm_grouped <- function(x) {
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
   print_header(title)
@@ -1223,7 +1223,7 @@ print.summary.linear_regression <- function(x, ...) {
 # ============================================================================
 
 #' Print model summary table
-#' @keywords internal
+#' @noRd
 .print_model_summary <- function(ms) {
   cat("  Model Summary\n")
   w <- 60
@@ -1237,7 +1237,7 @@ print.summary.linear_regression <- function(x, ...) {
 
 
 #' Print ANOVA table
-#' @keywords internal
+#' @noRd
 .print_anova_table <- function(anova) {
   cat("  ANOVA\n")
   w <- 78
@@ -1275,7 +1275,7 @@ print.summary.linear_regression <- function(x, ...) {
 
 
 #' Print descriptive statistics table
-#' @keywords internal
+#' @noRd
 .print_descriptives_table <- function(desc) {
   if (is.null(desc) || nrow(desc) == 0) return(invisible(NULL))
   cat("  Descriptive Statistics\n")
@@ -1357,7 +1357,7 @@ print.summary.linear_regression <- function(x, ...) {
 
 
 #' Print coefficients table
-#' @keywords internal
+#' @noRd
 .print_coefficients_table <- function(coefs, show_beta) {
   cat("  Coefficients\n")
 

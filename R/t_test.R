@@ -675,7 +675,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
 
 #' Create effect size data frame
-#' @keywords internal
+#' @noRd
 .create_effect_size_df <- function(var_name, cohens_d_val, hedges_g_val, glass_delta_val, is_paired = FALSE) {
   effect_size_g <- if (abs(hedges_g_val) < 0.2) "negligible" else
                   if (abs(hedges_g_val) < 0.5) "small" else
@@ -909,7 +909,7 @@ print.t_test <- function(x, digits = 3, ...) {
 }
 
 #' Print a compact one-line summary for a single t-test variable
-#' @keywords internal
+#' @noRd
 .print_t_test_compact <- function(results, i, group_tag, weighted_tag, digits) {
   var_name <- results$Variable[i]
   t_val    <- results$t_stat[i]

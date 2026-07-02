@@ -92,10 +92,10 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
   if (!is.data.frame(data)) {
     # This is the summarise() context - data is actually the variable values
     x <- data
-    weights_arg <- substitute(weights)
-    
-    # Use helper function to evaluate weights
-    weights_vec <- .evaluate_weights(weights_arg, parent.frame())
+    # enquo captures the user's expression with its environment; inside
+    # summarise() that is the data mask, so bare column names resolve
+    weights_quo <- rlang::enquo(weights)
+    weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
     
     # Calculate weighted or unweighted mode
     weighted <- .are_weights(weights_vec)

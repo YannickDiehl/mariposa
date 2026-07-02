@@ -360,7 +360,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 #' @param df Data frame containing effect size columns
 #' @param i Row index to extract from
 #' @param digits Number of decimal places
-#' @keywords internal
+#' @noRd
 .print_chi_effect_sizes <- function(df, i, digits) {
   cramers_v <- df$cramers_v[i]
   if (is.na(cramers_v)) return(invisible(NULL))
@@ -506,7 +506,7 @@ print.chi_square <- function(x, digits = 3, ...) {
 #' @param var_label Variable label string (e.g. "gender x region")
 #' @param weighted_tag Weighted tag string (e.g. " \[Weighted\]" or "")
 #' @param digits Number of decimal places
-#' @keywords internal
+#' @noRd
 .print_chi_square_compact <- function(results, i, var_label, weighted_tag, digits) {
   chi_val <- results$chi_squared[i]
   df_val  <- results$df[i]

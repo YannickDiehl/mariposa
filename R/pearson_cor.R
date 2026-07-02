@@ -561,7 +561,7 @@ print.pearson_cor <- function(x, digits = 3, ...) {
 }
 
 #' Print compact pearson_cor output for one group or ungrouped
-#' @keywords internal
+#' @noRd
 .print_pearson_compact <- function(x, corrs, weighted_tag, digits) {
   n_vars <- length(x$variables)
 
@@ -699,7 +699,7 @@ print.summary.pearson_cor <- function(x, ...) {
 }
 
 #' Print verbose pearson_cor output for one group
-#' @keywords internal
+#' @noRd
 .print_pearson_verbose <- function(x, corrs, matrix_idx, show_cor, show_p, show_n, digits) {
   n_vars <- length(x$variables)
 

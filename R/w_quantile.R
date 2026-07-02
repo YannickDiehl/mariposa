@@ -102,8 +102,10 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
   # Handle summarise() context
   if (is.numeric(data) && !is.data.frame(data)) {
     x <- data
-    weights_arg <- substitute(weights)
-    weights_vec <- .evaluate_weights(weights_arg, parent.frame())
+    # enquo captures the user's expression with its environment; inside
+    # summarise() that is the data mask, so bare column names resolve
+    weights_quo <- rlang::enquo(weights)
+    weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
     
     weighted <- .are_weights(weights_vec)
     if (weighted) .check_weights(weights_vec)

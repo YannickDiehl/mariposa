@@ -183,7 +183,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 # ============================================================================
 
 #' Compute reliability statistics for a single group
-#' @keywords internal
+#' @noRd
 .reliability_core <- function(data, var_names, weights_vec, na.rm) {
 
   # Extract item matrix and apply listwise deletion
@@ -351,7 +351,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
 #' Compute weighted covariance matrix (SPSS-compatible)
 #' @description Uses frequency-weighted formula: cov = sum(w*(x-mx)*(y-my)) / (V1 - 1)
-#' @keywords internal
+#' @noRd
 .weighted_cov <- function(mat, w) {
   k <- ncol(mat)
   V1 <- sum(w)
@@ -369,7 +369,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Compute weighted correlation matrix from weighted covariance
-#' @keywords internal
+#' @noRd
 .weighted_cor <- function(mat, w) {
   cov_mat <- .weighted_cov(mat, w)
   sds <- sqrt(diag(cov_mat))
@@ -380,7 +380,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 #' Compute weighted correlation between two vectors
-#' @keywords internal
+#' @noRd
 .weighted_cor_vec <- function(x, y, w) {
   V1 <- sum(w)
   mx <- sum(x * w) / V1
@@ -398,7 +398,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 # ============================================================================
 
 #' Interpret Cronbach's Alpha value
-#' @keywords internal
+#' @noRd
 .alpha_interpretation <- function(alpha) {
   if (is.na(alpha)) return("")
   if (alpha >= 0.90) return("Excellent")
@@ -455,7 +455,7 @@ print.reliability <- function(x, digits = 3, ...) {
 }
 
 #' Print compact one-liner for a single reliability result
-#' @keywords internal
+#' @noRd
 .print_reliability_compact <- function(res, n_items, weighted_tag, digits) {
   alpha <- res$alpha
   interp <- .alpha_interpretation(alpha)
@@ -554,7 +554,7 @@ print.summary.reliability <- function(x, ...) {
 }
 
 #' Print reliability results for ungrouped data
-#' @keywords internal
+#' @noRd
 .print_reliability_ungrouped <- function(x, digits = 3) {
   show_reliability_stats <- if (!is.null(x$show)) isTRUE(x$show$reliability_statistics) else TRUE
   show_item_stats <- if (!is.null(x$show)) isTRUE(x$show$item_statistics) else TRUE
@@ -627,7 +627,7 @@ print.summary.reliability <- function(x, ...) {
 }
 
 #' Print reliability results for grouped data
-#' @keywords internal
+#' @noRd
 .print_reliability_grouped <- function(x, digits = 3) {
 
   for (group_result in x$groups) {

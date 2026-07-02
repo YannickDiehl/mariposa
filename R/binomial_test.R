@@ -296,7 +296,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 }
 
 # Helper: print a single variable's binomial test block
-#' @keywords internal
+#' @noRd
 .print_bt_block <- function(var_name, row_data, weights, digits) {
   print_header(var_name, newline_before = FALSE)
 

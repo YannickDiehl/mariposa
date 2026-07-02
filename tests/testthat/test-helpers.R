@@ -122,25 +122,27 @@ test_that(".validate_weights returns FALSE and warns for all-negative weights", 
 })
 
 # ============================================================================
-# .evaluate_weights() TESTS
+# Weights capture in summarise() context (enquo/eval_tidy path)
 # ============================================================================
 
-test_that(".evaluate_weights evaluates a simple expression", {
-  wt_vec <- c(1.0, 2.0, 3.0)
-  result <- mariposa:::.evaluate_weights(quote(wt_vec))
-  expect_equal(result, c(1.0, 2.0, 3.0))
+test_that("w_* summarise context resolves bare column weights via quosures", {
+  d <- dplyr::tibble(v = c(1, 2, 3, 4), wt = c(2, 1, 1, 2))
+  res <- dplyr::summarise(d, m = w_mean(v, weights = wt))
+  expect_equal(res$m, sum(d$v * d$wt) / sum(d$wt))
 })
 
-test_that(".evaluate_weights returns NULL for NULL argument", {
-  result <- mariposa:::.evaluate_weights(NULL)
-  expect_null(result)
+test_that("w_* summarise context resolves environment-level weights", {
+  wt_vec <- c(2, 1, 1, 2)
+  d <- dplyr::tibble(v = c(1, 2, 3, 4))
+  res <- dplyr::summarise(d, m = w_mean(v, weights = wt_vec))
+  expect_equal(res$m, sum(d$v * wt_vec) / sum(wt_vec))
 })
 
-test_that(".evaluate_weights returns NULL for non-existent variable", {
-  result <- suppressWarnings(
-    mariposa:::.evaluate_weights(quote(nonexistent_weights_var_xyz))
+test_that("w_* summarise context errors informatively on unknown weights", {
+  d <- dplyr::tibble(v = c(1, 2, 3))
+  expect_error(
+    dplyr::summarise(d, m = w_mean(v, weights = nonexistent_weights_var_xyz))
   )
-  expect_null(result)
 })
 
 # ============================================================================

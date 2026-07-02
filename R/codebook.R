@@ -11,7 +11,7 @@
 #' Classify a variable's type for codebook display
 #' @param x A data vector
 #' @return List with type (full description) and type_short (abbreviated)
-#' @keywords internal
+#' @noRd
 .classify_type <- function(x) {
   if (inherits(x, "haven_labelled")) {
     storage <- typeof(x)
@@ -55,7 +55,7 @@
 #' @param position Column position in original data
 #' @param max_values Maximum number of values to display before truncating
 #' @return Named list of metadata
-#' @keywords internal
+#' @noRd
 .extract_var_metadata <- function(x, var_name, position, max_values = 10) {
   type_info <- .classify_type(x)
 
@@ -447,7 +447,7 @@ codebook <- function(data, ..., weights = NULL,
 #' Build HTML codebook from result object
 #' @param result A codebook result list
 #' @return An htmltools tag object
-#' @keywords internal
+#' @noRd
 .codebook_to_html <- function(result) {
   cb <- result$codebook
   info <- result$data_info

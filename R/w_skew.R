@@ -98,24 +98,7 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
     na.rm = na.rm,
     stat_fn = function(x, w) {
       if (length(x) < 3) return(NA_real_)
-      if (is.null(w)) {
-        # Unweighted: Type 2 sample-corrected skewness (SPSS formula)
-        n <- length(x)
-        mean_x <- mean(x)
-        m2 <- sum((x - mean_x)^2) / n
-        m3 <- sum((x - mean_x)^3) / n
-        type1_skew <- m3 / (m2^(3/2))
-        type1_skew * sqrt(n * (n - 1)) / (n - 2)
-      } else {
-        # Weighted: Type 2 with frequency-weighted N = sum(w)
-        w_sum <- sum(w)
-        w_mean <- sum(x * w) / w_sum
-        m2 <- sum(w * (x - w_mean)^2) / w_sum
-        m3 <- sum(w * (x - w_mean)^3) / w_sum
-        type1_skew <- m3 / (m2^(3/2))
-        n <- w_sum  # SPSS treats sum of frequency weights as N
-        type1_skew * sqrt(n * (n - 1)) / (n - 2)
-      }
+      .calc_skewness(x, w)  # shared SPSS Type-2 kernel
     },
     stat_name = "skew",
     weighted_col = "weighted_skew",

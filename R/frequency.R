@@ -594,10 +594,8 @@ calculate_single_stats <- function(x, w = NULL) {
     # population formulas - audit finding).
     if (is.numeric(x_valid)) {
       w_sum <- sum(w_valid)
-      mean_val <- sum(x_valid * w_valid) / w_sum
-      sd_val <- if (w_sum > 1) {
-        sqrt(sum(w_valid * (x_valid - mean_val)^2) / (w_sum - 1))
-      } else NA
+      mean_val <- .w_mean(x_valid, w_valid, na.rm = FALSE)
+      sd_val <- if (w_sum > 1) .w_sd(x_valid, w_valid, na.rm = FALSE) else NA
       skewness <- if (length(x_valid) > 2 && !is.na(sd_val) && sd_val > 0) {
         .calc_skewness(x_valid, w_valid)
       } else NA
