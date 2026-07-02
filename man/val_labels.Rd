@@ -4,7 +4,7 @@
 \alias{val_labels}
 \title{Get or Set Value Labels}
 \usage{
-val_labels(data, ..., .add = FALSE, drop_na = TRUE, drop.na = NULL)
+val_labels(data, ..., .add = FALSE, drop_na = TRUE)
 }
 \arguments{
 \item{data}{A data frame, tibble, or a single vector.}
@@ -19,9 +19,6 @@ replacing them. Default: \code{FALSE}.}
 
 \item{drop_na}{If \code{TRUE} (default), tagged NA labels are excluded from
 GET results.}
-
-\item{drop.na}{Deprecated dot-case argument name. See the "Deprecated
-arguments" section below.}
 }
 \value{
 \itemize{
@@ -48,19 +45,10 @@ labels to variables.
 }
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument name \code{drop.na} is deprecated; use the snake_case
-equivalent \code{drop_na} instead. The old name still works but issues a
-deprecation warning (once per session) and will be removed in a future
-release.
-
 Value labels are stored as the \code{"labels"} attribute in haven's format:
 a named numeric vector where names are the label text and values are
 the numeric codes. This is the standard used by \code{\link[=read_spss]{read_spss()}},
 \code{\link[=read_stata]{read_stata()}}, and \code{\link[=read_sas]{read_sas()}}.
-}
-
 \subsection{Adding vs. Replacing Labels}{
 
 By default, SET mode replaces all existing value labels. Use \code{.add = TRUE}

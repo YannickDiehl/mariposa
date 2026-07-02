@@ -26,9 +26,6 @@ including:
 \item Frequency table with observed, expected, and residual counts
 \item Sample size (N)
 }
-
-Note: the \code{chi_sq} results column is a deprecated duplicate of
-\code{chi_squared} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{chisq_gof()} tests whether observed frequencies of a categorical

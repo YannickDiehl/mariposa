@@ -132,7 +132,7 @@ compare_friedman <- function(row, spss, scenario) {
 
 extract_grouped_row <- function(result, group_value) {
   r <- result$results
-  group_cols <- setdiff(names(r), c("chi_squared", "chi_sq", "df", "p_value",
+  group_cols <- setdiff(names(r), c("chi_squared", "df", "p_value",
                                      "kendall_w", "n", "k", "mean_ranks"))
   if (length(group_cols) == 0L) stop("not a grouped result")
   # Just take the first group column

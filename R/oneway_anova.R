@@ -34,9 +34,6 @@
 #' - Both standard and Welch ANOVA results
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
-#' Note: the \code{F_stat} results column is a deprecated duplicate of
-#' \code{F_statistic} and will be removed in mariposa 0.6.11.
-#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -242,7 +239,6 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
           error_df <- data.frame(
             Variable = var_name_safe,
             F_statistic = NA,
-            F_stat = NA,  # deprecated duplicate, remove in 0.6.11
             df1 = NA,
             df2 = NA,
             p_value = NA,
@@ -594,7 +590,6 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   cols <- list(
     Variable = var_name,
     F_statistic = anova_result$f_stat,
-    F_stat = anova_result$f_stat,  # deprecated duplicate, remove in 0.6.11
     df1 = anova_result$df1,
     df2 = anova_result$df2,
     p_value = anova_result$p_value,

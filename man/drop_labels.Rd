@@ -4,7 +4,7 @@
 \alias{drop_labels}
 \title{Remove Unused Value Labels}
 \usage{
-drop_labels(data, ..., drop_na = FALSE, drop.na = NULL)
+drop_labels(data, ..., drop_na = FALSE)
 }
 \arguments{
 \item{data}{A data frame or a single vector.}
@@ -14,9 +14,6 @@ empty, applies to all labelled columns.}
 
 \item{drop_na}{If \code{TRUE}, also removes tagged NA labels. Default: \code{FALSE}
 (tagged NA labels are preserved even if no tagged NAs of that type exist).}
-
-\item{drop.na}{Deprecated dot-case argument name. See the "Deprecated
-arguments" section below.}
 }
 \value{
 The data with unused labels removed.
@@ -27,13 +24,6 @@ useful after filtering or subsetting, when some categories may no longer
 exist but their labels remain attached.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument name \code{drop.na} is deprecated; use the snake_case
-equivalent \code{drop_na} instead. The old name still works but issues a
-deprecation warning (once per session) and will be removed in a future
-release.
-
 This is useful after subsetting data (e.g., filtering out a category).
 The removed category's label still exists on the variable, which can
 cause confusing output in \code{\link[=frequency]{frequency()}} or \code{\link[=codebook]{codebook()}}.
@@ -42,7 +32,6 @@ actually present in the data.
 
 By default, tagged NA labels are preserved (\code{drop_na = FALSE}) because
 they represent missing value types, not substantive categories.
-}
 }
 \examples{
 # After filtering, region == 4 no longer exists but its label remains

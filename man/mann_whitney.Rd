@@ -45,9 +45,6 @@ Test results showing whether groups differ, including:
 \item Rank means for each group (which group is higher?)
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
-
-Note: the \code{effect_size_r} results column is a deprecated duplicate of
-\code{r_effect} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{mann_whitney()} compares two groups when your data isn't normally

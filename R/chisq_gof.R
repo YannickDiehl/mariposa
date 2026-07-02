@@ -31,9 +31,6 @@
 #' - Frequency table with observed, expected, and residual counts
 #' - Sample size (N)
 #'
-#' Note: the \code{chi_sq} results column is a deprecated duplicate of
-#' \code{chi_squared} and will be removed in mariposa 0.6.11.
-#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -249,7 +246,6 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
             data.frame(
               Variable = vn,
               chi_squared = res$chi_sq,
-              chi_sq = res$chi_sq,  # deprecated duplicate, remove in 0.6.11
               df = res$df,
               p_value = res$p_value,
               n = res$n,
@@ -262,7 +258,6 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
             data.frame(
               Variable = vn,
               chi_squared = NA_real_,
-              chi_sq = NA_real_,  # deprecated duplicate, remove in 0.6.11
               df = NA_integer_,
               p_value = NA_real_,
               n = NA_integer_,
@@ -296,7 +291,6 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
           row = data.frame(
             Variable = vn,
             chi_squared = res$chi_sq,
-            chi_sq = res$chi_sq,  # deprecated duplicate, remove in 0.6.11
             df = res$df,
             p_value = res$p_value,
             n = res$n,
@@ -309,7 +303,6 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
           row = data.frame(
             Variable = vn,
             chi_squared = NA_real_,
-            chi_sq = NA_real_,  # deprecated duplicate, remove in 0.6.11
             df = NA_integer_,
             p_value = NA_real_,
             n = NA_integer_,

@@ -18,17 +18,7 @@ codebook(
   max_values = 10,
   max_len = 50,
   sort_by_name = FALSE,
-  file = NULL,
-  show.id = NULL,
-  show.type = NULL,
-  show.labels = NULL,
-  show.values = NULL,
-  show.freq = NULL,
-  show.na = NULL,
-  show.unused = NULL,
-  max.values = NULL,
-  max.len = NULL,
-  sort.by.name = NULL
+  file = NULL
 )
 }
 \arguments{
@@ -70,9 +60,6 @@ before truncating or showing a range (Default: 10)}
 
 \item{file}{Path to save the HTML codebook. If NULL (default), a temporary
 file is used and the codebook opens in the Viewer.}
-
-\item{show.id, show.type, show.labels, show.values, show.freq, show.na, show.unused, max.values, max.len, sort.by.name}{Deprecated dot-case argument names. See the "Deprecated arguments"
-section below.}
 }
 \value{
 Invisibly returns a list of class \code{"codebook"} containing:
@@ -96,17 +83,6 @@ useful when working with labelled survey data imported from SPSS, Stata,
 or SAS.
 }
 \details{
-\subsection{Deprecated arguments}{
-
-The dot-case argument names \code{show.id}, \code{show.type}, \code{show.labels},
-\code{show.values}, \code{show.freq}, \code{show.na}, \code{show.unused}, \code{max.values},
-\code{max.len}, and \code{sort.by.name} are deprecated; use the snake_case
-equivalents \code{show_id}, \code{show_type}, \code{show_labels}, \code{show_values},
-\code{show_freq}, \code{show_na}, \code{show_unused}, \code{max_values}, \code{max_len}, and
-\code{sort_by_name} instead. The old names still work but issue a deprecation
-warning (once per session) and will be removed in a future release.
-}
-
 \subsection{What the Codebook Shows}{
 
 For each variable, the codebook displays (depending on options):

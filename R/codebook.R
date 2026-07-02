@@ -246,9 +246,6 @@
 #'   (Default: FALSE)
 #' @param file Path to save the HTML codebook. If NULL (default), a temporary
 #'   file is used and the codebook opens in the Viewer.
-#' @param show.id,show.type,show.labels,show.values,show.freq,show.na,show.unused,max.values,max.len,sort.by.name
-#'   Deprecated dot-case argument names. See the "Deprecated arguments"
-#'   section below.
 #'
 #' @return Invisibly returns a list of class `"codebook"` containing:
 #'   \describe{
@@ -261,16 +258,6 @@
 #'   }
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument names `show.id`, `show.type`, `show.labels`,
-#' `show.values`, `show.freq`, `show.na`, `show.unused`, `max.values`,
-#' `max.len`, and `sort.by.name` are deprecated; use the snake_case
-#' equivalents `show_id`, `show_type`, `show_labels`, `show_values`,
-#' `show_freq`, `show_na`, `show_unused`, `max_values`, `max_len`, and
-#' `sort_by_name` instead. The old names still work but issue a deprecation
-#' warning (once per session) and will be removed in a future release.
-#'
 #' ## What the Codebook Shows
 #'
 #' For each variable, the codebook displays (depending on options):
@@ -322,58 +309,11 @@ codebook <- function(data, ..., weights = NULL,
                      show_na = TRUE, show_unused = FALSE,
                      max_values = 10, max_len = 50,
                      sort_by_name = FALSE,
-                     file = NULL,
-                     show.id = NULL, show.type = NULL, show.labels = NULL,
-                     show.values = NULL, show.freq = NULL,
-                     show.na = NULL, show.unused = NULL,
-                     max.values = NULL, max.len = NULL,
-                     sort.by.name = NULL) {
+                     file = NULL) {
 
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
-  }
-
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(show.id)) {
-    .warn_deprecated_arg("show.id", "show_id")
-    if (missing(show_id)) show_id <- show.id
-  }
-  if (!is.null(show.type)) {
-    .warn_deprecated_arg("show.type", "show_type")
-    if (missing(show_type)) show_type <- show.type
-  }
-  if (!is.null(show.labels)) {
-    .warn_deprecated_arg("show.labels", "show_labels")
-    if (missing(show_labels)) show_labels <- show.labels
-  }
-  if (!is.null(show.values)) {
-    .warn_deprecated_arg("show.values", "show_values")
-    if (missing(show_values)) show_values <- show.values
-  }
-  if (!is.null(show.freq)) {
-    .warn_deprecated_arg("show.freq", "show_freq")
-    if (missing(show_freq)) show_freq <- show.freq
-  }
-  if (!is.null(show.na)) {
-    .warn_deprecated_arg("show.na", "show_na")
-    if (missing(show_na)) show_na <- show.na
-  }
-  if (!is.null(show.unused)) {
-    .warn_deprecated_arg("show.unused", "show_unused")
-    if (missing(show_unused)) show_unused <- show.unused
-  }
-  if (!is.null(max.values)) {
-    .warn_deprecated_arg("max.values", "max_values")
-    if (missing(max_values)) max_values <- max.values
-  }
-  if (!is.null(max.len)) {
-    .warn_deprecated_arg("max.len", "max_len")
-    if (missing(max_len)) max_len <- max.len
-  }
-  if (!is.null(sort.by.name)) {
-    .warn_deprecated_arg("sort.by.name", "sort_by_name")
-    if (missing(sort_by_name)) sort_by_name <- sort.by.name
   }
 
   # Capture data name before any modifications

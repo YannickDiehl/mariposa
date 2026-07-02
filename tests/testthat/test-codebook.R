@@ -348,9 +348,9 @@ test_that("data_info captures correct counts", {
 
 # --- Options and special behavior ---
 
-test_that("sort.by.name orders alphabetically", {
+test_that("sort_by_name orders alphabetically", {
   df <- data.frame(z = 1, a = 2, m = 3)
-  result <- codebook(df, sort.by.name = TRUE)
+  result <- codebook(df, sort_by_name = TRUE)
   expect_equal(result$codebook$name, c("a", "m", "z"))
 })
 

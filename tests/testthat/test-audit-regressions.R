@@ -465,66 +465,70 @@ test_that("readers: removed tag.na fails as unused argument", {
   expect_error(read_xpt("nofile.xpt", tag.na = c(-9)), "unused argument")
 })
 
-# --- Stage 5: 0.6.9 renames (codebook, val_labels, drop_labels) ----------------
-# Fresh soft-deprecation bridges (removal planned for 0.6.10): the old dot
-# name still works but warns (once per session), the new name works silently,
-# and both produce identical results.
+# --- Stage 5: 0.6.9 renames removed (codebook, val_labels, drop_labels) ---------
+# The 0.6.9 soft-deprecation bridges were removed in 0.6.11: the old dot-case
+# argument names no longer work (they fall through to tidyselect/SET-mode
+# validation and error), while the snake_case names work silently.
 
-test_that("codebook: deprecated dot-case args warn and match snake_case", {
+test_that("codebook: removed dot-case args error and snake_case works silently", {
   df <- data.frame(a = c(1, 2, 2, 3), b = letters[1:4])
 
-  rlang::reset_warning_verbosity("mariposa_show.freq")
-  expect_warning(old <- codebook(df, show.freq = FALSE), "deprecated")
+  # Old dotted names land in `...` (tidyselect); logical values are not
+  # valid selectors, so they error rather than silently warn-and-work.
+  expect_error(codebook(df, show.freq = FALSE))
+  expect_error(codebook(df, sort.by.name = TRUE))
+
+  # The dotted names are gone from the formals entirely
+  expect_false("show.freq" %in% names(formals(codebook)))
+  expect_false("max.values" %in% names(formals(codebook)))
+  expect_false("sort.by.name" %in% names(formals(codebook)))
+
+  # snake_case works without warnings
   expect_no_warning(new <- codebook(df, show_freq = FALSE))
-  expect_identical(old$codebook, new$codebook)
-  expect_identical(old$options, new$options)
   expect_false(new$options$show_freq)
-
-  rlang::reset_warning_verbosity("mariposa_max.values")
-  expect_warning(old_mv <- codebook(df, max.values = 2), "deprecated")
-  expect_no_warning(new_mv <- codebook(df, max_values = 2))
-  expect_identical(old_mv$codebook, new_mv$codebook)
-  expect_identical(old_mv$options, new_mv$options)
-
-  rlang::reset_warning_verbosity("mariposa_sort.by.name")
-  expect_warning(old_s <- codebook(df, sort.by.name = TRUE), "deprecated")
-  expect_no_warning(new_s <- codebook(df, sort_by_name = TRUE))
-  expect_identical(old_s$codebook, new_s$codebook)
+  expect_no_warning(codebook(df, max_values = 2))
+  expect_no_warning(codebook(df, sort_by_name = TRUE))
 })
 
-test_that("val_labels: deprecated drop.na warns and matches drop_na", {
+test_that("val_labels: removed drop.na errors and drop_na works silently", {
   skip_if_not_installed("haven")
-  x <- haven::labelled(
-    c(1, 2, haven::tagged_na("a")),
-    labels = c(Low = 1, High = 2, "No answer" = haven::tagged_na("a"))
+  df <- data.frame(
+    a = haven::labelled(
+      c(1, 2, haven::tagged_na("a")),
+      labels = c(Low = 1, High = 2, "No answer" = haven::tagged_na("a"))
+    )
   )
 
-  rlang::reset_warning_verbosity("mariposa_drop.na")
-  expect_warning(old <- val_labels(x, drop.na = FALSE), "deprecated")
-  expect_no_warning(new <- val_labels(x, drop_na = FALSE))
-  expect_identical(old, new)
+  # Old dotted name lands in `...` (SET mode) and errors
+  expect_error(val_labels(df, a, drop.na = FALSE))
+
+  # snake_case works without warnings
+  expect_no_warning(new <- val_labels(df, a, drop_na = FALSE))
   expect_length(new, 3L)
 
   # Default (drop_na = TRUE) excludes the tagged NA label, silently
-  expect_no_warning(dropped <- val_labels(x))
+  expect_no_warning(dropped <- val_labels(df, a))
   expect_length(dropped, 2L)
 })
 
-test_that("drop_labels: deprecated drop.na warns and matches drop_na", {
+test_that("drop_labels: removed drop.na errors and drop_na works silently", {
   skip_if_not_installed("haven")
-  x <- haven::labelled(
-    c(1, 2, 2),
-    labels = c(Low = 1, High = 2, Unused = 3,
-               "No answer" = haven::tagged_na("a"))
+  df <- data.frame(
+    a = haven::labelled(
+      c(1, 2, 2),
+      labels = c(Low = 1, High = 2, Unused = 3,
+                 "No answer" = haven::tagged_na("a"))
+    )
   )
 
-  rlang::reset_warning_verbosity("mariposa_drop.na")
-  expect_warning(old <- drop_labels(x, drop.na = TRUE), "deprecated")
-  expect_no_warning(new <- drop_labels(x, drop_na = TRUE))
-  expect_identical(old, new)
+  # Old dotted name lands in `...` (tidyselect) and errors
+  expect_error(drop_labels(df, drop.na = TRUE))
+
+  # snake_case works without warnings
+  expect_no_warning(new <- drop_labels(df, drop_na = TRUE))
 
   # drop_na = TRUE removes the unused tagged NA label as well
-  expect_false("No answer" %in% names(attr(new, "labels")))
+  expect_false("No answer" %in% names(attr(new$a, "labels")))
 })
 
 test_that("t_test results carry conf_int_* and no duplicated CI_* aliases", {
@@ -533,50 +537,44 @@ test_that("t_test results carry conf_int_* and no duplicated CI_* aliases", {
   expect_false(any(c("CI_lower", "CI_upper") %in% names(res$results)))
 })
 
-# --- Stage 6: column harmonization (0.6.10) -------------------------------------
-# Canonical result-column names with the old name kept as a deprecated
-# duplicate for one release (removed in 0.6.11, per VERSIONING_POLICY §4.3).
+# --- Stage 6: column harmonization complete (0.6.11) ----------------------------
+# The deprecated duplicate columns introduced in 0.6.10 are removed in 0.6.11;
+# only the canonical result-column names remain (per VERSIONING_POLICY §4.3).
 
-test_that("chisq_gof results carry chi_squared with chi_sq as deprecated duplicate", {
+test_that("chisq_gof results carry chi_squared and no chi_sq duplicate", {
   res <- chisq_gof(survey_data, gender)
   cols <- names(res$results)
-  expect_true(all(c("chi_squared", "chi_sq") %in% cols))
-  expect_identical(res$results$chi_squared, res$results$chi_sq)
-  # canonical column comes first (chi_sq is the trailing duplicate)
-  expect_lt(match("chi_squared", cols), match("chi_sq", cols))
+  expect_true("chi_squared" %in% cols)
+  expect_false("chi_sq" %in% cols)
 })
 
-test_that("friedman_test results carry chi_squared with chi_sq as deprecated duplicate", {
+test_that("friedman_test results carry chi_squared and no chi_sq duplicate", {
   res <- friedman_test(survey_data, trust_government, trust_media, trust_science)
   cols <- names(res$results)
-  expect_true(all(c("chi_squared", "chi_sq") %in% cols))
-  expect_identical(res$results$chi_squared, res$results$chi_sq)
-  expect_lt(match("chi_squared", cols), match("chi_sq", cols))
+  expect_true("chi_squared" %in% cols)
+  expect_false("chi_sq" %in% cols)
 })
 
-test_that("mcnemar_test results carry chi_squared with statistic as deprecated duplicate", {
+test_that("mcnemar_test results carry chi_squared and no statistic duplicate", {
   test_data <- transform(survey_data,
     trust_gov_high = as.integer(trust_government >= 4),
     trust_media_high = as.integer(trust_media >= 4))
   res <- mcnemar_test(test_data, var1 = trust_gov_high, var2 = trust_media_high)
   cols <- names(res$results)
-  expect_true(all(c("chi_squared", "statistic") %in% cols))
-  expect_identical(res$results$chi_squared, res$results$statistic)
-  expect_lt(match("chi_squared", cols), match("statistic", cols))
+  expect_true("chi_squared" %in% cols)
+  expect_false("statistic" %in% cols)
 })
 
-test_that("mann_whitney results carry r_effect with effect_size_r as deprecated duplicate", {
+test_that("mann_whitney results carry r_effect and no effect_size_r duplicate", {
   res <- mann_whitney(survey_data, life_satisfaction, group = gender)
   cols <- names(res$results)
-  expect_true(all(c("r_effect", "effect_size_r") %in% cols))
-  expect_identical(res$results$r_effect, res$results$effect_size_r)
-  expect_lt(match("r_effect", cols), match("effect_size_r", cols))
+  expect_true("r_effect" %in% cols)
+  expect_false("effect_size_r" %in% cols)
 })
 
-test_that("oneway_anova results carry F_statistic with F_stat as deprecated duplicate", {
+test_that("oneway_anova results carry F_statistic and no F_stat duplicate", {
   res <- oneway_anova(survey_data, life_satisfaction, group = education)
   cols <- names(res$results)
-  expect_true(all(c("F_statistic", "F_stat") %in% cols))
-  expect_identical(res$results$F_statistic, res$results$F_stat)
-  expect_lt(match("F_statistic", cols), match("F_stat", cols))
+  expect_true("F_statistic" %in% cols)
+  expect_false("F_stat" %in% cols)
 })

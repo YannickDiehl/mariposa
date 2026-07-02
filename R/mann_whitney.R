@@ -38,9 +38,6 @@
 #' - Rank means for each group (which group is higher?)
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
-#' Note: the \code{effect_size_r} results column is a deprecated duplicate of
-#' \code{r_effect} and will be removed in mariposa 0.6.11.
-#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -384,7 +381,6 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
           Z = result$Z,
           p_value = result$p_value,
           r_effect = result$effect_size_r,
-          effect_size_r = result$effect_size_r,  # deprecated duplicate, remove in 0.6.11
           rank_mean_diff = result$rank_mean_diff,
           group_stats = list(result$group_stats)
         )
@@ -398,7 +394,6 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
           Z = NA_real_,
           p_value = NA_real_,
           r_effect = NA_real_,
-          effect_size_r = NA_real_,  # deprecated duplicate, remove in 0.6.11
           rank_mean_diff = NA_real_,
           group_stats = list(NULL)
         )
@@ -575,7 +570,7 @@ print.mann_whitney <- function(x, digits = 3, ...) {
 
   if (isTRUE(x$is_grouped)) {
     group_vars <- setdiff(names(results), c("Variable", "U", "W", "Z", "p_value",
-                                             "r_effect", "effect_size_r",
+                                             "r_effect",
                                              "rank_mean_diff", "group_stats"))
     groups <- unique(results[group_vars])
 
@@ -705,7 +700,7 @@ print.summary.mann_whitney <- function(x, ...) {
   if (is_grouped_data) {
     # Get unique groups
     group_vars <- setdiff(names(x$results), c("Variable", "U", "W", "Z", "p_value",
-                                               "r_effect", "effect_size_r",
+                                               "r_effect",
                                                "rank_mean_diff", "group_stats",
                                                "sig"))
     groups <- unique(x$results[group_vars])

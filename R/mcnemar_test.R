@@ -31,9 +31,6 @@
 #' - 2x2 contingency table
 #' - Discordant pair counts (b and c)
 #'
-#' Note: the \code{statistic} results column is a deprecated duplicate of
-#' \code{chi_squared} and will be removed in mariposa 0.6.11.
-#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -223,7 +220,6 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
           group_keys_df[i, , drop = FALSE],
           data.frame(
             chi_squared = res$statistic,
-            statistic = res$statistic,  # deprecated duplicate, remove in 0.6.11
             p_value = res$p_value,
             exact_p = res$exact_p,
             n = res$n,
@@ -237,7 +233,6 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
           group_keys_df[i, , drop = FALSE],
           data.frame(
             chi_squared = NA_real_,
-            statistic = NA_real_,  # deprecated duplicate, remove in 0.6.11
             p_value = NA_real_,
             exact_p = NA_real_,
             n = NA_integer_,
@@ -254,7 +249,7 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
 
     result <- list(
       results = results_df,
-      statistic = results_df$statistic[1],
+      statistic = results_df$chi_squared[1],
       p_value = results_df$p_value[1],
       exact_p = results_df$exact_p[1],
       n = results_df$n[1],
@@ -273,7 +268,6 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
 
     results_df <- data.frame(
       chi_squared = res$statistic,
-      statistic = res$statistic,  # deprecated duplicate, remove in 0.6.11
       p_value = res$p_value,
       exact_p = res$exact_p,
       n = res$n,

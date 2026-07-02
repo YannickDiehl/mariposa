@@ -29,9 +29,6 @@ correction)
 \item 2x2 contingency table
 \item Discordant pair counts (b and c)
 }
-
-Note: the \code{statistic} results column is a deprecated duplicate of
-\code{chi_squared} and will be removed in mariposa 0.6.11.
 }
 \description{
 \code{mcnemar_test()} tests whether paired proportions have changed between

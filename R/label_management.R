@@ -178,8 +178,6 @@ var_label <- function(data, ...) {
 #'   replacing them. Default: `FALSE`.
 #' @param drop_na If `TRUE` (default), tagged NA labels are excluded from
 #'   GET results.
-#' @param drop.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return
 #' \itemize{
@@ -193,13 +191,6 @@ var_label <- function(data, ...) {
 #' }
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `drop.na` is deprecated; use the snake_case
-#' equivalent `drop_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' Value labels are stored as the `"labels"` attribute in haven's format:
 #' a named numeric vector where names are the label text and values are
 #' the numeric codes. This is the standard used by [read_spss()],
@@ -238,14 +229,7 @@ var_label <- function(data, ...) {
 #' data <- val_labels(data, gender = NULL)
 #'
 #' @export
-val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE,
-                       drop.na = NULL) {
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(drop.na)) {
-    .warn_deprecated_arg("drop.na", "drop_na")
-    if (missing(drop_na)) drop_na <- drop.na
-  }
-
+val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
   # --- Single vector input ---
   if (!is.data.frame(data)) {
     dots <- rlang::enexprs(...)
@@ -465,19 +449,10 @@ copy_labels <- function(data, source) {
 #'   empty, applies to all labelled columns.
 #' @param drop_na If `TRUE`, also removes tagged NA labels. Default: `FALSE`
 #'   (tagged NA labels are preserved even if no tagged NAs of that type exist).
-#' @param drop.na Deprecated dot-case argument name. See the "Deprecated
-#'   arguments" section below.
 #'
 #' @return The data with unused labels removed.
 #'
 #' @details
-#' ## Deprecated arguments
-#'
-#' The dot-case argument name `drop.na` is deprecated; use the snake_case
-#' equivalent `drop_na` instead. The old name still works but issues a
-#' deprecation warning (once per session) and will be removed in a future
-#' release.
-#'
 #' This is useful after subsetting data (e.g., filtering out a category).
 #' The removed category's label still exists on the variable, which can
 #' cause confusing output in [frequency()] or [codebook()].
@@ -497,13 +472,7 @@ copy_labels <- function(data, source) {
 #' data_clean <- drop_labels(data_subset)
 #'
 #' @export
-drop_labels <- function(data, ..., drop_na = FALSE, drop.na = NULL) {
-  # ---- Deprecated dot-case argument bridge (see VERSIONING_POLICY.md, 4) ----
-  if (!is.null(drop.na)) {
-    .warn_deprecated_arg("drop.na", "drop_na")
-    if (missing(drop_na)) drop_na <- drop.na
-  }
-
+drop_labels <- function(data, ..., drop_na = FALSE) {
   if (!is.data.frame(data)) {
     # Single vector
     return(.drop_labels_vec(data, drop_na))

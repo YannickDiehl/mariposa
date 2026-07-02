@@ -30,9 +30,6 @@
 #' - Kendall's W (effect size: how strong is the overall pattern?)
 #' - Mean rank for each measurement (which measurements are higher/lower?)
 #'
-#' Note: the \code{chi_sq} results column is a deprecated duplicate of
-#' \code{chi_squared} and will be removed in mariposa 0.6.11.
-#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -238,7 +235,6 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 
       tibble(
         chi_squared = result$chi_sq,
-        chi_sq = result$chi_sq,  # deprecated duplicate, remove in 0.6.11
         df = result$df,
         p_value = result$p_value,
         kendall_w = result$kendall_w,
@@ -250,7 +246,6 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
       cli_warn("Friedman test failed: {e$message}")
       tibble(
         chi_squared = NA_real_,
-        chi_sq = NA_real_,  # deprecated duplicate, remove in 0.6.11
         df = NA_integer_,
         p_value = NA_real_,
         kendall_w = NA_real_,
@@ -381,7 +376,7 @@ print.friedman_test <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("chi_squared", "chi_sq", "df",
+    group_vars <- setdiff(names(results), c("chi_squared", "df",
                                             "p_value", "kendall_w", "n", "k",
                                             "mean_ranks"))
     groups <- unique(results[group_vars])
@@ -495,7 +490,7 @@ print.summary.friedman_test <- function(x, ...) {
 
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("chi_squared", "chi_sq", "df",
+    group_vars <- setdiff(names(x$results), c("chi_squared", "df",
                                                 "p_value", "kendall_w", "n",
                                                 "k", "mean_ranks", "sig"))
     groups <- unique(x$results[group_vars])
