@@ -47,9 +47,10 @@ add_significance_stars <- function(p_value,
                                   labels = c("***", "**", "*", "")) {
   # right = TRUE: boundary values follow the symnum convention printed in
   # the legend (p = 0.001 -> '***', p = 0.05 -> '*'). Vectorized; returns
-  # character, NA p-values map to "".
-  out <- as.character(cut(p_value, breaks = breaks, labels = labels,
-                          right = TRUE))
+  # character, NA p-values map to "" (as.numeric: a bare logical NA must
+  # not crash cut()).
+  out <- as.character(cut(as.numeric(p_value), breaks = breaks,
+                          labels = labels, right = TRUE))
   out[is.na(out)] <- ""
   out
 }

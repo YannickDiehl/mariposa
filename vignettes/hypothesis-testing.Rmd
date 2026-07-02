@@ -243,6 +243,11 @@ A significant result means the variables are not independent --- knowing one tel
 
 ### Effect Sizes for Categorical Data
 
+The helpers `phi()`, `cramers_v()`, and `goodman_gamma()` run the
+chi-square analysis internally and return just the requested effect size
+as a number (per group for grouped data). For the full test output, call
+`chi_square()` directly.
+
 ```{r}
 # Phi coefficient (2x2 tables)
 survey_data %>%
