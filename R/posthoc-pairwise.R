@@ -10,7 +10,8 @@
 #   .pairwise_posthoc_single() one variable: group stats + pooled MSE + core
 #   .tukey_stats()             studentized-range core (qtukey/ptukey)
 #   .scheffe_stats()           (k-1)*F core (qf/pf)
-#   .print_pairwise_posthoc()  shared print implementation
+#   .print_posthoc_compact()   shared compact print (Layer 1)
+#   .print_pairwise_posthoc()  shared verbose implementation (Layer 3)
 #
 # The statistical code paths are copied verbatim from the original
 # R/tukey_test.R and R/scheffe_test.R — do not "improve" any formula here;
@@ -378,7 +379,82 @@
 }
 
 # =============================================================================
-# Shared print implementation
+# Shared compact print implementation (Layer 1)
+# =============================================================================
+
+#' Compact overview for pairwise post-hoc results
+#'
+#' Shared Layer-1 print core used by all four post-hoc classes
+#' (tukey_test, scheffe_test, dunn_test, pairwise_wilcoxon). Prints a
+#' title line, then one line per variable (or factor, or group x
+#' variable combination) with the number of comparisons and how many are
+#' significant at the .05 level, followed by a summary() hint.
+#'
+#' @param title Pre-built title line (test name + by-group + weighted tag)
+#' @param results Comparison data frame (one row per pairwise comparison)
+#' @param p_col Name of the adjusted p-value column
+#' @param group_vars Character vector of grouping columns (grouped
+#'   analyses) or NULL
+#' @param by_col Column defining per-line blocks ("Variable", "Factor")
+#'   or NULL for a single unlabelled line (pairwise_wilcoxon)
+#' @return invisible(NULL)
+#' @noRd
+.print_posthoc_compact <- function(title, results, p_col,
+                                   group_vars = NULL, by_col = NULL) {
+  cat(title, "\n", sep = "")
+
+  if (is.null(results) || nrow(results) == 0) {
+    cat("  No post-hoc comparisons available.\n")
+    cat("Use summary() for the full comparison table.\n")
+    return(invisible(NULL))
+  }
+
+  p_vals <- as.numeric(results[[p_col]])
+  results$.sig05 <- !is.na(p_vals) & p_vals < 0.05
+
+  line_for <- function(label, rows) {
+    n_comp <- nrow(rows)
+    cat(sprintf("  %s%d comparison%s, %d significant (p < .05)\n",
+                if (nzchar(label)) paste0(label, ": ") else "",
+                n_comp, if (n_comp == 1) "" else "s",
+                sum(rows$.sig05)))
+  }
+
+  emit_block <- function(rows) {
+    if (!is.null(by_col) && by_col %in% names(rows)) {
+      for (v in unique(rows[[by_col]])) {
+        line_for(v, rows[rows[[by_col]] == v, , drop = FALSE])
+      }
+    } else {
+      line_for("", rows)
+    }
+  }
+
+  if (!is.null(group_vars) && length(group_vars) > 0 &&
+      all(group_vars %in% names(results))) {
+    groups <- unique(results[group_vars])
+    for (i in seq_len(nrow(groups))) {
+      group_values <- groups[i, , drop = FALSE]
+      group_label <- paste(names(group_values), "=",
+                           vapply(group_values, as.character, character(1)),
+                           collapse = ", ")
+      cat(sprintf("[%s]\n", group_label))
+      rows <- results
+      for (g in names(group_values)) {
+        rows <- rows[rows[[g]] == group_values[[g]], , drop = FALSE]
+      }
+      emit_block(rows)
+    }
+  } else {
+    emit_block(results)
+  }
+
+  cat("Use summary() for the full comparison table.\n")
+  invisible(NULL)
+}
+
+# =============================================================================
+# Shared verbose print implementation (Layer 3)
 # =============================================================================
 
 #' Render one pairwise-comparison table
@@ -406,13 +482,15 @@
   invisible(NULL)
 }
 
-#' Shared print implementation for tukey_test / scheffe_test objects
+#' Shared verbose print implementation for tukey_test / scheffe_test objects
 #'
 #' Parameterized by the method-specific title, notes, results label, and
 #' interpretation lines; everything else (factorial branch, grouped branch,
 #' ungrouped branch, empty-results message, significance legend) is common.
+#' Invoked from print.summary.tukey_test / print.summary.scheffe_test with
+#' the summary object's \code{$show} toggles.
 #'
-#' @param x A "tukey_test" or "scheffe_test" object
+#' @param x A "tukey_test"/"scheffe_test" object or its summary counterpart
 #' @param digits Decimal places
 #' @param title Base title, e.g. "Tukey HSD Post-Hoc Test"
 #' @param method_notes Character vector of note lines printed after the
@@ -421,10 +499,20 @@
 #'   ("Tukey Results" / "Weighted Tukey Results")
 #' @param interpretation_notes Character vector of method-specific
 #'   interpretation lines appended after the shared ones
+#' @param show Named list of logical section toggles: \code{parameters}
+#'   (confidence level + method notes), \code{comparisons} (pairwise
+#'   tables + significance legend), \code{interpretation}
 #' @return invisible(x)
 #' @noRd
 .print_pairwise_posthoc <- function(x, digits = 3, title, method_notes,
-                                    results_label, interpretation_notes) {
+                                    results_label, interpretation_notes,
+                                    show = list(parameters = TRUE,
+                                                comparisons = TRUE,
+                                                interpretation = TRUE)) {
+  show_parameters     <- isTRUE(show$parameters)
+  show_comparisons    <- isTRUE(show$comparisons)
+  show_interpretation <- isTRUE(show$interpretation)
+
   # Determine test type using standardized helper
   weights_name <- x$weights
   test_type <- get_standard_title(title, weights_name, "Results")
@@ -456,19 +544,25 @@
       "Weights variable" = x$weights
     )
     print_info_section(test_info)
-    test_params <- list(conf.level = x$conf.level)
-    print_test_parameters(test_params)
-    print_method_notes()
+    if (show_parameters) {
+      test_params <- list(conf.level = x$conf.level)
+      print_test_parameters(test_params)
+      print_method_notes()
+    } else {
+      cat("\n")
+    }
 
     x$results$sig <- sapply(x$results$p_adjusted, add_significance_stars)
 
-    for (fct in unique(x$results$Factor)) {
-      cat(sprintf("\n--- Factor: %s ---\n\n", fct))
-      .print_posthoc_table(x$results[x$results$Factor == fct, ], digits)
-    }
+    if (show_comparisons) {
+      for (fct in unique(x$results$Factor)) {
+        cat(sprintf("\n--- Factor: %s ---\n\n", fct))
+        .print_posthoc_table(x$results[x$results$Factor == fct, ], digits)
+      }
 
-    print_significance_legend()
-    print_interpretation()
+      print_significance_legend()
+    }
+    if (show_interpretation) print_interpretation()
     return(invisible(x))
   }
 
@@ -480,9 +574,13 @@
     "Weights variable" = x$weights
   )
   print_info_section(test_info)
-  test_params <- list(conf.level = x$conf.level)
-  print_test_parameters(test_params)
-  print_method_notes()
+  if (show_parameters) {
+    test_params <- list(conf.level = x$conf.level)
+    print_test_parameters(test_params)
+    print_method_notes()
+  } else {
+    cat("\n")
+  }
 
   if (nrow(x$results) == 0) {
     cat("No post-hoc comparisons available.\n")
@@ -513,18 +611,20 @@
     }
   }
 
-  if (isTRUE(x$is_grouped)) {
-    for_each_group(x$results, x$groups, function(rows, group_values) {
-      # Print group header using standardized helper
-      print_group_header(group_values)
-      print_variable_blocks(rows)
-    }, header = FALSE)
-  } else {
-    print_variable_blocks(x$results)
-  }
+  if (show_comparisons) {
+    if (isTRUE(x$is_grouped)) {
+      for_each_group(x$results, x$groups, function(rows, group_values) {
+        # Print group header using standardized helper
+        print_group_header(group_values)
+        print_variable_blocks(rows)
+      }, header = FALSE)
+    } else {
+      print_variable_blocks(x$results)
+    }
 
-  print_significance_legend()
-  print_interpretation()
+    print_significance_legend()
+  }
+  if (show_interpretation) print_interpretation()
 
   invisible(x)
 }

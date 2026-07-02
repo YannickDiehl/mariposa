@@ -18,5 +18,9 @@ Invisibly returns the input object \code{x}.
 }
 \description{
 Prints formatted descriptive statistics with professional layout.
-Automatically adjusts output based on whether analysis was weighted or unweighted.
+Automatically adjusts output based on whether analysis was weighted or
+unweighted. The output of \code{describe()} is a summary table by
+nature, so \code{print()} and \code{summary()} display the same
+statistics table; \code{summary()} additionally offers a
+\code{statistics} section toggle and a \code{digits} option.
 }

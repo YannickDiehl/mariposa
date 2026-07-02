@@ -311,13 +311,126 @@ crosstab.grouped_df <- function(data, row, col,
   return(combined_result)
 }
 
-#' Print method for crosstab results
+#' Print method for crosstab results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"crosstab"}. Shows the
+#' table variables, dimensions, and valid N, plus a reminder that no
+#' significance test is included.
+#'
+#' For the full cross-tabulation table (cell counts and percentages), use
+#' \code{summary()}.
+#'
 #' @param x A crosstab result object
 #' @param digits Number of decimal places for percentages (default: 1)
 #' @param ... Additional arguments (currently unused)
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- crosstab(survey_data, gender, region)
+#' result              # compact overview
+#' summary(result)     # full cross-tabulation table
+#'
 #' @export
+#' @method print crosstab
 print.crosstab <- function(x, digits = 1, ...) {
+  weighted_tag <- if (x$is_weighted) " [Weighted]" else ""
+  cat(sprintf("Crosstab: %s x %s%s\n", x$row_var, x$col_var, weighted_tag))
+
+  dim_line <- function(res, prefix = "") {
+    cat(sprintf("  %s%d x %d table, N = %s%s\n",
+                prefix,
+                length(res$row_levels), length(res$col_levels),
+                sprintf("%.0f", res$n_valid),
+                if (res$n_missing > 0) {
+                  sprintf(", missing = %.0f", res$n_missing)
+                } else {
+                  ""
+                }))
+  }
+
+  if (x$is_grouped) {
+    for (i in seq_along(x$results)) {
+      result <- x$results[[i]]
+      group_info <- result$group_info
+      group_label <- paste(names(group_info), "=",
+                           vapply(group_info, as.character, character(1)),
+                           collapse = ", ")
+      dim_line(result, prefix = sprintf("[%s] ", group_label))
+    }
+  } else {
+    dim_line(x)
+  }
+
+  cat("  Note: no significance test included - use chi_square() for a test of independence.\n")
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for crosstab results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the full cross-tabulation table with cell counts, marginal
+#' totals, and the requested percentage breakdowns.
+#'
+#' @param object A \code{crosstab} result object.
+#' @param crosstab_table Logical. Show the cross-tabulation table?
+#'   (Default: TRUE)
+#' @param percentages Logical. Show the percentage sub-rows inside the
+#'   table (as requested via the \code{percentages} argument of
+#'   \code{\link{crosstab}})? (Default: TRUE)
+#' @param digits Number of decimal places for percentages (Default: 1).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.crosstab} object.
+#'
+#' @examples
+#' result <- crosstab(survey_data, gender, region)
+#' summary(result)
+#' summary(result, percentages = FALSE)
+#'
+#' @seealso \code{\link{crosstab}} for the main analysis function.
+#' @export
+#' @method summary crosstab
+summary.crosstab <- function(object, crosstab_table = TRUE,
+                             percentages = TRUE, digits = 1, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(crosstab_table = crosstab_table,
+                      percentages = percentages),
+    digits     = digits,
+    class_name = "summary.crosstab"
+  )
+}
+
+#' Print summary of crosstab results (detailed output)
+#'
+#' @description
+#' Displays the full cross-tabulation table for a \code{crosstab} result,
+#' with sections controlled by the boolean parameters passed to
+#' \code{\link{summary.crosstab}}. For grouped analyses, a separate table
+#' is displayed for each group combination.
+#'
+#' @param x A \code{summary.crosstab} object created by
+#'   \code{\link{summary.crosstab}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- crosstab(survey_data, gender, region)
+#' summary(result)                       # full table
+#' summary(result, percentages = FALSE) # counts only
+#'
+#' @seealso \code{\link{crosstab}} for the main analysis,
+#'   \code{\link{summary.crosstab}} for summary options.
+#' @export
+#' @method print summary.crosstab
+print.summary.crosstab <- function(x, ...) {
+  digits <- x$digits
+
+  show_table       <- isTRUE(x$show$crosstab_table)
+  show_percentages <- isTRUE(x$show$percentages)
 
   if (x$is_grouped) {
     # Print grouped results using standardized header
@@ -333,19 +446,26 @@ print.crosstab <- function(x, digits = 1, ...) {
       print_group_header(as.data.frame(group_info, stringsAsFactors = FALSE))
 
       # Print the crosstab for this group
-      .print_single_crosstab(result, digits = digits)
+      .print_single_crosstab(result, digits = digits,
+                             show_table = show_table,
+                             show_percentages = show_percentages)
       cat("\n")
     }
   } else {
     # Print single crosstab
-    .print_single_crosstab(x, digits = digits)
+    .print_single_crosstab(x, digits = digits,
+                           show_table = show_table,
+                           show_percentages = show_percentages)
   }
 
   invisible(x)
 }
 
 # Helper function to print a single crosstab
-.print_single_crosstab <- function(x, digits = 1) {
+# show_table / show_percentages gate the table body and the percentage
+# sub-rows (used by print.summary.crosstab)
+.print_single_crosstab <- function(x, digits = 1, show_table = TRUE,
+                                   show_percentages = TRUE) {
 
   # Header
   title <- paste0("Crosstabulation: ", x$row_var, " \u00d7 ", x$col_var)
@@ -371,6 +491,8 @@ print.crosstab <- function(x, digits = 1, ...) {
   )
   print_info_section(test_info)
   cat("\n")
+
+  if (!show_table) return(invisible(NULL))
 
   # Apply value labels if available
   display_row_levels <- .apply_labels(x$row_levels, x$row_label_map)
@@ -447,7 +569,7 @@ print.crosstab <- function(x, digits = 1, ...) {
     ct_row(display_row_levels[i], count_vals)
 
     # Row percentage sub-row
-    if (!is.null(x$row_pct)) {
+    if (show_percentages && !is.null(x$row_pct)) {
       pct_vals <- c(
         vapply(seq_len(n_cols), function(j) fmt_pct(x$row_pct[i, j]), character(1)),
         fmt_pct(100)
@@ -456,7 +578,7 @@ print.crosstab <- function(x, digits = 1, ...) {
     }
 
     # Column percentage sub-row
-    if (!is.null(x$col_pct)) {
+    if (show_percentages && !is.null(x$col_pct)) {
       row_of_total <- (x$row_totals[i] / x$total) * 100
       pct_vals <- c(
         vapply(seq_len(n_cols), function(j) fmt_pct(x$col_pct[i, j]), character(1)),
@@ -466,7 +588,7 @@ print.crosstab <- function(x, digits = 1, ...) {
     }
 
     # Total percentage sub-row
-    if (!is.null(x$total_pct)) {
+    if (show_percentages && !is.null(x$total_pct)) {
       row_total_pct <- (x$row_totals[i] / x$total) * 100
       pct_vals <- c(
         vapply(seq_len(n_cols), function(j) fmt_pct(x$total_pct[i, j]), character(1)),
@@ -488,7 +610,7 @@ print.crosstab <- function(x, digits = 1, ...) {
   ct_row("Total", total_vals)
 
   # Total row's column percentage sub-row
-  if (!is.null(x$col_pct)) {
+  if (show_percentages && !is.null(x$col_pct)) {
     pct_vals <- c(
       vapply(seq_len(n_cols), function(j) {
         fmt_pct((x$col_totals[j] / x$total) * 100)

@@ -54,24 +54,32 @@ test_that("print.describe: show = 'all'", {
 # ===========================================================================
 # 2. frequency()
 # ===========================================================================
-test_that("print.frequency: ungrouped, unweighted", {
+test_that("print.frequency: ungrouped, unweighted (compact)", {
   result <- frequency(survey_data, gender)
-  expect_prints(result, "Frequency")
+  output <- expect_prints(result, "Frequency")
+  expect_true(any(grepl("categories", output, fixed = TRUE)))
+  expect_true(any(grepl("N valid = ", output, fixed = TRUE)))
+  expect_true(any(grepl("missing = ", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.frequency: ungrouped, weighted", {
   result <- frequency(survey_data, gender, weights = sampling_weight)
-  expect_prints(result, "Frequency")
+  output <- expect_prints(result, "Frequency")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
 })
 
 test_that("print.frequency: grouped", {
   result <- survey_data %>% group_by(region) %>% frequency(gender)
-  expect_prints(result, "Frequency")
+  output <- expect_prints(result, "Frequency")
+  expect_true(any(grepl("region = ", output, fixed = TRUE)))
 })
 
 test_that("print.frequency: multiple variables", {
   result <- frequency(survey_data, gender, education)
-  expect_prints(result, "Frequency")
+  output <- expect_prints(result, "Frequency")
+  expect_true(any(grepl("gender", output, fixed = TRUE)))
+  expect_true(any(grepl("education", output, fixed = TRUE)))
 })
 
 test_that("print.frequency: toggled columns", {
@@ -82,9 +90,12 @@ test_that("print.frequency: toggled columns", {
 # ===========================================================================
 # 3. crosstab()
 # ===========================================================================
-test_that("print.crosstab: ungrouped, row pct (default)", {
+test_that("print.crosstab: ungrouped, row pct (default, compact)", {
   result <- crosstab(survey_data, gender, region)
-  expect_prints(result, "Crosstab")
+  output <- expect_prints(result, "Crosstab")
+  expect_true(any(grepl("table, N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("chi_square()", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
 test_that("print.crosstab: ungrouped, weighted", {
@@ -597,13 +608,18 @@ test_that("print.levene_test: piped from t_test", {
 # ===========================================================================
 # 21. tukey_test()
 # ===========================================================================
-test_that("print.tukey_test: ungrouped, unweighted", {
+test_that("print.tukey_test: ungrouped, unweighted (compact)", {
   result <- oneway_anova(survey_data, life_satisfaction,
                          group = education) %>%
     tukey_test()
   output <- expect_prints(result, "Tukey")
-  expect_true(any(grepl("Family-wise", output, ignore.case = TRUE) |
-                    grepl("Tukey Results", output, fixed = TRUE)))
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for the full comparison table.", output, fixed = TRUE)))
+  # Verbose content moved to summary()
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Family-wise", summary_output, ignore.case = TRUE) |
+                    grepl("Tukey Results", summary_output, fixed = TRUE)))
 })
 
 test_that("print.tukey_test: ungrouped, weighted", {
@@ -630,11 +646,14 @@ test_that("print.tukey_test: factorial ANOVA post-hoc", {
 # ===========================================================================
 # 22. scheffe_test()
 # ===========================================================================
-test_that("print.scheffe_test: ungrouped, unweighted", {
+test_that("print.scheffe_test: ungrouped, unweighted (compact)", {
   result <- oneway_anova(survey_data, life_satisfaction,
                          group = education) %>%
     scheffe_test()
-  expect_prints(result, "Scheffe")
+  output <- expect_prints(result, "Scheffe")
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for the full comparison table.", output, fixed = TRUE)))
 })
 
 test_that("print.scheffe_test: ungrouped, weighted", {
@@ -661,13 +680,18 @@ test_that("print.scheffe_test: factorial ANOVA post-hoc", {
 # ===========================================================================
 # 23. dunn_test()
 # ===========================================================================
-test_that("print.dunn_test: ungrouped, single var", {
+test_that("print.dunn_test: ungrouped, single var (compact)", {
   result <- kruskal_wallis(survey_data, life_satisfaction,
                            group = education) %>%
     dunn_test()
   output <- expect_prints(result, "Dunn")
-  expect_true(any(grepl("Group 1", output, fixed = TRUE) |
-                    grepl("p (adj)", output, fixed = TRUE)))
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for the full comparison table.", output, fixed = TRUE)))
+  # Verbose comparison table moved to summary()
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Group 1", summary_output, fixed = TRUE) |
+                    grepl("p (adj)", summary_output, fixed = TRUE)))
 })
 
 test_that("print.dunn_test: ungrouped, multi-var", {
@@ -694,11 +718,14 @@ test_that("print.dunn_test: weighted", {
 # ===========================================================================
 # 24. pairwise_wilcoxon()
 # ===========================================================================
-test_that("print.pairwise_wilcoxon: ungrouped", {
+test_that("print.pairwise_wilcoxon: ungrouped (compact)", {
   result <- friedman_test(survey_data, trust_government, trust_media,
                           trust_science) %>%
     pairwise_wilcoxon()
-  expect_prints(result, "Pairwise Wilcoxon")
+  output <- expect_prints(result, "Pairwise Wilcoxon")
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary() for the full comparison table.", output, fixed = TRUE)))
 })
 
 test_that("print.pairwise_wilcoxon: grouped", {

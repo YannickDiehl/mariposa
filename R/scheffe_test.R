@@ -142,19 +142,90 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   .pairwise_posthoc(x, method = "scheffe", conf.level = conf.level)
 }
 
-#' Print Scheffe test results
+#' Print Scheffe test results (compact)
 #'
 #' @description
-#' Print method for objects of class \code{"scheffe_test"}. Provides a
-#' formatted display of Scheffe post-hoc test results including pairwise
-#' comparisons, confidence intervals, and adjusted p-values.
+#' Compact print method for objects of class \code{"scheffe_test"}. Shows
+#' one line per variable (or factor, or group combination) with the number
+#' of pairwise comparisons and how many are significant at the .05 level.
+#'
+#' For the full comparison tables (mean differences, confidence intervals,
+#' adjusted p-values), use \code{summary()}.
 #'
 #' @param x An object of class \code{"scheffe_test"} returned by \code{\link{scheffe_test}}.
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
 #'
-#' @details
-#' The print method displays:
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- oneway_anova(survey_data, life_satisfaction,
+#'                        group = education) |> scheffe_test()
+#' result              # compact overview
+#' summary(result)     # full comparison tables
+#'
+#' @export
+#' @method print scheffe_test
+print.scheffe_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_tag <- if (!is.null(x$group)) paste0(" by ", x$group) else ""
+  title <- sprintf("Scheffe Post-Hoc Test%s%s", group_tag, weighted_tag)
+
+  # Shared compact print core in R/posthoc-pairwise.R
+  .print_posthoc_compact(
+    title      = title,
+    results    = x$results,
+    p_col      = "p_adjusted",
+    group_vars = if (isTRUE(x$is_grouped)) x$groups else NULL,
+    by_col     = if (isTRUE(x$is_factorial)) "Factor" else "Variable"
+  )
+  invisible(x)
+}
+
+#' Summary method for Scheffe test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the pairwise comparison tables with mean differences,
+#' confidence intervals, Scheffe-adjusted p-values, and interpretation.
+#'
+#' @param object A \code{scheffe_test} result object.
+#' @param parameters Logical. Show test parameters (confidence level,
+#'   method notes)? (Default: TRUE)
+#' @param comparisons Logical. Show the pairwise comparison tables?
+#'   (Default: TRUE)
+#' @param interpretation Logical. Show the interpretation section?
+#'   (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.scheffe_test} object.
+#'
+#' @examples
+#' result <- oneway_anova(survey_data, life_satisfaction,
+#'                        group = education) |> scheffe_test()
+#' summary(result)
+#' summary(result, interpretation = FALSE)
+#'
+#' @seealso \code{\link{scheffe_test}} for the main analysis function.
+#' @export
+#' @method summary scheffe_test
+summary.scheffe_test <- function(object, parameters = TRUE, comparisons = TRUE,
+                                 interpretation = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(parameters = parameters, comparisons = comparisons,
+                      interpretation = interpretation),
+    digits     = digits,
+    class_name = "summary.scheffe_test"
+  )
+}
+
+#' Print summary of Scheffe test results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for Scheffe post-hoc comparisons, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.scheffe_test}}. The display includes:
 #' \itemize{
 #'   \item Pairwise group comparisons with mean differences
 #'   \item Confidence intervals for differences (widest among all post-hoc tests)
@@ -165,14 +236,27 @@ scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
 #' For grouped analyses, results are displayed separately for each group combination.
 #' For weighted analyses, effective sample sizes are used in calculations.
 #'
+#' @param x A \code{summary.scheffe_test} object created by
+#'   \code{\link{summary.scheffe_test}}.
+#' @param ... Additional arguments (not used).
+#'
 #' @return Invisibly returns the input object \code{x}.
 #'
+#' @examples
+#' result <- oneway_anova(survey_data, life_satisfaction,
+#'                        group = education) |> scheffe_test()
+#' summary(result)                       # all sections
+#' summary(result, comparisons = FALSE)  # hide comparison tables
+#'
+#' @seealso \code{\link{scheffe_test}} for the main analysis,
+#'   \code{\link{summary.scheffe_test}} for summary options.
 #' @export
-print.scheffe_test <- function(x, digits = 3, ...) {
-  # Shared print implementation in R/posthoc-pairwise.R
+#' @method print summary.scheffe_test
+print.summary.scheffe_test <- function(x, ...) {
+  # Shared verbose implementation in R/posthoc-pairwise.R
   .print_pairwise_posthoc(
     x,
-    digits = digits,
+    digits = x$digits,
     title = "Scheffe Post-Hoc Test",
     method_notes = c(
       "Family-wise error rate controlled using Scheffe's method",
@@ -182,6 +266,8 @@ print.scheffe_test <- function(x, digits = 3, ...) {
     interpretation_notes = c(
       "- p-values are adjusted for all possible contrasts (most conservative)",
       "- Scheffe test has wider CIs than Tukey HSD"
-    )
+    ),
+    show = x$show
   )
+  invisible(x)
 }

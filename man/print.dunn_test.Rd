@@ -2,7 +2,7 @@
 % Please edit documentation in R/dunn_test.R
 \name{print.dunn_test}
 \alias{print.dunn_test}
-\title{Print Dunn post-hoc test results}
+\title{Print Dunn post-hoc test results (compact)}
 \usage{
 \method{print}{dunn_test}(x, digits = 3, ...)
 }
@@ -17,17 +17,17 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for objects of class \code{"dunn_test"}. Provides a
-formatted display of Dunn pairwise comparison results including
-Z-statistics and adjusted p-values.
-}
-\details{
-The print method displays:
-\itemize{
-\item Pairwise group comparisons with Z-statistics
-\item Adjusted p-values controlling for multiple comparisons
-\item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-}
+Compact print method for objects of class \code{"dunn_test"}. Shows
+one line per variable (or group combination) with the number of
+pairwise comparisons and how many are significant at the .05 level.
 
-For grouped analyses, results are displayed separately for each group combination.
+For the full comparison tables (Z-statistics, adjusted p-values), use
+\code{summary()}.
+}
+\examples{
+result <- kruskal_wallis(survey_data, life_satisfaction,
+                         group = education) |> dunn_test()
+result              # compact overview
+summary(result)     # full comparison tables
+
 }

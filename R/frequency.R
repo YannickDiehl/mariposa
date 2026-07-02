@@ -693,18 +693,143 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort.frq, sho
   )
 }
 
-#' Print method for frequency objects
+#' Print method for frequency objects (compact)
 #'
 #' @description
-#' Prints formatted frequency statistics with ASCII tables.
+#' Compact print method for objects of class \code{"frequency"}. Shows
+#' one line per variable (and group combination) with the number of
+#' categories, the valid N, and the missing count.
+#'
+#' For the full frequency tables (counts, percentages, cumulative
+#' percentages), use \code{summary()}.
 #'
 #' @param x An object of class "frequency"
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #'
 #' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- frequency(survey_data, gender)
+#' result              # compact overview
+#' summary(result)     # full frequency tables
+#'
 #' @export
+#' @method print frequency
 print.frequency <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+
+  # One-line summary: categories, valid N, missing count
+  compact_line <- function(rows, stats, prefix = "") {
+    n_categories <- sum(!is.na(rows$value))
+    n_valid <- stats$valid_n
+    n_missing <- stats$total_n - stats$valid_n
+    cat(sprintf("  %s%d categor%s, N valid = %s, missing = %s\n",
+                prefix, n_categories, if (n_categories == 1) "y" else "ies",
+                sprintf("%.0f", n_valid), sprintf("%.0f", n_missing)))
+  }
+
+  for (var in x$variables) {
+    cat(sprintf("Frequency: %s%s\n", var, weighted_tag))
+
+    if (x$is_grouped) {
+      unique_groups <- unique(x$results[x$groups])
+
+      for (i in seq_len(nrow(unique_groups))) {
+        group_values <- unique_groups[i, , drop = FALSE]
+        group_label <- paste(names(group_values), "=",
+                             vapply(group_values, as.character, character(1)),
+                             collapse = ", ")
+
+        rows <- x$results
+        stats <- x$stats
+        for (g in names(group_values)) {
+          rows <- rows[rows[[g]] == group_values[[g]], ]
+          stats <- stats[stats[[g]] == group_values[[g]], ]
+        }
+        rows <- rows[rows$Variable == var, ]
+        stats <- stats[stats$Variable == var, ]
+        if (nrow(stats) == 0) next
+
+        compact_line(rows, stats, prefix = sprintf("[%s] ", group_label))
+      }
+    } else {
+      rows <- x$results[x$results$Variable == var, ]
+      stats <- x$stats[x$stats$Variable == var, ]
+      compact_line(rows, stats)
+    }
+  }
+
+  cat("Use summary() for detailed output.\n")
+  invisible(x)
+}
+
+#' Summary method for frequency results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the per-variable summary statistics line (total N, valid N,
+#' mean, SD, skewness) and the full ASCII frequency tables with counts,
+#' raw/valid/cumulative percentages, and missing value breakdowns.
+#'
+#' @param object A \code{frequency} result object.
+#' @param frequency_table Logical. Show the frequency tables?
+#'   (Default: TRUE)
+#' @param summary_stats Logical. Show the per-variable summary statistics
+#'   line? (Default: TRUE)
+#' @param digits Number of decimal places for percentages and summary
+#'   statistics (Default: 2).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.frequency} object.
+#'
+#' @examples
+#' result <- frequency(survey_data, gender)
+#' summary(result)
+#' summary(result, summary_stats = FALSE)
+#'
+#' @seealso \code{\link{frequency}} for the main analysis function.
+#' @export
+#' @method summary frequency
+summary.frequency <- function(object, frequency_table = TRUE,
+                              summary_stats = TRUE, digits = 2, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(frequency_table = frequency_table,
+                      summary_stats = summary_stats),
+    digits     = digits,
+    class_name = "summary.frequency"
+  )
+}
+
+#' Print summary of frequency results (detailed output)
+#'
+#' @description
+#' Prints formatted frequency statistics with ASCII tables, with sections
+#' controlled by the boolean parameters passed to
+#' \code{\link{summary.frequency}}.
+#'
+#' @param x A \code{summary.frequency} object created by
+#'   \code{\link{summary.frequency}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- frequency(survey_data, gender)
+#' summary(result)                          # all sections
+#' summary(result, frequency_table = FALSE) # only summary statistics
+#'
+#' @seealso \code{\link{frequency}} for the main analysis,
+#'   \code{\link{summary.frequency}} for summary options.
+#' @export
+#' @method print summary.frequency
+print.summary.frequency <- function(x, ...) {
+  digits <- x$digits
+
+  # Resolve show toggles
+  show_frequency_table <- isTRUE(x$show$frequency_table)
+  show_summary_stats   <- isTRUE(x$show$summary_stats)
+
   # Helper functions for formatting
   format_num <- function(x, width = 6) {
     s <- sprintf("%.2f", ifelse(is.na(x), NA, x))
@@ -774,50 +899,66 @@ print.frequency <- function(x, digits = 3, ...) {
   title <- get_standard_title("Frequency Analysis", weights_name, "Results")
   print_header(title)
 
+  # Summary statistics line format ("%.2f" at the default digits = 2)
+  stat_fmt <- sprintf(
+    "# total N=%%.0f valid N=%%.0f mean=%%.%1$df sd=%%.%1$df skewness=%%.%1$df\n\n",
+    digits
+  )
+
   # Print results for each variable
   for (var in x$variables) {
     var_label <- x$labels[var]
     cat(sprintf("\n%s\n", format_variable_name(var, var_label)))
-    
+
     if (x$is_grouped) {
       unique_groups <- unique(x$results[x$groups])
-      
+
       for (i in seq_len(nrow(unique_groups))) {
         group_values <- unique_groups[i, , drop = FALSE]
         # Group info not needed here since print_group_header handles it
-        
+
         # Filter results for current group and variable
         group_results <- x$results
         for (g in names(group_values)) {
           group_results <- group_results[group_results[[g]] == group_values[[g]], ]
         }
         group_results <- group_results[group_results$Variable == var, ]
-        
+
         if (nrow(group_results) == 0) next
-        
+
         # Get stats
         group_stats <- x$stats
         for (g in names(group_values)) {
           group_stats <- group_stats[group_stats[[g]] == group_values[[g]], ]
         }
         stats <- group_stats[group_stats$Variable == var, ]
-        
+
         # Print group header using standardized helper
         print_group_header(group_values)
-        cat(sprintf("# total N=%.0f valid N=%.0f mean=%.2f sd=%.2f skewness=%.2f\n\n",
-                    stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
-        
-        print_table(group_results, col_widths, print_line, print_row, format_int, format_num, x$options)
+        if (show_summary_stats) {
+          cat(sprintf(stat_fmt,
+                      stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
+        } else {
+          cat("\n")
+        }
+
+        if (show_frequency_table) {
+          print_table(group_results, col_widths, print_line, print_row, format_int, format_num, x$options, digits = digits)
+        }
       }
     } else {
       # Ungrouped results
       var_results <- x$results[x$results$Variable == var, ]
       stats <- x$stats[x$stats$Variable == var, ]
-      
-      cat(sprintf("# total N=%.0f valid N=%.0f mean=%.2f sd=%.2f skewness=%.2f\n\n",
-                  stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
-      
-      print_table(var_results, col_widths, print_line, print_row, format_int, format_num, x$options)
+
+      if (show_summary_stats) {
+        cat(sprintf(stat_fmt,
+                    stats$total_n, stats$valid_n, stats$mean, stats$sd, stats$skewness))
+      }
+
+      if (show_frequency_table) {
+        print_table(var_results, col_widths, print_line, print_row, format_int, format_num, x$options, digits = digits)
+      }
     }
   }
 
@@ -825,7 +966,8 @@ print.frequency <- function(x, digits = 3, ...) {
 }
 
 # Helper function to print frequency table
-print_table <- function(results, col_widths, print_line, print_row, format_int, format_num, options) {
+print_table <- function(results, col_widths, print_line, print_row, format_int, format_num, options, digits = 2) {
+  pct_fmt <- paste0("%.", digits, "f")
   # Determine which columns to show
   headers <- c("Value")
   width_names <- c("Value")
@@ -879,9 +1021,9 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
     }
 
     freq_str <- sprintf("%.0f", ifelse(is.na(row$freq), NA, round(row$freq)))
-    prc_str <- sprintf("%.2f", ifelse(is.na(row$prc), NA, row$prc))
-    valid_str <- if (is.na(row$valid_prc)) "NA" else sprintf("%.2f", row$valid_prc)
-    cum_str <- if (is.na(row$cum_prc)) "NA" else sprintf("%.2f", row$cum_prc)
+    prc_str <- sprintf(pct_fmt, ifelse(is.na(row$prc), NA, row$prc))
+    valid_str <- if (is.na(row$valid_prc)) "NA" else sprintf(pct_fmt, row$valid_prc)
+    cum_str <- if (is.na(row$cum_prc)) "NA" else sprintf(pct_fmt, row$cum_prc)
 
     values <- c(display_value)
     if (options$show.labels) values <- c(values, display_label)
@@ -898,7 +1040,7 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
     values <- c(label)
     if (options$show.labels) values <- c(values, sublabel)
     values <- c(values, sprintf("%.0f", round(freq)))
-    if (options$show.prc) values <- c(values, sprintf("%.2f", prc))
+    if (options$show.prc) values <- c(values, sprintf(pct_fmt, prc))
     if (options$show.valid) values <- c(values, valid_prc_str)
     if (options$show.sum) values <- c(values, cum_str)
     print_row(values, active_widths, aligns)
@@ -947,7 +1089,7 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
     if (has_na) {
       # Layout with NAs: Total Valid → NA row(s) → Total Missing
       print_line(active_widths)
-      render_summary_row("Total", valid_freq, valid_prc, "100.00", "", "Total Valid")
+      render_summary_row("Total", valid_freq, valid_prc, sprintf(pct_fmt, 100), "", "Total Valid")
       print_line(active_widths)
 
       for (i in seq_len(nrow(na_rows))) {
@@ -959,7 +1101,7 @@ print_table <- function(results, col_widths, print_line, print_row, format_int, 
     } else {
       # No NAs: simple total row
       print_line(active_widths)
-      render_summary_row("Total", valid_freq, valid_prc, "100.00", "")
+      render_summary_row("Total", valid_freq, valid_prc, sprintf(pct_fmt, 100), "")
     }
   }
 

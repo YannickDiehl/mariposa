@@ -2,7 +2,7 @@
 % Please edit documentation in R/crosstab.R
 \name{print.crosstab}
 \alias{print.crosstab}
-\title{Print method for crosstab results}
+\title{Print method for crosstab results (compact)}
 \usage{
 \method{print}{crosstab}(x, digits = 1, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for crosstab results
+Compact print method for objects of class \code{"crosstab"}. Shows the
+table variables, dimensions, and valid N, plus a reminder that no
+significance test is included.
+
+For the full cross-tabulation table (cell counts and percentages), use
+\code{summary()}.
+}
+\examples{
+result <- crosstab(survey_data, gender, region)
+result              # compact overview
+summary(result)     # full cross-tabulation table
+
 }

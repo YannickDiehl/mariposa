@@ -1952,3 +1952,625 @@ test_that("summary.levene_test: grouped produces output", {
   expect_true(any(grepl("Group", output)))
   expect_true(any(grepl("Recommendation", output, fixed = TRUE)))
 })
+
+# ===========================================================================
+# 22. tukey_test()
+# ===========================================================================
+test_that("summary.tukey_test returns correct class", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+  s <- summary(result)
+  expect_summary_class(s, "summary.tukey_test")
+  expect_true(all(c("parameters", "comparisons", "interpretation")
+                  %in% names(s$show)))
+})
+
+test_that("print.summary.tukey_test produces output", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+  s <- summary(result)
+  output <- expect_summary_prints(s, "Tukey HSD Post-Hoc Test Results")
+  expect_true(any(grepl("Family-wise", output, ignore.case = TRUE) |
+                    grepl("Tukey Results", output, fixed = TRUE)))
+  expect_true(any(grepl("Difference", output, fixed = TRUE)))
+  expect_true(any(grepl("Lower CI", output, fixed = TRUE)))
+  expect_true(any(grepl("Upper CI", output, fixed = TRUE)))
+  expect_true(any(grepl("p-value", output, fixed = TRUE)))
+  expect_true(any(grepl("Signif. codes", output, fixed = TRUE)))
+})
+
+test_that("summary.tukey_test: parameters toggle works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+
+  out_on <- capture.output(print(summary(result, parameters = TRUE)))
+  expect_true(any(grepl("Confidence level", out_on, fixed = TRUE)))
+  expect_true(any(grepl("Family-wise", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, parameters = FALSE)))
+  expect_false(any(grepl("Confidence level", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Family-wise", out_off, fixed = TRUE)))
+})
+
+test_that("summary.tukey_test: comparisons toggle works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+
+  out_on <- capture.output(print(summary(result, comparisons = TRUE)))
+  expect_true(any(grepl("Tukey Results", out_on, fixed = TRUE)))
+  expect_true(any(grepl("Difference", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, comparisons = FALSE)))
+  expect_false(any(grepl("Tukey Results", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Difference", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Signif. codes", out_off, fixed = TRUE)))
+})
+
+test_that("summary.tukey_test: interpretation toggle works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+
+  out_on <- capture.output(print(summary(result, interpretation = TRUE)))
+  expect_true(any(grepl("Interpretation:", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, interpretation = FALSE)))
+  expect_false(any(grepl("Interpretation:", out_off, fixed = TRUE)))
+})
+
+test_that("summary.tukey_test: all FALSE shows minimal output", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+  s <- summary(result, parameters = FALSE, comparisons = FALSE,
+               interpretation = FALSE)
+  output <- capture.output(print(s))
+  expect_true(any(grepl("Tukey", output)))
+  expect_false(any(grepl("Tukey Results", output, fixed = TRUE)))
+  expect_false(any(grepl("Interpretation:", output, fixed = TRUE)))
+})
+
+test_that("summary.tukey_test preserves original data", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+  s <- summary(result)
+  expect_equal(s$group, result$group)
+  expect_equal(s$variables, result$variables)
+  expect_equal(s$conf.level, result$conf.level)
+  expect_equal(nrow(s$results), nrow(result$results))
+})
+
+test_that("compact print.tukey_test works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    tukey_test()
+  output <- expect_compact_print(result, "Tukey HSD Post-Hoc Test")
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+})
+
+test_that("compact print.tukey_test: weighted", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education,
+                         weights = sampling_weight) %>%
+    tukey_test()
+  output <- expect_compact_print(result, "Tukey")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+})
+
+test_that("summary.tukey_test: grouped produces output", {
+  result <- survey_data %>% group_by(region) %>%
+    oneway_anova(life_satisfaction, group = education) %>%
+    tukey_test()
+  output <- expect_summary_prints(summary(result), "Tukey")
+  expect_true(any(grepl("Group", output)))
+})
+
+test_that("summary.tukey_test: factorial ANOVA post-hoc produces output", {
+  result <- factorial_anova(survey_data, dv = life_satisfaction,
+                            between = c(gender, education)) %>%
+    tukey_test()
+  output <- expect_summary_prints(summary(result), "Tukey")
+  expect_true(any(grepl("Factor:", output, fixed = TRUE)))
+})
+
+# ===========================================================================
+# 23. scheffe_test()
+# ===========================================================================
+test_that("summary.scheffe_test returns correct class", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+  s <- summary(result)
+  expect_summary_class(s, "summary.scheffe_test")
+  expect_true(all(c("parameters", "comparisons", "interpretation")
+                  %in% names(s$show)))
+})
+
+test_that("print.summary.scheffe_test produces output", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+  s <- summary(result)
+  output <- expect_summary_prints(s, "Scheffe Post-Hoc Test Results")
+  expect_true(any(grepl("Scheffe Results", output, fixed = TRUE)))
+  expect_true(any(grepl("Most conservative", output, fixed = TRUE)))
+  expect_true(any(grepl("Difference", output, fixed = TRUE)))
+  expect_true(any(grepl("Signif. codes", output, fixed = TRUE)))
+})
+
+test_that("summary.scheffe_test: parameters toggle works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+
+  out_on <- capture.output(print(summary(result, parameters = TRUE)))
+  expect_true(any(grepl("Confidence level", out_on, fixed = TRUE)))
+  expect_true(any(grepl("Most conservative", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, parameters = FALSE)))
+  expect_false(any(grepl("Confidence level", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Most conservative", out_off, fixed = TRUE)))
+})
+
+test_that("summary.scheffe_test: comparisons toggle works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+
+  out_on <- capture.output(print(summary(result, comparisons = TRUE)))
+  expect_true(any(grepl("Scheffe Results", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, comparisons = FALSE)))
+  expect_false(any(grepl("Scheffe Results", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Signif. codes", out_off, fixed = TRUE)))
+})
+
+test_that("summary.scheffe_test: interpretation toggle works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+
+  out_on <- capture.output(print(summary(result, interpretation = TRUE)))
+  expect_true(any(grepl("Interpretation:", out_on, fixed = TRUE)))
+  expect_true(any(grepl("wider CIs than Tukey", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, interpretation = FALSE)))
+  expect_false(any(grepl("Interpretation:", out_off, fixed = TRUE)))
+})
+
+test_that("summary.scheffe_test: all FALSE shows minimal output", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+  s <- summary(result, parameters = FALSE, comparisons = FALSE,
+               interpretation = FALSE)
+  output <- capture.output(print(s))
+  expect_true(any(grepl("Scheffe", output)))
+  expect_false(any(grepl("Scheffe Results", output, fixed = TRUE)))
+  expect_false(any(grepl("Interpretation:", output, fixed = TRUE)))
+})
+
+test_that("summary.scheffe_test preserves original data", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+  s <- summary(result)
+  expect_equal(s$group, result$group)
+  expect_equal(s$variables, result$variables)
+  expect_equal(s$conf.level, result$conf.level)
+  expect_equal(nrow(s$results), nrow(result$results))
+})
+
+test_that("compact print.scheffe_test works", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education) %>%
+    scheffe_test()
+  output <- expect_compact_print(result, "Scheffe Post-Hoc Test")
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+})
+
+test_that("compact print.scheffe_test: weighted", {
+  result <- oneway_anova(survey_data, life_satisfaction, group = education,
+                         weights = sampling_weight) %>%
+    scheffe_test()
+  output <- expect_compact_print(result, "Scheffe")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+})
+
+test_that("summary.scheffe_test: grouped produces output", {
+  result <- survey_data %>% group_by(region) %>%
+    oneway_anova(life_satisfaction, group = education) %>%
+    scheffe_test()
+  output <- expect_summary_prints(summary(result), "Scheffe")
+  expect_true(any(grepl("Group", output)))
+})
+
+# ===========================================================================
+# 24. dunn_test()
+# ===========================================================================
+test_that("summary.dunn_test returns correct class", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+  s <- summary(result)
+  expect_summary_class(s, "summary.dunn_test")
+  expect_true(all(c("comparisons", "interpretation") %in% names(s$show)))
+})
+
+test_that("print.summary.dunn_test produces output", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+  s <- summary(result)
+  output <- expect_summary_prints(s, "Dunn Post-Hoc Test (Bonferroni) Results")
+  expect_true(any(grepl("Group 1", output, fixed = TRUE)))
+  expect_true(any(grepl("p (adj)", output, fixed = TRUE)))
+  expect_true(any(grepl("P-value adjustment", output, fixed = TRUE)))
+  expect_true(any(grepl("Signif. codes", output, fixed = TRUE)))
+})
+
+test_that("summary.dunn_test: comparisons toggle works", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+
+  out_on <- capture.output(print(summary(result, comparisons = TRUE)))
+  expect_true(any(grepl("Group 1", out_on, fixed = TRUE)))
+  expect_true(any(grepl("p (adj)", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, comparisons = FALSE)))
+  expect_false(any(grepl("Group 1", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Signif. codes", out_off, fixed = TRUE)))
+})
+
+test_that("summary.dunn_test: interpretation toggle works", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+
+  out_on <- capture.output(print(summary(result, interpretation = TRUE)))
+  expect_true(any(grepl("Interpretation:", out_on, fixed = TRUE)))
+  expect_true(any(grepl("mean rank", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, interpretation = FALSE)))
+  expect_false(any(grepl("Interpretation:", out_off, fixed = TRUE)))
+})
+
+test_that("summary.dunn_test: all FALSE shows minimal output", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+  s <- summary(result, comparisons = FALSE, interpretation = FALSE)
+  output <- capture.output(print(s))
+  expect_true(any(grepl("Dunn", output)))
+  expect_false(any(grepl("Group 1", output, fixed = TRUE)))
+  expect_false(any(grepl("Interpretation:", output, fixed = TRUE)))
+})
+
+test_that("summary.dunn_test preserves original data", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+  s <- summary(result)
+  expect_equal(s$group, result$group)
+  expect_equal(s$variables, result$variables)
+  expect_equal(s$p_adjust_method, result$p_adjust_method)
+  expect_equal(nrow(s$comparisons), nrow(result$comparisons))
+})
+
+test_that("compact print.dunn_test works", {
+  result <- kruskal_wallis(survey_data, life_satisfaction,
+                           group = education) %>%
+    dunn_test()
+  output <- expect_compact_print(result, "Dunn Post-Hoc Test")
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+})
+
+test_that("compact print.dunn_test: weighted", {
+  result <- kruskal_wallis(survey_data, life_satisfaction, group = education,
+                           weights = sampling_weight) %>%
+    dunn_test()
+  output <- expect_compact_print(result, "Dunn")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+})
+
+test_that("summary.dunn_test: grouped produces output", {
+  result <- survey_data %>% group_by(region) %>%
+    kruskal_wallis(life_satisfaction, group = education) %>%
+    dunn_test()
+  output <- expect_summary_prints(summary(result), "Dunn")
+  expect_true(any(grepl("Group", output)))
+})
+
+# ===========================================================================
+# 25. pairwise_wilcoxon()
+# ===========================================================================
+test_that("summary.pairwise_wilcoxon returns correct class", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+  s <- summary(result)
+  expect_summary_class(s, "summary.pairwise_wilcoxon")
+  expect_true(all(c("comparisons", "interpretation") %in% names(s$show)))
+})
+
+test_that("print.summary.pairwise_wilcoxon produces output", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+  s <- summary(result)
+  output <- expect_summary_prints(
+    s, "Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results")
+  expect_true(any(grepl("Var 1", output, fixed = TRUE)))
+  expect_true(any(grepl("p (adj)", output, fixed = TRUE)))
+  expect_true(any(grepl("Number of comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("Signif. codes", output, fixed = TRUE)))
+})
+
+test_that("summary.pairwise_wilcoxon: comparisons toggle works", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+
+  out_on <- capture.output(print(summary(result, comparisons = TRUE)))
+  expect_true(any(grepl("Var 1", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, comparisons = FALSE)))
+  expect_false(any(grepl("Var 1", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Signif. codes", out_off, fixed = TRUE)))
+})
+
+test_that("summary.pairwise_wilcoxon: interpretation toggle works", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+
+  out_on <- capture.output(print(summary(result, interpretation = TRUE)))
+  expect_true(any(grepl("Interpretation:", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, interpretation = FALSE)))
+  expect_false(any(grepl("Interpretation:", out_off, fixed = TRUE)))
+})
+
+test_that("summary.pairwise_wilcoxon: all FALSE shows minimal output", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+  s <- summary(result, comparisons = FALSE, interpretation = FALSE)
+  output <- capture.output(print(s))
+  expect_true(any(grepl("Pairwise Wilcoxon", output)))
+  expect_false(any(grepl("Var 1", output, fixed = TRUE)))
+  expect_false(any(grepl("Interpretation:", output, fixed = TRUE)))
+})
+
+test_that("summary.pairwise_wilcoxon preserves original data", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+  s <- summary(result)
+  expect_equal(s$variables, result$variables)
+  expect_equal(s$p_adjust_method, result$p_adjust_method)
+  expect_equal(s$n_comparisons, result$n_comparisons)
+  expect_equal(nrow(s$comparisons), nrow(result$comparisons))
+})
+
+test_that("compact print.pairwise_wilcoxon works", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science) %>%
+    pairwise_wilcoxon()
+  output <- expect_compact_print(result, "Pairwise Wilcoxon Post-Hoc Test")
+  expect_true(any(grepl("comparisons", output, fixed = TRUE)))
+  expect_true(any(grepl("significant (p < .05)", output, fixed = TRUE)))
+})
+
+test_that("compact print.pairwise_wilcoxon: weighted", {
+  result <- friedman_test(survey_data, trust_government, trust_media,
+                          trust_science, weights = sampling_weight) %>%
+    pairwise_wilcoxon()
+  output <- expect_compact_print(result, "Pairwise Wilcoxon")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+})
+
+test_that("summary.pairwise_wilcoxon: grouped produces output", {
+  result <- survey_data %>% group_by(region) %>%
+    friedman_test(trust_government, trust_media, trust_science) %>%
+    pairwise_wilcoxon()
+  output <- expect_summary_prints(summary(result), "Pairwise Wilcoxon")
+  expect_true(any(grepl("Group", output)))
+})
+
+# ===========================================================================
+# 26. describe()
+# ===========================================================================
+test_that("summary.describe returns correct class", {
+  result <- describe(survey_data, age, income)
+  s <- summary(result)
+  expect_summary_class(s, "summary.describe")
+  expect_true("statistics" %in% names(s$show))
+})
+
+test_that("print.summary.describe produces output", {
+  result <- describe(survey_data, age, income)
+  s <- summary(result)
+  output <- expect_summary_prints(s, "Descriptive Statistics")
+  expect_true(any(grepl("Mean", output, fixed = TRUE)))
+  expect_true(any(grepl("Median", output, fixed = TRUE)))
+  expect_true(any(grepl("SD", output, fixed = TRUE)))
+})
+
+test_that("summary.describe: statistics toggle works", {
+  result <- describe(survey_data, age, income)
+
+  out_on <- capture.output(print(summary(result, statistics = TRUE)))
+  expect_true(any(grepl("Mean", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, statistics = FALSE)))
+  expect_true(any(grepl("Descriptive Statistics", out_off, fixed = TRUE)))
+  expect_false(any(grepl("Mean", out_off, fixed = TRUE)))
+})
+
+test_that("summary.describe preserves original data", {
+  result <- describe(survey_data, age, income)
+  s <- summary(result)
+  expect_equal(s$variables, result$variables)
+  expect_equal(s$results, result$results)
+  expect_equal(s$stat_selection, result$show)
+})
+
+test_that("summary.describe respects digits", {
+  result <- describe(survey_data, age)
+  out_2 <- capture.output(print(summary(result, digits = 2)))
+  expect_true(any(grepl("50.55", out_2, fixed = TRUE)))
+})
+
+test_that("print.describe stays tabular (compact by nature)", {
+  result <- describe(survey_data, age, income)
+  output <- expect_compact_print(result, "Descriptive Statistics")
+  expect_true(any(grepl("Mean", output, fixed = TRUE)))
+})
+
+test_that("summary.describe: grouped, weighted produces output", {
+  result <- survey_data %>% group_by(region) %>%
+    describe(age, weights = sampling_weight)
+  output <- expect_summary_prints(summary(result), "Weighted")
+  expect_true(any(grepl("Group", output)))
+})
+
+# ===========================================================================
+# 27. frequency()
+# ===========================================================================
+test_that("summary.frequency returns correct class", {
+  result <- frequency(survey_data, gender)
+  s <- summary(result)
+  expect_summary_class(s, "summary.frequency")
+  expect_true(all(c("frequency_table", "summary_stats") %in% names(s$show)))
+})
+
+test_that("print.summary.frequency produces output", {
+  result <- frequency(survey_data, gender)
+  s <- summary(result)
+  output <- expect_summary_prints(s, "Frequency Analysis Results")
+  expect_true(any(grepl("Value", output, fixed = TRUE)))
+  expect_true(any(grepl("Raw %", output, fixed = TRUE)))
+  expect_true(any(grepl("Valid %", output, fixed = TRUE)))
+  expect_true(any(grepl("Cum. %", output, fixed = TRUE)))
+  expect_true(any(grepl("Total", output, fixed = TRUE)))
+})
+
+test_that("summary.frequency: frequency_table toggle works", {
+  result <- frequency(survey_data, gender)
+
+  out_on <- capture.output(print(summary(result, frequency_table = TRUE)))
+  expect_true(any(grepl("Raw %", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, frequency_table = FALSE)))
+  expect_false(any(grepl("Raw %", out_off, fixed = TRUE)))
+})
+
+test_that("summary.frequency: summary_stats toggle works", {
+  result <- frequency(survey_data, gender)
+
+  out_on <- capture.output(print(summary(result, summary_stats = TRUE)))
+  expect_true(any(grepl("# total N=", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, summary_stats = FALSE)))
+  expect_false(any(grepl("# total N=", out_off, fixed = TRUE)))
+})
+
+test_that("summary.frequency: all FALSE shows minimal output", {
+  result <- frequency(survey_data, gender)
+  s <- summary(result, frequency_table = FALSE, summary_stats = FALSE)
+  output <- capture.output(print(s))
+  expect_true(any(grepl("Frequency Analysis", output, fixed = TRUE)))
+  expect_false(any(grepl("Raw %", output, fixed = TRUE)))
+  expect_false(any(grepl("# total N=", output, fixed = TRUE)))
+})
+
+test_that("summary.frequency preserves original data", {
+  result <- frequency(survey_data, gender)
+  s <- summary(result)
+  expect_equal(s$variables, result$variables)
+  expect_equal(s$results, result$results)
+  expect_equal(s$stats, result$stats)
+  expect_equal(s$options, result$options)
+})
+
+test_that("compact print.frequency works", {
+  result <- frequency(survey_data, gender)
+  output <- expect_compact_print(result, "Frequency: gender")
+  expect_true(any(grepl("categories", output, fixed = TRUE)))
+  expect_true(any(grepl("N valid = ", output, fixed = TRUE)))
+})
+
+test_that("compact print.frequency: weighted", {
+  result <- frequency(survey_data, gender, weights = sampling_weight)
+  output <- expect_compact_print(result, "Frequency")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+})
+
+test_that("summary.frequency: grouped produces output", {
+  result <- survey_data %>% group_by(region) %>% frequency(gender)
+  output <- expect_summary_prints(summary(result), "Frequency Analysis")
+  expect_true(any(grepl("Group", output)))
+})
+
+# ===========================================================================
+# 28. crosstab()
+# ===========================================================================
+test_that("summary.crosstab returns correct class", {
+  result <- crosstab(survey_data, gender, region)
+  s <- summary(result)
+  expect_summary_class(s, "summary.crosstab")
+  expect_true(all(c("crosstab_table", "percentages") %in% names(s$show)))
+})
+
+test_that("print.summary.crosstab produces output", {
+  result <- crosstab(survey_data, gender, region)
+  s <- summary(result)
+  output <- expect_summary_prints(s, "Crosstabulation")
+  expect_true(any(grepl("Row variable", output, fixed = TRUE)))
+  expect_true(any(grepl("Column variable", output, fixed = TRUE)))
+  expect_true(any(grepl("Total", output, fixed = TRUE)))
+  expect_true(any(grepl("row %", output, fixed = TRUE)))
+})
+
+test_that("summary.crosstab: crosstab_table toggle works", {
+  result <- crosstab(survey_data, gender, region)
+
+  out_on <- capture.output(print(summary(result, crosstab_table = TRUE)))
+  expect_true(any(grepl("Total", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, crosstab_table = FALSE)))
+  expect_false(any(grepl("| Total", out_off, fixed = TRUE)))
+})
+
+test_that("summary.crosstab: percentages toggle works", {
+  result <- crosstab(survey_data, gender, region)
+
+  out_on <- capture.output(print(summary(result, percentages = TRUE)))
+  expect_true(any(grepl("row %", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, percentages = FALSE)))
+  expect_false(any(grepl("row %", out_off, fixed = TRUE)))
+})
+
+test_that("summary.crosstab preserves original data", {
+  result <- crosstab(survey_data, gender, region)
+  s <- summary(result)
+  expect_equal(s$row_var, result$row_var)
+  expect_equal(s$col_var, result$col_var)
+  expect_equal(s$table, result$table)
+  expect_equal(s$n_valid, result$n_valid)
+})
+
+test_that("compact print.crosstab works", {
+  result <- crosstab(survey_data, gender, region)
+  output <- expect_compact_print(result, "Crosstab: gender x region")
+  expect_true(any(grepl("table, N = ", output, fixed = TRUE)))
+  expect_true(any(grepl("chi_square()", output, fixed = TRUE)))
+})
+
+test_that("compact print.crosstab: weighted", {
+  result <- crosstab(survey_data, gender, region,
+                     weights = sampling_weight)
+  output <- expect_compact_print(result, "Crosstab")
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+})
+
+test_that("summary.crosstab: grouped produces output", {
+  result <- survey_data %>% group_by(education) %>%
+    crosstab(gender, region)
+  output <- expect_summary_prints(summary(result), "Grouped Crosstabulation")
+  expect_true(any(grepl("Group", output)))
+})

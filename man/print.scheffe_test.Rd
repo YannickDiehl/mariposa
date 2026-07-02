@@ -2,7 +2,7 @@
 % Please edit documentation in R/scheffe_test.R
 \name{print.scheffe_test}
 \alias{print.scheffe_test}
-\title{Print Scheffe test results}
+\title{Print Scheffe test results (compact)}
 \usage{
 \method{print}{scheffe_test}(x, digits = 3, ...)
 }
@@ -17,19 +17,17 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for objects of class \code{"scheffe_test"}. Provides a
-formatted display of Scheffe post-hoc test results including pairwise
-comparisons, confidence intervals, and adjusted p-values.
-}
-\details{
-The print method displays:
-\itemize{
-\item Pairwise group comparisons with mean differences
-\item Confidence intervals for differences (widest among all post-hoc tests)
-\item Scheffe-adjusted p-values controlling family-wise error rate
-\item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-}
+Compact print method for objects of class \code{"scheffe_test"}. Shows
+one line per variable (or factor, or group combination) with the number
+of pairwise comparisons and how many are significant at the .05 level.
 
-For grouped analyses, results are displayed separately for each group combination.
-For weighted analyses, effective sample sizes are used in calculations.
+For the full comparison tables (mean differences, confidence intervals,
+adjusted p-values), use \code{summary()}.
+}
+\examples{
+result <- oneway_anova(survey_data, life_satisfaction,
+                       group = education) |> scheffe_test()
+result              # compact overview
+summary(result)     # full comparison tables
+
 }

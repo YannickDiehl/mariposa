@@ -349,8 +349,9 @@ test_that("frequency print does not error with tagged NAs", {
   df <- make_tagged_df()
   result <- frequency(df, satisfaction)
 
-  # Printing should not throw an error
+  # Printing should not throw an error (compact print and verbose summary)
   expect_no_error(capture.output(print(result)))
+  expect_no_error(capture.output(print(summary(result))))
 })
 
 test_that("frequency with show.unused and tagged NAs works together", {

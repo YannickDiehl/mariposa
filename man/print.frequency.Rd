@@ -2,7 +2,7 @@
 % Please edit documentation in R/frequency.R
 \name{print.frequency}
 \alias{print.frequency}
-\title{Print method for frequency objects}
+\title{Print method for frequency objects (compact)}
 \usage{
 \method{print}{frequency}(x, digits = 3, ...)
 }
@@ -17,5 +17,16 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Prints formatted frequency statistics with ASCII tables.
+Compact print method for objects of class \code{"frequency"}. Shows
+one line per variable (and group combination) with the number of
+categories, the valid N, and the missing count.
+
+For the full frequency tables (counts, percentages, cumulative
+percentages), use \code{summary()}.
+}
+\examples{
+result <- frequency(survey_data, gender)
+result              # compact overview
+summary(result)     # full frequency tables
+
 }

@@ -338,12 +338,15 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
   )
 }
 
-#' Print pairwise Wilcoxon post-hoc test results
+#' Print pairwise Wilcoxon post-hoc test results (compact)
 #'
 #' @description
-#' Print method for objects of class \code{"pairwise_wilcoxon"}. Provides a
-#' formatted display of pairwise Wilcoxon comparison results including
-#' Z-statistics and adjusted p-values.
+#' Compact print method for objects of class \code{"pairwise_wilcoxon"}.
+#' Shows one line per group combination with the number of pairwise
+#' comparisons and how many are significant at the .05 level.
+#'
+#' For the full comparison tables (Z-statistics, adjusted p-values), use
+#' \code{summary()}.
 #'
 #' @param x An object of class \code{"pairwise_wilcoxon"} returned by
 #'   \code{\link{pairwise_wilcoxon}}.
@@ -351,8 +354,75 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
 #' @param ... Additional arguments passed to \code{\link[base]{print}}.
 #'   Currently unused.
 #'
-#' @details
-#' The print method displays:
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- friedman_test(survey_data, trust_government, trust_media,
+#'                         trust_science) |> pairwise_wilcoxon()
+#' result              # compact overview
+#' summary(result)     # full comparison tables
+#'
+#' @export
+#' @method print pairwise_wilcoxon
+print.pairwise_wilcoxon <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  adjust_label <- .p_adjust_label(x$p_adjust_method)
+  title <- sprintf("Pairwise Wilcoxon Post-Hoc Test (%s)%s",
+                   adjust_label, weighted_tag)
+
+  # Shared compact print core in R/posthoc-pairwise.R
+  .print_posthoc_compact(
+    title      = title,
+    results    = x$comparisons,
+    p_col      = "p_adj",
+    group_vars = if (isTRUE(x$is_grouped)) x$groups else NULL,
+    by_col     = NULL
+  )
+  invisible(x)
+}
+
+#' Summary method for pairwise Wilcoxon post-hoc test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the pairwise comparison tables with Z-statistics, unadjusted
+#' and adjusted p-values, and interpretation.
+#'
+#' @param object A \code{pairwise_wilcoxon} result object.
+#' @param comparisons Logical. Show the pairwise comparison tables?
+#'   (Default: TRUE)
+#' @param interpretation Logical. Show the interpretation section?
+#'   (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.pairwise_wilcoxon} object.
+#'
+#' @examples
+#' result <- friedman_test(survey_data, trust_government, trust_media,
+#'                         trust_science) |> pairwise_wilcoxon()
+#' summary(result)
+#' summary(result, interpretation = FALSE)
+#'
+#' @seealso \code{\link{pairwise_wilcoxon}} for the main analysis function.
+#' @export
+#' @method summary pairwise_wilcoxon
+summary.pairwise_wilcoxon <- function(object, comparisons = TRUE,
+                                      interpretation = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(comparisons = comparisons,
+                      interpretation = interpretation),
+    digits     = digits,
+    class_name = "summary.pairwise_wilcoxon"
+  )
+}
+
+#' Print summary of pairwise Wilcoxon post-hoc test results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for pairwise Wilcoxon comparisons, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.pairwise_wilcoxon}}. The display includes:
 #' \itemize{
 #'   \item Pairwise measurement comparisons with Z-statistics
 #'   \item Adjusted p-values controlling for multiple comparisons
@@ -361,23 +431,32 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
 #'
 #' For grouped analyses, results are displayed separately for each group.
 #'
+#' @param x A \code{summary.pairwise_wilcoxon} object created by
+#'   \code{\link{summary.pairwise_wilcoxon}}.
+#' @param ... Additional arguments (not used).
+#'
 #' @return Invisibly returns the input object \code{x}.
 #'
+#' @examples
+#' result <- friedman_test(survey_data, trust_government, trust_media,
+#'                         trust_science) |> pairwise_wilcoxon()
+#' summary(result)                       # all sections
+#' summary(result, comparisons = FALSE)  # hide comparison tables
+#'
+#' @seealso \code{\link{pairwise_wilcoxon}} for the main analysis,
+#'   \code{\link{summary.pairwise_wilcoxon}} for summary options.
 #' @export
-print.pairwise_wilcoxon <- function(x, digits = 3, ...) {
+#' @method print summary.pairwise_wilcoxon
+print.summary.pairwise_wilcoxon <- function(x, ...) {
+  digits <- x$digits
+
+  # Resolve show toggles
+  show_comparisons    <- isTRUE(x$show$comparisons)
+  show_interpretation <- isTRUE(x$show$interpretation)
+
   # Determine test type using standardized helper
   weights_name <- x$weights
-  adjust_label <- switch(x$p_adjust_method,
-    "bonferroni" = "Bonferroni",
-    "holm"       = "Holm",
-    "BH"         = "Benjamini-Hochberg",
-    "fdr"        = "Benjamini-Hochberg",
-    "hochberg"   = "Hochberg",
-    "hommel"     = "Hommel",
-    "BY"         = "Benjamini-Yekutieli",
-    "none"       = "None",
-    x$p_adjust_method
-  )
+  adjust_label <- .p_adjust_label(x$p_adjust_method)
 
   title_name <- paste0("Pairwise Wilcoxon Post-Hoc Test (", adjust_label, ")")
   test_type <- get_standard_title(title_name, weights_name, "Results")
@@ -404,36 +483,40 @@ print.pairwise_wilcoxon <- function(x, digits = 3, ...) {
 
   is_grouped_data <- isTRUE(x$is_grouped)
 
-  if (is_grouped_data) {
-    # Get unique groups
-    groups <- unique(x$comparisons[x$groups])
+  if (show_comparisons) {
+    if (is_grouped_data) {
+      # Get unique groups
+      groups <- unique(x$comparisons[x$groups])
 
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
+      for (i in seq_len(nrow(groups))) {
+        group_values <- groups[i, , drop = FALSE]
 
-      # Print group header using standardized helper
-      print_group_header(group_values)
+        # Print group header using standardized helper
+        print_group_header(group_values)
 
-      # Filter results for current group
-      group_results <- x$comparisons
-      for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        # Filter results for current group
+        group_results <- x$comparisons
+        for (g in names(group_values)) {
+          group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        }
+
+        if (nrow(group_results) == 0) next
+
+        .print_pw_table(group_results, digits)
       }
-
-      if (nrow(group_results) == 0) next
-
-      .print_pw_table(group_results, digits)
+    } else {
+      .print_pw_table(x$comparisons, digits)
     }
-  } else {
-    .print_pw_table(x$comparisons, digits)
+
+    print_significance_legend()
   }
 
-  print_significance_legend()
-
-  cat("\nInterpretation:\n")
-  cat("- Positive Z: First variable tends to have higher values\n")
-  cat("- Negative Z: Second variable tends to have higher values\n")
-  cat("- p-values are adjusted for multiple comparisons\n")
+  if (show_interpretation) {
+    cat("\nInterpretation:\n")
+    cat("- Positive Z: First variable tends to have higher values\n")
+    cat("- Negative Z: Second variable tends to have higher values\n")
+    cat("- p-values are adjusted for multiple comparisons\n")
+  }
 
   invisible(x)
 }

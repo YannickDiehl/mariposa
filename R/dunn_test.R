@@ -366,34 +366,11 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
   )
 }
 
-#' Print Dunn post-hoc test results
-#'
-#' @description
-#' Print method for objects of class \code{"dunn_test"}. Provides a
-#' formatted display of Dunn pairwise comparison results including
-#' Z-statistics and adjusted p-values.
-#'
-#' @param x An object of class \code{"dunn_test"} returned by \code{\link{dunn_test}}.
-#' @param digits Number of decimal places to display (default: 3)
-#' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
-#'
-#' @details
-#' The print method displays:
-#' \itemize{
-#'   \item Pairwise group comparisons with Z-statistics
-#'   \item Adjusted p-values controlling for multiple comparisons
-#'   \item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-#' }
-#'
-#' For grouped analyses, results are displayed separately for each group combination.
-#'
-#' @return Invisibly returns the input object \code{x}.
-#'
-#' @export
-print.dunn_test <- function(x, digits = 3, ...) {
-  # Determine test type using standardized helper
-  weights_name <- x$weights
-  adjust_label <- switch(x$p_adjust_method,
+#' Resolve display label for a p-adjustment method
+#' @param p_adjust_method Method string as stored on the result object
+#' @noRd
+.p_adjust_label <- function(p_adjust_method) {
+  switch(p_adjust_method,
     "bonferroni" = "Bonferroni",
     "holm"       = "Holm",
     "BH"         = "Benjamini-Hochberg",
@@ -402,8 +379,128 @@ print.dunn_test <- function(x, digits = 3, ...) {
     "hommel"     = "Hommel",
     "BY"         = "Benjamini-Yekutieli",
     "none"       = "None",
-    x$p_adjust_method
+    p_adjust_method
   )
+}
+
+#' Print Dunn post-hoc test results (compact)
+#'
+#' @description
+#' Compact print method for objects of class \code{"dunn_test"}. Shows
+#' one line per variable (or group combination) with the number of
+#' pairwise comparisons and how many are significant at the .05 level.
+#'
+#' For the full comparison tables (Z-statistics, adjusted p-values), use
+#' \code{summary()}.
+#'
+#' @param x An object of class \code{"dunn_test"} returned by \code{\link{dunn_test}}.
+#' @param digits Number of decimal places to display (default: 3)
+#' @param ... Additional arguments passed to \code{\link[base]{print}}. Currently unused.
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- kruskal_wallis(survey_data, life_satisfaction,
+#'                          group = education) |> dunn_test()
+#' result              # compact overview
+#' summary(result)     # full comparison tables
+#'
+#' @export
+#' @method print dunn_test
+print.dunn_test <- function(x, digits = 3, ...) {
+  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  group_tag <- if (!is.null(x$group)) paste0(" by ", x$group) else ""
+  adjust_label <- .p_adjust_label(x$p_adjust_method)
+  title <- sprintf("Dunn Post-Hoc Test (%s)%s%s",
+                   adjust_label, group_tag, weighted_tag)
+
+  # Shared compact print core in R/posthoc-pairwise.R
+  .print_posthoc_compact(
+    title      = title,
+    results    = x$comparisons,
+    p_col      = "p_adj",
+    group_vars = if (isTRUE(x$is_grouped)) x$groups else NULL,
+    by_col     = "Variable"
+  )
+  invisible(x)
+}
+
+#' Summary method for Dunn post-hoc test results
+#'
+#' @description
+#' Creates a summary object that produces detailed output when printed,
+#' including the pairwise comparison tables with Z-statistics, unadjusted
+#' and adjusted p-values, and interpretation.
+#'
+#' @param object A \code{dunn_test} result object.
+#' @param comparisons Logical. Show the pairwise comparison tables?
+#'   (Default: TRUE)
+#' @param interpretation Logical. Show the interpretation section?
+#'   (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.dunn_test} object.
+#'
+#' @examples
+#' result <- kruskal_wallis(survey_data, life_satisfaction,
+#'                          group = education) |> dunn_test()
+#' summary(result)
+#' summary(result, interpretation = FALSE)
+#'
+#' @seealso \code{\link{dunn_test}} for the main analysis function.
+#' @export
+#' @method summary dunn_test
+summary.dunn_test <- function(object, comparisons = TRUE,
+                              interpretation = TRUE, digits = 3, ...) {
+  build_summary_object(
+    object     = object,
+    show       = list(comparisons = comparisons,
+                      interpretation = interpretation),
+    digits     = digits,
+    class_name = "summary.dunn_test"
+  )
+}
+
+#' Print summary of Dunn post-hoc test results (detailed output)
+#'
+#' @description
+#' Displays the detailed output for Dunn pairwise comparisons, with
+#' sections controlled by the boolean parameters passed to
+#' \code{\link{summary.dunn_test}}. The display includes:
+#' \itemize{
+#'   \item Pairwise group comparisons with Z-statistics
+#'   \item Adjusted p-values controlling for multiple comparisons
+#'   \item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
+#' }
+#'
+#' For grouped analyses, results are displayed separately for each group combination.
+#'
+#' @param x A \code{summary.dunn_test} object created by
+#'   \code{\link{summary.dunn_test}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- kruskal_wallis(survey_data, life_satisfaction,
+#'                          group = education) |> dunn_test()
+#' summary(result)                       # all sections
+#' summary(result, comparisons = FALSE)  # hide comparison tables
+#'
+#' @seealso \code{\link{dunn_test}} for the main analysis,
+#'   \code{\link{summary.dunn_test}} for summary options.
+#' @export
+#' @method print summary.dunn_test
+print.summary.dunn_test <- function(x, ...) {
+  digits <- x$digits
+
+  # Resolve show toggles
+  show_comparisons    <- isTRUE(x$show$comparisons)
+  show_interpretation <- isTRUE(x$show$interpretation)
+
+  # Determine test type using standardized helper
+  weights_name <- x$weights
+  adjust_label <- .p_adjust_label(x$p_adjust_method)
 
   title_name <- paste0("Dunn Post-Hoc Test (", adjust_label, ")")
   test_type <- get_standard_title(title_name, weights_name, "Results")
@@ -435,54 +532,58 @@ print.dunn_test <- function(x, digits = 3, ...) {
   # Template Standard: Dual grouped data detection
   is_grouped_data <- isTRUE(x$is_grouped)
 
-  if (is_grouped_data) {
-    # Get unique groups
-    groups <- unique(x$comparisons[x$groups])
+  if (show_comparisons) {
+    if (is_grouped_data) {
+      # Get unique groups
+      groups <- unique(x$comparisons[x$groups])
 
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
+      for (i in seq_len(nrow(groups))) {
+        group_values <- groups[i, , drop = FALSE]
 
-      # Print group header using standardized helper
-      print_group_header(group_values)
+        # Print group header using standardized helper
+        print_group_header(group_values)
 
-      # Filter results for current group
-      group_results <- x$comparisons
-      for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        # Filter results for current group
+        group_results <- x$comparisons
+        for (g in names(group_values)) {
+          group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        }
+
+        if (nrow(group_results) == 0) next
+
+        # Print each variable as separate block
+        for (var in x$variables) {
+          var_results <- group_results[group_results$Variable == var, ]
+          if (nrow(var_results) == 0) next
+
+          cat(sprintf("\n--- %s ---\n\n", var))
+
+          .print_dunn_table(var_results, digits)
+        }
       }
-
-      if (nrow(group_results) == 0) next
-
-      # Print each variable as separate block
+    } else {
+      # Print results for ungrouped data
       for (var in x$variables) {
-        var_results <- group_results[group_results$Variable == var, ]
+        var_results <- x$comparisons[x$comparisons$Variable == var, ]
         if (nrow(var_results) == 0) next
 
-        cat(sprintf("\n--- %s ---\n\n", var))
+        if (length(x$variables) > 1) {
+          cat(sprintf("\n--- %s ---\n\n", var))
+        }
 
         .print_dunn_table(var_results, digits)
       }
     }
-  } else {
-    # Print results for ungrouped data
-    for (var in x$variables) {
-      var_results <- x$comparisons[x$comparisons$Variable == var, ]
-      if (nrow(var_results) == 0) next
 
-      if (length(x$variables) > 1) {
-        cat(sprintf("\n--- %s ---\n\n", var))
-      }
-
-      .print_dunn_table(var_results, digits)
-    }
+    print_significance_legend()
   }
 
-  print_significance_legend()
-
-  cat("\nInterpretation:\n")
-  cat("- Positive Z: First group has higher mean rank\n")
-  cat("- Negative Z: First group has lower mean rank\n")
-  cat("- p-values are adjusted for multiple comparisons\n")
+  if (show_interpretation) {
+    cat("\nInterpretation:\n")
+    cat("- Positive Z: First group has higher mean rank\n")
+    cat("- Negative Z: First group has lower mean rank\n")
+    cat("- p-values are adjusted for multiple comparisons\n")
+  }
 
   invisible(x)
 }

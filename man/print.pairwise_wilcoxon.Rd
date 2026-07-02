@@ -2,7 +2,7 @@
 % Please edit documentation in R/pairwise_wilcoxon.R
 \name{print.pairwise_wilcoxon}
 \alias{print.pairwise_wilcoxon}
-\title{Print pairwise Wilcoxon post-hoc test results}
+\title{Print pairwise Wilcoxon post-hoc test results (compact)}
 \usage{
 \method{print}{pairwise_wilcoxon}(x, digits = 3, ...)
 }
@@ -19,17 +19,17 @@ Currently unused.}
 Invisibly returns the input object \code{x}.
 }
 \description{
-Print method for objects of class \code{"pairwise_wilcoxon"}. Provides a
-formatted display of pairwise Wilcoxon comparison results including
-Z-statistics and adjusted p-values.
-}
-\details{
-The print method displays:
-\itemize{
-\item Pairwise measurement comparisons with Z-statistics
-\item Adjusted p-values controlling for multiple comparisons
-\item Significance indicators (* p < 0.05, ** p < 0.01, *** p < 0.001)
-}
+Compact print method for objects of class \code{"pairwise_wilcoxon"}.
+Shows one line per group combination with the number of pairwise
+comparisons and how many are significant at the .05 level.
 
-For grouped analyses, results are displayed separately for each group.
+For the full comparison tables (Z-statistics, adjusted p-values), use
+\code{summary()}.
+}
+\examples{
+result <- friedman_test(survey_data, trust_government, trust_media,
+                        trust_science) |> pairwise_wilcoxon()
+result              # compact overview
+summary(result)     # full comparison tables
+
 }

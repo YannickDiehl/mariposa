@@ -481,8 +481,10 @@ test_that("frequency with show.valid=FALSE, show.sum=FALSE", {
                       show.valid = FALSE, show.sum = FALSE)
   output <- capture.output(print(result))
   expect_true(length(output) > 0)
-  # Valid % and Cum. % should not appear
-  expect_false(any(grepl("Valid %", output, fixed = TRUE)))
+  # Valid % and Cum. % should not appear (full table lives in summary())
+  summary_output <- capture.output(print(summary(result)))
+  expect_true(length(summary_output) > 0)
+  expect_false(any(grepl("Valid %", summary_output, fixed = TRUE)))
 })
 
 test_that("frequency with show.labels=TRUE", {

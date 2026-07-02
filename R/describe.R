@@ -264,7 +264,11 @@ describe <- function(data, ..., weights = NULL,
 #'
 #' @description
 #' Prints formatted descriptive statistics with professional layout.
-#' Automatically adjusts output based on whether analysis was weighted or unweighted.
+#' Automatically adjusts output based on whether analysis was weighted or
+#' unweighted. The output of \code{describe()} is a summary table by
+#' nature, so \code{print()} and \code{summary()} display the same
+#' statistics table; \code{summary()} additionally offers a
+#' \code{statistics} section toggle and a \code{digits} option.
 #'
 #' @param x A describe object
 #' @param digits Number of decimal places to display (default: 3)
@@ -285,6 +289,91 @@ print.describe <- function(x, digits = 3, ...) {
     .print_grouped_results(x, is_weighted, digits = digits)
   } else {
     .print_ungrouped_results(x, is_weighted, digits = digits)
+  }
+
+  invisible(x)
+}
+
+#' Summary method for describe results
+#'
+#' @description
+#' Creates a summary object that produces the descriptive statistics
+#' table when printed. Since \code{describe()} output is already a
+#' summary table by nature, the printed content matches \code{print()};
+#' the summary layer adds the \code{statistics} section toggle and the
+#' \code{digits} formatting option for consistency with the other
+#' analysis functions.
+#'
+#' @param object A \code{describe} result object.
+#' @param statistics Logical. Show the descriptive statistics table?
+#'   (Default: TRUE)
+#' @param digits Number of decimal places for formatting (Default: 3).
+#' @param ... Additional arguments (not used).
+#' @return A \code{summary.describe} object.
+#'
+#' @examples
+#' result <- describe(survey_data, age, income)
+#' summary(result)
+#' summary(result, digits = 2)
+#'
+#' @seealso \code{\link{describe}} for the main analysis function.
+#' @export
+#' @method summary describe
+summary.describe <- function(object, statistics = TRUE, digits = 3, ...) {
+  out <- build_summary_object(
+    object     = object,
+    show       = list(statistics = statistics),
+    digits     = digits,
+    class_name = "summary.describe"
+  )
+  # describe objects already carry a $show field (the selected statistics);
+  # preserve it under a different name so the summary $show toggles can
+  # take its place.
+  out$stat_selection <- object$show
+  out
+}
+
+#' Print summary of describe results (detailed output)
+#'
+#' @description
+#' Displays the descriptive statistics table for a \code{describe}
+#' result, controlled by the boolean parameter passed to
+#' \code{\link{summary.describe}}.
+#'
+#' @param x A \code{summary.describe} object created by
+#'   \code{\link{summary.describe}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns the input object \code{x}.
+#'
+#' @examples
+#' result <- describe(survey_data, age, income)
+#' summary(result)
+#'
+#' @seealso \code{\link{describe}} for the main analysis,
+#'   \code{\link{summary.describe}} for summary options.
+#' @export
+#' @method print summary.describe
+print.summary.describe <- function(x, ...) {
+  digits <- x$digits
+
+  # Determine if weighted analysis
+  is_weighted <- !is.null(x$weights)
+
+  # Print header using standardized helper
+  title <- get_standard_title("Descriptive", x$weights, "Statistics")
+  print_header(title)
+
+  if (isTRUE(x$show$statistics)) {
+    # Restore the statistic selection under $show for the shared renderers
+    obj <- x
+    obj$show <- x$stat_selection
+
+    if (x$is_grouped) {
+      .print_grouped_results(obj, is_weighted, digits = digits)
+    } else {
+      .print_ungrouped_results(obj, is_weighted, digits = digits)
+    }
   }
 
   invisible(x)
