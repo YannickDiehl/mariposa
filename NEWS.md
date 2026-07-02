@@ -1,3 +1,67 @@
+# mariposa 0.6.12
+
+Weighted-rank correctness and accurate claims (theme: the weighted rank
+family says exactly what it is). Two formula errors in weighted rank
+statistics are fixed and a package-wide invariance suite now guards
+every weighted entry point; alongside, the user-facing claim surface
+(README, DESCRIPTION, help pages, compatibility vignette) is realigned
+with what the validation suite actually covers.
+
+## Bug fixes
+
+* Weighted `kendall_tau()`: the tau-b denominator omitted double-tied
+  pairs (`ties_both`) from the two tie-correction factors, deflating
+  |tau| on tied data. The weighted denominator now mirrors the
+  unweighted `(n0 - Tx - Txy)(n0 - Ty - Txy)` structure.
+* Weighted `kruskal_wallis()`: the grand mean rank was still the
+  hard-coded `N/2` of the pre-0.6.4 rank convention instead of
+  `(N+1)/2`, inflating H. It is now derived from the weighted mid-ranks
+  themselves.
+* Both bugs violated the invariant that weights of exactly 1 must
+  reproduce the unweighted result. A new package-wide invariance suite
+  (`tests/testthat/test-weights-invariance.R`) enforces this w == 1
+  reduction for every weighted entry point; intentionally approximate
+  reductions (design-based `mann_whitney`, weighted Kendall z/p) are
+  documented exceptions with bounded assertions.
+
+## Accurate claims
+
+* README and DESCRIPTION no longer overclaim: the paired t-test mode
+  (not yet implemented) is no longer advertised, and "every function is
+  validated ... your results will match" is replaced by the
+  Charter-compliant wording — validated against SPSS v29 within
+  documented per-tier tolerances, with
+  `vignette("spss-compatibility")` for per-function status.
+* The weighted variants of the rank-based family — `mann_whitney()`,
+  `kruskal_wallis()`, `wilcoxon_test()`, `friedman_test()`,
+  `binomial_test()`, `dunn_test()`, `pairwise_wilcoxon()`, and
+  `kendall_tau()` — are now disclosed as R-only (Tier 4) in a
+  "Weighted variants" note on each help page: SPSS `NPAR TESTS` /
+  `NONPAR CORR` ignore `WEIGHT BY`, so no SPSS reference exists for
+  these weighted paths. `mann_whitney()`'s note also states that its
+  design-based U/W may differ from SPSS's expanded-data U (Z and p are
+  the validated quantities); `oneway_anova()` now documents that
+  omega-/epsilon-squared are truncated at 0 (negative raw estimates
+  occur when F < 1).
+
+## Validation
+
+* The SPSS-compatibility vignette is regenerated (was frozen at
+  2026-05-19) and now carries an "Internal (Tier 4)" marker for the
+  weighted rank variants. Generator fixes: the `w_*` family and
+  `scheffe_test` are correctly matched to their shared test files
+  (previously shown as "not validated" despite existing tests),
+  zero-match tier counts no longer report as 1, and
+  `assert_spss_count()` call sites are tallied as Spec.
+* `test-t-test-spss-validation.R`: the header tier table claimed the
+  t-statistic at Spec (±1e-5) while the assertions use Display(3); the
+  header now matches the assertions.
+* The last `expect_no_error()` in a validation file
+  (`test-linear-regression-spss-validation.R`) is replaced by real
+  assertions on the per-group predictions; the validation-discipline
+  meta-test now passes with `MARIPOSA_VALIDATION_STRICT=TRUE`.
+
+
 # mariposa 0.6.11
 
 Deprecation cleanup (theme: the due bridges come out). Two batches of
