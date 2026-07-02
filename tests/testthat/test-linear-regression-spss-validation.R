@@ -498,8 +498,11 @@ test_that("each group element of a grouped result inherits from lm", {
     linear_regression(life_satisfaction ~ age)
   for (grp in rg$groups) {
     expect_true(inherits(grp, "lm"))
-    # Per-group predict should work directly
+    # Per-group predict should work directly and return finite predictions
     nd <- head(survey_data, 3)
-    expect_no_error(predict(grp, newdata = nd))
+    pred <- predict(grp, newdata = nd)
+    expect_type(pred, "double")
+    expect_length(pred, 3L)
+    expect_true(all(is.finite(pred)))
   }
 })

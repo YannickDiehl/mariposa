@@ -47,6 +47,7 @@ tests/testthat/_snaps/
 # Vignettes (intermediate build artifacts)
 vignettes/*.html
 vignettes/*.R
+!vignettes/_build-spss-compatibility.R
 vignettes/.build.timestamp
 vignettes/inst/
 

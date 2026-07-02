@@ -80,6 +80,8 @@ The test tells you:
 \item 0.14 or higher: Large effect
 }
 \item \strong{Omega-squared}: More conservative estimate (usually preferred)
+\item Omega-squared and epsilon-squared are truncated at 0; a negative raw
+estimate (which occurs when F < 1) is reported as 0.
 }
 }
 

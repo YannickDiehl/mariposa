@@ -9,7 +9,7 @@
 
 **Professional statistical analysis for survey data in R.**
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. All statistical results are validated against SPSS v29; see `vignette("spss-compatibility")` for per-function status.
+mariposa (*Marburg Initiative for Political and Social Analysis*) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. Statistical results are validated against SPSS v29 within documented per-tier tolerances; see `vignette("spss-compatibility")` for per-function status.
 
 ## Installation
 
@@ -71,7 +71,7 @@ survey_data %>%
 | **Label Management** | `var_label()`, `val_labels()`, `to_label()`, `set_na()`, + 6 more | Get/set labels, convert formats, declare missing values |
 | **Data Transformation** | `rec()`, `to_dummy()`, `std()`, `center()`, `find_var()` | Recoding, dummy coding, standardization, centering |
 | **Descriptive** | `describe()`, `frequency()`, `crosstab()`, `codebook()` | Summaries, distributions, and data dictionaries |
-| **T-Tests** | `t_test()` | Mean comparisons (independent, paired, one-sample) |
+| **T-Tests** | `t_test()` | Mean comparisons (independent and one-sample) |
 | **ANOVA** | `oneway_anova()`, `factorial_anova()`, `ancova()` | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
 | **Non-parametric** | `mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`, `friedman_test()`, `binomial_test()` | Distribution-free tests |
 | **Exact tests** | `chi_square()`, `fisher_test()`, `chisq_gof()`, `mcnemar_test()` | Categorical associations and exact tests |
@@ -84,7 +84,7 @@ survey_data %>%
 
 ### Survey Weights Built-In
 
-Every function handles survey weights correctly:
+All statistical functions accept survey weights:
 
 ```r
 # Weighted mean, median, SD
@@ -163,7 +163,7 @@ This works for all analysis functions — `t_test()`, `oneway_anova()`, `chi_squ
 
 ## SPSS Compatibility
 
-Every function is validated against SPSS v29 across four scenarios: weighted/unweighted and grouped/ungrouped. If you're migrating from SPSS, your results will match:
+Statistical functions are validated against SPSS v29 within documented per-tier tolerances, typically across four scenarios: weighted/unweighted and grouped/ungrouped. Some statistics have no SPSS equivalent (for example, the weighted variants of the rank-based tests, which SPSS's `NPAR TESTS` does not support) and are covered by internal regression tests instead. See `vignette("spss-compatibility")` for the per-function validation status. If you're migrating from SPSS, workflows translate directly:
 
 **SPSS:**
 ```spss

@@ -85,6 +85,18 @@ Choose Kendall's tau when:
 \item Your data is ordinal (ranked categories)
 \item You have a small sample size (< 30 observations)
 \item Your data has outliers that might affect Pearson correlation
+}
+}
+
+\subsection{Weighted variants}{
+
+The weighted tau-b is an exact frequency-weighted computation (it
+reproduces the unweighted tau when all weights equal 1, enforced by an
+internal invariance suite), but its z statistic and p-value use a no-ties
+normal approximation. SPSS \code{NONPAR CORR} ignores \code{WEIGHT BY},
+so weighted results have no SPSS reference; see
+\code{vignette("spss-compatibility")} for validation status.
+\itemize{
 \item You want a more conservative measure than Spearman's rho
 }
 }

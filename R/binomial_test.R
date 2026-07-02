@@ -65,6 +65,14 @@
 #' - For comparing proportions between groups:
 #'   Use chi-square or z-test for proportions
 #' - For larger samples with normal approximation:
+#' ## Weighted variants
+#'
+#' SPSS \code{NPAR TESTS} ignores \code{WEIGHT BY}, so weighted results have
+#' no SPSS reference. The weighted variant is an R-only frequency-weight
+#' extension that reduces exactly to the unweighted test when all weights
+#' equal 1 (enforced by an internal invariance suite); see
+#' \code{vignette("spss-compatibility")} for validation status.
+#'
 #'   Results will be very similar to a one-sample z-test for proportions
 #'
 #' @seealso

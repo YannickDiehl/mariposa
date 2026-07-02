@@ -59,6 +59,15 @@
 #' - Your data is ordinal (ranked categories)
 #' - You have a small sample size (< 30 observations)
 #' - Your data has outliers that might affect Pearson correlation
+#' ## Weighted variants
+#'
+#' The weighted tau-b is an exact frequency-weighted computation (it
+#' reproduces the unweighted tau when all weights equal 1, enforced by an
+#' internal invariance suite), but its z statistic and p-value use a no-ties
+#' normal approximation. SPSS \code{NONPAR CORR} ignores \code{WEIGHT BY},
+#' so weighted results have no SPSS reference; see
+#' \code{vignette("spss-compatibility")} for validation status.
+#'
 #' - You want a more conservative measure than Spearman's rho
 #'
 #' @examples

@@ -223,7 +223,7 @@ survey_data %>%
 
 | Function | Purpose |
 |----------|---------|
-| `t_test()` | Independent, paired, and one-sample t-tests |
+| `t_test()` | Independent and one-sample t-tests |
 | `oneway_anova()` | One-way ANOVA |
 | `factorial_anova()` | Multi-factor ANOVA with Type III SS |
 | `ancova()` | ANCOVA with estimated marginal means |

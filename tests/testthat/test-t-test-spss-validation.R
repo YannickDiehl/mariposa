@@ -21,7 +21,7 @@
 # Tolerance tier assignment for t-test outputs:
 #   N (integer)                       — Spec (count, exact)
 #   Mean, SD, SE                      — Spec (statistic), see "Gaps" note below
-#   t-statistic                       — Spec (statistic, ±1e-5)
+#   t-statistic                       — Display (precision = 3, ±5e-4)
 #   df (integer, equal variance)      — Spec (count, exact)
 #   df (Welch-Satterthwaite, decimal) — Display (precision = 3, ±5e-4)
 #   Mean Difference                   — Spec (statistic)
@@ -700,7 +700,7 @@ compare_one_sample <- function(r_result, spss, scenario) {
   r <- r_result$results[1, ]
   mu <- r_result$mu %||% 0
 
-  # ---- t-statistic (Spec) ------------------------------------------------
+  # ---- t-statistic (Display) -----------------------------------------------
   # SPSS prints t to 3 decimals → Display tier, precision = 3 (tol ±5e-4).
   assert_spss(r$t_stat, spss$t_stat,
               tier = "display", precision = 3,
