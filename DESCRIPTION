@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
 Title: SPSS-Compatible Statistical Tools for Survey Data
-Version: 0.6.12
+Version: 0.6.13
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
@@ -43,7 +43,10 @@ Suggests:
     MASS,
     openxlsx2,
     survey,
-    broom
+    broom,
+    psych,
+    lavaan,
+    semTools
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)

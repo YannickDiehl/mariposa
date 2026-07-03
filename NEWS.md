@@ -1,3 +1,46 @@
+# mariposa 0.6.13
+
+McDonald's omega (theme: reliability() learns a second reliability
+coefficient). `reliability()` now reports McDonald's omega alongside
+Cronbach's alpha — a new statistic within an existing function, hence a
+PATCH per the clarified versioning policy.
+
+## New features
+
+* `reliability()` computes **McDonald's omega** from a one-factor
+  maximum-likelihood model (`stats::factanal` on the same (weighted)
+  correlation matrix already used for standardized alpha):
+  - `omega` — raw/total omega in the covariance metric (analogous to
+    raw alpha), reported as "McDonald's Omega";
+  - `omega_std` — standardized omega in the correlation metric
+    (analogous to standardized alpha);
+  - `omega_if_deleted` — a new column in `item_total`, refitting the
+    one-factor model per deleted item (NA when the reduced scale has
+    fewer than 3 items, where the model is unidentified).
+  Scales with fewer than 3 items get NA omega fields plus a warning
+  (alpha is unaffected); non-convergent factor fits degrade to NA with
+  the factanal message. The compact `print()` shows omega next to
+  alpha, and `summary()` adds omega rows to the Reliability Statistics
+  block and an omega column to the Item-Total table.
+
+## Validation
+
+* McDonald's omega is **Tier 4 (Internal, R-only)** for now: SPSS v27+
+  offers omega in `RELIABILITY`, but IBM's algorithm documentation is
+  not publicly retrievable and no SPSS v29 reference run exists yet.
+  The pending reference run is prepared in
+  `.claude/spss-syntax-omega-references.sps` (expected values included);
+  until it lands, omega is guarded by a parameter-recovery test on
+  simulated congeneric data, exact cross-checks against a manual
+  factanal computation, cross-checks against `psych::omega()` and a
+  lavaan/semTools one-factor CFA (`tests/testthat/test-reliability-omega.R`),
+  and a `w == 1` block in the weights-invariance suite. The help page
+  carries the Tier-4 disclosure; the compatibility vignette flags
+  omega as Internal (Tier 4).
+* `psych`, `lavaan`, and `semTools` added to Suggests (cross-check
+  tests only; all gated by `skip_if_not_installed()`).
+
+
 # mariposa 0.6.12
 
 Weighted-rank correctness and accurate claims (theme: the weighted rank
