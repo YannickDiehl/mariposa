@@ -9,8 +9,8 @@ Stata, SAS, Excel) through label management, recoding, and
 standardization to statistical analysis with survey weights, grouped
 operations via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
-and publication-ready output. All statistical results are validated
-against SPSS v29; see
+and publication-ready output. Statistical results are validated against
+SPSS v29 within documented per-tier tolerances; see
 [`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
 for per-function status.
 
@@ -76,7 +76,7 @@ survey_data %>%
 | **Label Management** | [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md), [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md), [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md), [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md), + 6 more | Get/set labels, convert formats, declare missing values |
 | **Data Transformation** | [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md), [`to_dummy()`](https://YannickDiehl.github.io/mariposa/reference/to_dummy.md), [`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md), [`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md), [`find_var()`](https://YannickDiehl.github.io/mariposa/reference/find_var.md) | Recoding, dummy coding, standardization, centering |
 | **Descriptive** | [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md), [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md), [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md), [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md) | Summaries, distributions, and data dictionaries |
-| **T-Tests** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | Mean comparisons (independent, paired, one-sample) |
+| **T-Tests** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | Mean comparisons (independent and one-sample) |
 | **ANOVA** | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md), [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md), [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md) | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
 | **Non-parametric** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md), [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md), [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md), [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md), [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md) | Distribution-free tests |
 | **Exact tests** | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md), [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md), [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md), [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md) | Categorical associations and exact tests |
@@ -84,12 +84,12 @@ survey_data %>%
 | **Post-hoc** | [`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md), [`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md), [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md), [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md), [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md) | Follow-up analyses (parametric and non-parametric) |
 | **Scale analysis** | [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md), [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md), [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md), [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md), [`row_count()`](https://YannickDiehl.github.io/mariposa/reference/row_count.md), [`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md) | Cronbach’s Alpha, factor analysis, index construction |
 | **Regression** | [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md), [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md) | Linear and logistic models with SPSS-style output |
-| **Effect sizes** | [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md), [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md), [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Effect size measures for categorical data |
+| **Effect sizes** | [`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md), [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md), [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md) | Effect size measures for categorical data |
 | **Weighted stats** | [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md), [`w_median()`](https://YannickDiehl.github.io/mariposa/reference/w_median.md), [`w_sd()`](https://YannickDiehl.github.io/mariposa/reference/w_sd.md), + 8 more | Individual weighted statistics |
 
 ### Survey Weights Built-In
 
-Every function handles survey weights correctly:
+All statistical functions accept survey weights:
 
 ``` r
 
@@ -184,9 +184,15 @@ and more.
 
 ## SPSS Compatibility
 
-Every function is validated against SPSS v29 across four scenarios:
-weighted/unweighted and grouped/ungrouped. If you’re migrating from
-SPSS, your results will match:
+Statistical functions are validated against SPSS v29 within documented
+per-tier tolerances, typically across four scenarios:
+weighted/unweighted and grouped/ungrouped. Some statistics have no SPSS
+equivalent (for example, the weighted variants of the rank-based tests,
+which SPSS’s `NPAR TESTS` does not support) and are covered by internal
+regression tests instead. See
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for the per-function validation status. If you’re migrating from SPSS,
+workflows translate directly:
 
 **SPSS:**
 

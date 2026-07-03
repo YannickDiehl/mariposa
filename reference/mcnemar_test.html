@@ -35,7 +35,7 @@ The number of discordant pairs (who actually changed)
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,7 +127,8 @@ categorical outcomes.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Test results showing whether paired proportions changed, including:</p><ul><li><p>McNemar chi-square statistic (with continuity correction)</p></li>
+    <p>Test results showing whether paired proportions changed, including:</p><ul><li><p>McNemar chi-square statistic (<code>chi_squared</code>, with continuity
+correction)</p></li>
 <li><p>Asymptotic p-value</p></li>
 <li><p>Exact binomial p-value (two-sided)</p></li>
 <li><p>2x2 contingency table</p></li>
@@ -229,58 +230,21 @@ correlated proportions or percentages. <em>Psychometrika</em>, 12(2), 153-157.</
 <span class="r-in"><span><span class="co"># McNemar test</span></span></span>
 <span class="r-in"><span><span class="va">test_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mcnemar_test</span><span class="op">(</span>var1 <span class="op">=</span> <span class="va">trust_gov_high</span>, var2 <span class="op">=</span> <span class="va">trust_media_high</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> McNemar Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variable 1: trust_gov_high</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variable 2: trust_media_high</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2x2 Contingency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    v2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> v1     0    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0 1342  338</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1  448   99</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Chi-Sq (cc) p (asymp) p (exact)    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       15.116     &lt;.001     &lt;.001 2227 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Discordant pairs: b = 338, c = 448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> McNemar Test: trust_gov_high x trust_media_high</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2 = 15.116, p &lt; 0.001 (asymp), p &lt; 0.001 (exact) ***, N = 2227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">test_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mcnemar_test</span><span class="op">(</span>var1 <span class="op">=</span> <span class="va">trust_gov_high</span>, var2 <span class="op">=</span> <span class="va">trust_media_high</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> McNemar Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variable 1: trust_gov_high</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variable 2: trust_media_high</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Chi-Sq p (asymp) p (exact)   N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   8.255    0.0041    0.0039 435  ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Chi-Sq p (asymp) p (exact)    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   8.242    0.0041    0.0041 1792  ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> McNemar Test: trust_gov_high x trust_media_high</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2 = 8.255, p = 0.004 (asymp), p = 0.004 (exact) **, N = 435</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> McNemar Test: trust_gov_high x trust_media_high</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2 = 8.242, p = 0.004 (asymp), p = 0.004 (exact) **, N = 1792</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

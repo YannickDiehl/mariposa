@@ -35,7 +35,7 @@ Which groups tend to have higher or lower values (via mean ranks)
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,7 +128,7 @@ employment). Must have at least 2 groups (3+ for meaningful use).</p></dd>
     <p>Test results showing whether groups differ, including:</p><ul><li><p>H statistic (Kruskal-Wallis chi-square test statistic)</p></li>
 <li><p>Degrees of freedom (number of groups minus 1)</p></li>
 <li><p>P-value (are groups different?)</p></li>
-<li><p>Effect size eta-squared (how big is the group effect?)</p></li>
+<li><p>Effect size epsilon-squared (how big is the group effect?)</p></li>
 <li><p>Mean rank for each group (which groups are higher/lower?)</p></li>
 </ul></div>
     <div class="section level2">
@@ -142,7 +142,7 @@ employment). Must have at least 2 groups (3+ for meaningful use).</p></dd>
 <li><p>p &lt; 0.01: Strong evidence of group differences</p></li>
 <li><p>p &lt; 0.05: Moderate evidence of group differences</p></li>
 <li><p>p &gt; 0.05: No significant group differences found</p></li>
-</ul><p><strong>Effect Size Eta-squared</strong> (How much do groups matter?):</p><ul><li><p>&lt; 0.01: Negligible effect</p></li>
+</ul><p><strong>Effect Size Epsilon-squared</strong> (How much do groups matter?):</p><ul><li><p>&lt; 0.01: Negligible effect</p></li>
 <li><p>0.01-0.06: Small effect</p></li>
 <li><p>0.06-0.14: Medium effect</p></li>
 <li><p>0.14 or higher: Large effect</p></li>
@@ -177,7 +177,17 @@ which specific groups differ</p></li>
 
 <ul><li><p>For 2 groups: Use <code><a href="mann_whitney.html">mann_whitney()</a></code> instead</p></li>
 <li><p>For normally distributed data: Use <code><a href="oneway_anova.html">oneway_anova()</a></code> instead</p></li>
-<li><p>For repeated measures (same subjects): Use <code><a href="friedman_test.html">friedman_test()</a></code> instead</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>SPSS <code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have
+no SPSS reference. The weighted variant is an R-only frequency-weight
+extension that reduces exactly to the unweighted test when all weights
+equal 1 (enforced by an internal invariance suite); see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>For repeated measures (same subjects): Use <code><a href="friedman_test.html">friedman_test()</a></code> instead</p></li>
 </ul></div>
 
     </div>
@@ -219,322 +229,59 @@ in Sport Sciences, 1(21), 19-25.</p>
 <span class="r-in"><span><span class="co"># Basic Kruskal-Wallis test (comparing across education levels)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  809    974.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  618   1250.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  607   1329.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  387   1456.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2421        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             171.178  3       0       0.071 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Eta-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">income</span>, <span class="va">trust_government</span>,</span></span>
 <span class="r-in"><span>                 group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  809    974.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  618   1250.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  607   1329.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  387   1456.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2421        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             171.178  3       0       0.071 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  735    623.53</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  548   1076.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  548   1359.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  355   1681.93</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2186        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             814.174  3       0       0.373 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  791   1191.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  592   1156.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  595   1170.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  376   1192.82</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2354        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               1.235  3   0.745       0.001    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Eta-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: income by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 814.174, p &lt; 0.001 ***, eps2 = 0.373, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_government by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  791   1191.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  592   1156.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  595   1170.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  376   1192.82</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2354        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               1.235  3   0.745       0.001    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  797   1178.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  594   1210.37</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  599   1192.69</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  377   1140.82</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2367        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               2.709  3   0.439       0.001    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  807   1200.79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  610   1172.31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  597   1235.52</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  384   1183.98</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2398        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               3.047  3   0.384       0.001    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Eta-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_government by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_media by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 2.709, p = 0.439 , eps2 = 0.001, N = 2367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_science by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 3.047, p = 0.384 , eps2 = 0.001, N = 2398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span></span>
 <span class="r-in"><span>                 weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kruskal-Wallis Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group      N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  815.7    984.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  629.6   1258.61</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  618.2   1338.55</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  373.2   1464.69</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2436.7        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Weighted Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             167.149  3       0       0.069 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses frequency-weighted ranks.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Eta-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 167.075, p &lt; 0.001 ***, eps2 = 0.069, N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate test for each region)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group   N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary 161    202.35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary 119    232.99</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary 110    254.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  75    266.77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 465        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              17.105  3   0.001       0.037 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  648    771.38</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  499   1018.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  497   1075.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  312   1190.70</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 1956        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             158.807  3       0       0.081 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Eta-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 17.105, p &lt; 0.001 ***, eps2 = 0.037, N = 465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 158.807, p &lt; 0.001 ***, eps2 = 0.081, N = 1956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare across employment status (5 groups)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">employment</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: employment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Groups: Student, Employed, Unemployed, Retired, Other</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Student   65   1495.58</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Employed 1390   1075.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Unemployed  159   1073.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Retired  471   1089.83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Other  101   1129.95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Total 2186        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Eta-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              28.026  4       0       0.013 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Eta-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: income by employment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(4) = 28.026, p &lt; 0.001 ***, eps2 = 0.013, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

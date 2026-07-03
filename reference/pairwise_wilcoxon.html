@@ -23,7 +23,7 @@ A way to make all possible pairwise comparisons for repeated measures
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -157,7 +157,17 @@ Options: <code>"bonferroni"</code> (default, most conservative),
 independent groups)</p></li>
 <li><p>Follow-up to <code><a href="friedman_test.html">friedman_test()</a></code>, like <code><a href="dunn_test.html">dunn_test()</a></code>
 follows <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code></p></li>
-<li><p>Each pairwise comparison uses <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code> logic internally</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>When the parent <code><a href="friedman_test.html">friedman_test()</a></code> result is weighted, each
+pairwise test uses the same frequency-weighted signed-rank formulas. SPSS
+<code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have no
+SPSS reference (R-only, guarded by an internal invariance suite); see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>Each pairwise comparison uses <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code> logic internally</p></li>
 </ul></div>
 
     </div>
@@ -190,75 +200,21 @@ Bulletin, 1(6), 80-83.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Pairwise Wilcoxon comparisons (default: Bonferroni)</span></span></span>
 <span class="r-in"><span><span class="va">friedman_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">pairwise_wilcoxon</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of comparisons: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -5.097     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 25.945     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 29.091     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Bonferroni)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 comparisons, 3 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With Holm correction (less conservative)</span></span></span>
 <span class="r-in"><span><span class="va">friedman_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">pairwise_wilcoxon</span><span class="op">(</span>p_adjust <span class="op">=</span> <span class="st">"holm"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Holm) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Holm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of comparisons: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -5.097     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 25.945     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 29.091     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Holm)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 comparisons, 3 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With Benjamini-Hochberg (controls false discovery rate)</span></span></span>
 <span class="r-in"><span><span class="va">friedman_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">pairwise_wilcoxon</span><span class="op">(</span>p_adjust <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Benjamini-Hochberg) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Benjamini-Hochberg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of comparisons: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -5.097     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 25.945     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 29.091     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Benjamini-Hochberg)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 comparisons, 3 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">fw_weighted</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -266,28 +222,9 @@ Bulletin, 1(6), 80-83.</p>
 <span class="r-in"><span>                weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fw_weighted</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">pairwise_wilcoxon</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of comparisons: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -5.033     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 25.997     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 29.095     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 comparisons, 3 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">fw_grouped</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -295,40 +232,12 @@ Bulletin, 1(6), 80-83.</p>
 <span class="r-in"><span>  <span class="fu"><a href="friedman_test.html">friedman_test</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fw_grouped</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">pairwise_wilcoxon</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of comparisons: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -2.727     0.006   0.019   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 11.635     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 13.820     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -4.346     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 23.191     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 25.630     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Bonferroni)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 comparisons, 3 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 comparisons, 3 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

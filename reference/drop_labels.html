@@ -11,7 +11,7 @@ exist but their labels remain attached."><meta property="og:image" content="http
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ exist but their labels remain attached.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drop_labels</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drop_labels</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, drop_na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -80,7 +80,7 @@ exist but their labels remain attached.</p>
 empty, applies to all labelled columns.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>If <code>TRUE</code>, also removes tagged NA labels. Default: <code>FALSE</code>
 (tagged NA labels are preserved even if no tagged NAs of that type exist).</p></dd>
 
@@ -96,7 +96,7 @@ The removed category's label still exists on the variable, which can
 cause confusing output in <code><a href="frequency.html">frequency()</a></code> or <code><a href="codebook.html">codebook()</a></code>.
 <code>drop_labels()</code> cleans this up by keeping only labels for values
 actually present in the data.</p>
-<p>By default, tagged NA labels are preserved (<code>drop.na = FALSE</code>) because
+<p>By default, tagged NA labels are preserved (<code>drop_na = FALSE</code>) because
 they represent missing value types, not substantive categories.</p>
     </div>
     <div class="section level2">

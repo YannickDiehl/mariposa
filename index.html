@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,7 @@
 <!-- badges: start -->
 
 <p><strong>Professional statistical analysis for survey data in R.</strong></p>
-<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. All statistical results are validated against SPSS v29; see <code><a href="articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for per-function status.</p>
+<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. Statistical results are validated against SPSS v29 within documented per-tier tolerances; see <code><a href="articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for per-function status.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -189,7 +189,7 @@
 <tr>
 <td><strong>T-Tests</strong></td>
 <td><code><a href="reference/t_test.html">t_test()</a></code></td>
-<td>Mean comparisons (independent, paired, one-sample)</td>
+<td>Mean comparisons (independent and one-sample)</td>
 </tr>
 <tr>
 <td><strong>ANOVA</strong></td>
@@ -243,7 +243,7 @@
 <tr>
 <td><strong>Effect sizes</strong></td>
 <td>
-<code><a href="reference/chi_square.html">phi()</a></code>, <code><a href="reference/chi_square.html">cramers_v()</a></code>, <code><a href="reference/chi_square.html">goodman_gamma()</a></code>
+<code><a href="reference/phi.html">phi()</a></code>, <code><a href="reference/phi.html">cramers_v()</a></code>, <code><a href="reference/phi.html">goodman_gamma()</a></code>
 </td>
 <td>Effect size measures for categorical data</td>
 </tr>
@@ -259,7 +259,7 @@
 <div class="section level3">
 <h3 id="survey-weights-built-in">Survey Weights Built-In<a class="anchor" aria-label="anchor" href="#survey-weights-built-in"></a>
 </h3>
-<p>Every function handles survey weights correctly:</p>
+<p>All statistical functions accept survey weights:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Weighted mean, median, SD</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -335,7 +335,7 @@
 <div class="section level2">
 <h2 id="spss-compatibility">SPSS Compatibility<a class="anchor" aria-label="anchor" href="#spss-compatibility"></a>
 </h2>
-<p>Every function is validated against SPSS v29 across four scenarios: weighted/unweighted and grouped/ungrouped. If you’re migrating from SPSS, your results will match:</p>
+<p>Statistical functions are validated against SPSS v29 within documented per-tier tolerances, typically across four scenarios: weighted/unweighted and grouped/ungrouped. Some statistics have no SPSS equivalent (for example, the weighted variants of the rank-based tests, which SPSS’s <code>NPAR TESTS</code> does not support) and are covered by internal regression tests instead. See <code><a href="articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for the per-function validation status. If you’re migrating from SPSS, workflows translate directly:</p>
 <p><strong>SPSS:</strong></p>
 <pre class="spss"><code>WEIGHT BY sampling_weight.
 T-TEST GROUPS=gender(1 2)

@@ -16,17 +16,18 @@ codebook(
   data,
   ...,
   weights = NULL,
-  show.id = TRUE,
-  show.type = TRUE,
-  show.labels = TRUE,
-  show.values = TRUE,
-  show.freq = TRUE,
-  show.na = TRUE,
-  show.unused = FALSE,
-  max.values = 10,
-  max.len = 50,
-  sort.by.name = FALSE,
-  file = NULL
+  show_id = TRUE,
+  show_type = TRUE,
+  show_labels = TRUE,
+  show_values = TRUE,
+  show_freq = TRUE,
+  show_na = TRUE,
+  show_unused = FALSE,
+  max_values = 10,
+  max_len = 50,
+  sort_by_name = FALSE,
+  file = NULL,
+  view = interactive()
 )
 ```
 
@@ -45,27 +46,27 @@ codebook(
 
   Optional survey weights for weighted frequency calculations
 
-- show.id:
+- show_id:
 
   Show variable position number? (Default: TRUE)
 
-- show.type:
+- show_type:
 
   Show data type? (Default: TRUE)
 
-- show.labels:
+- show_labels:
 
   Show variable labels? (Default: TRUE)
 
-- show.values:
+- show_values:
 
   Show empirical values and value labels? (Default: TRUE)
 
-- show.freq:
+- show_freq:
 
   Show frequency counts? (Default: TRUE)
 
-- show.na:
+- show_na:
 
   Show tagged missing value types in the codebook? (Default: TRUE). When
   data was imported with
@@ -78,29 +79,38 @@ codebook(
   codes, labels, and frequencies below the valid values, separated by a
   thin gray line.
 
-- show.unused:
+- show_unused:
 
   Show all defined value labels, even those with zero observations?
   (Default: FALSE). Useful for seeing the full codebook including
   response options that no respondent selected.
 
-- max.values:
+- max_values:
 
   Maximum number of values to display per variable before truncating or
   showing a range (Default: 10)
 
-- max.len:
+- max_len:
 
   Maximum character width for labels before truncation (Default: 50)
 
-- sort.by.name:
+- sort_by_name:
 
   Sort variables alphabetically instead of by position? (Default: FALSE)
 
 - file:
 
-  Path to save the HTML codebook. If NULL (default), a temporary file is
-  used and the codebook opens in the Viewer.
+  Path to save the HTML codebook. If NULL (default), no file is written
+  unless the codebook is opened in the Viewer (then a temporary file is
+  used). The directory of `file` must already exist.
+
+- view:
+
+  Open the HTML codebook in the RStudio Viewer (or browser)? Defaults to
+  [`interactive()`](https://rdrr.io/r/base/interactive.html), so
+  interactive sessions open the Viewer and scripts/tests do not. Set
+  `view = FALSE` to suppress the Viewer side effect entirely; `file =`
+  writing is unaffected by this argument.
 
 ## Value
 
@@ -190,7 +200,7 @@ print(cb)
 #> Codebook: survey_data
 #> 16 variables | 2,500 observations | 15 labelled
 #> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)
-#> -- Open HTML viewer for full codebook with values and frequencies
+#> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer
 
 # Detailed console output
 summary(cb)
@@ -207,11 +217,11 @@ summary(cb)
 #> -------------------------------------------------- 
 #> 
 #> [1] id (integer)
-#>     Values: 1 - 2500
+#>     Values: 1 - 2500 (2500 distinct)
 #> 
 #> [2] age (numeric)
 #>     Label: Age in years
-#>     Values: 18 - 95
+#>     Values: 18 - 95 (78 distinct)
 #> 
 #> [3] gender (factor)
 #>     Label: Gender
@@ -238,7 +248,7 @@ summary(cb)
 #> 
 #> [6] income (numeric)
 #>     Label: Monthly household income (EUR)
-#>     Values: 800 - 8000
+#>     Values: 800 - 8000 (73 distinct)
 #> 
 #> [7] employment (factor)
 #>     Label: Employment status
@@ -276,7 +286,7 @@ summary(cb)
 #> 
 #> [14] sampling_weight (numeric)
 #>     Label: Weighting factor
-#>     Values: 0.70155162345618 - 1.39769840524532
+#>     Values: 0.7016 - 1.398 (2500 distinct)
 #> 
 #> [15] stratum (factor)
 #>     Label: Stratification variable

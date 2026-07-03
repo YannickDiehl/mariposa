@@ -2,7 +2,13 @@
 
 Prints formatted descriptive statistics with professional layout.
 Automatically adjusts output based on whether analysis was weighted or
-unweighted.
+unweighted. The output of
+[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+is a summary table by nature, so
+[`print()`](https://rdrr.io/r/base/print.html) and
+[`summary()`](https://rdrr.io/r/base/summary.html) display the same
+statistics table; [`summary()`](https://rdrr.io/r/base/summary.html)
+additionally offers a `statistics` section toggle and a `digits` option.
 
 ## Usage
 

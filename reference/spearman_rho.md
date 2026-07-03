@@ -274,12 +274,12 @@ summary(result)     # full correlation, p-value, and N matrices
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> --------------------------------------------------------------------- 
+#> ---------------- 
 #>                        Pair    rho      t      p    n sig
 #>                age × income  0.003  0.163 0.8703 2186    
 #>     age × life_satisfaction -0.024 -1.180 0.2383 2421    
 #>  income × life_satisfaction  0.464 24.073 0.0000 2115 ***
-#> --------------------------------------------------------------------- 
+#> ---------------- 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)  # hide p-values
@@ -310,12 +310,12 @@ summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> ------------------- 
 #> 
 #> Pairwise Results:
-#> --------------------------------------------------------------------- 
+#> ---------------- 
 #>                        Pair    rho      t      p    n sig
 #>                age × income  0.003  0.163 0.8703 2186    
 #>     age × life_satisfaction -0.024 -1.180 0.2383 2421    
 #>  income × life_satisfaction  0.464 24.073 0.0000 2115 ***
-#> --------------------------------------------------------------------- 
+#> ---------------- 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

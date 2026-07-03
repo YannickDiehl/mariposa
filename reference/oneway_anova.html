@@ -35,7 +35,7 @@ Which variance assumption fits your data best
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,9 +127,9 @@ region, age_group). Must have at least 3 groups for ANOVA.</p></dd>
 
 
 <dt id="arg-var-equal">var.equal<a class="anchor" aria-label="anchor" href="#arg-var-equal"></a></dt>
-<dd><p>Should we assume all groups have similar variance? (Default: TRUE)</p><ul><li><p>TRUE: Standard ANOVA (assumes equal variances)</p></li>
-<li><p>FALSE: Welch's ANOVA (allows unequal variances)</p></li>
-</ul></dd>
+<dd><p>Deprecated and ignored (a warning is issued when set to
+FALSE). Like SPSS ONEWAY, the classical ANOVA table and Welch's robust
+test are always both computed and displayed.</p></dd>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -138,7 +138,7 @@ region, age_group). Must have at least 3 groups for ANOVA.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>ANOVA results showing whether groups differ, including:</p><ul><li><p>F-statistic and p-value (are groups different?)</p></li>
+    <p>ANOVA results showing whether groups differ, including:</p><ul><li><p>F-statistic (<code>F_statistic</code>) and p-value (are groups different?)</p></li>
 <li><p>Effect sizes (how much do groups matter?)</p></li>
 <li><p>Group statistics (means and standard deviations)</p></li>
 <li><p>Both standard and Welch ANOVA results
@@ -161,6 +161,8 @@ Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">su
 <li><p>0.14 or higher: Large effect</p></li>
 </ul></li>
 <li><p><strong>Omega-squared</strong>: More conservative estimate (usually preferred)</p></li>
+<li><p>Omega-squared and epsilon-squared are truncated at 0; a negative raw
+estimate (which occurs when F &lt; 1) is reported as 0.</p></li>
 </ul></div>
 
 <div class="section">
@@ -174,11 +176,12 @@ Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">su
 </ul></div>
 
 <div class="section">
-<h3 id="choosing-variance-assumptions">Choosing Variance Assumptions<a class="anchor" aria-label="anchor" href="#choosing-variance-assumptions"></a></h3>
+<h3 id="variance-assumptions">Variance Assumptions<a class="anchor" aria-label="anchor" href="#variance-assumptions"></a></h3>
 
-<ul><li><p><strong>Standard ANOVA</strong> (var.equal = TRUE): Use when group variances are similar</p></li>
-<li><p><strong>Welch's ANOVA</strong> (var.equal = FALSE): Use when group variances differ or you're unsure</p></li>
-<li><p>The function shows both results for comparison</p></li>
+
+<p>Like SPSS ONEWAY, both results are always shown for comparison:</p><ul><li><p><strong>Standard ANOVA</strong>: valid when group variances are similar</p></li>
+<li><p><strong>Welch's ANOVA</strong>: robust when group variances differ</p></li>
+<li><p>Use <code><a href="levene_test.html">levene_test</a></code> to check which situation applies</p></li>
 </ul></div>
 
 <div class="section">
@@ -279,80 +282,19 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA: life_satisfaction by education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 1952) = 62.153, p &lt; 0.001 ***, eta2 = 0.087 (medium), N = 1956</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Unequal variances (Welch's ANOVA)</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">education</span>, var.equal <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA: income by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 2182) = 466.494, p &lt; 0.001 ***, eta2 = 0.391 (large), N = 2186</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Store results for post-hoc analysis</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">oneway_anova</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Follow up with post-hoc tests</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary      0.497    0.344    0.649   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary      0.649    0.496    0.802   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary      0.843    0.666    1.019   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.153   -0.010    0.316   0.075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.346    0.161    0.531   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary      0.193    0.008    0.379   0.037</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># Check homogeneity of variances</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable F_statistic df1  df2 p_value sig        Conclusion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction      31.634   3 2417       0 *** Variances unequal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p &lt;= 0.05: Variances are heterogeneous (equal variances NOT assumed)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recommendation based on Levene test:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Use Welch's t-test (unequal variances)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: life_satisfaction by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 2417) = 31.634, p &lt; 0.001 ***, variances unequal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
@@ -380,7 +322,7 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span> ANOVA Results:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Source Sum_Squares   df Mean_Square      F p_value sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Between Groups     247.347    3      82.449 67.096   &lt;.001   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Between Groups     247.347    3      82.449 67.096   &lt;.001 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Within Groups    2970.080 2417       1.229                   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Total    3217.428 2420                               </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
@@ -422,7 +364,7 @@ measures of effect size for some common research designs. Psychological Methods,
 <span class="r-out co"><span class="r-pr">#&gt;</span> ANOVA Results:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Source Sum_Squares   df Mean_Square      F p_value sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Between Groups     247.347    3      82.449 67.096   &lt;.001   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Between Groups     247.347    3      82.449 67.096   &lt;.001 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Within Groups    2970.080 2417       1.229                   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Total    3217.428 2420                               </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>

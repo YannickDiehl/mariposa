@@ -105,10 +105,11 @@ Compare groups and test for significant differences
 - [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
   : Compare Two Groups Without Assuming Normal Data
 - [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
-  [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
-  [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
-  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   : Test If Two Categories Are Related
+- [`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)
+  [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)
+  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)
+  : Effect Sizes for Contingency Tables
 - [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md)
   : Fisher's Exact Test for Small Samples
 - [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md)
@@ -181,6 +182,14 @@ Linear and logistic regression with SPSS-compatible output
   : Run a Linear Regression
 - [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
   : Run a Logistic Regression
+- [`anova(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/anova.linear_regression.md)
+  : ANOVA for a linear_regression model
+- [`anova(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/anova.logistic_regression.md)
+  : ANOVA for a logistic_regression model
+- [`predict(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/predict.linear_regression.md)
+  : Predict from a linear_regression model
+- [`predict(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/predict.logistic_regression.md)
+  : Predict from a logistic_regression model
 
 ## Weighted Statistics
 

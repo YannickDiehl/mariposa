@@ -23,7 +23,7 @@ SPSS-style: logistic_regression(data, dependent = high_satisfaction, predictors 
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,7 +136,9 @@ subcommand is given. The "numeric" mode emits a one-line
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>"logistic_regression"</code> containing:</p><dl><dt>coefficients</dt>
+    <p>For ungrouped data, an object of class
+<code>c("logistic_regression", "glm", "lm")</code> — <strong>the fitted
+<code>glm</code> itself</strong>, with mariposa-specific slots attached:</p><dl><dt>coef_table</dt>
 <dd><p>Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper</p></dd>
 
 <dt>model_summary</dt>
@@ -151,29 +153,23 @@ subcommand is given. The "numeric" mode emits a one-line
 <dt>hosmer_lemeshow</dt>
 <dd><p>List with chi_sq, df, p (goodness-of-fit test)</p></dd>
 
-<dt>model</dt>
-<dd><p>The underlying <code>glm</code> object</p></dd>
-
-<dt>formula</dt>
-<dd><p>The formula used</p></dd>
-
 <dt>n</dt>
-<dd><p>Sample size (listwise complete cases)</p></dd>
+<dd><p>Sample size (listwise complete cases; weighted N when weighted)</p></dd>
 
-<dt>dependent</dt>
-<dd><p>Name of the dependent variable</p></dd>
-
-<dt>predictor_names</dt>
-<dd><p>Names of predictor variables</p></dd>
-
-<dt>weighted</dt>
-<dd><p>Logical indicating whether weights were used</p></dd>
-
-<dt>weight_name</dt>
-<dd><p>Name of the weight variable (or NULL)</p></dd>
+<dt>formula, dependent, predictor_names, weighted, weight_name, is_grouped, conf.level</dt>
+<dd><p>Call metadata.</p></dd>
 
 
-</dl><p>Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p>
+</dl><p>Because the object inherits from <code>"glm"</code>, all standard
+generics (<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code>, <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>,
+<code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code>, <code><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals()</a></code>, <code><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted()</a></code>,
+<code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>, <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code>, <code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">broom::glance()</a></code>,
+<code><a href="https://generics.r-lib.org/reference/augment.html" class="external-link">broom::augment()</a></code>) dispatch natively without unwrapping.
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> returns the SPSS-style mariposa summary; for
+the raw glm summary use <code><a href="https://rdrr.io/r/stats/summary.glm.html" class="external-link">stats::summary.glm()</a></code> on the same
+object.</p>
+<p>For grouped data, returns a list of class <code>"logistic_regression"</code>
+with <code>$groups</code> holding one fitted glm-inheriting result per group.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -257,7 +253,7 @@ explicit <code>/CATEGORICAL</code> subcommand).</p>
 <span class="r-in"><span><span class="co"># Multiple logistic regression</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + income + education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.213, chi2(3) = 364.62, p &lt; 0.001 ***, Accuracy = 68.3%, N = 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.213, chi2(5) = 364.62, p &lt; 0.001 ***, Accuracy = 68.3%, N = 2115</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># SPSS-style interface</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
@@ -283,7 +279,7 @@ explicit <code>/CATEGORICAL</code> subcommand).</p>
 <span class="r-in"><span><span class="co"># Factor predictors: dummy-coding (default, matches base R glm())</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Logistic Regression: high_satisfaction ~ age + education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.084, chi2(2) = 156.25, p &lt; 0.001 ***, Accuracy = 63.4%, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Nagelkerke R2 = 0.084, chi2(4) = 156.25, p &lt; 0.001 ***, Accuracy = 63.4%, N = 2421</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Factor predictors: SPSS-style ordinal-as-scale</span></span></span>
 <span class="r-in"><span><span class="fu">logistic_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span>,</span></span>

@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -297,87 +297,15 @@ membership:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Tukey HSD: balanced comparison of all pairs</span></span>
 <span><span class="fu"><a href="../reference/tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted Tukey HSD Post-Hoc Test Results</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt;   Family-wise error rate controlled using Tukey HSD</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Tukey Results:</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt;                                   Comparison Difference Lower CI Upper CI</span></span>
-<span><span class="co">#&gt;     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339</span></span>
-<span><span class="co">#&gt;         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491</span></span>
-<span><span class="co">#&gt;                 Basic Secondary - University     -0.832   -1.011   -0.654</span></span>
-<span><span class="co">#&gt;  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008</span></span>
-<span><span class="co">#&gt;          Intermediate Secondary - University     -0.342   -0.529   -0.156</span></span>
-<span><span class="co">#&gt;              Academic Secondary - University     -0.189   -0.376   -0.003</span></span>
-<span><span class="co">#&gt;  p-value Sig</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    0.071    </span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    0.046   *</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - Positive differences: First group &gt; Second group</span></span>
-<span><span class="co">#&gt; - Negative differences: First group &lt; Second group</span></span>
-<span><span class="co">#&gt; - Confidence intervals not containing 0 indicate significant differences</span></span>
-<span><span class="co">#&gt; - p-values are adjusted for multiple comparisons (family-wise error control)</span></span></code></pre></div>
+<span><span class="co">#&gt; Tukey HSD Post-Hoc Test by education [Weighted]</span></span>
+<span><span class="co">#&gt;   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span></span>
+<span><span class="co">#&gt; Use summary() for the full comparison table.</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Scheffe: more conservative (fewer false positives)</span></span>
 <span><span class="fu"><a href="../reference/scheffe_test.html">scheffe_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted Scheffe Post-Hoc Test Results</span></span>
-<span><span class="co">#&gt; --------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt;   Family-wise error rate controlled using Scheffe's method</span></span>
-<span><span class="co">#&gt;   Note: Most conservative post-hoc test (widest confidence intervals)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Scheffe Results:</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt;                                   Comparison Difference Lower CI Upper CI</span></span>
-<span><span class="co">#&gt;     Basic Secondary - Intermediate Secondary     -0.490   -0.655   -0.325</span></span>
-<span><span class="co">#&gt;         Basic Secondary - Academic Secondary     -0.643   -0.808   -0.477</span></span>
-<span><span class="co">#&gt;                 Basic Secondary - University     -0.832   -1.026   -0.638</span></span>
-<span><span class="co">#&gt;  Intermediate Secondary - Academic Secondary     -0.153   -0.329    0.023</span></span>
-<span><span class="co">#&gt;          Intermediate Secondary - University     -0.342   -0.545   -0.140</span></span>
-<span><span class="co">#&gt;              Academic Secondary - University     -0.189   -0.393    0.014</span></span>
-<span><span class="co">#&gt;  p-value Sig</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    0.115    </span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    0.079    </span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - Positive differences: First group &gt; Second group</span></span>
-<span><span class="co">#&gt; - Negative differences: First group &lt; Second group</span></span>
-<span><span class="co">#&gt; - Confidence intervals not containing 0 indicate significant differences</span></span>
-<span><span class="co">#&gt; - p-values are adjusted for all possible contrasts (most conservative)</span></span>
-<span><span class="co">#&gt; - Scheffe test has wider CIs than Tukey HSD</span></span></code></pre></div>
+<span><span class="co">#&gt; Scheffe Post-Hoc Test by education [Weighted]</span></span>
+<span><span class="co">#&gt;   life_satisfaction: 6 comparisons, 4 significant (p &lt; .05)</span></span>
+<span><span class="co">#&gt; Use summary() for the full comparison table.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="assumption-check">Assumption Check<a class="anchor" aria-label="anchor" href="#assumption-check"></a>
@@ -385,31 +313,9 @@ membership:</p>
 <p>ANOVA assumes equal variances. Test with Levene’s test:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Levene's Test for Homogeneity of Variance </span></span>
-<span><span class="co">#&gt; ---------------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Center: mean</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Levene's Test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;           Variable F_statistic df1      df2 p_value sig        Conclusion</span></span>
-<span><span class="co">#&gt;  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span></span>
-<span><span class="co">#&gt; - p &lt;= 0.05: Variances are heterogeneous (equal variances NOT assumed)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Recommendation based on Levene test:</span></span>
-<span><span class="co">#&gt; - Use Welch's t-test (unequal variances)</span></span></code></pre></div>
+<span><span class="co">#&gt; Levene's Test: life_satisfaction by education [Weighted]</span></span>
+<span><span class="co">#&gt;   F(3, 2432.6) = 31.282, p &lt; 0.001 ***, variances unequal</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>If Levene’s test is significant
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&lt;</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p &lt; .05</annotation></semantics></math>),
 variances are unequal. Use the Welch correction included in the ANOVA
@@ -526,66 +432,16 @@ small samples.</p>
 <span>  <span class="fu"><a href="../reference/kruskal_wallis.html">kruskal_wallis</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">kw_result</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Kruskal-Wallis Test Results</span></span>
-<span><span class="co">#&gt; ---------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; life_satisfaction</span></span>
-<span><span class="co">#&gt; -----------------</span></span>
-<span><span class="co">#&gt;   Ranks:</span></span>
-<span><span class="co">#&gt;   --------------------------------------</span></span>
-<span><span class="co">#&gt;                     Group    N Mean Rank</span></span>
-<span><span class="co">#&gt;           Basic Secondary  809    974.29</span></span>
-<span><span class="co">#&gt;    Intermediate Secondary  618   1250.73</span></span>
-<span><span class="co">#&gt;        Academic Secondary  607   1329.56</span></span>
-<span><span class="co">#&gt;                University  387   1456.42</span></span>
-<span><span class="co">#&gt;                     Total 2421        NA</span></span>
-<span><span class="co">#&gt;   --------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Test Statistics:</span></span>
-<span><span class="co">#&gt;   --------------------------------------------</span></span>
-<span><span class="co">#&gt;    Kruskal-Wallis H df p value Eta-squared sig</span></span>
-<span><span class="co">#&gt;             171.178  3       0       0.071 ***</span></span>
-<span><span class="co">#&gt;   --------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation (Eta-squared):</span></span>
-<span><span class="co">#&gt; - Small effect: 0.01 - 0.06</span></span>
-<span><span class="co">#&gt; - Medium effect: 0.06 - 0.14</span></span>
-<span><span class="co">#&gt; - Large effect: &gt; 0.14</span></span></code></pre></div>
+<span><span class="co">#&gt; Kruskal-Wallis Test: life_satisfaction by education</span></span>
+<span><span class="co">#&gt;   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071, N = 2421</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>When significant, use Dunn’s post-hoc test with Bonferroni
 correction:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dunn_test.html">dunn_test</a></span><span class="op">(</span><span class="va">kw_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Dunn Post-Hoc Test (Bonferroni) Results</span></span>
-<span><span class="co">#&gt; ---------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - P-value adjustment: Bonferroni</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span></span>
-<span><span class="co">#&gt;         Basic Secondary Intermediate Secondary  -7.658     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;         Basic Secondary     Academic Secondary  -9.792     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;         Basic Secondary             University -11.545     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     </span></span>
-<span><span class="co">#&gt;  Intermediate Secondary             University  -4.696     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;      Academic Secondary             University  -2.886     0.004   0.023   * </span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - Positive Z: First group has higher mean rank</span></span>
-<span><span class="co">#&gt; - Negative Z: First group has lower mean rank</span></span>
-<span><span class="co">#&gt; - p-values are adjusted for multiple comparisons</span></span></code></pre></div>
+<span><span class="co">#&gt; Dunn Post-Hoc Test (Bonferroni) by education</span></span>
+<span><span class="co">#&gt;   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span></span>
+<span><span class="co">#&gt; Use summary() for the full comparison table.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="wilcoxon-signed-rank-test">Wilcoxon Signed-Rank Test<a class="anchor" aria-label="anchor" href="#wilcoxon-signed-rank-test"></a>
@@ -596,40 +452,9 @@ correction:</p>
 <span></span>
 <span><span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/wilcoxon_test.html">wilcoxon_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Wilcoxon Signed-Rank Test Results</span></span>
-<span><span class="co">#&gt; ---------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Pair: score_T2 vs score_T1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; score_T2 - score_T1</span></span>
-<span><span class="co">#&gt; -------------------</span></span>
-<span><span class="co">#&gt;   Ranks:</span></span>
-<span><span class="co">#&gt;   ------------------------------------------</span></span>
-<span><span class="co">#&gt;                     N Mean Rank Sum of Ranks</span></span>
-<span><span class="co">#&gt;    Negative Ranks  27     40.19         1085</span></span>
-<span><span class="co">#&gt;    Positive Ranks  78     57.44         4480</span></span>
-<span><span class="co">#&gt;              Ties   0        NA           NA</span></span>
-<span><span class="co">#&gt;             Total 105        NA           NA</span></span>
-<span><span class="co">#&gt;   ------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   a score_T2 &lt; score_T1</span></span>
-<span><span class="co">#&gt;   b score_T2 &gt; score_T1</span></span>
-<span><span class="co">#&gt;   c score_T2 = score_T1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Test Statistics:</span></span>
-<span><span class="co">#&gt;   ---------------------------</span></span>
-<span><span class="co">#&gt;        Z p value Effect r sig</span></span>
-<span><span class="co">#&gt;    5.427       0     0.53 ***</span></span>
-<span><span class="co">#&gt;   ---------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation (r):</span></span>
-<span><span class="co">#&gt; - Small effect: 0.1 - 0.3</span></span>
-<span><span class="co">#&gt; - Medium effect: 0.3 - 0.5</span></span>
-<span><span class="co">#&gt; - Large effect: &gt; 0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; Wilcoxon Signed-Rank Test: score_T2 - score_T1</span></span>
+<span><span class="co">#&gt;   Z = 5.427, p &lt; 0.001 ***, r = 0.530 (large), N = 105</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="friedman-test">Friedman Test<a class="anchor" aria-label="anchor" href="#friedman-test"></a>
@@ -641,58 +466,15 @@ measurements):</p>
 <span>  <span class="fu"><a href="../reference/friedman_test.html">friedman_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span>, <span class="va">score_T3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">friedman_result</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Friedman Test Results</span></span>
-<span><span class="co">#&gt; ---------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Variables: score_T1, score_T2, score_T3</span></span>
-<span><span class="co">#&gt; - Number of conditions: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Ranks:</span></span>
-<span><span class="co">#&gt;   -------------------</span></span>
-<span><span class="co">#&gt;    Variable Mean Rank</span></span>
-<span><span class="co">#&gt;    score_T1      1.48</span></span>
-<span><span class="co">#&gt;    score_T2      2.04</span></span>
-<span><span class="co">#&gt;    score_T3      2.48</span></span>
-<span><span class="co">#&gt;   -------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Test Statistics:</span></span>
-<span><span class="co">#&gt;   -----------------------------------------</span></span>
-<span><span class="co">#&gt;     N Chi-Square df p value Kendall's W sig</span></span>
-<span><span class="co">#&gt;    94     47.255  2       0       0.251 ***</span></span>
-<span><span class="co">#&gt;   -----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect Size Interpretation (Kendall's W):</span></span>
-<span><span class="co">#&gt; - Weak agreement: 0.1 - 0.3</span></span>
-<span><span class="co">#&gt; - Moderate agreement: 0.3 - 0.5</span></span>
-<span><span class="co">#&gt; - Strong agreement: &gt; 0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; Friedman Test: score_T1, score_T2, score_T3</span></span>
+<span><span class="co">#&gt;   chi2(2) = 47.255, p &lt; 0.001 ***, W = 0.251, N = 94</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>When significant, use pairwise Wilcoxon post-hoc tests:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon</a></span><span class="op">(</span><span class="va">friedman_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results</span></span>
-<span><span class="co">#&gt; ----------------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Variables: score_T1, score_T2, score_T3</span></span>
-<span><span class="co">#&gt; - P-value adjustment: Bonferroni</span></span>
-<span><span class="co">#&gt; - Number of comparisons: 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ---------------------------------------------- </span></span>
-<span><span class="co">#&gt;     Var 1    Var 2     Z p (unadj) p (adj) Sig </span></span>
-<span><span class="co">#&gt;  score_T1 score_T2 5.427     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;  score_T1 score_T3 6.132     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt;  score_T2 score_T3 4.413     &lt;.001   &lt;.001 *** </span></span>
-<span><span class="co">#&gt; ---------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - Positive Z: First variable tends to have higher values</span></span>
-<span><span class="co">#&gt; - Negative Z: Second variable tends to have higher values</span></span>
-<span><span class="co">#&gt; - p-values are adjusted for multiple comparisons</span></span></code></pre></div>
+<span><span class="co">#&gt; Pairwise Wilcoxon Post-Hoc Test (Bonferroni)</span></span>
+<span><span class="co">#&gt;   3 comparisons, 3 significant (p &lt; .05)</span></span>
+<span><span class="co">#&gt; Use summary() for the full comparison table.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="binomial-test">Binomial Test<a class="anchor" aria-label="anchor" href="#binomial-test"></a>
@@ -702,31 +484,9 @@ value:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/binomial_test.html">binomial_test</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Binomial Test Results</span></span>
-<span><span class="co">#&gt; ---------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Test proportion: 0.5</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; gender</span></span>
-<span><span class="co">#&gt; ------</span></span>
-<span><span class="co">#&gt;   Categories:</span></span>
-<span><span class="co">#&gt;   ------------------------------------</span></span>
-<span><span class="co">#&gt;                       N Observed Prop.</span></span>
-<span><span class="co">#&gt;      Group 1: Male 1194          0.478</span></span>
-<span><span class="co">#&gt;    Group 2: Female 1306          0.522</span></span>
-<span><span class="co">#&gt;              Total 2500          1.000</span></span>
-<span><span class="co">#&gt;   ------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Test Statistics:</span></span>
-<span><span class="co">#&gt;   -----------------------------------------</span></span>
-<span><span class="co">#&gt;    Test Prop. p value CI lower CI upper sig</span></span>
-<span><span class="co">#&gt;           0.5   0.026    0.458    0.497   *</span></span>
-<span><span class="co">#&gt;   -----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<span><span class="co">#&gt; Binomial Test: gender</span></span>
+<span><span class="co">#&gt;   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -747,18 +507,21 @@ knowing one tells you something about the other.</p>
 <div class="section level3">
 <h3 id="effect-sizes-for-categorical-data">Effect Sizes for Categorical Data<a class="anchor" aria-label="anchor" href="#effect-sizes-for-categorical-data"></a>
 </h3>
+<p>The helpers <code><a href="../reference/phi.html">phi()</a></code>, <code><a href="../reference/phi.html">cramers_v()</a></code>, and
+<code><a href="../reference/phi.html">goodman_gamma()</a></code> run the chi-square analysis internally and
+return just the requested effect size as a number (per group for grouped
+data). For the full test output, call <code><a href="../reference/chi_square.html">chi_square()</a></code>
+directly.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Phi coefficient (2x2 tables)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/chi_square.html">phi</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chi-Squared Test: gender × employment [Weighted]</span></span>
-<span><span class="co">#&gt;   chi2(4) = 7.661, p = 0.105 , V = 0.055 (neglig.), N = 2515</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/phi.html">phi</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.05519227</span></span></code></pre></div>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Cramer's V (larger tables)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/chi_square.html">cramers_v</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chi-Squared Test: education × employment [Weighted]</span></span>
-<span><span class="co">#&gt;   chi2(12) = 130.696, p &lt; 0.001 ***, V = 0.132 (small), N = 2518</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/phi.html">cramers_v</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.1315356</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="fishers-exact-test">Fisher’s Exact Test<a class="anchor" aria-label="anchor" href="#fishers-exact-test"></a>
@@ -769,27 +532,9 @@ knowing one tells you something about the other.</p>
 <span></span>
 <span><span class="va">small_sample</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/fisher_test.html">fisher_test</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Fisher's Exact Test Results</span></span>
-<span><span class="co">#&gt; ---------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Row variable: gender</span></span>
-<span><span class="co">#&gt; - Column variable: region</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Contingency Table:</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt;         cc</span></span>
-<span><span class="co">#&gt; r        East West</span></span>
-<span><span class="co">#&gt;   Male      3    9</span></span>
-<span><span class="co">#&gt;   Female    4   14</span></span>
-<span><span class="co">#&gt; ---------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
-<span><span class="co">#&gt;                              Method p-value  N Sig </span></span>
-<span><span class="co">#&gt;  Fisher's Exact Test for Count Data  1.0000 30     </span></span>
-<span><span class="co">#&gt; -------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<span><span class="co">#&gt; Fisher's Exact Test: gender x region</span></span>
+<span><span class="co">#&gt;   p = 1.0000 , N = 30</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="chi-square-goodness-of-fit">Chi-Square Goodness-of-Fit<a class="anchor" aria-label="anchor" href="#chi-square-goodness-of-fit"></a>
@@ -799,54 +544,16 @@ knowing one tells you something about the other.</p>
 <code class="sourceCode R"><span><span class="co"># Equal proportions (default)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chisq_gof.html">chisq_gof</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test Results</span></span>
-<span><span class="co">#&gt; ---------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Variables: education</span></span>
-<span><span class="co">#&gt; - Expected: Equal proportions</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   education - Frequency Table:</span></span>
-<span><span class="co">#&gt;   --------------------------------------------------</span></span>
-<span><span class="co">#&gt;                  category observed expected residual</span></span>
-<span><span class="co">#&gt;           Basic Secondary      841      625      216</span></span>
-<span><span class="co">#&gt;    Intermediate Secondary      629      625        4</span></span>
-<span><span class="co">#&gt;        Academic Secondary      631      625        6</span></span>
-<span><span class="co">#&gt;                University      399      625     -226</span></span>
-<span><span class="co">#&gt;   --------------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ----------------------------------------- </span></span>
-<span><span class="co">#&gt;   Variable Chi-Square df p-value    N Sig </span></span>
-<span><span class="co">#&gt;  education    156.454  3   &lt;.001 2500 *** </span></span>
-<span><span class="co">#&gt; ----------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test: education</span></span>
+<span><span class="co">#&gt;   chi2(3) = 156.454, p &lt; 0.001 ***, N = 2500</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Custom expected proportions</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chisq_gof.html">chisq_gof</a></span><span class="op">(</span><span class="va">education</span>, expected <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.30</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>, <span class="fl">0.20</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test Results</span></span>
-<span><span class="co">#&gt; ---------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Variables: education</span></span>
-<span><span class="co">#&gt; - Expected: 0.3, 0.25, 0.25, 0.2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   education - Frequency Table:</span></span>
-<span><span class="co">#&gt;   --------------------------------------------------</span></span>
-<span><span class="co">#&gt;                  category observed expected residual</span></span>
-<span><span class="co">#&gt;           Basic Secondary      841      750       91</span></span>
-<span><span class="co">#&gt;    Intermediate Secondary      629      625        4</span></span>
-<span><span class="co">#&gt;        Academic Secondary      631      625        6</span></span>
-<span><span class="co">#&gt;                University      399      500     -101</span></span>
-<span><span class="co">#&gt;   --------------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ----------------------------------------- </span></span>
-<span><span class="co">#&gt;   Variable Chi-Square df p-value    N Sig </span></span>
-<span><span class="co">#&gt;  education     31.527  3   &lt;.001 2500 *** </span></span>
-<span><span class="co">#&gt; ----------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test: education</span></span>
+<span><span class="co">#&gt;   chi2(3) = 31.527, p &lt; 0.001 ***, N = 2500</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="mcnemars-test">McNemar’s Test<a class="anchor" aria-label="anchor" href="#mcnemars-test"></a>
@@ -987,72 +694,15 @@ corrections.</p>
 <span></span>
 <span><span class="co"># 3. Check assumptions</span></span>
 <span><span class="fu"><a href="../reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="va">anova_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Levene's Test for Homogeneity of Variance </span></span>
-<span><span class="co">#&gt; ---------------------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Center: mean</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Levene's Test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;           Variable F_statistic df1      df2 p_value sig        Conclusion</span></span>
-<span><span class="co">#&gt;  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span></span>
-<span><span class="co">#&gt; - p &lt;= 0.05: Variances are heterogeneous (equal variances NOT assumed)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Recommendation based on Levene test:</span></span>
-<span><span class="co">#&gt; - Use Welch's t-test (unequal variances)</span></span>
+<span><span class="co">#&gt; Levene's Test: life_satisfaction by education [Weighted]</span></span>
+<span><span class="co">#&gt;   F(3, 2432.6) = 31.282, p &lt; 0.001 ***, variances unequal</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span>
 <span></span>
 <span><span class="co"># 4. Post-hoc: which groups differ?</span></span>
 <span><span class="fu"><a href="../reference/tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="va">anova_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Weighted Tukey HSD Post-Hoc Test Results</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
-<span><span class="co">#&gt; - Grouping variable: education</span></span>
-<span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
-<span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
-<span><span class="co">#&gt;   Family-wise error rate controlled using Tukey HSD</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; --- life_satisfaction ---</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Tukey Results:</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt;                                   Comparison Difference Lower CI Upper CI</span></span>
-<span><span class="co">#&gt;     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339</span></span>
-<span><span class="co">#&gt;         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491</span></span>
-<span><span class="co">#&gt;                 Basic Secondary - University     -0.832   -1.011   -0.654</span></span>
-<span><span class="co">#&gt;  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008</span></span>
-<span><span class="co">#&gt;          Intermediate Secondary - University     -0.342   -0.529   -0.156</span></span>
-<span><span class="co">#&gt;              Academic Secondary - University     -0.189   -0.376   -0.003</span></span>
-<span><span class="co">#&gt;  p-value Sig</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    0.071    </span></span>
-<span><span class="co">#&gt;    &lt;.001 ***</span></span>
-<span><span class="co">#&gt;    0.046   *</span></span>
-<span><span class="co">#&gt; ------------------------------------------------------------------------------------ </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Interpretation:</span></span>
-<span><span class="co">#&gt; - Positive differences: First group &gt; Second group</span></span>
-<span><span class="co">#&gt; - Negative differences: First group &lt; Second group</span></span>
-<span><span class="co">#&gt; - Confidence intervals not containing 0 indicate significant differences</span></span>
-<span><span class="co">#&gt; - p-values are adjusted for multiple comparisons (family-wise error control)</span></span></code></pre></div>
+<span><span class="co">#&gt; Tukey HSD Post-Hoc Test by education [Weighted]</span></span>
+<span><span class="co">#&gt;   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span></span>
+<span><span class="co">#&gt; Use summary() for the full comparison table.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="practical-tips">Practical Tips<a class="anchor" aria-label="anchor" href="#practical-tips"></a>
@@ -1127,9 +777,9 @@ factors and interactions</li>
 </h3>
 <ul>
 <li>
-<strong><code><a href="../reference/chi_square.html">phi()</a></code></strong>,
-<strong><code><a href="../reference/chi_square.html">cramers_v()</a></code></strong>,
-<strong><code><a href="../reference/chi_square.html">goodman_gamma()</a></code></strong>
+<strong><code><a href="../reference/phi.html">phi()</a></code></strong>,
+<strong><code><a href="../reference/phi.html">cramers_v()</a></code></strong>,
+<strong><code><a href="../reference/phi.html">goodman_gamma()</a></code></strong>
 </li>
 </ul>
 </div>

@@ -1,8 +1,11 @@
-# Print Dunn post-hoc test results
+# Print Dunn post-hoc test results (compact)
 
-Print method for objects of class `"dunn_test"`. Provides a formatted
-display of Dunn pairwise comparison results including Z-statistics and
-adjusted p-values.
+Compact print method for objects of class `"dunn_test"`. Shows one line
+per variable (or group combination) with the number of pairwise
+comparisons and how many are significant at the .05 level.
+
+For the full comparison tables (Z-statistics, adjusted p-values), use
+[`summary()`](https://rdrr.io/r/base/summary.html).
 
 ## Usage
 
@@ -31,16 +34,38 @@ print(x, digits = 3, ...)
 
 Invisibly returns the input object `x`.
 
-## Details
+## Examples
 
-The print method displays:
-
-- Pairwise group comparisons with Z-statistics
-
-- Adjusted p-values controlling for multiple comparisons
-
-- Significance indicators (\* p \< 0.05, \*\* p \< 0.01, \*\*\* p \<
-  0.001)
-
-For grouped analyses, results are displayed separately for each group
-combination.
+``` r
+result <- kruskal_wallis(survey_data, life_satisfaction,
+                         group = education) |> dunn_test()
+result              # compact overview
+#> Dunn Post-Hoc Test (Bonferroni) by education
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
+summary(result)     # full comparison tables
+#> Dunn Post-Hoc Test (Bonferroni) Results
+#> ---------------------------------------
+#> 
+#> - Dependent variable: life_satisfaction
+#> - Grouping variable: education
+#> - P-value adjustment: Bonferroni
+#> 
+#> ---------------------------------------------------------------------------- 
+#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
+#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
+#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
+#>         Basic Secondary             University -11.545     <.001   <.001 *** 
+#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
+#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
+#>      Academic Secondary             University  -2.886     0.004   0.023   * 
+#> ---------------------------------------------------------------------------- 
+#> 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> 
+#> Interpretation:
+#> - Positive Z: First group has higher mean rank
+#> - Negative Z: First group has lower mean rank
+#> - p-values are adjusted for multiple comparisons
+```

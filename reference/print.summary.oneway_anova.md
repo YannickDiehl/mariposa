@@ -61,7 +61,7 @@ summary(result)                        # all sections
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 
@@ -103,7 +103,7 @@ summary(result, descriptives = FALSE)  # hide group statistics
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 

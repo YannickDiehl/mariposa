@@ -11,9 +11,12 @@ to_label(
   data,
   ...,
   ordered = FALSE,
-  drop.na = TRUE,
-  drop.unused = FALSE,
-  add.non.labelled = FALSE
+  drop_na = TRUE,
+  drop_unused = FALSE,
+  add_non_labelled = FALSE,
+  drop.na = NULL,
+  drop.unused = NULL,
+  add.non.labelled = NULL
 )
 ```
 
@@ -32,22 +35,29 @@ to_label(
 
   If `TRUE`, creates an ordered factor. Default: `FALSE`.
 
-- drop.na:
+- drop_na:
 
   If `TRUE` (default), tagged NAs are converted to regular `NA`
   (excluded from factor levels). If `FALSE`, tagged NAs are kept as
   factor levels with their label text.
 
-- drop.unused:
+- drop_unused:
 
   If `TRUE`, removes factor levels with zero observations. Default:
   `FALSE`.
 
-- add.non.labelled:
+- add_non_labelled:
 
   If `TRUE`, values without labels are included as factor levels using
   their numeric value as the level name. Default: `FALSE` (unlabelled
   values become `NA`).
+
+- drop.na, drop.unused, add.non.labelled:
+
+  Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
+  the function with any of them is an error; use the snake_case
+  equivalents instead. (The formals are retained only so that the old
+  names error clearly instead of being swallowed by `...`.)
 
 ## Value
 
@@ -357,7 +367,7 @@ data <- to_label(survey_data, gender, region)
 data <- to_label(survey_data)
 
 # Keep values without labels as factor levels
-to_label(survey_data$life_satisfaction, add.non.labelled = TRUE)
+to_label(survey_data$life_satisfaction, add_non_labelled = TRUE)
 #>    [1] 4    3    2    2    4    4    3    3    4    3    1    1    2    5   
 #>   [15] 3    2    3    4    3    3    2    5    1    5    5    2    5    4   
 #>   [29] 5    5    3    3    2    3    5    1    <NA> 2    3    3    3    2   

@@ -15,7 +15,7 @@ The function operates in two modes:
 ## Usage
 
 ``` r
-val_labels(data, ..., .add = FALSE, drop.na = TRUE)
+val_labels(data, ..., .add = FALSE, drop_na = TRUE)
 ```
 
 ## Arguments
@@ -36,7 +36,7 @@ val_labels(data, ..., .add = FALSE, drop.na = TRUE)
   If `TRUE`, adds labels to any existing ones instead of replacing them.
   Default: `FALSE`.
 
-- drop.na:
+- drop_na:
 
   If `TRUE` (default), tagged NA labels are excluded from GET results.
 

@@ -23,7 +23,7 @@ A way to make all possible pairwise comparisons using rank-based statistics
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -157,7 +157,17 @@ sample size, and \(n_i\) is the size of group i.</p>
 <ul><li><p>Non-parametric equivalent of <code><a href="tukey_test.html">tukey_test()</a></code> and
 <code><a href="scheffe_test.html">scheffe_test()</a></code></p></li>
 <li><p>Follow-up to <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code>, just like Tukey follows ANOVA</p></li>
-<li><p>Uses ranks instead of raw values, making it robust to outliers</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>When the parent <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code> result is weighted, the
+pairwise z statistics use the same frequency-weighted midranks. SPSS
+<code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have no
+SPSS reference (R-only, guarded by an internal invariance suite); see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>Uses ranks instead of raw values, making it robust to outliers</p></li>
 </ul></div>
 
     </div>
@@ -190,84 +200,21 @@ sample size, and \(n_i\) is the size of group i.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Dunn post-hoc comparisons (default: Bonferroni)</span></span></span>
 <span class="r-in"><span><span class="va">kw_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dunn_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  -7.658     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  -9.792     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -11.545     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University  -4.696     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University  -2.886     0.004   0.023   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First group has higher mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: First group has lower mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With Holm correction (less conservative)</span></span></span>
 <span class="r-in"><span><span class="va">kw_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dunn_test</span><span class="op">(</span>p_adjust <span class="op">=</span> <span class="st">"holm"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Holm) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Holm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  -7.658     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  -9.792     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -11.545     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.041   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University  -4.696     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University  -2.886     0.004   0.008  ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First group has higher mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: First group has lower mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Holm) by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 6 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With Benjamini-Hochberg (controls false discovery rate)</span></span></span>
 <span class="r-in"><span><span class="va">kw_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dunn_test</span><span class="op">(</span>p_adjust <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Benjamini-Hochberg) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Benjamini-Hochberg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  -7.658     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  -9.792     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -11.545     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.041   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University  -4.696     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University  -2.886     0.004   0.005  ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First group has higher mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: First group has lower mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Benjamini-Hochberg) by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 6 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">kw_weighted</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -275,31 +222,9 @@ sample size, and \(n_i\) is the size of group i.</p>
 <span class="r-in"><span>                 weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">kw_weighted</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dunn_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Dunn Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  -7.351     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  -9.444     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -10.927     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary  -2.007     0.045   0.269     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University  -4.484     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University  -2.735     0.006   0.037   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First group has higher mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: First group has lower mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) by education [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">kw_multi</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -307,45 +232,10 @@ sample size, and \(n_i\) is the size of group i.</p>
 <span class="r-in"><span>                 group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">kw_multi</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dunn_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  -7.658     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  -9.792     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -11.545     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University  -4.696     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University  -2.886     0.004   0.023   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_government ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  0.983     0.325   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  0.569     0.570   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -0.038     0.970   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary -0.389     0.697   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University -0.846     0.398   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University -0.504     0.614   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First group has higher mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: First group has lower mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government: 6 comparisons, 0 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">kw_grouped</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -353,51 +243,12 @@ sample size, and \(n_i\) is the size of group i.</p>
 <span class="r-in"><span>  <span class="fu"><a href="kruskal_wallis.html">kruskal_wallis</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">kw_grouped</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dunn_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary -1.949     0.051   0.308     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary -3.263     0.001   0.007  ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -3.543     &lt;.001   0.002  ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary -1.271     0.204   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University -1.762     0.078   0.469     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University -0.612     0.540   1.000     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Group 1                Group 2       Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary Intermediate Secondary  -7.601     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary     Academic Secondary  -9.338     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary             University -11.151     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary     Academic Secondary  -1.642     0.101   0.603     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary             University  -4.373     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Academic Secondary             University  -2.929     0.003   0.020   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First group has higher mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: First group has lower mean rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dunn Post-Hoc Test (Bonferroni) by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 2 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

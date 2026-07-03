@@ -27,7 +27,7 @@ summary(
 
 - reliability_statistics:
 
-  Show Cronbach's Alpha statistics? (Default: TRUE)
+  Show Cronbach's Alpha and McDonald's Omega statistics? (Default: TRUE)
 
 - item_statistics:
 
@@ -73,6 +73,8 @@ summary(result)
 #> ---------------------------------------- 
 #>   Cronbach's Alpha:              0.047
 #>   Alpha (standardized):          0.048
+#>   McDonald's Omega:              0.047
+#>   Omega (standardized):          0.048
 #>   N of Items:                    3
 #>   N (listwise):                  2135
 #> 
@@ -97,10 +99,12 @@ summary(result)
 #>  trust_government               6.05             2.440       0.024
 #>       trust_media               6.25             2.467       0.020
 #>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#>  alpha_deleted omega_deleted
+#>          0.029            NA
+#>          0.040            NA
+#>          0.027            NA
+#> Note: Omega if item deleted requires at least 4 items
+#> (a one-factor model on the remaining 2 items is not identified).
 summary(result, inter_item_correlations = FALSE)
 #> 
 #> Reliability Analysis Results
@@ -112,6 +116,8 @@ summary(result, inter_item_correlations = FALSE)
 #> ---------------------------------------- 
 #>   Cronbach's Alpha:              0.047
 #>   Alpha (standardized):          0.048
+#>   McDonald's Omega:              0.047
+#>   Omega (standardized):          0.048
 #>   N of Items:                    3
 #>   N (listwise):                  2135
 #> 
@@ -128,8 +134,10 @@ summary(result, inter_item_correlations = FALSE)
 #>  trust_government               6.05             2.440       0.024
 #>       trust_media               6.25             2.467       0.020
 #>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#>  alpha_deleted omega_deleted
+#>          0.029            NA
+#>          0.040            NA
+#>          0.027            NA
+#> Note: Omega if item deleted requires at least 4 items
+#> (a one-factor model on the remaining 2 items is not identified).
 ```

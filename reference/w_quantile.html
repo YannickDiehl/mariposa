@@ -15,7 +15,7 @@ distribution of variables like income, age, or satisfaction scores."><meta prope
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,7 +163,17 @@ proportion reaches the target probability.</p>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></code> for the base R quantile function.</p>
 <p><code><a href="w_median.html">w_median</a></code> for the weighted median (50th percentile).</p>
 <p><code><a href="w_iqr.html">w_iqr</a></code> for the weighted interquartile range (Q3 - Q1).</p>
-<p><code><a href="describe.html">describe</a></code> for comprehensive descriptive statistics including quantiles.</p>
+<p><code><a href="describe.html">describe</a></code> for comprehensive descriptive statistics including quantiles.</p><div class="section">
+<h3 id="validation-status">Validation status<a class="anchor" aria-label="anchor" href="#validation-status"></a></h3>
+
+
+<p>Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
+apply the HAVERAGE position to cumulative weights with linear
+interpolation - an R-internal extension (Tier 4 of the Validation
+Charter); SPSS reference validation for weighted percentiles is
+pending.</p>
+</div>
+
 <p>Other weighted_statistics:
 <code><a href="w_iqr.html">w_iqr()</a></code>,
 <code><a href="w_kurtosis.html">w_kurtosis()</a></code>,
@@ -225,7 +235,7 @@ proportion reaches the target probability.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    income      Max  8000 2186      2158.9 sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Grouped data  </span></span></span>
+<span class="r-in"><span><span class="co"># Grouped data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_quantile</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Quantile Statistics</span>

@@ -15,7 +15,7 @@ standard R operations.'><meta property="og:image" content="https://YannickDiehl.
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ standard R operations.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_spss</span><span class="op">(</span><span class="va">path</span>, tag.na <span class="op">=</span> <span class="cn">TRUE</span>, encoding <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_spss</span><span class="op">(</span><span class="va">path</span>, tag_na <span class="op">=</span> <span class="cn">TRUE</span>, encoding <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,7 +81,7 @@ standard R operations.</p>
 <dd><p>Path to an SPSS <code>.sav</code> file.</p></dd>
 
 
-<dt id="arg-tag-na">tag.na<a class="anchor" aria-label="anchor" href="#arg-tag-na"></a></dt>
+<dt id="arg-tag-na">tag_na<a class="anchor" aria-label="anchor" href="#arg-tag-na"></a></dt>
 <dd><p>If <code>TRUE</code> (the default), user-defined missing values are
 converted to tagged NAs using <code><a href="https://haven.tidyverse.org/reference/tagged_na.html" class="external-link">haven::tagged_na()</a></code>. If <code>FALSE</code>, the file
 is read with standard <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> behavior (all missing values
@@ -100,7 +100,7 @@ converted.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with the SPSS data. When <code>tag.na = TRUE</code>:</p><ul><li><p>User-defined missing values are stored as tagged NAs</p></li>
+    <p>A tibble with the SPSS data. When <code>tag_na = TRUE</code>:</p><ul><li><p>User-defined missing values are stored as tagged NAs</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> returns <code>TRUE</code> for these values (standard R behavior)</p></li>
 <li><p>The original SPSS missing codes can be recovered via
 <code><a href="na_frequencies.html">na_frequencies()</a></code>, <code><a href="untag_na.html">untag_na()</a></code>, or <code><a href="https://haven.tidyverse.org/reference/tagged_na.html" class="external-link">haven::na_tag()</a></code></p></li>

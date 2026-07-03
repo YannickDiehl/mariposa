@@ -167,150 +167,28 @@ anova_result <- survey_data %>%
 
 # Tukey post-hoc comparisons
 anova_result %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Tukey Results:
-#> ---------------------------------------------------------------------------------- 
-#>                                 Comparison Difference Lower CI Upper CI p-value
-#>     Intermediate Secondary-Basic Secondary      0.497    0.344    0.649   <.001
-#>         Academic Secondary-Basic Secondary      0.649    0.496    0.802   <.001
-#>                 University-Basic Secondary      0.843    0.666    1.019   <.001
-#>  Academic Secondary-Intermediate Secondary      0.153   -0.010    0.316   0.075
-#>          University-Intermediate Secondary      0.346    0.161    0.531   <.001
-#>              University-Academic Secondary      0.193    0.008    0.379   0.037
-#>  Sig
-#>  ***
-#>  ***
-#>  ***
-#>     
-#>  ***
-#>    *
-#> ---------------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With weights
 anova_weighted <- survey_data %>%
   oneway_anova(life_satisfaction, group = education, weights = sampling_weight)
 
 anova_weighted %>% tukey_test()
-#> Weighted Tukey HSD Post-Hoc Test Results
-#> ----------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Tukey Results:
-#> ------------------------------------------------------------------------------------ 
-#>                                   Comparison Difference Lower CI Upper CI
-#>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339
-#>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491
-#>                 Basic Secondary - University     -0.832   -1.011   -0.654
-#>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008
-#>          Intermediate Secondary - University     -0.342   -0.529   -0.156
-#>              Academic Secondary - University     -0.189   -0.376   -0.003
-#>  p-value Sig
-#>    <.001 ***
-#>    <.001 ***
-#>    <.001 ***
-#>    0.071    
-#>    <.001 ***
-#>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education [Weighted]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # Multiple variables
 anova_multi <- survey_data %>%
   oneway_anova(trust_government, trust_science, group = education)
 
 anova_multi %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
-#> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- trust_government ---
-#> 
-#> Tukey Results:
-#> ---------------------------------------------------------------------------------- 
-#>                                 Comparison Difference Lower CI Upper CI p-value
-#>     Intermediate Secondary-Basic Secondary     -0.066   -0.229    0.096   0.722
-#>         Academic Secondary-Basic Secondary     -0.037   -0.200    0.125   0.935
-#>                 University-Basic Secondary     -0.004   -0.191    0.184   1.000
-#>  Academic Secondary-Intermediate Secondary      0.029   -0.145    0.203   0.973
-#>          University-Intermediate Secondary      0.063   -0.135    0.260   0.847
-#>              University-Academic Secondary      0.034   -0.164    0.231   0.972
-#>  Sig
-#>     
-#>     
-#>     
-#>     
-#>     
-#>     
-#> ---------------------------------------------------------------------------------- 
-#> 
-#> 
-#> --- trust_science ---
-#> 
-#> Tukey Results:
-#> ---------------------------------------------------------------------------------- 
-#>                                 Comparison Difference Lower CI Upper CI p-value
-#>     Intermediate Secondary-Basic Secondary     -0.028   -0.170    0.113   0.956
-#>         Academic Secondary-Basic Secondary      0.049   -0.094    0.191   0.817
-#>                 University-Basic Secondary     -0.011   -0.174    0.153   0.998
-#>  Academic Secondary-Intermediate Secondary      0.077   -0.075    0.229   0.563
-#>          University-Intermediate Secondary      0.018   -0.154    0.190   0.993
-#>              University-Academic Secondary     -0.059   -0.232    0.114   0.815
-#>  Sig
-#>     
-#>     
-#>     
-#>     
-#>     
-#>     
-#> ---------------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education
+#>   trust_government: 6 comparisons, 0 significant (p < .05)
+#>   trust_science: 6 comparisons, 0 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # Grouped analysis
 anova_grouped <- survey_data %>%
@@ -318,67 +196,10 @@ anova_grouped <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 
 anova_grouped %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
-#> 
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Tukey Results:
-#> ---------------------------------------------------------------------------------- 
-#>                                 Comparison Difference Lower CI Upper CI p-value
-#>     Intermediate Secondary-Basic Secondary      0.334   -0.035    0.703   0.092
-#>         Academic Secondary-Basic Secondary      0.532    0.154    0.910   0.002
-#>                 University-Basic Secondary      0.642    0.215    1.069   <.001
-#>  Academic Secondary-Intermediate Secondary      0.198   -0.206    0.602   0.587
-#>          University-Intermediate Secondary      0.308   -0.142    0.758   0.292
-#>              University-Academic Secondary      0.110   -0.347    0.568   0.925
-#>  Sig
-#>     
-#>   **
-#>  ***
-#>     
-#>     
-#>     
-#> ---------------------------------------------------------------------------------- 
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Tukey Results:
-#> ---------------------------------------------------------------------------------- 
-#>                                 Comparison Difference Lower CI Upper CI p-value
-#>     Intermediate Secondary-Basic Secondary      0.536    0.369    0.703   <.001
-#>         Academic Secondary-Basic Secondary      0.678    0.511    0.845   <.001
-#>                 University-Basic Secondary      0.892    0.698    1.085   <.001
-#>  Academic Secondary-Intermediate Secondary      0.142   -0.036    0.319    0.17
-#>          University-Intermediate Secondary      0.355    0.153    0.557   <.001
-#>              University-Academic Secondary      0.213    0.011    0.416   0.034
-#>  Sig
-#>  ***
-#>  ***
-#>  ***
-#>     
-#>  ***
-#>    *
-#> ---------------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education
+#> [region = East]
+#>   life_satisfaction: 6 comparisons, 2 significant (p < .05)
+#> [region = West]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```

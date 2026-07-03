@@ -23,7 +23,7 @@ A way to make all possible comparisons while controlling error rates
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -200,150 +200,28 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Tukey post-hoc comparisons</span></span></span>
 <span class="r-in"><span><span class="va">anova_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary      0.497    0.344    0.649   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary      0.649    0.496    0.802   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary      0.843    0.666    1.019   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.153   -0.010    0.316   0.075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.346    0.161    0.531   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary      0.193    0.008    0.379   0.037</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">anova_weighted</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_weighted</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                   Comparison Difference Lower CI Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Basic Secondary - University     -0.832   -1.011   -0.654</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Intermediate Secondary - University     -0.342   -0.529   -0.156</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Academic Secondary - University     -0.189   -0.376   -0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  p-value Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;.001 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;.001 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;.001 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0.071    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;.001 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0.046   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test by education [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">anova_multi</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_science</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_multi</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_government ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary     -0.066   -0.229    0.096   0.722</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary     -0.037   -0.200    0.125   0.935</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary     -0.004   -0.191    0.184   1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.029   -0.145    0.203   0.973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.063   -0.135    0.260   0.847</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary      0.034   -0.164    0.231   0.972</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- trust_science ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary     -0.028   -0.170    0.113   0.956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary      0.049   -0.094    0.191   0.817</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary     -0.011   -0.174    0.153   0.998</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.077   -0.075    0.229   0.563</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.018   -0.154    0.190   0.993</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary     -0.059   -0.232    0.114   0.815</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government: 6 comparisons, 0 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_science: 6 comparisons, 0 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">anova_grouped</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -351,69 +229,12 @@ unequal numbers of replications. Biometrics, 12(3), 307-310.</p>
 <span class="r-in"><span>  <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anova_grouped</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tukey_test</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary      0.334   -0.035    0.703   0.092</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary      0.532    0.154    0.910   0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary      0.642    0.215    1.069   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.198   -0.206    0.602   0.587</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.308   -0.142    0.758   0.292</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary      0.110   -0.347    0.568   0.925</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary      0.536    0.369    0.703   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary      0.678    0.511    0.845   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary      0.892    0.698    1.085   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary      0.142   -0.036    0.319    0.17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary      0.355    0.153    0.557   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary      0.213    0.011    0.416   0.034</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test by education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 2 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

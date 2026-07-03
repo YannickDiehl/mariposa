@@ -60,7 +60,7 @@ Test results showing whether groups differ, including:
 
 - P-value (are groups different?)
 
-- Effect size eta-squared (how big is the group effect?)
+- Effect size epsilon-squared (how big is the group effect?)
 
 - Mean rank for each group (which groups are higher/lower?)
 
@@ -78,7 +78,7 @@ Test results showing whether groups differ, including:
 
 - p \> 0.05: No significant group differences found
 
-**Effect Size Eta-squared** (How much do groups matter?):
+**Effect Size Epsilon-squared** (How much do groups matter?):
 
 - \< 0.01: Negligible effect
 
@@ -132,6 +132,15 @@ If the Kruskal-Wallis test is significant:
   [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
   instead
 
+### Weighted variants
+
+SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted results have no SPSS
+reference. The weighted variant is an R-only frequency-weight extension
+that reduces exactly to the unweighted test when all weights equal 1
+(enforced by an internal invariance suite); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for validation status.
+
 - For repeated measures (same subjects): Use
   [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
   instead
@@ -181,320 +190,57 @@ data(survey_data)
 # Basic Kruskal-Wallis test (comparing across education levels)
 survey_data %>%
   kruskal_wallis(life_satisfaction, group = education)
-#> 
-#> Kruskal-Wallis Test Results
-#> ---------------------------
-#> 
-#> - Grouping variable: education
-#> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
-#> 
-#> life_satisfaction
-#> -----------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  809    974.29
-#>    Intermediate Secondary  618   1250.73
-#>        Academic Secondary  607   1329.56
-#>                University  387   1456.42
-#>                     Total 2421        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>             171.178  3       0       0.071 ***
-#>   --------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> Kruskal-Wallis Test: life_satisfaction by education
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#> Use summary() for detailed output.
 
 # Multiple variables
 survey_data %>%
   kruskal_wallis(life_satisfaction, income, trust_government,
                  group = education)
-#> 
-#> Kruskal-Wallis Test Results
-#> ---------------------------
-#> 
-#> - Grouping variable: education
-#> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
-#> 
-#> life_satisfaction
-#> -----------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  809    974.29
-#>    Intermediate Secondary  618   1250.73
-#>        Academic Secondary  607   1329.56
-#>                University  387   1456.42
-#>                     Total 2421        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>             171.178  3       0       0.071 ***
-#>   --------------------------------------------
-#> 
-#> income
-#> ------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  735    623.53
-#>    Intermediate Secondary  548   1076.65
-#>        Academic Secondary  548   1359.50
-#>                University  355   1681.93
-#>                     Total 2186        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>             814.174  3       0       0.373 ***
-#>   --------------------------------------------
-#> 
-#> trust_government
-#> ----------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  791   1191.27
-#>    Intermediate Secondary  592   1156.01
-#>        Academic Secondary  595   1170.90
-#>                University  376   1192.82
-#>                     Total 2354        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>               1.235  3   0.745       0.001    
-#>   --------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> Kruskal-Wallis Test: life_satisfaction by education
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#> Kruskal-Wallis Test: income by education
+#>   H(3) = 814.174, p < 0.001 ***, eps2 = 0.373, N = 2186
+#> Kruskal-Wallis Test: trust_government by education
+#>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   kruskal_wallis(starts_with("trust_"), group = education)
-#> 
-#> Kruskal-Wallis Test Results
-#> ---------------------------
-#> 
-#> - Grouping variable: education
-#> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
-#> 
-#> trust_government
-#> ----------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  791   1191.27
-#>    Intermediate Secondary  592   1156.01
-#>        Academic Secondary  595   1170.90
-#>                University  376   1192.82
-#>                     Total 2354        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>               1.235  3   0.745       0.001    
-#>   --------------------------------------------
-#> 
-#> trust_media
-#> -----------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  797   1178.24
-#>    Intermediate Secondary  594   1210.37
-#>        Academic Secondary  599   1192.69
-#>                University  377   1140.82
-#>                     Total 2367        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>               2.709  3   0.439       0.001    
-#>   --------------------------------------------
-#> 
-#> trust_science
-#> -------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  807   1200.79
-#>    Intermediate Secondary  610   1172.31
-#>        Academic Secondary  597   1235.52
-#>                University  384   1183.98
-#>                     Total 2398        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>               3.047  3   0.384       0.001    
-#>   --------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> Kruskal-Wallis Test: trust_government by education
+#>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354
+#> Kruskal-Wallis Test: trust_media by education
+#>   H(3) = 2.709, p = 0.439 , eps2 = 0.001, N = 2367
+#> Kruskal-Wallis Test: trust_science by education
+#>   H(3) = 3.047, p = 0.384 , eps2 = 0.001, N = 2398
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>%
   kruskal_wallis(life_satisfaction, group = education,
                  weights = sampling_weight)
-#> 
-#> Weighted Kruskal-Wallis Test Results
-#> ------------------------------------
-#> 
-#> - Grouping variable: education
-#> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
-#> - Weights variable: sampling_weight
-#> 
-#> life_satisfaction
-#> -----------------
-#>   Ranks:
-#>   ----------------------------------------
-#>                     Group      N Mean Rank
-#>           Basic Secondary  815.7    984.25
-#>    Intermediate Secondary  629.6   1258.61
-#>        Academic Secondary  618.2   1338.55
-#>                University  373.2   1464.69
-#>                     Total 2436.7        NA
-#>   ----------------------------------------
-#> 
-#>   Weighted Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>             167.149  3       0       0.069 ***
-#>   --------------------------------------------
-#> 
-#> Note: Weighted analysis uses frequency-weighted ranks.
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> Kruskal-Wallis Test: life_satisfaction by education [Weighted]
+#>   H(3) = 167.075, p < 0.001 ***, eps2 = 0.069, N = 2437
+#> Use summary() for detailed output.
 
 # Grouped analysis (separate test for each region)
 survey_data %>%
   group_by(region) %>%
   kruskal_wallis(life_satisfaction, group = education)
-#> 
-#> Kruskal-Wallis Test Results
-#> ---------------------------
-#> 
-#> - Grouping variable: education
-#> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> life_satisfaction
-#> -----------------
-#>   Ranks:
-#>   -------------------------------------
-#>                     Group   N Mean Rank
-#>           Basic Secondary 161    202.35
-#>    Intermediate Secondary 119    232.99
-#>        Academic Secondary 110    254.85
-#>                University  75    266.77
-#>                     Total 465        NA
-#>   -------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>              17.105  3   0.001       0.037 ***
-#>   --------------------------------------------
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> life_satisfaction
-#> -----------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  648    771.38
-#>    Intermediate Secondary  499   1018.44
-#>        Academic Secondary  497   1075.24
-#>                University  312   1190.70
-#>                     Total 1956        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>             158.807  3       0       0.081 ***
-#>   --------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> [region = 1]
+#> Kruskal-Wallis Test: life_satisfaction by education
+#>   H(3) = 17.105, p < 0.001 ***, eps2 = 0.037, N = 465
+#> [region = 2]
+#> Kruskal-Wallis Test: life_satisfaction by education
+#>   H(3) = 158.807, p < 0.001 ***, eps2 = 0.081, N = 1956
+#> Use summary() for detailed output.
 
 # Compare across employment status (5 groups)
 survey_data %>%
   kruskal_wallis(income, group = employment)
-#> 
-#> Kruskal-Wallis Test Results
-#> ---------------------------
-#> 
-#> - Grouping variable: employment
-#> - Groups: Student, Employed, Unemployed, Retired, Other
-#> 
-#> income
-#> ------
-#>   Ranks:
-#>   --------------------------
-#>         Group    N Mean Rank
-#>       Student   65   1495.58
-#>      Employed 1390   1075.60
-#>    Unemployed  159   1073.29
-#>       Retired  471   1089.83
-#>         Other  101   1129.95
-#>         Total 2186        NA
-#>   --------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>              28.026  4       0       0.013 ***
-#>   --------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> Kruskal-Wallis Test: income by employment
+#>   H(4) = 28.026, p < 0.001 ***, eps2 = 0.013, N = 2186
+#> Use summary() for detailed output.
 ```

@@ -13,7 +13,7 @@ values, making it a robust measure of the "typical" value in your population.'><
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,10 +128,13 @@ right-skewed (a few very high values pull the mean up, e.g., income).</p></li>
 <h3 id="formula">Formula<a class="anchor" aria-label="anchor" href="#formula"></a></h3>
 
 
-<p>The weighted median is calculated using cumulative weights: observations are
-sorted by value, weights are accumulated, and the median is the value where
-the cumulative weight reaches 50% of the total weight. Linear interpolation
-is used when the 50% point falls between two observations.</p>
+<p>The weighted median is the weighted 50th percentile, computed with the
+SPSS HAVERAGE (quantile Type 6) position h = 0.5 * (W + 1) on the
+cumulative weights, with linear interpolation between bracketing
+observations. It is identical to <code>w_quantile(x, probs = 0.5)</code> by
+construction. Unweighted values match SPSS FREQUENCIES; weighted values
+with non-integer weights are an R-internal extension of the HAVERAGE
+rule (Tier 4 of the Validation Charter) pending SPSS reference runs.</p>
 </div>
 
     </div>
@@ -197,10 +200,16 @@ is used when the 50% point falls between two observations.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `Variable`.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_median Effective_N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       age              53         477</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `Variable`.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_median Effective_N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       age              49      1993.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In summarise context</span></span></span>

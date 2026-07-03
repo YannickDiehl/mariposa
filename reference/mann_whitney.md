@@ -80,7 +80,7 @@ Test results showing whether groups differ, including:
 
 - Z-score and p-value (are groups different?)
 
-- Effect size r (how big is the difference?)
+- Effect size r (`r_effect`, how big is the difference?)
 
 - Rank means for each group (which group is higher?) Use
   [`summary()`](https://rdrr.io/r/base/summary.html) for the full
@@ -156,6 +156,17 @@ Use Mann-Whitney test when:
 - Look at both p-values and effect sizes
 
 - Consider plotting the data to see the pattern
+
+### Weighted variants
+
+The weighted test is the design-based Lumley-Scott (2013) rank test
+(Horvitz-Thompson midranks with a sandwich variance), validated against
+[`survey::svyranktest()`](https://rdrr.io/pkg/survey/man/svyranktest.html)
+rather than SPSS: SPSS `NPAR TESTS` ignores `WEIGHT BY`, so no SPSS
+reference exists for weighted results. The weighted descriptive U and W
+are design-based rank quantities and may differ from SPSS's
+expanded-data U; the Z statistic and p-value are the validated
+quantities.
 
 - Use this for Likert scales and rating data
 

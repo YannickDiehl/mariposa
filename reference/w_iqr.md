@@ -95,6 +95,13 @@ for the full weighted range.
 [`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
 for comprehensive descriptive statistics including IQR.
 
+### Validation status
+
+Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
+apply the HAVERAGE position to cumulative weights with linear
+interpolation - an R-internal extension (Tier 4 of the Validation
+Charter); SPSS reference validation for weighted percentiles is pending.
+
 Other weighted_statistics:
 [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md),
 [`w_mean()`](https://YannickDiehl.github.io/mariposa/reference/w_mean.md),
@@ -147,10 +154,16 @@ survey_data %>% group_by(region) %>% w_iqr(age, weights = sampling_weight)
 #> ---------------------------------------
 #> 
 #> Group: region = East
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_iqr Effective_N
+#>       age           24         477
 #> 
 #> Group: region = West
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_iqr Effective_N
+#>       age           24      1993.1
 #> 
 
 # In summarise context

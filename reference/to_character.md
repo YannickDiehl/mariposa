@@ -8,7 +8,14 @@ but returns character instead of factor.
 ## Usage
 
 ``` r
-to_character(data, ..., drop.na = TRUE, add.non.labelled = FALSE)
+to_character(
+  data,
+  ...,
+  drop_na = TRUE,
+  add_non_labelled = FALSE,
+  drop.na = NULL,
+  add.non.labelled = NULL
+)
 ```
 
 ## Arguments
@@ -22,14 +29,21 @@ to_character(data, ..., drop.na = TRUE, add.non.labelled = FALSE)
   Optional: unquoted variable names (tidyselect supported). If empty,
   converts all `haven_labelled` columns.
 
-- drop.na:
+- drop_na:
 
   If `TRUE` (default), tagged NAs become regular `NA`.
 
-- add.non.labelled:
+- add_non_labelled:
 
   If `TRUE`, unlabelled values are included as their numeric string
   representation. Default: `FALSE`.
+
+- drop.na, add.non.labelled:
+
+  Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
+  the function with any of them is an error; use the snake_case
+  equivalents instead. (The formals are retained only so that the old
+  names error clearly instead of being swallowed by `...`.)
 
 ## Value
 

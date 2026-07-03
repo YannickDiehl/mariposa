@@ -9,7 +9,7 @@ including model summary, ANOVA table, and coefficient table."><meta property="og
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,6 +67,7 @@ including model summary, ANOVA table, and coefficient table.</p>
 <span>  model_summary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  anova_table <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  coefficients <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  collinearity <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  descriptives <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -91,6 +92,11 @@ including model summary, ANOVA table, and coefficient table.</p>
 
 <dt id="arg-coefficients">coefficients<a class="anchor" aria-label="anchor" href="#arg-coefficients"></a></dt>
 <dd><p>Logical. Show coefficients table? (Default: TRUE)</p></dd>
+
+
+<dt id="arg-collinearity">collinearity<a class="anchor" aria-label="anchor" href="#arg-collinearity"></a></dt>
+<dd><p>Logical. Show collinearity diagnostics (Tolerance,
+VIF per model term)? (Default: TRUE)</p></dd>
 
 
 <dt id="arg-descriptives">descriptives<a class="anchor" aria-label="anchor" href="#arg-descriptives"></a></dt>
@@ -161,6 +167,15 @@ including model summary, ANOVA table, and coefficient table.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government               0.006      0.021    0.006      0.305    0.760 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Collinearity Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                       Tolerance        VIF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                            1.000      1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government               1.000      1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   VIF &gt; 10 (Tolerance &lt; 0.1) indicates problematic collinearity.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, descriptives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -195,6 +210,15 @@ including model summary, ANOVA table, and coefficient table.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   age                           -0.002      0.001   -0.025     -1.208    0.227 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government               0.006      0.021    0.006      0.305    0.760 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Collinearity Statistics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                       Tolerance        VIF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                            1.000      1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government               1.000      1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   VIF &gt; 10 (Tolerance &lt; 0.1) indicates problematic collinearity.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

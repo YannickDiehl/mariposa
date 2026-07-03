@@ -3,7 +3,7 @@
 Replaces tagged NAs with their original missing value codes. Works with
 data imported via
 [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
-(with `tag.na = TRUE`) or any reader that used the `tag.na` parameter
+(with `tag_na = TRUE`) or any reader that used the `tag_na` parameter
 ([`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
 [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md),
 [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)).
@@ -59,8 +59,8 @@ if (FALSE) { # \dontrun{
 data <- read_spss("survey.sav")
 original <- untag_na(data$satisfaction)
 
-# Stata data with tag.na
-data <- read_stata("survey.dta", tag.na = c(-9, -8, -42))
+# Stata data with tag_na
+data <- read_stata("survey.dta", tag_na = c(-9, -8, -42))
 original <- untag_na(data$income)
 } # }
 ```

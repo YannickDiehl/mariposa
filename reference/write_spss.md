@@ -4,7 +4,7 @@ Writes a data frame to an SPSS `.sav` file, preserving variable labels,
 value labels, and user-defined missing values. When exporting data that
 was imported with
 [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
-(with `tag.na = TRUE`), the tagged NAs are automatically converted back
+(with `tag_na = TRUE`), the tagged NAs are automatically converted back
 to SPSS user-defined missing values, enabling full roundtrip fidelity.
 
 ## Usage

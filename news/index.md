@@ -1,5 +1,665 @@
 # Changelog
 
+## mariposa 0.6.14
+
+Codebook robustness (theme:
+[`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
+survives real-world data and says what it shows). A stress test of the
+codebook stack (metadata extraction, console print/summary, HTML
+builder, xlsx export) surfaced a batch of crashes, silent data errors,
+and display leaks; this release fixes all of them and adds a `view`
+argument for side-effect control.
+
+### Bug fixes
+
+- Variables with value labels but **no variable label** no longer show a
+  fake label like “1 \| 2 \| 3”: `attr(x, "label")` partially matched
+  the `labels` attribute; all label reads now use `exact = TRUE`. The
+  “Variables with labels” count excludes such variables accordingly.
+- [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
+  no longer errors on **inline data expressions**
+  (e.g. `codebook(data.frame(...))` spanning multiple deparse lines);
+  long expressions collapse to the generic dataset name “data”.
+- **List columns** no longer crash the frequency computation: they are
+  skipped with a warning (“list column … skipped - not supported in
+  codebooks”) and a data frame consisting only of list columns aborts
+  with a clear error.
+- The **tagged-NA breakdown is now consistent across all three layers**:
+  - the HTML builder appends the missing-value rows (codes, labels,
+    counts) below range-displayed variables too — previously an
+    all-user-missing or high-cardinality variable silently lost them
+    (the xlsx export already did this correctly);
+  - NA frequencies are computed even for
+    high-cardinality/range-displayed variables;
+  - `print(summary(cb))` gains a “Missing values:” section (codes,
+    labels, counts) — `show_na` was a no-op on the console layer before.
+
+### Improvements
+
+- **Central display formatting for numeric values**: empirical values
+  and ranges no longer leak 15-digit doubles or scientific notation into
+  the console/HTML/xlsx output. Fractional values show 4 significant
+  digits (“0.3333”), whole numbers keep their integer look (“1”), tiny
+  values are expanded (“0.00000001”, never “1e-08”). Frequency matching
+  is unaffected: display strings and raw matching keys are carried
+  separately (`empirical_values` vs. new `empirical_keys`).
+- The percentage and effective-n columns (`prc`, `valid_prc`, `cum_prc`,
+  `n_eff`) on `write_xlsx(cb, frequencies = TRUE)` sheets are rounded to
+  2 decimals.
+- `max_values` (single integer \>= 1) and `max_len` (single integer
+  \>= 4) are validated up front with a clear error.
+- Factor levels now respect `max_values` and truncate with the same “…
+  (N more)” note used for character values.
+- Range displays show the cardinality: “18 - 95 (78 distinct)” instead
+  of just “18 - 95”.
+- `file =` into a nonexistent directory aborts early, naming the missing
+  directory.
+- Polish: “1 variable” / “1 observation” pluralization in the console
+  and HTML subtitle; very long character values are truncated to
+  `max_len` with “…” (raw values still drive frequency matching);
+  zero-row data frames say “(no observations)” instead of “(all
+  missing)”.
+
+### New features
+
+- New `view` argument for
+  [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
+  (default: [`interactive()`](https://rdrr.io/r/base/interactive.html)):
+  controls whether the HTML codebook opens in the RStudio Viewer.
+  `view = FALSE` suppresses the Viewer side effect entirely; writing via
+  `file =` is unaffected. The compact
+  [`print()`](https://rdrr.io/r/base/print.html) only advertises the
+  Viewer when it was actually opened (result gains a `viewed` flag).
+
+## mariposa 0.6.13
+
+McDonald’s omega (theme: reliability() learns a second reliability
+coefficient).
+[`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md)
+now reports McDonald’s omega alongside Cronbach’s alpha — a new
+statistic within an existing function, hence a PATCH per the clarified
+versioning policy.
+
+### New features
+
+- [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md)
+  computes **McDonald’s omega** from a one-factor maximum-likelihood
+  model ([`stats::factanal`](https://rdrr.io/r/stats/factanal.html) on
+  the same (weighted) correlation matrix already used for standardized
+  alpha):
+  - `omega` — raw/total omega in the covariance metric (analogous to raw
+    alpha), reported as “McDonald’s Omega”;
+  - `omega_std` — standardized omega in the correlation metric
+    (analogous to standardized alpha);
+  - `omega_if_deleted` — a new column in `item_total`, refitting the
+    one-factor model per deleted item (NA when the reduced scale has
+    fewer than 3 items, where the model is unidentified). Scales with
+    fewer than 3 items get NA omega fields plus a warning (alpha is
+    unaffected); non-convergent factor fits degrade to NA with the
+    factanal message. The compact
+    [`print()`](https://rdrr.io/r/base/print.html) shows omega next to
+    alpha, and [`summary()`](https://rdrr.io/r/base/summary.html) adds
+    omega rows to the Reliability Statistics block and an omega column
+    to the Item-Total table.
+
+### Validation
+
+- McDonald’s omega is **Tier 4 (Internal, R-only)** for now: SPSS v27+
+  offers omega in `RELIABILITY`, but IBM’s algorithm documentation is
+  not publicly retrievable and no SPSS v29 reference run exists yet. The
+  pending reference run is prepared in
+  `.claude/spss-syntax-omega-references.sps` (expected values included);
+  until it lands, omega is guarded by a parameter-recovery test on
+  simulated congeneric data, exact cross-checks against a manual
+  factanal computation, cross-checks against
+  [`psych::omega()`](https://rdrr.io/pkg/psych/man/omega.html) and a
+  lavaan/semTools one-factor CFA
+  (`tests/testthat/test-reliability-omega.R`), and a `w == 1` block in
+  the weights-invariance suite. The help page carries the Tier-4
+  disclosure; the compatibility vignette flags omega as Internal (Tier
+  4).
+- `psych`, `lavaan`, and `semTools` added to Suggests (cross-check tests
+  only; all gated by `skip_if_not_installed()`).
+
+## mariposa 0.6.12
+
+Weighted-rank correctness and accurate claims (theme: the weighted rank
+family says exactly what it is). Two formula errors in weighted rank
+statistics are fixed and a package-wide invariance suite now guards
+every weighted entry point; alongside, the user-facing claim surface
+(README, DESCRIPTION, help pages, compatibility vignette) is realigned
+with what the validation suite actually covers.
+
+### Bug fixes
+
+- Weighted
+  [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md):
+  the tau-b denominator omitted double-tied pairs (`ties_both`) from the
+  two tie-correction factors, deflating \|tau\| on tied data. The
+  weighted denominator now mirrors the unweighted
+  `(n0 - Tx - Txy)(n0 - Ty - Txy)` structure.
+- Weighted
+  [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md):
+  the grand mean rank was still the hard-coded `N/2` of the pre-0.6.4
+  rank convention instead of `(N+1)/2`, inflating H. It is now derived
+  from the weighted mid-ranks themselves.
+- Both bugs violated the invariant that weights of exactly 1 must
+  reproduce the unweighted result. A new package-wide invariance suite
+  (`tests/testthat/test-weights-invariance.R`) enforces this w == 1
+  reduction for every weighted entry point; intentionally approximate
+  reductions (design-based `mann_whitney`, weighted Kendall z/p) are
+  documented exceptions with bounded assertions.
+
+### Accurate claims
+
+- README and DESCRIPTION no longer overclaim: the paired t-test mode
+  (not yet implemented) is no longer advertised, and “every function is
+  validated … your results will match” is replaced by the
+  Charter-compliant wording — validated against SPSS v29 within
+  documented per-tier tolerances, with
+  [`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+  for per-function status.
+- The weighted variants of the rank-based family —
+  [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md),
+  [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
+  [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md),
+  [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
+  [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md),
+  [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md),
+  [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md),
+  and
+  [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
+  — are now disclosed as R-only (Tier 4) in a “Weighted variants” note
+  on each help page: SPSS `NPAR TESTS` / `NONPAR CORR` ignore
+  `WEIGHT BY`, so no SPSS reference exists for these weighted paths.
+  [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)’s
+  note also states that its design-based U/W may differ from SPSS’s
+  expanded-data U (Z and p are the validated quantities);
+  [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+  now documents that omega-/epsilon-squared are truncated at 0 (negative
+  raw estimates occur when F \< 1).
+
+### Validation
+
+- The SPSS-compatibility vignette is regenerated (was frozen at
+  2026-05-19) and now carries an “Internal (Tier 4)” marker for the
+  weighted rank variants. Generator fixes: the `w_*` family and
+  `scheffe_test` are correctly matched to their shared test files
+  (previously shown as “not validated” despite existing tests),
+  zero-match tier counts no longer report as 1, and
+  `assert_spss_count()` call sites are tallied as Spec.
+- `test-t-test-spss-validation.R`: the header tier table claimed the
+  t-statistic at Spec (±1e-5) while the assertions use Display(3); the
+  header now matches the assertions.
+- The last `expect_no_error()` in a validation file
+  (`test-linear-regression-spss-validation.R`) is replaced by real
+  assertions on the per-group predictions; the validation-discipline
+  meta-test now passes with `MARIPOSA_VALIDATION_STRICT=TRUE`.
+
+## mariposa 0.6.11
+
+Deprecation cleanup (theme: the due bridges come out). Two batches of
+deprecations reached their removal release together: the 0.6.9 argument
+bridges (originally slated for 0.6.10) and the 0.6.10 duplicate result
+columns. Removing both here keeps the run-up to the 1.0 API freeze tidy.
+
+### Breaking changes
+
+- The 0.6.9 dot-case argument bridges are removed as announced. The old
+  names no longer warn-and-work; they now error (falling through to
+  tidyselect or SET-mode validation):
+  - [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md):
+    `show.id`, `show.type`, `show.labels`, `show.values`, `show.freq`,
+    `show.na`, `show.unused`, `max.values`, `max.len`, `sort.by.name`
+    (use `show_id`, `show_type`, `show_labels`, `show_values`,
+    `show_freq`, `show_na`, `show_unused`, `max_values`, `max_len`,
+    `sort_by_name`)
+  - [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md):
+    `drop.na` (use `drop_na`)
+  - [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md):
+    `drop.na` (use `drop_na`) These bridges were originally slated for
+    removal in 0.6.10 and are batched into this release. The
+    [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)/[`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md)/[`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
+    family of removed-argument errors introduced in 0.6.9 remain in
+    place as permanent guidance (their `...` consumes tidyselect, so a
+    clear error beats a silent misinterpretation).
+- The deprecated duplicate result columns kept for one release in 0.6.10
+  are removed; only the canonical column remains:
+  - [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
+    [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md):
+    `chi_sq` removed (use `chi_squared`)
+  - [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md):
+    `statistic` removed (use `chi_squared`)
+  - [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md):
+    `effect_size_r` removed (use `r_effect`)
+  - [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md):
+    `F_stat` removed (use `F_statistic`) The statistical values are
+    unchanged; only the redundant column names go away.
+
+## mariposa 0.6.10
+
+Result-column harmonization (theme: one statistic, one column name). A
+style audit found the same statistic carrying different result-column
+names across sibling functions; the drifted names now converge on the
+canonical spelling, with the old columns kept as duplicates for one
+release.
+
+### Improvements
+
+- The `$results` columns for shared statistics are harmonized on the
+  canonical names already used elsewhere in the package:
+  - Chi-square statistic: `chi_squared` (as in
+    [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)) -
+    now also in
+    [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
+    [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md),
+    and
+    [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md)
+  - Effect size r: `r_effect` (as in
+    [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)) -
+    now also in
+    [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
+  - F statistic: `F_statistic` (as in
+    [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)) -
+    now also in
+    [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+    Print and summary methods read the canonical columns; the
+    statistical values are unchanged.
+
+### Deprecations
+
+- The old result-column names remain available as duplicated columns
+  (positioned right after their canonical counterpart) for one release
+  and will be removed in 0.6.11:
+  - [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md),
+    [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md):
+    `chi_sq` (use `chi_squared`)
+  - [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md):
+    `statistic` (use `chi_squared`)
+  - [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md):
+    `effect_size_r` (use `r_effect`)
+  - [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md):
+    `F_stat` (use `F_statistic`)
+
+## mariposa 0.6.9
+
+API-cleanup completion (theme: the 0.6.8 bridges come out, the last
+dot-case stragglers get theirs). One step closer to the 1.0 API freeze.
+
+### Breaking changes
+
+- The 0.6.8 deprecation bridges are removed as announced. The dot-case
+  argument names now error instead of warning:
+  - [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)/[`fre()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md):
+    `sort.frq`, `show.na`, `show.prc`, `show.valid`, `show.sum`,
+    `show.labels`, `show.unused`
+  - [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md):
+    `as.factor`, `var.label`, `val.labels`
+  - [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)/[`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md)/[`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md):
+    `drop.na`, `drop.unused`, `add.non.labelled`, `use.labels`,
+    `start.at`, `keep.labels`
+  - [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)/[`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md)/[`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)/[`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md)/[`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md):
+    `tag.na` Before: `frequency(data, x, sort.frq = "desc")` warned and
+    worked. After: it errors with a pointer to `sort_frq`. In the
+    functions whose `...` selects variables, the old names raise a clear
+    “removed in 0.6.9” error instead of being silently swallowed by
+    tidyselect; in the readers they fail as unused arguments.
+
+### Deprecations
+
+- The remaining dot-case arguments are renamed to snake_case with the
+  usual one-release bridge (old names warn once per session; removal
+  planned for 0.6.10):
+  - [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md):
+    `show_id`, `show_type`, `show_labels`, `show_values`, `show_freq`,
+    `show_na`, `show_unused`, `max_values`, `max_len`, `sort_by_name`
+  - [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md):
+    `drop_na`
+  - [`drop_labels()`](https://YannickDiehl.github.io/mariposa/reference/drop_labels.md):
+    `drop_na` The display options stored on codebook results
+    (`result$options`) use the snake_case keys as well.
+
+## mariposa 0.6.8
+
+API-unification release (theme: snake_case arguments). One release-long
+deprecation bridge per the versioning policy - old names keep working
+and warn once per session; they will be removed in 0.6.9.
+
+### Breaking changes (with bridge)
+
+- Dot-case arguments renamed to snake_case:
+  - [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)/[`fre()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md):
+    `sort_frq`, `show_na`, `show_prc`, `show_valid`, `show_sum`,
+    `show_labels`, `show_unused`
+  - [`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md):
+    `as_factor`, `var_label`, `val_labels`
+  - [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)/[`to_character()`](https://YannickDiehl.github.io/mariposa/reference/to_character.md)/[`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md):
+    `drop_na`, `drop_unused`, `add_non_labelled`, `use_labels`,
+    `start_at`, `keep_labels`
+  - [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)/[`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md)/[`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md)/[`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md)/[`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md):
+    `tag_na` Base-R-universal names (`na.rm`, `conf.level`, `var.equal`)
+    are kept.
+
+### Breaking changes (no bridge)
+
+- [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+  results no longer carry the duplicated `CI_lower`/`CI_upper` alias
+  columns; `conf_int_lower`/`conf_int_upper` are the contract.
+
+### Improvements
+
+- `sort_frq` is validated (`"none"/"asc"/"desc"`) - typos used to
+  silently produce an unsorted table; `show_labels` validates its
+  `TRUE`/`FALSE`/`"auto"` values with a clear error.
+- Vignettes showcase the new argument names.
+
+## mariposa 0.6.7
+
+Output-layer release (theme: uniform three-layer output). Statistical
+results are unchanged; what changed is how results present themselves.
+
+### Uniform three-layer output (visible change)
+
+Every analysis class now follows the documented pattern that t_test and
+chi_square pioneered: `result` prints a compact overview (headline
+statistic, p-value, significance stars, one line per test), and
+`summary(result)` carries the full detailed output behind boolean
+section toggles. Newly migrated: kruskal_wallis, wilcoxon_test,
+friedman_test, binomial_test, fisher_test, chisq_gof, mcnemar_test,
+levene_test, tukey_test, scheffe_test, dunn_test, pairwise_wilcoxon,
+frequency, crosstab (describe was already compact and gained the summary
+layer for uniformity). Nothing was removed - everything the old print()
+showed is in summary(), verified line-by-line.
+
+### Internal architecture
+
+- One shared engine for the three correlation functions
+  (pearson/spearman/kendall results verified byte-identical across 21
+  scenarios; ~500 lines removed).
+- The w\_\* factory now supports multi-value and non-numeric statistics;
+  w_quantile() and w_modus() are ordinary plugins instead of pipeline
+  reimplementations (~420 lines removed, results identical across 31
+  scenarios).
+
+## mariposa 0.6.6
+
+Internal-architecture release (theme: shared cores and formatting
+utilities). No statistical results change; table rendering in the
+Tukey/Scheffe output is now aligned and uses SPSS-style p display.
+
+- One home for every weighted formula: the new weighted-statistics
+  kernel file backs describe(), frequency(), the w\_\* functions and the
+  rank tests; the weighted variance formula previously existed in six
+  files.
+- New internal output utilities (bordered table renderer,
+  grouped-results iterator, unified number/p formatting) - the building
+  blocks the print style guide documented; adoption started with the
+  post-hoc tests.
+- Tukey and Scheffe now share one engine and one print implementation
+  (results verified byte-identical); t_test() and oneway_anova() were
+  restructured from 500-line nested-closure bodies into short
+  orchestrators with file-level helpers (byte-identical results).
+- Weights in summarise() context are captured as quosures
+  (enquo/eval_tidy) instead of frame-walking; shared validators report
+  errors at the user-facing call site.
+- Documentation internals standardized on
+  [@noRd](https://github.com/noRd) (man/ shrinks by ~120 internal
+  pages).
+
+## mariposa 0.6.5
+
+Housekeeping release (theme: package hygiene). No statistical results
+change.
+
+- Slimmer dependencies: removed the unused tidyr import and pruned
+  unused `importFrom` entries.
+- Error chains: failures inside grouped analyses are re-thrown with
+  `cli_abort(parent = ...)` so the original condition is preserved; the
+  haven requirement is enforced by one central guard that reports the
+  calling function instead of an internal helper.
+- Import internals: the native-missing-value detection shared by
+  [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
+  [`read_sas()`](https://YannickDiehl.github.io/mariposa/reference/read_sas.md)
+  and
+  [`read_xpt()`](https://YannickDiehl.github.io/mariposa/reference/read_xpt.md)
+  now lives in one helper instead of three copies.
+- Mechanical polish: remaining
+  [`sapply()`](https://rdrr.io/r/base/lapply.html) calls in the oldest
+  files converted to type-stable
+  [`vapply()`](https://rdrr.io/r/base/lapply.html); pkgdown reference
+  now lists
+  [`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md),
+  [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md),
+  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md).
+- Test suite: removed a legacy tolerance registry that contradicted the
+  Validation Charter and was no longer used by any test.
+
+## mariposa 0.6.4
+
+A quality release. Following an in-depth internal review of the entire
+statistical codebase, this version sharpens the accuracy of several
+statistics, makes the package behave more consistently across functions,
+and adds a dedicated regression-test suite
+(`tests/testthat/test-audit-regressions.R`) so these guarantees hold in
+future releases. Some outputs change slightly as a result - in every
+case toward the standard reference implementations.
+
+### More accurate statistics
+
+- Kendall’s tau-b significance test now agrees with
+  [`stats::cor.test()`](https://rdrr.io/r/stats/cor.test.html) (and the
+  SPSS formula) to machine precision, which is most noticeable for
+  heavily tied data such as binary variables.
+- The weighted Wilcoxon signed-rank test (and
+  [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md))
+  now uses frequency-expansion mid-ranks: with integer weights the
+  statistic equals the expanded-data Wilcoxon exactly, and `weights = 1`
+  reproduces the unweighted test. Displayed rank means in the weighted
+  Kruskal-Wallis and Dunn tests follow the same convention.
+- The Mann-Whitney asymptotic p-value now matches its reported Z (both
+  follow the SPSS convention without continuity correction).
+- Regression degrees of freedom are now derived from the fitted model
+  terms, improving results for models with dummy-coded factors or
+  interaction terms (weighted linear regression and the logistic omnibus
+  test).
+- The Kruskal-Wallis effect size is now correctly labelled: the returned
+  field is `epsilon_squared` (previously named `eta_squared`).
+
+### New and refined API
+
+- [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+  gains SPSS-style collinearity diagnostics (Tolerance and VIF per model
+  term), including a `collinearity` toggle in
+  [`summary()`](https://rdrr.io/r/base/summary.html).
+- [`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md),
+  [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md),
+  and
+  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)
+  now return the requested effect size directly as a numeric value - the
+  convenient behavior their names suggest. For the full test output, use
+  [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md).
+- The weighted two-sample
+  [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+  now honors `var.equal` for its primary result.
+  [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+  always reports both the classical and Welch results (like SPSS
+  ONEWAY), so its `var.equal` argument is deprecated; `ss_type` in
+  [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md)/[`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)
+  is likewise deprecated in favor of the SPSS-standard Type III.
+
+### More consistent behavior
+
+- One package-wide weights policy: invalid (negative) weights are now
+  rejected with a clear message at every entry point, instead of being
+  handled differently depending on the function.
+- The weighted median now always equals the weighted 50th percentile,
+  and unweighted quantiles follow the SPSS convention (Type 6/HAVERAGE)
+  throughout.
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+  header statistics use the same formulas as
+  [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+  and the `w_*` functions.
+- Significance stars follow a single boundary convention everywhere,
+  matching the printed legend.
+
+### More robust in edge cases
+
+- Correlation functions handle constant variables gracefully (NA instead
+  of an error), `frequency(show.unused = TRUE)` works on variables
+  tagged via
+  [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)/[`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md),
+  and `frequency(sort.frq =)` now sorts by frequency with a monotone
+  cumulative-percent column.
+- [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+  protects valid values when many missing-value codes must be
+  consolidated into a range, and explains what it is doing.
+- [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+  surfaces separation and convergence warnings again; post-hoc tests
+  report when a computation could not be carried out instead of skipping
+  it silently.
+
+### Housekeeping
+
+- Internal code paths were consolidated (shared helpers for weighted
+  mid-ranks and the Wilcoxon core) and a substantial amount of unused
+  code was removed, making the codebase easier to maintain.
+- Grouped single-variable `w_*` results print their statistics again.
+
+## mariposa 0.6.3.2
+
+### `rec()` reliably matches decimal single values
+
+Single-value recode rules now match decimal codes (e.g. `"3.6=2"`) even
+when the stored value carries floating-point representation error. The
+single-value comparison was changed from exact numeric equality
+(`x == value`) to a string comparison
+(`as.character(x) == as.character(value)`), which rounds to 15
+significant digits and thereby absorbs the error.
+
+Reason: a value such as `0.1 + 0.2` is stored as `0.30000000000000004`,
+so the previous exact `==` test silently failed to match a rule
+`"0.3=..."`. This mirrors the behaviour of `sjmisc::rec()`, on which
+[`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md)’s
+string syntax is modelled. Range rules were already robust (they use
+`>=`/`<=`) and are unchanged.
+
+## mariposa 0.6.3.1
+
+### broom tidiers now work natively
+
+Adds explicit `tidy()`, `glance()`, and `augment()` methods for both
+`linear_regression` and `logistic_regression` results, registered via
+the standard `s3_register()` pattern (broom in Suggests, no hard dep).
+
+Reason: with `class(r) = c("linear_regression", "lm")`,
+[`broom::tidy.lm()`](https://broom.tidymodels.org/reference/tidy.lm.html)
+and
+[`broom::glance.lm()`](https://broom.tidymodels.org/reference/glance.lm.html)
+dispatched as expected, but internally called `summary(x)` — which
+(because of our specialised
+[`summary.linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/summary.linear_regression.md)
+overriding `summary.lm`) returned the mariposa SPSS-style summary
+instead of the lm summary broom needs. The visible failures:
+
+- `broom::glance(r)` raised `object 'r.squared' not found` because
+  mariposa’s summary stores it as `R_squared`.
+- `broom::tidy(r, conf.int = TRUE)` returned only 4 columns (`term`,
+  `estimate`, `conf.low`, `conf.high`) instead of the expected 6+
+  (`term`, `estimate`, `std.error`, `statistic`, `p.value`, `conf.low`,
+  `conf.high`).
+
+The new methods strip our `linear_regression` / `logistic_regression`
+class before delegating to
+[`broom::tidy.lm`](https://broom.tidymodels.org/reference/tidy.lm.html)
+/ `tidy.glm` etc., so the inner
+[`summary()`](https://rdrr.io/r/base/summary.html) call dispatches to
+`summary.lm` / `summary.glm` and broom receives its expected shape. The
+user-facing `summary(r)` still returns mariposa’s SPSS-style output
+(more specific method wins).
+
+Edge cases stay consistent with the rest of the lm-generic surface:
+[`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) /
+`glance()` / `augment()` on a grouped or pairwise result raise an
+actionable error pointing at `lapply(r$groups, ...)` or
+`use = "listwise"`.
+
+New tests in `test-broom-methods.R` cover all three tidiers for both
+regression types, plus the grouped/pairwise error paths.
+
+## mariposa 0.6.3
+
+### Behavior Change — regression results inherit from `lm` / `glm`
+
+[`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+and
+[`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+results now ARE the fitted `lm` / `glm` object (with mariposa-specific
+tables attached as additional slots), instead of wrapping it in
+`$model`. All base-R and `broom` generics dispatch natively:
+
+``` r
+
+r <- linear_regression(survey_data, life_satisfaction ~ age + income)
+coef(r)                                 # named numeric vector
+predict(r, newdata = head(survey_data)) # works directly
+anova(r)                                # sequential SS table
+vcov(r); confint(r); residuals(r); fitted(r)
+broom::tidy(r); broom::glance(r); broom::augment(r)
+```
+
+Class hierarchy is `c("linear_regression", "lm")` for linear and
+`c("logistic_regression", "glm", "lm")` for logistic. `summary(r)` still
+returns the SPSS-style mariposa summary (more specific method wins); for
+the raw `lm`/`glm` summary call `stats::summary.lm(r)` /
+`stats::summary.glm(r)`.
+
+#### Slot renames (breaking)
+
+Two slots collided with `lm`/`glm` conventions and were renamed:
+
+| Before                   | After                                      |
+|:-------------------------|:-------------------------------------------|
+| `$coefficients` (tibble) | `$coef_table` (tibble)                     |
+| `$anova` (tibble)        | `$anova_table` (tibble)                    |
+| `$model` (lm/glm)        | the object IS the model — use `r` directly |
+
+Migration:
+
+- `r$coefficients` → `r$coef_table` (SPSS-style tibble) or `coef(r)`
+  (named numeric vector).
+- `r$anova` → `r$anova_table` (SPSS-style overall-model ANOVA tibble) or
+  `anova(r)` (R’s per-term sequential SS table).
+- `r$model |> predict(...)` → `predict(r, ...)` directly.
+- `r$model |> broom::tidy()` → `broom::tidy(r)` directly.
+
+#### Edge cases
+
+- `use = "pairwise"`: no single fitted lm is available, so the result is
+  a custom list with class `"linear_regression"` only.
+  [`predict()`](https://rdrr.io/r/stats/predict.html)/[`anova()`](https://rdrr.io/r/stats/anova.html)
+  etc. raise an informative error pointing at `use = "listwise"`.
+- Grouped results (top-level): no single model.
+  [`predict()`](https://rdrr.io/r/stats/predict.html)/[`anova()`](https://rdrr.io/r/stats/anova.html)
+  raise an informative error pointing at
+  `lapply(r$groups, predict, ...)`. Each `r$groups[[i]]` is itself an
+  lm-inheriting object, so per-group generics work directly.
+
+### Test Suite
+
+- New test block in `test-linear-regression-spss-validation.R` verifies
+  that [`coef()`](https://rdrr.io/r/stats/coef.html),
+  [`predict()`](https://rdrr.io/r/stats/predict.html),
+  [`anova()`](https://rdrr.io/r/stats/anova.html),
+  [`vcov()`](https://rdrr.io/r/stats/vcov.html),
+  [`confint()`](https://rdrr.io/r/stats/confint.html),
+  [`residuals()`](https://rdrr.io/r/stats/residuals.html),
+  [`fitted()`](https://rdrr.io/r/stats/fitted.values.html),
+  [`formula()`](https://rdrr.io/r/stats/formula.html),
+  [`nobs()`](https://rdrr.io/r/stats/nobs.html),
+  [`model.matrix()`](https://rdrr.io/r/stats/model.matrix.html) all
+  dispatch natively, plus the grouped/pairwise error paths.
+- 1184/1184 tests pass; R CMD check on built tarball: Status OK.
+
 ## mariposa 0.6.2
 
 ### Behavior Change
@@ -173,21 +833,18 @@ all corrected in this release:
   (unweighted branch). The inconsistency caused weighted chi-squared
   values to be too low for tied data.
 - [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md):
-  weighted skewness and kurtosis now delegate to
-  [`.calc_skewness()`](https://YannickDiehl.github.io/mariposa/reference/dot-calc_skewness.md)
-  /
-  [`.calc_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/dot-calc_kurtosis.md)
-  in `helpers.R` (Joanes-Gill Type-2 with `Σw` substitution), matching
+  weighted skewness and kurtosis now delegate to `.calc_skewness()` /
+  `.calc_kurtosis()` in `helpers.R` (Joanes-Gill Type-2 with `Σw`
+  substitution), matching
   [`w_skew()`](https://YannickDiehl.github.io/mariposa/reference/w_skew.md)
   /
   [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md)
   and SPSS FREQUENCIES exactly. The previous duplicate implementation
   used a simple weighted moment without bias correction.
-- [`.w_quantile()`](https://YannickDiehl.github.io/mariposa/reference/dot-w_quantile.md):
-  weighted quantiles now use Type-6 (HAVERAGE) linear interpolation
-  between cumulative-weight crossings — matches SPSS FREQUENCIES
-  /PERCENTILES. Unweighted quantiles also switched from R default
-  `type = 7` to SPSS-compatible `type = 6`.
+- `.w_quantile()`: weighted quantiles now use Type-6 (HAVERAGE) linear
+  interpolation between cumulative-weight crossings — matches SPSS
+  FREQUENCIES /PERCENTILES. Unweighted quantiles also switched from R
+  default `type = 7` to SPSS-compatible `type = 6`.
 
 ### Documentation Honesty
 
@@ -671,11 +1328,8 @@ data exploration functions.
 
 ### Internal Helpers
 
-- Added
-  [`build_summary_object()`](https://YannickDiehl.github.io/mariposa/reference/build_summary_object.md)
-  and
-  [`format_p_compact()`](https://YannickDiehl.github.io/mariposa/reference/format_p_compact.md)
-  in `R/summary_helpers.R` as shared infrastructure for all summary
+- Added `build_summary_object()` and `format_p_compact()` in
+  `R/summary_helpers.R` as shared infrastructure for all summary
   methods.
 
 ### Documentation
@@ -865,12 +1519,9 @@ data exploration functions.
 
 - Internal refactoring of
   [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md):
-  extraction logic separated into
-  [`.efa_extract_pca()`](https://YannickDiehl.github.io/mariposa/reference/dot-efa_extract_pca.md)
-  and
-  [`.efa_extract_ml()`](https://YannickDiehl.github.io/mariposa/reference/dot-efa_extract_ml.md)
-  for cleaner architecture and easier extension with future extraction
-  methods (PAF planned).
+  extraction logic separated into `.efa_extract_pca()` and
+  `.efa_extract_ml()` for cleaner architecture and easier extension with
+  future extraction methods (PAF planned).
 
 ------------------------------------------------------------------------
 
@@ -978,7 +1629,7 @@ data exploration functions.
 ### Breaking Changes
 
 - [`gamma()`](https://rdrr.io/r/base/Special.html) has been renamed to
-  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)
   to avoid shadowing
   [`base::gamma()`](https://rdrr.io/r/base/Special.html). The function
   remains an alias for
@@ -993,12 +1644,9 @@ data exploration functions.
 ### Bug Fixes
 
 - Fixed namespace collisions from triple-defined internal helper
-  functions
-  ([`.process_variables()`](https://YannickDiehl.github.io/mariposa/reference/dot-process_variables.md),
-  [`.process_weights()`](https://YannickDiehl.github.io/mariposa/reference/dot-process_weights.md),
-  [`.effective_n()`](https://YannickDiehl.github.io/mariposa/reference/dot-effective_n.md)).
-  These are now defined once in `helpers.R` and shared across all
-  functions.
+  functions (`.process_variables()`, `.process_weights()`,
+  `.effective_n()`). These are now defined once in `helpers.R` and
+  shared across all functions.
 
 - Fixed weighted variance/SD formula inconsistency. All weighted
   calculations now use the SPSS frequency weights formula:

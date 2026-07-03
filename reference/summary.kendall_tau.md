@@ -66,9 +66,9 @@ summary(result)
 #> 
 #> 
 #>   Kendall's tau-b: tau-b = 0.006
-#>   p-value: p = 0.721 
+#>   p-value: p = 0.722 
 #>   N = 2227
-#>   z-score: 0.357
+#>   z-score: 0.356
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)
@@ -82,7 +82,7 @@ summary(result, pvalue_matrix = FALSE)
 #> 
 #>   Kendall's tau-b: tau-b = 0.006
 #>   N = 2227
-#>   z-score: 0.357
+#>   z-score: 0.356
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

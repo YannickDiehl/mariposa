@@ -12,8 +12,11 @@ rec(
   data,
   ...,
   rules,
-  as.factor = FALSE,
+  as_factor = FALSE,
   suffix = NULL,
+  var_label = NULL,
+  val_labels = NULL,
+  as.factor = NULL,
   var.label = NULL,
   val.labels = NULL
 )
@@ -35,7 +38,7 @@ rec(
 
   A character string defining the recoding rules (see Details).
 
-- as.factor:
+- as_factor:
 
   If `TRUE`, return the result as a factor. Default: `FALSE`.
 
@@ -45,17 +48,24 @@ rec(
   variables (e.g., `"_r"`). If `NULL` (default), the original columns
   are overwritten in-place.
 
-- var.label:
+- var_label:
 
   A new variable label. If `NULL`, the existing label is kept with
   `" (recoded)"` appended.
 
-- val.labels:
+- val_labels:
 
   A named character vector of value labels for the new values (e.g.,
   `c("1" = "Low", "2" = "Medium", "3" = "High")`). If `NULL`, labels are
   taken from inline `[Label]` syntax in `rules` (if present). Explicit
-  `val.labels` always override inline labels.
+  `val_labels` always override inline labels.
+
+- as.factor, var.label, val.labels:
+
+  Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
+  the function with any of them is an error; use the snake_case
+  equivalents instead. (The formals are retained only so that the old
+  names error clearly instead of being swallowed by `...`.)
 
 ## Value
 
@@ -88,6 +98,13 @@ pairs:
 
 Rules are evaluated in order — the first matching rule wins.
 
+### Decimal Values
+
+Both single values and ranges accept decimals (e.g. `"3.6=2"` or
+`"2.5:3.5=1"`). Single-value matching compares values as strings
+(rounded to 15 significant digits), so decimal codes match reliably even
+when stored with floating-point representation error.
+
 ### Inline Value Labels
 
 You can attach value labels directly in the rules string using square
@@ -96,9 +113,9 @@ brackets after the new value:
 `"1:2=1 [Low]; 3=2 [Medium]; 4:5=3 [High]"`
 
 This is equivalent to specifying
-`val.labels = c("1" = "Low", "2" = "Medium", "3" = "High")` but more
-compact and self-documenting. If both inline labels and `val.labels` are
-provided, `val.labels` takes precedence.
+`val_labels = c("1" = "Low", "2" = "Medium", "3" = "High")` but more
+compact and self-documenting. If both inline labels and `val_labels` are
+provided, `val_labels` takes precedence.
 
 ### Special Modes
 

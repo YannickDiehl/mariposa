@@ -11,7 +11,7 @@ data ready for plotting, cross-tabulation, and regression analysis."><meta prope
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,9 +68,12 @@ data ready for plotting, cross-tabulation, and regression analysis.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  ordered <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  drop.na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  drop.unused <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  add.non.labelled <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  drop_na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  drop_unused <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  add_non_labelled <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  drop.unused <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add.non.labelled <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -91,21 +94,29 @@ empty, converts all <code>haven_labelled</code> columns.</p></dd>
 <dd><p>If <code>TRUE</code>, creates an ordered factor. Default: <code>FALSE</code>.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>If <code>TRUE</code> (default), tagged NAs are converted to regular
 <code>NA</code> (excluded from factor levels). If <code>FALSE</code>, tagged NAs are kept as
 factor levels with their label text.</p></dd>
 
 
-<dt id="arg-drop-unused">drop.unused<a class="anchor" aria-label="anchor" href="#arg-drop-unused"></a></dt>
+<dt id="arg-drop-unused">drop_unused<a class="anchor" aria-label="anchor" href="#arg-drop-unused"></a></dt>
 <dd><p>If <code>TRUE</code>, removes factor levels with zero observations.
 Default: <code>FALSE</code>.</p></dd>
 
 
-<dt id="arg-add-non-labelled">add.non.labelled<a class="anchor" aria-label="anchor" href="#arg-add-non-labelled"></a></dt>
+<dt id="arg-add-non-labelled">add_non_labelled<a class="anchor" aria-label="anchor" href="#arg-add-non-labelled"></a></dt>
 <dd><p>If <code>TRUE</code>, values without labels are included as
 factor levels using their numeric value as the level name.
 Default: <code>FALSE</code> (unlabelled values become <code>NA</code>).</p></dd>
+
+
+<dt id="arg-drop-na-drop-unused-add-non-labelled">drop.na, drop.unused, add.non.labelled<a class="anchor" aria-label="anchor" href="#arg-drop-na-drop-unused-add-non-labelled"></a></dt>
+<dd><p>Defunct dot-case argument
+names, removed in mariposa 0.6.9. Calling the function with any of
+them is an error; use the snake_case equivalents instead. (The formals
+are retained only so that the old names error clearly instead of being
+swallowed by <code>...</code>.)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -409,7 +420,7 @@ reverse operation, <code><a href="val_labels.html">val_labels()</a></code> for v
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">to_label</span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Keep values without labels as factor levels</span></span></span>
-<span class="r-in"><span><span class="fu">to_label</span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">life_satisfaction</span>, add.non.labelled <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">to_label</span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">life_satisfaction</span>, add_non_labelled <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    [1] 4    3    2    2    4    4    3    3    4    3    1    1    2    5   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [15] 3    2    3    4    3    3    2    5    1    5    5    2    5    4   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [29] 5    5    3    3    2    3    5    1    &lt;NA&gt; 2    3    3    3    2   </span>

@@ -35,7 +35,7 @@ The strength of the effect (effect size r)
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -166,7 +166,17 @@ The difference is computed as <code>y - x</code></p></dd>
 
 <ul><li><p>For normally distributed paired data: Use paired t-test instead</p></li>
 <li><p>For independent groups: Use <code><a href="mann_whitney.html">mann_whitney()</a></code> instead</p></li>
-<li><p>For 3+ related measurements: Use <code><a href="friedman_test.html">friedman_test()</a></code> instead</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>SPSS <code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have
+no SPSS reference. The weighted variant is an R-only frequency-weight
+extension that reduces exactly to the unweighted test when all weights
+equal 1 (enforced by an internal invariance suite); see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>For 3+ related measurements: Use <code><a href="friedman_test.html">friedman_test()</a></code> instead</p></li>
 </ul></div>
 
     </div>
@@ -206,149 +216,29 @@ Psychology: General, 141(1), 2.</p>
 <span class="r-in"><span><span class="co"># Compare trust in government vs trust in media</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">wilcoxon_test</span><span class="op">(</span>x <span class="op">=</span> <span class="va">trust_government</span>, y <span class="op">=</span> <span class="va">trust_media</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Pair: trust_media vs trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media - trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      N Mean Rank Sum of Ranks</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Negative Ranks  955    887.53     847592.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Positive Ranks  770    832.57     641082.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Ties  502        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Total 2227        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   a trust_media &lt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   b trust_media &gt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   c trust_media = trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Z p value Effect r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    -5.097       0    0.123 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test: trust_media - trust_government</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Z = -5.097, p &lt; 0.001 ***, r = 0.123 (small), N = 2227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">wilcoxon_test</span><span class="op">(</span>x <span class="op">=</span> <span class="va">trust_government</span>, y <span class="op">=</span> <span class="va">trust_media</span>,</span></span>
 <span class="r-in"><span>                weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Wilcoxon Signed-Rank Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Pair: trust_media vs trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media - trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      N Mean Rank Sum of Ranks</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Negative Ranks  960    891.43     855464.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Positive Ranks  775    838.58     649788.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Ties  508        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Total 2242        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   a trust_media &lt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   b trust_media &gt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   c trust_media = trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Weighted Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Z p value Effect r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    -5.033       0    0.121 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses frequency-weighted ranks.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test: trust_media - trust_government [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Z = -5.035, p &lt; 0.001 ***, r = 0.121 (small), N = 2242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate test per region)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">wilcoxon_test</span><span class="op">(</span>x <span class="op">=</span> <span class="va">trust_government</span>, y <span class="op">=</span> <span class="va">trust_media</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Pair: trust_media vs trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media - trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     N Mean Rank Sum of Ranks</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Negative Ranks 191    183.16      34983.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Positive Ranks 155    161.60      25047.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Ties  89        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Total 435        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   a trust_media &lt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   b trust_media &gt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   c trust_media = trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Z p value Effect r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    -2.727   0.006    0.147  **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media - trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      N Mean Rank Sum of Ranks</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Negative Ranks  764    705.10     538697.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Positive Ranks  615    671.24     412812.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Ties  413        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Total 1792        NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   a trust_media &lt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   b trust_media &gt; trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   c trust_media = trust_government</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Z p value Effect r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    -4.346       0    0.117 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test: trust_media - trust_government</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Z = -2.727, p = 0.006 **, r = 0.147 (small), N = 435</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test: trust_media - trust_government</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Z = -4.346, p &lt; 0.001 ***, r = 0.117 (small), N = 1792</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

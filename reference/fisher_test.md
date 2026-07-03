@@ -156,121 +156,39 @@ data(survey_data)
 # Basic 2x2 Fisher test
 survey_data %>%
   fisher_test(row = gender, col = region)
-#> Fisher's Exact Test Results
-#> ---------------------------
-#> 
-#> - Row variable: gender
-#> - Column variable: region
-#> 
-#> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        East West
-#>   Male    238  956
-#>   Female  247 1059
-#> ---------------------------------------- 
-#> 
-#> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data  0.5435 2500     
-#> ---------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Fisher's Exact Test: gender x region
+#>   p = 0.5435 , N = 2500
+#> Use summary() for detailed output.
 
 # Fisher test for larger table
 survey_data %>%
   fisher_test(row = gender, col = interview_mode)
-#> Fisher's Exact Test Results
-#> ---------------------------
-#> 
-#> - Row variable: gender
-#> - Column variable: interview_mode
-#> 
-#> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        Face-to-face Telephone Online
-#>   Male            720       307    167
-#>   Female          765       348    193
-#> ---------------------------------------- 
-#> 
-#> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data  0.6782 2500     
-#> ---------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Fisher's Exact Test: gender x interview_mode
+#>   p = 0.6782 , N = 2500
+#> Use summary() for detailed output.
 
 # With weights
 survey_data %>%
   fisher_test(row = gender, col = region, weights = sampling_weight)
-#> Weighted Fisher's Exact Test Results
-#> ------------------------------------
-#> 
-#> - Row variable: gender
-#> - Column variable: region
-#> - Weights variable: sampling_weight
-#> 
-#> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        East West
-#>   Male    249  945
-#>   Female  260 1062
-#> ---------------------------------------- 
-#> 
-#> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data  0.4867 2516     
-#> ---------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Fisher's Exact Test: gender x region [Weighted]
+#>   p = 0.4867 , N = 2516
+#> Use summary() for detailed output.
 
 # Grouped analysis
 survey_data %>%
   group_by(education) %>%
   fisher_test(row = gender, col = region)
-#> Fisher's Exact Test Results
-#> ---------------------------
-#> 
-#> - Row variable: gender
-#> - Column variable: region
-#> 
-#> 
-#> Group: education = Basic Secondary
-#> ----------------------------------
-#> ---------------- 
-#>  p-value   N Sig 
-#>   0.9315 841     
-#> ---------------- 
-#> 
-#> 
-#> Group: education = Intermediate Secondary
-#> -----------------------------------------
-#> ---------------- 
-#>  p-value   N Sig 
-#>   0.4170 629     
-#> ---------------- 
-#> 
-#> 
-#> Group: education = Academic Secondary
-#> -------------------------------------
-#> ---------------- 
-#>  p-value   N Sig 
-#>   0.9181 631     
-#> ---------------- 
-#> 
-#> 
-#> Group: education = University
-#> -----------------------------
-#> ---------------- 
-#>  p-value   N Sig 
-#>   0.9003 399     
-#> ---------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> [education = 1]
+#> Fisher's Exact Test: gender x region
+#>   p = 0.9315 , N = 841
+#> [education = 2]
+#> Fisher's Exact Test: gender x region
+#>   p = 0.4170 , N = 629
+#> [education = 3]
+#> Fisher's Exact Test: gender x region
+#>   p = 0.9181 , N = 631
+#> [education = 4]
+#> Fisher's Exact Test: gender x region
+#>   p = 0.9003 , N = 399
+#> Use summary() for detailed output.
 ```

@@ -166,10 +166,16 @@ survey_data %>% group_by(region) %>% w_skew(age, weights = sampling_weight)
 #> ----------------------------
 #> 
 #> Group: region = East
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_skew Effective_N
+#>       age         0.098         477
 #> 
 #> Group: region = West
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_skew Effective_N
+#>       age          0.17      1993.1
 #> 
 
 # In summarise context

@@ -63,10 +63,10 @@ missing code they came from:
 ``` r
 
 # Tagged NAs are on by default
-data <- read_spss("survey.sav", tag.na = TRUE)
+data <- read_spss("survey.sav", tag_na = TRUE)
 
 # Turn off if you just want regular NAs
-data <- read_spss("survey.sav", tag.na = FALSE)
+data <- read_spss("survey.sav", tag_na = FALSE)
 ```
 
 ### Working with Tagged NAs

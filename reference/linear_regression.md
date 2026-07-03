@@ -90,54 +90,60 @@ linear_regression(
 
 ## Value
 
-An object of class `"linear_regression"` containing:
+For ungrouped + listwise data, an object of class
+`c("linear_regression", "lm")` — **the fitted `lm` itself**, with
+mariposa-specific slots attached:
 
-- coefficients:
+- coef_table:
 
-  Tibble with B, Std.Error, Beta, t, p, CI_lower, CI_upper
+  SPSS-style tibble with B, Std.Error, Beta, t, p, CI_lower, CI_upper.
+  For weighted models, SE / t / p are adjusted to SPSS's
+  frequency-weight df (see Technical Details).
+
+- anova_table:
+
+  SPSS-style overall-model ANOVA tibble (Source × Sum_of_Squares / df /
+  Mean_Square / F_statistic / Sig).
 
 - model_summary:
 
-  List with R, R_squared, adj_R_squared, std_error
-
-- anova:
-
-  Tibble with Sum of Squares, df, Mean Square, F, Sig.
+  List with R, R_squared, adj_R_squared, std_error.
 
 - descriptives:
 
-  Tibble with Mean, Std.Deviation, N for all variables
-
-- model:
-
-  The underlying `lm` object
-
-- formula:
-
-  The formula used
+  Tibble with Mean, Std.Deviation, N for all variables.
 
 - n:
 
-  Sample size (listwise complete cases)
+  Sample size (listwise complete cases; weighted N when weighted).
 
-- dependent:
+- formula, dependent, predictor_names, weighted, weight_name, use,
+  is_grouped, standardized, conf.level:
 
-  Name of the dependent variable
+  Call metadata.
 
-- predictor_names:
+Because the object inherits from `"lm"`, all standard generics
+([`predict()`](https://rdrr.io/r/stats/predict.html),
+[`anova()`](https://rdrr.io/r/stats/anova.html),
+[`vcov()`](https://rdrr.io/r/stats/vcov.html),
+[`confint()`](https://rdrr.io/r/stats/confint.html),
+[`residuals()`](https://rdrr.io/r/stats/residuals.html),
+[`fitted()`](https://rdrr.io/r/stats/fitted.values.html),
+[`coef()`](https://rdrr.io/r/stats/coef.html),
+[`model.matrix()`](https://rdrr.io/r/stats/model.matrix.html),
+[`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html),
+[`broom::glance()`](https://generics.r-lib.org/reference/glance.html),
+[`broom::augment()`](https://generics.r-lib.org/reference/augment.html))
+dispatch natively without unwrapping.
+[`summary()`](https://rdrr.io/r/base/summary.html) returns the
+SPSS-style mariposa summary; for the raw lm summary use
+[`stats::summary.lm()`](https://rdrr.io/r/stats/summary.lm.html) on the
+same object.
 
-  Names of predictor variables
-
-- weighted:
-
-  Logical indicating whether weights were used
-
-- weight_name:
-
-  Name of the weight variable (or NULL)
-
-Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
-SPSS-style output with toggleable sections.
+For `use = "pairwise"` (no single fitted lm available) or for grouped
+data, returns a list of class `"linear_regression"`. Pairwise results
+expose the same SPSS-style tables but not the lm generics; grouped
+results hold one fitted lm-inheriting model per group under `$groups`.
 
 ## Details
 
@@ -329,6 +335,15 @@ summary(result)                         # full detailed SPSS-style output
 #>   income                         0.000      0.000    0.448     23.037    0.000 ***
 #>   ----------------------------------------------------------------------------------------
 #> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   income                         1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
+#> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, descriptives = FALSE)   # hide descriptives section
 #> 
@@ -363,6 +378,15 @@ summary(result, descriptives = FALSE)   # hide descriptives section
 #>   age                           -0.001      0.001   -0.010     -0.508    0.611 
 #>   income                         0.000      0.000    0.448     23.037    0.000 ***
 #>   ----------------------------------------------------------------------------------------
+#> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   income                         1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

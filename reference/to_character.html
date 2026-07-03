@@ -11,7 +11,7 @@ factor."><meta property="og:image" content="https://YannickDiehl.github.io/marip
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,14 @@ factor.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">to_character</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span>, add.non.labelled <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">to_character</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  drop_na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  add_non_labelled <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add.non.labelled <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -80,13 +87,21 @@ factor.</p>
 empty, converts all <code>haven_labelled</code> columns.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>If <code>TRUE</code> (default), tagged NAs become regular <code>NA</code>.</p></dd>
 
 
-<dt id="arg-add-non-labelled">add.non.labelled<a class="anchor" aria-label="anchor" href="#arg-add-non-labelled"></a></dt>
+<dt id="arg-add-non-labelled">add_non_labelled<a class="anchor" aria-label="anchor" href="#arg-add-non-labelled"></a></dt>
 <dd><p>If <code>TRUE</code>, unlabelled values are included as
 their numeric string representation. Default: <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-drop-na-add-non-labelled">drop.na, add.non.labelled<a class="anchor" aria-label="anchor" href="#arg-drop-na-add-non-labelled"></a></dt>
+<dd><p>Defunct dot-case argument names, removed
+in mariposa 0.6.9. Calling the function with any of them is an error;
+use the snake_case equivalents instead. (The formals are retained only
+so that the old names error clearly instead of being swallowed by
+<code>...</code>.)</p></dd>
 
 </dl></div>
     <div class="section level2">

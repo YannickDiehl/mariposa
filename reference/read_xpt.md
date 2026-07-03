@@ -2,14 +2,14 @@
 
 Reads a SAS transport file (`.xpt`) and integrates with mariposa's
 tagged NA system. Handles both native SAS special missing values and
-user-specified numeric missing codes (via `tag.na`). Transport files are
+user-specified numeric missing codes (via `tag_na`). Transport files are
 a platform-independent SAS data format commonly used for FDA submissions
 and data exchange.
 
 ## Usage
 
 ``` r
-read_xpt(path, tag.na = NULL, verbose = FALSE)
+read_xpt(path, tag_na = NULL, verbose = FALSE)
 ```
 
 ## Arguments
@@ -18,7 +18,7 @@ read_xpt(path, tag.na = NULL, verbose = FALSE)
 
   Path to a SAS transport file (`.xpt`).
 
-- tag.na:
+- tag_na:
 
   Numeric vector of values to treat as missing (e.g., `c(-9, -8, -42)`).
   These values will be converted to tagged NAs across all numeric
@@ -42,7 +42,7 @@ SAS transport files support the same special missing values as
 `.sas7bdat` files (`.A`-`.Z`, `._`). This format is self-contained and
 does not require a separate catalog file for value labels.
 
-When `tag.na` is used,
+When `tag_na` is used,
 [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md)
 can recover the original numeric codes.
 
@@ -72,7 +72,7 @@ if (FALSE) { # \dontrun{
 data <- read_xpt("survey.xpt")
 
 # Read with numeric missing codes
-data <- read_xpt("survey.xpt", tag.na = c(-9, -8, -42))
+data <- read_xpt("survey.xpt", tag_na = c(-9, -8, -42))
 
 na_frequencies(data$income)
 } # }

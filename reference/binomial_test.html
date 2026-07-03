@@ -35,7 +35,7 @@ A confidence interval for the true proportion
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -169,9 +169,20 @@ the result is significant.</p>
 Use <code><a href="chi_square.html">chi_square()</a></code> instead</p></li>
 <li><p>For comparing proportions between groups:
 Use chi-square or z-test for proportions</p></li>
-<li><p>For larger samples with normal approximation:
-Results will be very similar to a one-sample z-test for proportions</p></li>
+<li><p>For larger samples with normal approximation:</p></li>
 </ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>SPSS <code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have
+no SPSS reference. The weighted variant is an R-only frequency-weight
+extension that reduces exactly to the unweighted test when all weights
+equal 1 (enforced by an internal invariance suite); see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p>
+<p>Results will be very similar to a one-sample z-test for proportions</p>
+</div>
 
     </div>
     <div class="section level2">
@@ -208,190 +219,44 @@ variables.</p>
 <span class="r-in"><span><span class="co"># Test whether gender split is 50/50</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Test proportion: 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Group 1: Male 1194          0.478</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: Female 1306          0.522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Total 2500          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5   0.026    0.458    0.497   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test whether East region proportion is 50%</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">region</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Test proportion: 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 1: East  485          0.194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: West 2015          0.806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Total 2500          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5       0    0.179     0.21 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (East): prop = 0.194 vs 0.500, p &lt; 0.001 ***, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables at once</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Test proportion: 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Group 1: Male 1194          0.478</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: Female 1306          0.522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Total 2500          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5   0.026    0.458    0.497   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 1: East  485          0.194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: West 2015          0.806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Total 2500          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5       0    0.179     0.21 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (East): prop = 0.194 vs 0.500, p &lt; 0.001 ***, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Binomial Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Test proportion: 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Group 1: Male 1194          0.478</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: Female 1306          0.522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Total 2500          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Weighted Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5   0.026    0.458    0.497   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses rounded frequency weights.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate test per region)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Test proportion: 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Group 1: Male 238          0.491</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: Female 247          0.509</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Total 485          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5   0.716    0.445    0.536    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Group 1: Male  956          0.474</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: Female 1059          0.526</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Total 2015          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5   0.023    0.452    0.497   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.491 vs 0.500, p = 0.716 , N = 485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.474 vs 0.500, p = 0.023 *, N = 2015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

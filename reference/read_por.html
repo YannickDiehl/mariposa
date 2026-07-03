@@ -11,7 +11,7 @@ as tagged NAs. This is the portable format equivalent of read_spss() for
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ as tagged NAs. This is the portable format equivalent of <code><a href="read_sps
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_por</span><span class="op">(</span><span class="va">path</span>, tag.na <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_por</span><span class="op">(</span><span class="va">path</span>, tag_na <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,7 +75,7 @@ as tagged NAs. This is the portable format equivalent of <code><a href="read_sps
 <dd><p>Path to an SPSS <code>.por</code> file.</p></dd>
 
 
-<dt id="arg-tag-na">tag.na<a class="anchor" aria-label="anchor" href="#arg-tag-na"></a></dt>
+<dt id="arg-tag-na">tag_na<a class="anchor" aria-label="anchor" href="#arg-tag-na"></a></dt>
 <dd><p>If <code>TRUE</code> (the default), user-defined missing values are
 converted to tagged NAs using <code><a href="https://haven.tidyverse.org/reference/tagged_na.html" class="external-link">haven::tagged_na()</a></code>. If <code>FALSE</code>, the file
 is read with standard <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_por()</a></code> behavior.</p></dd>

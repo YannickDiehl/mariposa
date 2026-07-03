@@ -57,8 +57,8 @@ ancova(data, dv, between, covariate, weights = NULL, ss_type = 3)
 
 - ss_type:
 
-  Type of Sum of Squares: 3 (default, SPSS standard) or 2. Type III is
-  recommended for unbalanced designs.
+  Deprecated; only 3 (Type III, the SPSS default) is implemented.
+  Passing 2 issues a warning and computes Type III.
 
 ## Value
 

@@ -208,13 +208,13 @@ library(dplyr)
 data(survey_data)
 
 # Basic correlation between two variables
-survey_data %>% 
+survey_data %>%
   pearson_cor(age, income)
 #> Pearson Correlation: age x income
 #>   r = -0.007, p = 0.761 , N = 2186
 
 # Correlation matrix for multiple variables
-survey_data %>% 
+survey_data %>%
   pearson_cor(age, income, life_satisfaction)
 #> Pearson Correlation: 3 variables
 #>   age x income:                  r = -0.007, p = 0.761  
@@ -223,14 +223,14 @@ survey_data %>%
 #>   1/3 pairs significant (p < .05), N = 2186
 
 # Weighted correlations
-survey_data %>% 
+survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> Pearson Correlation: age x income [Weighted]
 #>   r = -0.005, p = 0.828 , N = 2201
 
 # Grouped correlations
-survey_data %>% 
-  group_by(region) %>% 
+survey_data %>%
+  group_by(region) %>%
   pearson_cor(age, income, life_satisfaction)
 #> [region = 1]
 #> Pearson Correlation: 3 variables
@@ -246,7 +246,7 @@ survey_data %>%
 #>   1/3 pairs significant (p < .05), N = 1757
 
 # Using tidyselect helpers
-survey_data %>% 
+survey_data %>%
   pearson_cor(where(is.numeric), weights = sampling_weight)
 #> Pearson Correlation: 10 variables [Weighted]
 #>   id x age:                      r = 0.009, p = 0.648  
@@ -297,7 +297,7 @@ survey_data %>%
 #>   4/45 pairs significant (p < .05), N = 2516
 
 # Listwise deletion for missing data
-survey_data %>% 
+survey_data %>%
   pearson_cor(age, income, use = "listwise")
 #> Pearson Correlation: age x income
 #>   r = -0.007, p = 0.761 , N = 2186

@@ -106,6 +106,17 @@ Use Dunn test when:
   [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
   just like Tukey follows ANOVA
 
+### Weighted variants
+
+When the parent
+[`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
+result is weighted, the pairwise z statistics use the same
+frequency-weighted midranks. SPSS `NPAR TESTS` ignores `WEIGHT BY`, so
+weighted results have no SPSS reference (R-only, guarded by an internal
+invariance suite); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for validation status.
+
 - Uses ranks instead of raw values, making it robust to outliers
 
 ## References
@@ -143,84 +154,21 @@ kw_result <- survey_data %>%
 
 # Dunn post-hoc comparisons (default: Bonferroni)
 kw_result %>% dunn_test()
-#> Dunn Post-Hoc Test (Bonferroni) Results
-#> ---------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - P-value adjustment: Bonferroni
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
-#>         Basic Secondary             University -11.545     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
-#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.886     0.004   0.023   * 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Bonferroni) by education
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With Holm correction (less conservative)
 kw_result %>% dunn_test(p_adjust = "holm")
-#> Dunn Post-Hoc Test (Holm) Results
-#> ---------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - P-value adjustment: Holm
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
-#>         Basic Secondary             University -11.545     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.041   * 
-#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.886     0.004   0.008  ** 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Holm) by education
+#>   life_satisfaction: 6 comparisons, 6 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With Benjamini-Hochberg (controls false discovery rate)
 kw_result %>% dunn_test(p_adjust = "BH")
-#> Dunn Post-Hoc Test (Benjamini-Hochberg) Results
-#> -----------------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - P-value adjustment: Benjamini-Hochberg
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
-#>         Basic Secondary             University -11.545     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.041   * 
-#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.886     0.004   0.005  ** 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Benjamini-Hochberg) by education
+#>   life_satisfaction: 6 comparisons, 6 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With weights
 kw_weighted <- survey_data %>%
@@ -228,31 +176,9 @@ kw_weighted <- survey_data %>%
                  weights = sampling_weight)
 
 kw_weighted %>% dunn_test()
-#> Weighted Dunn Post-Hoc Test (Bonferroni) Results
-#> ------------------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - P-value adjustment: Bonferroni
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.351     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.444     <.001   <.001 *** 
-#>         Basic Secondary             University -10.927     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.007     0.045   0.269     
-#>  Intermediate Secondary             University  -4.484     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.735     0.006   0.037   * 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Bonferroni) by education [Weighted]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # Multiple variables
 kw_multi <- survey_data %>%
@@ -260,45 +186,10 @@ kw_multi <- survey_data %>%
                  group = education)
 
 kw_multi %>% dunn_test()
-#> Dunn Post-Hoc Test (Bonferroni) Results
-#> ---------------------------------------
-#> 
-#> - Grouping variable: education
-#> - P-value adjustment: Bonferroni
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
-#>         Basic Secondary             University -11.545     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
-#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.886     0.004   0.023   * 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> --- trust_government ---
-#> 
-#> --------------------------------------------------------------------------- 
-#>                 Group 1                Group 2      Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  0.983     0.325   1.000     
-#>         Basic Secondary     Academic Secondary  0.569     0.570   1.000     
-#>         Basic Secondary             University -0.038     0.970   1.000     
-#>  Intermediate Secondary     Academic Secondary -0.389     0.697   1.000     
-#>  Intermediate Secondary             University -0.846     0.398   1.000     
-#>      Academic Secondary             University -0.504     0.614   1.000     
-#> --------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Bonferroni) by education
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#>   trust_government: 6 comparisons, 0 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # Grouped analysis
 kw_grouped <- survey_data %>%
@@ -306,49 +197,10 @@ kw_grouped <- survey_data %>%
   kruskal_wallis(life_satisfaction, group = education)
 
 kw_grouped %>% dunn_test()
-#> Dunn Post-Hoc Test (Bonferroni) Results
-#> ---------------------------------------
-#> 
-#> - Grouping variable: education
-#> - P-value adjustment: Bonferroni
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#> --------------------------------------------------------------------------- 
-#>                 Group 1                Group 2      Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary -1.949     0.051   0.308     
-#>         Basic Secondary     Academic Secondary -3.263     0.001   0.007  ** 
-#>         Basic Secondary             University -3.543     <.001   0.002  ** 
-#>  Intermediate Secondary     Academic Secondary -1.271     0.204   1.000     
-#>  Intermediate Secondary             University -1.762     0.078   0.469     
-#>      Academic Secondary             University -0.612     0.540   1.000     
-#> --------------------------------------------------------------------------- 
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> --- life_satisfaction ---
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.601     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.338     <.001   <.001 *** 
-#>         Basic Secondary             University -11.151     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -1.642     0.101   0.603     
-#>  Intermediate Secondary             University  -4.373     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.929     0.003   0.020   * 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Bonferroni) by education
+#> [region = East]
+#>   life_satisfaction: 6 comparisons, 2 significant (p < .05)
+#> [region = West]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```

@@ -9,7 +9,7 @@ in standard R operations.
 ## Usage
 
 ``` r
-read_spss(path, tag.na = TRUE, encoding = NULL, verbose = FALSE)
+read_spss(path, tag_na = TRUE, encoding = NULL, verbose = FALSE)
 ```
 
 ## Arguments
@@ -18,7 +18,7 @@ read_spss(path, tag.na = TRUE, encoding = NULL, verbose = FALSE)
 
   Path to an SPSS `.sav` file.
 
-- tag.na:
+- tag_na:
 
   If `TRUE` (the default), user-defined missing values are converted to
   tagged NAs using
@@ -39,7 +39,7 @@ read_spss(path, tag.na = TRUE, encoding = NULL, verbose = FALSE)
 
 ## Value
 
-A tibble with the SPSS data. When `tag.na = TRUE`:
+A tibble with the SPSS data. When `tag_na = TRUE`:
 
 - User-defined missing values are stored as tagged NAs
 

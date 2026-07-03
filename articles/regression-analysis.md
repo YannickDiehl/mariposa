@@ -81,6 +81,14 @@ summary(result)
 #>   age                           -0.002      0.001   -0.029     -1.413    0.158 
 #>   ----------------------------------------------------------------------------------------
 #> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
+#> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
@@ -287,7 +295,7 @@ Exp(B) is the odds ratio — the key statistic in logistic regression:
 logistic_regression(survey_data,
                     high_satisfaction ~ age + income + trust_government + education)
 #> Logistic Regression: high_satisfaction ~ age + income + trust_government + education
-#>   Nagelkerke R2 = 0.212, chi2(4) = 341.28, p < 0.001 ***, Accuracy = 68.1%, N = 1995
+#>   Nagelkerke R2 = 0.212, chi2(6) = 341.28, p < 0.001 ***, Accuracy = 68.1%, N = 1995
 ```
 
 ### SPSS-Style Interface
@@ -408,6 +416,16 @@ summary(lm_result)
 #>   income                         0.000      0.000    0.448     22.409    0.000 ***
 #>   trust_government               0.002      0.020    0.002      0.113    0.910 
 #>   ----------------------------------------------------------------------------------------
+#> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   income                         1.000      1.000
+#>   trust_government               1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 

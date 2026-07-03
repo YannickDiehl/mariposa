@@ -13,7 +13,7 @@ the IQR is not affected by outliers, making it a robust measure of spread."><met
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,7 +144,17 @@ percentiles, calculated using cumulative weights (see <code><a href="w_quantile.
 <p><code><a href="w_quantile.html">w_quantile</a></code> for arbitrary weighted percentiles.</p>
 <p><code><a href="w_sd.html">w_sd</a></code> for weighted standard deviation (another spread measure).</p>
 <p><code><a href="w_range.html">w_range</a></code> for the full weighted range.</p>
-<p><code><a href="describe.html">describe</a></code> for comprehensive descriptive statistics including IQR.</p>
+<p><code><a href="describe.html">describe</a></code> for comprehensive descriptive statistics including IQR.</p><div class="section">
+<h3 id="validation-status">Validation status<a class="anchor" aria-label="anchor" href="#validation-status"></a></h3>
+
+
+<p>Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
+apply the HAVERAGE position to cumulative weights with linear
+interpolation - an R-internal extension (Tier 4 of the Validation
+Charter); SPSS reference validation for weighted percentiles is
+pending.</p>
+</div>
+
 <p>Other weighted_statistics:
 <code><a href="w_kurtosis.html">w_kurtosis()</a></code>,
 <code><a href="w_mean.html">w_mean()</a></code>,
@@ -197,10 +207,16 @@ percentiles, calculated using cumulative weights (see <code><a href="w_quantile.
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `Variable`.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_iqr Effective_N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       age           24         477</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `Variable`.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_iqr Effective_N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       age           24      1993.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In summarise context</span></span></span>

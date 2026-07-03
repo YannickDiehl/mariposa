@@ -7,7 +7,7 @@ longer exist but their labels remain attached.
 ## Usage
 
 ``` r
-drop_labels(data, ..., drop.na = FALSE)
+drop_labels(data, ..., drop_na = FALSE)
 ```
 
 ## Arguments
@@ -21,7 +21,7 @@ drop_labels(data, ..., drop.na = FALSE)
   Optional: unquoted variable names (tidyselect supported). If empty,
   applies to all labelled columns.
 
-- drop.na:
+- drop_na:
 
   If `TRUE`, also removes tagged NA labels. Default: `FALSE` (tagged NA
   labels are preserved even if no tagged NAs of that type exist).
@@ -41,7 +41,7 @@ or
 `drop_labels()` cleans this up by keeping only labels for values
 actually present in the data.
 
-By default, tagged NA labels are preserved (`drop.na = FALSE`) because
+By default, tagged NA labels are preserved (`drop_na = FALSE`) because
 they represent missing value types, not substantive categories.
 
 ## See also

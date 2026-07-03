@@ -118,6 +118,15 @@ Use Wilcoxon signed-rank test when:
   [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
   instead
 
+### Weighted variants
+
+SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted results have no SPSS
+reference. The weighted variant is an R-only frequency-weight extension
+that reduces exactly to the unweighted test when all weights equal 1
+(enforced by an internal invariance suite); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for validation status.
+
 - For 3+ related measurements: Use
   [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
   instead
@@ -163,147 +172,27 @@ data(survey_data)
 # Compare trust in government vs trust in media
 survey_data %>%
   wilcoxon_test(x = trust_government, y = trust_media)
-#> 
-#> Wilcoxon Signed-Rank Test Results
-#> ---------------------------------
-#> 
-#> - Pair: trust_media vs trust_government
-#> 
-#> trust_media - trust_government
-#> ------------------------------
-#>   Ranks:
-#>   -------------------------------------------
-#>                      N Mean Rank Sum of Ranks
-#>    Negative Ranks  955    887.53     847592.5
-#>    Positive Ranks  770    832.57     641082.5
-#>              Ties  502        NA           NA
-#>             Total 2227        NA           NA
-#>   -------------------------------------------
-#> 
-#>   a trust_media < trust_government
-#>   b trust_media > trust_government
-#>   c trust_media = trust_government
-#> 
-#>   Test Statistics:
-#>   ----------------------------
-#>         Z p value Effect r sig
-#>    -5.097       0    0.123 ***
-#>   ----------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (r):
-#> - Small effect: 0.1 - 0.3
-#> - Medium effect: 0.3 - 0.5
-#> - Large effect: > 0.5
+#> Wilcoxon Signed-Rank Test: trust_media - trust_government
+#>   Z = -5.097, p < 0.001 ***, r = 0.123 (small), N = 2227
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>%
   wilcoxon_test(x = trust_government, y = trust_media,
                 weights = sampling_weight)
-#> 
-#> Weighted Wilcoxon Signed-Rank Test Results
-#> ------------------------------------------
-#> 
-#> - Pair: trust_media vs trust_government
-#> - Weights variable: sampling_weight
-#> 
-#> trust_media - trust_government
-#> ------------------------------
-#>   Ranks:
-#>   -------------------------------------------
-#>                      N Mean Rank Sum of Ranks
-#>    Negative Ranks  960    891.43     855464.0
-#>    Positive Ranks  775    838.58     649788.2
-#>              Ties  508        NA           NA
-#>             Total 2242        NA           NA
-#>   -------------------------------------------
-#> 
-#>   a trust_media < trust_government
-#>   b trust_media > trust_government
-#>   c trust_media = trust_government
-#> 
-#>   Weighted Test Statistics:
-#>   ----------------------------
-#>         Z p value Effect r sig
-#>    -5.033       0    0.121 ***
-#>   ----------------------------
-#> 
-#> Note: Weighted analysis uses frequency-weighted ranks.
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (r):
-#> - Small effect: 0.1 - 0.3
-#> - Medium effect: 0.3 - 0.5
-#> - Large effect: > 0.5
+#> Wilcoxon Signed-Rank Test: trust_media - trust_government [Weighted]
+#>   Z = -5.035, p < 0.001 ***, r = 0.121 (small), N = 2242
+#> Use summary() for detailed output.
 
 # Grouped analysis (separate test per region)
 survey_data %>%
   group_by(region) %>%
   wilcoxon_test(x = trust_government, y = trust_media)
-#> 
-#> Wilcoxon Signed-Rank Test Results
-#> ---------------------------------
-#> 
-#> - Pair: trust_media vs trust_government
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> trust_media - trust_government
-#> ------------------------------
-#>   Ranks:
-#>   ------------------------------------------
-#>                     N Mean Rank Sum of Ranks
-#>    Negative Ranks 191    183.16      34983.5
-#>    Positive Ranks 155    161.60      25047.5
-#>              Ties  89        NA           NA
-#>             Total 435        NA           NA
-#>   ------------------------------------------
-#> 
-#>   a trust_media < trust_government
-#>   b trust_media > trust_government
-#>   c trust_media = trust_government
-#> 
-#>   Test Statistics:
-#>   ----------------------------
-#>         Z p value Effect r sig
-#>    -2.727   0.006    0.147  **
-#>   ----------------------------
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> trust_media - trust_government
-#> ------------------------------
-#>   Ranks:
-#>   -------------------------------------------
-#>                      N Mean Rank Sum of Ranks
-#>    Negative Ranks  764    705.10     538697.5
-#>    Positive Ranks  615    671.24     412812.5
-#>              Ties  413        NA           NA
-#>             Total 1792        NA           NA
-#>   -------------------------------------------
-#> 
-#>   a trust_media < trust_government
-#>   b trust_media > trust_government
-#>   c trust_media = trust_government
-#> 
-#>   Test Statistics:
-#>   ----------------------------
-#>         Z p value Effect r sig
-#>    -4.346       0    0.117 ***
-#>   ----------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (r):
-#> - Small effect: 0.1 - 0.3
-#> - Medium effect: 0.3 - 0.5
-#> - Large effect: > 0.5
+#> [region = 1]
+#> Wilcoxon Signed-Rank Test: trust_media - trust_government
+#>   Z = -2.727, p = 0.006 **, r = 0.147 (small), N = 435
+#> [region = 2]
+#> Wilcoxon Signed-Rank Test: trust_media - trust_government
+#>   Z = -4.346, p < 0.001 ***, r = 0.117 (small), N = 1792
+#> Use summary() for detailed output.
 ```

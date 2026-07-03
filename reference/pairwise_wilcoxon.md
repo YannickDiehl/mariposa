@@ -112,6 +112,17 @@ Use pairwise Wilcoxon when:
   follows
   [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
 
+### Weighted variants
+
+When the parent
+[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
+result is weighted, each pairwise test uses the same frequency-weighted
+signed-rank formulas. SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted
+results have no SPSS reference (R-only, guarded by an internal
+invariance suite); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for validation status.
+
 - Each pairwise comparison uses
   [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)
   logic internally
@@ -151,75 +162,21 @@ friedman_result <- survey_data %>%
 
 # Pairwise Wilcoxon comparisons (default: Bonferroni)
 friedman_result %>% pairwise_wilcoxon()
-#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results
-#> ----------------------------------------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - P-value adjustment: Bonferroni
-#> - Number of comparisons: 3
-#> 
-#> ------------------------------------------------------------ 
-#>             Var 1         Var 2      Z p (unadj) p (adj) Sig 
-#>  trust_government   trust_media -5.097     <.001   <.001 *** 
-#>  trust_government trust_science 25.945     <.001   <.001 *** 
-#>       trust_media trust_science 29.091     <.001   <.001 *** 
-#> ------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First variable tends to have higher values
-#> - Negative Z: Second variable tends to have higher values
-#> - p-values are adjusted for multiple comparisons
+#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni)
+#>   3 comparisons, 3 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With Holm correction (less conservative)
 friedman_result %>% pairwise_wilcoxon(p_adjust = "holm")
-#> Pairwise Wilcoxon Post-Hoc Test (Holm) Results
-#> ----------------------------------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - P-value adjustment: Holm
-#> - Number of comparisons: 3
-#> 
-#> ------------------------------------------------------------ 
-#>             Var 1         Var 2      Z p (unadj) p (adj) Sig 
-#>  trust_government   trust_media -5.097     <.001   <.001 *** 
-#>  trust_government trust_science 25.945     <.001   <.001 *** 
-#>       trust_media trust_science 29.091     <.001   <.001 *** 
-#> ------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First variable tends to have higher values
-#> - Negative Z: Second variable tends to have higher values
-#> - p-values are adjusted for multiple comparisons
+#> Pairwise Wilcoxon Post-Hoc Test (Holm)
+#>   3 comparisons, 3 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With Benjamini-Hochberg (controls false discovery rate)
 friedman_result %>% pairwise_wilcoxon(p_adjust = "BH")
-#> Pairwise Wilcoxon Post-Hoc Test (Benjamini-Hochberg) Results
-#> ------------------------------------------------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - P-value adjustment: Benjamini-Hochberg
-#> - Number of comparisons: 3
-#> 
-#> ------------------------------------------------------------ 
-#>             Var 1         Var 2      Z p (unadj) p (adj) Sig 
-#>  trust_government   trust_media -5.097     <.001   <.001 *** 
-#>  trust_government trust_science 25.945     <.001   <.001 *** 
-#>       trust_media trust_science 29.091     <.001   <.001 *** 
-#> ------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First variable tends to have higher values
-#> - Negative Z: Second variable tends to have higher values
-#> - p-values are adjusted for multiple comparisons
+#> Pairwise Wilcoxon Post-Hoc Test (Benjamini-Hochberg)
+#>   3 comparisons, 3 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # With weights
 fw_weighted <- survey_data %>%
@@ -227,28 +184,9 @@ fw_weighted <- survey_data %>%
                 weights = sampling_weight)
 
 fw_weighted %>% pairwise_wilcoxon()
-#> Weighted Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results
-#> -------------------------------------------------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - Weights variable: sampling_weight
-#> - P-value adjustment: Bonferroni
-#> - Number of comparisons: 3
-#> 
-#> ------------------------------------------------------------ 
-#>             Var 1         Var 2      Z p (unadj) p (adj) Sig 
-#>  trust_government   trust_media -5.033     <.001   <.001 *** 
-#>  trust_government trust_science 25.997     <.001   <.001 *** 
-#>       trust_media trust_science 29.095     <.001   <.001 *** 
-#> ------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First variable tends to have higher values
-#> - Negative Z: Second variable tends to have higher values
-#> - p-values are adjusted for multiple comparisons
+#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) [Weighted]
+#>   3 comparisons, 3 significant (p < .05)
+#> Use summary() for the full comparison table.
 
 # Grouped analysis
 fw_grouped <- survey_data %>%
@@ -256,38 +194,10 @@ fw_grouped <- survey_data %>%
   friedman_test(trust_government, trust_media, trust_science)
 
 fw_grouped %>% pairwise_wilcoxon()
-#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results
-#> ----------------------------------------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - P-value adjustment: Bonferroni
-#> - Number of comparisons: 3
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> ------------------------------------------------------------ 
-#>             Var 1         Var 2      Z p (unadj) p (adj) Sig 
-#>  trust_government   trust_media -2.727     0.006   0.019   * 
-#>  trust_government trust_science 11.635     <.001   <.001 *** 
-#>       trust_media trust_science 13.820     <.001   <.001 *** 
-#> ------------------------------------------------------------ 
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> ------------------------------------------------------------ 
-#>             Var 1         Var 2      Z p (unadj) p (adj) Sig 
-#>  trust_government   trust_media -4.346     <.001   <.001 *** 
-#>  trust_government trust_science 23.191     <.001   <.001 *** 
-#>       trust_media trust_science 25.630     <.001   <.001 *** 
-#> ------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First variable tends to have higher values
-#> - Negative Z: Second variable tends to have higher values
-#> - p-values are adjusted for multiple comparisons
+#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni)
+#> [region = East]
+#>   3 comparisons, 3 significant (p < .05)
+#> [region = West]
+#>   3 comparisons, 3 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```

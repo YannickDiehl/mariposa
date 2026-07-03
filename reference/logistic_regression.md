@@ -73,9 +73,11 @@ logistic_regression(
 
 ## Value
 
-An object of class `"logistic_regression"` containing:
+For ungrouped data, an object of class
+`c("logistic_regression", "glm", "lm")` — **the fitted `glm` itself**,
+with mariposa-specific slots attached:
 
-- coefficients:
+- coef_table:
 
   Tibble with B, S.E., Wald, df, Sig., Exp(B), CI_lower, CI_upper
 
@@ -95,36 +97,34 @@ An object of class `"logistic_regression"` containing:
 
   List with chi_sq, df, p (goodness-of-fit test)
 
-- model:
-
-  The underlying `glm` object
-
-- formula:
-
-  The formula used
-
 - n:
 
-  Sample size (listwise complete cases)
+  Sample size (listwise complete cases; weighted N when weighted)
 
-- dependent:
+- formula, dependent, predictor_names, weighted, weight_name,
+  is_grouped, conf.level:
 
-  Name of the dependent variable
+  Call metadata.
 
-- predictor_names:
+Because the object inherits from `"glm"`, all standard generics
+([`predict()`](https://rdrr.io/r/stats/predict.html),
+[`anova()`](https://rdrr.io/r/stats/anova.html),
+[`vcov()`](https://rdrr.io/r/stats/vcov.html),
+[`confint()`](https://rdrr.io/r/stats/confint.html),
+[`residuals()`](https://rdrr.io/r/stats/residuals.html),
+[`fitted()`](https://rdrr.io/r/stats/fitted.values.html),
+[`coef()`](https://rdrr.io/r/stats/coef.html),
+[`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html),
+[`broom::glance()`](https://generics.r-lib.org/reference/glance.html),
+[`broom::augment()`](https://generics.r-lib.org/reference/augment.html))
+dispatch natively without unwrapping.
+[`summary()`](https://rdrr.io/r/base/summary.html) returns the
+SPSS-style mariposa summary; for the raw glm summary use
+[`stats::summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) on
+the same object.
 
-  Names of predictor variables
-
-- weighted:
-
-  Logical indicating whether weights were used
-
-- weight_name:
-
-  Name of the weight variable (or NULL)
-
-Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
-SPSS-style output with toggleable sections.
+For grouped data, returns a list of class `"logistic_regression"` with
+`$groups` holding one fitted glm-inheriting result per group.
 
 ## Details
 
@@ -233,7 +233,7 @@ logistic_regression(survey_data, high_satisfaction ~ age)
 # Multiple logistic regression
 logistic_regression(survey_data, high_satisfaction ~ age + income + education)
 #> Logistic Regression: high_satisfaction ~ age + income + education
-#>   Nagelkerke R2 = 0.213, chi2(3) = 364.62, p < 0.001 ***, Accuracy = 68.3%, N = 2115
+#>   Nagelkerke R2 = 0.213, chi2(5) = 364.62, p < 0.001 ***, Accuracy = 68.3%, N = 2115
 
 # SPSS-style interface
 logistic_regression(survey_data,
@@ -259,7 +259,7 @@ survey_data |>
 # Factor predictors: dummy-coding (default, matches base R glm())
 logistic_regression(survey_data, high_satisfaction ~ age + education)
 #> Logistic Regression: high_satisfaction ~ age + education
-#>   Nagelkerke R2 = 0.084, chi2(2) = 156.25, p < 0.001 ***, Accuracy = 63.4%, N = 2421
+#>   Nagelkerke R2 = 0.084, chi2(4) = 156.25, p < 0.001 ***, Accuracy = 63.4%, N = 2421
 
 # Factor predictors: SPSS-style ordinal-as-scale
 logistic_regression(survey_data, high_satisfaction ~ age + education,

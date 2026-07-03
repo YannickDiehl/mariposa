@@ -173,10 +173,16 @@ survey_data %>% group_by(region) %>% w_kurtosis(age, weights = sampling_weight)
 #> -----------------------------------
 #> 
 #> Group: region = East
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_kurtosis Effective_N
+#>       age            -0.389         477
 #> 
 #> Group: region = West
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_kurtosis Effective_N
+#>       age            -0.396      1993.1
 #> 
 
 # Raw kurtosis (not excess)

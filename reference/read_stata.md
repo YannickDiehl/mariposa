@@ -6,16 +6,16 @@ system. Handles two scenarios:
 1.  **Native extended missing values** (`.a` through `.z`):
     Automatically detected and annotated.
 
-2.  **Numeric missing codes** (e.g., -9, -42): When `tag.na` is
+2.  **Numeric missing codes** (e.g., -9, -42): When `tag_na` is
     provided, these regular values are converted to tagged NAs, giving
     the same result as
     [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
-    with `tag.na = TRUE`.
+    with `tag_na = TRUE`.
 
 ## Usage
 
 ``` r
-read_stata(path, encoding = NULL, tag.na = NULL, verbose = FALSE)
+read_stata(path, encoding = NULL, tag_na = NULL, verbose = FALSE)
 ```
 
 ## Arguments
@@ -30,7 +30,7 @@ read_stata(path, encoding = NULL, tag.na = NULL, verbose = FALSE)
   detection is used. Generally only needed for Stata 13 files and
   earlier.
 
-- tag.na:
+- tag_na:
 
   Numeric vector of values to treat as missing (e.g., `c(-9, -8, -42)`).
   These values will be converted to tagged NAs across all numeric
@@ -64,17 +64,17 @@ preserves these as tagged NAs automatically. `read_stata()` adds the
 `na_tag_map` attribute so that mariposa's tagged NA functions work
 seamlessly.
 
-### Numeric Missing Codes (tag.na)
+### Numeric Missing Codes (tag_na)
 
 Many Stata files – especially those converted from SPSS – store missing
 value codes as regular numeric values (e.g., -9 = "No answer", -42 =
-"Data error"). The `tag.na` parameter converts these to tagged NAs,
+"Data error"). The `tag_na` parameter converts these to tagged NAs,
 enabling proper handling in
 [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
 [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md),
 and other functions.
 
-When `tag.na` is used,
+When `tag_na` is used,
 [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md)
 can recover the original numeric codes.
 
@@ -106,7 +106,7 @@ if (FALSE) { # \dontrun{
 data <- read_stata("survey.dta")
 
 # Read Stata file with SPSS-style missing codes
-data <- read_stata("survey.dta", tag.na = c(-9, -8, -42, -11))
+data <- read_stata("survey.dta", tag_na = c(-9, -8, -42, -11))
 
 # Check what types of missing values exist
 na_frequencies(data$income)

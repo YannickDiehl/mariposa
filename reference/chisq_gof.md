@@ -52,7 +52,7 @@ chisq_gof(data, ..., expected = NULL, weights = NULL)
 Test results showing whether observed frequencies match expected,
 including:
 
-- Chi-square statistic and p-value for each variable
+- Chi-square statistic (`chi_squared`) and p-value for each variable
 
 - Degrees of freedom
 
@@ -155,145 +155,44 @@ data(survey_data)
 # Test whether gender is equally distributed
 survey_data %>%
   chisq_gof(gender)
-#> Chi-Square Goodness-of-Fit Test Results
-#> ---------------------------------------
-#> 
-#> - Variables: gender
-#> - Expected: Equal proportions
-#> 
-#>   gender - Frequency Table:
-#>   ------------------------------------
-#>    category observed expected residual
-#>        Male     1194     1250      -56
-#>      Female     1306     1250       56
-#>   ------------------------------------
-#> 
-#> ---------------------------------------- 
-#>  Variable Chi-Square df p-value    N Sig 
-#>    gender      5.018  1  0.0251 2500   * 
-#> ---------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Square Goodness-of-Fit Test: gender
+#>   chi2(1) = 5.018, p = 0.025 *, N = 2500
+#> Use summary() for detailed output.
 
 # Test multiple variables at once
 survey_data %>%
   chisq_gof(gender, region, education)
-#> Chi-Square Goodness-of-Fit Test Results
-#> ---------------------------------------
-#> 
-#> - Variables: gender, region, education
-#> - Expected: Equal proportions
-#> 
-#>   gender - Frequency Table:
-#>   ------------------------------------
-#>    category observed expected residual
-#>        Male     1194     1250      -56
-#>      Female     1306     1250       56
-#>   ------------------------------------
-#> 
-#>   region - Frequency Table:
-#>   ------------------------------------
-#>    category observed expected residual
-#>        East      485     1250     -765
-#>        West     2015     1250      765
-#>   ------------------------------------
-#> 
-#>   education - Frequency Table:
-#>   --------------------------------------------------
-#>                  category observed expected residual
-#>           Basic Secondary      841      625      216
-#>    Intermediate Secondary      629      625        4
-#>        Academic Secondary      631      625        6
-#>                University      399      625     -226
-#>   --------------------------------------------------
-#> 
-#> ----------------------------------------- 
-#>   Variable Chi-Square df p-value    N Sig 
-#>     gender      5.018  1  0.0251 2500   * 
-#>     region    936.360  1   <.001 2500 *** 
-#>  education    156.454  3   <.001 2500 *** 
-#> ----------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Square Goodness-of-Fit Test: gender
+#>   chi2(1) = 5.018, p = 0.025 *, N = 2500
+#> Chi-Square Goodness-of-Fit Test: region
+#>   chi2(1) = 936.360, p < 0.001 ***, N = 2500
+#> Chi-Square Goodness-of-Fit Test: education
+#>   chi2(3) = 156.454, p < 0.001 ***, N = 2500
+#> Use summary() for detailed output.
 
 # Custom expected proportions
 survey_data %>%
   chisq_gof(interview_mode, expected = c(0.5, 0.3, 0.2))
-#> Chi-Square Goodness-of-Fit Test Results
-#> ---------------------------------------
-#> 
-#> - Variables: interview_mode
-#> - Expected: 0.5, 0.3, 0.2
-#> 
-#>   interview_mode - Frequency Table:
-#>   ----------------------------------------
-#>        category observed expected residual
-#>    Face-to-face     1485     1250      235
-#>       Telephone      655      750      -95
-#>          Online      360      500     -140
-#>   ----------------------------------------
-#> 
-#> ---------------------------------------------- 
-#>        Variable Chi-Square df p-value    N Sig 
-#>  interview_mode     95.413  2   <.001 2500 *** 
-#> ---------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Square Goodness-of-Fit Test: interview_mode
+#>   chi2(2) = 95.413, p < 0.001 ***, N = 2500
+#> Use summary() for detailed output.
 
 # With weights
 survey_data %>%
   chisq_gof(gender, weights = sampling_weight)
-#> Weighted Chi-Square Goodness-of-Fit Test Results
-#> ------------------------------------------------
-#> 
-#> - Variables: gender
-#> - Expected: Equal proportions
-#> - Weights variable: sampling_weight
-#> 
-#>   gender - Frequency Table:
-#>   ------------------------------------
-#>    category observed expected residual
-#>        Male     1195     1258      -63
-#>      Female     1321     1258       63
-#>   ------------------------------------
-#> 
-#> ---------------------------------------- 
-#>  Variable Chi-Square df p-value    N Sig 
-#>    gender       6.31  1  0.0120 2516   * 
-#> ---------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Square Goodness-of-Fit Test: gender [Weighted]
+#>   chi2(1) = 6.310, p = 0.012 *, N = 2516
+#> Use summary() for detailed output.
 
 # Grouped analysis
 survey_data %>%
   group_by(region) %>%
   chisq_gof(education)
-#> Chi-Square Goodness-of-Fit Test Results
-#> ---------------------------------------
-#> 
-#> - Variables: education
-#> - Expected: Equal proportions
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> ---------------------------------------- 
-#>   Variable Chi-Square df p-value   N Sig 
-#>  education     34.645  3   <.001 485 *** 
-#> ---------------------------------------- 
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> ----------------------------------------- 
-#>   Variable Chi-Square df p-value    N Sig 
-#>  education    122.888  3   <.001 2015 *** 
-#> ----------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> [region = 1]
+#> Chi-Square Goodness-of-Fit Test: education
+#>   chi2(3) = 34.645, p < 0.001 ***, N = 485
+#> [region = 2]
+#> Chi-Square Goodness-of-Fit Test: education
+#>   chi2(3) = 122.888, p < 0.001 ***, N = 2015
+#> Use summary() for detailed output.
 ```

@@ -82,6 +82,15 @@ summary(result)                           # all sections
 #>   income                         0.000      0.000    0.448     23.037    0.000 ***
 #>   ----------------------------------------------------------------------------------------
 #> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   income                         1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
+#> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, collinearity = FALSE)     # hide VIF/Tolerance
 #> 

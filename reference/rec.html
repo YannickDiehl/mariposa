@@ -11,7 +11,7 @@ in a single function — the R equivalent of SPSS's RECODE command."><meta prope
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,8 +68,11 @@ in a single function — the R equivalent of SPSS's <code>RECODE</code> command.
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  <span class="va">rules</span>,</span>
-<span>  as.factor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  as_factor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  var_label <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  val_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  as.factor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  var.label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  val.labels <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -93,7 +96,7 @@ is a data frame.</p></dd>
 <dd><p>A character string defining the recoding rules (see Details).</p></dd>
 
 
-<dt id="arg-as-factor">as.factor<a class="anchor" aria-label="anchor" href="#arg-as-factor"></a></dt>
+<dt id="arg-as-factor">as_factor<a class="anchor" aria-label="anchor" href="#arg-as-factor"></a></dt>
 <dd><p>If <code>TRUE</code>, return the result as a factor. Default:
 <code>FALSE</code>.</p></dd>
 
@@ -104,17 +107,25 @@ recoded variables (e.g., <code>"_r"</code>). If <code>NULL</code> (default), the
 original columns are overwritten in-place.</p></dd>
 
 
-<dt id="arg-var-label">var.label<a class="anchor" aria-label="anchor" href="#arg-var-label"></a></dt>
+<dt id="arg-var-label">var_label<a class="anchor" aria-label="anchor" href="#arg-var-label"></a></dt>
 <dd><p>A new variable label. If <code>NULL</code>, the existing label
 is kept with <code>" (recoded)"</code> appended.</p></dd>
 
 
-<dt id="arg-val-labels">val.labels<a class="anchor" aria-label="anchor" href="#arg-val-labels"></a></dt>
+<dt id="arg-val-labels">val_labels<a class="anchor" aria-label="anchor" href="#arg-val-labels"></a></dt>
 <dd><p>A named character vector of value labels for the new
 values (e.g., <code>c("1" = "Low", "2" = "Medium", "3" = "High")</code>).
 If <code>NULL</code>, labels are taken from inline <code>[Label]</code> syntax in
-<code>rules</code> (if present). Explicit <code>val.labels</code> always override
+<code>rules</code> (if present). Explicit <code>val_labels</code> always override
 inline labels.</p></dd>
+
+
+<dt id="arg-as-factor-var-label-val-labels">as.factor, var.label, val.labels<a class="anchor" aria-label="anchor" href="#arg-as-factor-var-label-val-labels"></a></dt>
+<dd><p>Defunct dot-case argument names,
+removed in mariposa 0.6.9. Calling the function with any of them is an
+error; use the snake_case equivalents instead. (The formals are
+retained only so that the old names error clearly instead of being
+swallowed by <code>...</code>.)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -136,6 +147,16 @@ inline labels.</p></dd>
 </div>
 
 <div class="section">
+<h3 id="decimal-values">Decimal Values<a class="anchor" aria-label="anchor" href="#decimal-values"></a></h3>
+
+
+<p>Both single values and ranges accept decimals (e.g. <code>"3.6=2"</code> or
+<code>"2.5:3.5=1"</code>). Single-value matching compares values as strings
+(rounded to 15 significant digits), so decimal codes match reliably even
+when stored with floating-point representation error.</p>
+</div>
+
+<div class="section">
 <h3 id="inline-value-labels">Inline Value Labels<a class="anchor" aria-label="anchor" href="#inline-value-labels"></a></h3>
 
 
@@ -143,9 +164,9 @@ inline labels.</p></dd>
 square brackets after the new value:</p>
 <p><code>"1:2=1 [Low]; 3=2 [Medium]; 4:5=3 [High]"</code></p>
 <p>This is equivalent to specifying
-<code>val.labels = c("1" = "Low", "2" = "Medium", "3" = "High")</code>
+<code>val_labels = c("1" = "Low", "2" = "Medium", "3" = "High")</code>
 but more compact and self-documenting. If both inline labels and
-<code>val.labels</code> are provided, <code>val.labels</code> takes precedence.</p>
+<code>val_labels</code> are provided, <code>val_labels</code> takes precedence.</p>
 </div>
 
 <div class="section">

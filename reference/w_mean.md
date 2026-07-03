@@ -138,10 +138,16 @@ survey_data %>% group_by(region) %>% w_mean(age, weights = sampling_weight)
 #> ------------------------
 #> 
 #> Group: region = East
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_mean Effective_N
+#>       age        52.278         477
 #> 
 #> Group: region = West
-#> Warning: Unknown or uninitialised column: `Variable`.
+#> 
+#> --- age ---
+#>  Variable weighted_mean Effective_N
+#>       age        50.067      1993.1
 #> 
 
 # In summarise context

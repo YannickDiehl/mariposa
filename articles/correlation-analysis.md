@@ -151,7 +151,7 @@ survey_data %>%
   kendall_tau(political_orientation, life_satisfaction,
               weights = sampling_weight)
 #> Kendall's Tau: political_orientation x life_satisfaction [Weighted]
-#>   tau = -0.004, p = 0.766 , N = 2241
+#>   tau = -0.005, p = 0.747 , N = 2241
 ```
 
 ## Interpreting Correlations
@@ -204,7 +204,7 @@ print(comparison)
 #>     Method Correlation       P_Value
 #> 1  Pearson   0.4501535 8.997507e-107
 #> 2 Spearman   0.4501535 2.322944e-113
-#> 3  Kendall   0.4501535 5.179415e-130
+#> 3  Kendall   0.4501535 6.963954e-132
 ```
 
 ### Correlation Does Not Imply Causation

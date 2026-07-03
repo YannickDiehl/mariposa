@@ -37,7 +37,7 @@ A frequency table with observed, expected, and residual counts
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,7 +125,7 @@ proportions are assumed.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Test results showing whether observed frequencies match expected,
-including:</p><ul><li><p>Chi-square statistic and p-value for each variable</p></li>
+including:</p><ul><li><p>Chi-square statistic (<code>chi_squared</code>) and p-value for each variable</p></li>
 <li><p>Degrees of freedom</p></li>
 <li><p>Frequency table with observed, expected, and residual counts</p></li>
 <li><p>Sample size (N)</p></li>
@@ -219,147 +219,46 @@ can be reasonably supposed to have arisen from random sampling.
 <span class="r-in"><span><span class="co"># Test whether gender is equally distributed</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">chisq_gof</span><span class="op">(</span><span class="va">gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Expected: Equal proportions</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender - Frequency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    category observed expected residual</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Male     1194     1250      -56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Female     1306     1250       56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Chi-Square df p-value    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    gender      5.018  1  0.0251 2500   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 5.018, p = 0.025 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test multiple variables at once</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">chisq_gof</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender, region, education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Expected: Equal proportions</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender - Frequency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    category observed expected residual</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Male     1194     1250      -56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Female     1306     1250       56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   region - Frequency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    category observed expected residual</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        East      485     1250     -765</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        West     2015     1250      765</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   education - Frequency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  category observed expected residual</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary      841      625      216</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary      629      625        4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary      631      625        6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University      399      625     -226</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable Chi-Square df p-value    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     gender      5.018  1  0.0251 2500   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     region    936.360  1   &lt;.001 2500 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education    156.454  3   &lt;.001 2500 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 5.018, p = 0.025 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 936.360, p &lt; 0.001 ***, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 156.454, p &lt; 0.001 ***, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom expected proportions</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">chisq_gof</span><span class="op">(</span><span class="va">interview_mode</span>, expected <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: interview_mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Expected: 0.5, 0.3, 0.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   interview_mode - Frequency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        category observed expected residual</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Face-to-face     1485     1250      235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Telephone      655      750      -95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Online      360      500     -140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Variable Chi-Square df p-value    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  interview_mode     95.413  2   &lt;.001 2500 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: interview_mode</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(2) = 95.413, p &lt; 0.001 ***, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">chisq_gof</span><span class="op">(</span><span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Chi-Square Goodness-of-Fit Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Expected: Equal proportions</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender - Frequency Table:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    category observed expected residual</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Male     1195     1258      -63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Female     1321     1258       63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Chi-Square df p-value    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    gender       6.31  1  0.0120 2516   * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: gender [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 6.310, p = 0.012 *, N = 2516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">chisq_gof</span><span class="op">(</span><span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Expected: Equal proportions</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable Chi-Square df p-value   N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education     34.645  3   &lt;.001 485 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable Chi-Square df p-value    N Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education    122.888  3   &lt;.001 2015 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 34.645, p &lt; 0.001 ***, N = 485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Square Goodness-of-Fit Test: education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 122.888, p &lt; 0.001 ***, N = 2015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

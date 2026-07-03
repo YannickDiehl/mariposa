@@ -12,6 +12,7 @@ summary(
   model_summary = TRUE,
   anova_table = TRUE,
   coefficients = TRUE,
+  collinearity = TRUE,
   descriptives = TRUE,
   digits = 3,
   ...
@@ -35,6 +36,11 @@ summary(
 - coefficients:
 
   Logical. Show coefficients table? (Default: TRUE)
+
+- collinearity:
+
+  Logical. Show collinearity diagnostics (Tolerance, VIF per model
+  term)? (Default: TRUE)
 
 - descriptives:
 
@@ -105,6 +111,15 @@ summary(result)
 #>   trust_government               0.006      0.021    0.006      0.305    0.760 
 #>   ----------------------------------------------------------------------------------------
 #> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   trust_government               1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
+#> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, descriptives = FALSE)
 #> 
@@ -139,6 +154,15 @@ summary(result, descriptives = FALSE)
 #>   age                           -0.002      0.001   -0.025     -1.208    0.227 
 #>   trust_government               0.006      0.021    0.006      0.305    0.760 
 #>   ----------------------------------------------------------------------------------------
+#> 
+#>   Collinearity Statistics
+#>   --------------------------------------------------
+#>   Term                       Tolerance        VIF
+#>   --------------------------------------------------
+#>   age                            1.000      1.000
+#>   trust_government               1.000      1.000
+#>   --------------------------------------------------
+#>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

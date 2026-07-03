@@ -16,12 +16,6 @@ The test tells you:
 
 ``` r
 chi_square(data, ..., weights = NULL, correct = FALSE)
-
-phi(data, ..., weights = NULL, correct = FALSE)
-
-cramers_v(data, ..., weights = NULL, correct = FALSE)
-
-goodman_gamma(data, ..., weights = NULL, correct = FALSE)
 ```
 
 ## Arguments

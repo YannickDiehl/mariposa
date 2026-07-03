@@ -114,6 +114,13 @@ for the weighted interquartile range (Q3 - Q1).
 [`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
 for comprehensive descriptive statistics including quantiles.
 
+### Validation status
+
+Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
+apply the HAVERAGE position to cumulative weights with linear
+interpolation - an R-internal extension (Tier 4 of the Validation
+Charter); SPSS reference validation for weighted percentiles is pending.
+
 Other weighted_statistics:
 [`w_iqr()`](https://YannickDiehl.github.io/mariposa/reference/w_iqr.md),
 [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md),
@@ -175,7 +182,7 @@ survey_data %>% w_quantile(age, income, weights = sampling_weight)
 #>    income      Max  8000 2186      2158.9 sampling_weight
 #> ----------------------------------------
 
-# Grouped data  
+# Grouped data
 survey_data %>% group_by(region) %>% w_quantile(age, weights = sampling_weight)
 #> 
 #> Weighted Quantile Statistics

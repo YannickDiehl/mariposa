@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,7 +89,7 @@
 <p>This vignette reports the SPSS-compatibility status of every
 statistical function in <strong>mariposa</strong>. It is auto-generated
 from the test suite and the validation exception registry.</p>
-<p><strong>Generated:</strong> 2026-05-19</p>
+<p><strong>Generated:</strong> 2026-07-03</p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
@@ -111,8 +111,8 @@ from the test suite and the validation exception registry.</p>
 reference falls into one of four tiers (Charter §4):</p>
 <ul>
 <li>
-<strong>Spec</strong> — same closed-form formula; tolerance
-<code>±1e-5</code> (statistics) or <code>±1e-4</code> (p-values)</li>
+<strong>Spec</strong> — exact integers and SPSS-truncated sentinels
+(exact match)</li>
 <li>
 <strong>Display</strong> — SPSS rounds for print; tolerance is half
 a unit of the last printed decimal</li>
@@ -131,7 +131,28 @@ verified via snapshot tests only</li>
 <p>The columns show how many <code>assert_spss()</code> calls per tier
 the validation file contains. “Total” is the total number of
 charter-compliant assertions.</p>
+<p>The “Internal (Tier 4)” column flags statistics that have no SPSS
+reference and are therefore R-only: for the rank-based family the
+<em>weighted variant</em> (SPSS <code>NPAR TESTS</code> and
+<code>NONPAR CORR</code> ignore <code>WEIGHT BY</code>); for
+<code>reliability</code>, McDonald’s omega in all paths (IBM does not
+publicly document the SPSS omega algorithm; an SPSS v29 reference run is
+pending). Tier-4 statistics are covered by internal regression and
+cross-check tests plus a weights-equal-1 invariance suite instead of
+SPSS references. (<code>mann_whitney</code>’s weighted variant is a
+design-based rank test additionally validated against
+<code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">survey::svyranktest()</a></code>.) All other statistics of these
+functions are SPSS-validated as shown in the tier columns.</p>
 <table class="table">
+<colgroup>
+<col width="12%">
+<col width="12%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="12%">
+</colgroup>
 <thead><tr class="header">
 <th>Function</th>
 <th>Status</th>
@@ -139,6 +160,7 @@ charter-compliant assertions.</p>
 <th align="right">Display</th>
 <th align="right">Exception</th>
 <th align="right">Total</th>
+<th>Internal (Tier 4)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -146,16 +168,18 @@ charter-compliant assertions.</p>
 <td>compliant</td>
 <td align="right">1</td>
 <td align="right">5</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>binomial_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">3</td>
-<td align="right">1</td>
-<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>center</code></td>
@@ -164,22 +188,25 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>chi_square</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">6</td>
-<td align="right">1</td>
-<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>chisq_gof</code></td>
 <td>compliant</td>
-<td align="right">1</td>
 <td align="right">2</td>
-<td align="right">1</td>
 <td align="right">2</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>codebook</code></td>
@@ -188,6 +215,7 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>cramers_v</code></td>
@@ -196,70 +224,79 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>crosstab</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">4</td>
 <td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>describe</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">3</td>
-<td align="right">1</td>
-<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>dunn_test</code></td>
 <td>compliant</td>
+<td align="right">0</td>
 <td align="right">1</td>
+<td align="right">0</td>
 <td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
+<td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>efa</code></td>
 <td>compliant</td>
 <td align="right">1</td>
 <td align="right">7</td>
-<td align="right">1</td>
-<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>factorial_anova</code></td>
 <td>compliant</td>
 <td align="right">1</td>
 <td align="right">5</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>fisher_test</code></td>
 <td>compliant</td>
 <td align="right">1</td>
 <td align="right">3</td>
-<td align="right">1</td>
-<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>frequency</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">5</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>friedman_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
 <td align="right">3</td>
-<td align="right">1</td>
 <td align="right">3</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td>weighted variant</td>
 </tr>
 <tr class="even">
 <td><code>goodman_gamma</code></td>
@@ -268,86 +305,97 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>kendall_tau</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">4</td>
 <td align="right">6</td>
-<td align="right">1</td>
-<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">10</td>
+<td>weighted variant</td>
 </tr>
 <tr class="even">
 <td><code>kruskal_wallis</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">5</td>
 <td align="right">3</td>
-<td align="right">1</td>
-<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>levene_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">2</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">2</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>linear_regression</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">15</td>
-<td align="right">1</td>
-<td align="right">15</td>
+<td align="right">4</td>
+<td align="right">23</td>
+<td align="right">0</td>
+<td align="right">27</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>logistic_regression</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">16</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>mann_whitney</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">6</td>
-<td align="right">1</td>
-<td align="right">6</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">10</td>
+<td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>mcnemar_test</code></td>
 <td>compliant</td>
+<td align="right">3</td>
 <td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>oneway_anova</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">6</td>
 <td align="right">16</td>
-<td align="right">1</td>
-<td align="right">16</td>
+<td align="right">0</td>
+<td align="right">22</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>pairwise_wilcoxon</code></td>
 <td>compliant</td>
+<td align="right">0</td>
 <td align="right">1</td>
+<td align="right">0</td>
 <td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
+<td>weighted variant</td>
 </tr>
 <tr class="even">
 <td><code>pearson_cor</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">5</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>phi</code></td>
@@ -356,6 +404,7 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>pomps</code></td>
@@ -364,6 +413,7 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>rec</code></td>
@@ -372,14 +422,16 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>reliability</code></td>
 <td>compliant</td>
 <td align="right">1</td>
 <td align="right">5</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td>McDonald’s omega (all paths)</td>
 </tr>
 <tr class="odd">
 <td><code>row_count</code></td>
@@ -388,6 +440,7 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>row_means</code></td>
@@ -396,6 +449,7 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>row_sums</code></td>
@@ -404,22 +458,25 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>scheffe_test</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>spearman_rho</code></td>
 <td>compliant</td>
-<td align="right">1</td>
 <td align="right">2</td>
-<td align="right">1</td>
 <td align="right">2</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>std</code></td>
@@ -428,118 +485,133 @@ charter-compliant assertions.</p>
 <td align="right">—</td>
 <td align="right">—</td>
 <td align="right">—</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>t_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">30</td>
-<td align="right">1</td>
-<td align="right">30</td>
+<td align="right">0</td>
+<td align="right">32</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>tukey_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">4</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">4</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_iqr</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_kurtosis</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_mean</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_median</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_modus</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_quantile</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_range</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_sd</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_se</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_skew</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_var</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td>compliant</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td><code>wilcoxon_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
 <td align="right">6</td>
-<td align="right">1</td>
 <td align="right">6</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td>weighted variant</td>
 </tr>
 </tbody>
 </table>

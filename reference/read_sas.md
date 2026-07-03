@@ -6,11 +6,11 @@ system. Handles two scenarios:
 1.  **Native special missing values** (`.A` through `.Z`, `._`):
     Automatically detected and annotated.
 
-2.  **Numeric missing codes** (e.g., -9, -42): When `tag.na` is
+2.  **Numeric missing codes** (e.g., -9, -42): When `tag_na` is
     provided, these regular values are converted to tagged NAs, giving
     the same result as
     [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
-    with `tag.na = TRUE`.
+    with `tag_na = TRUE`.
 
 ## Usage
 
@@ -20,7 +20,7 @@ read_sas(
   catalog_file = NULL,
   encoding = NULL,
   catalog_encoding = NULL,
-  tag.na = NULL,
+  tag_na = NULL,
   verbose = FALSE
 )
 ```
@@ -46,7 +46,7 @@ read_sas(
   Character encoding for the catalog file. If `NULL`, the same encoding
   as the data file is used.
 
-- tag.na:
+- tag_na:
 
   Numeric vector of values to treat as missing (e.g., `c(-9, -8, -42)`).
   These values will be converted to tagged NAs across all numeric
@@ -79,16 +79,16 @@ through `.Z`, and `._` (underscore). The `haven` package preserves these
 as tagged NAs automatically. `read_sas()` adds the `na_tag_map`
 attribute so that mariposa's tagged NA functions work seamlessly.
 
-### Numeric Missing Codes (tag.na)
+### Numeric Missing Codes (tag_na)
 
 Some SAS files store missing value codes as regular numeric values
-(e.g., -9 = "No answer"). The `tag.na` parameter converts these to
+(e.g., -9 = "No answer"). The `tag_na` parameter converts these to
 tagged NAs, enabling proper handling in
 [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
 [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md),
 and other functions.
 
-When `tag.na` is used,
+When `tag_na` is used,
 [`untag_na()`](https://YannickDiehl.github.io/mariposa/reference/untag_na.md)
 can recover the original numeric codes.
 
@@ -123,7 +123,7 @@ data <- read_sas("survey.sas7bdat")
 data <- read_sas("survey.sas7bdat", catalog_file = "formats.sas7bcat")
 
 # Read SAS file with numeric missing codes
-data <- read_sas("survey.sas7bdat", tag.na = c(-9, -8, -42))
+data <- read_sas("survey.sas7bdat", tag_na = c(-9, -8, -42))
 
 # Check what types of missing values exist
 na_frequencies(data$income)

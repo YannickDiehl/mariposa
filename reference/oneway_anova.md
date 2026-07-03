@@ -55,11 +55,9 @@ oneway_anova(
 
 - var.equal:
 
-  Should we assume all groups have similar variance? (Default: TRUE)
-
-  - TRUE: Standard ANOVA (assumes equal variances)
-
-  - FALSE: Welch's ANOVA (allows unequal variances)
+  Deprecated and ignored (a warning is issued when set to FALSE). Like
+  SPSS ONEWAY, the classical ANOVA table and Welch's robust test are
+  always both computed and displayed.
 
 - conf.level:
 
@@ -69,7 +67,7 @@ oneway_anova(
 
 ANOVA results showing whether groups differ, including:
 
-- F-statistic and p-value (are groups different?)
+- F-statistic (`F_statistic`) and p-value (are groups different?)
 
 - Effect sizes (how much do groups matter?)
 
@@ -107,6 +105,9 @@ ANOVA results showing whether groups differ, including:
 
 - **Omega-squared**: More conservative estimate (usually preferred)
 
+- Omega-squared and epsilon-squared are truncated at 0; a negative raw
+  estimate (which occurs when F \< 1) is reported as 0.
+
 ### When to Use This
 
 Use ANOVA when:
@@ -119,15 +120,17 @@ Use ANOVA when:
 
 - Your data is roughly normally distributed within groups
 
-### Choosing Variance Assumptions
+### Variance Assumptions
 
-- **Standard ANOVA** (var.equal = TRUE): Use when group variances are
-  similar
+Like SPSS ONEWAY, both results are always shown for comparison:
 
-- **Welch's ANOVA** (var.equal = FALSE): Use when group variances differ
-  or you're unsure
+- **Standard ANOVA**: valid when group variances are similar
 
-- The function shows both results for comparison
+- **Welch's ANOVA**: robust when group variances differ
+
+- Use
+  [`levene_test`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)
+  to check which situation applies
 
 ### What Comes Next?
 
@@ -243,80 +246,19 @@ survey_data %>%
 #> One-Way ANOVA: life_satisfaction by education
 #>   F(3, 1952) = 62.153, p < 0.001 ***, eta2 = 0.087 (medium), N = 1956
 
-# Unequal variances (Welch's ANOVA)
-survey_data %>%
-  oneway_anova(income, group = education, var.equal = FALSE)
-#> One-Way ANOVA: income by education
-#>   F(3, 2182) = 466.494, p < 0.001 ***, eta2 = 0.391 (large), N = 2186
-
 # Store results for post-hoc analysis
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 
 # Follow up with post-hoc tests
 result %>% tukey_test()
-#> Tukey HSD Post-Hoc Test Results
-#> -------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Tukey Results:
-#> ---------------------------------------------------------------------------------- 
-#>                                 Comparison Difference Lower CI Upper CI p-value
-#>     Intermediate Secondary-Basic Secondary      0.497    0.344    0.649   <.001
-#>         Academic Secondary-Basic Secondary      0.649    0.496    0.802   <.001
-#>                 University-Basic Secondary      0.843    0.666    1.019   <.001
-#>  Academic Secondary-Intermediate Secondary      0.153   -0.010    0.316   0.075
-#>          University-Intermediate Secondary      0.346    0.161    0.531   <.001
-#>              University-Academic Secondary      0.193    0.008    0.379   0.037
-#>  Sig
-#>  ***
-#>  ***
-#>  ***
-#>     
-#>  ***
-#>    *
-#> ---------------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 result %>% levene_test()  # Check homogeneity of variances
-#> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
-#> 
-#> - Grouping variable: education
-#> - Center: mean
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Levene's Test Results:
-#> -------------------------------------------------------------------- 
-#>           Variable F_statistic df1  df2 p_value sig        Conclusion
-#>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
-#> 
-#> Recommendation based on Levene test:
-#> - Use Welch's t-test (unequal variances)
+#> Levene's Test: life_satisfaction by education
+#>   F(3, 2417) = 31.634, p < 0.001 ***, variances unequal
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result              # compact one-line overview
@@ -344,7 +286,7 @@ summary(result)     # full detailed output with all sections
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 
@@ -386,7 +328,7 @@ summary(result, descriptives = FALSE)  # hide group statistics
 #> ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001   1
+#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
 #>   Within Groups    2970.080 2417       1.229                   
 #>           Total    3217.428 2420                               
 #> -------------------------------------------------------------------------------- 

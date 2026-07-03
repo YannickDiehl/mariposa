@@ -30,7 +30,7 @@ media, and science).
 
 | Function | Purpose |
 |----|----|
-| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Internal consistency (Cronbach’s Alpha) |
+| [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md) | Internal consistency (Cronbach’s Alpha, McDonald’s Omega) |
 | [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md) | Discover underlying dimensions (factor analysis) |
 | [`row_means()`](https://YannickDiehl.github.io/mariposa/reference/row_means.md) | Row-wise mean indices |
 | [`row_sums()`](https://YannickDiehl.github.io/mariposa/reference/row_sums.md) | Row-wise sums |
@@ -45,7 +45,7 @@ media, and science).
 
 reliability(survey_data, trust_government, trust_media, trust_science)
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
+#>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
 ```
 
 ### Detailed Output
@@ -64,6 +64,8 @@ summary(rel)
 #> ---------------------------------------- 
 #>   Cronbach's Alpha:              0.047
 #>   Alpha (standardized):          0.048
+#>   McDonald's Omega:              0.047
+#>   Omega (standardized):          0.048
 #>   N of Items:                    3
 #>   N (listwise):                  2135
 #> 
@@ -88,10 +90,12 @@ summary(rel)
 #>  trust_government               6.05             2.440       0.024
 #>       trust_media               6.25             2.467       0.020
 #>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#>  alpha_deleted omega_deleted
+#>          0.029            NA
+#>          0.040            NA
+#>          0.027            NA
+#> Note: Omega if item deleted requires at least 4 items
+#> (a one-factor model on the remaining 2 items is not identified).
 ```
 
 The detailed output shows item-total correlations,
@@ -113,6 +117,24 @@ not belong.
 **Alpha if Item Deleted** shows what happens without each item. If alpha
 increases when you remove an item, that item weakens the scale.
 
+### McDonald’s Omega
+
+Alongside alpha,
+[`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md)
+reports **McDonald’s Omega**, a factor-model-based reliability
+coefficient. Alpha assumes all items measure the construct equally well;
+omega fits a one-factor model and lets each item carry its own loading,
+which usually makes it the more accurate estimate when item loadings
+differ. The same thresholds as for alpha are commonly applied. Omega
+needs at least 3 items (with 2 items it is reported as `NA`), and
+**Omega if Item Deleted** appears in the item-total table for scales of
+4 or more items.
+
+Note: omega is currently an R-only statistic (no SPSS reference run
+yet); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for its validation status.
+
 ### With Survey Weights
 
 ``` r
@@ -120,7 +142,7 @@ increases when you remove an item, that item weakens the scale.
 reliability(survey_data, trust_government, trust_media, trust_science,
             weights = sampling_weight)
 #> Reliability Analysis: 3 items [Weighted]
-#>   Cronbach's Alpha = 0.052 (Poor), N = 2150
+#>   Cronbach's Alpha = 0.052 (Poor), McDonald's Omega = 0.053, N = 2150
 ```
 
 ### Using tidyselect
@@ -129,7 +151,7 @@ reliability(survey_data, trust_government, trust_media, trust_science,
 
 reliability(survey_data, starts_with("trust"))
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
+#>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
 ```
 
 ### Grouped Analysis
@@ -143,10 +165,10 @@ survey_data %>%
   reliability(trust_government, trust_media, trust_science)
 #> [region = 1]
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.037 (Poor), N = 422
+#>   Cronbach's Alpha = 0.037 (Poor), McDonald's Omega = 0.349, N = 422
 #> [region = 2]
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.050 (Poor), N = 1713
+#>   Cronbach's Alpha = 0.050 (Poor), McDonald's Omega = 0.071, N = 1713
 ```
 
 A scale that works well overall might be unreliable in specific
@@ -423,7 +445,7 @@ survey_data %>%
 rel <- reliability(survey_data, trust_government, trust_media, trust_science)
 rel
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
+#>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
 summary(rel)
 #> 
 #> Reliability Analysis Results
@@ -435,6 +457,8 @@ summary(rel)
 #> ---------------------------------------- 
 #>   Cronbach's Alpha:              0.047
 #>   Alpha (standardized):          0.048
+#>   McDonald's Omega:              0.047
+#>   Omega (standardized):          0.048
 #>   N of Items:                    3
 #>   N (listwise):                  2135
 #> 
@@ -459,10 +483,12 @@ summary(rel)
 #>  trust_government               6.05             2.440       0.024
 #>       trust_media               6.25             2.467       0.020
 #>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#>  alpha_deleted omega_deleted
+#>          0.029            NA
+#>          0.040            NA
+#>          0.027            NA
+#> Note: Omega if item deleted requires at least 4 items
+#> (a one-factor model on the remaining 2 items is not identified).
 
 # 2. Explore factor structure
 efa_result <- efa(survey_data, trust_government, trust_media, trust_science)

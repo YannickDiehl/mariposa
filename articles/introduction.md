@@ -98,23 +98,9 @@ survey_data %>%
 # Frequency table
 survey_data %>%
   frequency(education, weights = sampling_weight)
-#> 
-#> Weighted Frequency Analysis Results
-#> -----------------------------------
-#> 
-#> education (Highest educational attainment)
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
-#> 
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |
-#> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |
-#> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |
-#> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
-#> +------------------------+------------------------+--------+--------+--------+--------+
+#> Frequency: education [Weighted]
+#>   4 categories, N valid = 2516, missing = 0
+#> Use summary() for detailed output.
 ```
 
 ### 2. Transform Variables
@@ -124,7 +110,7 @@ survey_data %>%
 # Create age groups
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
-  suffix = "_group", as.factor = TRUE)
+  suffix = "_group", as_factor = TRUE)
 
 # Build a trust scale
 survey_data <- survey_data %>%
@@ -176,7 +162,7 @@ summary(result, descriptives = FALSE)
 #> Weighted ANOVA Results:
 #> -------------------------------------------------------------------------------- 
 #>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.333   <.001   1
+#>  Between Groups     241.130    3      80.377 65.333   <.001 ***
 #>   Within Groups    2992.019 2432        1.23                   
 #>           Total    3233.149 2435                               
 #> -------------------------------------------------------------------------------- 
@@ -209,44 +195,9 @@ summary(result, descriptives = FALSE)
 
 # Which education groups differ?
 tukey_test(result)
-#> Weighted Tukey HSD Post-Hoc Test Results
-#> ----------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Tukey Results:
-#> ------------------------------------------------------------------------------------ 
-#>                                   Comparison Difference Lower CI Upper CI
-#>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339
-#>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491
-#>                 Basic Secondary - University     -0.832   -1.011   -0.654
-#>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008
-#>          Intermediate Secondary - University     -0.342   -0.529   -0.156
-#>              Academic Secondary - University     -0.189   -0.376   -0.003
-#>  p-value Sig
-#>    <.001 ***
-#>    <.001 ***
-#>    <.001 ***
-#>    0.071    
-#>    <.001 ***
-#>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education [Weighted]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```
 
 ### 5. Measure Relationships
@@ -466,7 +417,7 @@ survey_data %>%
 
 | Function | Purpose |
 |----|----|
-| [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | Independent, paired, and one-sample t-tests |
+| [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | Independent and one-sample t-tests |
 | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | One-way ANOVA |
 | [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | Multi-factor ANOVA with Type III SS |
 | [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md) | ANCOVA with estimated marginal means |
@@ -489,9 +440,9 @@ survey_data %>%
 | [`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md) | Test for homogeneity of variances |
 | [`dunn_test()`](https://YannickDiehl.github.io/mariposa/reference/dunn_test.md) | Dunn’s post-hoc for Kruskal-Wallis |
 | [`pairwise_wilcoxon()`](https://YannickDiehl.github.io/mariposa/reference/pairwise_wilcoxon.md) | Pairwise Wilcoxon for Friedman |
-| [`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Phi coefficient |
-| [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Cramer’s V |
-| [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | Goodman-Kruskal gamma |
+| [`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md) | Phi coefficient |
+| [`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md) | Cramer’s V |
+| [`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md) | Goodman-Kruskal gamma |
 
 ### Scale Analysis
 

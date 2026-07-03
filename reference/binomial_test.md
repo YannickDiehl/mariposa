@@ -108,8 +108,18 @@ Use the binomial test when:
 - For comparing proportions between groups: Use chi-square or z-test for
   proportions
 
-- For larger samples with normal approximation: Results will be very
-  similar to a one-sample z-test for proportions
+- For larger samples with normal approximation:
+
+### Weighted variants
+
+SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted results have no SPSS
+reference. The weighted variant is an R-only frequency-weight extension
+that reduces exactly to the unweighted test when all weights equal 1
+(enforced by an internal invariance suite); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for validation status.
+
+Results will be very similar to a one-sample z-test for proportions
 
 ## References
 
@@ -148,188 +158,42 @@ data(survey_data)
 # Test whether gender split is 50/50
 survey_data %>%
   binomial_test(gender, p = 0.50)
-#> 
-#> Binomial Test Results
-#> ---------------------
-#> 
-#> - Test proportion: 0.5
-#> - Confidence level: 95.0%
-#> 
-#> gender
-#> ------
-#>   Categories:
-#>   ------------------------------------
-#>                       N Observed Prop.
-#>      Group 1: Male 1194          0.478
-#>    Group 2: Female 1306          0.522
-#>              Total 2500          1.000
-#>   ------------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5   0.026    0.458    0.497   *
-#>   -----------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Binomial Test: gender
+#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#> Use summary() for detailed output.
 
 # Test whether East region proportion is 50%
 survey_data %>%
   binomial_test(region, p = 0.50)
-#> 
-#> Binomial Test Results
-#> ---------------------
-#> 
-#> - Test proportion: 0.5
-#> - Confidence level: 95.0%
-#> 
-#> region
-#> ------
-#>   Categories:
-#>   ----------------------------------
-#>                     N Observed Prop.
-#>    Group 1: East  485          0.194
-#>    Group 2: West 2015          0.806
-#>            Total 2500          1.000
-#>   ----------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5       0    0.179     0.21 ***
-#>   -----------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Binomial Test: region
+#>   Group 1 (East): prop = 0.194 vs 0.500, p < 0.001 ***, N = 2500
+#> Use summary() for detailed output.
 
 # Multiple variables at once
 survey_data %>%
   binomial_test(gender, region, p = 0.50)
-#> 
-#> Binomial Test Results
-#> ---------------------
-#> 
-#> - Test proportion: 0.5
-#> - Confidence level: 95.0%
-#> 
-#> gender
-#> ------
-#>   Categories:
-#>   ------------------------------------
-#>                       N Observed Prop.
-#>      Group 1: Male 1194          0.478
-#>    Group 2: Female 1306          0.522
-#>              Total 2500          1.000
-#>   ------------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5   0.026    0.458    0.497   *
-#>   -----------------------------------------
-#> 
-#> region
-#> ------
-#>   Categories:
-#>   ----------------------------------
-#>                     N Observed Prop.
-#>    Group 1: East  485          0.194
-#>    Group 2: West 2015          0.806
-#>            Total 2500          1.000
-#>   ----------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5       0    0.179     0.21 ***
-#>   -----------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Binomial Test: gender
+#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#> Binomial Test: region
+#>   Group 1 (East): prop = 0.194 vs 0.500, p < 0.001 ***, N = 2500
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>%
   binomial_test(gender, p = 0.50, weights = sampling_weight)
-#> 
-#> Weighted Binomial Test Results
-#> ------------------------------
-#> 
-#> - Test proportion: 0.5
-#> - Confidence level: 95.0%
-#> - Weights variable: sampling_weight
-#> 
-#> gender
-#> ------
-#>   Categories:
-#>   ------------------------------------
-#>                       N Observed Prop.
-#>      Group 1: Male 1194          0.478
-#>    Group 2: Female 1306          0.522
-#>              Total 2500          1.000
-#>   ------------------------------------
-#> 
-#>   Weighted Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5   0.026    0.458    0.497   *
-#>   -----------------------------------------
-#> 
-#> Note: Weighted analysis uses rounded frequency weights.
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Binomial Test: gender [Weighted]
+#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#> Use summary() for detailed output.
 
 # Grouped analysis (separate test per region)
 survey_data %>%
   group_by(region) %>%
   binomial_test(gender, p = 0.50)
-#> 
-#> Binomial Test Results
-#> ---------------------
-#> 
-#> - Test proportion: 0.5
-#> - Confidence level: 95.0%
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#> gender
-#> ------
-#>   Categories:
-#>   -----------------------------------
-#>                      N Observed Prop.
-#>      Group 1: Male 238          0.491
-#>    Group 2: Female 247          0.509
-#>              Total 485          1.000
-#>   -----------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5   0.716    0.445    0.536    
-#>   -----------------------------------------
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#> gender
-#> ------
-#>   Categories:
-#>   ------------------------------------
-#>                       N Observed Prop.
-#>      Group 1: Male  956          0.474
-#>    Group 2: Female 1059          0.526
-#>              Total 2015          1.000
-#>   ------------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5   0.023    0.452    0.497   *
-#>   -----------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> [region = 1]
+#> Binomial Test: gender
+#>   Group 1 (Male): prop = 0.491 vs 0.500, p = 0.716 , N = 485
+#> [region = 2]
+#> Binomial Test: gender
+#>   Group 1 (Male): prop = 0.474 vs 0.500, p = 0.023 *, N = 2015
+#> Use summary() for detailed output.
 ```

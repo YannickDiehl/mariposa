@@ -40,26 +40,13 @@ Collapse categories by mapping old values to new values:
 
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
-  suffix = "_group", as.factor = TRUE
+  suffix = "_group", as_factor = TRUE
 )
 
 frequency(survey_data, age_group)
-#> 
-#> Frequency Analysis Results
-#> --------------------------
-#> 
-#> age_group (Age in years (recoded))
-#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
-#> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Young |  Young |    292 |  11.68 |  11.68 |  11.68 |
-#> | Middle | Middle |    935 |  37.40 |  37.40 |  49.08 |
-#> |  Older |  Older |   1273 |  50.92 |  50.92 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2500 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> Frequency: age_group
+#>   3 categories, N valid = 2500, missing = 0
+#> Use summary() for detailed output.
 ```
 
 The bracket notation (`[Young]`) automatically creates value labels on
@@ -103,25 +90,9 @@ survey_data <- rec(survey_data, income,
 )
 
 frequency(survey_data, income_dicho)
-#> 
-#> Frequency Analysis Results
-#> --------------------------
-#> 
-#> income_dicho (Monthly household income (EUR) (recoded))
-#> # total N=2500 valid N=2186 mean=0.49 sd=0.50 skewness=0.03
-#> 
-#> +------+--------+--------+--------+--------+
-#> |Value |      N |  Raw % |Valid % | Cum. % |
-#> +------+--------+--------+--------+--------+
-#> |    0 |   1108 |  44.32 |  50.69 |  50.69 |
-#> |    1 |   1078 |  43.12 |  49.31 | 100.00 |
-#> +------+--------+--------+--------+--------+
-#> |Total |   2186 |  87.44 | 100.00 |        |
-#> +------+--------+--------+--------+--------+
-#> |   NA |    314 |  12.56 |     NA |     NA |
-#> +------+--------+--------+--------+--------+
-#> |Total |    314 |  12.56 |     NA |        |
-#> +------+--------+--------+--------+--------+
+#> Frequency: income_dicho
+#>   2 categories, N valid = 2186, missing = 314
+#> Use summary() for detailed output.
 ```
 
 Other split options:
@@ -148,25 +119,13 @@ for a catch-all:
 
 survey_data <- rec(survey_data, education,
   rules = "1:2=1 [Lower]; else=2 [Higher]",
-  suffix = "_binary", as.factor = TRUE
+  suffix = "_binary", as_factor = TRUE
 )
 
 frequency(survey_data, education_binary)
-#> 
-#> Frequency Analysis Results
-#> --------------------------
-#> 
-#> education_binary (Highest educational attainment (recoded))
-#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
-#> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Lower |  Lower |   1470 |  58.80 |  58.80 |  58.80 |
-#> | Higher | Higher |   1030 |  41.20 |  41.20 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2500 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> Frequency: education_binary
+#>   2 categories, N valid = 2500, missing = 0
+#> Use summary() for detailed output.
 ```
 
 ## Dummy Coding with to_dummy()
@@ -501,22 +460,9 @@ survey_data <- survey_data %>%
   ))
 
 frequency(survey_data, n_high_trust)
-#> 
-#> Frequency Analysis Results
-#> --------------------------
-#> 
-#> n_high_trust
-#> # total N=2500 valid N=2500 mean=0.29 sd=0.49 skewness=1.38
-#> 
-#> +------+--------+--------+--------+--------+
-#> |Value |      N |  Raw % |Valid % | Cum. % |
-#> +------+--------+--------+--------+--------+
-#> |    0 |   1829 |  73.16 |  73.16 |  73.16 |
-#> |    1 |    628 |  25.12 |  25.12 |  98.28 |
-#> |    2 |     43 |   1.72 |   1.72 | 100.00 |
-#> +------+--------+--------+--------+--------+
-#> |Total |   2500 | 100.00 | 100.00 |        |
-#> +------+--------+--------+--------+--------+
+#> Frequency: n_high_trust
+#>   3 categories, N valid = 2500, missing = 0
+#> Use summary() for detailed output.
 ```
 
 ## POMPS Transformation
@@ -569,7 +515,7 @@ data(survey_data)  # fresh copy
 # 1. Recode: create age groups and reverse-code an item
 survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
-  suffix = "_group", as.factor = TRUE)
+  suffix = "_group", as_factor = TRUE)
 survey_data <- rec(survey_data, trust_government,
   rules = "rev", suffix = "_rev")
 

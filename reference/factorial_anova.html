@@ -37,7 +37,7 @@ How much variance each factor explains (partial eta squared)
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,8 +124,8 @@ between-subjects factors (2-3 factors). These must be categorical variables
 
 
 <dt id="arg-ss-type">ss_type<a class="anchor" aria-label="anchor" href="#arg-ss-type"></a></dt>
-<dd><p>Type of Sum of Squares: 3 (default, SPSS standard) or 2.
-Type III is recommended for unbalanced designs.</p></dd>
+<dd><p>Deprecated; only 3 (Type III, the SPSS default) is
+implemented. Passing 2 issues a warning and computes Type III.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -267,73 +267,14 @@ Analyzing Data (2nd ed.). Lawrence Erlbaum Associates.</p>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">factorial_anova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Factors: gender x education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Family-wise error rate controlled using Tukey HSD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- Factor: gender ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Comparison Difference Lower CI Upper CI p-value Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female-Male     -42.32 -162.639   77.999    0.49    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- Factor: education ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 Comparison Difference Lower CI Upper CI p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Intermediate Secondary-Basic Secondary    833.471  671.079  995.862   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Academic Secondary-Basic Secondary   1465.040 1302.648 1627.432   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 University-Basic Secondary   2578.135 2392.167 2764.104   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Academic Secondary-Intermediate Secondary    631.569  457.746  805.393   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          University-Intermediate Secondary   1744.665 1548.634 1940.695   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              University-Academic Secondary   1113.096  917.065 1309.126   &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive differences: First group &gt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative differences: First group &lt; Second group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence intervals not containing 0 indicate significant differences</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons (family-wise error control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Tukey HSD Post-Hoc Test by gender x education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender: 1 comparison, 0 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education: 6 comparisons, 6 significant (p &lt; .05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for the full comparison table.</span>
 <span class="r-in"><span><span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="levene_test.html">levene_test</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender * education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable F_statistic df1  df2 p_value sig        Conclusion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      44.988   7 2178       0 *** Variances unequal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - p &lt;= 0.05: Variances are heterogeneous (equal variances NOT assumed)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recommendation based on Levene test:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Use Welch's t-test (unequal variances)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: income by gender * education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(7, 2178) = 44.988, p &lt; 0.001 ***, variances unequal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact overview</span></span></span>

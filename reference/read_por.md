@@ -8,7 +8,7 @@ for `.sav` files.
 ## Usage
 
 ``` r
-read_por(path, tag.na = TRUE, verbose = FALSE)
+read_por(path, tag_na = TRUE, verbose = FALSE)
 ```
 
 ## Arguments
@@ -17,7 +17,7 @@ read_por(path, tag.na = TRUE, verbose = FALSE)
 
   Path to an SPSS `.por` file.
 
-- tag.na:
+- tag_na:
 
   If `TRUE` (the default), user-defined missing values are converted to
   tagged NAs using

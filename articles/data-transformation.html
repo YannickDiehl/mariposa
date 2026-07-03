@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,26 +151,13 @@ reverse-coding, and inline value labels.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>,</span>
 <span>  rules <span class="op">=</span> <span class="st">"18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]"</span>,</span>
-<span>  suffix <span class="op">=</span> <span class="st">"_group"</span>, as.factor <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  suffix <span class="op">=</span> <span class="st">"_group"</span>, as_factor <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age_group</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; --------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; age_group (Age in years (recoded))</span></span>
-<span><span class="co">#&gt; # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Young |  Young |    292 |  11.68 |  11.68 |  11.68 |</span></span>
-<span><span class="co">#&gt; | Middle | Middle |    935 |  37.40 |  37.40 |  49.08 |</span></span>
-<span><span class="co">#&gt; |  Older |  Older |   1273 |  50.92 |  50.92 | 100.00 |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Total |        |   2500 | 100.00 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; Frequency: age_group</span></span>
+<span><span class="co">#&gt;   3 categories, N valid = 2500, missing = 0</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>The bracket notation (<code>[Young]</code>) automatically creates
 value labels on the recoded variable. The <code>suffix</code> argument
 creates a new column (here <code>age_group</code>) instead of
@@ -210,25 +197,9 @@ scale are negatively worded:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income_dicho</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; --------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; income_dicho (Monthly household income (EUR) (recoded))</span></span>
-<span><span class="co">#&gt; # total N=2500 valid N=2186 mean=0.49 sd=0.50 skewness=0.03</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Value |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |    0 |   1108 |  44.32 |  50.69 |  50.69 |</span></span>
-<span><span class="co">#&gt; |    1 |   1078 |  43.12 |  49.31 | 100.00 |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Total |   2186 |  87.44 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |   NA |    314 |  12.56 |     NA |     NA |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Total |    314 |  12.56 |     NA |        |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; Frequency: income_dicho</span></span>
+<span><span class="co">#&gt;   2 categories, N valid = 2186, missing = 314</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>Other split options:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Split at the mean</span></span>
@@ -249,25 +220,13 @@ and <code>else</code> for a catch-all:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">education</span>,</span>
 <span>  rules <span class="op">=</span> <span class="st">"1:2=1 [Lower]; else=2 [Higher]"</span>,</span>
-<span>  suffix <span class="op">=</span> <span class="st">"_binary"</span>, as.factor <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  suffix <span class="op">=</span> <span class="st">"_binary"</span>, as_factor <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">education_binary</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; --------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; education_binary (Highest educational attainment (recoded))</span></span>
-<span><span class="co">#&gt; # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Lower |  Lower |   1470 |  58.80 |  58.80 |  58.80 |</span></span>
-<span><span class="co">#&gt; | Higher | Higher |   1030 |  41.20 |  41.20 | 100.00 |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Total |        |   2500 | 100.00 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; Frequency: education_binary</span></span>
+<span><span class="co">#&gt;   2 categories, N valid = 2500, missing = 0</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -582,22 +541,9 @@ appears in each row:</p>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/frequency.html">frequency</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">n_high_trust</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Frequency Analysis Results</span></span>
-<span><span class="co">#&gt; --------------------------</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; n_high_trust</span></span>
-<span><span class="co">#&gt; # total N=2500 valid N=2500 mean=0.29 sd=0.49 skewness=1.38</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Value |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |    0 |   1829 |  73.16 |  73.16 |  73.16 |</span></span>
-<span><span class="co">#&gt; |    1 |    628 |  25.12 |  25.12 |  98.28 |</span></span>
-<span><span class="co">#&gt; |    2 |     43 |   1.72 |   1.72 | 100.00 |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Total |   2500 | 100.00 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; Frequency: n_high_trust</span></span>
+<span><span class="co">#&gt;   3 categories, N valid = 2500, missing = 0</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -642,7 +588,7 @@ ensures scores are comparable across samples.</p>
 <span><span class="co"># 1. Recode: create age groups and reverse-code an item</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>,</span>
 <span>  rules <span class="op">=</span> <span class="st">"18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]"</span>,</span>
-<span>  suffix <span class="op">=</span> <span class="st">"_group"</span>, as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  suffix <span class="op">=</span> <span class="st">"_group"</span>, as_factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>,</span>
 <span>  rules <span class="op">=</span> <span class="st">"rev"</span>, suffix <span class="op">=</span> <span class="st">"_rev"</span><span class="op">)</span></span>
 <span></span>

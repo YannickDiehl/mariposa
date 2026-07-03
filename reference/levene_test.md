@@ -180,165 +180,43 @@ data(survey_data)
 
 # Standalone Levene test (test homogeneity of variances)
 survey_data %>% levene_test(life_satisfaction, group = region)
-#> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
-#> 
-#> - Grouping variable: region
-#> - Center: mean
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Levene's Test Results:
-#> ------------------------------------------------------------------ 
-#>           Variable F_statistic df1  df2 p_value sig      Conclusion
-#>  life_satisfaction       3.164   1 2419   0.075     Variances equal
-#> ------------------------------------------------------------------ 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
+#> Levene's Test: life_satisfaction by region
+#>   F(1, 2419) = 3.164, p = 0.075 , variances equal
+#> Use summary() for detailed output.
 
 # Multiple variables
 survey_data %>% levene_test(life_satisfaction, trust_government, group = region)
-#> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
-#> 
-#> - Grouping variable: region
-#> - Center: mean
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Levene's Test Results:
-#> ------------------------------------------------------------------ 
-#>           Variable F_statistic df1  df2 p_value sig      Conclusion
-#>  life_satisfaction       3.164   1 2419   0.075     Variances equal
-#> ------------------------------------------------------------------ 
-#> 
-#> 
-#> --- trust_government ---
-#> 
-#> Levene's Test Results:
-#> ----------------------------------------------------------------- 
-#>          Variable F_statistic df1  df2 p_value sig      Conclusion
-#>  trust_government       0.145   1 2352   0.703     Variances equal
-#> ----------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
+#> Levene's Test: life_satisfaction by region
+#>   F(1, 2419) = 3.164, p = 0.075 , variances equal
+#> Levene's Test: trust_government by region
+#>   F(1, 2352) = 0.145, p = 0.703 , variances equal
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>% levene_test(income, group = education, weights = sampling_weight)
-#> 
-#> Weighted Levene's Test for Homogeneity of Variance 
-#> ---------------------------------------------------
-#> 
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Center: mean
-#> 
-#> 
-#> --- income ---
-#> 
-#> Weighted Levene's Test Results:
-#> ----------------------------------------------------------------------- 
-#>  Variable F_statistic df1      df2 p_value sig        Conclusion
-#>    income     102.048   3 2196.939       0 *** Variances unequal
-#> ----------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
+#> Levene's Test: income by education [Weighted]
+#>   F(3, 2196.9) = 102.048, p < 0.001 ***, variances unequal
+#> Use summary() for detailed output.
 
 # Piped after ANOVA (common workflow)
 result <- survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 result %>% levene_test()
-#> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
-#> 
-#> - Grouping variable: education
-#> - Center: mean
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Levene's Test Results:
-#> -------------------------------------------------------------------- 
-#>           Variable F_statistic df1  df2 p_value sig        Conclusion
-#>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
-#> 
-#> Recommendation based on Levene test:
-#> - Use Welch's t-test (unequal variances)
+#> Levene's Test: life_satisfaction by education
+#>   F(3, 2417) = 31.634, p < 0.001 ***, variances unequal
+#> Use summary() for detailed output.
 
 # Piped after t-test
 survey_data %>%
   t_test(age, group = gender) %>%
   levene_test()
-#> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
-#> 
-#> - Grouping variable: gender
-#> - Center: mean
-#> 
-#> 
-#> --- age ---
-#> 
-#> Levene's Test Results:
-#> --------------------------------------------------------- 
-#>  Variable F_statistic df1  df2 p_value sig      Conclusion
-#>       age       0.534   1 2498   0.465     Variances equal
-#> --------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
-#> 
-#> Recommendation based on Levene test:
-#> - Student's t-test or Welch's t-test both appropriate
+#> Levene's Test: age by gender
+#>   F(1, 2498) = 0.534, p = 0.465 , variances equal
+#> Use summary() for detailed output.
 
 # Using mean instead of median as center
 survey_data %>% levene_test(income, group = region, center = "mean")
-#> 
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
-#> 
-#> - Grouping variable: region
-#> - Center: mean
-#> 
-#> 
-#> --- income ---
-#> 
-#> Levene's Test Results:
-#> --------------------------------------------------------- 
-#>  Variable F_statistic df1  df2 p_value sig      Conclusion
-#>    income       1.631   1 2184   0.202     Variances equal
-#> --------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
+#> Levene's Test: income by region
+#>   F(1, 2184) = 1.631, p = 0.202 , variances equal
+#> Use summary() for detailed output.
 ```

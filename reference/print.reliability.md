@@ -1,8 +1,8 @@
 # Print reliability results (compact)
 
 Compact print method for objects of class `"reliability"`. Shows
-Cronbach's Alpha with quality interpretation and item count in a single
-line per group.
+Cronbach's Alpha (with quality interpretation), McDonald's Omega, and
+item count in a single line per group.
 
 For the full detailed output including item statistics, inter-item
 correlations, and item-total statistics, use
@@ -40,7 +40,7 @@ Invisibly returns the input object `x`.
 result <- reliability(survey_data, trust_government, trust_media, trust_science)
 result              # compact one-line overview
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.047 (Poor), N = 2135
+#>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
 summary(result)     # full detailed output
 #> 
 #> Reliability Analysis Results
@@ -52,6 +52,8 @@ summary(result)     # full detailed output
 #> ---------------------------------------- 
 #>   Cronbach's Alpha:              0.047
 #>   Alpha (standardized):          0.048
+#>   McDonald's Omega:              0.047
+#>   Omega (standardized):          0.048
 #>   N of Items:                    3
 #>   N (listwise):                  2135
 #> 
@@ -76,8 +78,10 @@ summary(result)     # full detailed output
 #>  trust_government               6.05             2.440       0.024
 #>       trust_media               6.25             2.467       0.020
 #>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted
-#>          0.029
-#>          0.040
-#>          0.027
+#>  alpha_deleted omega_deleted
+#>          0.029            NA
+#>          0.040            NA
+#>          0.027            NA
+#> Note: Omega if item deleted requires at least 4 items
+#> (a one-factor model on the remaining 2 items is not identified).
 ```

@@ -51,7 +51,7 @@ friedman_test(data, ..., weights = NULL, conf.level = 0.95)
 
 Test results showing whether the measurements differ, including:
 
-- Chi-Square statistic (Friedman test statistic)
+- Chi-Square statistic (`chi_squared`, the Friedman test statistic)
 
 - Degrees of freedom (number of measurements minus 1)
 
@@ -117,6 +117,15 @@ Use the Friedman test when:
 - For normally distributed repeated measures: Use repeated-measures
   ANOVA
 
+### Weighted variants
+
+SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted results have no SPSS
+reference. The weighted variant is an R-only frequency-weight extension
+that reduces exactly to the unweighted test when all weights equal 1
+(enforced by an internal invariance suite); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+for validation status.
+
 - For independent groups: Use
   [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
   instead
@@ -165,154 +174,34 @@ data(survey_data)
 # Compare three trust items (rated by same respondents)
 survey_data %>%
   friedman_test(trust_government, trust_media, trust_science)
-#> 
-#> Friedman Test Results
-#> ---------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - Number of conditions: 3
-#> 
-#>   Ranks:
-#>   ---------------------------
-#>            Variable Mean Rank
-#>    trust_government      1.81
-#>         trust_media      1.68
-#>       trust_science      2.51
-#>   ---------------------------
-#> 
-#>   Test Statistics:
-#>   -------------------------------------------
-#>       N Chi-Square df p value Kendall's W sig
-#>    2135   1009.035  2       0       0.236 ***
-#>   -------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Kendall's W):
-#> - Weak agreement: 0.1 - 0.3
-#> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> Friedman Test: trust_government, trust_media, trust_science
+#>   chi2(2) = 1009.035, p < 0.001 ***, W = 0.236, N = 2135
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   friedman_test(starts_with("trust_"))
-#> 
-#> Friedman Test Results
-#> ---------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - Number of conditions: 3
-#> 
-#>   Ranks:
-#>   ---------------------------
-#>            Variable Mean Rank
-#>    trust_government      1.81
-#>         trust_media      1.68
-#>       trust_science      2.51
-#>   ---------------------------
-#> 
-#>   Test Statistics:
-#>   -------------------------------------------
-#>       N Chi-Square df p value Kendall's W sig
-#>    2135   1009.035  2       0       0.236 ***
-#>   -------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Kendall's W):
-#> - Weak agreement: 0.1 - 0.3
-#> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> Friedman Test: trust_government, trust_media, trust_science
+#>   chi2(2) = 1009.035, p < 0.001 ***, W = 0.236, N = 2135
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>%
   friedman_test(trust_government, trust_media, trust_science,
                 weights = sampling_weight)
-#> 
-#> Weighted Friedman Test Results
-#> ------------------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - Number of conditions: 3
-#> - Weights variable: sampling_weight
-#> 
-#>   Ranks:
-#>   ---------------------------
-#>            Variable Mean Rank
-#>    trust_government      1.81
-#>         trust_media      1.68
-#>       trust_science      2.51
-#>   ---------------------------
-#> 
-#>   Weighted Test Statistics:
-#>   -------------------------------------------
-#>       N Chi-Square df p value Kendall's W sig
-#>    2150   1012.084  2       0       0.235 ***
-#>   -------------------------------------------
-#> 
-#> Note: Weighted analysis uses frequency-weighted ranks.
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Kendall's W):
-#> - Weak agreement: 0.1 - 0.3
-#> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> Friedman Test: trust_government, trust_media, trust_science [Weighted]
+#>   chi2(2) = 1012.084, p < 0.001 ***, W = 0.235, N = 2150
+#> Use summary() for detailed output.
 
 # Grouped analysis (separate test per region)
 survey_data %>%
   group_by(region) %>%
   friedman_test(trust_government, trust_media, trust_science)
-#> 
-#> Friedman Test Results
-#> ---------------------
-#> 
-#> - Variables: trust_government, trust_media, trust_science
-#> - Number of conditions: 3
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> 
-#>   Ranks:
-#>   ---------------------------
-#>            Variable Mean Rank
-#>    trust_government      1.80
-#>         trust_media      1.67
-#>       trust_science      2.53
-#>   ---------------------------
-#> 
-#>   Test Statistics:
-#>   ------------------------------------------
-#>      N Chi-Square df p value Kendall's W sig
-#>    422      217.1  2       0       0.257 ***
-#>   ------------------------------------------
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> 
-#>   Ranks:
-#>   ---------------------------
-#>            Variable Mean Rank
-#>    trust_government      1.81
-#>         trust_media      1.68
-#>       trust_science      2.50
-#>   ---------------------------
-#> 
-#>   Test Statistics:
-#>   -------------------------------------------
-#>       N Chi-Square df p value Kendall's W sig
-#>    1713    792.344  2       0       0.231 ***
-#>   -------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Kendall's W):
-#> - Weak agreement: 0.1 - 0.3
-#> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> [region = 1]
+#> Friedman Test: trust_government, trust_media, trust_science
+#>   chi2(2) = 217.100, p < 0.001 ***, W = 0.257, N = 422
+#> [region = 2]
+#> Friedman Test: trust_government, trust_media, trust_science
+#>   chi2(2) = 792.344, p < 0.001 ***, W = 0.231, N = 1713
+#> Use summary() for detailed output.
 ```

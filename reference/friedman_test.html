@@ -35,7 +35,7 @@ The strength of the overall effect (Kendall's W)
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,7 +121,7 @@ them individually or use helpers like <code>starts_with("trust_")</code></p></dd
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Test results showing whether the measurements differ, including:</p><ul><li><p>Chi-Square statistic (Friedman test statistic)</p></li>
+    <p>Test results showing whether the measurements differ, including:</p><ul><li><p>Chi-Square statistic (<code>chi_squared</code>, the Friedman test statistic)</p></li>
 <li><p>Degrees of freedom (number of measurements minus 1)</p></li>
 <li><p>P-value (are measurements different?)</p></li>
 <li><p>Kendall's W (effect size: how strong is the overall pattern?)</p></li>
@@ -163,7 +163,17 @@ them individually or use helpers like <code>starts_with("trust_")</code></p></dd
 
 <ul><li><p>For 2 related measurements: Use <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code> instead</p></li>
 <li><p>For normally distributed repeated measures: Use repeated-measures ANOVA</p></li>
-<li><p>For independent groups: Use <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code> instead</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>SPSS <code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have
+no SPSS reference. The weighted variant is an R-only frequency-weight
+extension that reduces exactly to the unweighted test when all weights
+equal 1 (enforced by an internal invariance suite); see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>For independent groups: Use <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code> instead</p></li>
 </ul></div>
 
     </div>
@@ -204,156 +214,36 @@ The Annals of Mathematical Statistics, 10(3), 275-287.</p>
 <span class="r-in"><span><span class="co"># Compare three trust items (rated by same respondents)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">friedman_test</span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of conditions: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    trust_government      1.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         trust_media      1.68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_science      2.51</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N Chi-Square df p value Kendall's W sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2135   1009.035  2       0       0.236 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Kendall's W):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weak agreement: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Moderate agreement: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Strong agreement: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(2) = 1009.035, p &lt; 0.001 ***, W = 0.236, N = 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">friedman_test</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of conditions: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    trust_government      1.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         trust_media      1.68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_science      2.51</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N Chi-Square df p value Kendall's W sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2135   1009.035  2       0       0.236 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Kendall's W):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weak agreement: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Moderate agreement: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Strong agreement: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(2) = 1009.035, p &lt; 0.001 ***, W = 0.236, N = 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">friedman_test</span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span></span>
 <span class="r-in"><span>                weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Friedman Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of conditions: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    trust_government      1.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         trust_media      1.68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_science      2.51</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Weighted Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N Chi-Square df p value Kendall's W sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2150   1012.084  2       0       0.235 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses frequency-weighted ranks.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Kendall's W):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weak agreement: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Moderate agreement: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Strong agreement: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test: trust_government, trust_media, trust_science [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(2) = 1012.084, p &lt; 0.001 ***, W = 0.235, N = 2150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate test per region)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">friedman_test</span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: trust_government, trust_media, trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Number of conditions: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    trust_government      1.80</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         trust_media      1.67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_science      2.53</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      N Chi-Square df p value Kendall's W sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    422      217.1  2       0       0.257 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    trust_government      1.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         trust_media      1.68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_science      2.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N Chi-Square df p value Kendall's W sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1713    792.344  2       0       0.231 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Kendall's W):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Weak agreement: 0.1 - 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Moderate agreement: 0.3 - 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Strong agreement: &gt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(2) = 217.100, p &lt; 0.001 ***, W = 0.257, N = 422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Friedman Test: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(2) = 792.344, p &lt; 0.001 ***, W = 0.231, N = 1713</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -56,7 +56,8 @@ mcnemar_test(data, var1, var2, weights = NULL, correct = TRUE, ...)
 
 Test results showing whether paired proportions changed, including:
 
-- McNemar chi-square statistic (with continuity correction)
+- McNemar chi-square statistic (`chi_squared`, with continuity
+  correction)
 
 - Asymptotic p-value
 
@@ -166,56 +167,19 @@ test_data <- survey_data %>%
 # McNemar test
 test_data %>%
   mcnemar_test(var1 = trust_gov_high, var2 = trust_media_high)
-#> McNemar Test Results
-#> --------------------
-#> 
-#> - Variable 1: trust_gov_high
-#> - Variable 2: trust_media_high
-#> 
-#> 2x2 Contingency Table:
-#> ---------------------------------------- 
-#>    v2
-#> v1     0    1
-#>   0 1342  338
-#>   1  448   99
-#> ---------------------------------------- 
-#> 
-#> Test Results:
-#> ----------------------------------------- 
-#>  Chi-Sq (cc) p (asymp) p (exact)    N Sig 
-#>       15.116     <.001     <.001 2227 *** 
-#> ----------------------------------------- 
-#> 
-#> Discordant pairs: b = 338, c = 448
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> McNemar Test: trust_gov_high x trust_media_high
+#>   chi2 = 15.116, p < 0.001 (asymp), p < 0.001 (exact) ***, N = 2227
+#> Use summary() for detailed output.
 
 # Grouped analysis
 test_data %>%
   group_by(region) %>%
   mcnemar_test(var1 = trust_gov_high, var2 = trust_media_high)
-#> McNemar Test Results
-#> --------------------
-#> 
-#> - Variable 1: trust_gov_high
-#> - Variable 2: trust_media_high
-#> 
-#> 
-#> Group: region = East
-#> --------------------
-#> ----------------------------------- 
-#>  Chi-Sq p (asymp) p (exact)   N Sig 
-#>   8.255    0.0041    0.0039 435  ** 
-#> ----------------------------------- 
-#> 
-#> 
-#> Group: region = West
-#> --------------------
-#> ------------------------------------ 
-#>  Chi-Sq p (asymp) p (exact)    N Sig 
-#>   8.242    0.0041    0.0041 1792  ** 
-#> ------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> [region = 1]
+#> McNemar Test: trust_gov_high x trust_media_high
+#>   chi2 = 8.255, p = 0.004 (asymp), p = 0.004 (exact) **, N = 435
+#> [region = 2]
+#> McNemar Test: trust_gov_high x trust_media_high
+#>   chi2 = 8.242, p = 0.004 (asymp), p = 0.004 (exact) **, N = 1792
+#> Use summary() for detailed output.
 ```

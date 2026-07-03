@@ -35,7 +35,7 @@ Which group has higher average ranks
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -146,7 +146,7 @@ treatment/control). Must have exactly two groups.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Test results showing whether groups differ, including:</p><ul><li><p>U and W statistics (test statistics)</p></li>
 <li><p>Z-score and p-value (are groups different?)</p></li>
-<li><p>Effect size r (how big is the difference?)</p></li>
+<li><p>Effect size r (<code>r_effect</code>, how big is the difference?)</p></li>
 <li><p>Rank means for each group (which group is higher?)
 Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p></li>
 </ul></div>
@@ -199,7 +199,19 @@ Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">su
 <li><p>The test compares distributions, not just means</p></li>
 <li><p>Look at both p-values and effect sizes</p></li>
 <li><p>Consider plotting the data to see the pattern</p></li>
-<li><p>Use this for Likert scales and rating data</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+
+
+<p>The weighted test is the design-based Lumley-Scott (2013) rank test
+(Horvitz-Thompson midranks with a sandwich variance), validated against
+<code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">survey::svyranktest()</a></code> rather than SPSS: SPSS <code>NPAR TESTS</code>
+ignores <code>WEIGHT BY</code>, so no SPSS reference exists for weighted results.
+The weighted descriptive U and W are design-based rank quantities and may
+differ from SPSS's expanded-data U; the Z statistic and p-value are the
+validated quantities.</p><ul><li><p>Use this for Likert scales and rating data</p></li>
 </ul></div>
 
     </div>

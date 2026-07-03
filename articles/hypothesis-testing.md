@@ -165,90 +165,18 @@ groups. Use post-hoc tests:
 
 # Tukey HSD: balanced comparison of all pairs
 tukey_test(result)
-#> Weighted Tukey HSD Post-Hoc Test Results
-#> ----------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Tukey Results:
-#> ------------------------------------------------------------------------------------ 
-#>                                   Comparison Difference Lower CI Upper CI
-#>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339
-#>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491
-#>                 Basic Secondary - University     -0.832   -1.011   -0.654
-#>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008
-#>          Intermediate Secondary - University     -0.342   -0.529   -0.156
-#>              Academic Secondary - University     -0.189   -0.376   -0.003
-#>  p-value Sig
-#>    <.001 ***
-#>    <.001 ***
-#>    <.001 ***
-#>    0.071    
-#>    <.001 ***
-#>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education [Weighted]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```
 
 ``` r
 
 # Scheffe: more conservative (fewer false positives)
 scheffe_test(result)
-#> Weighted Scheffe Post-Hoc Test Results
-#> --------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Scheffe's method
-#>   Note: Most conservative post-hoc test (widest confidence intervals)
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Scheffe Results:
-#> ------------------------------------------------------------------------------------ 
-#>                                   Comparison Difference Lower CI Upper CI
-#>     Basic Secondary - Intermediate Secondary     -0.490   -0.655   -0.325
-#>         Basic Secondary - Academic Secondary     -0.643   -0.808   -0.477
-#>                 Basic Secondary - University     -0.832   -1.026   -0.638
-#>  Intermediate Secondary - Academic Secondary     -0.153   -0.329    0.023
-#>          Intermediate Secondary - University     -0.342   -0.545   -0.140
-#>              Academic Secondary - University     -0.189   -0.393    0.014
-#>  p-value Sig
-#>    <.001 ***
-#>    <.001 ***
-#>    <.001 ***
-#>    0.115    
-#>    <.001 ***
-#>    0.079    
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for all possible contrasts (most conservative)
-#> - Scheffe test has wider CIs than Tukey HSD
+#> Scheffe Post-Hoc Test by education [Weighted]
+#>   life_satisfaction: 6 comparisons, 4 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```
 
 ### Assumption Check
@@ -258,31 +186,9 @@ ANOVA assumes equal variances. Test with Levene’s test:
 ``` r
 
 levene_test(result)
-#> 
-#> Weighted Levene's Test for Homogeneity of Variance 
-#> ---------------------------------------------------
-#> 
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Center: mean
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Levene's Test Results:
-#> -------------------------------------------------------------------------------- 
-#>           Variable F_statistic df1      df2 p_value sig        Conclusion
-#>  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
-#> 
-#> Recommendation based on Levene test:
-#> - Use Welch's t-test (unequal variances)
+#> Levene's Test: life_satisfaction by education [Weighted]
+#>   F(3, 2432.6) = 31.282, p < 0.001 ***, variances unequal
+#> Use summary() for detailed output.
 ```
 
 If Levene’s test is significant ($`p < .05`$), variances are unequal.
@@ -409,38 +315,9 @@ kw_result <- survey_data %>%
   kruskal_wallis(life_satisfaction, group = education)
 
 kw_result
-#> 
-#> Kruskal-Wallis Test Results
-#> ---------------------------
-#> 
-#> - Grouping variable: education
-#> - Groups: Basic Secondary, Intermediate Secondary, Academic Secondary, University
-#> 
-#> life_satisfaction
-#> -----------------
-#>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  809    974.29
-#>    Intermediate Secondary  618   1250.73
-#>        Academic Secondary  607   1329.56
-#>                University  387   1456.42
-#>                     Total 2421        NA
-#>   --------------------------------------
-#> 
-#>   Test Statistics:
-#>   --------------------------------------------
-#>    Kruskal-Wallis H df p value Eta-squared sig
-#>             171.178  3       0       0.071 ***
-#>   --------------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Eta-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> Kruskal-Wallis Test: life_satisfaction by education
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#> Use summary() for detailed output.
 ```
 
 When significant, use Dunn’s post-hoc test with Bonferroni correction:
@@ -448,30 +325,9 @@ When significant, use Dunn’s post-hoc test with Bonferroni correction:
 ``` r
 
 dunn_test(kw_result)
-#> Dunn Post-Hoc Test (Bonferroni) Results
-#> ---------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - P-value adjustment: Bonferroni
-#> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
-#>         Basic Secondary             University -11.545     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
-#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.886     0.004   0.023   * 
-#> ---------------------------------------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First group has higher mean rank
-#> - Negative Z: First group has lower mean rank
-#> - p-values are adjusted for multiple comparisons
+#> Dunn Post-Hoc Test (Bonferroni) by education
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```
 
 ### Wilcoxon Signed-Rank Test
@@ -484,40 +340,9 @@ data(longitudinal_data_wide)
 
 longitudinal_data_wide %>%
   wilcoxon_test(score_T1, score_T2)
-#> 
-#> Wilcoxon Signed-Rank Test Results
-#> ---------------------------------
-#> 
-#> - Pair: score_T2 vs score_T1
-#> 
-#> score_T2 - score_T1
-#> -------------------
-#>   Ranks:
-#>   ------------------------------------------
-#>                     N Mean Rank Sum of Ranks
-#>    Negative Ranks  27     40.19         1085
-#>    Positive Ranks  78     57.44         4480
-#>              Ties   0        NA           NA
-#>             Total 105        NA           NA
-#>   ------------------------------------------
-#> 
-#>   a score_T2 < score_T1
-#>   b score_T2 > score_T1
-#>   c score_T2 = score_T1
-#> 
-#>   Test Statistics:
-#>   ---------------------------
-#>        Z p value Effect r sig
-#>    5.427       0     0.53 ***
-#>   ---------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (r):
-#> - Small effect: 0.1 - 0.3
-#> - Medium effect: 0.3 - 0.5
-#> - Large effect: > 0.5
+#> Wilcoxon Signed-Rank Test: score_T2 - score_T1
+#>   Z = 5.427, p < 0.001 ***, r = 0.530 (large), N = 105
+#> Use summary() for detailed output.
 ```
 
 ### Friedman Test
@@ -531,34 +356,9 @@ friedman_result <- longitudinal_data_wide %>%
   friedman_test(score_T1, score_T2, score_T3)
 
 friedman_result
-#> 
-#> Friedman Test Results
-#> ---------------------
-#> 
-#> - Variables: score_T1, score_T2, score_T3
-#> - Number of conditions: 3
-#> 
-#>   Ranks:
-#>   -------------------
-#>    Variable Mean Rank
-#>    score_T1      1.48
-#>    score_T2      2.04
-#>    score_T3      2.48
-#>   -------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>     N Chi-Square df p value Kendall's W sig
-#>    94     47.255  2       0       0.251 ***
-#>   -----------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Effect Size Interpretation (Kendall's W):
-#> - Weak agreement: 0.1 - 0.3
-#> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> Friedman Test: score_T1, score_T2, score_T3
+#>   chi2(2) = 47.255, p < 0.001 ***, W = 0.251, N = 94
+#> Use summary() for detailed output.
 ```
 
 When significant, use pairwise Wilcoxon post-hoc tests:
@@ -566,27 +366,9 @@ When significant, use pairwise Wilcoxon post-hoc tests:
 ``` r
 
 pairwise_wilcoxon(friedman_result)
-#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results
-#> ----------------------------------------------------
-#> 
-#> - Variables: score_T1, score_T2, score_T3
-#> - P-value adjustment: Bonferroni
-#> - Number of comparisons: 3
-#> 
-#> ---------------------------------------------- 
-#>     Var 1    Var 2     Z p (unadj) p (adj) Sig 
-#>  score_T1 score_T2 5.427     <.001   <.001 *** 
-#>  score_T1 score_T3 6.132     <.001   <.001 *** 
-#>  score_T2 score_T3 4.413     <.001   <.001 *** 
-#> ---------------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive Z: First variable tends to have higher values
-#> - Negative Z: Second variable tends to have higher values
-#> - p-values are adjusted for multiple comparisons
+#> Pairwise Wilcoxon Post-Hoc Test (Bonferroni)
+#>   3 comparisons, 3 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```
 
 ### Binomial Test
@@ -597,31 +379,9 @@ Test whether an observed proportion differs from an expected value:
 
 survey_data %>%
   binomial_test(gender)
-#> 
-#> Binomial Test Results
-#> ---------------------
-#> 
-#> - Test proportion: 0.5
-#> - Confidence level: 95.0%
-#> 
-#> gender
-#> ------
-#>   Categories:
-#>   ------------------------------------
-#>                       N Observed Prop.
-#>      Group 1: Male 1194          0.478
-#>    Group 2: Female 1306          0.522
-#>              Total 2500          1.000
-#>   ------------------------------------
-#> 
-#>   Test Statistics:
-#>   -----------------------------------------
-#>    Test Prop. p value CI lower CI upper sig
-#>           0.5   0.026    0.458    0.497   *
-#>   -----------------------------------------
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Binomial Test: gender
+#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#> Use summary() for detailed output.
 ```
 
 ## Categorical Tests
@@ -643,13 +403,23 @@ one tells you something about the other.
 
 ### Effect Sizes for Categorical Data
 
+The helpers
+[`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md),
+[`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md),
+and
+[`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)
+run the chi-square analysis internally and return just the requested
+effect size as a number (per group for grouped data). For the full test
+output, call
+[`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+directly.
+
 ``` r
 
 # Phi coefficient (2x2 tables)
 survey_data %>%
   phi(gender, employment, weights = sampling_weight)
-#> Chi-Squared Test: gender × employment [Weighted]
-#>   chi2(4) = 7.661, p = 0.105 , V = 0.055 (neglig.), N = 2515
+#> [1] 0.05519227
 ```
 
 ``` r
@@ -657,8 +427,7 @@ survey_data %>%
 # Cramer's V (larger tables)
 survey_data %>%
   cramers_v(education, employment, weights = sampling_weight)
-#> Chi-Squared Test: education × employment [Weighted]
-#>   chi2(12) = 130.696, p < 0.001 ***, V = 0.132 (small), N = 2518
+#> [1] 0.1315356
 ```
 
 ### Fisher’s Exact Test
@@ -671,27 +440,9 @@ small_sample <- survey_data %>% slice_sample(n = 30)
 
 small_sample %>%
   fisher_test(gender, region)
-#> Fisher's Exact Test Results
-#> ---------------------------
-#> 
-#> - Row variable: gender
-#> - Column variable: region
-#> 
-#> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        East West
-#>   Male      3    9
-#>   Female    4   14
-#> ---------------------------------------- 
-#> 
-#> Test Results:
-#> -------------------------------------------------- 
-#>                              Method p-value  N Sig 
-#>  Fisher's Exact Test for Count Data  1.0000 30     
-#> -------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Fisher's Exact Test: gender x region
+#>   p = 1.0000 , N = 30
+#> Use summary() for detailed output.
 ```
 
 ### Chi-Square Goodness-of-Fit
@@ -703,28 +454,9 @@ Test whether observed frequencies match expected proportions:
 # Equal proportions (default)
 survey_data %>%
   chisq_gof(education)
-#> Chi-Square Goodness-of-Fit Test Results
-#> ---------------------------------------
-#> 
-#> - Variables: education
-#> - Expected: Equal proportions
-#> 
-#>   education - Frequency Table:
-#>   --------------------------------------------------
-#>                  category observed expected residual
-#>           Basic Secondary      841      625      216
-#>    Intermediate Secondary      629      625        4
-#>        Academic Secondary      631      625        6
-#>                University      399      625     -226
-#>   --------------------------------------------------
-#> 
-#> ----------------------------------------- 
-#>   Variable Chi-Square df p-value    N Sig 
-#>  education    156.454  3   <.001 2500 *** 
-#> ----------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Square Goodness-of-Fit Test: education
+#>   chi2(3) = 156.454, p < 0.001 ***, N = 2500
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -732,28 +464,9 @@ survey_data %>%
 # Custom expected proportions
 survey_data %>%
   chisq_gof(education, expected = c(0.30, 0.25, 0.25, 0.20))
-#> Chi-Square Goodness-of-Fit Test Results
-#> ---------------------------------------
-#> 
-#> - Variables: education
-#> - Expected: 0.3, 0.25, 0.25, 0.2
-#> 
-#>   education - Frequency Table:
-#>   --------------------------------------------------
-#>                  category observed expected residual
-#>           Basic Secondary      841      750       91
-#>    Intermediate Secondary      629      625        4
-#>        Academic Secondary      631      625        6
-#>                University      399      500     -101
-#>   --------------------------------------------------
-#> 
-#> ----------------------------------------- 
-#>   Variable Chi-Square df p-value    N Sig 
-#>  education     31.527  3   <.001 2500 *** 
-#> ----------------------------------------- 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+#> Chi-Square Goodness-of-Fit Test: education
+#>   chi2(3) = 31.527, p < 0.001 ***, N = 2500
+#> Use summary() for detailed output.
 ```
 
 ### McNemar’s Test
@@ -854,72 +567,15 @@ anova_result
 
 # 3. Check assumptions
 levene_test(anova_result)
-#> 
-#> Weighted Levene's Test for Homogeneity of Variance 
-#> ---------------------------------------------------
-#> 
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Center: mean
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Levene's Test Results:
-#> -------------------------------------------------------------------------------- 
-#>           Variable F_statistic df1      df2 p_value sig        Conclusion
-#>  life_satisfaction      31.282   3 2432.609       0 *** Variances unequal
-#> -------------------------------------------------------------------------------- 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - p > 0.05: Variances are homogeneous (equal variances assumed)
-#> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
-#> 
-#> Recommendation based on Levene test:
-#> - Use Welch's t-test (unequal variances)
+#> Levene's Test: life_satisfaction by education [Weighted]
+#>   F(3, 2432.6) = 31.282, p < 0.001 ***, variances unequal
+#> Use summary() for detailed output.
 
 # 4. Post-hoc: which groups differ?
 tukey_test(anova_result)
-#> Weighted Tukey HSD Post-Hoc Test Results
-#> ----------------------------------------
-#> 
-#> - Dependent variable: life_satisfaction
-#> - Grouping variable: education
-#> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
-#>   Family-wise error rate controlled using Tukey HSD
-#> 
-#> 
-#> --- life_satisfaction ---
-#> 
-#> Weighted Tukey Results:
-#> ------------------------------------------------------------------------------------ 
-#>                                   Comparison Difference Lower CI Upper CI
-#>     Basic Secondary - Intermediate Secondary     -0.490   -0.641   -0.339
-#>         Basic Secondary - Academic Secondary     -0.643   -0.795   -0.491
-#>                 Basic Secondary - University     -0.832   -1.011   -0.654
-#>  Intermediate Secondary - Academic Secondary     -0.153   -0.314    0.008
-#>          Intermediate Secondary - University     -0.342   -0.529   -0.156
-#>              Academic Secondary - University     -0.189   -0.376   -0.003
-#>  p-value Sig
-#>    <.001 ***
-#>    <.001 ***
-#>    <.001 ***
-#>    0.071    
-#>    <.001 ***
-#>    0.046   *
-#> ------------------------------------------------------------------------------------ 
-#> 
-#> 
-#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-#> 
-#> Interpretation:
-#> - Positive differences: First group > Second group
-#> - Negative differences: First group < Second group
-#> - Confidence intervals not containing 0 indicate significant differences
-#> - p-values are adjusted for multiple comparisons (family-wise error control)
+#> Tukey HSD Post-Hoc Test by education [Weighted]
+#>   life_satisfaction: 6 comparisons, 5 significant (p < .05)
+#> Use summary() for the full comparison table.
 ```
 
 ## Practical Tips
@@ -983,9 +639,9 @@ tukey_test(anova_result)
 
 ### Effect Sizes
 
-- **[`phi()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)**,
-  **[`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)**,
-  **[`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)**
+- **[`phi()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)**,
+  **[`cramers_v()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)**,
+  **[`goodman_gamma()`](https://YannickDiehl.github.io/mariposa/reference/phi.md)**
 
 ## Next Steps
 

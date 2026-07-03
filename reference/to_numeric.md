@@ -8,7 +8,16 @@ numeric values.
 ## Usage
 
 ``` r
-to_numeric(data, ..., use.labels = TRUE, start.at = NULL, keep.labels = FALSE)
+to_numeric(
+  data,
+  ...,
+  use_labels = TRUE,
+  start_at = NULL,
+  keep_labels = FALSE,
+  use.labels = NULL,
+  start.at = NULL,
+  keep.labels = NULL
+)
 ```
 
 ## Arguments
@@ -22,21 +31,28 @@ to_numeric(data, ..., use.labels = TRUE, start.at = NULL, keep.labels = FALSE)
   Optional: unquoted variable names (tidyselect supported). If empty,
   converts all factor columns.
 
-- use.labels:
+- use_labels:
 
   If `TRUE` (default), attempts to use the numeric value of factor
   levels (e.g., level `"3"` becomes `3`). If `FALSE`, uses sequential
   integers (1, 2, 3, ...).
 
-- start.at:
+- start_at:
 
   If not `NULL`, the lowest numeric value in the output starts at this
   number. Default: `NULL` (use original values).
 
-- keep.labels:
+- keep_labels:
 
   If `TRUE`, the former factor levels are stored as value labels on the
   result. Default: `FALSE`.
+
+- use.labels, start.at, keep.labels:
+
+  Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
+  the function with any of them is an error; use the snake_case
+  equivalents instead. (The formals are retained only so that the old
+  names error clearly instead of being swallowed by `...`.)
 
 ## Value
 
@@ -51,7 +67,7 @@ This function handles three input types:
     numeric values from the level names.
 
 2.  **Text factors** (levels like `"Male"`, `"Female"`): Converts to
-    sequential integers by default; use `use.labels = FALSE` to force
+    sequential integers by default; use `use_labels = FALSE` to force
     this behavior even for numeric-looking levels.
 
 3.  **haven_labelled**: Extracts the underlying numeric vector,
@@ -86,7 +102,7 @@ to_numeric(x)
 # [1] 1 3 5 3
 
 # Sequential integers
-to_numeric(x, use.labels = FALSE)
+to_numeric(x, use_labels = FALSE)
 #> [1] 1 2 3 2
 # [1] 1 2 3 2
 

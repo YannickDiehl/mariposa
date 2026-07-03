@@ -44,11 +44,11 @@ print(summary(cb))
 #> -------------------------------------------------- 
 #> 
 #> [1] id (integer)
-#>     Values: 1 - 2500
+#>     Values: 1 - 2500 (2500 distinct)
 #> 
 #> [2] age (numeric)
 #>     Label: Age in years
-#>     Values: 18 - 95
+#>     Values: 18 - 95 (78 distinct)
 #> 
 #> [3] gender (factor)
 #>     Label: Gender
@@ -75,7 +75,7 @@ print(summary(cb))
 #> 
 #> [6] income (numeric)
 #>     Label: Monthly household income (EUR)
-#>     Values: 800 - 8000
+#>     Values: 800 - 8000 (73 distinct)
 #> 
 #> [7] employment (factor)
 #>     Label: Employment status
@@ -113,7 +113,7 @@ print(summary(cb))
 #> 
 #> [14] sampling_weight (numeric)
 #>     Label: Weighting factor
-#>     Values: 0.70155162345618 - 1.39769840524532
+#>     Values: 0.7016 - 1.398 (2500 distinct)
 #> 
 #> [15] stratum (factor)
 #>     Label: Stratification variable

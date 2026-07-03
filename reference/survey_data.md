@@ -133,37 +133,11 @@ survey_data %>% describe(age, income, weights = sampling_weight)
 
 # Frequency analysis
 survey_data %>% frequency(education, region, weights = sampling_weight)
-#> 
-#> Weighted Frequency Analysis Results
-#> -----------------------------------
-#> 
-#> education (Highest educational attainment)
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
-#> 
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |
-#> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |
-#> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |
-#> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> 
-#> 
-#> region (Region (East/West))
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
-#> 
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                   East |                   East |    509 |  20.23 |  20.23 |  20.23 |
-#> |                   West |                   West |   2007 |  79.77 |  79.77 | 100.00 |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> 
+#> Frequency: education [Weighted]
+#>   4 categories, N valid = 2516, missing = 0
+#> Frequency: region [Weighted]
+#>   2 categories, N valid = 2516, missing = 0
+#> Use summary() for detailed output.
 
 # Group comparisons
 survey_data %>%

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,350 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.14" id="mariposa-0614">mariposa 0.6.14<a class="anchor" aria-label="anchor" href="#mariposa-0614"></a></h2>
+<p>Codebook robustness (theme: <code><a href="../reference/codebook.html">codebook()</a></code> survives real-world data and says what it shows). A stress test of the codebook stack (metadata extraction, console print/summary, HTML builder, xlsx export) surfaced a batch of crashes, silent data errors, and display leaks; this release fixes all of them and adds a <code>view</code> argument for side-effect control.</p>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-14">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-14"></a></h3>
+<ul><li>Variables with value labels but <strong>no variable label</strong> no longer show a fake label like “1 | 2 | 3”: <code>attr(x, "label")</code> partially matched the <code>labels</code> attribute; all label reads now use <code>exact = TRUE</code>. The “Variables with labels” count excludes such variables accordingly.</li>
+<li>
+<code><a href="../reference/codebook.html">codebook()</a></code> no longer errors on <strong>inline data expressions</strong> (e.g. <code>codebook(data.frame(...))</code> spanning multiple deparse lines); long expressions collapse to the generic dataset name “data”.</li>
+<li>
+<strong>List columns</strong> no longer crash the frequency computation: they are skipped with a warning (“list column … skipped - not supported in codebooks”) and a data frame consisting only of list columns aborts with a clear error.</li>
+<li>The <strong>tagged-NA breakdown is now consistent across all three layers</strong>:
+<ul><li>the HTML builder appends the missing-value rows (codes, labels, counts) below range-displayed variables too — previously an all-user-missing or high-cardinality variable silently lost them (the xlsx export already did this correctly);</li>
+<li>NA frequencies are computed even for high-cardinality/range-displayed variables;</li>
+<li>
+<code>print(summary(cb))</code> gains a “Missing values:” section (codes, labels, counts) — <code>show_na</code> was a no-op on the console layer before.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-6-14">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-6-14"></a></h3>
+<ul><li>
+<strong>Central display formatting for numeric values</strong>: empirical values and ranges no longer leak 15-digit doubles or scientific notation into the console/HTML/xlsx output. Fractional values show 4 significant digits (“0.3333”), whole numbers keep their integer look (“1”), tiny values are expanded (“0.00000001”, never “1e-08”). Frequency matching is unaffected: display strings and raw matching keys are carried separately (<code>empirical_values</code> vs. new <code>empirical_keys</code>).</li>
+<li>The percentage and effective-n columns (<code>prc</code>, <code>valid_prc</code>, <code>cum_prc</code>, <code>n_eff</code>) on <code>write_xlsx(cb, frequencies = TRUE)</code> sheets are rounded to 2 decimals.</li>
+<li>
+<code>max_values</code> (single integer &gt;= 1) and <code>max_len</code> (single integer &gt;= 4) are validated up front with a clear error.</li>
+<li>Factor levels now respect <code>max_values</code> and truncate with the same “… (N more)” note used for character values.</li>
+<li>Range displays show the cardinality: “18 - 95 (78 distinct)” instead of just “18 - 95”.</li>
+<li>
+<code>file =</code> into a nonexistent directory aborts early, naming the missing directory.</li>
+<li>Polish: “1 variable” / “1 observation” pluralization in the console and HTML subtitle; very long character values are truncated to <code>max_len</code> with “…” (raw values still drive frequency matching); zero-row data frames say “(no observations)” instead of “(all missing)”.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-6-14">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-14"></a></h3>
+<ul><li>New <code>view</code> argument for <code><a href="../reference/codebook.html">codebook()</a></code> (default: <code><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive()</a></code>): controls whether the HTML codebook opens in the RStudio Viewer. <code>view = FALSE</code> suppresses the Viewer side effect entirely; writing via <code>file =</code> is unaffected. The compact <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> only advertises the Viewer when it was actually opened (result gains a <code>viewed</code> flag).</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.13" id="mariposa-0613">mariposa 0.6.13<a class="anchor" aria-label="anchor" href="#mariposa-0613"></a></h2>
+<p>McDonald’s omega (theme: reliability() learns a second reliability coefficient). <code><a href="../reference/reliability.html">reliability()</a></code> now reports McDonald’s omega alongside Cronbach’s alpha — a new statistic within an existing function, hence a PATCH per the clarified versioning policy.</p>
+<div class="section level3">
+<h3 id="new-features-0-6-13">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-13"></a></h3>
+<ul><li>
+<code><a href="../reference/reliability.html">reliability()</a></code> computes <strong>McDonald’s omega</strong> from a one-factor maximum-likelihood model (<code><a href="https://rdrr.io/r/stats/factanal.html" class="external-link">stats::factanal</a></code> on the same (weighted) correlation matrix already used for standardized alpha):
+<ul><li>
+<code>omega</code> — raw/total omega in the covariance metric (analogous to raw alpha), reported as “McDonald’s Omega”;</li>
+<li>
+<code>omega_std</code> — standardized omega in the correlation metric (analogous to standardized alpha);</li>
+<li>
+<code>omega_if_deleted</code> — a new column in <code>item_total</code>, refitting the one-factor model per deleted item (NA when the reduced scale has fewer than 3 items, where the model is unidentified). Scales with fewer than 3 items get NA omega fields plus a warning (alpha is unaffected); non-convergent factor fits degrade to NA with the factanal message. The compact <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows omega next to alpha, and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> adds omega rows to the Reliability Statistics block and an omega column to the Item-Total table.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-0-6-13">Validation<a class="anchor" aria-label="anchor" href="#validation-0-6-13"></a></h3>
+<ul><li>McDonald’s omega is <strong>Tier 4 (Internal, R-only)</strong> for now: SPSS v27+ offers omega in <code>RELIABILITY</code>, but IBM’s algorithm documentation is not publicly retrievable and no SPSS v29 reference run exists yet. The pending reference run is prepared in <code>.claude/spss-syntax-omega-references.sps</code> (expected values included); until it lands, omega is guarded by a parameter-recovery test on simulated congeneric data, exact cross-checks against a manual factanal computation, cross-checks against <code><a href="https://rdrr.io/pkg/psych/man/omega.html" class="external-link">psych::omega()</a></code> and a lavaan/semTools one-factor CFA (<code>tests/testthat/test-reliability-omega.R</code>), and a <code>w == 1</code> block in the weights-invariance suite. The help page carries the Tier-4 disclosure; the compatibility vignette flags omega as Internal (Tier 4).</li>
+<li>
+<code>psych</code>, <code>lavaan</code>, and <code>semTools</code> added to Suggests (cross-check tests only; all gated by <code>skip_if_not_installed()</code>).</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.12" id="mariposa-0612">mariposa 0.6.12<a class="anchor" aria-label="anchor" href="#mariposa-0612"></a></h2>
+<p>Weighted-rank correctness and accurate claims (theme: the weighted rank family says exactly what it is). Two formula errors in weighted rank statistics are fixed and a package-wide invariance suite now guards every weighted entry point; alongside, the user-facing claim surface (README, DESCRIPTION, help pages, compatibility vignette) is realigned with what the validation suite actually covers.</p>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-12">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-12"></a></h3>
+<ul><li>Weighted <code><a href="../reference/kendall_tau.html">kendall_tau()</a></code>: the tau-b denominator omitted double-tied pairs (<code>ties_both</code>) from the two tie-correction factors, deflating |tau| on tied data. The weighted denominator now mirrors the unweighted <code>(n0 - Tx - Txy)(n0 - Ty - Txy)</code> structure.</li>
+<li>Weighted <code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code>: the grand mean rank was still the hard-coded <code>N/2</code> of the pre-0.6.4 rank convention instead of <code>(N+1)/2</code>, inflating H. It is now derived from the weighted mid-ranks themselves.</li>
+<li>Both bugs violated the invariant that weights of exactly 1 must reproduce the unweighted result. A new package-wide invariance suite (<code>tests/testthat/test-weights-invariance.R</code>) enforces this w == 1 reduction for every weighted entry point; intentionally approximate reductions (design-based <code>mann_whitney</code>, weighted Kendall z/p) are documented exceptions with bounded assertions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="accurate-claims-0-6-12">Accurate claims<a class="anchor" aria-label="anchor" href="#accurate-claims-0-6-12"></a></h3>
+<ul><li>README and DESCRIPTION no longer overclaim: the paired t-test mode (not yet implemented) is no longer advertised, and “every function is validated … your results will match” is replaced by the Charter-compliant wording — validated against SPSS v29 within documented per-tier tolerances, with <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for per-function status.</li>
+<li>The weighted variants of the rank-based family — <code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>, <code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code>, <code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code>, <code><a href="../reference/friedman_test.html">friedman_test()</a></code>, <code><a href="../reference/binomial_test.html">binomial_test()</a></code>, <code><a href="../reference/dunn_test.html">dunn_test()</a></code>, <code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>, and <code><a href="../reference/kendall_tau.html">kendall_tau()</a></code> — are now disclosed as R-only (Tier 4) in a “Weighted variants” note on each help page: SPSS <code>NPAR TESTS</code> / <code>NONPAR CORR</code> ignore <code>WEIGHT BY</code>, so no SPSS reference exists for these weighted paths. <code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>’s note also states that its design-based U/W may differ from SPSS’s expanded-data U (Z and p are the validated quantities); <code><a href="../reference/oneway_anova.html">oneway_anova()</a></code> now documents that omega-/epsilon-squared are truncated at 0 (negative raw estimates occur when F &lt; 1).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-0-6-12">Validation<a class="anchor" aria-label="anchor" href="#validation-0-6-12"></a></h3>
+<ul><li>The SPSS-compatibility vignette is regenerated (was frozen at 2026-05-19) and now carries an “Internal (Tier 4)” marker for the weighted rank variants. Generator fixes: the <code>w_*</code> family and <code>scheffe_test</code> are correctly matched to their shared test files (previously shown as “not validated” despite existing tests), zero-match tier counts no longer report as 1, and <code>assert_spss_count()</code> call sites are tallied as Spec.</li>
+<li>
+<code>test-t-test-spss-validation.R</code>: the header tier table claimed the t-statistic at Spec (±1e-5) while the assertions use Display(3); the header now matches the assertions.</li>
+<li>The last <code>expect_no_error()</code> in a validation file (<code>test-linear-regression-spss-validation.R</code>) is replaced by real assertions on the per-group predictions; the validation-discipline meta-test now passes with <code>MARIPOSA_VALIDATION_STRICT=TRUE</code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.11" id="mariposa-0611">mariposa 0.6.11<a class="anchor" aria-label="anchor" href="#mariposa-0611"></a></h2>
+<p>Deprecation cleanup (theme: the due bridges come out). Two batches of deprecations reached their removal release together: the 0.6.9 argument bridges (originally slated for 0.6.10) and the 0.6.10 duplicate result columns. Removing both here keeps the run-up to the 1.0 API freeze tidy.</p>
+<div class="section level3">
+<h3 id="breaking-changes-0-6-11">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-11"></a></h3>
+<ul><li>The 0.6.9 dot-case argument bridges are removed as announced. The old names no longer warn-and-work; they now error (falling through to tidyselect or SET-mode validation):
+<ul><li>
+<code><a href="../reference/codebook.html">codebook()</a></code>: <code>show.id</code>, <code>show.type</code>, <code>show.labels</code>, <code>show.values</code>, <code>show.freq</code>, <code>show.na</code>, <code>show.unused</code>, <code>max.values</code>, <code>max.len</code>, <code>sort.by.name</code> (use <code>show_id</code>, <code>show_type</code>, <code>show_labels</code>, <code>show_values</code>, <code>show_freq</code>, <code>show_na</code>, <code>show_unused</code>, <code>max_values</code>, <code>max_len</code>, <code>sort_by_name</code>)</li>
+<li>
+<code><a href="../reference/val_labels.html">val_labels()</a></code>: <code>drop.na</code> (use <code>drop_na</code>)</li>
+<li>
+<code><a href="../reference/drop_labels.html">drop_labels()</a></code>: <code>drop.na</code> (use <code>drop_na</code>) These bridges were originally slated for removal in 0.6.10 and are batched into this release. The <code><a href="../reference/frequency.html">frequency()</a></code>/<code><a href="../reference/rec.html">rec()</a></code>/<code><a href="../reference/to_label.html">to_label()</a></code> family of removed-argument errors introduced in 0.6.9 remain in place as permanent guidance (their <code>...</code> consumes tidyselect, so a clear error beats a silent misinterpretation).</li>
+</ul></li>
+<li>The deprecated duplicate result columns kept for one release in 0.6.10 are removed; only the canonical column remains:
+<ul><li>
+<code><a href="../reference/chisq_gof.html">chisq_gof()</a></code>, <code><a href="../reference/friedman_test.html">friedman_test()</a></code>: <code>chi_sq</code> removed (use <code>chi_squared</code>)</li>
+<li>
+<code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code>: <code>statistic</code> removed (use <code>chi_squared</code>)</li>
+<li>
+<code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>: <code>effect_size_r</code> removed (use <code>r_effect</code>)</li>
+<li>
+<code><a href="../reference/oneway_anova.html">oneway_anova()</a></code>: <code>F_stat</code> removed (use <code>F_statistic</code>) The statistical values are unchanged; only the redundant column names go away.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.10" id="mariposa-0610">mariposa 0.6.10<a class="anchor" aria-label="anchor" href="#mariposa-0610"></a></h2>
+<p>Result-column harmonization (theme: one statistic, one column name). A style audit found the same statistic carrying different result-column names across sibling functions; the drifted names now converge on the canonical spelling, with the old columns kept as duplicates for one release.</p>
+<div class="section level3">
+<h3 id="improvements-0-6-10">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-6-10"></a></h3>
+<ul><li>The <code>$results</code> columns for shared statistics are harmonized on the canonical names already used elsewhere in the package:
+<ul><li>Chi-square statistic: <code>chi_squared</code> (as in <code><a href="../reference/chi_square.html">chi_square()</a></code>) - now also in <code><a href="../reference/chisq_gof.html">chisq_gof()</a></code>, <code><a href="../reference/friedman_test.html">friedman_test()</a></code>, and <code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code>
+</li>
+<li>Effect size r: <code>r_effect</code> (as in <code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code>) - now also in <code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>
+</li>
+<li>F statistic: <code>F_statistic</code> (as in <code><a href="../reference/levene_test.html">levene_test()</a></code>) - now also in <code><a href="../reference/oneway_anova.html">oneway_anova()</a></code> Print and summary methods read the canonical columns; the statistical values are unchanged.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecations-0-6-10">Deprecations<a class="anchor" aria-label="anchor" href="#deprecations-0-6-10"></a></h3>
+<ul><li>The old result-column names remain available as duplicated columns (positioned right after their canonical counterpart) for one release and will be removed in 0.6.11:
+<ul><li>
+<code><a href="../reference/chisq_gof.html">chisq_gof()</a></code>, <code><a href="../reference/friedman_test.html">friedman_test()</a></code>: <code>chi_sq</code> (use <code>chi_squared</code>)</li>
+<li>
+<code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code>: <code>statistic</code> (use <code>chi_squared</code>)</li>
+<li>
+<code><a href="../reference/mann_whitney.html">mann_whitney()</a></code>: <code>effect_size_r</code> (use <code>r_effect</code>)</li>
+<li>
+<code><a href="../reference/oneway_anova.html">oneway_anova()</a></code>: <code>F_stat</code> (use <code>F_statistic</code>)</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.9" id="mariposa-069">mariposa 0.6.9<a class="anchor" aria-label="anchor" href="#mariposa-069"></a></h2>
+<p>API-cleanup completion (theme: the 0.6.8 bridges come out, the last dot-case stragglers get theirs). One step closer to the 1.0 API freeze.</p>
+<div class="section level3">
+<h3 id="breaking-changes-0-6-9">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-9"></a></h3>
+<ul><li>The 0.6.8 deprecation bridges are removed as announced. The dot-case argument names now error instead of warning:
+<ul><li>
+<code><a href="../reference/frequency.html">frequency()</a></code>/<code><a href="../reference/frequency.html">fre()</a></code>: <code>sort.frq</code>, <code>show.na</code>, <code>show.prc</code>, <code>show.valid</code>, <code>show.sum</code>, <code>show.labels</code>, <code>show.unused</code>
+</li>
+<li>
+<code><a href="../reference/rec.html">rec()</a></code>: <code>as.factor</code>, <code>var.label</code>, <code>val.labels</code>
+</li>
+<li>
+<code><a href="../reference/to_label.html">to_label()</a></code>/<code><a href="../reference/to_character.html">to_character()</a></code>/<code><a href="../reference/to_numeric.html">to_numeric()</a></code>: <code>drop.na</code>, <code>drop.unused</code>, <code>add.non.labelled</code>, <code>use.labels</code>, <code>start.at</code>, <code>keep.labels</code>
+</li>
+<li>
+<code><a href="../reference/read_spss.html">read_spss()</a></code>/<code><a href="../reference/read_por.html">read_por()</a></code>/<code><a href="../reference/read_stata.html">read_stata()</a></code>/<code><a href="../reference/read_sas.html">read_sas()</a></code>/<code><a href="../reference/read_xpt.html">read_xpt()</a></code>: <code>tag.na</code> Before: <code>frequency(data, x, sort.frq = "desc")</code> warned and worked. After: it errors with a pointer to <code>sort_frq</code>. In the functions whose <code>...</code> selects variables, the old names raise a clear “removed in 0.6.9” error instead of being silently swallowed by tidyselect; in the readers they fail as unused arguments.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecations-0-6-9">Deprecations<a class="anchor" aria-label="anchor" href="#deprecations-0-6-9"></a></h3>
+<ul><li>The remaining dot-case arguments are renamed to snake_case with the usual one-release bridge (old names warn once per session; removal planned for 0.6.10):
+<ul><li>
+<code><a href="../reference/codebook.html">codebook()</a></code>: <code>show_id</code>, <code>show_type</code>, <code>show_labels</code>, <code>show_values</code>, <code>show_freq</code>, <code>show_na</code>, <code>show_unused</code>, <code>max_values</code>, <code>max_len</code>, <code>sort_by_name</code>
+</li>
+<li>
+<code><a href="../reference/val_labels.html">val_labels()</a></code>: <code>drop_na</code>
+</li>
+<li>
+<code><a href="../reference/drop_labels.html">drop_labels()</a></code>: <code>drop_na</code> The display options stored on codebook results (<code>result$options</code>) use the snake_case keys as well.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.8" id="mariposa-068">mariposa 0.6.8<a class="anchor" aria-label="anchor" href="#mariposa-068"></a></h2>
+<p>API-unification release (theme: snake_case arguments). One release-long deprecation bridge per the versioning policy - old names keep working and warn once per session; they will be removed in 0.6.9.</p>
+<div class="section level3">
+<h3 id="breaking-changes-with-bridge-0-6-8">Breaking changes (with bridge)<a class="anchor" aria-label="anchor" href="#breaking-changes-with-bridge-0-6-8"></a></h3>
+<ul><li>Dot-case arguments renamed to snake_case:
+<ul><li>
+<code><a href="../reference/frequency.html">frequency()</a></code>/<code><a href="../reference/frequency.html">fre()</a></code>: <code>sort_frq</code>, <code>show_na</code>, <code>show_prc</code>, <code>show_valid</code>, <code>show_sum</code>, <code>show_labels</code>, <code>show_unused</code>
+</li>
+<li>
+<code><a href="../reference/rec.html">rec()</a></code>: <code>as_factor</code>, <code>var_label</code>, <code>val_labels</code>
+</li>
+<li>
+<code><a href="../reference/to_label.html">to_label()</a></code>/<code><a href="../reference/to_character.html">to_character()</a></code>/<code><a href="../reference/to_numeric.html">to_numeric()</a></code>: <code>drop_na</code>, <code>drop_unused</code>, <code>add_non_labelled</code>, <code>use_labels</code>, <code>start_at</code>, <code>keep_labels</code>
+</li>
+<li>
+<code><a href="../reference/read_spss.html">read_spss()</a></code>/<code><a href="../reference/read_por.html">read_por()</a></code>/<code><a href="../reference/read_stata.html">read_stata()</a></code>/<code><a href="../reference/read_sas.html">read_sas()</a></code>/<code><a href="../reference/read_xpt.html">read_xpt()</a></code>: <code>tag_na</code> Base-R-universal names (<code>na.rm</code>, <code>conf.level</code>, <code>var.equal</code>) are kept.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-no-bridge-0-6-8">Breaking changes (no bridge)<a class="anchor" aria-label="anchor" href="#breaking-changes-no-bridge-0-6-8"></a></h3>
+<ul><li>
+<code><a href="../reference/t_test.html">t_test()</a></code> results no longer carry the duplicated <code>CI_lower</code>/<code>CI_upper</code> alias columns; <code>conf_int_lower</code>/<code>conf_int_upper</code> are the contract.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-6-8">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-6-8"></a></h3>
+<ul><li>
+<code>sort_frq</code> is validated (<code>"none"/"asc"/"desc"</code>) - typos used to silently produce an unsorted table; <code>show_labels</code> validates its <code>TRUE</code>/<code>FALSE</code>/<code>"auto"</code> values with a clear error.</li>
+<li>Vignettes showcase the new argument names.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.7" id="mariposa-067">mariposa 0.6.7<a class="anchor" aria-label="anchor" href="#mariposa-067"></a></h2>
+<p>Output-layer release (theme: uniform three-layer output). Statistical results are unchanged; what changed is how results present themselves.</p>
+<div class="section level3">
+<h3 id="uniform-three-layer-output-visible-change-0-6-7">Uniform three-layer output (visible change)<a class="anchor" aria-label="anchor" href="#uniform-three-layer-output-visible-change-0-6-7"></a></h3>
+<p>Every analysis class now follows the documented pattern that t_test and chi_square pioneered: <code>result</code> prints a compact overview (headline statistic, p-value, significance stars, one line per test), and <code>summary(result)</code> carries the full detailed output behind boolean section toggles. Newly migrated: kruskal_wallis, wilcoxon_test, friedman_test, binomial_test, fisher_test, chisq_gof, mcnemar_test, levene_test, tukey_test, scheffe_test, dunn_test, pairwise_wilcoxon, frequency, crosstab (describe was already compact and gained the summary layer for uniformity). Nothing was removed - everything the old print() showed is in summary(), verified line-by-line.</p>
+</div>
+<div class="section level3">
+<h3 id="internal-architecture-0-6-7">Internal architecture<a class="anchor" aria-label="anchor" href="#internal-architecture-0-6-7"></a></h3>
+<ul><li>One shared engine for the three correlation functions (pearson/spearman/kendall results verified byte-identical across 21 scenarios; ~500 lines removed).</li>
+<li>The w_* factory now supports multi-value and non-numeric statistics; w_quantile() and w_modus() are ordinary plugins instead of pipeline reimplementations (~420 lines removed, results identical across 31 scenarios).</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.6" id="mariposa-066">mariposa 0.6.6<a class="anchor" aria-label="anchor" href="#mariposa-066"></a></h2>
+<p>Internal-architecture release (theme: shared cores and formatting utilities). No statistical results change; table rendering in the Tukey/Scheffe output is now aligned and uses SPSS-style p display.</p>
+<ul><li>One home for every weighted formula: the new weighted-statistics kernel file backs describe(), frequency(), the w_* functions and the rank tests; the weighted variance formula previously existed in six files.</li>
+<li>New internal output utilities (bordered table renderer, grouped-results iterator, unified number/p formatting) - the building blocks the print style guide documented; adoption started with the post-hoc tests.</li>
+<li>Tukey and Scheffe now share one engine and one print implementation (results verified byte-identical); t_test() and oneway_anova() were restructured from 500-line nested-closure bodies into short orchestrators with file-level helpers (byte-identical results).</li>
+<li>Weights in summarise() context are captured as quosures (enquo/eval_tidy) instead of frame-walking; shared validators report errors at the user-facing call site.</li>
+<li>Documentation internals standardized on <a href="https://github.com/noRd" class="external-link">@noRd</a> (man/ shrinks by ~120 internal pages).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.5" id="mariposa-065">mariposa 0.6.5<a class="anchor" aria-label="anchor" href="#mariposa-065"></a></h2>
+<p>Housekeeping release (theme: package hygiene). No statistical results change.</p>
+<ul><li>Slimmer dependencies: removed the unused tidyr import and pruned unused <code>importFrom</code> entries.</li>
+<li>Error chains: failures inside grouped analyses are re-thrown with <code>cli_abort(parent = ...)</code> so the original condition is preserved; the haven requirement is enforced by one central guard that reports the calling function instead of an internal helper.</li>
+<li>Import internals: the native-missing-value detection shared by <code><a href="../reference/read_stata.html">read_stata()</a></code>, <code><a href="../reference/read_sas.html">read_sas()</a></code> and <code><a href="../reference/read_xpt.html">read_xpt()</a></code> now lives in one helper instead of three copies.</li>
+<li>Mechanical polish: remaining <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply()</a></code> calls in the oldest files converted to type-stable <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>; pkgdown reference now lists <code><a href="../reference/phi.html">phi()</a></code>, <code><a href="../reference/phi.html">cramers_v()</a></code>, <code><a href="../reference/phi.html">goodman_gamma()</a></code>.</li>
+<li>Test suite: removed a legacy tolerance registry that contradicted the Validation Charter and was no longer used by any test.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.4" id="mariposa-064">mariposa 0.6.4<a class="anchor" aria-label="anchor" href="#mariposa-064"></a></h2>
+<p>A quality release. Following an in-depth internal review of the entire statistical codebase, this version sharpens the accuracy of several statistics, makes the package behave more consistently across functions, and adds a dedicated regression-test suite (<code>tests/testthat/test-audit-regressions.R</code>) so these guarantees hold in future releases. Some outputs change slightly as a result - in every case toward the standard reference implementations.</p>
+<div class="section level3">
+<h3 id="more-accurate-statistics-0-6-4">More accurate statistics<a class="anchor" aria-label="anchor" href="#more-accurate-statistics-0-6-4"></a></h3>
+<ul><li>Kendall’s tau-b significance test now agrees with <code><a href="https://rdrr.io/r/stats/cor.test.html" class="external-link">stats::cor.test()</a></code> (and the SPSS formula) to machine precision, which is most noticeable for heavily tied data such as binary variables.</li>
+<li>The weighted Wilcoxon signed-rank test (and <code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code>) now uses frequency-expansion mid-ranks: with integer weights the statistic equals the expanded-data Wilcoxon exactly, and <code>weights = 1</code> reproduces the unweighted test. Displayed rank means in the weighted Kruskal-Wallis and Dunn tests follow the same convention.</li>
+<li>The Mann-Whitney asymptotic p-value now matches its reported Z (both follow the SPSS convention without continuity correction).</li>
+<li>Regression degrees of freedom are now derived from the fitted model terms, improving results for models with dummy-coded factors or interaction terms (weighted linear regression and the logistic omnibus test).</li>
+<li>The Kruskal-Wallis effect size is now correctly labelled: the returned field is <code>epsilon_squared</code> (previously named <code>eta_squared</code>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-and-refined-api-0-6-4">New and refined API<a class="anchor" aria-label="anchor" href="#new-and-refined-api-0-6-4"></a></h3>
+<ul><li>
+<code><a href="../reference/linear_regression.html">linear_regression()</a></code> gains SPSS-style collinearity diagnostics (Tolerance and VIF per model term), including a <code>collinearity</code> toggle in <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</li>
+<li>
+<code><a href="../reference/phi.html">phi()</a></code>, <code><a href="../reference/phi.html">cramers_v()</a></code>, and <code><a href="../reference/phi.html">goodman_gamma()</a></code> now return the requested effect size directly as a numeric value - the convenient behavior their names suggest. For the full test output, use <code><a href="../reference/chi_square.html">chi_square()</a></code>.</li>
+<li>The weighted two-sample <code><a href="../reference/t_test.html">t_test()</a></code> now honors <code>var.equal</code> for its primary result. <code><a href="../reference/oneway_anova.html">oneway_anova()</a></code> always reports both the classical and Welch results (like SPSS ONEWAY), so its <code>var.equal</code> argument is deprecated; <code>ss_type</code> in <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code>/<code><a href="../reference/ancova.html">ancova()</a></code> is likewise deprecated in favor of the SPSS-standard Type III.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="more-consistent-behavior-0-6-4">More consistent behavior<a class="anchor" aria-label="anchor" href="#more-consistent-behavior-0-6-4"></a></h3>
+<ul><li>One package-wide weights policy: invalid (negative) weights are now rejected with a clear message at every entry point, instead of being handled differently depending on the function.</li>
+<li>The weighted median now always equals the weighted 50th percentile, and unweighted quantiles follow the SPSS convention (Type 6/HAVERAGE) throughout.</li>
+<li>
+<code><a href="../reference/frequency.html">frequency()</a></code> header statistics use the same formulas as <code><a href="../reference/describe.html">describe()</a></code> and the <code>w_*</code> functions.</li>
+<li>Significance stars follow a single boundary convention everywhere, matching the printed legend.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="more-robust-in-edge-cases-0-6-4">More robust in edge cases<a class="anchor" aria-label="anchor" href="#more-robust-in-edge-cases-0-6-4"></a></h3>
+<ul><li>Correlation functions handle constant variables gracefully (NA instead of an error), <code>frequency(show.unused = TRUE)</code> works on variables tagged via <code><a href="../reference/set_na.html">set_na()</a></code>/<code><a href="../reference/read_spss.html">read_spss()</a></code>, and <code>frequency(sort.frq =)</code> now sorts by frequency with a monotone cumulative-percent column.</li>
+<li>
+<code><a href="../reference/write_spss.html">write_spss()</a></code> protects valid values when many missing-value codes must be consolidated into a range, and explains what it is doing.</li>
+<li>
+<code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> surfaces separation and convergence warnings again; post-hoc tests report when a computation could not be carried out instead of skipping it silently.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="housekeeping-0-6-4">Housekeeping<a class="anchor" aria-label="anchor" href="#housekeeping-0-6-4"></a></h3>
+<ul><li>Internal code paths were consolidated (shared helpers for weighted mid-ranks and the Wilcoxon core) and a substantial amount of unused code was removed, making the codebase easier to maintain.</li>
+<li>Grouped single-variable <code>w_*</code> results print their statistics again.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.3.2" id="mariposa-0632">mariposa 0.6.3.2<a class="anchor" aria-label="anchor" href="#mariposa-0632"></a></h2>
+<div class="section level3">
+<h3 id="rec-reliably-matches-decimal-single-values-0-6-3-2">
+<code>rec()</code> reliably matches decimal single values<a class="anchor" aria-label="anchor" href="#rec-reliably-matches-decimal-single-values-0-6-3-2"></a></h3>
+<p>Single-value recode rules now match decimal codes (e.g. <code>"3.6=2"</code>) even when the stored value carries floating-point representation error. The single-value comparison was changed from exact numeric equality (<code>x == value</code>) to a string comparison (<code>as.character(x) == as.character(value)</code>), which rounds to 15 significant digits and thereby absorbs the error.</p>
+<p>Reason: a value such as <code>0.1 + 0.2</code> is stored as <code>0.30000000000000004</code>, so the previous exact <code>==</code> test silently failed to match a rule <code>"0.3=..."</code>. This mirrors the behaviour of <code>sjmisc::rec()</code>, on which <code><a href="../reference/rec.html">rec()</a></code>’s string syntax is modelled. Range rules were already robust (they use <code>&gt;=</code>/<code>&lt;=</code>) and are unchanged.</p>
+</div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.3.1" id="mariposa-0631">mariposa 0.6.3.1<a class="anchor" aria-label="anchor" href="#mariposa-0631"></a></h2>
+<div class="section level3">
+<h3 id="broom-tidiers-now-work-natively-0-6-3-1">broom tidiers now work natively<a class="anchor" aria-label="anchor" href="#broom-tidiers-now-work-natively-0-6-3-1"></a></h3>
+<p>Adds explicit <code>tidy()</code>, <code>glance()</code>, and <code>augment()</code> methods for both <code>linear_regression</code> and <code>logistic_regression</code> results, registered via the standard <code>s3_register()</code> pattern (broom in Suggests, no hard dep).</p>
+<p>Reason: with <code>class(r) = c("linear_regression", "lm")</code>, <code><a href="https://broom.tidymodels.org/reference/tidy.lm.html" class="external-link">broom::tidy.lm()</a></code> and <code><a href="https://broom.tidymodels.org/reference/glance.lm.html" class="external-link">broom::glance.lm()</a></code> dispatched as expected, but internally called <code>summary(x)</code> — which (because of our specialised <code><a href="../reference/summary.linear_regression.html">summary.linear_regression()</a></code> overriding <code>summary.lm</code>) returned the mariposa SPSS-style summary instead of the lm summary broom needs. The visible failures:</p>
+<ul><li>
+<code>broom::glance(r)</code> raised <code>object 'r.squared' not found</code> because mariposa’s summary stores it as <code>R_squared</code>.</li>
+<li>
+<code>broom::tidy(r, conf.int = TRUE)</code> returned only 4 columns (<code>term</code>, <code>estimate</code>, <code>conf.low</code>, <code>conf.high</code>) instead of the expected 6+ (<code>term</code>, <code>estimate</code>, <code>std.error</code>, <code>statistic</code>, <code>p.value</code>, <code>conf.low</code>, <code>conf.high</code>).</li>
+</ul><p>The new methods strip our <code>linear_regression</code> / <code>logistic_regression</code> class before delegating to <code><a href="https://broom.tidymodels.org/reference/tidy.lm.html" class="external-link">broom::tidy.lm</a></code> / <code>tidy.glm</code> etc., so the inner <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> call dispatches to <code>summary.lm</code> / <code>summary.glm</code> and broom receives its expected shape. The user-facing <code>summary(r)</code> still returns mariposa’s SPSS-style output (more specific method wins).</p>
+<p>Edge cases stay consistent with the rest of the lm-generic surface: <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code> / <code>glance()</code> / <code>augment()</code> on a grouped or pairwise result raise an actionable error pointing at <code>lapply(r$groups, ...)</code> or <code>use = "listwise"</code>.</p>
+<p>New tests in <code>test-broom-methods.R</code> cover all three tidiers for both regression types, plus the grouped/pairwise error paths.</p>
+</div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.3" id="mariposa-063">mariposa 0.6.3<a class="anchor" aria-label="anchor" href="#mariposa-063"></a></h2>
+<div class="section level3">
+<h3 id="behavior-change--regression-results-inherit-from-lm--glm-0-6-3">Behavior Change — regression results inherit from <code>lm</code> / <code>glm</code>
+<a class="anchor" aria-label="anchor" href="#behavior-change--regression-results-inherit-from-lm--glm-0-6-3"></a></h3>
+<p><code><a href="../reference/linear_regression.html">linear_regression()</a></code> and <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> results now ARE the fitted <code>lm</code> / <code>glm</code> object (with mariposa-specific tables attached as additional slots), instead of wrapping it in <code>$model</code>. All base-R and <code>broom</code> generics dispatch natively:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>                                 <span class="co"># named numeric vector</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">r</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span><span class="op">)</span> <span class="co"># works directly</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>                                <span class="co"># sequential SS table</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
+<span><span class="fu">broom</span><span class="fu">::</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>; <span class="fu">broom</span><span class="fu">::</span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>; <span class="fu">broom</span><span class="fu">::</span><span class="fu"><a href="https://generics.r-lib.org/reference/augment.html" class="external-link">augment</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></code></pre></div>
+<p>Class hierarchy is <code>c("linear_regression", "lm")</code> for linear and <code>c("logistic_regression", "glm", "lm")</code> for logistic. <code>summary(r)</code> still returns the SPSS-style mariposa summary (more specific method wins); for the raw <code>lm</code>/<code>glm</code> summary call <code>stats::summary.lm(r)</code> / <code>stats::summary.glm(r)</code>.</p>
+<div class="section level4">
+<h4 id="slot-renames-breaking-0-6-3">Slot renames (breaking)<a class="anchor" aria-label="anchor" href="#slot-renames-breaking-0-6-3"></a></h4>
+<p>Two slots collided with <code>lm</code>/<code>glm</code> conventions and were renamed:</p>
+<table class="table"><colgroup><col width="48%"><col width="51%"></colgroup><thead><tr><th align="left">Before</th>
+<th align="left">After</th>
+</tr></thead><tbody><tr><td align="left">
+<code>$coefficients</code> (tibble)</td>
+<td align="left">
+<code>$coef_table</code> (tibble)</td>
+</tr><tr><td align="left">
+<code>$anova</code> (tibble)</td>
+<td align="left">
+<code>$anova_table</code> (tibble)</td>
+</tr><tr><td align="left">
+<code>$model</code> (lm/glm)</td>
+<td align="left">the object IS the model — use <code>r</code> directly</td>
+</tr></tbody></table><p>Migration:</p>
+<ul><li>
+<code>r$coefficients</code> → <code>r$coef_table</code> (SPSS-style tibble) or <code>coef(r)</code> (named numeric vector).</li>
+<li>
+<code>r$anova</code> → <code>r$anova_table</code> (SPSS-style overall-model ANOVA tibble) or <code>anova(r)</code> (R’s per-term sequential SS table).</li>
+<li>
+<code>r$model |&gt; predict(...)</code> → <code>predict(r, ...)</code> directly.</li>
+<li>
+<code>r$model |&gt; broom::tidy()</code> → <code>broom::tidy(r)</code> directly.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="edge-cases-0-6-3">Edge cases<a class="anchor" aria-label="anchor" href="#edge-cases-0-6-3"></a></h4>
+<ul><li>
+<code>use = "pairwise"</code>: no single fitted lm is available, so the result is a custom list with class <code>"linear_regression"</code> only. <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>/<code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> etc. raise an informative error pointing at <code>use = "listwise"</code>.</li>
+<li>Grouped results (top-level): no single model. <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>/<code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> raise an informative error pointing at <code>lapply(r$groups, predict, ...)</code>. Each <code>r$groups[[i]]</code> is itself an lm-inheriting object, so per-group generics work directly.</li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="test-suite-0-6-3">Test Suite<a class="anchor" aria-label="anchor" href="#test-suite-0-6-3"></a></h3>
+<ul><li>New test block in <code>test-linear-regression-spss-validation.R</code> verifies that <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code>, <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>, <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code>, <code><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals()</a></code>, <code><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted()</a></code>, <code><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula()</a></code>, <code><a href="https://rdrr.io/r/stats/nobs.html" class="external-link">nobs()</a></code>, <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix()</a></code> all dispatch natively, plus the grouped/pairwise error paths.</li>
+<li>1184/1184 tests pass; R CMD check on built tarball: Status OK.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.2" id="mariposa-062">mariposa 0.6.2<a class="anchor" aria-label="anchor" href="#mariposa-062"></a></h2>
 <div class="section level3">
@@ -136,9 +480,9 @@
 <li>
 <code><a href="../reference/friedman_test.html">friedman_test()</a></code>: weighted branch now applies the tie correction consistently with <code><a href="https://rdrr.io/r/stats/friedman.test.html" class="external-link">stats::friedman.test</a></code> (unweighted branch). The inconsistency caused weighted chi-squared values to be too low for tied data.</li>
 <li>
-<code><a href="../reference/describe.html">describe()</a></code>: weighted skewness and kurtosis now delegate to <code><a href="../reference/dot-calc_skewness.html">.calc_skewness()</a></code> / <code><a href="../reference/dot-calc_kurtosis.html">.calc_kurtosis()</a></code> in <code>helpers.R</code> (Joanes-Gill Type-2 with <code>Σw</code> substitution), matching <code><a href="../reference/w_skew.html">w_skew()</a></code> / <code><a href="../reference/w_kurtosis.html">w_kurtosis()</a></code> and SPSS FREQUENCIES exactly. The previous duplicate implementation used a simple weighted moment without bias correction.</li>
+<code><a href="../reference/describe.html">describe()</a></code>: weighted skewness and kurtosis now delegate to <code>.calc_skewness()</code> / <code>.calc_kurtosis()</code> in <code>helpers.R</code> (Joanes-Gill Type-2 with <code>Σw</code> substitution), matching <code><a href="../reference/w_skew.html">w_skew()</a></code> / <code><a href="../reference/w_kurtosis.html">w_kurtosis()</a></code> and SPSS FREQUENCIES exactly. The previous duplicate implementation used a simple weighted moment without bias correction.</li>
 <li>
-<code><a href="../reference/dot-w_quantile.html">.w_quantile()</a></code>: weighted quantiles now use Type-6 (HAVERAGE) linear interpolation between cumulative-weight crossings — matches SPSS FREQUENCIES /PERCENTILES. Unweighted quantiles also switched from R default <code>type = 7</code> to SPSS-compatible <code>type = 6</code>.</li>
+<code>.w_quantile()</code>: weighted quantiles now use Type-6 (HAVERAGE) linear interpolation between cumulative-weight crossings — matches SPSS FREQUENCIES /PERCENTILES. Unweighted quantiles also switched from R default <code>type = 7</code> to SPSS-compatible <code>type = 6</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-honesty-0-6-1">Documentation Honesty<a class="anchor" aria-label="anchor" href="#documentation-honesty-0-6-1"></a></h3>
@@ -336,7 +680,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="internal-helpers-0-5-1">Internal Helpers<a class="anchor" aria-label="anchor" href="#internal-helpers-0-5-1"></a></h3>
-<ul><li>Added <code><a href="../reference/build_summary_object.html">build_summary_object()</a></code> and <code><a href="../reference/format_p_compact.html">format_p_compact()</a></code> in <code>R/summary_helpers.R</code> as shared infrastructure for all summary methods.</li>
+<ul><li>Added <code>build_summary_object()</code> and <code>format_p_compact()</code> in <code>R/summary_helpers.R</code> as shared infrastructure for all summary methods.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-0-5-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-5-1"></a></h3>
@@ -405,7 +749,7 @@
 <h3 id="enhancements-0-3-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-3-1"></a></h3>
 <ul><li><p><code><a href="../reference/efa.html">efa()</a></code> now supports Maximum Likelihood (ML) extraction via <code>extraction = "ml"</code>. ML extraction provides a goodness-of-fit chi-square test, initial communalities as SMC (squared multiple correlations), and uniquenesses. Uses <code><a href="https://rdrr.io/r/stats/factanal.html" class="external-link">stats::factanal()</a></code> with correlation matrix input for seamless survey weight support.</p></li>
 <li><p><code><a href="../reference/efa.html">efa()</a></code> now supports Promax rotation via <code>rotation = "promax"</code>. Like Oblimin, Promax is an oblique rotation that produces Pattern Matrix, Structure Matrix, and Factor Correlation Matrix. Uses <code><a href="https://rdrr.io/r/stats/varimax.html" class="external-link">stats::promax()</a></code> (base R, no new dependency).</p></li>
-<li><p>Internal refactoring of <code><a href="../reference/efa.html">efa()</a></code>: extraction logic separated into <code><a href="../reference/dot-efa_extract_pca.html">.efa_extract_pca()</a></code> and <code><a href="../reference/dot-efa_extract_ml.html">.efa_extract_ml()</a></code> for cleaner architecture and easier extension with future extraction methods (PAF planned).</p></li>
+<li><p>Internal refactoring of <code><a href="../reference/efa.html">efa()</a></code>: extraction logic separated into <code>.efa_extract_pca()</code> and <code>.efa_extract_ml()</code> for cleaner architecture and easier extension with future extraction methods (PAF planned).</p></li>
 </ul><hr></div>
 </div>
     <div class="section level2">
@@ -449,12 +793,12 @@
 <h2 class="pkg-version" data-toc-text="0.1.0" id="mariposa-010">mariposa 0.1.0<a class="anchor" aria-label="anchor" href="#mariposa-010"></a></h2>
 <div class="section level3">
 <h3 id="breaking-changes-0-1-0">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-1-0"></a></h3>
-<ul><li><p><code><a href="https://rdrr.io/r/base/Special.html" class="external-link">gamma()</a></code> has been renamed to <code><a href="../reference/chi_square.html">goodman_gamma()</a></code> to avoid shadowing <code><a href="https://rdrr.io/r/base/Special.html" class="external-link">base::gamma()</a></code>. The function remains an alias for <code><a href="../reference/chi_square.html">chi_square()</a></code> and works identically.</p></li>
+<ul><li><p><code><a href="https://rdrr.io/r/base/Special.html" class="external-link">gamma()</a></code> has been renamed to <code><a href="../reference/phi.html">goodman_gamma()</a></code> to avoid shadowing <code><a href="https://rdrr.io/r/base/Special.html" class="external-link">base::gamma()</a></code>. The function remains an alias for <code><a href="../reference/chi_square.html">chi_square()</a></code> and works identically.</p></li>
 <li><p>S3 class names unified: removed <code>_results</code> suffix from all result classes (e.g., <code>chi_square_results</code> -&gt; <code>chi_square</code>, <code>t_test_results</code> -&gt; <code>t_test</code>). Class names now match the function name that created them.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-1-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0"></a></h3>
-<ul><li><p>Fixed namespace collisions from triple-defined internal helper functions (<code><a href="../reference/dot-process_variables.html">.process_variables()</a></code>, <code><a href="../reference/dot-process_weights.html">.process_weights()</a></code>, <code><a href="../reference/dot-effective_n.html">.effective_n()</a></code>). These are now defined once in <code>helpers.R</code> and shared across all functions.</p></li>
+<ul><li><p>Fixed namespace collisions from triple-defined internal helper functions (<code>.process_variables()</code>, <code>.process_weights()</code>, <code>.effective_n()</code>). These are now defined once in <code>helpers.R</code> and shared across all functions.</p></li>
 <li><p>Fixed weighted variance/SD formula inconsistency. All weighted calculations now use the SPSS frequency weights formula: <code>sum(w * (x - w_mean)^2) / (V1 - 1)</code>.</p></li>
 <li><p>Fixed Gamma ASE (asymptotic standard error) calculation. Replaced empirical magic-number formula with the correct ASE0 formula from Agresti (2002).</p></li>
 <li><p>Fixed weighted Cohen’s d calculation in <code><a href="../reference/t_test.html">t_test()</a></code>. Previously multiplied values by weights (<code>x * w</code>); now uses proper weighted means and pooled weighted standard deviation.</p></li>
