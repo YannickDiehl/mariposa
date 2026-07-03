@@ -1,3 +1,69 @@
+# mariposa 0.6.14
+
+Codebook robustness (theme: `codebook()` survives real-world data and says
+what it shows). A stress test of the codebook stack (metadata extraction,
+console print/summary, HTML builder, xlsx export) surfaced a batch of
+crashes, silent data errors, and display leaks; this release fixes all of
+them and adds a `view` argument for side-effect control.
+
+## Bug fixes
+
+* Variables with value labels but **no variable label** no longer show a
+  fake label like "1 | 2 | 3": `attr(x, "label")` partially matched the
+  `labels` attribute; all label reads now use `exact = TRUE`. The
+  "Variables with labels" count excludes such variables accordingly.
+* `codebook()` no longer errors on **inline data expressions**
+  (e.g. `codebook(data.frame(...))` spanning multiple deparse lines);
+  long expressions collapse to the generic dataset name "data".
+* **List columns** no longer crash the frequency computation: they are
+  skipped with a warning ("list column ... skipped - not supported in
+  codebooks") and a data frame consisting only of list columns aborts
+  with a clear error.
+* The **tagged-NA breakdown is now consistent across all three layers**:
+  - the HTML builder appends the missing-value rows (codes, labels,
+    counts) below range-displayed variables too — previously an
+    all-user-missing or high-cardinality variable silently lost them
+    (the xlsx export already did this correctly);
+  - NA frequencies are computed even for high-cardinality/range-displayed
+    variables;
+  - `print(summary(cb))` gains a "Missing values:" section (codes,
+    labels, counts) — `show_na` was a no-op on the console layer before.
+
+## Improvements
+
+* **Central display formatting for numeric values**: empirical values and
+  ranges no longer leak 15-digit doubles or scientific notation into the
+  console/HTML/xlsx output. Fractional values show 4 significant digits
+  ("0.3333"), whole numbers keep their integer look ("1"), tiny values
+  are expanded ("0.00000001", never "1e-08"). Frequency matching is
+  unaffected: display strings and raw matching keys are carried
+  separately (`empirical_values` vs. new `empirical_keys`).
+* The percentage and effective-n columns (`prc`, `valid_prc`, `cum_prc`,
+  `n_eff`) on `write_xlsx(cb, frequencies = TRUE)` sheets are rounded to
+  2 decimals.
+* `max_values` (single integer >= 1) and `max_len` (single integer >= 4)
+  are validated up front with a clear error.
+* Factor levels now respect `max_values` and truncate with the same
+  "... (N more)" note used for character values.
+* Range displays show the cardinality: "18 - 95 (78 distinct)" instead
+  of just "18 - 95".
+* `file =` into a nonexistent directory aborts early, naming the missing
+  directory.
+* Polish: "1 variable" / "1 observation" pluralization in the console
+  and HTML subtitle; very long character values are truncated to
+  `max_len` with "..." (raw values still drive frequency matching);
+  zero-row data frames say "(no observations)" instead of
+  "(all missing)".
+
+## New features
+
+* New `view` argument for `codebook()` (default: `interactive()`):
+  controls whether the HTML codebook opens in the RStudio Viewer.
+  `view = FALSE` suppresses the Viewer side effect entirely; writing via
+  `file =` is unaffected. The compact `print()` only advertises the
+  Viewer when it was actually opened (result gains a `viewed` flag).
+
+
 # mariposa 0.6.13
 
 McDonald's omega (theme: reliability() learns a second reliability
