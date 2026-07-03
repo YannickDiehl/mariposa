@@ -186,3 +186,11 @@ test_that("existing alpha fields are unchanged by the omega extension", {
   alpha_manual <- (k / (k - 1)) * (1 - sum(diag(S)) / sum(S))
   expect_equal(res$alpha, alpha_manual, tolerance = 1e-10)
 })
+
+test_that("3-item scales explain the NA omega_deleted column in the output", {
+  data(survey_data)
+  rel <- reliability(survey_data, trust_government, trust_media, trust_science)
+  out <- capture.output(print(summary(rel)))
+  expect_true(all(is.na(rel$item_total$omega_if_deleted)))
+  expect_true(any(grepl("requires at least 4 items", out)))
+})

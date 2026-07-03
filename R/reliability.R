@@ -778,10 +778,19 @@ print.summary.reliability <- function(x, ...) {
       alpha_deleted = round(x$item_total$alpha_if_deleted, digits),
       stringsAsFactors = FALSE
     )
-    if (!is.null(x$item_total$omega_if_deleted)) {
-      total_df$omega_deleted <- round(x$item_total$omega_if_deleted, digits)
+    omega_del <- x$item_total$omega_if_deleted
+    if (!is.null(omega_del)) {
+      total_df$omega_deleted <- round(omega_del, digits)
     }
     print(total_df, row.names = FALSE)
+
+    # A 3-item scale leaves a 2-item one-factor model after deletion, which
+    # is not identified - explain the NA column instead of leaving it bare.
+    if (!is.null(omega_del) && all(is.na(omega_del)) &&
+        length(omega_del) == 3) {
+      cat("Note: Omega if item deleted requires at least 4 items\n")
+      cat("(a one-factor model on the remaining 2 items is not identified).\n")
+    }
   }
 }
 
