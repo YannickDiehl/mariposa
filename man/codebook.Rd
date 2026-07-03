@@ -18,7 +18,8 @@ codebook(
   max_values = 10,
   max_len = 50,
   sort_by_name = FALSE,
-  file = NULL
+  file = NULL,
+  view = interactive()
 )
 }
 \arguments{
@@ -58,8 +59,14 @@ before truncating or showing a range (Default: 10)}
 \item{sort_by_name}{Sort variables alphabetically instead of by position?
 (Default: FALSE)}
 
-\item{file}{Path to save the HTML codebook. If NULL (default), a temporary
-file is used and the codebook opens in the Viewer.}
+\item{file}{Path to save the HTML codebook. If NULL (default), no file is
+written unless the codebook is opened in the Viewer (then a temporary
+file is used). The directory of \code{file} must already exist.}
+
+\item{view}{Open the HTML codebook in the RStudio Viewer (or browser)?
+Defaults to \code{\link[=interactive]{interactive()}}, so interactive sessions open the Viewer
+and scripts/tests do not. Set \code{view = FALSE} to suppress the Viewer
+side effect entirely; \verb{file =} writing is unaffected by this argument.}
 }
 \value{
 Invisibly returns a list of class \code{"codebook"} containing:

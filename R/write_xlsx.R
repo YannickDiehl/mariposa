@@ -158,6 +158,12 @@ write_xlsx.codebook <- function(x, file, frequencies = FALSE,
     for (var_name in names(x$frequencies)) {
       freq_df <- x$frequencies[[var_name]]
       if (is.data.frame(freq_df) && nrow(freq_df) > 0L) {
+        # Round percentage/effective-n columns for display (2 decimals)
+        round_cols <- intersect(c("prc", "valid_prc", "cum_prc", "n_eff"),
+                                names(freq_df))
+        for (col in round_cols) {
+          freq_df[[col]] <- round(freq_df[[col]], 2)
+        }
         sheet_name <- .sanitize_sheet_name(var_name)
         .write_sheet(wb, sheet_name, freq_df)
       }
@@ -1097,6 +1103,13 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 #' @noRd
 .build_stacked_cells <- function(tbl, i, freq_list, opts) {
   emp_vals <- tbl$empirical_values[[i]]
+  # Raw matching keys (display values may be formatted/truncated); NA keys
+  # mark display-only entries such as "... (N more)" truncation notes
+  emp_keys <- if ("empirical_keys" %in% names(tbl)) {
+    tbl$empirical_keys[[i]]
+  } else {
+    emp_vals
+  }
   val_labels <- tbl$value_labels[[i]]
   is_rng <- tbl$is_range[i]
   na_vals <- tbl$na_values[[i]]
@@ -1114,13 +1127,16 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
     lbl_lines <- ""
     freq_lines <- ""
   } else if (length(emp_vals) > 0L) {
-    # Per-value lines
-    for (v in emp_vals) {
+    # Per-value lines (lookups on raw keys, display on formatted values)
+    for (j in seq_along(emp_vals)) {
+      v <- emp_vals[j]
+      k <- emp_keys[j]
       val_lines <- c(val_lines, v)
 
       # Value label
-      lbl_text <- if (!is.null(val_labels) && v %in% names(val_labels)) {
-        unname(val_labels[v])
+      lbl_text <- if (!is.na(k) && !is.null(val_labels) &&
+                      k %in% names(val_labels)) {
+        unname(val_labels[k])
       } else {
         ""
       }
@@ -1128,8 +1144,8 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 
       # Frequency
       freq_text <- ""
-      if (!is.null(freq_data)) {
-        freq_row <- freq_data[as.character(freq_data$value) == v, ]
+      if (!is.null(freq_data) && !is.na(k)) {
+        freq_row <- freq_data[as.character(freq_data$value) == k, ]
         if (nrow(freq_row) > 0L) {
           freq_text <- as.character(round(freq_row$freq[1]))
         }

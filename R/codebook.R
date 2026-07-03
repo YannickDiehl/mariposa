@@ -49,20 +49,54 @@
   list(type = type, type_short = type_short)
 }
 
+#' Format numeric values for codebook display
+#'
+#' One display policy for empirical values and ranges shared by all three
+#' output layers (console summary, HTML, xlsx). Whole numbers keep their
+#' integer look ("1", not "1.0000"); fractional values are shown with
+#' `digits` significant digits (signif-based, so "0.3333" and "0.7016" come
+#' out at comparable precision); small values are expanded in decimal
+#' notation (never raw "1e-08"). Only truly extreme magnitudes
+#' (|x| >= 1e15 or 0 < |x| < 1e-15) fall back to compact scientific
+#' notation. Display-only: frequency matching uses the raw
+#' `empirical_keys`, never these strings.
+#'
+#' @param x Numeric vector
+#' @param digits Significant digits for fractional values
+#' @return Character vector
+#' @noRd
+.cb_format_value <- function(x, digits = 4) {
+  vapply(as.numeric(x), function(v) {
+    if (is.na(v)) return(NA_character_)
+    if (!is.finite(v)) return(as.character(v))
+    if (v == round(v) && abs(v) < 1e15) {
+      return(format(v, scientific = FALSE, trim = TRUE, big.mark = ""))
+    }
+    if (abs(v) >= 1e15 || abs(v) < 1e-15) {
+      return(format(signif(v, digits), trim = TRUE, big.mark = ""))
+    }
+    format(signif(v, digits), scientific = FALSE, trim = TRUE, big.mark = "")
+  }, character(1))
+}
+
 #' Extract codebook metadata for a single variable
 #' @param x Data vector
 #' @param var_name Variable name
 #' @param position Column position in original data
 #' @param max_values Maximum number of values to display before truncating
+#' @param max_len Maximum character width for displayed values/labels
 #' @return Named list of metadata
 #' @noRd
-.extract_var_metadata <- function(x, var_name, position, max_values = 10) {
+.extract_var_metadata <- function(x, var_name, position, max_values = 10,
+                                  max_len = 50) {
   type_info <- .classify_type(x)
 
   # Variable label (haven-style) — coerce to character for safety,
 
-  # because some SPSS imports store numeric label attributes
-  var_label <- attr(x, "label")
+  # because some SPSS imports store numeric label attributes.
+  # exact = TRUE is load-bearing: partial matching would pick up the
+  # "labels" attribute (value labels) on variables without a variable label
+  var_label <- attr(x, "label", exact = TRUE)
   var_label <- if (is.null(var_label)) {
     NA_character_
   } else {
@@ -93,40 +127,69 @@
   n_valid <- n_total - n_missing
   n_unique <- length(unique(x[!is.na(x)]))
 
-  # Empirical values: the actual distinct values found in the data
-  if (n_valid == 0) {
+  # Empirical values: the actual distinct values found in the data.
+  # Two parallel vectors: empirical_values are DISPLAY strings (formatted,
+  # truncated); empirical_keys carry the raw as.character() form used to
+  # match frequency rows and value-label names. Truncation-note entries
+  # ("... (N more)") get an NA key so no lookup is attempted for them.
+  if (n_total == 0) {
+    empirical_values <- "(no observations)"
+    empirical_keys <- NA_character_
+    is_range <- TRUE
+  } else if (n_valid == 0) {
     empirical_values <- "(all missing)"
+    empirical_keys <- NA_character_
     is_range <- TRUE
   } else if (is.factor(x)) {
-    empirical_values <- levels(x)
+    lvls <- levels(x)
+    if (length(lvls) > max_values) {
+      empirical_values <- c(lvls[seq_len(max_values)],
+                            paste0("... (", length(lvls) - max_values, " more)"))
+      empirical_keys <- c(lvls[seq_len(max_values)], NA_character_)
+    } else {
+      empirical_values <- lvls
+      empirical_keys <- lvls
+    }
     is_range <- FALSE
   } else if (is.logical(x)) {
     empirical_values <- as.character(sort(unique(x[!is.na(x)])))
+    empirical_keys <- empirical_values
     is_range <- FALSE
   } else if (is.character(x)) {
     uvals <- sort(unique(x[!is.na(x)]))
     if (length(uvals) > max_values) {
-      empirical_values <- c(uvals[seq_len(max_values)],
-                            paste0("... (", length(uvals) - max_values, " more)"))
+      empirical_values <- c(
+        .truncate_labels(uvals[seq_len(max_values)], max_len),
+        paste0("... (", length(uvals) - max_values, " more)")
+      )
+      empirical_keys <- c(uvals[seq_len(max_values)], NA_character_)
     } else {
-      empirical_values <- uvals
+      empirical_values <- .truncate_labels(uvals, max_len)
+      empirical_keys <- uvals
     }
     is_range <- FALSE
   } else if (is.numeric(x) || inherits(x, "haven_labelled")) {
     uvals <- sort(unique(x[!is.na(x)]))
     if (length(uvals) <= max_values) {
-      empirical_values <- as.character(uvals)
+      empirical_values <- .cb_format_value(uvals)
+      empirical_keys <- as.character(uvals)
       is_range <- FALSE
     } else {
-      empirical_values <- paste(min(uvals), "-", max(uvals))
+      empirical_values <- paste0(
+        .cb_format_value(min(uvals)), " - ", .cb_format_value(max(uvals)),
+        " (", n_unique, " distinct)"
+      )
+      empirical_keys <- NA_character_
       is_range <- TRUE
     }
   } else {
     uvals <- sort(unique(as.character(x[!is.na(x)])))
     if (length(uvals) > max_values) {
       empirical_values <- paste(length(uvals), "unique values")
+      empirical_keys <- NA_character_
     } else {
       empirical_values <- uvals
+      empirical_keys <- uvals
     }
     is_range <- length(uvals) > max_values
   }
@@ -194,6 +257,7 @@
     n_missing        = n_missing,
     n_unique         = n_unique,
     empirical_values = empirical_values,
+    empirical_keys   = empirical_keys,
     is_range         = is_range,
     value_labels     = raw_labels,
     n_labels         = n_total_labels,
@@ -244,8 +308,13 @@
 #'   (Default: 50)
 #' @param sort_by_name Sort variables alphabetically instead of by position?
 #'   (Default: FALSE)
-#' @param file Path to save the HTML codebook. If NULL (default), a temporary
-#'   file is used and the codebook opens in the Viewer.
+#' @param file Path to save the HTML codebook. If NULL (default), no file is
+#'   written unless the codebook is opened in the Viewer (then a temporary
+#'   file is used). The directory of `file` must already exist.
+#' @param view Open the HTML codebook in the RStudio Viewer (or browser)?
+#'   Defaults to [interactive()], so interactive sessions open the Viewer
+#'   and scripts/tests do not. Set `view = FALSE` to suppress the Viewer
+#'   side effect entirely; `file =` writing is unaffected by this argument.
 #'
 #' @return Invisibly returns a list of class `"codebook"` containing:
 #'   \describe{
@@ -309,15 +378,34 @@ codebook <- function(data, ..., weights = NULL,
                      show_na = TRUE, show_unused = FALSE,
                      max_values = 10, max_len = 50,
                      sort_by_name = FALSE,
-                     file = NULL) {
+                     file = NULL, view = interactive()) {
 
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }
+  if (!is.numeric(max_values) || length(max_values) != 1L ||
+      is.na(max_values) || max_values < 1 || max_values %% 1 != 0) {
+    cli_abort("{.arg max_values} must be a single integer >= 1.")
+  }
+  if (!is.numeric(max_len) || length(max_len) != 1L ||
+      is.na(max_len) || max_len < 4 || max_len %% 1 != 0) {
+    cli_abort("{.arg max_len} must be a single integer >= 4.")
+  }
+  if (!is.null(file)) {
+    file_dir <- dirname(file)
+    if (!dir.exists(file_dir)) {
+      cli_abort(c(
+        "Cannot write the codebook to {.path {file}}.",
+        "x" = "Directory {.path {file_dir}} does not exist.",
+        "i" = "Create the directory first or choose an existing one."
+      ))
+    }
+  }
 
-  # Capture data name before any modifications
-  data_name <- deparse(substitute(data))
+  # Capture data name before any modifications; deparse() can return
+  # multiple lines for inline expressions, so collapse before measuring
+  data_name <- paste(deparse(substitute(data)), collapse = "")
   if (nchar(data_name) > 50) data_name <- "data"
 
   # Handle grouped data -- ungroup but record group vars
@@ -338,6 +426,20 @@ codebook <- function(data, ..., weights = NULL,
     var_names <- names(vars)
   }
 
+  # Skip list columns -- they cannot be summarized in a codebook
+  is_list_col <- vapply(var_names, function(v) is.list(data[[v]]), logical(1))
+  if (any(is_list_col)) {
+    skipped <- var_names[is_list_col]
+    cli_warn("list column{?s} {.var {skipped}} skipped - not supported in codebooks")
+    var_names <- var_names[!is_list_col]
+  }
+  if (length(var_names) == 0) {
+    cli_abort(c(
+      "No variables left to include in the codebook.",
+      "x" = "All selected columns are list columns, which are not supported."
+    ))
+  }
+
   # Optionally sort alphabetically
   if (sort_by_name) var_names <- sort(var_names)
 
@@ -345,7 +447,7 @@ codebook <- function(data, ..., weights = NULL,
   metadata_list <- lapply(seq_along(var_names), function(i) {
     vn <- var_names[i]
     pos <- match(vn, names(data))
-    .extract_var_metadata(data[[vn]], vn, pos, max_values)
+    .extract_var_metadata(data[[vn]], vn, pos, max_values, max_len)
   })
 
   # Combine into tibble
@@ -360,6 +462,7 @@ codebook <- function(data, ..., weights = NULL,
     n_missing        = vapply(metadata_list, `[[`, integer(1), "n_missing"),
     n_unique         = vapply(metadata_list, `[[`, integer(1), "n_unique"),
     empirical_values = lapply(metadata_list, `[[`, "empirical_values"),
+    empirical_keys   = lapply(metadata_list, `[[`, "empirical_keys"),
     is_range         = vapply(metadata_list, `[[`, logical(1), "is_range"),
     value_labels     = lapply(metadata_list, `[[`, "value_labels"),
     n_labels         = vapply(metadata_list, `[[`, integer(1), "n_labels"),
@@ -379,7 +482,9 @@ codebook <- function(data, ..., weights = NULL,
       !is.null(attr(x, "labels"))
     has_few_values <- n_unique_var <= max_values
     has_tagged <- !is.null(attr(x, "na_tag_map"))
-    if (is_categorical || has_few_values) {
+    # Tagged NAs force a frequency table even for high-cardinality/range
+    # variables so their per-code NA counts stay available in all layers
+    if (is_categorical || has_few_values || (show_na && has_tagged)) {
       freq_list[[vn]] <- calculate_single_frequency(
         x, w_vec,
         sort_frq = "none",
@@ -419,22 +524,27 @@ codebook <- function(data, ..., weights = NULL,
     weights     = w_name,
     options     = opts,
     frequencies = freq_list,
-    html        = NULL
+    html        = NULL,
+    viewed      = FALSE
   ), class = "codebook")
 
   # Generate HTML
   result$html <- .codebook_to_html(result)
 
-  # Display in Viewer
-  if (interactive()) {
-    html_file <- if (!is.null(file)) file else tempfile(fileext = ".html")
-    htmltools::save_html(result$html, file = html_file)
-    viewer <- getOption("viewer", utils::browseURL)
-    viewer(html_file)
-  } else if (!is.null(file)) {
+  # Save to file (unconditional whenever file= is given)
+  if (!is.null(file)) {
     htmltools::save_html(result$html, file = file)
   }
 
+  # Open in the Viewer (opt-out via view = FALSE; default only in
+  # interactive sessions)
+  if (isTRUE(view)) {
+    html_file <- if (!is.null(file)) file else tempfile(fileext = ".html")
+    if (is.null(file)) htmltools::save_html(result$html, file = html_file)
+    viewer <- getOption("viewer", utils::browseURL)
+    viewer(html_file)
+    result$viewed <- TRUE
+  }
 
   invisible(result)
 }
@@ -626,16 +736,17 @@ codebook <- function(data, ..., weights = NULL,
     # Build all three column div-lists in parallel, then create <td> cells
     if (opts$show_values || opts$show_freq) {
       emp_vals <- cb$empirical_values[[i]]
+      emp_keys <- cb$empirical_keys[[i]]
       val_labels <- cb$value_labels[[i]]
       is_rng <- cb$is_range[i]
 
-      # When show_unused is TRUE, add value label keys not yet in emp_vals
+      # When show_unused is TRUE, add value label keys not yet in the data
       if (opts$show_unused && !is_rng && !is.null(val_labels) &&
           length(val_labels) > 0) {
         label_keys <- names(val_labels)
         # Filter out NA-valued label keys (tagged NA labels map to "NA")
         label_keys <- label_keys[!is.na(label_keys) & label_keys != "NA"]
-        missing_keys <- setdiff(label_keys, emp_vals)
+        missing_keys <- setdiff(label_keys, emp_keys[!is.na(emp_keys)])
         if (length(missing_keys) > 0) {
           # Sort numerically if possible, otherwise alphabetically
           num_keys <- suppressWarnings(as.numeric(missing_keys))
@@ -644,12 +755,17 @@ codebook <- function(data, ..., weights = NULL,
           } else {
             missing_keys <- sort(missing_keys)
           }
-          # Merge into emp_vals at correct sorted positions
+          # Merge into keys AND display values at correct sorted positions
+          # (unused label keys are their own display representation)
+          all_keys <- c(emp_keys, missing_keys)
           all_vals <- c(emp_vals, missing_keys)
-          num_all <- suppressWarnings(as.numeric(all_vals))
+          num_all <- suppressWarnings(as.numeric(all_keys))
           if (!all(is.na(num_all))) {
-            all_vals <- all_vals[order(num_all)]
+            ord <- order(num_all, na.last = TRUE)
+            all_keys <- all_keys[ord]
+            all_vals <- all_vals[ord]
           }
+          emp_keys <- all_keys
           emp_vals <- all_vals
         }
       }
@@ -659,23 +775,21 @@ codebook <- function(data, ..., weights = NULL,
       n_sys_na <- cb$n_system_na[i]
 
       if (is_rng) {
-        # Range display (single line, e.g., "18 - 95")
-        if (opts$show_values) {
-          cells <- c(cells, list(
-            htmltools::tags$td(class = "values-cell range-text", emp_vals),
-            htmltools::tags$td("")  # empty Value Labels for range
-          ))
-        }
-        if (opts$show_freq) {
-          cells <- c(cells, list(htmltools::tags$td("")))
-        }
+        # Range display (single line, e.g., "18 - 95 (78 distinct)").
+        # Tagged NA rows are appended below, exactly like the value display
+        val_divs <- list(htmltools::tags$div(class = "range-text", emp_vals))
+        lbl_divs <- list(htmltools::tags$div("\u00A0"))
+        freq_divs <- list(htmltools::tags$div("\u00A0"))
       } else {
-        # Per-value display — build parallel div lists
+        # Per-value display — build parallel div lists; lookups run on
+        # emp_keys (raw values), display runs on emp_vals (formatted)
         val_divs <- lapply(emp_vals, function(v) htmltools::tags$div(v))
 
-        lbl_divs <- lapply(emp_vals, function(v) {
-          lbl_text <- if (!is.null(val_labels) && v %in% names(val_labels)) {
-            .truncate_labels(unname(val_labels[v]), opts$max_len)
+        lbl_divs <- lapply(seq_along(emp_vals), function(j) {
+          k <- emp_keys[j]
+          lbl_text <- if (!is.na(k) && !is.null(val_labels) &&
+                          k %in% names(val_labels)) {
+            .truncate_labels(unname(val_labels[k]), opts$max_len)
           } else {
             "\u00A0"
           }
@@ -683,8 +797,10 @@ codebook <- function(data, ..., weights = NULL,
         })
 
         freq_divs <- if (!is.null(freq_data)) {
-          lapply(emp_vals, function(v) {
-            freq_row <- freq_data[as.character(freq_data$value) == v, ]
+          lapply(seq_along(emp_vals), function(j) {
+            k <- emp_keys[j]
+            if (is.na(k)) return(htmltools::tags$div("\u00A0"))
+            freq_row <- freq_data[as.character(freq_data$value) == k, ]
             if (nrow(freq_row) > 0) {
               htmltools::tags$div(as.character(round(freq_row$freq[1])))
             } else {
@@ -695,110 +811,118 @@ codebook <- function(data, ..., weights = NULL,
           lapply(emp_vals, function(v) htmltools::tags$div("\u00A0"))
         }
 
-        # Truncation note for value labels
+        # Truncation note for value labels. If the values column already
+        # ends in its own "... (N more)" note row (NA key), align the
+        # label note with that row instead of appending a second note row
         if (!is.null(val_labels) && cb$truncated[i]) {
           trunc_note <- htmltools::tags$div(
             class = "truncated-note",
             paste0("... (", cb$n_labels[i] - opts$max_values, " more)")
           )
-          val_divs <- c(val_divs, list(htmltools::tags$div("\u00A0")))
-          lbl_divs <- c(lbl_divs, list(trunc_note))
-          freq_divs <- c(freq_divs, list(htmltools::tags$div("\u00A0")))
-        }
-
-        # Append tagged NA rows (separator + per-NA-code rows + system NA)
-        if (opts$show_na && length(na_vals) > 0) {
-          # Thin separator
-          sep_div <- htmltools::tags$div(class = "na-separator", "\u00A0")
-          val_divs <- c(val_divs, list(sep_div))
-          lbl_divs <- c(lbl_divs, list(sep_div))
-          freq_divs <- c(freq_divs, list(sep_div))
-
-          # One row per tagged NA code
-          for (nav in na_vals) {
-            val_divs <- c(val_divs, list(
-              htmltools::tags$div(class = "na-value", nav)
-            ))
-            na_lbl_text <- if (nav %in% names(na_lbls)) {
-              .truncate_labels(unname(na_lbls[nav]), opts$max_len)
-            } else {
-              ""
-            }
-            lbl_divs <- c(lbl_divs, list(
-              htmltools::tags$div(class = "na-value", na_lbl_text)
-            ))
-            # Freq from expanded frequency table (match on na_display_value)
-            if (!is.null(freq_data) && "na_display_value" %in% names(freq_data)) {
-              na_freq_row <- freq_data[
-                !is.na(freq_data$na_display_value) &
-                  freq_data$na_display_value == nav, ]
-              freq_text <- if (nrow(na_freq_row) > 0) {
-                as.character(round(na_freq_row$freq[1]))
-              } else {
-                "0"
-              }
-            } else {
-              freq_text <- ""
-            }
-            freq_divs <- c(freq_divs, list(
-              htmltools::tags$div(class = "na-value", freq_text)
-            ))
-          }
-
-          # System NA row if present
-          if (n_sys_na > 0) {
-            val_divs <- c(val_divs, list(
-              htmltools::tags$div(class = "na-value", "NA")
-            ))
-            lbl_divs <- c(lbl_divs, list(
-              htmltools::tags$div(class = "na-value", "(system missing)")
-            ))
-            # System NA freq from expanded table (display value is "NA")
-            if (!is.null(freq_data) && "na_display_value" %in% names(freq_data)) {
-              sys_freq_row <- freq_data[
-                !is.na(freq_data$na_display_value) &
-                  freq_data$na_display_value == "NA", ]
-              sys_freq_text <- if (nrow(sys_freq_row) > 0) {
-                as.character(round(sys_freq_row$freq[1]))
-              } else {
-                as.character(n_sys_na)
-              }
-            } else {
-              sys_freq_text <- as.character(n_sys_na)
-            }
-            freq_divs <- c(freq_divs, list(
-              htmltools::tags$div(class = "na-value", sys_freq_text)
-            ))
+          note_idx <- which(is.na(emp_keys) & grepl("more\\)$", emp_vals))
+          if (length(note_idx) > 0) {
+            lbl_divs[[note_idx[1]]] <- trunc_note
+          } else {
+            val_divs <- c(val_divs, list(htmltools::tags$div("\u00A0")))
+            lbl_divs <- c(lbl_divs, list(trunc_note))
+            freq_divs <- c(freq_divs, list(htmltools::tags$div("\u00A0")))
           }
         }
+      }
 
-        # Create the <td> cells
-        if (opts$show_values) {
-          cells <- c(cells, list(
-            htmltools::tags$td(class = "values-cell", htmltools::tagList(val_divs))
+      # Append tagged NA rows (separator + per-NA-code rows + system NA);
+      # runs for BOTH the per-value and the range display
+      if (opts$show_na && length(na_vals) > 0) {
+        # Thin separator
+        sep_div <- htmltools::tags$div(class = "na-separator", "\u00A0")
+        val_divs <- c(val_divs, list(sep_div))
+        lbl_divs <- c(lbl_divs, list(sep_div))
+        freq_divs <- c(freq_divs, list(sep_div))
+
+        # One row per tagged NA code
+        for (nav in na_vals) {
+          val_divs <- c(val_divs, list(
+            htmltools::tags$div(class = "na-value", nav)
           ))
-          if (!is.null(val_labels) && length(val_labels) > 0) {
-            cells <- c(cells, list(
-              htmltools::tags$td(class = "labels-cell", htmltools::tagList(lbl_divs))
-            ))
-          } else if (opts$show_na && length(na_vals) > 0) {
-            # Has NA labels but no valid value labels
-            cells <- c(cells, list(
-              htmltools::tags$td(class = "labels-cell", htmltools::tagList(lbl_divs))
-            ))
+          na_lbl_text <- if (nav %in% names(na_lbls)) {
+            .truncate_labels(unname(na_lbls[nav]), opts$max_len)
           } else {
-            cells <- c(cells, list(htmltools::tags$td("")))
+            ""
           }
+          lbl_divs <- c(lbl_divs, list(
+            htmltools::tags$div(class = "na-value", na_lbl_text)
+          ))
+          # Freq from expanded frequency table (match on na_display_value)
+          if (!is.null(freq_data) && "na_display_value" %in% names(freq_data)) {
+            na_freq_row <- freq_data[
+              !is.na(freq_data$na_display_value) &
+                freq_data$na_display_value == nav, ]
+            freq_text <- if (nrow(na_freq_row) > 0) {
+              as.character(round(na_freq_row$freq[1]))
+            } else {
+              "0"
+            }
+          } else {
+            freq_text <- ""
+          }
+          freq_divs <- c(freq_divs, list(
+            htmltools::tags$div(class = "na-value", freq_text)
+          ))
         }
 
-        if (opts$show_freq) {
-          if (!is.null(freq_data)) {
-            cells <- c(cells, list(
-              htmltools::tags$td(class = "freq-cell", htmltools::tagList(freq_divs))
-            ))
+        # System NA row if present
+        if (n_sys_na > 0) {
+          val_divs <- c(val_divs, list(
+            htmltools::tags$div(class = "na-value", "NA")
+          ))
+          lbl_divs <- c(lbl_divs, list(
+            htmltools::tags$div(class = "na-value", "(system missing)")
+          ))
+          # System NA freq from expanded table (display value is "NA")
+          if (!is.null(freq_data) && "na_display_value" %in% names(freq_data)) {
+            sys_freq_row <- freq_data[
+              !is.na(freq_data$na_display_value) &
+                freq_data$na_display_value == "NA", ]
+            sys_freq_text <- if (nrow(sys_freq_row) > 0) {
+              as.character(round(sys_freq_row$freq[1]))
+            } else {
+              as.character(n_sys_na)
+            }
           } else {
-            cells <- c(cells, list(htmltools::tags$td("")))
+            sys_freq_text <- as.character(n_sys_na)
           }
+          freq_divs <- c(freq_divs, list(
+            htmltools::tags$div(class = "na-value", sys_freq_text)
+          ))
+        }
+      }
+
+      # Create the <td> cells
+      if (opts$show_values) {
+        cells <- c(cells, list(
+          htmltools::tags$td(class = "values-cell", htmltools::tagList(val_divs))
+        ))
+        if (!is.null(val_labels) && length(val_labels) > 0) {
+          cells <- c(cells, list(
+            htmltools::tags$td(class = "labels-cell", htmltools::tagList(lbl_divs))
+          ))
+        } else if (opts$show_na && length(na_vals) > 0) {
+          # Has NA labels but no valid value labels
+          cells <- c(cells, list(
+            htmltools::tags$td(class = "labels-cell", htmltools::tagList(lbl_divs))
+          ))
+        } else {
+          cells <- c(cells, list(htmltools::tags$td("")))
+        }
+      }
+
+      if (opts$show_freq) {
+        if (!is.null(freq_data)) {
+          cells <- c(cells, list(
+            htmltools::tags$td(class = "freq-cell", htmltools::tagList(freq_divs))
+          ))
+        } else {
+          cells <- c(cells, list(htmltools::tags$td("")))
         }
       }
     }
@@ -808,8 +932,10 @@ codebook <- function(data, ..., weights = NULL,
 
   # Subtitle
   subtitle_parts <- c(
-    paste0(format(info$nrow, big.mark = ","), " observations"),
-    paste0(info$n_selected, " variables")
+    paste0(format(info$nrow, big.mark = ","), " observation",
+           if (info$nrow == 1) "" else "s"),
+    paste0(info$n_selected, " variable",
+           if (info$n_selected == 1) "" else "s")
   )
   if (info$n_labelled > 0) {
     subtitle_parts <- c(subtitle_parts, paste0(info$n_labelled, " labelled"))
@@ -879,13 +1005,19 @@ print.codebook <- function(x, ...) {
   }, character(1))
 
   cat(sprintf("\nCodebook: %s\n", info$name))
-  cat(sprintf("%s variables | %s observations",
+  cat(sprintf("%s variable%s | %s observation%s",
               info$n_selected,
-              format(info$nrow, big.mark = ",")))
+              if (info$n_selected == 1) "" else "s",
+              format(info$nrow, big.mark = ","),
+              if (info$nrow == 1) "" else "s"))
   if (info$n_labelled > 0) cat(sprintf(" | %s labelled", info$n_labelled))
   cat("\n")
   cat(sprintf("Types: %s\n", paste(type_parts, collapse = ", ")))
-  cat("-- Open HTML viewer for full codebook with values and frequencies\n")
+  if (isTRUE(x$viewed)) {
+    cat("-- Open HTML viewer for full codebook with values and frequencies\n")
+  } else {
+    cat("-- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer\n")
+  }
 
   invisible(x)
 }
@@ -1010,6 +1142,38 @@ print.summary.codebook <- function(x, ...) {
           if (cb$truncated[i]) {
             cat(sprintf("      ... (%d more)\n",
                         cb$n_labels[i] - opts$max_values))
+          }
+        }
+      }
+
+      # Missing values (tagged NAs): codes, labels, and counts
+      if (isTRUE(opts$show_na)) {
+        na_vals <- cb$na_values[[i]]
+        na_lbls <- cb$na_labels[[i]]
+        n_sys_na <- cb$n_system_na[i]
+        if (length(na_vals) > 0 || n_sys_na > 0) {
+          cat("    Missing values:\n")
+          freq_data <- x$frequencies[[cb$name[i]]]
+          for (nav in na_vals) {
+            na_lbl <- if (nav %in% names(na_lbls)) {
+              .truncate_labels(unname(na_lbls[nav]), opts$max_len)
+            } else {
+              ""
+            }
+            cnt <- ""
+            if (!is.null(freq_data) &&
+                "na_display_value" %in% names(freq_data)) {
+              na_row <- freq_data[
+                !is.na(freq_data$na_display_value) &
+                  freq_data$na_display_value == nav, ]
+              if (nrow(na_row) > 0) {
+                cnt <- sprintf(" (n = %s)", round(na_row$freq[1]))
+              }
+            }
+            cat(sprintf("      %s = %s%s\n", nav, na_lbl, cnt))
+          }
+          if (n_sys_na > 0) {
+            cat(sprintf("      NA = (system missing) (n = %d)\n", n_sys_na))
           }
         }
       }
