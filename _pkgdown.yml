@@ -165,6 +165,10 @@ reference:
   contents:
   - linear_regression
   - logistic_regression
+  - anova.linear_regression
+  - anova.logistic_regression
+  - predict.linear_regression
+  - predict.logistic_regression
 
 - title: "Weighted Statistics"
   desc: "Individual weighted statistics for survey data"
