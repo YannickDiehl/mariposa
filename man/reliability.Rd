@@ -22,17 +22,22 @@ A reliability result object containing:
 \describe{
 \item{alpha}{Cronbach's Alpha (unstandardized)}
 \item{alpha_standardized}{Cronbach's Alpha based on standardized items}
+\item{omega}{McDonald's Omega (raw/total, one-factor ML model; NA for
+fewer than 3 items)}
+\item{omega_std}{Standardized Omega (correlation metric)}
 \item{n_items}{Number of items in the scale}
 \item{item_statistics}{Mean, SD, and N for each item}
-\item{item_total}{Corrected Item-Total Correlation and Alpha if Item Deleted}
+\item{item_total}{Corrected Item-Total Correlation, Alpha if Item
+Deleted, and Omega if Item Deleted}
 \item{inter_item_cor}{Inter-item correlation matrix}
 \item{n}{Sample size (listwise)}
 }
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 \description{
-\code{reliability()} calculates Cronbach's Alpha and detailed item statistics
-to evaluate whether your survey items form a reliable scale. This is the R
+\code{reliability()} calculates Cronbach's Alpha, McDonald's Omega, and
+detailed item statistics to evaluate whether your survey items form a
+reliable scale. This is the R
 equivalent of SPSS's \code{RELIABILITY /MODEL=ALPHA /STATISTICS=DESCRIPTIVE CORR
 /SUMMARY=TOTAL}.
 
@@ -63,6 +68,43 @@ tells you whether these items consistently measure the same concept.
 \item If alpha increases when removing an item, that item hurts reliability
 \item If alpha decreases, the item contributes to the scale
 }
+}
+
+\subsection{McDonald's Omega}{
+
+\strong{McDonald's Omega} (omega total) is a factor-model-based reliability
+coefficient. Where alpha assumes every item measures the construct
+equally well (tau-equivalence), omega fits a one-factor model and lets
+each item carry its own loading. The two agree when items are roughly
+tau-equivalent; omega is typically slightly higher (and the more accurate
+estimate) when loadings differ across items, which is the common case in
+survey scales (Hayes & Coutts, 2020).
+
+\code{reliability()} reports two variants, mirroring the two alpha
+variants: \code{omega} from the covariance metric (analogous to raw
+alpha) and \code{omega_std} from the correlation metric (analogous to
+standardized alpha). \strong{Omega if Item Deleted} refits the one-factor
+model without each item, mirroring Alpha if Item Deleted.
+
+A one-factor model needs at least 3 items to be identified: with fewer
+than 3 items the omega fields are \code{NA} (alpha is still computed),
+and Omega if Item Deleted is \code{NA} whenever the reduced scale would
+fall below 3 items.
+}
+
+\subsection{Weighted variants and validation status}{
+
+Cronbach's alpha and the item statistics are validated against SPSS v29
+\code{RELIABILITY} output (weighted and unweighted). McDonald's omega is
+currently an R-only statistic (Tier 4 per the Validation Charter): SPSS
+offers omega from v27 onward, but IBM's algorithm documentation for it is
+not publicly retrievable and no SPSS v29 reference run exists yet.
+mariposa computes omega from a one-factor maximum-likelihood solution
+(the same estimator family as \code{\link{efa}} with \code{fm = "ml"}).
+The weighted omega uses the same weighted correlation and covariance
+matrices as the weighted alpha and reduces exactly to the unweighted
+omega when all weights equal 1 (enforced by an internal invariance
+suite); see \code{vignette("spss-compatibility")} for validation status.
 }
 
 \subsection{When to Use This}{
@@ -102,6 +144,14 @@ result              # compact one-line overview
 summary(result)     # full detailed output with all sections
 summary(result, inter_item_correlations = FALSE)  # hide correlations
 
+}
+\references{
+McDonald, R. P. (1999). \emph{Test Theory: A Unified Treatment}.
+Mahwah, NJ: Lawrence Erlbaum.
+
+Hayes, A. F., & Coutts, J. J. (2020). Use omega rather than Cronbach's
+alpha for estimating reliability. But... \emph{Communication Methods and
+Measures}, 14(1), 1-24.
 }
 \seealso{
 \code{\link{row_means}} for creating mean indices after checking reliability.

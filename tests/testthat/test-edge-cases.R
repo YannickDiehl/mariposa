@@ -324,8 +324,13 @@ test_that("ancova errors without covariate argument", {
 # 14. reliability: edge cases
 # ===========================================================================
 test_that("reliability with 2 items works", {
-  result <- reliability(survey_data, trust_government, trust_media)
+  # Alpha works at k = 2; omega needs >= 3 items and warns (0.6.13)
+  expect_warning(
+    result <- reliability(survey_data, trust_government, trust_media),
+    "at least 3 items"
+  )
   expect_s3_class(result, "reliability")
+  expect_true(is.na(result$omega))
   output <- capture.output(print(result))
   expect_true(any(grepl("Cronbach", output, fixed = TRUE)))
 })

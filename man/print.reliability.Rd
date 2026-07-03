@@ -19,8 +19,8 @@ Invisibly returns the input object \code{x}.
 }
 \description{
 Compact print method for objects of class \code{"reliability"}.
-Shows Cronbach's Alpha with quality interpretation and item count
-in a single line per group.
+Shows Cronbach's Alpha (with quality interpretation), McDonald's Omega,
+and item count in a single line per group.
 
 For the full detailed output including item statistics, inter-item
 correlations, and item-total statistics, use \code{summary()}.

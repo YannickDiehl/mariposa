@@ -86,6 +86,15 @@ tier4_weighted <- c("mann_whitney", "kruskal_wallis", "wilcoxon_test",
                     "friedman_test", "binomial_test", "dunn_test",
                     "pairwise_wilcoxon", "kendall_tau")
 
+# R-only statistics inside otherwise SPSS-validated functions (Charter §4,
+# Tier 4), named per function. reliability()'s McDonald's omega (0.6.13) is
+# a one-factor ML solution; IBM does not publicly document the SPSS omega
+# algorithm and no SPSS v29 reference run exists yet
+# (.claude/spss-syntax-omega-references.sps), so omega/omega_std/
+# omega_if_deleted are Internal (Tier 4) in both the weighted and the
+# unweighted path. Remove the entry once the reference run lands.
+tier4_statistics <- c(reliability = "McDonald's omega (all paths)")
+
 # 3. Exception registry
 helper_path <- file.path(test_dir, "helper-validation-tolerances.R")
 exception_registry <- list()
@@ -179,20 +188,29 @@ render_table_row <- function(fn) {
   # The shared weighted-statistics file covers all w_* functions
   if (fn %in% w_funcs) fn_alias <- "weighted_statistics"
 
-  weighted_col <- if (fn %in% tier4_weighted) "Internal (Tier 4)" else "—"
+  tier4_notes <- character()
+  if (fn %in% tier4_weighted) tier4_notes <- c(tier4_notes, "weighted variant")
+  if (fn %in% names(tier4_statistics)) {
+    tier4_notes <- c(tier4_notes, tier4_statistics[[fn]])
+  }
+  tier4_col <- if (length(tier4_notes)) {
+    paste(tier4_notes, collapse = "; ")
+  } else {
+    "—"
+  }
 
   matched <- per_file_stats[vapply(per_file_stats,
                                    function(x) x$fn == fn || x$fn == fn_alias,
                                    logical(1))]
   if (length(matched) == 0L) {
     return(sprintf("| `%s` | not validated | — | — | — | — | %s |",
-                   fn, weighted_col))
+                   fn, tier4_col))
   }
   cs <- matched[[1]]$counts
   status <- if (cs["legacy"] > 0L) "legacy (migration needed)" else "compliant"
   sprintf("| `%s` | %s | %d | %d | %d | %d | %s |",
           fn, status, cs["spec"], cs["display"], cs["exception"], cs["total"],
-          weighted_col)
+          tier4_col)
 }
 
 today <- format(Sys.Date(), "%Y-%m-%d")
@@ -247,16 +265,19 @@ rmd_lines <- c(
   "The columns show how many `assert_spss()` calls per tier the validation file",
   "contains. \"Total\" is the total number of charter-compliant assertions.",
   "",
-  "The \"Weighted variant\" column flags functions whose *weighted* computation",
-  "has no SPSS equivalent: SPSS `NPAR TESTS` and `NONPAR CORR` ignore",
-  "`WEIGHT BY`, so these weighted paths are R-only (\"Internal (Tier 4)\") and",
-  "are covered by internal regression tests and a weights-equal-1 invariance",
-  "suite instead of SPSS references. (`mann_whitney`'s weighted variant is a",
-  "design-based rank test additionally validated against",
-  "`survey::svyranktest()`.) The unweighted statistics of these functions are",
-  "SPSS-validated as shown in the tier columns.",
+  "The \"Internal (Tier 4)\" column flags statistics that have no SPSS",
+  "reference and are therefore R-only: for the rank-based family the",
+  "*weighted variant* (SPSS `NPAR TESTS` and `NONPAR CORR` ignore",
+  "`WEIGHT BY`); for `reliability`, McDonald's omega in all paths (IBM does",
+  "not publicly document the SPSS omega algorithm; an SPSS v29 reference run",
+  "is pending). Tier-4 statistics are covered by internal regression and",
+  "cross-check tests plus a weights-equal-1 invariance suite instead of SPSS",
+  "references. (`mann_whitney`'s weighted variant is a design-based rank",
+  "test additionally validated against `survey::svyranktest()`.) All other",
+  "statistics of these functions are SPSS-validated as shown in the tier",
+  "columns.",
   "",
-  "| Function | Status | Spec | Display | Exception | Total | Weighted variant |",
+  "| Function | Status | Spec | Display | Exception | Total | Internal (Tier 4) |",
   "|---|---|---:|---:|---:|---:|---|"
 )
 

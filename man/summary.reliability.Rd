@@ -17,7 +17,8 @@
 \arguments{
 \item{object}{A \code{reliability} result object}
 
-\item{reliability_statistics}{Show Cronbach's Alpha statistics? (Default: TRUE)}
+\item{reliability_statistics}{Show Cronbach's Alpha and McDonald's Omega
+statistics? (Default: TRUE)}
 
 \item{item_statistics}{Show per-item means and SDs? (Default: TRUE)}
 

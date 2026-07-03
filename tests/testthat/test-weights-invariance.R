@@ -237,10 +237,15 @@ test_that("logistic_regression: weights == 1 reproduces unweighted coef/omnibus"
                tolerance = TOL)
 })
 
-test_that("reliability: weights == 1 reproduces unweighted alpha", {
+test_that("reliability: weights == 1 reproduces unweighted alpha and omega", {
   rw <- reliability(inv_data, i1, i2, i3, weights = w1)
   ru <- reliability(inv_data, i1, i2, i3)
   expect_equal(rw$alpha, ru$alpha, tolerance = TOL)
+  # McDonald's omega (0.6.13): the weighted one-factor ML solution uses the
+  # weighted correlation/covariance matrices, which collapse exactly to
+  # their unweighted counterparts at w == 1.
+  expect_equal(rw$omega,     ru$omega,     tolerance = TOL)
+  expect_equal(rw$omega_std, ru$omega_std, tolerance = TOL)
 })
 
 

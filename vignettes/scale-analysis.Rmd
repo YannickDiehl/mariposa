@@ -35,7 +35,7 @@ This guide uses the trust items from `survey_data` (trust in government, media, 
 
 | Function | Purpose |
 |----------|---------|
-| `reliability()` | Internal consistency (Cronbach's Alpha) |
+| `reliability()` | Internal consistency (Cronbach's Alpha, McDonald's Omega) |
 | `efa()` | Discover underlying dimensions (factor analysis) |
 | `row_means()` | Row-wise mean indices |
 | `row_sums()` | Row-wise sums |
@@ -70,6 +70,12 @@ The detailed output shows item-total correlations, alpha-if-item-deleted, and in
 **Item-Total Correlation** shows how well each item fits the scale. Values above 0.40 indicate good fit; below 0.20 suggests the item does not belong.
 
 **Alpha if Item Deleted** shows what happens without each item. If alpha increases when you remove an item, that item weakens the scale.
+
+### McDonald's Omega
+
+Alongside alpha, `reliability()` reports **McDonald's Omega**, a factor-model-based reliability coefficient. Alpha assumes all items measure the construct equally well; omega fits a one-factor model and lets each item carry its own loading, which usually makes it the more accurate estimate when item loadings differ. The same thresholds as for alpha are commonly applied. Omega needs at least 3 items (with 2 items it is reported as `NA`), and **Omega if Item Deleted** appears in the item-total table for scales of 4 or more items.
+
+Note: omega is currently an R-only statistic (no SPSS reference run yet); see `vignette("spss-compatibility")` for its validation status.
 
 ### With Survey Weights
 

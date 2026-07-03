@@ -31,7 +31,8 @@ In case of conflict about validation matters, the
 | Bug fix, output changes toward reference implementation | PATCH | required, "Bug fixes" |
 | Robustness fix (crash → error/NA) | PATCH | required |
 | Dependency added/removed | PATCH | required |
-| New exported function/argument | MINOR | required, "New features" |
+| New statistic or argument within an existing function | PATCH | required, "New features" |
+| New exported function(s) / feature set (milestone-scale) | MINOR | required, "New features" |
 | New output section (print/summary layout change) | MINOR | required |
 | Deprecation warning introduced | MINOR | required, "Deprecations" |
 | Deprecated thing removed / rename executed / result-object shape change | MINOR (pre-1.0) | required, "Breaking changes" section at top |
@@ -81,6 +82,7 @@ The package has few users; breaking changes are acceptable but never casual:
 | Result-column harmonization (canonical names, old kept as duplicate for one release) - done | 0.6.10 | PATCH (with duplicate bridge, declared) |
 | Deprecation cleanup: remove 0.6.9 argument bridges + 0.6.10 duplicate columns - done | 0.6.11 | PATCH (breaking, bridges expired, declared) |
 | Weighted-rank correctness (kendall_tau tau-b, kruskal_wallis grand mean rank) + w == 1 invariance suite + accurate claims - done | 0.6.12 | PATCH |
+| McDonald's omega in reliability() (one-factor ML, weighted variant, omega-if-deleted; Tier 4 pending SPSS reference run) - done | 0.6.13 | PATCH (new statistic within an existing function) |
 | SPSS v29 reference runs for the Tier-4/order-statistics gaps (weighted quantiles/median/IQR, tied Kendall, weighted regression w/ categorical predictor) — maintainer runs `.claude/spss-syntax-0.6.4-references.sps`, results pasted into the validation tests | 0.6.x | PATCH (needs maintainer + SPSS v29) |
 | Optional polish: format_stat_table adoption, snapshot-test migration, remaining BACKLOG.md quality items | 0.6.x | PATCH/MICRO |
 | API freeze + full SPSS validation coverage per Charter §9 | 1.0.0 | MAJOR |

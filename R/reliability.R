@@ -2,8 +2,9 @@
 #' Check How Reliably Your Scale Measures a Concept
 #'
 #' @description
-#' \code{reliability()} calculates Cronbach's Alpha and detailed item statistics
-#' to evaluate whether your survey items form a reliable scale. This is the R
+#' \code{reliability()} calculates Cronbach's Alpha, McDonald's Omega, and
+#' detailed item statistics to evaluate whether your survey items form a
+#' reliable scale. This is the R
 #' equivalent of SPSS's \code{RELIABILITY /MODEL=ALPHA /STATISTICS=DESCRIPTIVE CORR
 #' /SUMMARY=TOTAL}.
 #'
@@ -21,9 +22,13 @@
 #' \describe{
 #'   \item{alpha}{Cronbach's Alpha (unstandardized)}
 #'   \item{alpha_standardized}{Cronbach's Alpha based on standardized items}
+#'   \item{omega}{McDonald's Omega (raw/total, one-factor ML model; NA for
+#'     fewer than 3 items)}
+#'   \item{omega_std}{Standardized Omega (correlation metric)}
 #'   \item{n_items}{Number of items in the scale}
 #'   \item{item_statistics}{Mean, SD, and N for each item}
-#'   \item{item_total}{Corrected Item-Total Correlation and Alpha if Item Deleted}
+#'   \item{item_total}{Corrected Item-Total Correlation, Alpha if Item
+#'     Deleted, and Omega if Item Deleted}
 #'   \item{inter_item_cor}{Inter-item correlation matrix}
 #'   \item{n}{Sample size (listwise)}
 #' }
@@ -53,6 +58,41 @@
 #'   \item If alpha increases when removing an item, that item hurts reliability
 #'   \item If alpha decreases, the item contributes to the scale
 #' }
+#'
+#' ## McDonald's Omega
+#'
+#' **McDonald's Omega** (omega total) is a factor-model-based reliability
+#' coefficient. Where alpha assumes every item measures the construct
+#' equally well (tau-equivalence), omega fits a one-factor model and lets
+#' each item carry its own loading. The two agree when items are roughly
+#' tau-equivalent; omega is typically slightly higher (and the more accurate
+#' estimate) when loadings differ across items, which is the common case in
+#' survey scales (Hayes & Coutts, 2020).
+#'
+#' \code{reliability()} reports two variants, mirroring the two alpha
+#' variants: \code{omega} from the covariance metric (analogous to raw
+#' alpha) and \code{omega_std} from the correlation metric (analogous to
+#' standardized alpha). **Omega if Item Deleted** refits the one-factor
+#' model without each item, mirroring Alpha if Item Deleted.
+#'
+#' A one-factor model needs at least 3 items to be identified: with fewer
+#' than 3 items the omega fields are \code{NA} (alpha is still computed),
+#' and Omega if Item Deleted is \code{NA} whenever the reduced scale would
+#' fall below 3 items.
+#'
+#' ## Weighted variants and validation status
+#'
+#' Cronbach's alpha and the item statistics are validated against SPSS v29
+#' \code{RELIABILITY} output (weighted and unweighted). McDonald's omega is
+#' currently an R-only statistic (Tier 4 per the Validation Charter): SPSS
+#' offers omega from v27 onward, but IBM's algorithm documentation for it is
+#' not publicly retrievable and no SPSS v29 reference run exists yet.
+#' mariposa computes omega from a one-factor maximum-likelihood solution
+#' (the same estimator family as \code{\link{efa}} with \code{fm = "ml"}).
+#' The weighted omega uses the same weighted correlation and covariance
+#' matrices as the weighted alpha and reduces exactly to the unweighted
+#' omega when all weights equal 1 (enforced by an internal invariance
+#' suite); see \code{vignette("spss-compatibility")} for validation status.
 #'
 #' ## When to Use This
 #'
@@ -96,6 +136,14 @@
 #' \code{\link{pearson_cor}} for bivariate correlations.
 #'
 #' \code{\link{summary.reliability}} for detailed output with toggleable sections.
+#'
+#' @references
+#' McDonald, R. P. (1999). \emph{Test Theory: A Unified Treatment}.
+#' Mahwah, NJ: Lawrence Erlbaum.
+#'
+#' Hayes, A. F., & Coutts, J. J. (2020). Use omega rather than Cronbach's
+#' alpha for estimating reliability. But... \emph{Communication Methods and
+#' Measures}, 14(1), 1-24.
 #'
 #' @family scale
 #' @export
@@ -207,6 +255,8 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     return(list(
       alpha = NA_real_,
       alpha_standardized = NA_real_,
+      omega = NA_real_,
+      omega_std = NA_real_,
       n_items = k,
       item_statistics = NULL,
       item_total = NULL,
@@ -253,6 +303,52 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   mean_r <- mean(off_diag)
 
   alpha_standardized <- (k * mean_r) / (1 + (k - 1) * mean_r)
+
+  # ============================================================================
+  # MCDONALD'S OMEGA (one-factor ML model)
+  # ============================================================================
+  # PROVENANCE: SPSS v27+ offers McDonald's omega in RELIABILITY, but IBM's
+  # algorithm documentation for it is not publicly retrievable. mariposa
+  # therefore computes omega from a ONE-FACTOR maximum-likelihood solution
+  # (stats::factanal on the (weighted) correlation matrix -- the same
+  # estimator family as efa()'s fm = "ml"), with the raw-metric omega
+  # obtained by rescaling loadings/uniquenesses via the (weighted)
+  # covariance diagonal. n.obs follows the package's frequency-weight
+  # convention (unrounded sum(w), Charter §5.1). Pending the SPSS v29
+  # reference run (.claude/spss-syntax-omega-references.sps, 0.6.13) this
+  # statistic is Tier 4 / Internal per the Validation Charter (§4).
+  # References: McDonald (1999); Hayes & Coutts (2020).
+
+  if (k < 3) {
+    cli_warn(c(
+      "McDonald's omega requires at least 3 items; a one-factor model is not identified for k = {k}.",
+      "i" = "Omega fields are set to NA. Cronbach's alpha is unaffected."
+    ))
+    omega <- NA_real_
+    omega_std <- NA_real_
+    omega_if_deleted <- rep(NA_real_, k)
+  } else {
+    om <- .omega_one_factor(cor_mat, cov_mat, w_n)
+    if (!is.null(om$error)) {
+      cli_warn(c(
+        "The one-factor model for McDonald's omega could not be fitted; omega is set to NA.",
+        "i" = "factanal reported: {om$error}"
+      ))
+    }
+    omega <- om$omega
+    omega_std <- om$omega_std
+
+    # Omega if Item Deleted: refit the one-factor model on the reduced
+    # correlation matrix (mirrors Alpha if Item Deleted). For k - 1 < 3 the
+    # reduced model is unidentified -> NA. Refit failures degrade to NA
+    # silently (the headline warning above already covers pathologies).
+    omega_if_deleted <- vapply(seq_len(k), function(i) {
+      if (k - 1 < 3) return(NA_real_)
+      idx <- setdiff(seq_len(k), i)
+      .omega_one_factor(cor_mat[idx, idx, drop = FALSE],
+                        cov_mat[idx, idx, drop = FALSE], w_n)$omega
+    }, numeric(1))
+  }
 
   # ============================================================================
   # ITEM STATISTICS (Mean, SD, N per item)
@@ -325,7 +421,8 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     scale_mean_if_deleted = scale_mean_if_deleted,
     scale_var_if_deleted = scale_var_if_deleted,
     corrected_item_total_r = corrected_item_total_r,
-    alpha_if_deleted = alpha_if_deleted
+    alpha_if_deleted = alpha_if_deleted,
+    omega_if_deleted = omega_if_deleted
   )
 
   # ============================================================================
@@ -335,6 +432,8 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   list(
     alpha = alpha,
     alpha_standardized = alpha_standardized,
+    omega = omega,
+    omega_std = omega_std,
     n_items = k,
     item_statistics = item_statistics,
     item_total = item_total,
@@ -342,6 +441,55 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     n = n,
     weighted_n = if (!is.null(weights_vec)) w_n else NULL
   )
+}
+
+
+# ============================================================================
+# MCDONALD'S OMEGA HELPER
+# ============================================================================
+
+#' Fit a one-factor ML model and compute McDonald's omega
+#'
+#' @description
+#' Fits a single-factor maximum-likelihood factor model to the (possibly
+#' weighted) correlation matrix via stats::factanal() and returns both the
+#' standardized omega (correlation metric) and the raw/total omega
+#' (covariance metric, obtained by rescaling loadings with item SDs and
+#' uniquenesses with item variances). Non-convergence and Heywood-adjacent
+#' factanal failures are caught and reported as NA plus an error message.
+#' See the provenance note in .reliability_core().
+#'
+#' @param cor_mat (weighted) correlation matrix of the items
+#' @param cov_mat (weighted) covariance matrix of the items
+#' @param n_obs number of listwise-complete cases; for weighted analyses the
+#'   unrounded sum of weights (Charter §5.1 convention)
+#' @return list(omega, omega_std, error) — error is NULL on success
+#' @noRd
+.omega_one_factor <- function(cor_mat, cov_mat, n_obs) {
+  fit <- tryCatch(
+    stats::factanal(covmat = cor_mat, factors = 1, n.obs = n_obs),
+    error = function(e) e
+  )
+  if (inherits(fit, "error")) {
+    return(list(omega = NA_real_, omega_std = NA_real_,
+                error = conditionMessage(fit)))
+  }
+
+  # Correlation metric: loadings lambda_i, uniquenesses theta_i
+  lambda <- as.numeric(fit$loadings)
+  theta  <- as.numeric(fit$uniquenesses)
+
+  # Standardized omega: (sum lambda)^2 / ((sum lambda)^2 + sum theta)
+  omega_std <- sum(lambda)^2 / (sum(lambda)^2 + sum(theta))
+
+  # Raw (total) omega: rescale to the covariance metric using the item
+  # SDs/variances from the same (weighted) covariance matrix diagonal
+  item_var   <- diag(cov_mat)
+  lambda_raw <- lambda * sqrt(item_var)
+  theta_raw  <- theta * item_var
+  omega <- sum(lambda_raw)^2 / (sum(lambda_raw)^2 + sum(theta_raw))
+
+  list(omega = omega, omega_std = omega_std, error = NULL)
 }
 
 
@@ -417,8 +565,8 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #'
 #' @description
 #' Compact print method for objects of class \code{"reliability"}.
-#' Shows Cronbach's Alpha with quality interpretation and item count
-#' in a single line per group.
+#' Shows Cronbach's Alpha (with quality interpretation), McDonald's Omega,
+#' and item count in a single line per group.
 #'
 #' For the full detailed output including item statistics, inter-item
 #' correlations, and item-total statistics, use \code{summary()}.
@@ -464,11 +612,14 @@ print.reliability <- function(x, digits = 3, ...) {
   } else {
     as.character(res$n)
   }
+  omega <- res$omega %||% NA_real_
 
   cat(sprintf("Reliability Analysis: %d items%s\n", n_items, weighted_tag))
-  cat(sprintf("  Cronbach's Alpha = %s (%s), N = %s\n",
+  cat(sprintf("  Cronbach's Alpha = %s (%s), McDonald's Omega = %s, N = %s\n",
               format(round(alpha, digits), nsmall = digits),
-              interp, n_display))
+              interp,
+              format(round(omega, digits), nsmall = digits),
+              n_display))
 }
 
 
@@ -484,7 +635,8 @@ print.reliability <- function(x, digits = 3, ...) {
 #' specific sections.
 #'
 #' @param object A \code{reliability} result object
-#' @param reliability_statistics Show Cronbach's Alpha statistics? (Default: TRUE)
+#' @param reliability_statistics Show Cronbach's Alpha and McDonald's Omega
+#'   statistics? (Default: TRUE)
 #' @param item_statistics Show per-item means and SDs? (Default: TRUE)
 #' @param inter_item_correlations Show inter-item correlation matrix? (Default: TRUE)
 #' @param item_total_statistics Show item-total statistics? (Default: TRUE)
@@ -578,6 +730,10 @@ print.summary.reliability <- function(x, ...) {
                 format(round(x$alpha, digits), nsmall = digits)))
     cat(sprintf("  Alpha (standardized):          %s\n",
                 format(round(x$alpha_standardized, digits), nsmall = digits)))
+    cat(sprintf("  McDonald's Omega:              %s\n",
+                format(round(x$omega %||% NA_real_, digits), nsmall = digits)))
+    cat(sprintf("  Omega (standardized):          %s\n",
+                format(round(x$omega_std %||% NA_real_, digits), nsmall = digits)))
     cat(sprintf("  N of Items:                    %d\n", x$n_items))
 
     n_label <- if (!is.null(x$weighted_n)) {
@@ -622,6 +778,9 @@ print.summary.reliability <- function(x, ...) {
       alpha_deleted = round(x$item_total$alpha_if_deleted, digits),
       stringsAsFactors = FALSE
     )
+    if (!is.null(x$item_total$omega_if_deleted)) {
+      total_df$omega_deleted <- round(x$item_total$omega_if_deleted, digits)
+    }
     print(total_df, row.names = FALSE)
   }
 }
