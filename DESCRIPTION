@@ -1,7 +1,7 @@
 Package: mariposa
 Type: Package
 Title: 'SPSS'-Compatible Statistical Tools for Survey Data
-Version: 0.7.0
+Version: 0.7.1
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
@@ -25,14 +25,14 @@ Language: en
 Encoding: UTF-8
 Depends: R (>= 4.1.0)
 Imports:
-    cli,
-    htmltools,
+    cli (>= 3.0.0),
+    htmltools (>= 0.5.0),
     stats,
     utils,
-    dplyr,
-    rlang,
-    tidyselect,
-    tibble
+    dplyr (>= 1.0.0),
+    rlang (>= 1.0.0),
+    tidyselect (>= 1.1.0),
+    tibble (>= 3.0.0)
 Suggests:
     testthat (>= 3.0.0),
     knitr,

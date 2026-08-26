@@ -261,6 +261,11 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 #' @return The modified tibble with tagged NAs.
 #' @noRd
 .tag_user_missing_values <- function(data, missing_values, format, verbose) {
+  # Guard for the set_na() unnamed-data-frame path, which reaches this
+  # function without a prior haven check (the read_* callers guarantee
+  # haven before getting here, so this is a no-op for them).
+  .check_haven("tagged NAs")
+
   missing_values <- sort(unique(missing_values))
   if (length(missing_values) == 0L) return(data)
 
