@@ -312,13 +312,13 @@ to_character <- function(data, ..., drop_na = TRUE,
 #'     stripping the labelled class.
 #' }
 #'
-#' @seealso [to_label()] for the reverse (numeric → factor),
+#' @seealso [to_label()] for the reverse (numeric -> factor),
 #'   [to_labelled()] for creating labelled vectors
 #'
 #' @family labels
 #'
 #' @examples
-#' # Numeric factor levels → numeric
+#' # Numeric factor levels -> numeric
 #' x <- factor(c("1", "3", "5", "3"))
 #' to_numeric(x)
 #' # [1] 1 3 5 3
@@ -327,7 +327,7 @@ to_character <- function(data, ..., drop_na = TRUE,
 #' to_numeric(x, use_labels = FALSE)
 #' # [1] 1 2 3 2
 #'
-#' # Haven labelled → plain numeric
+#' # Haven labelled -> plain numeric
 #' to_numeric(survey_data$life_satisfaction)
 #'
 #' @export
@@ -478,7 +478,7 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
 #' @family labels
 #'
 #' @examples
-#' # Factor → haven_labelled
+#' # Factor -> haven_labelled
 #' x <- factor(c("Male", "Female", "Male"))
 #' to_labelled(x)
 #'

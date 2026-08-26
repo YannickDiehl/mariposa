@@ -43,7 +43,7 @@ Think of it as:
 \strong{Adjusted P-values}: Control for multiple comparisons
 \itemize{
 \item p < 0.05: Groups are significantly different
-\item p ≥ 0.05: No significant difference between these groups
+\item p >= 0.05: No significant difference between these groups
 \item When you make many comparisons, chance alone could produce false positives
 \item Tukey adjustment protects against this by being more conservative
 }

@@ -13,6 +13,9 @@
 
 \item{...}{Additional arguments passed to print}
 }
+\value{
+Invisibly returns the input object \code{x}.
+}
 \description{
 Prints a formatted summary of weighted quantile calculations, including quantiles,
 sample sizes, and weights (if applicable). For grouped data, results are

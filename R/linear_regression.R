@@ -1487,6 +1487,8 @@ print.summary.linear_regression <- function(x, ...) {
 #'
 #' @param object A \code{linear_regression} result.
 #' @param ... Passed to \code{stats::predict.lm}.
+#' @return A numeric vector of predictions (or a matrix/list, depending on
+#'   the arguments), as returned by \code{stats::predict.lm}.
 #' @export
 #' @method predict linear_regression
 predict.linear_regression <- function(object, ...) {
@@ -1502,6 +1504,8 @@ predict.linear_regression <- function(object, ...) {
 #'
 #' @param object A \code{linear_regression} result.
 #' @param ... Passed to \code{stats::anova.lm}.
+#' @return An \code{anova} table (sequential Type-I sums of squares), as
+#'   returned by \code{stats::anova.lm}.
 #' @export
 #' @method anova linear_regression
 anova.linear_regression <- function(object, ...) {

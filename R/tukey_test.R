@@ -26,7 +26,7 @@
 #'
 #' **Adjusted P-values**: Control for multiple comparisons
 #' - p < 0.05: Groups are significantly different
-#' - p ≥ 0.05: No significant difference between these groups
+#' - p >= 0.05: No significant difference between these groups
 #' - When you make many comparisons, chance alone could produce false positives
 #' - Tukey adjustment protects against this by being more conservative
 #'

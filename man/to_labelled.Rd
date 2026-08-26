@@ -40,7 +40,7 @@ the unique character values as labels.
 }
 }
 \examples{
-# Factor → haven_labelled
+# Factor -> haven_labelled
 x <- factor(c("Male", "Female", "Male"))
 to_labelled(x)
 

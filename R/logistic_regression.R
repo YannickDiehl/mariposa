@@ -1025,6 +1025,9 @@ print.summary.logistic_regression <- function(x, ...) {
 #'
 #' @param object A \code{logistic_regression} result.
 #' @param ... Passed to \code{stats::predict.glm}.
+#' @return A numeric vector of predictions on the scale requested via
+#'   \code{type} (link scale by default), as returned by
+#'   \code{stats::predict.glm}.
 #' @export
 #' @method predict logistic_regression
 predict.logistic_regression <- function(object, ...) {
@@ -1040,6 +1043,8 @@ predict.logistic_regression <- function(object, ...) {
 #'
 #' @param object A \code{logistic_regression} result.
 #' @param ... Passed to \code{stats::anova.glm}.
+#' @return An \code{anova} table (sequential analysis of deviance per
+#'   term), as returned by \code{stats::anova.glm}.
 #' @export
 #' @method anova logistic_regression
 anova.logistic_regression <- function(object, ...) {

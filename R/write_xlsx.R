@@ -455,7 +455,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 }
 
 
-#' Standard layout: valid rows → Total Valid → NA rows → Total Missing
+#' Standard layout: valid rows -> Total Valid -> NA rows -> Total Missing
 #' @noRd
 .freq_write_standard_layout <- function(wb, sheet, start_row, results,
                                          col_headers, opts) {

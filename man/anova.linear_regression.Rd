@@ -11,6 +11,10 @@
 
 \item{...}{Passed to \code{stats::anova.lm}.}
 }
+\value{
+An \code{anova} table (sequential Type-I sums of squares), as
+returned by \code{stats::anova.lm}.
+}
 \description{
 For listwise + ungrouped results, dispatches to \code{stats::anova.lm}
 (sequential Type-I sum of squares per term). For the SPSS-style

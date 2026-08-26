@@ -11,6 +11,10 @@
 
 \item{...}{Passed to \code{stats::predict.lm}.}
 }
+\value{
+A numeric vector of predictions (or a matrix/list, depending on
+the arguments), as returned by \code{stats::predict.lm}.
+}
 \description{
 For listwise + ungrouped results, dispatches to \code{stats::predict.lm}
 (the result inherits from \code{"lm"}). For grouped or pairwise results,

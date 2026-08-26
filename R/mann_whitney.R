@@ -45,7 +45,7 @@
 #' - p < 0.001: Very strong evidence of difference
 #' - p < 0.01: Strong evidence of difference
 #' - p < 0.05: Moderate evidence of difference
-#' - p ≥ 0.05: No significant difference found
+#' - p >= 0.05: No significant difference found
 #'
 #' **Effect Size r** (How big is the difference?):
 #' - |r| < 0.1: Negligible difference

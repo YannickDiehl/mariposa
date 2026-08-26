@@ -125,10 +125,12 @@
 #'
 #' # With Oblimin rotation (requires GPArotation package)
 #' \donttest{
-#' efa(survey_data,
-#'     political_orientation, environmental_concern, life_satisfaction,
-#'     trust_government, trust_media, trust_science,
-#'     rotation = "oblimin")
+#' if (requireNamespace("GPArotation", quietly = TRUE)) {
+#'   efa(survey_data,
+#'       political_orientation, environmental_concern, life_satisfaction,
+#'       trust_government, trust_media, trust_science,
+#'       rotation = "oblimin")
+#' }
 #' }
 #'
 #' # Maximum Likelihood extraction

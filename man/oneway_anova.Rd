@@ -67,7 +67,7 @@ The test tells you:
 \item p < 0.001: Very strong evidence of group differences
 \item p < 0.01: Strong evidence of group differences
 \item p < 0.05: Moderate evidence of group differences
-\item p ≥ 0.05: No significant group differences found
+\item p >= 0.05: No significant group differences found
 }
 
 \strong{Effect Sizes} (How much do groups matter?):

@@ -11,6 +11,11 @@
 
 \item{...}{Passed to \code{stats::predict.glm}.}
 }
+\value{
+A numeric vector of predictions on the scale requested via
+\code{type} (link scale by default), as returned by
+\code{stats::predict.glm}.
+}
 \description{
 For ungrouped results, dispatches to \code{stats::predict.glm}
 (the result inherits from \code{"glm"}). For grouped results, raises

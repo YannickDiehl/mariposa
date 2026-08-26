@@ -46,7 +46,7 @@
 #' - p < 0.001: Very strong evidence of a difference
 #' - p < 0.01: Strong evidence of a difference
 #' - p < 0.05: Moderate evidence of a difference
-#' - p ≥ 0.05: No significant difference found
+#' - p >= 0.05: No significant difference found
 #'
 #' **Effect Sizes** (How big is the difference?):
 #' - **Cohen's d**: The standard measure
@@ -67,7 +67,7 @@
 #' - You have exactly two groups to compare
 #' - Your outcome variable is numeric (continuous)
 #' - Groups are independent (different people in each)
-#' - Data is roughly normally distributed (or n ≥ 30 per group)
+#' - Data is roughly normally distributed (or n >= 30 per group)
 #'
 #' Don't use when:
 #' - You have more than two groups (use ANOVA)

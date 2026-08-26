@@ -29,7 +29,7 @@
 #' - p < 0.001: Very strong evidence of relationship
 #' - p < 0.01: Strong evidence of relationship
 #' - p < 0.05: Moderate evidence of relationship
-#' - p ≥ 0.05: No significant relationship found
+#' - p >= 0.05: No significant relationship found
 #'
 #' **Effect Sizes** (How strong is the relationship?):
 #' - **Cramer's V**: Works for any table size (0 = no relationship, 1 = perfect relationship)

@@ -53,21 +53,23 @@ in \code{\link[=frequency]{frequency()}} and \code{\link[=codebook]{codebook()}}
 }
 }
 \examples{
-\dontrun{
-# Set -9 and -8 as missing across all numeric variables
-data <- set_na(survey_data, -9, -8)
-
-# Set missing for specific variables only
-data <- set_na(survey_data,
-  income = c(-9, -8, -42),
-  life_satisfaction = c(-9, -11)
-)
-
-# Use regular NA instead of tagged NA
+# Use regular NA instead of tagged NA (no packages required)
 data <- set_na(survey_data, -9, -8, tag = FALSE)
 
-# Check the result
-na_frequencies(data$income)
+# Tagged NAs preserve the distinction between missing types
+# (requires the haven package)
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Set -9 and -8 as missing across all numeric variables
+  data <- set_na(survey_data, -9, -8)
+
+  # Set missing for specific variables only
+  data <- set_na(survey_data,
+    income = c(-9, -8, -42),
+    life_satisfaction = c(-9, -11)
+  )
+
+  # Check the result
+  na_frequencies(data$income)
 }
 
 }

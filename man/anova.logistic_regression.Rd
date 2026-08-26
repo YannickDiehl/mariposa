@@ -11,6 +11,10 @@
 
 \item{...}{Passed to \code{stats::anova.glm}.}
 }
+\value{
+An \code{anova} table (sequential analysis of deviance per
+term), as returned by \code{stats::anova.glm}.
+}
 \description{
 For ungrouped results, dispatches to \code{stats::anova.glm} (sequential
 deviance per term). For the SPSS-style omnibus chi-square test, use

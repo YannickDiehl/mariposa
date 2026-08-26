@@ -65,7 +65,7 @@ The test tells you:
 \strong{P-value interpretation}:
 \itemize{
 \item p > 0.05: Good! Groups have similar variance (assumption met)
-\item p ≤ 0.05: Problem - groups vary differently (assumption violated)
+\item p <= 0.05: Problem - groups vary differently (assumption violated)
 }
 
 Think of it like checking if all groups are equally "spread out":
@@ -88,7 +88,7 @@ Check variance equality when:
 
 \subsection{What If Variances Are Unequal?}{
 
-If Levene's test is significant (p ≤ 0.05):
+If Levene's test is significant (p <= 0.05):
 \itemize{
 \item For t-tests: Use Welch's t-test (var.equal = FALSE)
 \item For ANOVA: Use Welch's ANOVA

@@ -44,7 +44,7 @@ The test tells you:
 \item p < 0.001: Very strong evidence of relationship
 \item p < 0.01: Strong evidence of relationship
 \item p < 0.05: Moderate evidence of relationship
-\item p ≥ 0.05: No significant relationship found
+\item p >= 0.05: No significant relationship found
 }
 
 \strong{Effect Sizes} (How strong is the relationship?):

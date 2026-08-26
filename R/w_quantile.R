@@ -160,6 +160,8 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
 #' @param digits Number of decimal places to display (default: 3)
 #' @param ... Additional arguments passed to print
 #'
+#' @return Invisibly returns the input object \code{x}.
+#'
 #' @keywords internal
 #' @export
 print.w_quantile <- function(x, digits = 3, ...) {

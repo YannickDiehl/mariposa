@@ -60,7 +60,7 @@ stripping the labelled class.
 }
 }
 \examples{
-# Numeric factor levels → numeric
+# Numeric factor levels -> numeric
 x <- factor(c("1", "3", "5", "3"))
 to_numeric(x)
 # [1] 1 3 5 3
@@ -69,12 +69,12 @@ to_numeric(x)
 to_numeric(x, use_labels = FALSE)
 # [1] 1 2 3 2
 
-# Haven labelled → plain numeric
+# Haven labelled -> plain numeric
 to_numeric(survey_data$life_satisfaction)
 
 }
 \seealso{
-\code{\link[=to_label]{to_label()}} for the reverse (numeric → factor),
+\code{\link[=to_label]{to_label()}} for the reverse (numeric -> factor),
 \code{\link[=to_labelled]{to_labelled()}} for creating labelled vectors
 
 Other labels:

@@ -73,7 +73,7 @@ The test tells you:
 \item p < 0.001: Very strong evidence of difference
 \item p < 0.01: Strong evidence of difference
 \item p < 0.05: Moderate evidence of difference
-\item p ≥ 0.05: No significant difference found
+\item p >= 0.05: No significant difference found
 }
 
 \strong{Effect Size r} (How big is the difference?):

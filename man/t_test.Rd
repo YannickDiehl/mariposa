@@ -74,7 +74,7 @@ The test tells you:
 \item p < 0.001: Very strong evidence of a difference
 \item p < 0.01: Strong evidence of a difference
 \item p < 0.05: Moderate evidence of a difference
-\item p ≥ 0.05: No significant difference found
+\item p >= 0.05: No significant difference found
 }
 
 \strong{Effect Sizes} (How big is the difference?):
@@ -104,7 +104,7 @@ Use t-test when:
 \item You have exactly two groups to compare
 \item Your outcome variable is numeric (continuous)
 \item Groups are independent (different people in each)
-\item Data is roughly normally distributed (or n ≥ 30 per group)
+\item Data is roughly normally distributed (or n >= 30 per group)
 }
 
 Don't use when:

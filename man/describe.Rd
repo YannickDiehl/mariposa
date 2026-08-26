@@ -81,7 +81,7 @@ Always start here! Use \code{describe()} to:
 
 \subsection{Interpreting Patterns}{
 \itemize{
-\item \strong{Mean ≈ Median}: Data is roughly symmetric
+\item \strong{Mean close to Median}: Data is roughly symmetric
 \item \strong{Mean > Median}: Right-skewed (tail extends right)
 \item \strong{Mean < Median}: Left-skewed (tail extends left)
 \item \strong{Large SD}: Responses vary widely

@@ -41,7 +41,7 @@
 #' - p < 0.001: Very strong evidence of group differences
 #' - p < 0.01: Strong evidence of group differences
 #' - p < 0.05: Moderate evidence of group differences
-#' - p ≥ 0.05: No significant group differences found
+#' - p >= 0.05: No significant group differences found
 #'
 #' **Effect Sizes** (How much do groups matter?):
 #' - **Eta-squared**: Proportion of variance explained by groups

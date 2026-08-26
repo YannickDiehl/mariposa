@@ -52,7 +52,7 @@
 #'
 #' ## Interpreting Patterns
 #'
-#' - **Mean ≈ Median**: Data is roughly symmetric
+#' - **Mean close to Median**: Data is roughly symmetric
 #' - **Mean > Median**: Right-skewed (tail extends right)
 #' - **Mean < Median**: Left-skewed (tail extends left)
 #' - **Large SD**: Responses vary widely

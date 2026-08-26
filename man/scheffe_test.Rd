@@ -43,7 +43,7 @@ Think of it as:
 \strong{Adjusted P-values}: Extra conservative to prevent false positives
 \itemize{
 \item p < 0.05: Groups are significantly different (you can be very confident)
-\item p ≥ 0.05: No significant difference between these groups
+\item p >= 0.05: No significant difference between these groups
 \item Scheffe adjustments are stricter than other methods
 }
 
