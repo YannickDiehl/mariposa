@@ -2546,6 +2546,17 @@ test_that("summary.crosstab: crosstab_table toggle works", {
   expect_false(any(grepl("| Total", out_off, fixed = TRUE)))
 })
 
+test_that("summary.crosstab: residuals toggle works", {
+  result <- crosstab(survey_data, gender, region)
+
+  out_off <- capture.output(print(summary(result)))
+  expect_false(any(grepl("adj.res.", out_off, fixed = TRUE)))
+
+  out_on <- capture.output(print(summary(result, residuals = TRUE)))
+  expect_true(any(grepl("adj.res.", out_on, fixed = TRUE)))
+  expect_true(any(grepl("adjusted standardized residual", out_on, fixed = TRUE)))
+})
+
 test_that("summary.crosstab: percentages toggle works", {
   result <- crosstab(survey_data, gender, region)
 

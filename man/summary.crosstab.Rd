@@ -4,7 +4,14 @@
 \alias{summary.crosstab}
 \title{Summary method for crosstab results}
 \usage{
-\method{summary}{crosstab}(object, crosstab_table = TRUE, percentages = TRUE, digits = 1, ...)
+\method{summary}{crosstab}(
+  object,
+  crosstab_table = TRUE,
+  percentages = TRUE,
+  residuals = FALSE,
+  digits = 1,
+  ...
+)
 }
 \arguments{
 \item{object}{A \code{crosstab} result object.}
@@ -15,6 +22,12 @@
 \item{percentages}{Logical. Show the percentage sub-rows inside the
 table (as requested via the \code{percentages} argument of
 \code{\link{crosstab}})? (Default: TRUE)}
+
+\item{residuals}{Logical. Show the adjusted standardized residual as a
+sub-row in each cell (SPSS \code{CROSSTABS /CELLS=ASRESID})? After a
+significant \code{\link{chi_square}} test, cells with an absolute
+adjusted residual above roughly 2 are the ones deviating from
+independence. (Default: FALSE, matching SPSS's opt-in cell display)}
 
 \item{digits}{Number of decimal places for percentages (Default: 1).}
 
@@ -32,6 +45,7 @@ totals, and the requested percentage breakdowns.
 result <- crosstab(survey_data, gender, region)
 summary(result)
 summary(result, percentages = FALSE)
+summary(result, residuals = TRUE)   # which cells drive the association?
 
 }
 \seealso{

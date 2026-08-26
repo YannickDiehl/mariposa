@@ -99,7 +99,8 @@ tier4_weighted <- c("mann_whitney", "kruskal_wallis", "wilcoxon_test",
 # LOGISTIC REGRESSION reference run lands.
 tier4_statistics <- c(
   reliability = "McDonald's omega (all paths)",
-  logistic_regression = "all statistics (textbook-formula oracle; no SPSS v29 reference run yet)"
+  logistic_regression = "all statistics (textbook-formula oracle; no SPSS v29 reference run yet)",
+  crosstab = "adjusted standardized residuals (Haberman-formula oracle; SPSS /CELLS=ASRESID reference run pending)"
 )
 
 # 3. Exception registry

@@ -275,6 +275,10 @@ test_that("crosstab: weights == 1 reproduces unweighted counts", {
   ru <- crosstab(inv_data, g2, g3)
   expect_equal(unclass(rw$table), unclass(ru$table), tolerance = TOL,
                ignore_attr = TRUE)
+  expect_equal(unclass(rw$expected), unclass(ru$expected), tolerance = TOL,
+               ignore_attr = TRUE)
+  expect_equal(unclass(rw$adj_residuals), unclass(ru$adj_residuals),
+               tolerance = TOL, ignore_attr = TRUE)
 })
 
 

@@ -37,7 +37,11 @@ crosstab(
 \item{digits}{Decimal places for percentages (Default: 1)}
 }
 \value{
-A cross-tabulation table showing the relationship between two variables
+A cross-tabulation table showing the relationship between two
+variables. The result also carries the expected cell counts
+(\code{$expected}) and adjusted standardized residuals
+(\code{$adj_residuals}); display the residuals with
+\code{summary(result, residuals = TRUE)}.
 }
 \description{
 \code{crosstab()} shows you how two categorical variables relate to each other.
@@ -60,6 +64,14 @@ The crosstab table shows:
 \item \strong{Row \%}: Distribution within each row (e.g., "Among those with high school education, X\% live in the East")
 \item \strong{Column \%}: Distribution within each column (e.g., "Among those in the East, X\% have high school education")
 \item \strong{Total \%}: Percentage of the entire sample (e.g., "X\% of all respondents have high school education AND live in the East")
+\item \strong{Adjusted residuals} (via \code{summary(result, residuals = TRUE)},
+SPSS \code{/CELLS=ASRESID}): which cells deviate from independence.
+After a significant \code{\link{chi_square}} test, cells with
+|adj. residual| > 2 are the ones driving the association.
+For weighted tables the residuals are computed on the unrounded
+weighted cell counts; an SPSS v29 reference run for the residuals is
+pending, so they are currently verified against the Haberman formula
+(\code{chisq.test()$stdres}) rather than SPSS output.
 }
 }
 

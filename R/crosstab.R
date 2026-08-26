@@ -25,7 +25,11 @@
 #' @param na.rm Remove missing values before calculating? (Default: TRUE)
 #' @param digits Decimal places for percentages (Default: 1)
 #'
-#' @return A cross-tabulation table showing the relationship between two variables
+#' @return A cross-tabulation table showing the relationship between two
+#'   variables. The result also carries the expected cell counts
+#'   (\code{$expected}) and adjusted standardized residuals
+#'   (\code{$adj_residuals}); display the residuals with
+#'   \code{summary(result, residuals = TRUE)}.
 #'
 #' @details
 #' ## Understanding the Results
@@ -35,6 +39,14 @@
 #' - **Row %**: Distribution within each row (e.g., "Among those with high school education, X% live in the East")
 #' - **Column %**: Distribution within each column (e.g., "Among those in the East, X% have high school education")
 #' - **Total %**: Percentage of the entire sample (e.g., "X% of all respondents have high school education AND live in the East")
+#' - **Adjusted residuals** (via \code{summary(result, residuals = TRUE)},
+#'   SPSS \code{/CELLS=ASRESID}): which cells deviate from independence.
+#'   After a significant \code{\link{chi_square}} test, cells with
+#'   |adj. residual| > 2 are the ones driving the association.
+#'   For weighted tables the residuals are computed on the unrounded
+#'   weighted cell counts; an SPSS v29 reference run for the residuals is
+#'   pending, so they are currently verified against the Haberman formula
+#'   (\code{chisq.test()$stdres}) rather than SPSS output.
 #'
 #' ## When to Use This
 #'
@@ -215,6 +227,17 @@ crosstab.data.frame <- function(data, row, col,
     total_pct[is.nan(total_pct)] <- 0  # Handle division by zero
   }
 
+  # Expected counts and adjusted standardized residuals
+  # (SPSS CROSSTABS /CELLS=EXPECTED ASRESID; Haberman 1973). Weighted
+  # tables use the unrounded weighted cell counts, consistent with the
+  # /COUNT note above; with weights == 1 this reduces exactly to the
+  # unweighted result. Cells in empty rows/columns yield NA.
+  expected <- outer(row_totals, col_totals) / grand_total
+  adj_correction <- outer(1 - row_totals / grand_total,
+                          1 - col_totals / grand_total)
+  adj_residuals <- (tab_matrix - expected) / sqrt(expected * adj_correction)
+  adj_residuals[!is.finite(adj_residuals)] <- NA_real_
+
   # Create results object
   result <- list(
     table = tab_matrix,
@@ -224,6 +247,8 @@ crosstab.data.frame <- function(data, row, col,
     row_pct = row_pct,
     col_pct = col_pct,
     total_pct = total_pct,
+    expected = expected,
+    adj_residuals = adj_residuals,
     row_var = row_var,
     col_var = col_var,
     row_levels = rownames(tab_matrix),
@@ -380,6 +405,11 @@ print.crosstab <- function(x, digits = 1, ...) {
 #' @param percentages Logical. Show the percentage sub-rows inside the
 #'   table (as requested via the \code{percentages} argument of
 #'   \code{\link{crosstab}})? (Default: TRUE)
+#' @param residuals Logical. Show the adjusted standardized residual as a
+#'   sub-row in each cell (SPSS \code{CROSSTABS /CELLS=ASRESID})? After a
+#'   significant \code{\link{chi_square}} test, cells with an absolute
+#'   adjusted residual above roughly 2 are the ones deviating from
+#'   independence. (Default: FALSE, matching SPSS's opt-in cell display)
 #' @param digits Number of decimal places for percentages (Default: 1).
 #' @param ... Additional arguments (not used).
 #' @return A \code{summary.crosstab} object.
@@ -388,16 +418,19 @@ print.crosstab <- function(x, digits = 1, ...) {
 #' result <- crosstab(survey_data, gender, region)
 #' summary(result)
 #' summary(result, percentages = FALSE)
+#' summary(result, residuals = TRUE)   # which cells drive the association?
 #'
 #' @seealso \code{\link{crosstab}} for the main analysis function.
 #' @export
 #' @method summary crosstab
 summary.crosstab <- function(object, crosstab_table = TRUE,
-                             percentages = TRUE, digits = 1, ...) {
+                             percentages = TRUE, residuals = FALSE,
+                             digits = 1, ...) {
   build_summary_object(
     object     = object,
     show       = list(crosstab_table = crosstab_table,
-                      percentages = percentages),
+                      percentages = percentages,
+                      residuals = residuals),
     digits     = digits,
     class_name = "summary.crosstab"
   )
@@ -431,6 +464,7 @@ print.summary.crosstab <- function(x, ...) {
 
   show_table       <- isTRUE(x$show$crosstab_table)
   show_percentages <- isTRUE(x$show$percentages)
+  show_residuals   <- isTRUE(x$show$residuals)
 
   if (x$is_grouped) {
     # Print grouped results using standardized header
@@ -448,24 +482,29 @@ print.summary.crosstab <- function(x, ...) {
       # Print the crosstab for this group
       .print_single_crosstab(result, digits = digits,
                              show_table = show_table,
-                             show_percentages = show_percentages)
+                             show_percentages = show_percentages,
+                             show_residuals = show_residuals)
       cat("\n")
     }
   } else {
     # Print single crosstab
     .print_single_crosstab(x, digits = digits,
                            show_table = show_table,
-                           show_percentages = show_percentages)
+                           show_percentages = show_percentages,
+                           show_residuals = show_residuals)
   }
 
   invisible(x)
 }
 
 # Helper function to print a single crosstab
-# show_table / show_percentages gate the table body and the percentage
-# sub-rows (used by print.summary.crosstab)
+# show_table / show_percentages / show_residuals gate the table body, the
+# percentage sub-rows, and the adjusted-residual sub-rows (used by
+# print.summary.crosstab)
 .print_single_crosstab <- function(x, digits = 1, show_table = TRUE,
-                                   show_percentages = TRUE) {
+                                   show_percentages = TRUE,
+                                   show_residuals = FALSE) {
+  show_residuals <- show_residuals && !is.null(x$adj_residuals)
 
   # Header
   title <- paste0("Crosstabulation: ", x$row_var, " \u00d7 ", x$col_var)
@@ -507,6 +546,7 @@ print.summary.crosstab <- function(x, ...) {
   if (!is.null(x$row_pct))   pct_sub_labels <- c(pct_sub_labels, "  row %")
   if (!is.null(x$col_pct))   pct_sub_labels <- c(pct_sub_labels, "  col %")
   if (!is.null(x$total_pct)) pct_sub_labels <- c(pct_sub_labels, "  total %")
+  if (show_residuals)        pct_sub_labels <- c(pct_sub_labels, "  adj.res.")
 
   # Row label column width (interior between | delimiters)
   all_first_col <- c(display_row_levels, "Total", x$row_var, pct_sub_labels)
@@ -597,6 +637,19 @@ print.summary.crosstab <- function(x, ...) {
       ct_row("  total %", pct_vals)
     }
 
+    # Adjusted standardized residual sub-row (SPSS /CELLS=ASRESID; SPSS
+    # prints 1 decimal). No value in the Total column - residuals are
+    # defined per cell, not for marginals.
+    if (show_residuals) {
+      res_vals <- c(
+        vapply(seq_len(n_cols), function(j) {
+          if (is.na(x$adj_residuals[i, j])) "" else sprintf("%.1f", x$adj_residuals[i, j])
+        }, character(1)),
+        ""
+      )
+      ct_row("  adj.res.", res_vals)
+    }
+
     # Separator between row groups (= before Total)
     if (i < n_rows) ct_line()
   }
@@ -621,4 +674,9 @@ print.summary.crosstab <- function(x, ...) {
   }
 
   ct_line()
+
+  if (show_residuals) {
+    cat("adj.res. = adjusted standardized residual; |adj.res.| > 2 marks cells\n")
+    cat("deviating from independence (use chi_square() for the overall test).\n")
+  }
 }

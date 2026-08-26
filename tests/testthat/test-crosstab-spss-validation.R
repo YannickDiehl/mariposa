@@ -106,3 +106,47 @@ test_that("Test 3.1: crosstab gender × education grouped by region — matches 
 # chi_square pilot validates the same crosstabulations from the
 # inference-test angle (Expected Count + chi² + Sig).
 # =============================================================================
+
+# =============================================================================
+# Adjusted standardized residuals (0.6.17) — property-based (Charter Tier 4
+# until the SPSS /CELLS=ASRESID reference run lands, see .claude/BACKLOG.md).
+# Oracle: the Haberman (1973) formula as implemented independently by
+# stats::chisq.test()$stdres.
+# =============================================================================
+
+test_that("Adjusted residuals match chisq.test()$stdres (unweighted)", {
+  r <- crosstab(survey_data, gender, region)
+  ref <- suppressWarnings(
+    chisq.test(table(survey_data$gender, survey_data$region), correct = FALSE)
+  )
+  for (i in seq_len(nrow(r$adj_residuals))) {
+    for (j in seq_len(ncol(r$adj_residuals))) {
+      assert_spss(r$adj_residuals[i, j], unname(ref$stdres[i, j]),
+                  tier = "display", precision = 5,
+                  label = sprintf("adj.residual[%d,%d] gender x region", i, j))
+      assert_spss(r$expected[i, j], unname(ref$expected[i, j]),
+                  tier = "display", precision = 5,
+                  label = sprintf("expected[%d,%d] gender x region", i, j))
+    }
+  }
+})
+
+test_that("Weighted adjusted residuals follow the Haberman formula on weighted counts", {
+  r <- crosstab(survey_data, gender, region, weights = sampling_weight)
+
+  # Independent recomputation from the weighted contingency table
+  d <- survey_data[!is.na(survey_data$gender) & !is.na(survey_data$region) &
+                     !is.na(survey_data$sampling_weight), ]
+  tab <- xtabs(sampling_weight ~ gender + region, data = d)
+  rt <- rowSums(tab); ct <- colSums(tab); N <- sum(tab)
+  E <- outer(rt, ct) / N
+  expected_res <- (tab - E) / sqrt(E * outer(1 - rt / N, 1 - ct / N))
+
+  for (i in seq_len(nrow(r$adj_residuals))) {
+    for (j in seq_len(ncol(r$adj_residuals))) {
+      assert_spss(r$adj_residuals[i, j], unname(expected_res[i, j]),
+                  tier = "display", precision = 5,
+                  label = sprintf("weighted adj.residual[%d,%d]", i, j))
+    }
+  }
+})
