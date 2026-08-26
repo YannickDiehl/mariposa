@@ -159,6 +159,54 @@ test_that("Classification accuracy reproducible from cutoff 0.5", {
 })
 
 
+test_that("Weighted -2LL and pseudo-R^2 honor fractional weights unrounded", {
+  # 0.6.15 fix: stats::logLik() on a binomial GLM ROUNDS prior weights
+  # inside its aic() term (dbinom(round(m*y), round(m), mu)), which
+  # distorted -2LL, the omnibus chi-square, and Cox & Snell / Nagelkerke
+  # under fractional frequency weights. The oracle below hand-sums the
+  # weighted Bernoulli log-likelihood from the fitted probabilities with
+  # UNROUNDED weights — independent of logLik() and of the deviance slot
+  # the implementation now uses. The earlier pseudo-R^2 test in this file
+  # is unweighted (where logLik and deviance agree exactly), so it could
+  # not catch this defect.
+  r <- logistic_regression(survey_data, high_life ~ age + income,
+                           weights = sampling_weight)
+
+  d <- survey_data[stats::complete.cases(
+    survey_data[, c("high_life", "age", "income", "sampling_weight")]), ]
+  w <- d$sampling_weight
+  y <- d$high_life
+
+  fit <- suppressWarnings(
+    glm(high_life ~ age + income, data = d, family = binomial,
+        weights = sampling_weight)
+  )
+  p_hat <- fitted(fit)
+  m2_full <- -2 * sum(w * (y * log(p_hat) + (1 - y) * log(1 - p_hat)))
+
+  # The intercept-only MLE is the weighted mean of y — no glm refit needed.
+  p0 <- weighted.mean(y, w)
+  m2_null <- -2 * sum(w * (y * log(p0) + (1 - y) * log(1 - p0)))
+
+  n_w <- sum(w)  # unrounded, Charter §5.1
+  cs_expected   <- 1 - exp((m2_full - m2_null) / n_w)
+  nagk_expected <- cs_expected / (1 - exp(-m2_null / n_w))
+
+  assert_spss(r$model_summary$minus2LL, m2_full,
+              tier = "display", precision = 3,
+              label = "Weighted -2LL from hand-summed log-likelihood")
+  assert_spss(r$omnibus_test$chi_sq, m2_null - m2_full,
+              tier = "display", precision = 3,
+              label = "Weighted omnibus chi-sq from hand-summed -2LLs")
+  assert_spss(r$model_summary$cox_snell_r2, cs_expected,
+              tier = "display", precision = 5,
+              label = "Weighted Cox & Snell R^2 with unrounded sum(w)")
+  assert_spss(r$model_summary$nagelkerke_r2, nagk_expected,
+              tier = "display", precision = 5,
+              label = "Weighted Nagelkerke R^2 with unrounded sum(w)")
+})
+
+
 test_that("Structural sanity: single predictor + n + Term names", {
   r <- logistic_regression(survey_data, high_life ~ age)
   expect_equal(nrow(r$coef_table), 2L)  # intercept + age

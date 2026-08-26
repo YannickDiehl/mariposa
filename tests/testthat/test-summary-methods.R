@@ -792,6 +792,17 @@ test_that("summary.linear_regression: coefficients toggle works", {
   expect_false(any(grepl("Coefficients", out_off, fixed = TRUE)))
 })
 
+test_that("summary.linear_regression: conf_int toggle controls CI columns", {
+  result <- linear_regression(survey_data, life_satisfaction ~ age + income)
+
+  out_on <- capture.output(print(summary(result)))
+  expect_true(any(grepl("CI Lower", out_on, fixed = TRUE)))
+  expect_true(any(grepl("CI Upper", out_on, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(result, conf_int = FALSE)))
+  expect_false(any(grepl("CI Lower", out_off, fixed = TRUE)))
+})
+
 test_that("summary.linear_regression: all FALSE shows minimal output", {
   result <- linear_regression(survey_data, life_satisfaction ~ age + income)
   out_all <- capture.output(print(summary(result, model_summary = FALSE,

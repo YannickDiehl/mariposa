@@ -18,9 +18,9 @@ Invisibly returns the input object \code{x}.
 \description{
 Displays the detailed SPSS-style output for a logistic regression, with
 sections controlled by the boolean parameters passed to
-\code{\link{summary.logistic_regression}}.  Sections include model fit
-statistics (Nagelkerke R-squared, Hosmer-Lemeshow), classification table,
-coefficients with odds ratios, and model comparison (chi-squared test).
+\code{\link{summary.logistic_regression}}.  Sections include the omnibus
+test of model coefficients, model fit statistics (Nagelkerke R-squared,
+Hosmer-Lemeshow), classification table, and coefficients with odds ratios.
 }
 \examples{
 survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction > 3)

@@ -578,3 +578,65 @@ test_that("oneway_anova results carry F_statistic and no F_stat duplicate", {
   expect_true("F_statistic" %in% cols)
   expect_false("F_stat" %in% cols)
 })
+
+# --- 0.6.15: regression-correctness fixes ------------------------------------
+
+test_that("rank-deficient unweighted linear_regression drops the aliased term instead of erroring", {
+  # 0.6.15 fix: summary() drops aliased (NA) coefficients while confint()
+  # keeps them as NA rows, so the unweighted coefficient table crashed with
+  # "Tibble columns must have compatible sizes" on perfectly collinear
+  # predictors. SPSS excludes the variable and reports the rest.
+  set.seed(42)
+  d <- dplyr::tibble(x1 = rnorm(100), y = rnorm(100))
+  d$x2 <- 2 * d$x1
+
+  expect_message(
+    r <- linear_regression(d, y ~ x1 + x2),
+    "collinearity"
+  )
+  expect_setequal(r$coef_table$Term, c("(Intercept)", "x1"))
+
+  # df must count estimated terms only (model rank), not NA coefficients:
+  # 1 regression df, n - 2 residual df.
+  expect_equal(as.integer(r$anova_table$df), c(1L, 98L, 99L))
+
+  # F in the ANOVA table equals summary.lm's F on the same rank-deficient fit.
+  fs <- summary(stats::lm(y ~ x1 + x2, data = d))$fstatistic
+  expect_equal(unname(r$anova_table$F_statistic[1]), unname(fs[1]),
+               tolerance = 1e-10)
+})
+
+test_that("use = 'pairwise' refuses interactions instead of silently dropping them", {
+  # 0.6.15 fix: the pairwise path rebuilds the model from the variable list,
+  # so y ~ a * b silently became y ~ a + b with no warning.
+  data(survey_data)
+  expect_error(
+    linear_regression(survey_data, life_satisfaction ~ age * income,
+                      use = "pairwise"),
+    "pairwise"
+  )
+  expect_error(
+    linear_regression(survey_data, life_satisfaction ~ age + I(income^2),
+                      use = "pairwise"),
+    "pairwise"
+  )
+
+  # Plain additive formulas keep working.
+  r <- linear_regression(survey_data, life_satisfaction ~ age + income,
+                         use = "pairwise")
+  expect_setequal(r$coef_table$Term, c("(Intercept)", "age", "income"))
+})
+
+test_that("weighted logistic -2LL uses the deviance, not weight-rounding logLik", {
+  # 0.6.15 fix: binomial logLik() rounds fractional prior weights; the
+  # deviance carries the exact frequency-weighted -2LL for a 0/1 response.
+  data(survey_data)
+  d <- survey_data
+  d$high_life <- as.integer(d$life_satisfaction >= 4)
+
+  r <- logistic_regression(d, high_life ~ age + income,
+                           weights = sampling_weight)
+  expect_equal(r$model_summary$minus2LL, r$deviance, tolerance = 1e-12)
+  expect_equal(r$omnibus_test$chi_sq, r$null.deviance - r$deviance,
+               tolerance = 1e-12)
+})

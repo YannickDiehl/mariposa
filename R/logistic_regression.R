@@ -26,11 +26,15 @@
 #' @param conf.level Confidence level for odds ratio intervals (default 0.95).
 #' @param factors How factor predictors are entered into the model:
 #'   \code{"dummy"} (default, matches base R \code{glm()}) expands a factor
-#'   with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+#'   with \code{L} levels into \code{L - 1} contrasts; \code{"numeric"}
 #'   silently coerces factor levels to their integer codes, matching SPSS
 #'   \code{LOGISTIC REGRESSION} default behavior when no \code{/CATEGORICAL}
 #'   subcommand is given. The "numeric" mode emits a one-line
-#'   \code{cli::cli_inform()} listing the coerced variables.
+#'   \code{cli::cli_inform()} listing the coerced variables. Note that for
+#'   \emph{ordered} factors, "dummy" applies R's default polynomial
+#'   contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}), not
+#'   treatment dummies; convert with \code{factor(x, ordered = FALSE)}
+#'   first if you want dummy coding.
 #'
 #' @return For ungrouped data, an object of class
 #'   \code{c("logistic_regression", "glm", "lm")} — \strong{the fitted
@@ -110,11 +114,14 @@
 #' }
 #'
 #' \strong{Factor Predictors}: By default (\code{factors = "dummy"}),
-#' factor predictors are expanded into \code{L - 1} dummy contrasts via
-#' R's \code{stats::model.matrix()}, matching base R \code{glm()}. Pass
-#' \code{factors = "numeric"} to silently coerce factor levels to their
-#' integer codes (SPSS \code{LOGISTIC REGRESSION} default without an
-#' explicit \code{/CATEGORICAL} subcommand).
+#' factor predictors are expanded into \code{L - 1} contrasts via
+#' R's \code{stats::model.matrix()}, matching base R \code{glm()}: unordered
+#' factors get treatment (dummy) contrasts against the first level, while
+#' \emph{ordered} factors get R's default polynomial contrasts
+#' (\code{.L}/\code{.Q}/\code{.C} terms). Pass \code{factors = "numeric"}
+#' to silently coerce factor levels to their integer codes (SPSS
+#' \code{LOGISTIC REGRESSION} default without an explicit
+#' \code{/CATEGORICAL} subcommand).
 #'
 #' \strong{Grouped Analysis}: When \code{data} is grouped via
 #' \code{dplyr::group_by()}, a separate regression is run for each group
@@ -390,18 +397,6 @@ logistic_regression <- function(data, formula = NULL,
     model <- stats::glm(formula, data = data_complete, family = stats::binomial())
   }
 
-  # Also fit null model for pseudo R-squared calculations
-  null_formula <- stats::as.formula(paste(dep_name, "~ 1"))
-  if (!is.null(weights_vec)) {
-    null_model <- .glm_quiet_weights(
-      stats::glm(null_formula, data = data_complete,
-                 family = stats::binomial(), weights = .wt)
-    )
-  } else {
-    null_model <- stats::glm(null_formula, data = data_complete,
-                             family = stats::binomial())
-  }
-
   # ============================================================================
   # SPSS-COMPATIBLE STATISTICS
   # ============================================================================
@@ -419,13 +414,18 @@ logistic_regression <- function(data, formula = NULL,
     n_report   <- n_actual
   }
 
-  # -2 Log Likelihood
-  minus2LL_model <- -2 * as.numeric(stats::logLik(model))
-  minus2LL_null <- -2 * as.numeric(stats::logLik(null_model))
+  # -2 Log Likelihood — taken from the deviance, NOT stats::logLik().
+  # For a 0/1 response the residual deviance equals -2*LL exactly (the
+  # saturated log-likelihood is 0), and unlike logLik() — whose binomial
+  # aic() rounds prior weights via dbinom(round(m*y), round(m), mu) — the
+  # deviance honors fractional frequency weights unrounded (Charter §5.1).
+  # model$null.deviance is the intercept-only fit on the same data/weights.
+  minus2LL_model <- model$deviance
+  minus2LL_null <- model$null.deviance
 
   # Log likelihoods
-  LL_model <- as.numeric(stats::logLik(model))
-  LL_null <- as.numeric(stats::logLik(null_model))
+  LL_model <- -minus2LL_model / 2
+  LL_null <- -minus2LL_null / 2
 
   # Omnibus test (Model chi-square)
   omnibus_chi_sq <- minus2LL_null - minus2LL_model
@@ -740,9 +740,9 @@ summary.logistic_regression <- function(object, omnibus_test = TRUE,
 #' @description
 #' Displays the detailed SPSS-style output for a logistic regression, with
 #' sections controlled by the boolean parameters passed to
-#' \code{\link{summary.logistic_regression}}.  Sections include model fit
-#' statistics (Nagelkerke R-squared, Hosmer-Lemeshow), classification table,
-#' coefficients with odds ratios, and model comparison (chi-squared test).
+#' \code{\link{summary.logistic_regression}}.  Sections include the omnibus
+#' test of model coefficients, model fit statistics (Nagelkerke R-squared,
+#' Hosmer-Lemeshow), classification table, and coefficients with odds ratios.
 #'
 #' @param x A \code{summary.logistic_regression} object created by
 #'   \code{\link{summary.logistic_regression}}.
@@ -936,7 +936,7 @@ print.summary.logistic_regression <- function(x, ...) {
 #' Print classification table
 #' @noRd
 .print_classification_table <- function(cls) {
-  cat("  Classification Table (cutoff = 0.50)\n")
+  cat(sprintf("  Classification Table (cutoff = %.2f)\n", cls$cutoff))
   w <- 65
   cat(paste0("  ", strrep("-", w), "\n"))
   cat(sprintf("  %-20s %20s %20s\n", "", "Predicted", ""))

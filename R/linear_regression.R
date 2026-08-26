@@ -32,12 +32,16 @@
 #' @param conf.level Confidence level for coefficient intervals (default 0.95).
 #' @param factors How factor predictors are entered into the model:
 #'   \code{"dummy"} (default, matches base R \code{lm()}) expands a factor
-#'   with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+#'   with \code{L} levels into \code{L - 1} contrasts; \code{"numeric"}
 #'   silently coerces factor levels to their integer codes, matching SPSS
 #'   \code{REGRESSION} default behavior (ordinal-as-scale). The "numeric"
 #'   mode emits a one-line \code{cli::cli_inform()} listing the coerced
 #'   variables. The "numeric" mode is required to reproduce SPSS results
 #'   when factor predictors carry ordered meaning (e.g., 4-level education).
+#'   Note that for \emph{ordered} factors, "dummy" applies R's default
+#'   polynomial contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}),
+#'   not treatment dummies; convert with
+#'   \code{factor(x, ordered = FALSE)} first if you want dummy coding.
 #'
 #' @return For ungrouped + listwise data, an object of class
 #'   \code{c("linear_regression", "lm")} — \strong{the fitted \code{lm}
@@ -121,8 +125,11 @@
 #' contrast column from the design matrix is used.
 #'
 #' \strong{Factor Predictors}: By default (\code{factors = "dummy"}),
-#' factor predictors are expanded into \code{L - 1} dummy contrasts via
-#' R's \code{stats::model.matrix()}, matching base R \code{lm()}. Pass
+#' factor predictors are expanded into \code{L - 1} contrasts via
+#' R's \code{stats::model.matrix()}, matching base R \code{lm()}: unordered
+#' factors get treatment (dummy) contrasts against the first level, while
+#' \emph{ordered} factors get R's default polynomial contrasts
+#' (\code{.L}/\code{.Q}/\code{.C} terms). Pass
 #' \code{factors = "numeric"} to silently coerce factor levels to their
 #' integer codes (SPSS \code{REGRESSION} default). The "numeric" mode is
 #' required to reproduce SPSS results for ordinal predictors like
@@ -334,6 +341,18 @@ linear_regression <- function(data, formula = NULL,
 
   # Dispatch to pairwise implementation if requested
   if (use == "pairwise") {
+    # Pairwise regression is computed from the correlation matrix of the raw
+    # variables, so formula operators (interactions, I(), poly(), ...) cannot
+    # be honored — refuse rather than silently fitting main effects only.
+    term_labels <- attr(stats::terms(formula), "term.labels")
+    unsupported <- setdiff(term_labels, pred_names)
+    if (length(unsupported) > 0) {
+      cli_abort(c(
+        "{.code use = \"pairwise\"} supports only plain additive predictors.",
+        "*" = "Unsupported: {.code {unsupported}}",
+        i = "Use {.code use = \"listwise\"} for interactions or transformed terms."
+      ))
+    }
     return(.lm_core_pairwise(data, dep_name, pred_names, weights_vec,
                              standardized, conf.level, factors))
   }
@@ -386,6 +405,16 @@ linear_regression <- function(data, formula = NULL,
     model <- stats::lm(formula, data = data_complete)
   }
 
+  # Perfectly collinear terms come back as NA coefficients; SPSS excludes
+  # such variables from the equation with a note. Surface the exclusion
+  # instead of failing silently downstream.
+  aliased <- names(stats::coef(model))[is.na(stats::coef(model))]
+  if (length(aliased) > 0) {
+    cli::cli_inform(c(
+      i = "Excluded due to perfect collinearity (matching SPSS): {.var {aliased}}"
+    ))
+  }
+
   model_summary <- summary(model)
 
   # ============================================================================
@@ -430,9 +459,10 @@ linear_regression <- function(data, formula = NULL,
     ss_total <- sum(weights_vec * (y - wm_y)^2)
     ss_regression <- ss_total - ss_residual
 
-    # Degrees of freedom (SPSS uses unrounded weighted N)
+    # Degrees of freedom (SPSS uses unrounded weighted N). sw - rank equals
+    # sw - k - 1 for intercept models and stays correct without an intercept.
     df_regression <- k
-    df_residual <- sw - k - 1         # non-integer for weighted data
+    df_residual <- sw - model$rank    # non-integer for weighted data
     df_total <- sw - 1
 
     # Mean squares and F
@@ -863,8 +893,10 @@ linear_regression <- function(data, formula = NULL,
 .lm_anova <- function(model, model_summary) {
   anova_result <- stats::anova(model)
 
-  # Calculate Regression and Residual sums of squares
-  k <- length(model$coefficients) - 1  # number of predictors
+  # Regression df = number of estimated non-intercept terms. Counted on the
+  # model rank (same rule as the weighted path): aliased coefficients in
+  # rank-deficient fits carry no df.
+  k <- model$rank - attr(stats::terms(model), "intercept")
   ss_total <- sum(anova_result[["Sum Sq"]])
   ss_residual <- anova_result[["Sum Sq"]][nrow(anova_result)]
   ss_regression <- ss_total - ss_residual
@@ -873,7 +905,7 @@ linear_regression <- function(data, formula = NULL,
   df_total <- df_regression + df_residual
   ms_regression <- ss_regression / df_regression
   ms_residual <- ss_residual / df_residual
-  f_stat <- model_summary$fstatistic[1]
+  f_stat <- unname(model_summary$fstatistic[1])
   p_value <- stats::pf(f_stat, model_summary$fstatistic[2],
                         model_summary$fstatistic[3], lower.tail = FALSE)
 
@@ -898,7 +930,11 @@ linear_regression <- function(data, formula = NULL,
                              weights_vec, standardized, conf.level) {
 
   coefs <- model_summary$coefficients
+  # summary() drops aliased (NA) coefficients while confint() keeps them as
+  # NA rows — align on the summary's rows so rank-deficient fits don't
+  # produce tables of mismatched length.
   ci <- stats::confint(model, level = conf.level)
+  ci <- ci[rownames(coefs), , drop = FALSE]
 
   # Term names
   term_names <- rownames(coefs)
@@ -1029,6 +1065,10 @@ print.linear_regression <- function(x, ...) {
 #' @param model_summary Logical. Show model summary (R, R-squared)? (Default: TRUE)
 #' @param anova_table Logical. Show ANOVA table? (Default: TRUE)
 #' @param coefficients Logical. Show coefficients table? (Default: TRUE)
+#' @param conf_int Logical. Show the confidence-interval columns for B in the
+#'   coefficients table (SPSS \code{/STATISTICS CI})? The interval level is
+#'   the \code{conf.level} passed to \code{\link{linear_regression}}.
+#'   (Default: TRUE)
 #' @param collinearity Logical. Show collinearity diagnostics (Tolerance,
 #'   VIF per model term)? (Default: TRUE)
 #' @param descriptives Logical. Show the Descriptive Statistics table
@@ -1041,6 +1081,7 @@ print.linear_regression <- function(x, ...) {
 #' result <- linear_regression(survey_data, life_satisfaction ~ age + trust_government)
 #' summary(result)
 #' summary(result, descriptives = FALSE)
+#' summary(result, conf_int = FALSE)   # hide the CI columns
 #'
 #' @seealso \code{\link{linear_regression}} for the main analysis function.
 #' @export
@@ -1048,6 +1089,7 @@ print.linear_regression <- function(x, ...) {
 summary.linear_regression <- function(object, model_summary = TRUE,
                                        anova_table = TRUE,
                                        coefficients = TRUE,
+                                       conf_int = TRUE,
                                        collinearity = TRUE,
                                        descriptives = TRUE,
                                        digits = 3, ...) {
@@ -1056,6 +1098,7 @@ summary.linear_regression <- function(object, model_summary = TRUE,
     show       = list(model_summary = model_summary,
                       anova_table   = anova_table,
                       coefficients  = coefficients,
+                      conf_int      = conf_int,
                       collinearity  = collinearity,
                       descriptives  = descriptives),
     digits     = digits,
@@ -1123,6 +1166,7 @@ print.summary.linear_regression <- function(x, ...) {
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+  show_ci    <- if (!is.null(x$show)) isTRUE(x$show$conf_int) else TRUE
   show_collin <- if (!is.null(x$show)) isTRUE(x$show$collinearity) else TRUE
   show_desc  <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
 
@@ -1143,7 +1187,7 @@ print.summary.linear_regression <- function(x, ...) {
 
   if (show_coefs) {
     cat("\n")
-    .print_coefficients_table(x$coef_table, x$standardized)
+    .print_coefficients_table(x$coef_table, x$standardized, show_ci)
   }
 
   if (show_collin) {
@@ -1177,6 +1221,7 @@ print.summary.linear_regression <- function(x, ...) {
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
+  show_ci    <- if (!is.null(x$show)) isTRUE(x$show$conf_int) else TRUE
   show_collin <- if (!is.null(x$show)) isTRUE(x$show$collinearity) else TRUE
   show_desc  <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
 
@@ -1203,7 +1248,7 @@ print.summary.linear_regression <- function(x, ...) {
 
     if (show_coefs) {
       cat("\n")
-      .print_coefficients_table(grp$coef_table, x$standardized)
+      .print_coefficients_table(grp$coef_table, x$standardized, show_ci)
     }
 
     if (show_collin) {
@@ -1357,43 +1402,48 @@ print.summary.linear_regression <- function(x, ...) {
 
 
 #' Print coefficients table
+#'
+#' show_ci appends the confidence-interval columns for B (SPSS
+#' /STATISTICS CI); the interval level is the conf.level the model was
+#' fitted with.
 #' @noRd
-.print_coefficients_table <- function(coefs, show_beta) {
+.print_coefficients_table <- function(coefs, show_beta, show_ci = FALSE) {
   cat("  Coefficients\n")
+  show_ci <- isTRUE(show_ci) && all(c("CI_lower", "CI_upper") %in% names(coefs))
 
+  w <- if (show_beta) 88 else 78
+  if (show_ci) w <- w + 22
+  ci_header <- if (show_ci) sprintf(" %10s %10s", "CI Lower", "CI Upper") else ""
+
+  cat(paste0("  ", strrep("-", w), "\n"))
   if (show_beta) {
-    w <- 88
-    cat(paste0("  ", strrep("-", w), "\n"))
-    cat(sprintf("  %-25s %10s %10s %8s %10s %8s %s\n",
-                "Term", "B", "Std.Error", "Beta", "t", "Sig.", ""))
-    cat(paste0("  ", strrep("-", w), "\n"))
-
-    for (i in seq_len(nrow(coefs))) {
-      term <- coefs$Term[i]
-      if (nchar(term) > 25) term <- paste0(substr(term, 1, 22), "...")
-
-      beta_str <- if (is.na(coefs$Beta[i])) "" else sprintf("%.3f", coefs$Beta[i])
-      stars <- add_significance_stars(coefs$p[i])
-
-      cat(sprintf("  %-25s %10.3f %10.3f %8s %10.3f %8.3f %s\n",
-                  term, coefs$B[i], coefs$Std.Error[i], beta_str,
-                  coefs$t[i], coefs$p[i], stars))
-    }
+    cat(sprintf("  %-25s %10s %10s %8s %10s %8s%s %s\n",
+                "Term", "B", "Std.Error", "Beta", "t", "Sig.", ci_header, ""))
   } else {
-    w <- 78
-    cat(paste0("  ", strrep("-", w), "\n"))
-    cat(sprintf("  %-25s %10s %10s %10s %8s %s\n",
-                "Term", "B", "Std.Error", "t", "Sig.", ""))
-    cat(paste0("  ", strrep("-", w), "\n"))
+    cat(sprintf("  %-25s %10s %10s %10s %8s%s %s\n",
+                "Term", "B", "Std.Error", "t", "Sig.", ci_header, ""))
+  }
+  cat(paste0("  ", strrep("-", w), "\n"))
 
-    for (i in seq_len(nrow(coefs))) {
-      term <- coefs$Term[i]
-      if (nchar(term) > 25) term <- paste0(substr(term, 1, 22), "...")
-      stars <- add_significance_stars(coefs$p[i])
+  for (i in seq_len(nrow(coefs))) {
+    term <- coefs$Term[i]
+    if (nchar(term) > 25) term <- paste0(substr(term, 1, 22), "...")
+    stars <- add_significance_stars(coefs$p[i])
+    ci_cells <- if (show_ci) {
+      sprintf(" %10.3f %10.3f", coefs$CI_lower[i], coefs$CI_upper[i])
+    } else {
+      ""
+    }
 
-      cat(sprintf("  %-25s %10.3f %10.3f %10.3f %8.3f %s\n",
+    if (show_beta) {
+      beta_str <- if (is.na(coefs$Beta[i])) "" else sprintf("%.3f", coefs$Beta[i])
+      cat(sprintf("  %-25s %10.3f %10.3f %8s %10.3f %8.3f%s %s\n",
+                  term, coefs$B[i], coefs$Std.Error[i], beta_str,
+                  coefs$t[i], coefs$p[i], ci_cells, stars))
+    } else {
+      cat(sprintf("  %-25s %10.3f %10.3f %10.3f %8.3f%s %s\n",
                   term, coefs$B[i], coefs$Std.Error[i],
-                  coefs$t[i], coefs$p[i], stars))
+                  coefs$t[i], coefs$p[i], ci_cells, stars))
     }
   }
   cat(paste0("  ", strrep("-", w), "\n"))

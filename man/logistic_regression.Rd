@@ -35,11 +35,15 @@ SPSS WEIGHT BY behavior.}
 
 \item{factors}{How factor predictors are entered into the model:
 \code{"dummy"} (default, matches base R \code{glm()}) expands a factor
-with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+with \code{L} levels into \code{L - 1} contrasts; \code{"numeric"}
 silently coerces factor levels to their integer codes, matching SPSS
 \code{LOGISTIC REGRESSION} default behavior when no \code{/CATEGORICAL}
 subcommand is given. The "numeric" mode emits a one-line
-\code{cli::cli_inform()} listing the coerced variables.}
+\code{cli::cli_inform()} listing the coerced variables. Note that for
+\emph{ordered} factors, "dummy" applies R's default polynomial
+contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}), not
+treatment dummies; convert with \code{factor(x, ordered = FALSE)}
+first if you want dummy coding.}
 }
 \value{
 For ungrouped data, an object of class
@@ -134,11 +138,14 @@ weights (matching SPSS WEIGHT BY behavior).
 }
 
 \strong{Factor Predictors}: By default (\code{factors = "dummy"}),
-factor predictors are expanded into \code{L - 1} dummy contrasts via
-R's \code{stats::model.matrix()}, matching base R \code{glm()}. Pass
-\code{factors = "numeric"} to silently coerce factor levels to their
-integer codes (SPSS \code{LOGISTIC REGRESSION} default without an
-explicit \code{/CATEGORICAL} subcommand).
+factor predictors are expanded into \code{L - 1} contrasts via
+R's \code{stats::model.matrix()}, matching base R \code{glm()}: unordered
+factors get treatment (dummy) contrasts against the first level, while
+\emph{ordered} factors get R's default polynomial contrasts
+(\code{.L}/\code{.Q}/\code{.C} terms). Pass \code{factors = "numeric"}
+to silently coerce factor levels to their integer codes (SPSS
+\code{LOGISTIC REGRESSION} default without an explicit
+\code{/CATEGORICAL} subcommand).
 
 \strong{Grouped Analysis}: When \code{data} is grouped via
 \code{dplyr::group_by()}, a separate regression is run for each group

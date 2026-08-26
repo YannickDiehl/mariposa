@@ -45,12 +45,16 @@ coefficients (Beta) are calculated and included in the output.}
 
 \item{factors}{How factor predictors are entered into the model:
 \code{"dummy"} (default, matches base R \code{lm()}) expands a factor
-with \code{L} levels into \code{L - 1} dummy contrasts; \code{"numeric"}
+with \code{L} levels into \code{L - 1} contrasts; \code{"numeric"}
 silently coerces factor levels to their integer codes, matching SPSS
 \code{REGRESSION} default behavior (ordinal-as-scale). The "numeric"
 mode emits a one-line \code{cli::cli_inform()} listing the coerced
 variables. The "numeric" mode is required to reproduce SPSS results
-when factor predictors carry ordered meaning (e.g., 4-level education).}
+when factor predictors carry ordered meaning (e.g., 4-level education).
+Note that for \emph{ordered} factors, "dummy" applies R's default
+polynomial contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}),
+not treatment dummies; convert with
+\code{factor(x, ordered = FALSE)} first if you want dummy coding.}
 }
 \value{
 For ungrouped + listwise data, an object of class
@@ -149,8 +153,11 @@ For dummy-coded factor terms (\code{factors = "dummy"}), the SD of the
 contrast column from the design matrix is used.
 
 \strong{Factor Predictors}: By default (\code{factors = "dummy"}),
-factor predictors are expanded into \code{L - 1} dummy contrasts via
-R's \code{stats::model.matrix()}, matching base R \code{lm()}. Pass
+factor predictors are expanded into \code{L - 1} contrasts via
+R's \code{stats::model.matrix()}, matching base R \code{lm()}: unordered
+factors get treatment (dummy) contrasts against the first level, while
+\emph{ordered} factors get R's default polynomial contrasts
+(\code{.L}/\code{.Q}/\code{.C} terms). Pass
 \code{factors = "numeric"} to silently coerce factor levels to their
 integer codes (SPSS \code{REGRESSION} default). The "numeric" mode is
 required to reproduce SPSS results for ordinal predictors like

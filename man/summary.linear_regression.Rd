@@ -9,6 +9,7 @@
   model_summary = TRUE,
   anova_table = TRUE,
   coefficients = TRUE,
+  conf_int = TRUE,
   collinearity = TRUE,
   descriptives = TRUE,
   digits = 3,
@@ -23,6 +24,11 @@
 \item{anova_table}{Logical. Show ANOVA table? (Default: TRUE)}
 
 \item{coefficients}{Logical. Show coefficients table? (Default: TRUE)}
+
+\item{conf_int}{Logical. Show the confidence-interval columns for B in the
+coefficients table (SPSS \code{/STATISTICS CI})? The interval level is
+the \code{conf.level} passed to \code{\link{linear_regression}}.
+(Default: TRUE)}
 
 \item{collinearity}{Logical. Show collinearity diagnostics (Tolerance,
 VIF per model term)? (Default: TRUE)}
@@ -45,6 +51,7 @@ including model summary, ANOVA table, and coefficient table.
 result <- linear_regression(survey_data, life_satisfaction ~ age + trust_government)
 summary(result)
 summary(result, descriptives = FALSE)
+summary(result, conf_int = FALSE)   # hide the CI columns
 
 }
 \seealso{

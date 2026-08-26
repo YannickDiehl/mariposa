@@ -93,7 +93,14 @@ tier4_weighted <- c("mann_whitney", "kruskal_wallis", "wilcoxon_test",
 # (.claude/spss-syntax-omega-references.sps), so omega/omega_std/
 # omega_if_deleted are Internal (Tier 4) in both the weighted and the
 # unweighted path. Remove the entry once the reference run lands.
-tier4_statistics <- c(reliability = "McDonald's omega (all paths)")
+# logistic_regression has no SPSS v29 reference output at all: its
+# validation file asserts textbook formulas (IBM SPSS Statistics
+# Algorithms) as the oracle, so every statistic is Tier 4 until an SPSS
+# LOGISTIC REGRESSION reference run lands.
+tier4_statistics <- c(
+  reliability = "McDonald's omega (all paths)",
+  logistic_regression = "all statistics (textbook-formula oracle; no SPSS v29 reference run yet)"
+)
 
 # 3. Exception registry
 helper_path <- file.path(test_dir, "helper-validation-tolerances.R")
