@@ -30,13 +30,32 @@ Statistical tests determine whether observed differences between groups are real
 
 | Your data | 2 groups | 3+ groups | Paired |
 |-----------|----------|-----------|--------|
-| **Continuous, normal** | `t_test()` | `oneway_anova()` | `t_test(paired)` |
+| **Continuous, normal** | `t_test()` | `oneway_anova()` | *paired t-test planned* |
 | **Continuous, non-normal** | `mann_whitney()` | `kruskal_wallis()` | `wilcoxon_test()` |
 | **Categorical** | `chi_square()` | `chi_square()` | `mcnemar_test()` |
 | **Small sample, categorical** | `fisher_test()` | --- | --- |
 | **Multiple factors** | --- | `factorial_anova()` | `friedman_test()` |
 | **With covariate** | --- | `ancova()` | --- |
 | **Proportion vs. expected** | `binomial_test()` | `chisq_gof()` | --- |
+
+### Checking Normality First
+
+The parametric tests in the first row assume (approximately) normally
+distributed variables. `normality_test()` produces the SPSS EXAMINE
+"Tests of Normality" table — Kolmogorov-Smirnov with Lilliefors
+correction and Shapiro-Wilk:
+
+```{r}
+survey_data %>%
+  group_by(gender) %>%
+  normality_test(age, income)
+```
+
+Run it grouped (as above) when you are about to compare groups: the
+assumption that matters is normality *within* each group. With large
+samples these tests flag even trivial deviations, so combine them with
+the skewness and kurtosis from `describe()` before switching to a
+non-parametric alternative.
 
 ## t-Tests
 

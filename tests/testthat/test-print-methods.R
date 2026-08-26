@@ -930,3 +930,21 @@ test_that("print.w_quantile: grouped", {
     w_quantile(age, weights = sampling_weight)
   expect_prints(result, "Quantile")
 })
+
+# ===========================================================================
+# normality_test() (0.7.0)
+# ===========================================================================
+
+test_that("print.normality_test: ungrouped (compact)", {
+  result <- normality_test(survey_data, age, income)
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Normality Tests", output, fixed = TRUE)))
+  expect_true(any(grepl("Shapiro-Wilk", output, fixed = TRUE)))
+  expect_true(any(grepl("Use summary()", output, fixed = TRUE)))
+})
+
+test_that("print.normality_test: grouped (compact)", {
+  result <- survey_data |> dplyr::group_by(gender) |> normality_test(age)
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Grouped: gender", output, fixed = TRUE)))
+})

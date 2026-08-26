@@ -113,6 +113,7 @@ reference:
 - title: "Hypothesis Testing"
   desc: "Compare groups and test for significant differences"
   contents:
+  - normality_test
   - t_test
   - oneway_anova
   - factorial_anova

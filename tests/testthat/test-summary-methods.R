@@ -2596,3 +2596,34 @@ test_that("summary.crosstab: grouped produces output", {
   output <- expect_summary_prints(summary(result), "Grouped Crosstabulation")
   expect_true(any(grepl("Group", output)))
 })
+
+# ===========================================================================
+# normality_test() (0.7.0)
+# ===========================================================================
+
+test_that("summary.normality_test returns correct class", {
+  result <- normality_test(survey_data, age)
+  s <- summary(result)
+  expect_summary_class(s, "summary.normality_test")
+  expect_true("tests" %in% names(s$show))
+})
+
+test_that("print.summary.normality_test produces the SPSS-style table", {
+  result <- normality_test(survey_data, age, income)
+  out <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Tests of Normality", out, fixed = TRUE)))
+  expect_true(any(grepl("Lilliefors", out, fixed = TRUE)))
+  expect_true(any(grepl("age", out, fixed = TRUE)))
+})
+
+test_that("summary.normality_test: tests toggle works", {
+  result <- normality_test(survey_data, age)
+  out_off <- capture.output(print(summary(result, tests = FALSE)))
+  expect_false(any(grepl("Tests of Normality", out_off, fixed = TRUE)))
+})
+
+test_that("print.summary.normality_test: grouped shows group headers", {
+  result <- survey_data |> dplyr::group_by(gender) |> normality_test(age)
+  out <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Group: gender", out, fixed = TRUE)))
+})
