@@ -279,6 +279,15 @@ test_that("frequency: weights == 1 reproduces unweighted counts/percentages", {
   expect_equal(rw$valid_prc, ru$valid_prc, tolerance = TOL)
 })
 
+test_that("multiple_response: weights == 1 reproduces unweighted counts and percents", {
+  rw <- multiple_response(inv_data, bin, ord1, counted = 1, weights = w1)
+  ru <- multiple_response(inv_data, bin, ord1, counted = 1)
+  expect_equal(rw$results$n, ru$results$n, tolerance = TOL)
+  expect_equal(rw$results$pct_responses, ru$results$pct_responses, tolerance = TOL)
+  expect_equal(rw$results$pct_cases, ru$results$pct_cases, tolerance = TOL)
+  expect_equal(rw$n_cases, ru$n_cases, tolerance = TOL)
+})
+
 test_that("marginal_effects: weights == 1 reproduces unweighted AME/SE", {
   mw <- logistic_regression(inv_data, bin ~ y + x2, weights = w1)
   mu <- logistic_regression(inv_data, bin ~ y + x2)

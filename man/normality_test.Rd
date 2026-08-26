@@ -128,6 +128,7 @@ distribution of Lilliefors's test statistic for normality.
 Other descriptive:
 \code{\link[=crosstab]{crosstab()}},
 \code{\link[=describe]{describe()}},
-\code{\link[=frequency]{frequency()}}
+\code{\link[=frequency]{frequency()}},
+\code{\link[=multiple_response]{multiple_response()}}
 }
 \concept{descriptive}

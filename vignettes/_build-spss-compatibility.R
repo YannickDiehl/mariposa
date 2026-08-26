@@ -102,7 +102,8 @@ tier4_statistics <- c(
   logistic_regression = "all statistics (textbook-formula oracle; no SPSS v29 reference run yet)",
   crosstab = "adjusted standardized residuals (Haberman-formula oracle; SPSS /CELLS=ASRESID reference run pending)",
   normality_test = "all statistics (independent-implementation oracles; SPSS EXAMINE reference run pending)",
-  partial_cor = "all statistics (residual-regression oracle; SPSS PARTIAL CORR reference run pending)"
+  partial_cor = "all statistics (residual-regression oracle; SPSS PARTIAL CORR reference run pending)",
+  multiple_response = "all statistics (hand-computation oracle; SPSS MULT RESPONSE reference run pending)"
 )
 
 # 3. Exception registry

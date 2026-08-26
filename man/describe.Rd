@@ -124,6 +124,7 @@ individual weighted statistics.
 Other descriptive:
 \code{\link[=crosstab]{crosstab()}},
 \code{\link[=frequency]{frequency()}},
+\code{\link[=multiple_response]{multiple_response()}},
 \code{\link[=normality_test]{normality_test()}}
 }
 \concept{descriptive}

@@ -969,3 +969,27 @@ test_that("print.partial_cor: grouped and weighted (compact)", {
   expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
   expect_true(any(grepl("gender = ", output, fixed = TRUE)))
 })
+
+# ===========================================================================
+# multiple_response() (0.7.0)
+# ===========================================================================
+
+test_that("print.multiple_response: ungrouped (compact)", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+  result <- multiple_response(d, gov, media)
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Multiple Response Set", output, fixed = TRUE)))
+  expect_true(any(grepl("of cases", output, fixed = TRUE)))
+  expect_true(any(grepl("Valid cases", output, fixed = TRUE)))
+})
+
+test_that("print.multiple_response: grouped (compact)", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+  result <- d |> dplyr::group_by(gender) |> multiple_response(gov, media)
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Grouped: gender", output, fixed = TRUE)))
+})

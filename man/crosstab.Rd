@@ -138,6 +138,7 @@ are related.
 Other descriptive:
 \code{\link[=describe]{describe()}},
 \code{\link[=frequency]{frequency()}},
+\code{\link[=multiple_response]{multiple_response()}},
 \code{\link[=normality_test]{normality_test()}}
 }
 \concept{descriptive}

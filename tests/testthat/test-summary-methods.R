@@ -2674,3 +2674,52 @@ test_that("print.summary.partial_cor: grouped shows group headers", {
   out <- capture.output(print(summary(result)))
   expect_true(any(grepl("Group: gender", out, fixed = TRUE)))
 })
+
+# ===========================================================================
+# multiple_response() (0.7.0)
+# ===========================================================================
+
+test_that("summary.multiple_response returns correct class", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+  result <- multiple_response(d, gov, media)
+  s <- summary(result)
+  expect_summary_class(s, "summary.multiple_response")
+  expect_true(all(c("frequencies", "crosstab") %in% names(s$show)))
+})
+
+test_that("print.summary.multiple_response shows both percent bases", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+  out <- capture.output(print(summary(multiple_response(d, gov, media))))
+  expect_true(any(grepl("Responses %", out, fixed = TRUE)))
+  expect_true(any(grepl("% of Cases", out, fixed = TRUE)))
+  expect_true(any(grepl("sum above 100%", out, fixed = TRUE)))
+})
+
+test_that("summary.multiple_response: crosstab appears only with by", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+
+  out_no_by <- capture.output(print(summary(multiple_response(d, gov, media))))
+  expect_false(any(grepl("Crosstab: set BY", out_no_by, fixed = TRUE)))
+
+  r_by <- multiple_response(d, gov, media, by = gender)
+  out_by <- capture.output(print(summary(r_by)))
+  expect_true(any(grepl("Crosstab: set BY gender", out_by, fixed = TRUE)))
+
+  out_off <- capture.output(print(summary(r_by, crosstab = FALSE)))
+  expect_false(any(grepl("Crosstab: set BY", out_off, fixed = TRUE)))
+})
+
+test_that("summary.multiple_response: frequencies toggle works", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+  out_off <- capture.output(print(summary(multiple_response(d, gov, media),
+                                          frequencies = FALSE)))
+  expect_false(any(grepl("Responses %", out_off, fixed = TRUE)))
+})

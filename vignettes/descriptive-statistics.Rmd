@@ -175,6 +175,38 @@ survey_data %>%
   crosstab(education, employment, weights = sampling_weight)
 ```
 
+## Multiple Response Sets with multiple_response()
+
+"Check all that apply" questions arrive as a series of 0/1 indicator
+variables. `multiple_response()` (SPSS `MULT RESPONSE`) analyzes them as
+one set, with the two percentage bases SPSS users expect: *percent of
+responses* (sums to 100%) and *percent of cases* (can sum above 100%,
+because respondents tick several boxes):
+
+```{r}
+# Example set: institutions a respondent trusts highly (rating 4-5)
+trust_set <- survey_data %>%
+  mutate(
+    gov     = as.integer(trust_government >= 4),
+    media   = as.integer(trust_media >= 4),
+    science = as.integer(trust_science >= 4)
+  )
+
+trust_set %>%
+  multiple_response(gov, media, science, weights = sampling_weight) %>%
+  summary()
+```
+
+Cross the set against a demographic with `by` — mentions and case-based
+column percentages per group:
+
+```{r}
+trust_set %>%
+  multiple_response(gov, media, science, by = gender,
+                    weights = sampling_weight) %>%
+  summary()
+```
+
 ## Data Dictionary with codebook()
 
 For a comprehensive overview of your entire dataset, use `codebook()`:
