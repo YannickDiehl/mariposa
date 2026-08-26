@@ -1,3 +1,67 @@
+# mariposa 0.7.0
+
+Assumption checks and model interpretation (feature set: three new
+functions closing the most common SPSS/Stata gaps for survey
+researchers).
+
+## New features
+
+* New function **`normality_test()`** — the SPSS EXAMINE "Tests of
+  Normality" table: Kolmogorov-Smirnov with Lilliefors significance
+  correction (Dallal-Wilkinson 1986 approximation, as in SPSS) and
+  Shapiro-Wilk (computed for 3 <= n <= 5000, matching the SPSS
+  convention). Supports tidyselect and `group_by()`
+  (SPSS `EXAMINE ... BY factor`). Deliberately takes no `weights`
+  argument: neither test has a well-defined fractional-frequency-weight
+  form (documented in the help page).
+* New function **`partial_cor()`** — SPSS PARTIAL CORR (Stata `pcorr`):
+  partial correlations of two or more variables controlling for one or
+  more others, with the zero-order correlation alongside for comparison,
+  df = n - 2 - k, two-tailed t-test, listwise deletion, weights
+  (frequency semantics, unrounded `sum(w)` in df), grouping, and a
+  partial-correlation matrix for three or more variables.
+* New function **`marginal_effects()`** — average marginal effects for
+  `logistic_regression()` models (Stata `margins, dydx(*)`): average
+  probability-scale derivatives for continuous predictors, average
+  discrete changes vs. the reference level for factors, delta-method
+  standard errors with analytic gradients, weights and `group_by()`
+  support. Calling it on a `linear_regression()` explains that B already
+  is the marginal effect there.
+* New function **`multiple_response()`** — SPSS MULT RESPONSE for
+  "check all that apply" questions (dichotomy sets): the frequencies
+  table with both percentage bases (*percent of responses*, summing to
+  100%, and *percent of cases*, summing above it), and via `by =` the
+  set-by-demographic crosstab with case-based column percentages.
+  SPSS case rule (valid = at least one non-missing indicator), variable
+  labels as option labels, frequency weights with unrounded sums,
+  `group_by()` support.
+
+All four ship with the full three-layer print/summary output.
+
+## Bug fixes
+
+* **pkgdown: formulas on the reference pages render again.** The
+  `w_*` help pages embed LaTeX via `\eqn{}`, but the site configuration
+  loaded no math engine, so pages showed raw LaTeX source
+  (`\frac{...}`). `_pkgdown.yml` now sets
+  `template: math-rendering: katex`.
+
+## Validation
+
+* All three functions carry property-based validation (Charter Tier 4
+  where an SPSS reference run is still pending): `normality_test()`
+  against `stats::ks.test()` and the independent
+  `nortest::lillie.test()` implementation (new Suggests dependency,
+  test-only); `partial_cor()` against the residual-of-regressions
+  characterization via `lm()`; `multiple_response()` against direct
+  hand-computation from the indicator matrix; `marginal_effects()`
+  against the analytic logit-AME formula and an independent
+  finite-difference delta-method recomputation (SPSS has no AME
+  procedure — permanently Tier 4). Weighted paths have `w == 1`
+  invariance blocks; grouped paths are pinned to per-subset
+  recomputation. SPSS v29 reference syntax for all pending runs lives
+  in `.claude/spss-syntax-0.7.0-references.sps`.
+
 # mariposa 0.6.17
 
 Crosstab cell diagnostics (theme: after the chi-square test, show *which*

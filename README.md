@@ -9,7 +9,7 @@
 
 **Professional statistical analysis for survey data in R.**
 
-mariposa (*Marburg Initiative for Political and Social Analysis*) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. Statistical results are validated against SPSS v29 within documented per-tier tolerances; see `vignette("spss-compatibility")` for per-function status.
+mariposa (*Marburg Initiative for Political and Social Analysis*) provides 80 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via `dplyr::group_by()`, and publication-ready output. Statistical results are validated against SPSS v29 within documented per-tier tolerances; see `vignette("spss-compatibility")` for per-function status.
 
 ## Installation
 
@@ -70,15 +70,16 @@ survey_data %>%
 | **Data Export** | `write_spss()`, `write_stata()`, `write_xpt()`, `write_xlsx()` | Export with full label and missing value roundtripping |
 | **Label Management** | `var_label()`, `val_labels()`, `to_label()`, `set_na()`, + 6 more | Get/set labels, convert formats, declare missing values |
 | **Data Transformation** | `rec()`, `to_dummy()`, `std()`, `center()`, `find_var()` | Recoding, dummy coding, standardization, centering |
-| **Descriptive** | `describe()`, `frequency()`, `crosstab()`, `codebook()` | Summaries, distributions, and data dictionaries |
+| **Descriptive** | `describe()`, `frequency()`, `crosstab()`, `multiple_response()`, `codebook()` | Summaries, distributions, multiple response sets, data dictionaries |
+| **Assumption checks** | `normality_test()` | Kolmogorov-Smirnov (Lilliefors) and Shapiro-Wilk normality tests |
 | **T-Tests** | `t_test()` | Mean comparisons (independent and one-sample) |
 | **ANOVA** | `oneway_anova()`, `factorial_anova()`, `ancova()` | One-way, multi-factor ANOVA, and ANCOVA with Type III SS |
 | **Non-parametric** | `mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`, `friedman_test()`, `binomial_test()` | Distribution-free tests |
 | **Exact tests** | `chi_square()`, `fisher_test()`, `chisq_gof()`, `mcnemar_test()` | Categorical associations and exact tests |
-| **Correlation** | `pearson_cor()`, `spearman_rho()`, `kendall_tau()` | Relationships between variables |
+| **Correlation** | `pearson_cor()`, `spearman_rho()`, `kendall_tau()`, `partial_cor()` | Relationships between variables, with and without controls |
 | **Post-hoc** | `tukey_test()`, `scheffe_test()`, `levene_test()`, `dunn_test()`, `pairwise_wilcoxon()` | Follow-up analyses (parametric and non-parametric) |
 | **Scale analysis** | `reliability()`, `efa()`, `row_means()`, `row_sums()`, `row_count()`, `pomps()` | Cronbach's Alpha, factor analysis, index construction |
-| **Regression** | `linear_regression()`, `logistic_regression()` | Linear and logistic models with SPSS-style output |
+| **Regression** | `linear_regression()`, `logistic_regression()`, `marginal_effects()` | Linear and logistic models with SPSS-style output, average marginal effects |
 | **Effect sizes** | `phi()`, `cramers_v()`, `goodman_gamma()` | Effect size measures for categorical data |
 | **Weighted stats** | `w_mean()`, `w_median()`, `w_sd()`, + 8 more | Individual weighted statistics |
 

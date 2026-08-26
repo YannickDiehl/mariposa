@@ -1,14 +1,14 @@
 Package: mariposa
 Type: Package
 Title: 'SPSS'-Compatible Statistical Tools for Survey Data
-Version: 0.6.17
+Version: 0.7.0
 Authors@R:
     person("Yannick", "Diehl",
            email = "yannick.diehl@gmail.com",
            role = c("aut", "cre"))
 Description: Statistical analysis of survey data with full support
     for survey weights, grouped operations, and 'tidyverse' integration. Provides
-    76 functions for data import/export ('SPSS', 'Stata', 'SAS', 'Excel') with
+    80 functions for data import/export ('SPSS', 'Stata', 'SAS', 'Excel') with
     label roundtripping and tagged NA preservation, label management (variable
     labels, value labels, type conversions, missing value declaration), data
     transformation (recoding, dummy coding, standardization, centering),
@@ -46,7 +46,8 @@ Suggests:
     broom,
     psych,
     lavaan,
-    semTools
+    semTools,
+    nortest
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)

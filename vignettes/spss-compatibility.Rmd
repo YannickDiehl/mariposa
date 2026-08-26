@@ -23,8 +23,8 @@ validation exception registry.
 
 ## Summary
 
-- Functions in SPSS-validation scope: **50**
-- With validation tests in place:      **39**
+- Functions in SPSS-validation scope: **53**
+- With validation tests in place:      **42**
 - Validation gaps (no test file yet):  **11**
 - Active Tier-3 algorithmic exceptions: **0**
 
@@ -80,8 +80,11 @@ columns.
 | `logistic_regression` | compliant | 7 | 13 | 0 | 20 | all statistics (textbook-formula oracle; no SPSS v29 reference run yet) |
 | `mann_whitney` | compliant | 2 | 8 | 0 | 10 | weighted variant |
 | `mcnemar_test` | compliant | 3 | 1 | 0 | 4 | — |
+| `multiple_response` | compliant | 11 | 10 | 0 | 21 | all statistics (hand-computation oracle; SPSS MULT RESPONSE reference run pending) |
+| `normality_test` | compliant | 4 | 8 | 0 | 12 | all statistics (independent-implementation oracles; SPSS EXAMINE reference run pending) |
 | `oneway_anova` | compliant | 6 | 16 | 0 | 22 | — |
 | `pairwise_wilcoxon` | compliant | 0 | 1 | 0 | 1 | weighted variant |
+| `partial_cor` | compliant | 3 | 9 | 0 | 12 | all statistics (residual-regression oracle; SPSS PARTIAL CORR reference run pending) |
 | `pearson_cor` | compliant | 2 | 5 | 0 | 7 | — |
 | `phi` | not validated | — | — | — | — | — |
 | `pomps` | not validated | — | — | — | — | — |
