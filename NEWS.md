@@ -1,3 +1,27 @@
+# mariposa 0.6.17
+
+Crosstab cell diagnostics (theme: after the chi-square test, show *which*
+cells drive the association).
+
+## New features
+
+* `crosstab()` now computes **expected cell counts and adjusted
+  standardized residuals** (SPSS `CROSSTABS /CELLS=EXPECTED ASRESID`,
+  Haberman 1973). Display them with `summary(result, residuals = TRUE)`
+  — a sub-row per cell, 1 decimal as in SPSS, with a footnote explaining
+  the |adj.res.| > 2 rule of thumb. The raw matrices are available as
+  `$expected` and `$adj_residuals`. Weighted tables use the unrounded
+  weighted cell counts (Charter §5.1) and reduce exactly to the
+  unweighted result at `weights == 1` (invariance suite extended).
+
+## Validation
+
+* The residuals are verified against the independent Haberman-formula
+  implementation in `chisq.test()$stdres` (unweighted) and a hand-derived
+  weighted recomputation; the SPSS v29 `/CELLS=ASRESID` reference run is
+  pending and the compatibility vignette discloses them as Tier 4 until
+  it lands.
+
 # mariposa 0.6.16
 
 CRAN readiness (theme: the package passes CRAN's submission conventions,
