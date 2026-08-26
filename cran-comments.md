@@ -1,33 +1,33 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 notes
 
 * This is a new submission.
 
 ## Test environments
 
-* local macOS Tahoe, R 4.6.0 (via `devtools::check()`: 0/0/0)
-* local macOS Tahoe, R 4.6.0 (via `R CMD check --as-cran --no-manual`)
-* GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
-  macOS-latest (release), windows-latest (release) — all `--as-cran`
+* local macOS (Apple Silicon), R 4.6.0 — `devtools::check()`: 0 errors,
+  0 warnings, 0 notes (no local LaTeX; the PDF manual is checked via
+  win-builder, see below)
+* GitHub Actions (`R CMD check --as-cran`): ubuntu-latest (release,
+  devel, oldrel-1), macOS-latest (release), windows-latest (release)
+<!-- TODO before submission: run devtools::check_win_devel() and paste
+     the result here — it is the only environment that builds the PDF
+     manual. Remove this comment afterwards. -->
 
-## Notes
+## CRAN-specific test behavior
 
-* checking CRAN incoming feasibility ... NOTE — "New submission". Expected.
+* The SPSS-validation test layer (golden-number comparisons against
+  IBM SPSS Statistics v29 reference output, 29 test files) is skipped
+  on CRAN via `skip_on_cran()`: tight numeric tolerances across CRAN's
+  BLAS/platform mix would risk false-positive failures. This layer is
+  the release gate and runs in CI on every commit. The remaining unit,
+  property-based, weights-invariance, and output tests all run on CRAN;
+  the full suite completes in under a minute.
+* All Suggests packages are guarded with `requireNamespace()` in code
+  and examples and `skip_if_not_installed()` in tests; examples write
+  only to `tempdir()`.
 
-## Package summary
+## Reverse dependencies
 
-* 76 exported functions across 15 categories: data I/O (SPSS, Stata,
-  SAS, Excel), label management, data transformation, descriptive
-  statistics, parametric and non-parametric tests, correlations,
-  post-hoc tests, factor analysis, regression, and survey-weighted
-  versions of common summaries.
-* 4200 passing test assertions across the full testthat suite
-  (29 SPSS-validation test files contribute ~1900 of these,
-  validated against SPSS v29 reference outputs under a published
-  Validation Charter — see `vignette("spss-compatibility")`).
-* All Suggests packages properly gated with `requireNamespace()`
-  or `skip_if_not_installed()`.
-* No reverse dependencies (new package).
-* Strict CRAN-style checks pass on all platforms via the
-  R-CMD-check workflow with `--as-cran`.
+This is a new package; there are no reverse dependencies.

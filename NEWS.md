@@ -1,3 +1,34 @@
+# mariposa 0.6.16
+
+CRAN readiness (theme: the package passes CRAN's submission conventions,
+not just `R CMD check`). No statistical behavior changes.
+
+## CRAN conventions
+
+* DESCRIPTION: software names are single-quoted per CRAN policy
+  ('SPSS', 'Stata', 'SAS', 'Excel', 'tidyverse'); the promotional
+  "Professional" opener is gone.
+* Help pages no longer contain Unicode characters that break the CRAN
+  PDF manual build (`>=`, `<=`, `->` replace their typographic
+  variants) — local and CI checks had always run `--no-manual`, so
+  this was never exercised.
+* `\value{}` sections added to the five documented S3 method pages that
+  lacked them (`predict`/`anova` for both regressions,
+  `print.w_quantile`).
+* The `set_na()` example is now runnable (haven-guarded) instead of
+  `\dontrun`; the `efa()` oblimin example guards its GPArotation
+  dependency so `--run-donttest` passes without Suggests installed.
+* `?mariposa` now resolves: the package help topic is generated from
+  DESCRIPTION (previously suppressed by `@noRd`).
+
+## Test infrastructure
+
+* SPSS-validation assertions (`assert_spss()` and everything built on
+  it) skip on CRAN. They are golden-number comparisons against SPSS v29
+  references and remain the release gate in CI; skipping them on CRAN
+  removes the false-positive risk from BLAS/platform numeric variation.
+  Unit, property, invariance, and print/summary tests still run on CRAN.
+
 # mariposa 0.6.15
 
 Regression correctness (theme: the two regression functions compute what
