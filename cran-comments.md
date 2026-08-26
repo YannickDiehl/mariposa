@@ -1,3 +1,16 @@
+## Resubmission
+
+This is a resubmission of the 0.7.0 submission (2026-08-26), addressing
+the Debian incoming-pretest NOTE:
+
+* "Examples with CPU (user + system) or elapsed time > 5s:
+  kendall_tau 7.543s" — Kendall's tau is O(n^2); the examples now run
+  on a 300-case subset of the bundled data (locally: 0.1s, previously
+  4.5s). No other example exceeds 1s.
+
+Additionally, version floors were added to the Imports and one
+missing `requireNamespace()` guard was fixed; no other changes.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
