@@ -1,19 +1,25 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
 
-* This is a new submission.
+The only NOTE is "checking CRAN incoming feasibility":
+
+* "New submission" — this is a new package.
+* "Possibly misspelled words in DESCRIPTION": ANCOVA, codebook,
+  roundtripping, toggleable — all are established statistical/technical
+  terms (ANCOVA is the standard acronym for analysis of covariance;
+  "codebook" is the standard survey-research term for a data
+  dictionary).
 
 ## Test environments
 
+* win-builder, R Under development (2026-08-24 r90445 ucrt) —
+  1 NOTE (see above); PDF and HTML manuals build cleanly
 * local macOS (Apple Silicon), R 4.6.0 — `devtools::check()`: 0 errors,
-  0 warnings, 0 notes (no local LaTeX; the PDF manual is checked via
-  win-builder, see below)
+  0 warnings, 0 notes (`--no-manual`; the manual is covered by
+  win-builder above)
 * GitHub Actions (`R CMD check --as-cran`): ubuntu-latest (release,
   devel, oldrel-1), macOS-latest (release), windows-latest (release)
-<!-- TODO before submission: run devtools::check_win_devel() and paste
-     the result here — it is the only environment that builds the PDF
-     manual. Remove this comment afterwards. -->
 
 ## CRAN-specific test behavior
 
