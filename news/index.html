@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,20 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.1" id="mariposa-071">mariposa 0.7.1<a class="anchor" aria-label="anchor" href="#mariposa-071"></a></h2>
+<p>CRAN resubmission (theme: address the incoming-pretest NOTE) plus two small robustness patches.</p>
+<div class="section level3">
+<h3 id="cran-0-7-1">CRAN<a class="anchor" aria-label="anchor" href="#cran-0-7-1"></a></h3>
+<ul><li>The <code><a href="../reference/kendall_tau.html">kendall_tau()</a></code> examples now run on a 300-case subset: Kendall’s tau is O(n^2) and the full-sample examples exceeded CRAN’s 5-second limit on the Debian pretest machine (7.5s). A comment in the example explains the subsetting.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-7-1">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-7-1"></a></h3>
+<ul><li>The Imports now declare minimum versions matching the APIs actually used (<code>cli &gt;= 3.0.0</code>, <code>dplyr &gt;= 1.0.0</code>, <code>rlang &gt;= 1.0.0</code>, <code>tidyselect &gt;= 1.1.0</code>, <code>tibble &gt;= 3.0.0</code>, <code>htmltools &gt;= 0.5.0</code>), so installations with stale libraries get an automatic update instead of runtime errors.</li>
+<li>
+<code><a href="../reference/set_na.html">set_na()</a></code> on a whole data frame without haven installed now aborts with the friendly “Package haven is required for tagged NAs” hint instead of the raw namespace error (the unnamed-values path reached <code><a href="https://haven.tidyverse.org/reference/tagged_na.html" class="external-link">haven::tagged_na()</a></code> without its guard; the vector and named-pairs paths were already guarded).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.0" id="mariposa-070">mariposa 0.7.0<a class="anchor" aria-label="anchor" href="#mariposa-070"></a></h2>
 <p>Assumption checks and model interpretation (feature set: three new functions closing the most common SPSS/Stata gaps for survey researchers).</p>

@@ -38,7 +38,7 @@ for summary options.
 ## Examples
 
 ``` r
-result <- kendall_tau(survey_data, age, life_satisfaction)
+result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 summary(result)                             # all matrices
 #> 
 #> Kendall's Tau-b Correlation 
@@ -48,10 +48,10 @@ summary(result)                             # all matrices
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
-#>   Kendall's tau-b: tau-b = -0.018
-#>   p-value: p = 0.232 
-#>   N = 2421
-#>   z-score: -1.195
+#>   Kendall's tau-b: tau-b = -0.011
+#>   p-value: p = 0.806 
+#>   N = 287
+#>   z-score: -0.245
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)      # hide p-values
@@ -63,9 +63,9 @@ summary(result, pvalue_matrix = FALSE)      # hide p-values
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
-#>   Kendall's tau-b: tau-b = -0.018
-#>   N = 2421
-#>   z-score: -1.195
+#>   Kendall's tau-b: tau-b = -0.011
+#>   N = 287
+#>   z-score: -0.245
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

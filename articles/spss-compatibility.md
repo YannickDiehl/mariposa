@@ -4,7 +4,7 @@ This vignette reports the SPSS-compatibility status of every statistical
 function in **mariposa**. It is auto-generated from the test suite and
 the validation exception registry.
 
-**Generated:** 2026-08-26
+**Generated:** 2026-08-27
 
 ## Summary
 

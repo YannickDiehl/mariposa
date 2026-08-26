@@ -35,10 +35,10 @@ Invisibly returns the input object `x`.
 ## Examples
 
 ``` r
-result <- kendall_tau(survey_data, age, life_satisfaction)
+result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 result              # compact one-line overview
 #> Kendall's Tau: age x life_satisfaction
-#>   tau = -0.018, p = 0.232 , N = 2421
+#>   tau = -0.011, p = 0.806 , N = 287
 summary(result)     # full correlation matrices
 #> 
 #> Kendall's Tau-b Correlation 
@@ -48,10 +48,10 @@ summary(result)     # full correlation matrices
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
-#>   Kendall's tau-b: tau-b = -0.018
-#>   p-value: p = 0.232 
-#>   N = 2421
-#>   z-score: -1.195
+#>   Kendall's tau-b: tau-b = -0.011
+#>   p-value: p = 0.806 
+#>   N = 287
+#>   z-score: -0.245
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

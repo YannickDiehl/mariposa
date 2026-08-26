@@ -55,7 +55,7 @@ for the main analysis function.
 ## Examples
 
 ``` r
-result <- kendall_tau(survey_data, trust_government, trust_media)
+result <- kendall_tau(survey_data[1:300, ], trust_government, trust_media)
 summary(result)
 #> 
 #> Kendall's Tau-b Correlation 
@@ -65,10 +65,10 @@ summary(result)
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
-#>   Kendall's tau-b: tau-b = 0.006
-#>   p-value: p = 0.722 
-#>   N = 2227
-#>   z-score: 0.356
+#>   Kendall's tau-b: tau-b = 0.083
+#>   p-value: p = 0.098 
+#>   N = 270
+#>   z-score: 1.655
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)
@@ -80,9 +80,9 @@ summary(result, pvalue_matrix = FALSE)
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
-#>   Kendall's tau-b: tau-b = 0.006
-#>   N = 2227
-#>   z-score: 0.356
+#>   Kendall's tau-b: tau-b = 0.083
+#>   N = 270
+#>   z-score: 1.655
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

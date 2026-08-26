@@ -1,5 +1,34 @@
 # Changelog
 
+## mariposa 0.7.1
+
+CRAN resubmission (theme: address the incoming-pretest NOTE) plus two
+small robustness patches.
+
+### CRAN
+
+- The
+  [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
+  examples now run on a 300-case subset: Kendall’s tau is O(n^2) and the
+  full-sample examples exceeded CRAN’s 5-second limit on the Debian
+  pretest machine (7.5s). A comment in the example explains the
+  subsetting.
+
+### Improvements
+
+- The Imports now declare minimum versions matching the APIs actually
+  used (`cli >= 3.0.0`, `dplyr >= 1.0.0`, `rlang >= 1.0.0`,
+  `tidyselect >= 1.1.0`, `tibble >= 3.0.0`, `htmltools >= 0.5.0`), so
+  installations with stale libraries get an automatic update instead of
+  runtime errors.
+- [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)
+  on a whole data frame without haven installed now aborts with the
+  friendly “Package haven is required for tagged NAs” hint instead of
+  the raw namespace error (the unnamed-values path reached
+  [`haven::tagged_na()`](https://haven.tidyverse.org/reference/tagged_na.html)
+  without its guard; the vector and named-pairs paths were already
+  guarded).
+
 ## mariposa 0.7.0
 
 Assumption checks and model interpretation (feature set: three new

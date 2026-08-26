@@ -11,7 +11,7 @@ For the full detailed output including matrices, use summary().'><meta property=
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,10 +92,10 @@ Shows tau coefficient, p-value, and sample size per pair.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="kendall_tau.html">kendall_tau</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="kendall_tau.html">kendall_tau</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">300</span>, <span class="op">]</span>, <span class="va">age</span>, <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau: age x life_satisfaction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   tau = -0.018, p = 0.232 , N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tau = -0.011, p = 0.806 , N = 287</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full correlation matrices</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kendall's Tau-b Correlation </span>
@@ -105,10 +105,10 @@ Shows tau coefficient, p-value, and sample size per pair.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: tau-b = -0.018</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value: p = 0.232 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   N = 2421</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: -1.195</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Kendall's tau-b: tau-b = -0.011</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p-value: p = 0.806 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   N = 287</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   z-score: -0.245</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>
