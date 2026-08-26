@@ -1,3 +1,51 @@
+# mariposa 0.6.15
+
+Regression correctness (theme: the two regression functions compute what
+they claim under weights and degenerate inputs, and say what they show).
+
+## Bug fixes
+
+* **Weighted `logistic_regression()`: -2LL, omnibus chi-square, and
+  Cox & Snell / Nagelkerke R-squared were wrong under fractional
+  weights.** The -2 log-likelihood came from `stats::logLik()`, whose
+  binomial method *rounds* prior weights internally
+  (`dbinom(round(m*y), round(m), mu)`). All likelihood-based statistics
+  now derive from the residual/null deviance, which equals -2LL exactly
+  for a 0/1 response and honors fractional frequency weights unrounded
+  (Charter §5.1). Unweighted and integer-weighted results are unchanged.
+  A weighted validation test with a hand-summed log-likelihood oracle
+  pins the fix.
+* **`linear_regression(use = "pairwise")` no longer silently drops
+  interactions and transformed terms.** The pairwise path rebuilds the
+  model from the raw correlation matrix, so `y ~ a * b` was silently
+  fitted as `y ~ a + b`. Formulas with non-additive terms now abort with
+  a pointer to `use = "listwise"`.
+* **Rank-deficient fits no longer crash the unweighted
+  `linear_regression()` path** ("Tibble columns must have compatible
+  sizes"): perfectly collinear terms are excluded from the coefficient
+  table (matching SPSS's excluded-variables handling) with a one-line
+  message, and the ANOVA df now count estimated terms (`model$rank`)
+  instead of raw coefficients — the same rule the weighted path has used
+  since 0.6.4.
+
+## New features
+
+* The `linear_regression()` coefficients table now **prints the
+  confidence intervals for B** (SPSS `/STATISTICS CI`) that it always
+  computed; the level is the `conf.level` argument. A new
+  `summary(..., conf_int = FALSE)` toggle hides the two columns.
+
+## Documentation
+
+* `factors = "dummy"` docs (both regressions) now state that *ordered*
+  factors get R's default polynomial contrasts (`.L`/`.Q`/`.C` terms),
+  not treatment dummies, and how to get dummy coding.
+* The SPSS-compatibility vignette now discloses `logistic_regression()`
+  as Tier 4 (textbook-formula oracle; no SPSS v29 reference run yet)
+  instead of implying SPSS-validated status.
+* The logistic classification-table header reads the stored cutoff
+  instead of hardcoding "0.50".
+
 # mariposa 0.6.14
 
 Codebook robustness (theme: `codebook()` survives real-world data and says
