@@ -156,6 +156,14 @@ assert_spss <- function(actual, expected,
                         what = NULL, precision = NULL, id = NULL,
                         label = NULL, relative_p = 0.01) {
 
+  # SPSS-validation assertions are golden-number comparisons against SPSS
+  # v29 reference output. They are the release gate and run in CI on the
+  # platforms we control; on CRAN they are skipped so that BLAS/platform
+  # numeric variation cannot produce false-positive check failures there.
+  # (Everything else — unit, property, invariance, print/summary tests —
+  # still runs on CRAN.)
+  testthat::skip_on_cran()
+
   if (is.null(label) || !nzchar(label)) {
     stop("assert_spss(): `label` is required (a human-readable description).",
          call. = FALSE)
