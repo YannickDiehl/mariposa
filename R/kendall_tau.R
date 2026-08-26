@@ -75,38 +75,42 @@
 #' library(dplyr)
 #' data(survey_data)
 #'
+#' # Kendall's tau is O(n^2); the examples run on a subset for speed.
+#' # On your own data, simply drop the subsetting.
+#' mini_survey <- survey_data[1:300, ]
+#'
 #' # Basic correlation between two variables
-#' survey_data %>%
+#' mini_survey %>%
 #'   kendall_tau(life_satisfaction, political_orientation)
 #'
 #' # Correlation matrix for multiple variables
-#' survey_data %>%
+#' mini_survey %>%
 #'   kendall_tau(life_satisfaction, political_orientation, trust_media)
 #'
 #' # Weighted correlations
-#' survey_data %>%
+#' mini_survey %>%
 #'   kendall_tau(age, income, weights = sampling_weight)
 #'
 #' # Listwise deletion for missing data
-#' survey_data %>%
+#' mini_survey %>%
 #'   kendall_tau(age, income, use = "listwise")
 #'
 #' # One-tailed test
-#' survey_data %>%
+#' mini_survey %>%
 #'   kendall_tau(age, income, alternative = "greater")
 #'
 #' \donttest{
 #' # Grouped correlations
-#' survey_data %>%
+#' mini_survey %>%
 #'   group_by(region) %>%
 #'   kendall_tau(age, income, life_satisfaction)
 #'
 #' # Using tidyselect helpers for ordinal variables
-#' survey_data %>%
+#' mini_survey %>%
 #'   kendall_tau(starts_with("trust"), weights = sampling_weight)
 #'
 #' # --- Three-layer output ---
-#' result <- survey_data %>%
+#' result <- mini_survey %>%
 #'   kendall_tau(life_satisfaction, political_orientation, trust_media,
 #'               weights = sampling_weight)
 #' result              # compact one-line overview
@@ -449,7 +453,7 @@ kendall_tau <- function(data, ..., weights = NULL,
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @examples
-#' result <- kendall_tau(survey_data, age, life_satisfaction)
+#' result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 #' result              # compact one-line overview
 #' summary(result)     # full correlation matrices
 #'
@@ -474,7 +478,7 @@ print.kendall_tau <- function(x, digits = 3, ...) {
 #' @return A \code{summary.kendall_tau} object.
 #'
 #' @examples
-#' result <- kendall_tau(survey_data, trust_government, trust_media)
+#' result <- kendall_tau(survey_data[1:300, ], trust_government, trust_media)
 #' summary(result)
 #' summary(result, pvalue_matrix = FALSE)
 #'
@@ -509,7 +513,7 @@ summary.kendall_tau <- function(object, correlation_matrix = TRUE,
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @examples
-#' result <- kendall_tau(survey_data, age, life_satisfaction)
+#' result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 #' summary(result)                             # all matrices
 #' summary(result, pvalue_matrix = FALSE)      # hide p-values
 #'

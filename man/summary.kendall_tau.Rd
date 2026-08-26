@@ -34,7 +34,7 @@ Creates a summary object that produces detailed output when printed,
 including tau matrices, p-value matrices, and sample size matrices.
 }
 \examples{
-result <- kendall_tau(survey_data, trust_government, trust_media)
+result <- kendall_tau(survey_data[1:300, ], trust_government, trust_media)
 summary(result)
 summary(result, pvalue_matrix = FALSE)
 

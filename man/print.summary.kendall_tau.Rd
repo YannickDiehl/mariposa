@@ -22,7 +22,7 @@ with sections controlled by the boolean parameters passed to
 matrix, p-value matrix, and sample size matrix.
 }
 \examples{
-result <- kendall_tau(survey_data, age, life_satisfaction)
+result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 summary(result)                             # all matrices
 summary(result, pvalue_matrix = FALSE)      # hide p-values
 

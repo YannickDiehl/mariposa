@@ -24,7 +24,7 @@ Shows tau coefficient, p-value, and sample size per pair.
 For the full detailed output including matrices, use \code{summary()}.
 }
 \examples{
-result <- kendall_tau(survey_data, age, life_satisfaction)
+result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 result              # compact one-line overview
 summary(result)     # full correlation matrices
 
