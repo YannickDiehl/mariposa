@@ -101,7 +101,8 @@ tier4_statistics <- c(
   reliability = "McDonald's omega (all paths)",
   logistic_regression = "all statistics (textbook-formula oracle; no SPSS v29 reference run yet)",
   crosstab = "adjusted standardized residuals (Haberman-formula oracle; SPSS /CELLS=ASRESID reference run pending)",
-  normality_test = "all statistics (independent-implementation oracles; SPSS EXAMINE reference run pending)"
+  normality_test = "all statistics (independent-implementation oracles; SPSS EXAMINE reference run pending)",
+  partial_cor = "all statistics (residual-regression oracle; SPSS PARTIAL CORR reference run pending)"
 )
 
 # 3. Exception registry
@@ -169,6 +170,11 @@ per_file_stats <- lapply(validation_files, function(p) {
 # Functions explicitly NOT in scope for SPSS validation:
 
 not_in_scope <- c(
+  # No SPSS equivalent exists (Charter Tier 4 by construction):
+  # AMEs are a Stata margins concept; validated against analytic
+  # formulas and finite-difference recomputation in
+  # tests/testthat/test-marginal-effects.R
+  "marginal_effects",
   # Label management
   "var_label", "val_labels", "copy_labels", "drop_labels",
   "to_label", "to_character", "to_numeric", "to_labelled",

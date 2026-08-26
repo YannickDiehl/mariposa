@@ -201,6 +201,7 @@ summary(result, classification = FALSE)   # hide classification table
 \code{\link{summary.logistic_regression}} for detailed output with toggleable sections.
 
 Other regression:
-\code{\link[=linear_regression]{linear_regression()}}
+\code{\link[=linear_regression]{linear_regression()}},
+\code{\link[=marginal_effects]{marginal_effects()}}
 }
 \concept{regression}

@@ -2627,3 +2627,50 @@ test_that("print.summary.normality_test: grouped shows group headers", {
   out <- capture.output(print(summary(result)))
   expect_true(any(grepl("Group: gender", out, fixed = TRUE)))
 })
+
+# ===========================================================================
+# partial_cor() (0.7.0)
+# ===========================================================================
+
+test_that("summary.partial_cor returns correct class", {
+  result <- partial_cor(survey_data, life_satisfaction, income, controls = age)
+  s <- summary(result)
+  expect_summary_class(s, "summary.partial_cor")
+  expect_true(all(c("pairwise", "matrix") %in% names(s$show)))
+})
+
+test_that("print.summary.partial_cor produces pairwise table and info", {
+  result <- partial_cor(survey_data, life_satisfaction, income, controls = age)
+  out <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Partial Correlation Results", out, fixed = TRUE)))
+  expect_true(any(grepl("Controlling for: age", out, fixed = TRUE)))
+  expect_true(any(grepl("Pairwise Results", out, fixed = TRUE)))
+  expect_true(any(grepl("Zero-order r", out, fixed = TRUE)))
+})
+
+test_that("summary.partial_cor: matrix toggle shows matrix only for 3+ variables", {
+  r2 <- partial_cor(survey_data, life_satisfaction, income, controls = age)
+  out2 <- capture.output(print(summary(r2)))
+  expect_false(any(grepl("Partial Correlation Matrix", out2, fixed = TRUE)))
+
+  r3 <- partial_cor(survey_data, trust_government, trust_media, trust_science,
+                    controls = age)
+  out3 <- capture.output(print(summary(r3)))
+  expect_true(any(grepl("Partial Correlation Matrix", out3, fixed = TRUE)))
+
+  out3_off <- capture.output(print(summary(r3, matrix = FALSE)))
+  expect_false(any(grepl("Partial Correlation Matrix", out3_off, fixed = TRUE)))
+})
+
+test_that("summary.partial_cor: pairwise toggle works", {
+  result <- partial_cor(survey_data, life_satisfaction, income, controls = age)
+  out_off <- capture.output(print(summary(result, pairwise = FALSE)))
+  expect_false(any(grepl("Pairwise Results", out_off, fixed = TRUE)))
+})
+
+test_that("print.summary.partial_cor: grouped shows group headers", {
+  result <- survey_data |> dplyr::group_by(gender) |>
+    partial_cor(life_satisfaction, income, controls = age)
+  out <- capture.output(print(summary(result)))
+  expect_true(any(grepl("Group: gender", out, fixed = TRUE)))
+})

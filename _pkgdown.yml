@@ -139,6 +139,7 @@ reference:
   desc: "Measure relationships between variables"
   contents:
   - pearson_cor
+  - partial_cor
   - spearman_rho
   - kendall_tau
 
@@ -166,6 +167,7 @@ reference:
   contents:
   - linear_regression
   - logistic_regression
+  - marginal_effects
   - anova.linear_regression
   - anova.logistic_regression
   - predict.linear_regression

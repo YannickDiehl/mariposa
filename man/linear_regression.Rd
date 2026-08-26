@@ -215,6 +215,7 @@ summary(result, descriptives = FALSE)   # hide descriptives section
 \code{\link{summary.linear_regression}} for detailed output with toggleable sections.
 
 Other regression:
-\code{\link[=logistic_regression]{logistic_regression()}}
+\code{\link[=logistic_regression]{logistic_regression()}},
+\code{\link[=marginal_effects]{marginal_effects()}}
 }
 \concept{regression}

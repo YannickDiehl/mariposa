@@ -189,6 +189,7 @@ correlation coefficient in samples from an indefinitely large population.
 
 Other correlation:
 \code{\link[=kendall_tau]{kendall_tau()}},
+\code{\link[=partial_cor]{partial_cor()}},
 \code{\link[=spearman_rho]{spearman_rho()}}
 }
 \concept{correlation}

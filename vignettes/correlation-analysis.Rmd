@@ -112,6 +112,31 @@ survey_data %>%
               weights = sampling_weight)
 ```
 
+## Partial Correlation
+
+`partial_cor()` (SPSS `PARTIAL CORR`) removes the influence of control
+variables from a correlation. Comparing the partial against the
+zero-order correlation shows how much of the original association the
+controls explain:
+
+```{r}
+# Does the satisfaction-income correlation survive controlling for age?
+survey_data %>%
+  partial_cor(life_satisfaction, income, controls = age,
+              weights = sampling_weight)
+```
+
+Multiple analysis variables and multiple controls work together; with
+three or more variables, `summary()` adds the partial-correlation
+matrix:
+
+```{r}
+result <- survey_data %>%
+  partial_cor(trust_government, trust_media, trust_science,
+              controls = c(age, political_orientation))
+summary(result)
+```
+
 ## Interpreting Correlations
 
 ### Strength Guidelines

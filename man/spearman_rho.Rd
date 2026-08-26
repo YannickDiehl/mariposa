@@ -165,6 +165,7 @@ implementation.
 
 Other correlation:
 \code{\link[=kendall_tau]{kendall_tau()}},
+\code{\link[=partial_cor]{partial_cor()}},
 \code{\link[=pearson_cor]{pearson_cor()}}
 }
 \concept{correlation}

@@ -194,6 +194,15 @@ test_that("pearson_cor: weights == 1 reproduces unweighted r/p", {
   expect_equal(rw$p_value,     ru$p_value,     tolerance = TOL)
 })
 
+test_that("partial_cor: weights == 1 reproduces unweighted partial r/df/p", {
+  rw <- partial_cor(inv_data, y, x2, controls = x3, weights = w1)$correlations
+  ru <- partial_cor(inv_data, y, x2, controls = x3)$correlations
+  expect_equal(rw$partial_r, ru$partial_r, tolerance = TOL)
+  expect_equal(rw$zero_order_r, ru$zero_order_r, tolerance = TOL)
+  expect_equal(rw$df, ru$df, tolerance = TOL)
+  expect_equal(rw$p_value, ru$p_value, tolerance = TOL)
+})
+
 test_that("spearman_rho: weights == 1 reproduces unweighted rho/p", {
   rw <- spearman_rho(inv_data, ord1, ord2, weights = w1)$correlations
   ru <- spearman_rho(inv_data, ord1, ord2)$correlations
@@ -268,6 +277,16 @@ test_that("frequency: weights == 1 reproduces unweighted counts/percentages", {
   expect_equal(rw$freq,      ru$freq,      tolerance = TOL)
   expect_equal(rw$prc,       ru$prc,       tolerance = TOL)
   expect_equal(rw$valid_prc, ru$valid_prc, tolerance = TOL)
+})
+
+test_that("marginal_effects: weights == 1 reproduces unweighted AME/SE", {
+  mw <- logistic_regression(inv_data, bin ~ y + x2, weights = w1)
+  mu <- logistic_regression(inv_data, bin ~ y + x2)
+  aw <- marginal_effects(mw)$results
+  au <- marginal_effects(mu)$results
+  expect_equal(aw$AME, au$AME, tolerance = TOL)
+  expect_equal(aw$SE, au$SE, tolerance = TOL)
+  expect_equal(aw$p_value, au$p_value, tolerance = TOL)
 })
 
 test_that("crosstab: weights == 1 reproduces unweighted counts", {

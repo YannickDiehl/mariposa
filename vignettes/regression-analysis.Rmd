@@ -208,6 +208,26 @@ survey_data %>%
 
 **Classification Table**: Compare correct predictions to the base rate --- your model should outperform guessing the most common category.
 
+### Average Marginal Effects
+
+Odds ratios are hard to communicate. `marginal_effects()` (Stata's
+`margins, dydx(*)`) translates the model onto the probability scale:
+the average change in predicted probability per unit of each predictor,
+with delta-method standard errors. Factor predictors show the average
+discrete change against their reference level:
+
+```{r}
+model <- survey_data %>%
+  logistic_regression(high_satisfaction ~ age + income + education)
+
+marginal_effects(model)
+summary(marginal_effects(model))
+```
+
+An AME of 0.03 reads: "one more unit increases the probability of the
+outcome by 3 percentage points, averaged over the sample" --- usually
+the sentence your readers actually need.
+
 ## Complete Example
 
 ```{r}

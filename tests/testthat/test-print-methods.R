@@ -948,3 +948,24 @@ test_that("print.normality_test: grouped (compact)", {
   output <- capture.output(print(result))
   expect_true(any(grepl("Grouped: gender", output, fixed = TRUE)))
 })
+
+# ===========================================================================
+# partial_cor() (0.7.0)
+# ===========================================================================
+
+test_that("print.partial_cor: ungrouped (compact)", {
+  result <- partial_cor(survey_data, life_satisfaction, income, controls = age)
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Partial Correlation", output, fixed = TRUE)))
+  expect_true(any(grepl("controlling for age", output, fixed = TRUE)))
+  expect_true(any(grepl("zero-order", output, fixed = TRUE)))
+})
+
+test_that("print.partial_cor: grouped and weighted (compact)", {
+  result <- survey_data |> dplyr::group_by(gender) |>
+    partial_cor(life_satisfaction, income, controls = age,
+                weights = sampling_weight)
+  output <- capture.output(print(result))
+  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+  expect_true(any(grepl("gender = ", output, fixed = TRUE)))
+})
