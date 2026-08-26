@@ -101,7 +101,7 @@ Test results showing whether groups differ, including:
 
 - p \< 0.05: Moderate evidence of a difference
 
-- p ≥ 0.05: No significant difference found
+- p \>= 0.05: No significant difference found
 
 **Effect Sizes** (How big is the difference?):
 
@@ -135,7 +135,7 @@ Use t-test when:
 
 - Groups are independent (different people in each)
 
-- Data is roughly normally distributed (or n ≥ 30 per group)
+- Data is roughly normally distributed (or n \>= 30 per group)
 
 Don't use when:
 

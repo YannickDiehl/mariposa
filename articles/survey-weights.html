@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -292,11 +293,10 @@ weighted statistics.</p>
 <h2 id="effective-sample-size">Effective Sample Size<a class="anchor" aria-label="anchor" href="#effective-sample-size"></a>
 </h2>
 <p>Weighting reduces statistical precision. The <em>effective sample
-size</em>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>e</mi><mi>f</mi><mi>f</mi></mrow></msub><annotation encoding="application/x-tex">n_{eff}</annotation></semantics></math>)
-tells you how much information your weighted sample actually
-carries:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mrow><mi>e</mi><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mo>∑</mo><msub><mi>w</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mrow><mo>∑</mo><msubsup><mi>w</mi><mi>i</mi><mn>2</mn></msubsup></mrow></mfrac></mrow><annotation encoding="application/x-tex">n_{eff} = \frac{\left(\sum w_i\right)^2}{\sum w_i^2}</annotation></semantics></math></p>
+size</em> (<span class="math inline">n_{eff}</span>) tells you how much
+information your weighted sample actually carries:</p>
+<p><span class="math display">n_{eff} = \frac{\left(\sum
+w_i\right)^2}{\sum w_i^2}</span></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">actual_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span>
 <span><span class="va">age_w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/w_mean.html">w_mean</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>

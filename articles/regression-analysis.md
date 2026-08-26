@@ -74,12 +74,12 @@ summary(result)
 #>   ------------------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    3.727      0.074              50.663    0.000 ***
-#>   age                           -0.002      0.001   -0.029     -1.413    0.158 
-#>   ----------------------------------------------------------------------------------------
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
+#>   --------------------------------------------------------------------------------------------------------------
+#>   (Intercept)                    3.727      0.074              50.663    0.000      3.583      3.871 ***
+#>   age                           -0.002      0.001   -0.029     -1.413    0.158     -0.005      0.001 
+#>   --------------------------------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
 #>   --------------------------------------------------
@@ -317,7 +317,7 @@ logistic_regression(survey_data,
                     high_satisfaction ~ age + income,
                     weights = sampling_weight)
 #> Logistic Regression: high_satisfaction ~ age + income [Weighted]
-#>   Nagelkerke R2 = 0.208, chi2(2) = 357.40, p < 0.001 ***, Accuracy = 68.3%, N = 2130
+#>   Nagelkerke R2 = 0.211, chi2(2) = 362.91, p < 0.001 ***, Accuracy = 68.3%, N = 2130
 ```
 
 ### Grouped Analysis
@@ -342,11 +342,61 @@ regression R-squared:
 - **Cox & Snell R-squared**: Cannot reach 1.0, always lower
 - **McFadden R-squared**: Values above 0.20 indicate good fit
 
-**Hosmer-Lemeshow Test**: Non-significant ($`p > .05`$) means the model
+**Hosmer-Lemeshow Test**: Non-significant (p \> .05) means the model
 fits well.
 
 **Classification Table**: Compare correct predictions to the base rate —
 your model should outperform guessing the most common category.
+
+### Average Marginal Effects
+
+Odds ratios are hard to communicate.
+[`marginal_effects()`](https://YannickDiehl.github.io/mariposa/reference/marginal_effects.md)
+(Stata’s `margins, dydx(*)`) translates the model onto the probability
+scale: the average change in predicted probability per unit of each
+predictor, with delta-method standard errors. Factor predictors show the
+average discrete change against their reference level:
+
+``` r
+
+model <- survey_data %>%
+  logistic_regression(high_satisfaction ~ age + income + education)
+
+marginal_effects(model)
+#> Average Marginal Effects: high_satisfaction ~ age + income + education
+#>   age: AME = 0.000, p = 0.730 
+#>   income: AME = 0.000, p < 0.001 ***
+#>   education: Intermediate Secondary vs. Basic Secondary: AME = 0.059, p = 0.023 *
+#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600 
+#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715 
+#> AME = average change in predicted probability. Use summary() for detailed output.
+summary(marginal_effects(model))
+#> 
+#> Average Marginal Effects Results
+#> --------------------------------
+#> - Formula: high_satisfaction ~ age + income + education
+#> - Scale: Predicted probability
+#> - Std. errors: Delta method
+#> - N: 2115
+#> 
+#>   ------------------------------------------------------------------------------------------------------------ 
+#>   Term                                                      AME     SE       z      p  CI Lower  CI Upper  sig 
+#>   ------------------------------------------------------------------------------------------------------------ 
+#>   age                                                     0.000  0.001   0.344   .730    -0.001     0.001      
+#>   income                                                  0.000  0.000  16.833  <.001     0.000     0.000  *** 
+#>   education: Intermediate Secondary vs. Basic Secondary   0.059  0.026   2.268   .023     0.008     0.110    * 
+#>   education: Academic Secondary vs. Basic Secondary       0.015  0.029   0.525   .600    -0.041     0.071      
+#>   education: University vs. Basic Secondary              -0.014  0.038  -0.365   .715    -0.088     0.061      
+#>   ------------------------------------------------------------------------------------------------------------ 
+#> 
+#> Factor rows show the average discrete change vs. the reference level.
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
+```
+
+An AME of 0.03 reads: “one more unit increases the probability of the
+outcome by 3 percentage points, averaged over the sample” — usually the
+sentence your readers actually need.
 
 ## Complete Example
 
@@ -408,14 +458,14 @@ summary(lm_result)
 #>   ------------------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    2.320      0.108              21.559    0.000 ***
-#>   age                           -0.001      0.001   -0.009     -0.441    0.660 
-#>   income                         0.000      0.000    0.448     22.409    0.000 ***
-#>   trust_government               0.002      0.020    0.002      0.113    0.910 
-#>   ----------------------------------------------------------------------------------------
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
+#>   --------------------------------------------------------------------------------------------------------------
+#>   (Intercept)                    2.320      0.108              21.559    0.000      2.109      2.531 ***
+#>   age                           -0.001      0.001   -0.009     -0.441    0.660     -0.003      0.002 
+#>   income                         0.000      0.000    0.448     22.409    0.000      0.000      0.000 ***
+#>   trust_government               0.002      0.020    0.002      0.113    0.910     -0.037      0.041 
+#>   --------------------------------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
 #>   --------------------------------------------------
@@ -439,7 +489,7 @@ log_result <- logistic_regression(survey_data,
                                   weights = sampling_weight)
 log_result
 #> Logistic Regression: high_satisfaction ~ age + income + trust_government [Weighted]
-#>   Nagelkerke R2 = 0.207, chi2(3) = 333.71, p < 0.001 ***, Accuracy = 68.5%, N = 2009
+#>   Nagelkerke R2 = 0.210, chi2(3) = 340.22, p < 0.001 ***, Accuracy = 68.5%, N = 2009
 summary(log_result)
 #> 
 #> Weighted Logistic Regression Results
@@ -453,15 +503,15 @@ summary(log_result)
 #>   --------------------------------------------------
 #>                          Chi-square    df       Sig.
 #>   --------------------------------------------------
-#>   Model                     333.708     3      0.000 ***
+#>   Model                     340.224     3      0.000 ***
 #>   --------------------------------------------------
 #> 
 #>   Model Summary
 #>   ------------------------------------------------------------
-#>   -2 Log Likelihood                  2379.425
-#>   Cox & Snell R Square                  0.153
-#>   Nagelkerke R Square                   0.207
-#>   McFadden R Square                     0.123
+#>   -2 Log Likelihood                  2392.588
+#>   Cox & Snell R Square                  0.156
+#>   Nagelkerke R Square                   0.210
+#>   McFadden R Square                     0.124
 #>   ------------------------------------------------------------
 #> 
 #>   Hosmer and Lemeshow Test

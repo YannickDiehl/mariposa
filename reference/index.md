@@ -89,11 +89,15 @@ Summarize and explore your survey data
   : Count How Many People Chose Each Option
 - [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
   : Compare Two Categories: See How They Relate
+- [`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md)
+  : Analyze Multiple Response Sets
 
 ## Hypothesis Testing
 
 Compare groups and test for significant differences
 
+- [`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)
+  : Test Variables for Normality
 - [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
   : Test If Two Groups Differ
 - [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
@@ -137,6 +141,8 @@ Measure relationships between variables
 
 - [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
   : Measure How Strongly Variables Are Related
+- [`partial_cor()`](https://YannickDiehl.github.io/mariposa/reference/partial_cor.md)
+  : Partial Correlation
 - [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md)
   : Spearman's Rank Correlation Analysis
 - [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md)
@@ -182,6 +188,8 @@ Linear and logistic regression with SPSS-compatible output
   : Run a Linear Regression
 - [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
   : Run a Logistic Regression
+- [`marginal_effects()`](https://YannickDiehl.github.io/mariposa/reference/marginal_effects.md)
+  : Average Marginal Effects
 - [`anova(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/anova.linear_regression.md)
   : ANOVA for a linear_regression model
 - [`anova(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/anova.logistic_regression.md)

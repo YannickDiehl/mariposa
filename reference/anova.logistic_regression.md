@@ -22,3 +22,8 @@ anova(object, ...)
 
   Passed to
   [`stats::anova.glm`](https://rdrr.io/r/stats/anova.glm.html).
+
+## Value
+
+An `anova` table (sequential analysis of deviance per term), as returned
+by [`stats::anova.glm`](https://rdrr.io/r/stats/anova.glm.html).

@@ -89,7 +89,7 @@ ANOVA results showing whether groups differ, including:
 
 - p \< 0.05: Moderate evidence of group differences
 
-- p ≥ 0.05: No significant group differences found
+- p \>= 0.05: No significant group differences found
 
 **Effect Sizes** (How much do groups matter?):
 

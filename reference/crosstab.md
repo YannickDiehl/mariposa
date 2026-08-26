@@ -69,7 +69,10 @@ crosstab(
 
 ## Value
 
-A cross-tabulation table showing the relationship between two variables
+A cross-tabulation table showing the relationship between two variables.
+The result also carries the expected cell counts (`$expected`) and
+adjusted standardized residuals (`$adj_residuals`); display the
+residuals with `summary(result, residuals = TRUE)`.
 
 ## Details
 
@@ -87,6 +90,16 @@ The crosstab table shows:
 
 - **Total %**: Percentage of the entire sample (e.g., "X% of all
   respondents have high school education AND live in the East")
+
+- **Adjusted residuals** (via `summary(result, residuals = TRUE)`, SPSS
+  `/CELLS=ASRESID`): which cells deviate from independence. After a
+  significant
+  [`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+  test, cells with \|adj. residual\| \> 2 are the ones driving the
+  association. For weighted tables the residuals are computed on the
+  unrounded weighted cell counts; an SPSS v29 reference run for the
+  residuals is pending, so they are currently verified against the
+  Haberman formula (`chisq.test()$stdres`) rather than SPSS output.
 
 ### When to Use This
 
@@ -134,7 +147,9 @@ for testing if the cross-tabulated variables are related.
 
 Other descriptive:
 [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),
-[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md),
+[`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)
 
 ## Examples
 

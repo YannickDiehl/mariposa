@@ -70,7 +70,7 @@ Other labels:
 ## Examples
 
 ``` r
-# Factor → haven_labelled
+# Factor -> haven_labelled
 x <- factor(c("Male", "Female", "Male"))
 to_labelled(x)
 #> <labelled<double>[3]>

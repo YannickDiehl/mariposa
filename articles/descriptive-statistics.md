@@ -140,12 +140,12 @@ survey_data %>%
 ### Understanding the Output
 
 - **n**: Number of valid (non-missing) cases
-- **mean** ($`\bar{x}`$): The arithmetic average
+- **mean** (\bar{x}): The arithmetic average
 - **sd**: Standard deviation — how spread out the values are
 - **median**: The middle value (50th percentile)
 - **min / max**: The range of observed values
 - **skewness**: Distribution symmetry. Values near 0 indicate symmetry;
-  values beyond $`\pm 1`$ indicate notable skew
+  values beyond \pm 1 indicate notable skew
 - **kurtosis**: Tail heaviness. Values near 0 indicate a normal-like
   shape
 
@@ -266,6 +266,87 @@ survey_data %>%
 #> Use summary() for detailed output.
 ```
 
+## Multiple Response Sets with multiple_response()
+
+“Check all that apply” questions arrive as a series of 0/1 indicator
+variables.
+[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md)
+(SPSS `MULT RESPONSE`) analyzes them as one set, with the two percentage
+bases SPSS users expect: *percent of responses* (sums to 100%) and
+*percent of cases* (can sum above 100%, because respondents tick several
+boxes):
+
+``` r
+
+# Example set: institutions a respondent trusts highly (rating 4-5)
+trust_set <- survey_data %>%
+  mutate(
+    gov     = as.integer(trust_government >= 4),
+    media   = as.integer(trust_media >= 4),
+    science = as.integer(trust_science >= 4)
+  )
+
+trust_set %>%
+  multiple_response(gov, media, science, weights = sampling_weight) %>%
+  summary()
+#> 
+#> Weighted Multiple Response Results
+#> ----------------------------------
+#> - Set: gov, media, science
+#> - Counted value: 1
+#> - Weights Variable: sampling_weight
+#> 
+#> Frequencies
+#>   --------------------------------------------- 
+#>   Option   Responses n  Responses %  % of Cases 
+#>   --------------------------------------------- 
+#>   gov            585.8         22.9        23.3 
+#>   media          476.5         18.7        18.9 
+#>   science       1490.3         58.4        59.2 
+#>   --------------------------------------------- 
+#>   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0
+#>   % of Cases can sum above 100% (multiple mentions per case).
+```
+
+Cross the set against a demographic with `by` — mentions and case-based
+column percentages per group:
+
+``` r
+
+trust_set %>%
+  multiple_response(gov, media, science, by = gender,
+                    weights = sampling_weight) %>%
+  summary()
+#> 
+#> Weighted Multiple Response Results
+#> ----------------------------------
+#> - Set: gov, media, science
+#> - Counted value: 1
+#> - Weights Variable: sampling_weight
+#> - By: gender
+#> 
+#> Frequencies
+#>   --------------------------------------------- 
+#>   Option   Responses n  Responses %  % of Cases 
+#>   --------------------------------------------- 
+#>   gov            585.8         22.9        23.3 
+#>   media          476.5         18.7        18.9 
+#>   science       1490.3         58.4        59.2 
+#>   --------------------------------------------- 
+#>   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0
+#>   % of Cases can sum above 100% (multiple mentions per case).
+#> 
+#> Crosstab: set BY gender (% of cases per column)
+#>   --------------------------------- 
+#>   Option          Male       Female 
+#>   --------------------------------- 
+#>   gov      280 (23.4%)  306 (23.2%) 
+#>   media    214 (17.9%)  262 (19.8%) 
+#>   science  694 (58.1%)  797 (60.3%) 
+#>   --------------------------------- 
+#>   Cases per column - Male: 1195, Female: 1321
+```
+
 ## Data Dictionary with codebook()
 
 For a comprehensive overview of your entire dataset, use
@@ -362,9 +443,9 @@ survey_data %>%
     plausible limits, or out-of-range Likert responses indicate data
     quality issues.
 
-3.  **Look at skewness.** Values beyond $`\pm 1`$ suggest the
-    distribution departs notably from normality. This affects the choice
-    between parametric and non-parametric tests.
+3.  **Look at skewness.** Values beyond \pm 1 suggest the distribution
+    departs notably from normality. This affects the choice between
+    parametric and non-parametric tests.
 
 4.  **Always use weights when available.** Unweighted statistics
     describe your sample; weighted statistics estimate the population.

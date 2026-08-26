@@ -17,13 +17,38 @@ in mariposa, organized by the type of data and research question.
 
 | Your data | 2 groups | 3+ groups | Paired |
 |----|----|----|----|
-| **Continuous, normal** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | `t_test(paired)` |
+| **Continuous, normal** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | *paired t-test planned* |
 | **Continuous, non-normal** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md) | [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md) | [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md) |
 | **Categorical** | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md) |
 | **Small sample, categorical** | [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md) | — | — |
 | **Multiple factors** | — | [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md) | [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md) |
 | **With covariate** | — | [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md) | — |
 | **Proportion vs. expected** | [`binomial_test()`](https://YannickDiehl.github.io/mariposa/reference/binomial_test.md) | [`chisq_gof()`](https://YannickDiehl.github.io/mariposa/reference/chisq_gof.md) | — |
+
+### Checking Normality First
+
+The parametric tests in the first row assume (approximately) normally
+distributed variables.
+[`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)
+produces the SPSS EXAMINE “Tests of Normality” table —
+Kolmogorov-Smirnov with Lilliefors correction and Shapiro-Wilk:
+
+``` r
+
+survey_data %>%
+  group_by(gender) %>%
+  normality_test(age, income)
+#> Normality Tests: age, income
+#>   2 group combination(s) x 2 variable(s) [Grouped: gender]
+#> Use summary() for detailed output.
+```
+
+Run it grouped (as above) when you are about to compare groups: the
+assumption that matters is normality *within* each group. With large
+samples these tests flag even trivial deviations, so combine them with
+the skewness and kurtosis from
+[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+before switching to a non-parametric alternative.
 
 ## t-Tests
 
@@ -149,12 +174,12 @@ result
 #>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
 ```
 
-The effect size $`\eta^2`$ (eta-squared) indicates how much variance is
+The effect size \eta^2 (eta-squared) indicates how much variance is
 explained by group membership:
 
-- **Small**: $`\eta^2 \approx 0.01`$
-- **Medium**: $`\eta^2 \approx 0.06`$
-- **Large**: $`\eta^2 \approx 0.14`$
+- **Small**: \eta^2 \approx 0.01
+- **Medium**: \eta^2 \approx 0.06
+- **Large**: \eta^2 \approx 0.14
 
 ### Post-Hoc Tests
 
@@ -191,8 +216,8 @@ levene_test(result)
 #> Use summary() for detailed output.
 ```
 
-If Levene’s test is significant ($`p < .05`$), variances are unequal.
-Use the Welch correction included in the ANOVA output.
+If Levene’s test is significant (p \< .05), variances are unequal. Use
+the Welch correction included in the ANOVA output.
 
 ## Factorial ANOVA
 
@@ -209,8 +234,8 @@ survey_data %>%
 #>   gender:education: F(3, 2178) = 0.300, p = 0.825 , eta2p = 0.000, N = 2186
 ```
 
-The output uses Type III sums of squares and reports partial $`\eta^2`$
-for each effect. Weighted analysis uses WLS estimation, matching SPSS
+The output uses Type III sums of squares and reports partial \eta^2 for
+each effect. Weighted analysis uses WLS estimation, matching SPSS
 UNIANOVA.
 
 For the full output with descriptive statistics per cell:
@@ -489,8 +514,8 @@ test_data %>%
 
 ### p-Values
 
-- $`p < .05`$: The difference is statistically significant
-- $`p \geq .05`$: No significant difference detected
+- p \< .05: The difference is statistically significant
+- p \geq .05: No significant difference detected
 
 “Not significant” does **not** mean “no difference” — it means we cannot
 rule out chance given the sample size.
@@ -503,7 +528,7 @@ check effect sizes:
 | Test        | Effect size  | Small | Medium | Large |
 |-------------|--------------|-------|--------|-------|
 | t-test      | Cohen’s *d*  | 0.20  | 0.50   | 0.80  |
-| ANOVA       | $`\eta^2`$   | 0.01  | 0.06   | 0.14  |
+| ANOVA       | \eta^2       | 0.01  | 0.06   | 0.14  |
 | Chi-square  | Cramer’s *V* | 0.10  | 0.30   | 0.50  |
 | Correlation | *r*          | 0.10  | 0.30   | 0.50  |
 

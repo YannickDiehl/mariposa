@@ -213,12 +213,10 @@ w_mean(survey_data, age, income, life_satisfaction,
 ## Effective Sample Size
 
 Weighting reduces statistical precision. The *effective sample size*
-($`n_{eff}`$) tells you how much information your weighted sample
-actually carries:
+(n\_{eff}) tells you how much information your weighted sample actually
+carries:
 
-``` math
-n_{eff} = \frac{\left(\sum w_i\right)^2}{\sum w_i^2}
-```
+n\_{eff} = \frac{\left(\sum w_i\right)^2}{\sum w_i^2}
 
 ``` r
 

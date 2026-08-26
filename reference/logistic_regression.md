@@ -64,12 +64,15 @@ logistic_regression(
 
   How factor predictors are entered into the model: `"dummy"` (default,
   matches base R [`glm()`](https://rdrr.io/r/stats/glm.html)) expands a
-  factor with `L` levels into `L - 1` dummy contrasts; `"numeric"`
-  silently coerces factor levels to their integer codes, matching SPSS
+  factor with `L` levels into `L - 1` contrasts; `"numeric"` silently
+  coerces factor levels to their integer codes, matching SPSS
   `LOGISTIC REGRESSION` default behavior when no `/CATEGORICAL`
   subcommand is given. The "numeric" mode emits a one-line
   [`cli::cli_inform()`](https://cli.r-lib.org/reference/cli_abort.html)
-  listing the coerced variables.
+  listing the coerced variables. Note that for *ordered* factors,
+  "dummy" applies R's default polynomial contrasts (terms suffixed `.L`,
+  `.Q`, `.C`), not treatment dummies; convert with
+  `factor(x, ordered = FALSE)` first if you want dummy coding.
 
 ## Value
 
@@ -190,12 +193,14 @@ weights (matching SPSS WEIGHT BY behavior).
 - McFadden R-squared (1 - LL_model/LL_null)
 
 **Factor Predictors**: By default (`factors = "dummy"`), factor
-predictors are expanded into `L - 1` dummy contrasts via R's
+predictors are expanded into `L - 1` contrasts via R's
 [`stats::model.matrix()`](https://rdrr.io/r/stats/model.matrix.html),
-matching base R [`glm()`](https://rdrr.io/r/stats/glm.html). Pass
-`factors = "numeric"` to silently coerce factor levels to their integer
-codes (SPSS `LOGISTIC REGRESSION` default without an explicit
-`/CATEGORICAL` subcommand).
+matching base R [`glm()`](https://rdrr.io/r/stats/glm.html): unordered
+factors get treatment (dummy) contrasts against the first level, while
+*ordered* factors get R's default polynomial contrasts (`.L`/`.Q`/`.C`
+terms). Pass `factors = "numeric"` to silently coerce factor levels to
+their integer codes (SPSS `LOGISTIC REGRESSION` default without an
+explicit `/CATEGORICAL` subcommand).
 
 **Grouped Analysis**: When `data` is grouped via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
@@ -214,7 +219,8 @@ for testing associations between categorical variables.
 for detailed output with toggleable sections.
 
 Other regression:
-[`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+[`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md),
+[`marginal_effects()`](https://YannickDiehl.github.io/mariposa/reference/marginal_effects.md)
 
 ## Examples
 
@@ -246,7 +252,7 @@ logistic_regression(survey_data,
 logistic_regression(survey_data, high_satisfaction ~ age,
                     weights = sampling_weight)
 #> Logistic Regression: high_satisfaction ~ age [Weighted]
-#>   Nagelkerke R2 = 0.000, chi2(1) = 0.28, p = 0.595 , Accuracy = 57.6%, N = 2437
+#>   Nagelkerke R2 = 0.000, chi2(1) = 0.30, p = 0.586 , Accuracy = 57.6%, N = 2437
 
 # Grouped by region
 survey_data |>

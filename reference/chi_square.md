@@ -61,7 +61,7 @@ independent)
 
 - p \< 0.05: Moderate evidence of relationship
 
-- p ≥ 0.05: No significant relationship found
+- p \>= 0.05: No significant relationship found
 
 **Effect Sizes** (How strong is the relationship?):
 

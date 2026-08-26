@@ -22,3 +22,9 @@ predict(object, ...)
 
   Passed to
   [`stats::predict.lm`](https://rdrr.io/r/stats/predict.lm.html).
+
+## Value
+
+A numeric vector of predictions (or a matrix/list, depending on the
+arguments), as returned by
+[`stats::predict.lm`](https://rdrr.io/r/stats/predict.lm.html).

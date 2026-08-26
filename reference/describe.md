@@ -110,7 +110,7 @@ Always start here! Use `describe()` to:
 
 ### Interpreting Patterns
 
-- **Mean ≈ Median**: Data is roughly symmetric
+- **Mean close to Median**: Data is roughly symmetric
 
 - **Mean \> Median**: Right-skewed (tail extends right)
 
@@ -140,7 +140,9 @@ for group comparisons.
 
 Other descriptive:
 [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
-[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md),
+[`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)
 
 ## Examples
 

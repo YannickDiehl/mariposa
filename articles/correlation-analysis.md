@@ -15,8 +15,8 @@ three methods for different situations:
 | Method | Function | Best for |
 |----|----|----|
 | Pearson’s *r* | [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md) | Linear relationships between continuous variables |
-| Spearman’s $`\rho`$ | [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) | Monotonic relationships, ordinal data, or data with outliers |
-| Kendall’s $`\tau`$ | [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md) | Ordinal data, small samples, or many tied values |
+| Spearman’s \rho | [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) | Monotonic relationships, ordinal data, or data with outliers |
+| Kendall’s \tau | [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md) | Ordinal data, small samples, or many tied values |
 
 All three support survey weights, multiple variables (correlation
 matrices), and grouped analysis.
@@ -35,9 +35,9 @@ survey_data %>%
 
 Interpretation of *r*:
 
-- $`r = 1`$: Perfect positive correlation
-- $`r = 0`$: No linear relationship
-- $`r = -1`$: Perfect negative correlation
+- r = 1: Perfect positive correlation
+- r = 0: No linear relationship
+- r = -1: Perfect negative correlation
 
 ### With Survey Weights
 
@@ -108,7 +108,7 @@ survey_data %>%
 
 ## Spearman Correlation
 
-Use Spearman’s $`\rho`$ when the relationship is monotonic but not
+Use Spearman’s \rho when the relationship is monotonic but not
 necessarily linear, or when working with ordinal data or data with
 outliers:
 
@@ -141,9 +141,9 @@ survey_data %>%
 
 ## Kendall’s Tau
 
-Use Kendall’s $`\tau`$ for ordinal data, small samples ($`n < 30`$), or
-data with many tied values. It is more robust than Spearman but
-typically produces smaller absolute values:
+Use Kendall’s \tau for ordinal data, small samples (n \< 30), or data
+with many tied values. It is more robust than Spearman but typically
+produces smaller absolute values:
 
 ``` r
 
@@ -152,6 +152,62 @@ survey_data %>%
               weights = sampling_weight)
 #> Kendall's Tau: political_orientation x life_satisfaction [Weighted]
 #>   tau = -0.005, p = 0.747 , N = 2241
+```
+
+## Partial Correlation
+
+[`partial_cor()`](https://YannickDiehl.github.io/mariposa/reference/partial_cor.md)
+(SPSS `PARTIAL CORR`) removes the influence of control variables from a
+correlation. Comparing the partial against the zero-order correlation
+shows how much of the original association the controls explain:
+
+``` r
+
+# Does the satisfaction-income correlation survive controlling for age?
+survey_data %>%
+  partial_cor(life_satisfaction, income, controls = age,
+              weights = sampling_weight)
+#> Partial Correlation: life_satisfaction, income | controlling for age [Weighted]
+#>   life_satisfaction x income: partial r = 0.450, p < 0.001 *** (zero-order r = 0.450), N = 2130
+#> Use summary() for detailed output.
+```
+
+Multiple analysis variables and multiple controls work together; with
+three or more variables,
+[`summary()`](https://rdrr.io/r/base/summary.html) adds the
+partial-correlation matrix:
+
+``` r
+
+result <- survey_data %>%
+  partial_cor(trust_government, trust_media, trust_science,
+              controls = c(age, political_orientation))
+summary(result)
+#> 
+#> Partial Correlation Results
+#> ---------------------------
+#> - Variables: trust_government, trust_media, trust_science
+#> - Controlling for: age, political_orientation
+#> - Missing: Listwise deletion
+#> 
+#> Partial Correlation Matrix:
+#> --------------------------- 
+#>                  trust_government trust_media trust_science
+#> trust_government            1.000       0.019         0.033
+#> trust_media                 0.019       1.000         0.009
+#> trust_science               0.033       0.009         1.000
+#> --------------------------- 
+#> 
+#> Pairwise Results:
+#>   -------------------------------------------------------------------------------------- 
+#>   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig 
+#>   -------------------------------------------------------------------------------------- 
+#>   trust_government    trust_media      0.019         0.019  1960  0.859  .390  1964      
+#>   trust_government  trust_science      0.033         0.030  1960  1.447  .148  1964      
+#>   trust_media       trust_science      0.009         0.010  1960  0.407  .684  1964      
+#>   -------------------------------------------------------------------------------------- 
+#> 
+#> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
 
 ## Interpreting Correlations
@@ -282,7 +338,7 @@ sample size:
     Pearson and works with both continuous and ordinal data.
 
 3.  **Report the magnitude, not just significance.** With large samples,
-    even $`r = .05`$ can be significant but is practically meaningless.
+    even r = .05 can be significant but is practically meaningless.
 
 4.  **Use correlation matrices to prioritize.** Before regression, check
     which variables are most strongly related to your outcome.

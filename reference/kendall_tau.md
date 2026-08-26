@@ -155,6 +155,7 @@ for Pearson correlation analysis.
 for detailed output with toggleable sections.
 
 Other correlation:
+[`partial_cor()`](https://YannickDiehl.github.io/mariposa/reference/partial_cor.md),
 [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md),
 [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md)
 

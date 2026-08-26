@@ -21,3 +21,8 @@ anova(object, ...)
 - ...:
 
   Passed to [`stats::anova.lm`](https://rdrr.io/r/stats/anova.lm.html).
+
+## Value
+
+An `anova` table (sequential Type-I sums of squares), as returned by
+[`stats::anova.lm`](https://rdrr.io/r/stats/anova.lm.html).

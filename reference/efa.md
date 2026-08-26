@@ -276,10 +276,12 @@ efa(survey_data,
 
 # With Oblimin rotation (requires GPArotation package)
 # \donttest{
-efa(survey_data,
-    political_orientation, environmental_concern, life_satisfaction,
-    trust_government, trust_media, trust_science,
-    rotation = "oblimin")
+if (requireNamespace("GPArotation", quietly = TRUE)) {
+  efa(survey_data,
+      political_orientation, environmental_concern, life_satisfaction,
+      trust_government, trust_media, trust_science,
+      rotation = "oblimin")
+}
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Oblimin)
 #>   KMO = 0.505 (Miserable), Variance explained: 61.0%
 # }

@@ -4,12 +4,12 @@ This vignette reports the SPSS-compatibility status of every statistical
 function in **mariposa**. It is auto-generated from the test suite and
 the validation exception registry.
 
-**Generated:** 2026-07-03
+**Generated:** 2026-08-26
 
 ## Summary
 
-- Functions in SPSS-validation scope: **50**
-- With validation tests in place: **39**
+- Functions in SPSS-validation scope: **53**
+- With validation tests in place: **42**
 - Validation gaps (no test file yet): **11**
 - Active Tier-3 algorithmic exceptions: **0**
 
@@ -54,7 +54,7 @@ the tier columns.
 | `chisq_gof` | compliant | 2 | 2 | 0 | 4 | — |
 | `codebook` | not validated | — | — | — | — | — |
 | `cramers_v` | not validated | — | — | — | — | — |
-| `crosstab` | compliant | 4 | 2 | 0 | 6 | — |
+| `crosstab` | compliant | 4 | 5 | 0 | 9 | adjusted standardized residuals (Haberman-formula oracle; SPSS /CELLS=ASRESID reference run pending) |
 | `describe` | compliant | 2 | 3 | 0 | 5 | — |
 | `dunn_test` | compliant | 0 | 1 | 0 | 1 | weighted variant |
 | `efa` | compliant | 1 | 7 | 0 | 8 | — |
@@ -67,11 +67,14 @@ the tier columns.
 | `kruskal_wallis` | compliant | 5 | 3 | 0 | 8 | weighted variant |
 | `levene_test` | compliant | 0 | 2 | 0 | 2 | — |
 | `linear_regression` | compliant | 4 | 23 | 0 | 27 | — |
-| `logistic_regression` | compliant | 7 | 9 | 0 | 16 | — |
+| `logistic_regression` | compliant | 7 | 13 | 0 | 20 | all statistics (textbook-formula oracle; no SPSS v29 reference run yet) |
 | `mann_whitney` | compliant | 2 | 8 | 0 | 10 | weighted variant |
 | `mcnemar_test` | compliant | 3 | 1 | 0 | 4 | — |
+| `multiple_response` | compliant | 11 | 10 | 0 | 21 | all statistics (hand-computation oracle; SPSS MULT RESPONSE reference run pending) |
+| `normality_test` | compliant | 4 | 8 | 0 | 12 | all statistics (independent-implementation oracles; SPSS EXAMINE reference run pending) |
 | `oneway_anova` | compliant | 6 | 16 | 0 | 22 | — |
 | `pairwise_wilcoxon` | compliant | 0 | 1 | 0 | 1 | weighted variant |
+| `partial_cor` | compliant | 3 | 9 | 0 | 12 | all statistics (residual-regression oracle; SPSS PARTIAL CORR reference run pending) |
 | `pearson_cor` | compliant | 2 | 5 | 0 | 7 | — |
 | `phi` | not validated | — | — | — | — | — |
 | `pomps` | not validated | — | — | — | — | — |

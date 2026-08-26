@@ -98,7 +98,7 @@ Test results showing whether groups differ, including:
 
 - p \< 0.05: Moderate evidence of difference
 
-- p ≥ 0.05: No significant difference found
+- p \>= 0.05: No significant difference found
 
 **Effect Size r** (How big is the difference?):
 

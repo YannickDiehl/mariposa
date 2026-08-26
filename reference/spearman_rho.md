@@ -162,6 +162,7 @@ for detailed output with toggleable sections.
 
 Other correlation:
 [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md),
+[`partial_cor()`](https://YannickDiehl.github.io/mariposa/reference/partial_cor.md),
 [`pearson_cor()`](https://YannickDiehl.github.io/mariposa/reference/pearson_cor.md)
 
 ## Examples

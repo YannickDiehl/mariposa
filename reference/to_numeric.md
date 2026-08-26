@@ -76,7 +76,7 @@ This function handles three input types:
 ## See also
 
 [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
-for the reverse (numeric → factor),
+for the reverse (numeric -\> factor),
 [`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)
 for creating labelled vectors
 
@@ -95,7 +95,7 @@ Other labels:
 ## Examples
 
 ``` r
-# Numeric factor levels → numeric
+# Numeric factor levels -> numeric
 x <- factor(c("1", "3", "5", "3"))
 to_numeric(x)
 #> [1] 1 3 5 3
@@ -106,7 +106,7 @@ to_numeric(x, use_labels = FALSE)
 #> [1] 1 2 3 2
 # [1] 1 2 3 2
 
-# Haven labelled → plain numeric
+# Haven labelled -> plain numeric
 to_numeric(survey_data$life_satisfaction)
 #>    [1]  4  3  2  2  4  4  3  3  4  3  1  1  2  5  3  2  3  4  3  3  2  5  1  5
 #>   [25]  5  2  5  4  5  5  3  3  2  3  5  1 NA  2  3  3  3  2  4  3  3  3  4  3

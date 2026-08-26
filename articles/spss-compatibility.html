@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,14 +90,14 @@
 <p>This vignette reports the SPSS-compatibility status of every
 statistical function in <strong>mariposa</strong>. It is auto-generated
 from the test suite and the validation exception registry.</p>
-<p><strong>Generated:</strong> 2026-07-03</p>
+<p><strong>Generated:</strong> 2026-08-26</p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
 <ul>
-<li>Functions in SPSS-validation scope: <strong>50</strong>
+<li>Functions in SPSS-validation scope: <strong>53</strong>
 </li>
-<li>With validation tests in place: <strong>39</strong>
+<li>With validation tests in place: <strong>42</strong>
 </li>
 <li>Validation gaps (no test file yet): <strong>11</strong>
 </li>
@@ -230,10 +231,11 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td><code>crosstab</code></td>
 <td>compliant</td>
 <td align="right">4</td>
-<td align="right">2</td>
+<td align="right">5</td>
 <td align="right">0</td>
-<td align="right">6</td>
-<td>—</td>
+<td align="right">9</td>
+<td>adjusted standardized residuals (Haberman-formula oracle; SPSS
+/CELLS=ASRESID reference run pending)</td>
 </tr>
 <tr class="odd">
 <td><code>describe</code></td>
@@ -347,10 +349,11 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td><code>logistic_regression</code></td>
 <td>compliant</td>
 <td align="right">7</td>
-<td align="right">9</td>
+<td align="right">13</td>
 <td align="right">0</td>
-<td align="right">16</td>
-<td>—</td>
+<td align="right">20</td>
+<td>all statistics (textbook-formula oracle; no SPSS v29 reference run
+yet)</td>
 </tr>
 <tr class="even">
 <td><code>mann_whitney</code></td>
@@ -371,6 +374,26 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td>—</td>
 </tr>
 <tr class="even">
+<td><code>multiple_response</code></td>
+<td>compliant</td>
+<td align="right">11</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">21</td>
+<td>all statistics (hand-computation oracle; SPSS MULT RESPONSE
+reference run pending)</td>
+</tr>
+<tr class="odd">
+<td><code>normality_test</code></td>
+<td>compliant</td>
+<td align="right">4</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td>all statistics (independent-implementation oracles; SPSS EXAMINE
+reference run pending)</td>
+</tr>
+<tr class="even">
 <td><code>oneway_anova</code></td>
 <td>compliant</td>
 <td align="right">6</td>
@@ -389,6 +412,16 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td>weighted variant</td>
 </tr>
 <tr class="even">
+<td><code>partial_cor</code></td>
+<td>compliant</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td>all statistics (residual-regression oracle; SPSS PARTIAL CORR
+reference run pending)</td>
+</tr>
+<tr class="odd">
 <td><code>pearson_cor</code></td>
 <td>compliant</td>
 <td align="right">2</td>
@@ -397,7 +430,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">7</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>phi</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -406,7 +439,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>pomps</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -415,7 +448,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>rec</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -424,7 +457,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reliability</code></td>
 <td>compliant</td>
 <td align="right">1</td>
@@ -433,7 +466,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">6</td>
 <td>McDonald’s omega (all paths)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>row_count</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -442,7 +475,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>row_means</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -451,7 +484,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>row_sums</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -460,7 +493,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>scheffe_test</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -469,7 +502,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">2</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>spearman_rho</code></td>
 <td>compliant</td>
 <td align="right">2</td>
@@ -478,7 +511,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">4</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>std</code></td>
 <td>not validated</td>
 <td align="right">—</td>
@@ -487,7 +520,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">—</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>t_test</code></td>
 <td>compliant</td>
 <td align="right">2</td>
@@ -496,7 +529,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">32</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>tukey_test</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -505,7 +538,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">4</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>w_iqr</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -514,7 +547,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>w_kurtosis</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -523,7 +556,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>w_mean</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -532,7 +565,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>w_median</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -541,7 +574,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>w_modus</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -550,7 +583,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>w_quantile</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -559,7 +592,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>w_range</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -568,7 +601,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>w_sd</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -577,7 +610,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>w_se</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -586,7 +619,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>w_skew</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -595,7 +628,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>w_var</code></td>
 <td>compliant</td>
 <td align="right">0</td>
@@ -604,7 +637,7 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <td align="right">19</td>
 <td>—</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>wilcoxon_test</code></td>
 <td>compliant</td>
 <td align="right">6</td>

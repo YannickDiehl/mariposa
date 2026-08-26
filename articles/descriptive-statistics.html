@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -235,8 +236,7 @@ displayed:</p>
 <li>
 <strong>n</strong>: Number of valid (non-missing) cases</li>
 <li>
-<strong>mean</strong>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>x</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{x}</annotation></semantics></math>):
+<strong>mean</strong> (<span class="math inline">\bar{x}</span>):
 The arithmetic average</li>
 <li>
 <strong>sd</strong>: Standard deviation — how spread out the values
@@ -247,8 +247,7 @@ are</li>
 <strong>min / max</strong>: The range of observed values</li>
 <li>
 <strong>skewness</strong>: Distribution symmetry. Values near 0
-indicate symmetry; values beyond
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>±</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\pm 1</annotation></semantics></math>
+indicate symmetry; values beyond <span class="math inline">\pm 1</span>
 indicate notable skew</li>
 <li>
 <strong>kurtosis</strong>: Tail heaviness. Values near 0 indicate a
@@ -388,11 +387,85 @@ what proportion has each education level?”</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="multiple-response-sets-with-multiple_response">Multiple Response Sets with multiple_response()<a class="anchor" aria-label="anchor" href="#multiple-response-sets-with-multiple_response"></a>
+</h2>
+<p>“Check all that apply” questions arrive as a series of 0/1 indicator
+variables. <code><a href="../reference/multiple_response.html">multiple_response()</a></code> (SPSS
+<code>MULT RESPONSE</code>) analyzes them as one set, with the two
+percentage bases SPSS users expect: <em>percent of responses</em> (sums
+to 100%) and <em>percent of cases</em> (can sum above 100%, because
+respondents tick several boxes):</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example set: institutions a respondent trusts highly (rating 4-5)</span></span>
+<span><span class="va">trust_set</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    gov     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">trust_government</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>    media   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">trust_media</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>    science <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">trust_science</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">trust_set</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/multiple_response.html">multiple_response</a></span><span class="op">(</span><span class="va">gov</span>, <span class="va">media</span>, <span class="va">science</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Multiple Response Results</span></span>
+<span><span class="co">#&gt; ----------------------------------</span></span>
+<span><span class="co">#&gt; - Set: gov, media, science</span></span>
+<span><span class="co">#&gt; - Counted value: 1</span></span>
+<span><span class="co">#&gt; - Weights Variable: sampling_weight</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Frequencies</span></span>
+<span><span class="co">#&gt;   --------------------------------------------- </span></span>
+<span><span class="co">#&gt;   Option   Responses n  Responses %  % of Cases </span></span>
+<span><span class="co">#&gt;   --------------------------------------------- </span></span>
+<span><span class="co">#&gt;   gov            585.8         22.9        23.3 </span></span>
+<span><span class="co">#&gt;   media          476.5         18.7        18.9 </span></span>
+<span><span class="co">#&gt;   science       1490.3         58.4        59.2 </span></span>
+<span><span class="co">#&gt;   --------------------------------------------- </span></span>
+<span><span class="co">#&gt;   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0</span></span>
+<span><span class="co">#&gt;   % of Cases can sum above 100% (multiple mentions per case).</span></span></code></pre></div>
+<p>Cross the set against a demographic with <code>by</code> — mentions
+and case-based column percentages per group:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trust_set</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/multiple_response.html">multiple_response</a></span><span class="op">(</span><span class="va">gov</span>, <span class="va">media</span>, <span class="va">science</span>, by <span class="op">=</span> <span class="va">gender</span>,</span>
+<span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Weighted Multiple Response Results</span></span>
+<span><span class="co">#&gt; ----------------------------------</span></span>
+<span><span class="co">#&gt; - Set: gov, media, science</span></span>
+<span><span class="co">#&gt; - Counted value: 1</span></span>
+<span><span class="co">#&gt; - Weights Variable: sampling_weight</span></span>
+<span><span class="co">#&gt; - By: gender</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Frequencies</span></span>
+<span><span class="co">#&gt;   --------------------------------------------- </span></span>
+<span><span class="co">#&gt;   Option   Responses n  Responses %  % of Cases </span></span>
+<span><span class="co">#&gt;   --------------------------------------------- </span></span>
+<span><span class="co">#&gt;   gov            585.8         22.9        23.3 </span></span>
+<span><span class="co">#&gt;   media          476.5         18.7        18.9 </span></span>
+<span><span class="co">#&gt;   science       1490.3         58.4        59.2 </span></span>
+<span><span class="co">#&gt;   --------------------------------------------- </span></span>
+<span><span class="co">#&gt;   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0</span></span>
+<span><span class="co">#&gt;   % of Cases can sum above 100% (multiple mentions per case).</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Crosstab: set BY gender (% of cases per column)</span></span>
+<span><span class="co">#&gt;   --------------------------------- </span></span>
+<span><span class="co">#&gt;   Option          Male       Female </span></span>
+<span><span class="co">#&gt;   --------------------------------- </span></span>
+<span><span class="co">#&gt;   gov      280 (23.4%)  306 (23.2%) </span></span>
+<span><span class="co">#&gt;   media    214 (17.9%)  262 (19.8%) </span></span>
+<span><span class="co">#&gt;   science  694 (58.1%)  797 (60.3%) </span></span>
+<span><span class="co">#&gt;   --------------------------------- </span></span>
+<span><span class="co">#&gt;   Cases per column - Male: 1195, Female: 1321</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="data-dictionary-with-codebook">Data Dictionary with codebook()<a class="anchor" aria-label="anchor" href="#data-dictionary-with-codebook"></a>
 </h2>
 <p>For a comprehensive overview of your entire dataset, use
 <code><a href="../reference/codebook.html">codebook()</a></code>:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codebook.html">codebook</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span></code></pre></div>
 <p>This opens an interactive HTML view in the RStudio Viewer showing
 variable names, types, labels, value distributions, and missing data
@@ -402,7 +475,7 @@ patterns. It is the fastest way to orient yourself in a new dataset.</p>
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
 <p>A typical descriptive analysis workflow:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Explore the dataset</span></span>
 <span><span class="fu"><a href="../reference/find_var.html">find_var</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="st">"trust|satisfaction"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   col              name                                           label</span></span>
@@ -478,10 +551,9 @@ surprises in later analyses.</p></li>
 <li><p><strong>Check for impossible values.</strong> Negative ages,
 incomes above plausible limits, or out-of-range Likert responses
 indicate data quality issues.</p></li>
-<li><p><strong>Look at skewness.</strong> Values beyond
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>±</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\pm 1</annotation></semantics></math>
-suggest the distribution departs notably from normality. This affects
-the choice between parametric and non-parametric tests.</p></li>
+<li><p><strong>Look at skewness.</strong> Values beyond <span class="math inline">\pm 1</span> suggest the distribution departs
+notably from normality. This affects the choice between parametric and
+non-parametric tests.</p></li>
 <li><p><strong>Always use weights when available.</strong> Unweighted
 statistics describe your sample; weighted statistics estimate the
 population.</p></li>

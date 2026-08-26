@@ -274,7 +274,7 @@ analysis:
 - 0.60 – 0.80: Acceptable
 - Below 0.60: Factor analysis may not be appropriate
 
-**Bartlett’s Test** should be significant ($`p < .05`$), confirming that
+**Bartlett’s Test** should be significant (p \< .05), confirming that
 meaningful correlations exist.
 
 **Eigenvalues** show variance explained per component. By default,

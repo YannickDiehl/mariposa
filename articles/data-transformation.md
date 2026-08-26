@@ -256,8 +256,8 @@ survey_data_methods %>%
 #> ----------------------------------------
 ```
 
-- **`"sd"`** (default): Classic z-standardization
-  ($`\frac{x - \bar{x}}{SD}`$)
+- **`"sd"`** (default): Classic z-standardization (\frac{x -
+  \bar{x}}{SD})
 - **`"2sd"`**: Gelman’s (2008) recommendation — divides by 2 SD, making
   coefficients comparable to untransformed binary predictors
 - **`"mad"`**: Robust standardization using median and MAD (resistant to

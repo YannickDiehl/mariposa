@@ -57,7 +57,7 @@ Pairwise comparison results showing:
 - p \< 0.05: Groups are significantly different (you can be very
   confident)
 
-- p ≥ 0.05: No significant difference between these groups
+- p \>= 0.05: No significant difference between these groups
 
 - Scheffe adjustments are stricter than other methods
 

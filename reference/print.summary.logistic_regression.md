@@ -3,9 +3,9 @@
 Displays the detailed SPSS-style output for a logistic regression, with
 sections controlled by the boolean parameters passed to
 [`summary.logistic_regression`](https://YannickDiehl.github.io/mariposa/reference/summary.logistic_regression.md).
-Sections include model fit statistics (Nagelkerke R-squared,
-Hosmer-Lemeshow), classification table, coefficients with odds ratios,
-and model comparison (chi-squared test).
+Sections include the omnibus test of model coefficients, model fit
+statistics (Nagelkerke R-squared, Hosmer-Lemeshow), classification
+table, and coefficients with odds ratios.
 
 ## Usage
 

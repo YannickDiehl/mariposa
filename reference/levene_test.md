@@ -87,7 +87,7 @@ Test results showing:
 
 - p \> 0.05: Good! Groups have similar variance (assumption met)
 
-- p ≤ 0.05: Problem - groups vary differently (assumption violated)
+- p \<= 0.05: Problem - groups vary differently (assumption violated)
 
 Think of it like checking if all groups are equally "spread out":
 
@@ -109,7 +109,7 @@ Check variance equality when:
 
 ### What If Variances Are Unequal?
 
-If Levene's test is significant (p ≤ 0.05):
+If Levene's test is significant (p \<= 0.05):
 
 - For t-tests: Use Welch's t-test (var.equal = FALSE)
 

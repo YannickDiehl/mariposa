@@ -79,14 +79,17 @@ linear_regression(
 
   How factor predictors are entered into the model: `"dummy"` (default,
   matches base R [`lm()`](https://rdrr.io/r/stats/lm.html)) expands a
-  factor with `L` levels into `L - 1` dummy contrasts; `"numeric"`
-  silently coerces factor levels to their integer codes, matching SPSS
+  factor with `L` levels into `L - 1` contrasts; `"numeric"` silently
+  coerces factor levels to their integer codes, matching SPSS
   `REGRESSION` default behavior (ordinal-as-scale). The "numeric" mode
   emits a one-line
   [`cli::cli_inform()`](https://cli.r-lib.org/reference/cli_abort.html)
   listing the coerced variables. The "numeric" mode is required to
   reproduce SPSS results when factor predictors carry ordered meaning
-  (e.g., 4-level education).
+  (e.g., 4-level education). Note that for *ordered* factors, "dummy"
+  applies R's default polynomial contrasts (terms suffixed `.L`, `.Q`,
+  `.C`), not treatment dummies; convert with
+  `factor(x, ordered = FALSE)` first if you want dummy coding.
 
 ## Value
 
@@ -208,13 +211,15 @@ intercept. For dummy-coded factor terms (`factors = "dummy"`), the SD of
 the contrast column from the design matrix is used.
 
 **Factor Predictors**: By default (`factors = "dummy"`), factor
-predictors are expanded into `L - 1` dummy contrasts via R's
+predictors are expanded into `L - 1` contrasts via R's
 [`stats::model.matrix()`](https://rdrr.io/r/stats/model.matrix.html),
-matching base R [`lm()`](https://rdrr.io/r/stats/lm.html). Pass
-`factors = "numeric"` to silently coerce factor levels to their integer
-codes (SPSS `REGRESSION` default). The "numeric" mode is required to
-reproduce SPSS results for ordinal predictors like education or Likert
-scales that SPSS treats as continuous.
+matching base R [`lm()`](https://rdrr.io/r/stats/lm.html): unordered
+factors get treatment (dummy) contrasts against the first level, while
+*ordered* factors get R's default polynomial contrasts (`.L`/`.Q`/`.C`
+terms). Pass `factors = "numeric"` to silently coerce factor levels to
+their integer codes (SPSS `REGRESSION` default). The "numeric" mode is
+required to reproduce SPSS results for ordinal predictors like education
+or Likert scales that SPSS treats as continuous.
 
 **Grouped Analysis**: When `data` is grouped via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
@@ -236,7 +241,8 @@ for checking bivariate correlations.
 for detailed output with toggleable sections.
 
 Other regression:
-[`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+[`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md),
+[`marginal_effects()`](https://YannickDiehl.github.io/mariposa/reference/marginal_effects.md)
 
 ## Examples
 
@@ -327,13 +333,13 @@ summary(result)                         # full detailed SPSS-style output
 #>   ------------------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    2.321      0.092              25.237    0.000 ***
-#>   age                           -0.001      0.001   -0.010     -0.508    0.611 
-#>   income                         0.000      0.000    0.448     23.037    0.000 ***
-#>   ----------------------------------------------------------------------------------------
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
+#>   --------------------------------------------------------------------------------------------------------------
+#>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***
+#>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 
+#>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***
+#>   --------------------------------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
 #>   --------------------------------------------------
@@ -371,13 +377,13 @@ summary(result, descriptives = FALSE)   # hide descriptives section
 #>   ------------------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   ----------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig. 
-#>   ----------------------------------------------------------------------------------------
-#>   (Intercept)                    2.321      0.092              25.237    0.000 ***
-#>   age                           -0.001      0.001   -0.010     -0.508    0.611 
-#>   income                         0.000      0.000    0.448     23.037    0.000 ***
-#>   ----------------------------------------------------------------------------------------
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
+#>   --------------------------------------------------------------------------------------------------------------
+#>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***
+#>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 
+#>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***
+#>   --------------------------------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
 #>   --------------------------------------------------

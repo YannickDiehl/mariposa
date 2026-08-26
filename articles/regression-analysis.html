@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -178,12 +179,12 @@ syntax</li>
 <span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Coefficients</span></span>
-<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Term                               B  Std.Error     Beta          t     Sig. </span></span>
-<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt;   (Intercept)                    3.727      0.074              50.663    0.000 ***</span></span>
-<span><span class="co">#&gt;   age                           -0.002      0.001   -0.029     -1.413    0.158 </span></span>
-<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   (Intercept)                    3.727      0.074              50.663    0.000      3.583      3.871 ***</span></span>
+<span><span class="co">#&gt;   age                           -0.002      0.001   -0.029     -1.413    0.158     -0.005      0.001 </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Collinearity Statistics</span></span>
 <span><span class="co">#&gt;   --------------------------------------------------</span></span>
@@ -433,7 +434,7 @@ regression:</p>
 <span>                    <span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span>,</span>
 <span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Logistic Regression: high_satisfaction ~ age + income [Weighted]</span></span>
-<span><span class="co">#&gt;   Nagelkerke R2 = 0.208, chi2(2) = 357.40, p &lt; 0.001 ***, Accuracy = 68.3%, N = 2130</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nagelkerke R2 = 0.211, chi2(2) = 362.91, p &lt; 0.001 ***, Accuracy = 68.3%, N = 2130</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="grouped-analysis-1">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis-1"></a>
@@ -462,18 +463,62 @@ lower</li>
 <strong>McFadden R-squared</strong>: Values above 0.20 indicate good
 fit</li>
 </ul>
-<p><strong>Hosmer-Lemeshow Test</strong>: Non-significant
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&gt;</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p &gt; .05</annotation></semantics></math>)
-means the model fits well.</p>
+<p><strong>Hosmer-Lemeshow Test</strong>: Non-significant (<span class="math inline">p &gt; .05</span>) means the model fits well.</p>
 <p><strong>Classification Table</strong>: Compare correct predictions to
 the base rate — your model should outperform guessing the most common
 category.</p>
+</div>
+<div class="section level3">
+<h3 id="average-marginal-effects">Average Marginal Effects<a class="anchor" aria-label="anchor" href="#average-marginal-effects"></a>
+</h3>
+<p>Odds ratios are hard to communicate. <code><a href="../reference/marginal_effects.html">marginal_effects()</a></code>
+(Stata’s <code>margins, dydx(*)</code>) translates the model onto the
+probability scale: the average change in predicted probability per unit
+of each predictor, with delta-method standard errors. Factor predictors
+show the average discrete change against their reference level:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/logistic_regression.html">logistic_regression</a></span><span class="op">(</span><span class="va">high_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/marginal_effects.html">marginal_effects</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Average Marginal Effects: high_satisfaction ~ age + income + education</span></span>
+<span><span class="co">#&gt;   age: AME = 0.000, p = 0.730 </span></span>
+<span><span class="co">#&gt;   income: AME = 0.000, p &lt; 0.001 ***</span></span>
+<span><span class="co">#&gt;   education: Intermediate Secondary vs. Basic Secondary: AME = 0.059, p = 0.023 *</span></span>
+<span><span class="co">#&gt;   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600 </span></span>
+<span><span class="co">#&gt;   education: University vs. Basic Secondary: AME = -0.014, p = 0.715 </span></span>
+<span><span class="co">#&gt; AME = average change in predicted probability. Use summary() for detailed output.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/marginal_effects.html">marginal_effects</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Average Marginal Effects Results</span></span>
+<span><span class="co">#&gt; --------------------------------</span></span>
+<span><span class="co">#&gt; - Formula: high_satisfaction ~ age + income + education</span></span>
+<span><span class="co">#&gt; - Scale: Predicted probability</span></span>
+<span><span class="co">#&gt; - Std. errors: Delta method</span></span>
+<span><span class="co">#&gt; - N: 2115</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt;   Term                                                      AME     SE       z      p  CI Lower  CI Upper  sig </span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt;   age                                                     0.000  0.001   0.344   .730    -0.001     0.001      </span></span>
+<span><span class="co">#&gt;   income                                                  0.000  0.000  16.833  &lt;.001     0.000     0.000  *** </span></span>
+<span><span class="co">#&gt;   education: Intermediate Secondary vs. Basic Secondary   0.059  0.026   2.268   .023     0.008     0.110    * </span></span>
+<span><span class="co">#&gt;   education: Academic Secondary vs. Basic Secondary       0.015  0.029   0.525   .600    -0.041     0.071      </span></span>
+<span><span class="co">#&gt;   education: University vs. Basic Secondary              -0.014  0.038  -0.365   .715    -0.088     0.061      </span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------------------------------------------------ </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Factor rows show the average discrete change vs. the reference level.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
+<p>An AME of 0.03 reads: “one more unit increases the probability of the
+outcome by 3 percentage points, averaged over the sample” — usually the
+sentence your readers actually need.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Explore relationships first</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">age</span>, <span class="va">income</span>, <span class="va">trust_government</span><span class="op">)</span></span>
@@ -530,14 +575,14 @@ category.</p>
 <span><span class="co">#&gt;   ------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Coefficients</span></span>
-<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Term                               B  Std.Error     Beta          t     Sig. </span></span>
-<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt;   (Intercept)                    2.320      0.108              21.559    0.000 ***</span></span>
-<span><span class="co">#&gt;   age                           -0.001      0.001   -0.009     -0.441    0.660 </span></span>
-<span><span class="co">#&gt;   income                         0.000      0.000    0.448     22.409    0.000 ***</span></span>
-<span><span class="co">#&gt;   trust_government               0.002      0.020    0.002      0.113    0.910 </span></span>
-<span><span class="co">#&gt;   ----------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   (Intercept)                    2.320      0.108              21.559    0.000      2.109      2.531 ***</span></span>
+<span><span class="co">#&gt;   age                           -0.001      0.001   -0.009     -0.441    0.660     -0.003      0.002 </span></span>
+<span><span class="co">#&gt;   income                         0.000      0.000    0.448     22.409    0.000      0.000      0.000 ***</span></span>
+<span><span class="co">#&gt;   trust_government               0.002      0.020    0.002      0.113    0.910     -0.037      0.041 </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Collinearity Statistics</span></span>
 <span><span class="co">#&gt;   --------------------------------------------------</span></span>
@@ -561,7 +606,7 @@ category.</p>
 <span>                                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="va">log_result</span></span>
 <span><span class="co">#&gt; Logistic Regression: high_satisfaction ~ age + income + trust_government [Weighted]</span></span>
-<span><span class="co">#&gt;   Nagelkerke R2 = 0.207, chi2(3) = 333.71, p &lt; 0.001 ***, Accuracy = 68.5%, N = 2009</span></span>
+<span><span class="co">#&gt;   Nagelkerke R2 = 0.210, chi2(3) = 340.22, p &lt; 0.001 ***, Accuracy = 68.5%, N = 2009</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">log_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Weighted Logistic Regression Results</span></span>
@@ -575,15 +620,15 @@ category.</p>
 <span><span class="co">#&gt;   --------------------------------------------------</span></span>
 <span><span class="co">#&gt;                          Chi-square    df       Sig.</span></span>
 <span><span class="co">#&gt;   --------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Model                     333.708     3      0.000 ***</span></span>
+<span><span class="co">#&gt;   Model                     340.224     3      0.000 ***</span></span>
 <span><span class="co">#&gt;   --------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Model Summary</span></span>
 <span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
-<span><span class="co">#&gt;   -2 Log Likelihood                  2379.425</span></span>
-<span><span class="co">#&gt;   Cox &amp; Snell R Square                  0.153</span></span>
-<span><span class="co">#&gt;   Nagelkerke R Square                   0.207</span></span>
-<span><span class="co">#&gt;   McFadden R Square                     0.123</span></span>
+<span><span class="co">#&gt;   -2 Log Likelihood                  2392.588</span></span>
+<span><span class="co">#&gt;   Cox &amp; Snell R Square                  0.156</span></span>
+<span><span class="co">#&gt;   Nagelkerke R Square                   0.210</span></span>
+<span><span class="co">#&gt;   McFadden R Square                     0.124</span></span>
 <span><span class="co">#&gt;   ------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Hosmer and Lemeshow Test</span></span>

@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
-<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="katex-auto.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -31,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +86,7 @@
 <!-- badges: start -->
 
 <p><strong>Professional statistical analysis for survey data in R.</strong></p>
-<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 76 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. Statistical results are validated against SPSS v29 within documented per-tier tolerances; see <code><a href="articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for per-function status.</p>
+<p>mariposa (<em>Marburg Initiative for Political and Social Analysis</em>) provides 80 functions for importing, managing, transforming, and analyzing survey data. Covers the full workflow from data import (SPSS, Stata, SAS, Excel) through label management, recoding, and standardization to statistical analysis with survey weights, grouped operations via <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, and publication-ready output. Statistical results are validated against SPSS v29 within documented per-tier tolerances; see <code><a href="articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for per-function status.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -182,9 +183,14 @@
 <tr>
 <td><strong>Descriptive</strong></td>
 <td>
-<code><a href="reference/describe.html">describe()</a></code>, <code><a href="reference/frequency.html">frequency()</a></code>, <code><a href="reference/crosstab.html">crosstab()</a></code>, <code><a href="reference/codebook.html">codebook()</a></code>
+<code><a href="reference/describe.html">describe()</a></code>, <code><a href="reference/frequency.html">frequency()</a></code>, <code><a href="reference/crosstab.html">crosstab()</a></code>, <code><a href="reference/multiple_response.html">multiple_response()</a></code>, <code><a href="reference/codebook.html">codebook()</a></code>
 </td>
-<td>Summaries, distributions, and data dictionaries</td>
+<td>Summaries, distributions, multiple response sets, data dictionaries</td>
+</tr>
+<tr>
+<td><strong>Assumption checks</strong></td>
+<td><code><a href="reference/normality_test.html">normality_test()</a></code></td>
+<td>Kolmogorov-Smirnov (Lilliefors) and Shapiro-Wilk normality tests</td>
 </tr>
 <tr>
 <td><strong>T-Tests</strong></td>
@@ -215,9 +221,9 @@
 <tr>
 <td><strong>Correlation</strong></td>
 <td>
-<code><a href="reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="reference/spearman_rho.html">spearman_rho()</a></code>, <code><a href="reference/kendall_tau.html">kendall_tau()</a></code>
+<code><a href="reference/pearson_cor.html">pearson_cor()</a></code>, <code><a href="reference/spearman_rho.html">spearman_rho()</a></code>, <code><a href="reference/kendall_tau.html">kendall_tau()</a></code>, <code><a href="reference/partial_cor.html">partial_cor()</a></code>
 </td>
-<td>Relationships between variables</td>
+<td>Relationships between variables, with and without controls</td>
 </tr>
 <tr>
 <td><strong>Post-hoc</strong></td>
@@ -236,9 +242,9 @@
 <tr>
 <td><strong>Regression</strong></td>
 <td>
-<code><a href="reference/linear_regression.html">linear_regression()</a></code>, <code><a href="reference/logistic_regression.html">logistic_regression()</a></code>
+<code><a href="reference/linear_regression.html">linear_regression()</a></code>, <code><a href="reference/logistic_regression.html">logistic_regression()</a></code>, <code><a href="reference/marginal_effects.html">marginal_effects()</a></code>
 </td>
-<td>Linear and logistic models with SPSS-style output</td>
+<td>Linear and logistic models with SPSS-style output, average marginal effects</td>
 </tr>
 <tr>
 <td><strong>Effect sizes</strong></td>

@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +119,7 @@ question.</p>
 <td><strong>Continuous, normal</strong></td>
 <td><code><a href="../reference/t_test.html">t_test()</a></code></td>
 <td><code><a href="../reference/oneway_anova.html">oneway_anova()</a></code></td>
-<td><code>t_test(paired)</code></td>
+<td><em>paired t-test planned</em></td>
 </tr>
 <tr class="even">
 <td><strong>Continuous, non-normal</strong></td>
@@ -159,6 +160,26 @@ question.</p>
 </tbody>
 </table>
 </div>
+<div class="section level3">
+<h3 id="checking-normality-first">Checking Normality First<a class="anchor" aria-label="anchor" href="#checking-normality-first"></a>
+</h3>
+<p>The parametric tests in the first row assume (approximately) normally
+distributed variables. <code><a href="../reference/normality_test.html">normality_test()</a></code> produces the SPSS
+EXAMINE “Tests of Normality” table — Kolmogorov-Smirnov with Lilliefors
+correction and Shapiro-Wilk:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/normality_test.html">normality_test</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Normality Tests: age, income</span></span>
+<span><span class="co">#&gt;   2 group combination(s) x 2 variable(s) [Grouped: gender]</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
+<p>Run it grouped (as above) when you are about to compare groups: the
+assumption that matters is normality <em>within</em> each group. With
+large samples these tests flag even trivial deviations, so combine them
+with the skewness and kurtosis from <code><a href="../reference/describe.html">describe()</a></code> before
+switching to a non-parametric alternative.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="t-tests">t-Tests<a class="anchor" aria-label="anchor" href="#t-tests"></a>
@@ -167,7 +188,7 @@ question.</p>
 <h3 id="independent-samples">Independent Samples<a class="anchor" aria-label="anchor" href="#independent-samples"></a>
 </h3>
 <p>Compare two groups on a continuous variable:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: life_satisfaction by gender [Weighted]</span></span>
@@ -177,7 +198,7 @@ and Welch’s t-test (not assumed). When in doubt, use Welch — it is more
 robust.</p>
 <p>For the detailed output with group descriptives, Levene’s test, and
 confidence intervals:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -223,7 +244,7 @@ confidence intervals:</p>
 <div class="section level3">
 <h3 id="multiple-variables-at-once">Multiple Variables at Once<a class="anchor" aria-label="anchor" href="#multiple-variables-at-once"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>         group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -238,7 +259,7 @@ confidence intervals:</p>
 <h3 id="one-sample-t-test">One-Sample t-Test<a class="anchor" aria-label="anchor" href="#one-sample-t-test"></a>
 </h3>
 <p>Test whether a mean differs from a specific value:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Is average life satisfaction different from the scale midpoint (3)?</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, mu <span class="op">=</span> <span class="fl">3</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -249,7 +270,7 @@ confidence intervals:</p>
 <h3 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
 </h3>
 <p>Run separate tests per subgroup:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -265,28 +286,26 @@ confidence intervals:</p>
 <h2 id="one-way-anova">One-Way ANOVA<a class="anchor" aria-label="anchor" href="#one-way-anova"></a>
 </h2>
 <p>Compare means across three or more groups:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="va">result</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
 <span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
-<p>The effect size
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>η</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\eta^2</annotation></semantics></math>
-(eta-squared) indicates how much variance is explained by group
-membership:</p>
+<p>The effect size <span class="math inline">\eta^2</span> (eta-squared)
+indicates how much variance is explained by group membership:</p>
 <ul>
 <li>
-<strong>Small</strong>:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>η</mi><mn>2</mn></msup><mo>≈</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">\eta^2 \approx 0.01</annotation></semantics></math>
+<strong>Small</strong>: <span class="math inline">\eta^2 \approx
+0.01</span>
 </li>
 <li>
-<strong>Medium</strong>:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>η</mi><mn>2</mn></msup><mo>≈</mo><mn>0.06</mn></mrow><annotation encoding="application/x-tex">\eta^2 \approx 0.06</annotation></semantics></math>
+<strong>Medium</strong>: <span class="math inline">\eta^2 \approx
+0.06</span>
 </li>
 <li>
-<strong>Large</strong>:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>η</mi><mn>2</mn></msup><mo>≈</mo><mn>0.14</mn></mrow><annotation encoding="application/x-tex">\eta^2 \approx 0.14</annotation></semantics></math>
+<strong>Large</strong>: <span class="math inline">\eta^2 \approx
+0.14</span>
 </li>
 </ul>
 <div class="section level3">
@@ -294,13 +313,13 @@ membership:</p>
 </h3>
 <p>A significant ANOVA tells you that groups differ, but not
 <em>which</em> groups. Use post-hoc tests:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Tukey HSD: balanced comparison of all pairs</span></span>
 <span><span class="fu"><a href="../reference/tukey_test.html">tukey_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Tukey HSD Post-Hoc Test by education [Weighted]</span></span>
 <span><span class="co">#&gt;   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span></span>
 <span><span class="co">#&gt; Use summary() for the full comparison table.</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Scheffe: more conservative (fewer false positives)</span></span>
 <span><span class="fu"><a href="../reference/scheffe_test.html">scheffe_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scheffe Post-Hoc Test by education [Weighted]</span></span>
@@ -311,22 +330,21 @@ membership:</p>
 <h3 id="assumption-check">Assumption Check<a class="anchor" aria-label="anchor" href="#assumption-check"></a>
 </h3>
 <p>ANOVA assumes equal variances. Test with Levene’s test:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Levene's Test: life_satisfaction by education [Weighted]</span></span>
 <span><span class="co">#&gt;   F(3, 2432.6) = 31.282, p &lt; 0.001 ***, variances unequal</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
-<p>If Levene’s test is significant
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&lt;</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p &lt; .05</annotation></semantics></math>),
-variances are unequal. Use the Welch correction included in the ANOVA
-output.</p>
+<p>If Levene’s test is significant (<span class="math inline">p &lt;
+.05</span>), variances are unequal. Use the Welch correction included in
+the ANOVA output.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="factorial-anova">Factorial ANOVA<a class="anchor" aria-label="anchor" href="#factorial-anova"></a>
 </h2>
 <p>Test the effects of two or more factors and their interactions:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/factorial_anova.html">factorial_anova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span>,</span>
 <span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -334,12 +352,10 @@ output.</p>
 <span><span class="co">#&gt;   gender:           F(1, 2178) = 0.115, p = 0.735 , eta2p = 0.000</span></span>
 <span><span class="co">#&gt;   education:        F(3, 2178) = 455.835, p &lt; 0.001 ***, eta2p = 0.386</span></span>
 <span><span class="co">#&gt;   gender:education: F(3, 2178) = 0.300, p = 0.825 , eta2p = 0.000, N = 2186</span></span></code></pre></div>
-<p>The output uses Type III sums of squares and reports partial
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>η</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\eta^2</annotation></semantics></math>
-for each effect. Weighted analysis uses WLS estimation, matching SPSS
-UNIANOVA.</p>
+<p>The output uses Type III sums of squares and reports partial <span class="math inline">\eta^2</span> for each effect. Weighted analysis
+uses WLS estimation, matching SPSS UNIANOVA.</p>
 <p>For the full output with descriptive statistics per cell:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/factorial_anova.html">factorial_anova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">life_satisfaction</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span>,</span>
 <span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -396,7 +412,7 @@ UNIANOVA.</p>
 <h2 id="ancova">ANCOVA<a class="anchor" aria-label="anchor" href="#ancova"></a>
 </h2>
 <p>Compare groups while controlling for a covariate:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/ancova.html">ancova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="va">education</span>, covariate <span class="op">=</span> <span class="va">age</span>,</span>
 <span>         weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -416,7 +432,7 @@ small samples.</p>
 <h3 id="mann-whitney-u-test">Mann-Whitney U Test<a class="anchor" aria-label="anchor" href="#mann-whitney-u-test"></a>
 </h3>
 <p>The non-parametric alternative to the independent t-test:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/mann_whitney.html">mann_whitney</a></span><span class="op">(</span><span class="va">political_orientation</span>, group <span class="op">=</span> <span class="va">region</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -427,7 +443,7 @@ small samples.</p>
 <h3 id="kruskal-wallis-h-test">Kruskal-Wallis H Test<a class="anchor" aria-label="anchor" href="#kruskal-wallis-h-test"></a>
 </h3>
 <p>The non-parametric alternative to one-way ANOVA (3+ groups):</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">kw_result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/kruskal_wallis.html">kruskal_wallis</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span>
 <span></span>
@@ -437,7 +453,7 @@ small samples.</p>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>When significant, use Dunn’s post-hoc test with Bonferroni
 correction:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dunn_test.html">dunn_test</a></span><span class="op">(</span><span class="va">kw_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Dunn Post-Hoc Test (Bonferroni) by education</span></span>
 <span><span class="co">#&gt;   life_satisfaction: 6 comparisons, 5 significant (p &lt; .05)</span></span>
@@ -447,7 +463,7 @@ correction:</p>
 <h3 id="wilcoxon-signed-rank-test">Wilcoxon Signed-Rank Test<a class="anchor" aria-label="anchor" href="#wilcoxon-signed-rank-test"></a>
 </h3>
 <p>The non-parametric alternative to the paired t-test:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">longitudinal_data_wide</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -461,7 +477,7 @@ correction:</p>
 </h3>
 <p>The non-parametric alternative to repeated-measures ANOVA (3+
 measurements):</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">friedman_result</span> <span class="op">&lt;-</span> <span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/friedman_test.html">friedman_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span>, <span class="va">score_T3</span><span class="op">)</span></span>
 <span></span>
@@ -470,7 +486,7 @@ measurements):</p>
 <span><span class="co">#&gt;   chi2(2) = 47.255, p &lt; 0.001 ***, W = 0.251, N = 94</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>When significant, use pairwise Wilcoxon post-hoc tests:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon</a></span><span class="op">(</span><span class="va">friedman_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Pairwise Wilcoxon Post-Hoc Test (Bonferroni)</span></span>
 <span><span class="co">#&gt;   3 comparisons, 3 significant (p &lt; .05)</span></span>
@@ -481,7 +497,7 @@ measurements):</p>
 </h3>
 <p>Test whether an observed proportion differs from an expected
 value:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/binomial_test.html">binomial_test</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Binomial Test: gender</span></span>
@@ -496,7 +512,7 @@ value:</p>
 <h3 id="chi-square-test-of-independence">Chi-Square Test of Independence<a class="anchor" aria-label="anchor" href="#chi-square-test-of-independence"></a>
 </h3>
 <p>Test whether two categorical variables are related:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chi_square.html">chi_square</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Chi-Squared Test: education × employment [Weighted]</span></span>
@@ -512,12 +528,12 @@ knowing one tells you something about the other.</p>
 return just the requested effect size as a number (per group for grouped
 data). For the full test output, call <code><a href="../reference/chi_square.html">chi_square()</a></code>
 directly.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Phi coefficient (2x2 tables)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/phi.html">phi</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.05519227</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Cramer's V (larger tables)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/phi.html">cramers_v</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
@@ -527,7 +543,7 @@ directly.</p>
 <h3 id="fishers-exact-test">Fisher’s Exact Test<a class="anchor" aria-label="anchor" href="#fishers-exact-test"></a>
 </h3>
 <p>Use when expected cell frequencies are below 5:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">small_sample</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">small_sample</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -540,14 +556,14 @@ directly.</p>
 <h3 id="chi-square-goodness-of-fit">Chi-Square Goodness-of-Fit<a class="anchor" aria-label="anchor" href="#chi-square-goodness-of-fit"></a>
 </h3>
 <p>Test whether observed frequencies match expected proportions:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Equal proportions (default)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chisq_gof.html">chisq_gof</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Chi-Square Goodness-of-Fit Test: education</span></span>
 <span><span class="co">#&gt;   chi2(3) = 156.454, p &lt; 0.001 ***, N = 2500</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Custom expected proportions</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chisq_gof.html">chisq_gof</a></span><span class="op">(</span><span class="va">education</span>, expected <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.30</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>, <span class="fl">0.20</span><span class="op">)</span><span class="op">)</span></span>
@@ -559,7 +575,7 @@ directly.</p>
 <h3 id="mcnemars-test">McNemar’s Test<a class="anchor" aria-label="anchor" href="#mcnemars-test"></a>
 </h3>
 <p>Compare paired proportions (e.g., before/after):</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    trust_gov_high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">trust_government</span> <span class="op">&gt;</span> <span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
@@ -578,11 +594,11 @@ directly.</p>
 </h3>
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&lt;</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p &lt; .05</annotation></semantics></math>:
-The difference is statistically significant</li>
+<span class="math inline">p &lt; .05</span>: The difference is
+statistically significant</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>≥</mo><mn>.05</mn></mrow><annotation encoding="application/x-tex">p \geq .05</annotation></semantics></math>:
-No significant difference detected</li>
+<span class="math inline">p \geq .05</span>: No significant
+difference detected</li>
 </ul>
 <p>“Not significant” does <strong>not</strong> mean “no difference” — it
 means we cannot rule out chance given the sample size.</p>
@@ -611,7 +627,7 @@ check effect sizes:</p>
 </tr>
 <tr class="even">
 <td>ANOVA</td>
-<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>η</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\eta^2</annotation></semantics></math></td>
+<td><span class="math inline">\eta^2</span></td>
 <td>0.01</td>
 <td>0.06</td>
 <td>0.14</td>
@@ -647,7 +663,7 @@ corrections.</p>
 <h2 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h2>
 <p>A typical hypothesis testing workflow:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Describe the groups</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>

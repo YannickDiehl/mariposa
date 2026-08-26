@@ -1,5 +1,199 @@
 # Changelog
 
+## mariposa 0.7.0
+
+Assumption checks and model interpretation (feature set: three new
+functions closing the most common SPSS/Stata gaps for survey
+researchers).
+
+### New features
+
+- New function
+  **[`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)**
+  — the SPSS EXAMINE “Tests of Normality” table: Kolmogorov-Smirnov with
+  Lilliefors significance correction (Dallal-Wilkinson 1986
+  approximation, as in SPSS) and Shapiro-Wilk (computed for 3 \<= n \<=
+  5000, matching the SPSS convention). Supports tidyselect and
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  (SPSS `EXAMINE ... BY factor`). Deliberately takes no `weights`
+  argument: neither test has a well-defined fractional-frequency-weight
+  form (documented in the help page).
+- New function
+  **[`partial_cor()`](https://YannickDiehl.github.io/mariposa/reference/partial_cor.md)**
+  — SPSS PARTIAL CORR (Stata `pcorr`): partial correlations of two or
+  more variables controlling for one or more others, with the zero-order
+  correlation alongside for comparison, df = n - 2 - k, two-tailed
+  t-test, listwise deletion, weights (frequency semantics, unrounded
+  `sum(w)` in df), grouping, and a partial-correlation matrix for three
+  or more variables.
+- New function
+  **[`marginal_effects()`](https://YannickDiehl.github.io/mariposa/reference/marginal_effects.md)**
+  — average marginal effects for
+  [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+  models (Stata `margins, dydx(*)`): average probability-scale
+  derivatives for continuous predictors, average discrete changes
+  vs. the reference level for factors, delta-method standard errors with
+  analytic gradients, weights and
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  support. Calling it on a
+  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+  explains that B already is the marginal effect there.
+- New function
+  **[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md)**
+  — SPSS MULT RESPONSE for “check all that apply” questions (dichotomy
+  sets): the frequencies table with both percentage bases (*percent of
+  responses*, summing to 100%, and *percent of cases*, summing above
+  it), and via `by =` the set-by-demographic crosstab with case-based
+  column percentages. SPSS case rule (valid = at least one non-missing
+  indicator), variable labels as option labels, frequency weights with
+  unrounded sums,
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)
+  support.
+
+All four ship with the full three-layer print/summary output.
+
+### Bug fixes
+
+- **pkgdown: formulas on the reference pages render again.** The `w_*`
+  help pages embed LaTeX via `\eqn{}`, but the site configuration loaded
+  no math engine, so pages showed raw LaTeX source (`\frac{...}`).
+  `_pkgdown.yml` now sets `template: math-rendering: katex`.
+
+### Validation
+
+- All three functions carry property-based validation (Charter Tier 4
+  where an SPSS reference run is still pending):
+  [`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)
+  against [`stats::ks.test()`](https://rdrr.io/r/stats/ks.test.html) and
+  the independent
+  [`nortest::lillie.test()`](https://rdrr.io/pkg/nortest/man/lillie.test.html)
+  implementation (new Suggests dependency, test-only);
+  [`partial_cor()`](https://YannickDiehl.github.io/mariposa/reference/partial_cor.md)
+  against the residual-of-regressions characterization via
+  [`lm()`](https://rdrr.io/r/stats/lm.html);
+  [`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md)
+  against direct hand-computation from the indicator matrix;
+  [`marginal_effects()`](https://YannickDiehl.github.io/mariposa/reference/marginal_effects.md)
+  against the analytic logit-AME formula and an independent
+  finite-difference delta-method recomputation (SPSS has no AME
+  procedure — permanently Tier 4). Weighted paths have `w == 1`
+  invariance blocks; grouped paths are pinned to per-subset
+  recomputation. SPSS v29 reference syntax for all pending runs lives in
+  `.claude/spss-syntax-0.7.0-references.sps`.
+
+## mariposa 0.6.17
+
+Crosstab cell diagnostics (theme: after the chi-square test, show
+*which* cells drive the association).
+
+### New features
+
+- [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+  now computes **expected cell counts and adjusted standardized
+  residuals** (SPSS `CROSSTABS /CELLS=EXPECTED ASRESID`, Haberman 1973).
+  Display them with `summary(result, residuals = TRUE)` — a sub-row per
+  cell, 1 decimal as in SPSS, with a footnote explaining the
+  \|adj.res.\| \> 2 rule of thumb. The raw matrices are available as
+  `$expected` and `$adj_residuals`. Weighted tables use the unrounded
+  weighted cell counts (Charter §5.1) and reduce exactly to the
+  unweighted result at `weights == 1` (invariance suite extended).
+
+### Validation
+
+- The residuals are verified against the independent Haberman-formula
+  implementation in `chisq.test()$stdres` (unweighted) and a
+  hand-derived weighted recomputation; the SPSS v29 `/CELLS=ASRESID`
+  reference run is pending and the compatibility vignette discloses them
+  as Tier 4 until it lands.
+
+## mariposa 0.6.16
+
+CRAN readiness (theme: the package passes CRAN’s submission conventions,
+not just `R CMD check`). No statistical behavior changes.
+
+### CRAN conventions
+
+- DESCRIPTION: software names are single-quoted per CRAN policy (‘SPSS’,
+  ‘Stata’, ‘SAS’, ‘Excel’, ‘tidyverse’); the promotional “Professional”
+  opener is gone.
+- Help pages no longer contain Unicode characters that break the CRAN
+  PDF manual build (`>=`, `<=`, `->` replace their typographic variants)
+  — local and CI checks had always run `--no-manual`, so this was never
+  exercised.
+- `\value{}` sections added to the five documented S3 method pages that
+  lacked them (`predict`/`anova` for both regressions,
+  `print.w_quantile`).
+- The
+  [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md)
+  example is now runnable (haven-guarded) instead of `\dontrun`; the
+  [`efa()`](https://YannickDiehl.github.io/mariposa/reference/efa.md)
+  oblimin example guards its GPArotation dependency so `--run-donttest`
+  passes without Suggests installed.
+- [`?mariposa`](https://YannickDiehl.github.io/mariposa/reference/mariposa-package.md)
+  now resolves: the package help topic is generated from DESCRIPTION
+  (previously suppressed by `@noRd`).
+
+### Test infrastructure
+
+- SPSS-validation assertions (`assert_spss()` and everything built on
+  it) skip on CRAN. They are golden-number comparisons against SPSS v29
+  references and remain the release gate in CI; skipping them on CRAN
+  removes the false-positive risk from BLAS/platform numeric variation.
+  Unit, property, invariance, and print/summary tests still run on CRAN.
+
+## mariposa 0.6.15
+
+Regression correctness (theme: the two regression functions compute what
+they claim under weights and degenerate inputs, and say what they show).
+
+### Bug fixes
+
+- **Weighted
+  [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md):
+  -2LL, omnibus chi-square, and Cox & Snell / Nagelkerke R-squared were
+  wrong under fractional weights.** The -2 log-likelihood came from
+  [`stats::logLik()`](https://rdrr.io/r/stats/logLik.html), whose
+  binomial method *rounds* prior weights internally
+  (`dbinom(round(m*y), round(m), mu)`). All likelihood-based statistics
+  now derive from the residual/null deviance, which equals -2LL exactly
+  for a 0/1 response and honors fractional frequency weights unrounded
+  (Charter §5.1). Unweighted and integer-weighted results are unchanged.
+  A weighted validation test with a hand-summed log-likelihood oracle
+  pins the fix.
+- **`linear_regression(use = "pairwise")` no longer silently drops
+  interactions and transformed terms.** The pairwise path rebuilds the
+  model from the raw correlation matrix, so `y ~ a * b` was silently
+  fitted as `y ~ a + b`. Formulas with non-additive terms now abort with
+  a pointer to `use = "listwise"`.
+- **Rank-deficient fits no longer crash the unweighted
+  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+  path** (“Tibble columns must have compatible sizes”): perfectly
+  collinear terms are excluded from the coefficient table (matching
+  SPSS’s excluded-variables handling) with a one-line message, and the
+  ANOVA df now count estimated terms (`model$rank`) instead of raw
+  coefficients — the same rule the weighted path has used since 0.6.4.
+
+### New features
+
+- The
+  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md)
+  coefficients table now **prints the confidence intervals for B** (SPSS
+  `/STATISTICS CI`) that it always computed; the level is the
+  `conf.level` argument. A new `summary(..., conf_int = FALSE)` toggle
+  hides the two columns.
+
+### Documentation
+
+- `factors = "dummy"` docs (both regressions) now state that *ordered*
+  factors get R’s default polynomial contrasts (`.L`/`.Q`/`.C` terms),
+  not treatment dummies, and how to get dummy coding.
+- The SPSS-compatibility vignette now discloses
+  [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
+  as Tier 4 (textbook-formula oracle; no SPSS v29 reference run yet)
+  instead of implying SPSS-validated status.
+- The logistic classification-table header reads the stored cutoff
+  instead of hardcoding “0.50”.
+
 ## mariposa 0.6.14
 
 Codebook robustness (theme:
@@ -826,7 +1020,8 @@ all corrected in this release:
   SE now includes the Dunn (1964) / Conover (1999) tie correction.
   Previous versions systematically under-estimated `|Z|` on tied data
   (e.g., Likert scales). Baselines regenerated from
-  `PMCMRplus::kwAllPairsDunnTest` (exact match to 4 decimals).
+  [`PMCMRplus::kwAllPairsDunnTest`](https://rdrr.io/pkg/PMCMRplus/man/kwAllPairsDunnTest.html)
+  (exact match to 4 decimals).
 - [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md):
   weighted branch now applies the tie correction consistently with
   [`stats::friedman.test`](https://rdrr.io/r/stats/friedman.test.html)

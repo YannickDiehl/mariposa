@@ -173,7 +173,9 @@ for numeric variable summaries.
 
 Other descriptive:
 [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
-[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
+[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),
+[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md),
+[`normality_test()`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md)
 
 ## Examples
 

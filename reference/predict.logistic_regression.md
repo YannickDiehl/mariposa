@@ -22,3 +22,9 @@ predict(object, ...)
 
   Passed to
   [`stats::predict.glm`](https://rdrr.io/r/stats/predict.glm.html).
+
+## Value
+
+A numeric vector of predictions on the scale requested via `type` (link
+scale by default), as returned by
+[`stats::predict.glm`](https://rdrr.io/r/stats/predict.glm.html).
