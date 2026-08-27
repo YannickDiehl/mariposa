@@ -26,9 +26,9 @@ The only NOTE is "checking CRAN incoming feasibility":
 
 ## Test environments
 
-* win-builder, R Under development (2026-08-24 r90445 ucrt),
-  mariposa 0.7.0 — 1 NOTE (see above); PDF and HTML manuals build
-  cleanly
+* win-builder, R Under development (2026-08-25 r90448 ucrt),
+  mariposa 0.7.1 — 1 NOTE (see above); examples in 24s total, PDF and
+  HTML manuals build cleanly
 * local macOS (Apple Silicon), R 4.6.0 — `devtools::check()`: 0 errors,
   0 warnings, 0 notes (`--no-manual`; the manual is covered by
   win-builder above)
