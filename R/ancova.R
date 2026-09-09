@@ -219,9 +219,12 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   # MODEL FITTING WITH TYPE III SS
   # ============================================================================
 
+  # Save + register restoration BEFORE changing the option, so an
+  # interrupt between the two lines cannot leak the changed setting
+  # (CRAN review 2026-09: on.exit() must immediately follow the save).
   old_contrasts <- options("contrasts")$contrasts
-  options(contrasts = c("contr.sum", "contr.poly"))
   on.exit(options(contrasts = old_contrasts), add = TRUE)
+  options(contrasts = c("contr.sum", "contr.poly"))
 
   # Build formula: dv ~ covariate1 + covariate2 + factor1 * factor2
   # SPSS convention: covariates are listed before factors

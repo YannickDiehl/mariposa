@@ -186,7 +186,11 @@ format_variable_name <- function(var, label = NULL) {
 #' @noRd
 .print_cor_matrix <- function(mat, digits = 3, title = "Correlation Matrix:",
                               type = "correlation") {
+  # Register restoration immediately after saving, before any change
+  # below (CRAN on.exit discipline); restoring to the saved value is a
+  # no-op when no branch adjusted the width.
   old_width <- getOption("width")
+  on.exit(options(width = old_width), add = TRUE)
 
   n_vars <- ncol(mat)
   max_rowname_length <- max(nchar(rownames(mat)), na.rm = TRUE)
@@ -204,11 +208,9 @@ format_variable_name <- function(var, label = NULL) {
   width_adjusted <- FALSE
   if (required_width > old_width && required_width <= 200) {
     options(width = required_width)
-    on.exit(options(width = old_width), add = TRUE)
     width_adjusted <- TRUE
   } else if (required_width > 200) {
     options(width = 200)
-    on.exit(options(width = old_width), add = TRUE)
     width_adjusted <- TRUE
   }
 

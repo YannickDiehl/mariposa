@@ -227,9 +227,12 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
   # ============================================================================
 
   # Set contrasts to contr.sum for Type III SS (orthogonal contrasts)
+  # Save + register restoration BEFORE changing the option, so an
+  # interrupt between the two lines cannot leak the changed setting
+  # (CRAN review 2026-09: on.exit() must immediately follow the save).
   old_contrasts <- options("contrasts")$contrasts
-  options(contrasts = c("contr.sum", "contr.poly"))
   on.exit(options(contrasts = old_contrasts), add = TRUE)
+  options(contrasts = c("contr.sum", "contr.poly"))
 
   # Build formula: dv ~ factor1 * factor2 (* includes all interactions)
   formula_str <- paste(dv_name, "~", paste(between_names, collapse = " * "))
