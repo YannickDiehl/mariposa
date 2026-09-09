@@ -115,21 +115,19 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Read SAS file with native special missing values
-data <- read_sas("survey.sas7bdat")
+# \donttest{
+# .sas7bdat files cannot be produced from R, so this only runs when
+# one is present in the working directory
+if (requireNamespace("haven", quietly = TRUE) &&
+    file.exists("survey.sas7bdat")) {
+  # Read SAS file with native special missing values
+  data <- read_sas("survey.sas7bdat")
 
-# Read with catalog for value labels
-data <- read_sas("survey.sas7bdat", catalog_file = "formats.sas7bcat")
+  # Read with catalog for value labels
+  data <- read_sas("survey.sas7bdat", catalog_file = "formats.sas7bcat")
 
-# Read SAS file with numeric missing codes
-data <- read_sas("survey.sas7bdat", tag_na = c(-9, -8, -42))
-
-# Check what types of missing values exist
-na_frequencies(data$income)
-
-# Recover original codes or convert to regular NAs
-untag_na(data$income)   # Recovers -9, -8, etc.
-strip_tags(data$income) # Converts all to NA
-} # }
+  # Read SAS file with numeric missing codes
+  data <- read_sas("survey.sas7bdat", tag_na = c(-9, -8, -42))
+}
+# }
 ```

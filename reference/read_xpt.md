@@ -67,13 +67,18 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Read transport file with native missing values
-data <- read_xpt("survey.xpt")
+# \donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Roundtrip through a temporary .xpt transport file
+  tmp <- tempfile(fileext = ".xpt")
+  write_xpt(survey_data, tmp)
+  data <- read_xpt(tmp)
 
-# Read with numeric missing codes
-data <- read_xpt("survey.xpt", tag_na = c(-9, -8, -42))
+  # Read with numeric missing codes tagged as distinct NA types
+  data <- read_xpt(tmp, tag_na = c(-9, -8))
 
-na_frequencies(data$income)
-} # }
+  unlink(tmp)
+}
+#> ✔ Wrote 16 variables (2500 obs.) to file19704bb73623.xpt
+# }
 ```

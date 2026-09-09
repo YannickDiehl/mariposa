@@ -54,13 +54,12 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# SPSS data
-data <- read_spss("survey.sav")
-original <- untag_na(data$satisfaction)
-
-# Stata data with tag_na
-data <- read_stata("survey.dta", tag_na = c(-9, -8, -42))
-original <- untag_na(data$income)
-} # }
+# \donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Tag -9/-8 as missing, then recover the original codes
+  x <- set_na(c(1, 2, -9, 3, -8), -9, -8)
+  untag_na(x)   # -9 and -8 are back
+}
+#> [1]  1  2 -9  3 -8
+# }
 ```

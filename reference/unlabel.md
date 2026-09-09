@@ -68,12 +68,9 @@ Other labels:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Remove all labels from entire dataset
-data <- read_spss("survey.sav")
-data_plain <- unlabel(data)
+# Remove all labels from the entire dataset
+data_plain <- unlabel(survey_data)
 
-# Remove labels from specific variables
-data <- unlabel(data, gender, life_satisfaction)
-} # }
+# Remove labels from specific variables only
+data <- unlabel(survey_data, gender, life_satisfaction)
 ```

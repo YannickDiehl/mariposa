@@ -13,7 +13,7 @@ value labels, and missing value types. Tagged NAs from any source format
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,19 +135,22 @@ distinctions (though this is extremely rare in practice).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Roundtrip: read Stata, process, write back</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_stata.html">read_stata</a></span><span class="op">(</span><span class="st">"survey.dta"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">data_clean</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span><span class="fu">write_stata</span><span class="op">(</span><span class="va">data_clean</span>, <span class="st">"survey_adults.dta"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"haven"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Roundtrip: write to a temporary .dta, read back</span></span></span>
+<span class="r-in"><span>  <span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".dta"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">write_stata</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">tmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_stata.html">read_stata</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Cross-format: SPSS to Stata</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_spss.html">read_spss</a></span><span class="op">(</span><span class="st">"survey.sav"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">write_stata</span><span class="op">(</span><span class="va">data</span>, <span class="st">"survey.dta"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Stata 13 compatibility</span></span></span>
+<span class="r-in"><span>  <span class="va">tmp13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".dta"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">write_stata</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">tmp13</span>, version <span class="op">=</span> <span class="fl">13</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Stata 13 compatibility</span></span></span>
-<span class="r-in"><span><span class="fu">write_stata</span><span class="op">(</span><span class="va">data</span>, <span class="st">"survey_v13.dta"</span>, version <span class="op">=</span> <span class="fl">13</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="va">tmp13</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Wrote 16 variables (2500 obs.) to <span style="color: #0000BB;">file19701a519cd7.dta</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Wrote 16 variables (2500 obs.) to <span style="color: #0000BB;">file19705f1969df.dta</span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

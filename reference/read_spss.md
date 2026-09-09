@@ -106,23 +106,22 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Read SPSS file with tagged missing values
-data <- read_spss("survey.sav")
+# \donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Roundtrip through a temporary .sav file (with your own data,
+  # simply pass its path instead)
+  tmp <- tempfile(fileext = ".sav")
+  write_spss(survey_data, tmp)
+  data <- read_spss(tmp)
 
-# Check what types of missing values exist
-na_frequencies(data$satisfaction)
+  # Standard R operations work normally (NAs are excluded)
+  mean(data$life_satisfaction, na.rm = TRUE)
 
-# Standard R operations work normally (NAs are excluded)
-mean(data$satisfaction, na.rm = TRUE)
+  # frequency() shows each missing type separately
+  data |> frequency(life_satisfaction)
 
-# frequency() shows each missing type separately
-data %>% frequency(satisfaction)
-
-# Recover original SPSS codes
-original_codes <- untag_na(data$satisfaction)
-
-# Convert to regular NAs (standard behavior)
-data_clean <- strip_tags(data$satisfaction)
-} # }
+  unlink(tmp)
+}
+#> ✔ Wrote 16 variables (2500 obs.) to file19707c10c294.sav
+# }
 ```

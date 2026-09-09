@@ -65,8 +65,13 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-data <- read_por("survey.por")
-na_frequencies(data$satisfaction)
-} # }
+# \donttest{
+# .por files cannot be produced from R, so this only runs when one
+# is present in the working directory
+if (requireNamespace("haven", quietly = TRUE) &&
+    file.exists("survey.por")) {
+  data <- read_por("survey.por")
+  na_frequencies(data$satisfaction)
+}
+# }
 ```

@@ -1,5 +1,57 @@
 # Changelog
 
+## mariposa 0.7.2
+
+CRAN resubmission (theme: address all four points of the 2026-09 manual
+review).
+
+### CRAN
+
+- DESCRIPTION now cites the published method references in CRAN’s
+  auto-link form: IBM SPSS Statistics Algorithms (\<https:…\>), Dallal
+  and Wilkinson (1986) <doi:10.1080/00031305.1986.10475419> for the
+  Lilliefors correction, Haberman (1973) <doi:10.2307/2529686> for
+  adjusted standardized residuals.
+- **All `\dontrun{}` blocks are gone.** The 15 import/export examples
+  are now genuinely executable `\donttest{}` roundtrips through
+  [`tempfile()`](https://rdrr.io/r/base/tempfile.html) (guarded by
+  [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) for the
+  Suggests packages); the two formats R cannot produce (.por, .sas7bdat)
+  run behind a [`file.exists()`](https://rdrr.io/r/base/files.html)
+  guard. The
+  [`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md)
+  example runs unconditionally on the bundled data.
+- [`on.exit()`](https://rdrr.io/r/base/on.exit.html) now registers the
+  restoration *before* the option is changed in
+  [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md),
+  [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md),
+  and the correlation-matrix print helper, so an interrupt between the
+  two lines cannot leak a changed
+  [`options()`](https://rdrr.io/r/base/options.html) setting.
+- New `test-silent-computation.R` proves the console contract the
+  reviewer asked about: every analysis entry point produces zero stdout
+  (32 assertions); all [`cat()`](https://rdrr.io/r/base/cat.html) calls
+  in the package live exclusively in the
+  [`print()`](https://rdrr.io/r/base/print.html)/[`summary()`](https://rdrr.io/r/base/summary.html)
+  display layer, and remaining runtime messages go through suppressable
+  [`message()`](https://rdrr.io/r/base/message.html)-based conditions.
+
+### Bug fixes
+
+Making the former `\dontrun{}` examples actually run uncovered two real
+crashes on integer columns (tagged NAs are NaN payloads in doubles;
+[`haven::na_tag()`](https://haven.tidyverse.org/reference/tagged_na.html)
+errors on integer input):
+
+- **[`unlabel()`](https://YannickDiehl.github.io/mariposa/reference/unlabel.md)
+  crashed on any data frame with integer columns** (“`x` must be a
+  double vector”) — including the bundled `survey_data`’s Likert
+  variables. Integer vectors can never carry tagged NAs and now pass
+  through directly.
+- **[`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)
+  crashed on integer columns** for the same reason in its
+  tag-uppercasing step. Both fixes carry regression tests.
+
 ## mariposa 0.7.1
 
 CRAN resubmission (theme: address the incoming-pretest NOTE) plus two
@@ -1049,8 +1101,7 @@ all corrected in this release:
   SE now includes the Dunn (1964) / Conover (1999) tie correction.
   Previous versions systematically under-estimated `|Z|` on tied data
   (e.g., Likert scales). Baselines regenerated from
-  [`PMCMRplus::kwAllPairsDunnTest`](https://rdrr.io/pkg/PMCMRplus/man/kwAllPairsDunnTest.html)
-  (exact match to 4 decimals).
+  `PMCMRplus::kwAllPairsDunnTest` (exact match to 4 decimals).
 - [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md):
   weighted branch now applies the tie correction consistently with
   [`stats::friedman.test`](https://rdrr.io/r/stats/friedman.test.html)

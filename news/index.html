@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,27 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.2" id="mariposa-072">mariposa 0.7.2<a class="anchor" aria-label="anchor" href="#mariposa-072"></a></h2>
+<p>CRAN resubmission (theme: address all four points of the 2026-09 manual review).</p>
+<div class="section level3">
+<h3 id="cran-0-7-2">CRAN<a class="anchor" aria-label="anchor" href="#cran-0-7-2"></a></h3>
+<ul><li>DESCRIPTION now cites the published method references in CRAN’s auto-link form: IBM SPSS Statistics Algorithms (&lt;https:…&gt;), Dallal and Wilkinson (1986) <a href="doi:10.1080/00031305.1986.10475419" class="uri">doi:10.1080/00031305.1986.10475419</a> for the Lilliefors correction, Haberman (1973) <a href="doi:10.2307/2529686" class="uri">doi:10.2307/2529686</a> for adjusted standardized residuals.</li>
+<li>
+<strong>All <code>\dontrun{}</code> blocks are gone.</strong> The 15 import/export examples are now genuinely executable <code>\donttest{}</code> roundtrips through <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile()</a></code> (guarded by <code><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace()</a></code> for the Suggests packages); the two formats R cannot produce (.por, .sas7bdat) run behind a <code><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists()</a></code> guard. The <code><a href="../reference/unlabel.html">unlabel()</a></code> example runs unconditionally on the bundled data.</li>
+<li>
+<code><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit()</a></code> now registers the restoration <em>before</em> the option is changed in <code><a href="../reference/ancova.html">ancova()</a></code>, <code><a href="../reference/factorial_anova.html">factorial_anova()</a></code>, and the correlation-matrix print helper, so an interrupt between the two lines cannot leak a changed <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options()</a></code> setting.</li>
+<li>New <code>test-silent-computation.R</code> proves the console contract the reviewer asked about: every analysis entry point produces zero stdout (32 assertions); all <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code> calls in the package live exclusively in the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>/<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> display layer, and remaining runtime messages go through suppressable <code><a href="https://rdrr.io/r/base/message.html" class="external-link">message()</a></code>-based conditions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-7-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-2"></a></h3>
+<p>Making the former <code>\dontrun{}</code> examples actually run uncovered two real crashes on integer columns (tagged NAs are NaN payloads in doubles; <code><a href="https://haven.tidyverse.org/reference/tagged_na.html" class="external-link">haven::na_tag()</a></code> errors on integer input):</p>
+<ul><li>
+<strong><code><a href="../reference/unlabel.html">unlabel()</a></code> crashed on any data frame with integer columns</strong> (“<code>x</code> must be a double vector”) — including the bundled <code>survey_data</code>’s Likert variables. Integer vectors can never carry tagged NAs and now pass through directly.</li>
+<li>
+<strong><code><a href="../reference/write_xpt.html">write_xpt()</a></code> crashed on integer columns</strong> for the same reason in its tag-uppercasing step. Both fixes carry regression tests.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.1" id="mariposa-071">mariposa 0.7.1<a class="anchor" aria-label="anchor" href="#mariposa-071"></a></h2>
 <p>CRAN resubmission (theme: address the incoming-pretest NOTE) plus two small robustness patches.</p>
@@ -566,7 +587,7 @@
 <h3 id="audit-driven-math-fixes-post-phase-0-6-1">Audit-Driven Math Fixes (post-Phase-1)<a class="anchor" aria-label="anchor" href="#audit-driven-math-fixes-post-phase-0-6-1"></a></h3>
 <p>A second audit pass identified additional math defects and test fudges, all corrected in this release:</p>
 <ul><li>
-<code><a href="../reference/dunn_test.html">dunn_test()</a></code>: SE now includes the Dunn (1964) / Conover (1999) tie correction. Previous versions systematically under-estimated <code>|Z|</code> on tied data (e.g., Likert scales). Baselines regenerated from <code><a href="https://rdrr.io/pkg/PMCMRplus/man/kwAllPairsDunnTest.html" class="external-link">PMCMRplus::kwAllPairsDunnTest</a></code> (exact match to 4 decimals).</li>
+<code><a href="../reference/dunn_test.html">dunn_test()</a></code>: SE now includes the Dunn (1964) / Conover (1999) tie correction. Previous versions systematically under-estimated <code>|Z|</code> on tied data (e.g., Likert scales). Baselines regenerated from <code>PMCMRplus::kwAllPairsDunnTest</code> (exact match to 4 decimals).</li>
 <li>
 <code><a href="../reference/friedman_test.html">friedman_test()</a></code>: weighted branch now applies the tie correction consistently with <code><a href="https://rdrr.io/r/stats/friedman.test.html" class="external-link">stats::friedman.test</a></code> (unweighted branch). The inconsistency caused weighted chi-squared values to be too low for tied data.</li>
 <li>

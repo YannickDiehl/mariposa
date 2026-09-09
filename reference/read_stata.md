@@ -101,22 +101,22 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Read Stata file with native extended missing values
-data <- read_stata("survey.dta")
+# \donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Roundtrip through a temporary .dta file (with your own data,
+  # simply pass its path instead)
+  tmp <- tempfile(fileext = ".dta")
+  write_stata(survey_data, tmp)
+  data <- read_stata(tmp)
 
-# Read Stata file with SPSS-style missing codes
-data <- read_stata("survey.dta", tag_na = c(-9, -8, -42, -11))
+  # Read with SPSS-style missing codes tagged as distinct NA types
+  data <- read_stata(tmp, tag_na = c(-9, -8))
 
-# Check what types of missing values exist
-na_frequencies(data$income)
+  # frequency() shows each missing type separately
+  data |> frequency(income)
 
-# frequency() and codebook() show each missing type separately
-data %>% frequency(income)
-codebook(data)
-
-# Recover original codes or convert to regular NAs
-untag_na(data$income)   # Recovers -9, -8, etc.
-strip_tags(data$income) # Converts all to NA
-} # }
+  unlink(tmp)
+}
+#> ✔ Wrote 16 variables (2500 obs.) to file197011562a3c.dta
+# }
 ```

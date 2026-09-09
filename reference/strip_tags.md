@@ -50,9 +50,12 @@ Other data-import:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-data <- read_spss("survey.sav")
-# Remove tag information, keep only valid labels
-clean <- strip_tags(data$satisfaction)
-} # }
+# \donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  x <- set_na(c(1, 2, -9, 3, -8), -9, -8)
+  # Remove tag information: all missings become plain NA
+  strip_tags(x)
+}
+#> [1]  1  2 NA  3 NA
+# }
 ```

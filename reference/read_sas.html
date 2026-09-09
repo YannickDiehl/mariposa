@@ -23,7 +23,7 @@ same result as read_spss() with tag_na = TRUE.
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -175,23 +175,21 @@ functions.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Read SAS file with native special missing values</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_sas</span><span class="op">(</span><span class="st">"survey.sas7bdat"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># .sas7bdat files cannot be produced from R, so this only runs when</span></span></span>
+<span class="r-in"><span><span class="co"># one is present in the working directory</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"haven"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="st">"survey.sas7bdat"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Read SAS file with native special missing values</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_sas</span><span class="op">(</span><span class="st">"survey.sas7bdat"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Read with catalog for value labels</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_sas</span><span class="op">(</span><span class="st">"survey.sas7bdat"</span>, catalog_file <span class="op">=</span> <span class="st">"formats.sas7bcat"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Read with catalog for value labels</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_sas</span><span class="op">(</span><span class="st">"survey.sas7bdat"</span>, catalog_file <span class="op">=</span> <span class="st">"formats.sas7bcat"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Read SAS file with numeric missing codes</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_sas</span><span class="op">(</span><span class="st">"survey.sas7bdat"</span>, tag_na <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">9</span>, <span class="op">-</span><span class="fl">8</span>, <span class="op">-</span><span class="fl">42</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Check what types of missing values exist</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="na_frequencies.html">na_frequencies</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">income</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Recover original codes or convert to regular NAs</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="untag_na.html">untag_na</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">income</span><span class="op">)</span>   <span class="co"># Recovers -9, -8, etc.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="strip_tags.html">strip_tags</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">income</span><span class="op">)</span> <span class="co"># Converts all to NA</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span>  <span class="co"># Read SAS file with numeric missing codes</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_sas</span><span class="op">(</span><span class="st">"survey.sas7bdat"</span>, tag_na <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">9</span>, <span class="op">-</span><span class="fl">8</span>, <span class="op">-</span><span class="fl">42</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
