@@ -10,7 +10,11 @@ This resubmission addresses all four points of the manual review of
    reference, IBM Corp. (2023, "IBM SPSS Statistics Algorithms"), has
    no DOI or ISBN, and IBM's documentation server answers automated
    URL checks inconsistently (intermittent 403), so it is cited in
-   plain text without an angle-bracket URL.
+   plain text without an angle-bracket URL. Both DOIs are verified
+   against Crossref; should the Dallal-Wilkinson DOI show as
+   "(possibly) invalid", that is Taylor & Francis intermittently
+   answering automated requests with 403 — it resolves correctly in a
+   browser.
 
 2. **\dontrun{}**: removed from the entire package. The import/export
    examples are now genuinely executable \donttest{} roundtrips through

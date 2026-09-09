@@ -68,6 +68,16 @@ test_that("hypothesis tests compute silently", {
                                             group = education)), "dunn_test")
 })
 
+test_that("import/export functions write nothing to stdout (messages only)", {
+  skip_if_not_installed("haven")
+  tmp <- tempfile(fileext = ".sav")
+  on.exit(unlink(tmp), add = TRUE)
+  expect_no_stdout(write_spss(survey_data, tmp), "write_spss")
+  expect_no_stdout(read_spss(tmp), "read_spss")
+  # The success note is a suppressable message-based condition, not stdout
+  expect_message(write_spss(survey_data, tmp))
+})
+
 test_that("correlation, scale, and regression functions compute silently", {
   expect_no_stdout(pearson_cor(survey_data, age, income), "pearson_cor")
   expect_no_stdout(spearman_rho(survey_data, age, income), "spearman_rho")
