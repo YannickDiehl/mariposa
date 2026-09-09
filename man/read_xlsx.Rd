@@ -84,20 +84,21 @@ with all metadata intact
 }
 }
 \examples{
-\dontrun{
-# Read back a mariposa-exported file with full label reconstruction
-data <- read_xlsx("survey_export.xlsx")
-attr(data$gender, "labels")   # Value labels restored
-attr(data$gender, "label")    # Variable label restored
+\donttest{
+if (requireNamespace("openxlsx2", quietly = TRUE)) {
+  # Roundtrip: export with labels, read back with reconstruction
+  tmp <- tempfile(fileext = ".xlsx")
+  write_xlsx(survey_data, tmp)
 
-# Read a plain Excel file
-data <- read_xlsx("plain_data.xlsx")
+  data <- read_xlsx(tmp)
+  attr(data$gender, "labels")   # Value labels restored
+  attr(data$gender, "label")    # Variable label restored
 
-# Read a specific sheet
-data <- read_xlsx("multi_sheet.xlsx", sheet = "Sheet2")
+  # Skip label reconstruction
+  raw <- read_xlsx(tmp, labels = FALSE)
 
-# Skip label reconstruction
-raw <- read_xlsx("survey_export.xlsx", labels = FALSE)
+  unlink(tmp)
+}
 }
 
 }

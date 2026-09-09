@@ -49,15 +49,15 @@
 #' @family data-export
 #'
 #' @examples
-#' \dontrun{
-#' # Roundtrip: read SAS transport, process, write back
-#' data <- read_xpt("survey.xpt")
-#' data_clean <- data[data$age >= 18, ]
-#' write_xpt(data_clean, "survey_adults.xpt")
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   # Roundtrip: write to a temporary .xpt transport file, read back
+#'   tmp <- tempfile(fileext = ".xpt")
+#'   write_xpt(survey_data, tmp)
+#'   data <- read_xpt(tmp)
 #'
-#' # Cross-format: SPSS to SAS transport
-#' data <- read_spss("survey.sav")
-#' write_xpt(data, "survey.xpt")
+#'   unlink(tmp)
+#' }
 #' }
 #'
 #' @export
@@ -171,7 +171,9 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
 #' @return The vector with any lowercase tags converted to uppercase.
 #' @noRd
 .retag_uppercase <- function(x) {
-  if (!is.numeric(x)) return(x)
+  # Tagged NAs exist only in doubles; haven::na_tag() errors on integer
+  # input, so integers (which can carry no tags) pass through untouched.
+  if (!is.double(x)) return(x)
 
   na_idx <- which(is.na(x))
   if (length(na_idx) == 0L) return(x)

@@ -24,22 +24,15 @@ that was read with \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_stat
 \code{\link[=read_xpt]{read_xpt()}} and contains tagged NAs.
 }
 \examples{
-\dontrun{
-# SPSS data
-data <- read_spss("survey.sav")
-na_frequencies(data$satisfaction)
-#   tag    n  code            label
-# 1   b 1774   -11       TNZ: SPLIT
-# 2   c   63    -9     KEINE ANGABE
-# 3   d   11    -8    WEISS NICHT
-# 4   a    6   -42 DATENFEHLER: MFN
-
-# Stata data
-data <- read_stata("survey.dta")
-na_frequencies(data$income)
-#   tag  n code           label
-# 1   a 42   .a     Not applicable
-# 2   b 15   .b     Refused
+\donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Declare -9/-8 as distinct tagged missing types, then inspect them
+  x <- set_na(c(1, 2, -9, 3, -8, -9), -9, -8)
+  na_frequencies(x)
+  #   tag n code label
+  # 1   a 2   -9  <NA>
+  # 2   b 1   -8  <NA>
+}
 }
 
 }

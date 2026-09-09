@@ -308,14 +308,11 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
 #' @family labels
 #'
 #' @examples
-#' \dontrun{
-#' # Remove all labels from entire dataset
-#' data <- read_spss("survey.sav")
-#' data_plain <- unlabel(data)
+#' # Remove all labels from the entire dataset
+#' data_plain <- unlabel(survey_data)
 #'
-#' # Remove labels from specific variables
-#' data <- unlabel(data, gender, life_satisfaction)
-#' }
+#' # Remove labels from specific variables only
+#' data <- unlabel(survey_data, gender, life_satisfaction)
 #'
 #' @export
 unlabel <- function(data, ...) {
@@ -341,8 +338,10 @@ unlabel <- function(data, ...) {
 #' Internal: remove all label attributes from a single vector
 #' @noRd
 .unlabel_vec <- function(x) {
-  # Convert tagged NAs to regular NA first
-  if (is.numeric(x) && any(is.na(x)) &&
+  # Convert tagged NAs to regular NA first. Tagged NAs are NaN payloads
+  # in doubles — integer vectors can never carry them, and
+  # haven::na_tag() errors on non-double input, so gate on is.double().
+  if (is.double(x) && any(is.na(x)) &&
       requireNamespace("haven", quietly = TRUE)) {
     # Check for tagged NAs
     has_tagged <- any(vapply(

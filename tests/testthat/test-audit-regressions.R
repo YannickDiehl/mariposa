@@ -640,3 +640,27 @@ test_that("weighted logistic -2LL uses the deviance, not weight-rounding logLik"
   expect_equal(r$omnibus_test$chi_sq, r$null.deviance - r$deviance,
                tolerance = 1e-12)
 })
+
+# --- 0.7.2: integer columns must not crash tagged-NA machinery ---------------
+
+test_that("unlabel() handles integer columns (haven::na_tag needs doubles)", {
+  # 0.7.2 fix: .unlabel_vec called haven::na_tag() on integer NAs, which
+  # errors ("`x` must be a double vector") — unlabel(survey_data) crashed
+  # on every integer Likert column. Integers can never carry tags.
+  data(survey_data)
+  expect_no_error(plain <- unlabel(survey_data))
+  expect_null(attr(plain$life_satisfaction, "label", exact = TRUE))
+  expect_null(attr(plain$gender, "labels", exact = TRUE))
+})
+
+test_that("write_xpt() roundtrips data with integer columns", {
+  skip_if_not_installed("haven")
+  # 0.7.2 fix: .retag_uppercase gated on is.numeric(), letting integer
+  # columns through to haven::na_tag() — write_xpt(survey_data) crashed.
+  data(survey_data)
+  tmp <- tempfile(fileext = ".xpt")
+  on.exit(unlink(tmp), add = TRUE)
+  expect_no_error(write_xpt(survey_data, tmp))
+  back <- read_xpt(tmp)
+  expect_equal(nrow(back), nrow(survey_data))
+})

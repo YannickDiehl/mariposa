@@ -49,18 +49,19 @@
 #' @family data-export
 #'
 #' @examples
-#' \dontrun{
-#' # Roundtrip: read Stata, process, write back
-#' data <- read_stata("survey.dta")
-#' data_clean <- data[data$age >= 18, ]
-#' write_stata(data_clean, "survey_adults.dta")
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   # Roundtrip: write to a temporary .dta, read back
+#'   tmp <- tempfile(fileext = ".dta")
+#'   write_stata(survey_data, tmp)
+#'   data <- read_stata(tmp)
 #'
-#' # Cross-format: SPSS to Stata
-#' data <- read_spss("survey.sav")
-#' write_stata(data, "survey.dta")
+#'   # Stata 13 compatibility
+#'   tmp13 <- tempfile(fileext = ".dta")
+#'   write_stata(survey_data, tmp13, version = 13)
 #'
-#' # Stata 13 compatibility
-#' write_stata(data, "survey_v13.dta", version = 13)
+#'   unlink(c(tmp, tmp13))
+#' }
 #' }
 #'
 #' @export

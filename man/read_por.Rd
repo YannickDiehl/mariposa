@@ -31,9 +31,14 @@ Unlike \code{.sav} files, the portable format does not support specifying a
 character encoding. Tagged NA handling is identical to \code{\link[=read_spss]{read_spss()}}.
 }
 \examples{
-\dontrun{
-data <- read_por("survey.por")
-na_frequencies(data$satisfaction)
+\donttest{
+# .por files cannot be produced from R, so this only runs when one
+# is present in the working directory
+if (requireNamespace("haven", quietly = TRUE) &&
+    file.exists("survey.por")) {
+  data <- read_por("survey.por")
+  na_frequencies(data$satisfaction)
+}
 }
 
 }

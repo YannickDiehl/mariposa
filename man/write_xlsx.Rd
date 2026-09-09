@@ -91,39 +91,48 @@ by 3 blank rows.
 
 }}
 \examples{
-\dontrun{
-# Export data with automatic label reference sheet
-write_xlsx(survey_data, "survey_export.xlsx")
+\donttest{
+if (requireNamespace("openxlsx2", quietly = TRUE)) {
+  # Export data with automatic label reference sheet
+  tmp <- tempfile(fileext = ".xlsx")
+  write_xlsx(survey_data, tmp)
 
-# Export a codebook (reproduces HTML layout in Excel)
-codebook(survey_data) |> write_xlsx("codebook.xlsx")
+  # Export a codebook (reproduces HTML layout in Excel)
+  tmp_cb <- tempfile(fileext = ".xlsx")
+  codebook(survey_data) |> write_xlsx(tmp_cb)
 
-# Export a codebook with per-variable frequency sheets
-codebook(survey_data) |> write_xlsx("codebook_full.xlsx", frequencies = TRUE)
+  # Export frequency tables
+  tmp_freq <- tempfile(fileext = ".xlsx")
+  frequency(survey_data, gender) |> write_xlsx(tmp_freq)
 
-# Export frequency tables (single or multiple variables)
-frequency(survey_data, gender) |> write_xlsx("freq.xlsx")
-frequency(survey_data, gender, life_satisfaction, region) |>
-  write_xlsx("freq_multi.xlsx")
+  # Multi-sheet export (mixed types: data frames, frequencies, codebooks)
+  tmp_multi <- tempfile(fileext = ".xlsx")
+  write_xlsx(
+    list(
+      "Frequencies" = frequency(survey_data, gender, life_satisfaction),
+      "Codebook"    = codebook(survey_data),
+      "Data"        = survey_data
+    ),
+    tmp_multi
+  )
 
-# Multi-sheet export (mixed types: data frames, frequencies, codebooks)
-write_xlsx(
-  list(
-    "Frequencies" = frequency(survey_data, gender, life_satisfaction),
-    "Codebook"    = codebook(survey_data),
-    "Data"        = survey_data
-  ),
-  "combined.xlsx"
-)
+  unlink(c(tmp, tmp_cb, tmp_freq, tmp_multi))
+}
 }
 
-\dontrun{
-# Single variable
-frequency(survey_data, gender) |> write_xlsx("freq.xlsx")
+\donttest{
+if (requireNamespace("openxlsx2", quietly = TRUE)) {
+  # Single variable
+  tmp <- tempfile(fileext = ".xlsx")
+  frequency(survey_data, gender) |> write_xlsx(tmp)
 
-# Multiple variables on one sheet
-frequency(survey_data, gender, life_satisfaction, region) |>
-  write_xlsx("freq_multi.xlsx")
+  # Multiple variables on one sheet
+  tmp2 <- tempfile(fileext = ".xlsx")
+  frequency(survey_data, gender, life_satisfaction, region) |>
+    write_xlsx(tmp2)
+
+  unlink(c(tmp, tmp2))
+}
 }
 
 }

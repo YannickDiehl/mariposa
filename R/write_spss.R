@@ -55,14 +55,19 @@
 #' @family data-export
 #'
 #' @examples
-#' \dontrun{
-#' # Roundtrip: read SPSS, process, write back
-#' data <- read_spss("survey.sav")
-#' data_clean <- data[data$age >= 18, ]
-#' write_spss(data_clean, "survey_adults.sav")
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   # Roundtrip: write to a temporary .sav, read back
+#'   tmp <- tempfile(fileext = ".sav")
+#'   write_spss(survey_data, tmp)
+#'   data <- read_spss(tmp)
 #'
-#' # Export with zlib compression (smaller file, requires SPSS v21+)
-#' write_spss(data, "survey_compressed.zsav", compress = "zsav")
+#'   # Export with zlib compression (smaller file, requires SPSS v21+)
+#'   tmp_z <- tempfile(fileext = ".zsav")
+#'   write_spss(survey_data, tmp_z, compress = "zsav")
+#'
+#'   unlink(c(tmp, tmp_z))
+#' }
 #' }
 #'
 #' @export

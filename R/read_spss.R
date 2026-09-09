@@ -51,24 +51,22 @@
 #' @family data-import
 #'
 #' @examples
-#' \dontrun{
-#' # Read SPSS file with tagged missing values
-#' data <- read_spss("survey.sav")
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   # Roundtrip through a temporary .sav file (with your own data,
+#'   # simply pass its path instead)
+#'   tmp <- tempfile(fileext = ".sav")
+#'   write_spss(survey_data, tmp)
+#'   data <- read_spss(tmp)
 #'
-#' # Check what types of missing values exist
-#' na_frequencies(data$satisfaction)
+#'   # Standard R operations work normally (NAs are excluded)
+#'   mean(data$life_satisfaction, na.rm = TRUE)
 #'
-#' # Standard R operations work normally (NAs are excluded)
-#' mean(data$satisfaction, na.rm = TRUE)
+#'   # frequency() shows each missing type separately
+#'   data |> frequency(life_satisfaction)
 #'
-#' # frequency() shows each missing type separately
-#' data %>% frequency(satisfaction)
-#'
-#' # Recover original SPSS codes
-#' original_codes <- untag_na(data$satisfaction)
-#'
-#' # Convert to regular NAs (standard behavior)
-#' data_clean <- strip_tags(data$satisfaction)
+#'   unlink(tmp)
+#' }
 #' }
 #'
 #' @export
@@ -113,9 +111,14 @@ read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE) {
 #' @family data-import
 #'
 #' @examples
-#' \dontrun{
-#' data <- read_por("survey.por")
-#' na_frequencies(data$satisfaction)
+#' \donttest{
+#' # .por files cannot be produced from R, so this only runs when one
+#' # is present in the working directory
+#' if (requireNamespace("haven", quietly = TRUE) &&
+#'     file.exists("survey.por")) {
+#'   data <- read_por("survey.por")
+#'   na_frequencies(data$satisfaction)
+#' }
 #' }
 #'
 #' @export
@@ -449,22 +452,15 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 #'   \item{label}{The value label for this missing type (if available)}
 #'
 #' @examples
-#' \dontrun{
-#' # SPSS data
-#' data <- read_spss("survey.sav")
-#' na_frequencies(data$satisfaction)
-#' #   tag    n  code            label
-#' # 1   b 1774   -11       TNZ: SPLIT
-#' # 2   c   63    -9     KEINE ANGABE
-#' # 3   d   11    -8    WEISS NICHT
-#' # 4   a    6   -42 DATENFEHLER: MFN
-#'
-#' # Stata data
-#' data <- read_stata("survey.dta")
-#' na_frequencies(data$income)
-#' #   tag  n code           label
-#' # 1   a 42   .a     Not applicable
-#' # 2   b 15   .b     Refused
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   # Declare -9/-8 as distinct tagged missing types, then inspect them
+#'   x <- set_na(c(1, 2, -9, 3, -8, -9), -9, -8)
+#'   na_frequencies(x)
+#'   #   tag n code label
+#'   # 1   a 2   -9  <NA>
+#'   # 2   b 1   -8  <NA>
+#' }
 #' }
 #'
 #' @seealso [read_spss()], [read_stata()], [read_sas()], [read_xpt()],
@@ -543,14 +539,12 @@ na_frequencies <- function(x) {
 #'   codes), falls back to [strip_tags()] behavior with a warning.
 #'
 #' @examples
-#' \dontrun{
-#' # SPSS data
-#' data <- read_spss("survey.sav")
-#' original <- untag_na(data$satisfaction)
-#'
-#' # Stata data with tag_na
-#' data <- read_stata("survey.dta", tag_na = c(-9, -8, -42))
-#' original <- untag_na(data$income)
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   # Tag -9/-8 as missing, then recover the original codes
+#'   x <- set_na(c(1, 2, -9, 3, -8), -9, -8)
+#'   untag_na(x)   # -9 and -8 are back
+#' }
 #' }
 #'
 #' @seealso [read_spss()], [read_stata()], [read_sas()], [na_frequencies()],
@@ -612,10 +606,12 @@ untag_na <- function(x) {
 #'   valid values are preserved.
 #'
 #' @examples
-#' \dontrun{
-#' data <- read_spss("survey.sav")
-#' # Remove tag information, keep only valid labels
-#' clean <- strip_tags(data$satisfaction)
+#' \donttest{
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   x <- set_na(c(1, 2, -9, 3, -8), -9, -8)
+#'   # Remove tag information: all missings become plain NA
+#'   strip_tags(x)
+#' }
 #' }
 #'
 #' @seealso [read_spss()], [read_stata()], [read_sas()], [read_xpt()],

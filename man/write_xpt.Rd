@@ -51,15 +51,15 @@ preserve full label metadata. Variable labels are preserved.
 }
 }
 \examples{
-\dontrun{
-# Roundtrip: read SAS transport, process, write back
-data <- read_xpt("survey.xpt")
-data_clean <- data[data$age >= 18, ]
-write_xpt(data_clean, "survey_adults.xpt")
+\donttest{
+if (requireNamespace("haven", quietly = TRUE)) {
+  # Roundtrip: write to a temporary .xpt transport file, read back
+  tmp <- tempfile(fileext = ".xpt")
+  write_xpt(survey_data, tmp)
+  data <- read_xpt(tmp)
 
-# Cross-format: SPSS to SAS transport
-data <- read_spss("survey.sav")
-write_xpt(data, "survey.xpt")
+  unlink(tmp)
+}
 }
 
 }
