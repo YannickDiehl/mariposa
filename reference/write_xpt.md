@@ -98,6 +98,6 @@ if (requireNamespace("haven", quietly = TRUE)) {
 
   unlink(tmp)
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file1970434646ea.xpt
+#> ✔ Wrote 16 variables (2500 obs.) to file188e3a337b21.xpt
 # }
 ```

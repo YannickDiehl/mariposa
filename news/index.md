@@ -8,10 +8,10 @@ review).
 ### CRAN
 
 - DESCRIPTION now cites the published method references in CRAN’s
-  auto-link form: IBM SPSS Statistics Algorithms (\<https:…\>), Dallal
-  and Wilkinson (1986) <doi:10.1080/00031305.1986.10475419> for the
-  Lilliefors correction, Haberman (1973) <doi:10.2307/2529686> for
-  adjusted standardized residuals.
+  auto-link form: IBM SPSS Statistics Algorithms, Dallal and Wilkinson
+  (1986, doi 10.1080/00031305.1986.10475419) for the Lilliefors
+  correction, and Haberman (1973, doi 10.2307/2529686) for adjusted
+  standardized residuals.
 - **All `\dontrun{}` blocks are gone.** The 15 import/export examples
   are now genuinely executable `\donttest{}` roundtrips through
   [`tempfile()`](https://rdrr.io/r/base/tempfile.html) (guarded by

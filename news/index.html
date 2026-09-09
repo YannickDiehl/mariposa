@@ -56,7 +56,7 @@
 <p>CRAN resubmission (theme: address all four points of the 2026-09 manual review).</p>
 <div class="section level3">
 <h3 id="cran-0-7-2">CRAN<a class="anchor" aria-label="anchor" href="#cran-0-7-2"></a></h3>
-<ul><li>DESCRIPTION now cites the published method references in CRAN’s auto-link form: IBM SPSS Statistics Algorithms (&lt;https:…&gt;), Dallal and Wilkinson (1986) <a href="doi:10.1080/00031305.1986.10475419" class="uri">doi:10.1080/00031305.1986.10475419</a> for the Lilliefors correction, Haberman (1973) <a href="doi:10.2307/2529686" class="uri">doi:10.2307/2529686</a> for adjusted standardized residuals.</li>
+<ul><li>DESCRIPTION now cites the published method references in CRAN’s auto-link form: IBM SPSS Statistics Algorithms, Dallal and Wilkinson (1986, doi 10.1080/00031305.1986.10475419) for the Lilliefors correction, and Haberman (1973, doi 10.2307/2529686) for adjusted standardized residuals.</li>
 <li>
 <strong>All <code>\dontrun{}</code> blocks are gone.</strong> The 15 import/export examples are now genuinely executable <code>\donttest{}</code> roundtrips through <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile()</a></code> (guarded by <code><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace()</a></code> for the Suggests packages); the two formats R cannot produce (.por, .sas7bdat) run behind a <code><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists()</a></code> guard. The <code><a href="../reference/unlabel.html">unlabel()</a></code> example runs unconditionally on the bundled data.</li>
 <li>

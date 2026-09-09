@@ -100,7 +100,7 @@ if (requireNamespace("haven", quietly = TRUE)) {
 
   unlink(c(tmp, tmp_z))
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file19702283356d.sav
-#> ✔ Wrote 16 variables (2500 obs.) to file1970581ee5f8.zsav
+#> ✔ Wrote 16 variables (2500 obs.) to file188e3c17b60f.sav
+#> ✔ Wrote 16 variables (2500 obs.) to file188e40ebf97e.zsav
 # }
 ```
