@@ -1,3 +1,44 @@
+# mariposa 0.7.2
+
+CRAN resubmission (theme: address all four points of the 2026-09 manual
+review).
+
+## CRAN
+
+* DESCRIPTION now cites the published method references in CRAN's
+  auto-link form: IBM SPSS Statistics Algorithms (<https:...>), Dallal
+  and Wilkinson (1986) <doi:10.1080/00031305.1986.10475419> for the
+  Lilliefors correction, Haberman (1973) <doi:10.2307/2529686> for
+  adjusted standardized residuals.
+* **All `\dontrun{}` blocks are gone.** The 15 import/export examples
+  are now genuinely executable `\donttest{}` roundtrips through
+  `tempfile()` (guarded by `requireNamespace()` for the Suggests
+  packages); the two formats R cannot produce (.por, .sas7bdat) run
+  behind a `file.exists()` guard. The `unlabel()` example runs
+  unconditionally on the bundled data.
+* `on.exit()` now registers the restoration *before* the option is
+  changed in `ancova()`, `factorial_anova()`, and the correlation-matrix
+  print helper, so an interrupt between the two lines cannot leak a
+  changed `options()` setting.
+* New `test-silent-computation.R` proves the console contract the
+  reviewer asked about: every analysis entry point produces zero stdout
+  (32 assertions); all `cat()` calls in the package live exclusively in
+  the `print()`/`summary()` display layer, and remaining runtime
+  messages go through suppressable `message()`-based conditions.
+
+## Bug fixes
+
+Making the former `\dontrun{}` examples actually run uncovered two real
+crashes on integer columns (tagged NAs are NaN payloads in doubles;
+`haven::na_tag()` errors on integer input):
+
+* **`unlabel()` crashed on any data frame with integer columns**
+  ("`x` must be a double vector") — including the bundled
+  `survey_data`'s Likert variables. Integer vectors can never carry
+  tagged NAs and now pass through directly.
+* **`write_xpt()` crashed on integer columns** for the same reason in
+  its tag-uppercasing step. Both fixes carry regression tests.
+
 # mariposa 0.7.1
 
 CRAN resubmission (theme: address the incoming-pretest NOTE) plus two
