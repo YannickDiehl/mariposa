@@ -376,12 +376,12 @@ print.summary.normality_test <- function(x, ...) {
     cat("\nTests of Normality\n")
     if (x$is_grouped) {
       for_each_group(x$results, x$group_vars, function(rows, group_values) {
-        format_stat_table(rows[stat_cols], digits = digits,
+        print_stat_table(rows[stat_cols], digits = digits,
                           col_types = c(ks_p = "pvalue", shapiro_p = "pvalue"),
                           col_labels = labels)
       })
     } else {
-      format_stat_table(x$results[stat_cols], digits = digits,
+      print_stat_table(x$results[stat_cols], digits = digits,
                         col_types = c(ks_p = "pvalue", shapiro_p = "pvalue"),
                         col_labels = labels)
     }

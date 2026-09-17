@@ -390,7 +390,7 @@ print.summary.multiple_response <- function(x, ...) {
   emit_freq <- function(rows, n_cases, n_responses, n_missing) {
     cat("\nFrequencies\n")
     df <- rows[c("Label", "n", "pct_responses", "pct_cases")]
-    format_stat_table(df, digits = digits,
+    print_stat_table(df, digits = digits,
                       col_types = c(n = "num", pct_responses = "num",
                                     pct_cases = "num"),
                       col_labels = c(Label = "Option", n = "Responses n",
@@ -410,7 +410,7 @@ print.summary.multiple_response <- function(x, ...) {
       wide[[lv]] <- sprintf(paste0("%.0f (%.", digits, "f%%)"),
                             sub$n, sub$pct_cases)
     }
-    format_stat_table(wide, digits = digits)
+    print_stat_table(wide, digits = digits)
     n_line <- vapply(levels, function(lv) {
       sprintf("%s: %.0f", lv, rows$n_cases_level[rows$by_level == lv][1])
     }, character(1))

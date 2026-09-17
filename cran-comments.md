@@ -1,44 +1,40 @@
 ## Resubmission
 
-This resubmission addresses all four points of the manual review of
-0.7.1 (Leonore Hochhauser, 2026-09-09). Thank you for the review!
+This resubmission addresses the remaining point of the manual review of
+0.7.2 (Leonore Hochhauser, 2026-09-16): information messages written
+with print()/cat() in R/kendall_tau.R.
 
-1. **References in DESCRIPTION**: added — Dallal and Wilkinson (1986)
-   <doi:10.1080/00031305.1986.10475419> for the Lilliefors significance
-   correction and Haberman (1973) <doi:10.2307/2529686> for adjusted
-   standardized residuals, in the requested auto-link form. The primary
-   reference, IBM Corp. (2023, "IBM SPSS Statistics Algorithms"), has
-   no DOI or ISBN, and IBM's documentation server answers automated
-   URL checks inconsistently (intermittent 403), so it is cited in
-   plain text without an angle-bracket URL. Both DOIs are verified
-   against Crossref; should the Dallal-Wilkinson DOI show as
-   "(possibly) invalid", that is Taylor & Francis intermittently
-   answering automated requests with 403 — it resolves correctly in a
-   browser.
+The flagged cat() call sat inside `.kendall_tau_spec$pair_extras`, a
+display callback stored in a top-level list. It was only ever executed
+by `print(summary(x))` — i.e. inside the print/summary layer the
+policy exempts — but from the source alone that was impossible to see,
+which we take to be the point of the remark. Rather than argue the
+exemption, we restructured the code so the exemption is visible:
 
-2. **\dontrun{}**: removed from the entire package. The import/export
-   examples are now genuinely executable \donttest{} roundtrips through
-   tempfile() (wrapped in requireNamespace() guards for the Suggests
-   packages 'haven'/'openxlsx2'); the two file formats R cannot produce
-   (.por, .sas7bdat) run behind a file.exists() guard so the examples
-   never error. The unlabel() example now runs unconditionally on the
-   bundled dataset.
+1. **The callback no longer writes to the console.** All three
+   correlation display callbacks (kendall_tau, pearson_cor,
+   spearman_rho — the latter two had the identical pattern) now
+   *return* formatted lines; the single cat() call lives in the
+   shared print helper `.print_cor_verbose()`. Output is
+   byte-identical.
 
-3. **print()/cat() to the console (R/kendall_tau.R,
-   R/print_helpers.R)**: the flagged cat() calls live exclusively in
-   the print()/summary() display layer — R/print_helpers.R holds the
-   shared display helpers called only from print methods, and the
-   kendall_tau.R occurrence is a display closure invoked only by
-   print(summary(x)). No computation writes to the console: runtime
-   information goes through cli's message-based conditions
-   (suppressable via suppressMessages()). This contract is now proven
-   by a dedicated test file (tests/testthat/test-silent-computation.R):
-   every analysis entry point is asserted to produce zero stdout.
+2. **The rule is now lexically true package-wide**: every cat()/print()
+   call in R/ lives inside a function whose name starts with `print`/
+   `.print` and that is called only from print()/summary() methods.
+   Two display helpers were renamed/refactored to make that hold
+   everywhere (`format_stat_table()` → `print_stat_table()`; the group
+   header line of `for_each_group()` moved into `print_group_label()`).
 
-4. **options() restoration**: on.exit() now registers the restoration
-   immediately after saving and *before* changing the option in
-   ancova(), factorial_anova(), and the correlation-matrix print
-   helper, exactly per the recommended pattern.
+3. **Both sides of the contract are enforced by tests**:
+   `test-silent-computation.R` (runs on CRAN) asserts that every
+   analysis entry point produces zero stdout at runtime, and the new
+   `test-console-discipline.R` (runs in development and CI, where the
+   R/ sources are present) statically parses all of R/ and fails if a
+   cat()/print()/writeLines() call ever appears outside a print-layer
+   function again.
+
+No computation writes to the console; runtime information goes through
+suppressable message()-based conditions.
 
 ## R CMD check results
 
@@ -53,7 +49,7 @@ The only NOTE is "checking CRAN incoming feasibility":
 
 ## Test environments
 
-* win-builder, R Under development, mariposa 0.7.2 — 1 NOTE (see
+* win-builder, R Under development, mariposa 0.7.3 — 1 NOTE (see
   above); PDF and HTML manuals build cleanly
 * local macOS (Apple Silicon), R 4.6.0 — `devtools::check()`
   (including `--run-donttest`): 0 errors, 0 warnings, 0 notes

@@ -390,7 +390,7 @@ print.summary.marginal_effects <- function(x, ...) {
     emit <- function(rows) {
       df <- rows[stat_cols]
       df$sig <- add_significance_stars(df$p_value)
-      format_stat_table(df, digits = digits, col_labels = labels)
+      print_stat_table(df, digits = digits, col_labels = labels)
     }
 
     cat("\n")

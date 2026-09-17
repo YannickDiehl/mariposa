@@ -471,7 +471,7 @@
 .print_posthoc_table <- function(rows, digits) {
   tbl <- rows[, c("Comparison", "Estimate", "conf_low",
                   "conf_high", "p_adjusted", "sig")]
-  format_stat_table(
+  print_stat_table(
     tbl,
     digits = digits,
     col_types = c(Estimate = "num", conf_low = "num", conf_high = "num"),

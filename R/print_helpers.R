@@ -65,6 +65,19 @@ print_significance_legend <- function(show = TRUE) {
   }
 }
 
+#' Print the plain one-line group label used by for_each_group()
+#'
+#' Bare "Group: ..." line without the underline that
+#' \code{print_group_header()} adds.
+#'
+#' @param label Pre-formatted "var = value, ..." string
+#' @return invisible(NULL)
+#' @noRd
+print_group_label <- function(label) {
+  cat("\nGroup:", label, "\n")
+  invisible(NULL)
+}
+
 #' Print grouped data header
 #' @param group_values Named vector or data frame of group values
 #' @param prefix Text to print before group info

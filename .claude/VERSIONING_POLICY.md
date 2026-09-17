@@ -85,7 +85,7 @@ The package has few users; breaking changes are acceptable but never casual:
 | McDonald's omega in reliability() (one-factor ML, weighted variant, omega-if-deleted; Tier 4 pending SPSS reference run) - done | 0.6.13 | PATCH (new statistic within an existing function) |
 | Codebook robustness (attr partial-match label fix, list-column/inline-expression crashes, tagged-NA parity across HTML/xlsx/summary, central value formatting, input validation, view= argument) - done | 0.6.14 | PATCH (bug fixes + one new argument, declared) |
 | SPSS v29 reference runs for the Tier-4/order-statistics gaps (weighted quantiles/median/IQR, tied Kendall, weighted regression w/ categorical predictor) — maintainer runs `.claude/spss-syntax-0.6.4-references.sps`, results pasted into the validation tests | 0.6.x | PATCH (needs maintainer + SPSS v29) |
-| Optional polish: format_stat_table adoption, snapshot-test migration, remaining BACKLOG.md quality items | 0.6.x | PATCH/MICRO |
+| Optional polish: print_stat_table adoption, snapshot-test migration, remaining BACKLOG.md quality items | 0.6.x | PATCH/MICRO |
 | API freeze + full SPSS validation coverage per Charter §9 | 1.0.0 | MAJOR |
 
 ---

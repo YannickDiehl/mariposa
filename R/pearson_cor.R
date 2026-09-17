@@ -327,14 +327,19 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
   params = function(x) list(conf.level = x$conf.level),
   pair_stat_prefix = "Correlation: r",
   pair_extras = function(corrs, digits) {
-    # Always show CI and r-squared
+    # Always show CI and r-squared (returns lines; printed by the engine's
+    # print layer)
+    lines <- character(0)
     if ("conf_int_lower" %in% names(corrs)) {
-      cat(sprintf("  95%% CI: [%.*f, %.*f]\n", digits, corrs$conf_int_lower[1],
-                  digits, corrs$conf_int_upper[1]))
+      lines <- c(lines, sprintf("  95%% CI: [%.*f, %.*f]\n", digits,
+                                corrs$conf_int_lower[1], digits,
+                                corrs$conf_int_upper[1]))
     }
     if ("r_squared" %in% names(corrs)) {
-      cat(sprintf("  r-squared: %.*f\n", digits, corrs$r_squared[1]))
+      lines <- c(lines, sprintf("  r-squared: %.*f\n", digits,
+                                corrs$r_squared[1]))
     }
+    lines
   },
   matrix_key = "correlations",
   matrix_title = "Correlation Matrix:",

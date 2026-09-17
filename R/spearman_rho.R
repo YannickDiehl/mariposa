@@ -284,9 +284,11 @@ spearman_rho <- function(data, ..., weights = NULL,
   params = function(x) list(alternative = x$alternative),
   pair_stat_prefix = "Spearman's rho: rho",
   pair_extras = function(corrs, digits) {
-    # Always show t-stat
+    # Always show t-stat (returns lines; printed by the engine's print layer)
     if ("t_stat" %in% names(corrs)) {
-      cat(sprintf("  t-statistic: %.*f\n", digits, corrs$t_stat[1]))
+      sprintf("  t-statistic: %.*f\n", digits, corrs$t_stat[1])
+    } else {
+      character(0)
     }
   },
   matrix_key = "rho",

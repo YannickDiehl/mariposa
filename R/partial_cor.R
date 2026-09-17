@@ -434,7 +434,7 @@ print.summary.partial_cor <- function(x, ...) {
       cat("\nPairwise Results:\n")
       df <- corrs[stat_cols]
       df$sig <- add_significance_stars(df$p_value)
-      format_stat_table(df, digits = digits, col_labels = labels)
+      print_stat_table(df, digits = digits, col_labels = labels)
     }
   }
 

@@ -413,9 +413,11 @@ kendall_tau <- function(data, ..., weights = NULL,
   params = NULL,
   pair_stat_prefix = "Kendall's tau-b: tau-b",
   pair_extras = function(corrs, digits) {
-    # Always show z-score
+    # Always show z-score (returns lines; printed by the engine's print layer)
     if ("z_score" %in% names(corrs)) {
-      cat(sprintf("  z-score: %.*f\n", digits, corrs$z_score[1]))
+      sprintf("  z-score: %.*f\n", digits, corrs$z_score[1])
+    } else {
+      character(0)
     }
   },
   matrix_key = "tau",

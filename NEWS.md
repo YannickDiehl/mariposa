@@ -1,3 +1,31 @@
+# mariposa 0.7.3
+
+CRAN resubmission (theme: make the print/cat console contract lexically
+visible — the 2026-09 second-round remark on `R/kendall_tau.R`).
+
+## CRAN
+
+* The reviewer-flagged `cat()` in `R/kendall_tau.R` sat in
+  `.kendall_tau_spec$pair_extras`, a display callback that only ever ran
+  inside the `summary()` print layer — functionally exempt, but
+  lexically indistinguishable from computation code. All three
+  correlation `pair_extras` callbacks (kendall, pearson, spearman) now
+  **return** formatted lines; the single `cat()` lives in the engine's
+  `.print_cor_verbose()`. Output is byte-identical.
+* The same lexical rule is now enforced package-wide:
+  `format_stat_table()` was renamed to `print_stat_table()` (it prints,
+  it never returned a formatted string), and `for_each_group()`'s group
+  header line moved into a new `print_group_label()` helper. After
+  this, every `cat()`/`print()` call in `R/` lives in a function whose
+  name starts with `print`/`.print`.
+* New static meta-test `test-console-discipline.R` locks the rule in:
+  it parses every file in `R/` and fails if a `cat()`, `print()`, or
+  `writeLines()` call appears in any top-level object not named
+  `print*`/`.print*` (calls inside `capture.output()` are exempt as
+  silent). Together with the runtime `test-silent-computation.R` (zero
+  stdout from every analysis entry point), this makes the CRAN console
+  contract regression-proof.
+
 # mariposa 0.7.2
 
 CRAN resubmission (theme: address all four points of the 2026-09 manual

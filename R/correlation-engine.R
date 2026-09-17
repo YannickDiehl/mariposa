@@ -46,6 +46,8 @@
 #     compact_title, stat_col, stat_label          compact print()
 #     verbose_title, info, params                  summary header block
 #     pair_stat_prefix, pair_extras                2-variable verbose block
+#                   (pair_extras returns formatted lines; the engine's
+#                   print layer emits them — spec callbacks never cat())
 #     matrix_key, matrix_title, p_title            3+ variable matrices
 #     pairwise_df                                  3+ variable pair table
 # =============================================================================
@@ -384,8 +386,10 @@
     if (show_n) {
       cat(sprintf("  N = %d\n", corrs$n[1]))
     }
-    # Always-shown per-method extras (CI/r-squared, t-statistic, z-score)
-    spec$pair_extras(corrs, digits)
+    # Always-shown per-method extras (CI/r-squared, t-statistic, z-score);
+    # the spec callback returns formatted lines so that all console output
+    # stays inside this print layer
+    cat(spec$pair_extras(corrs, digits), sep = "")
   } else {
     # For 3+ variables, show matrices and pairwise table
 

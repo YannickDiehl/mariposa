@@ -7,7 +7,7 @@
 #
 #   fmt_num()           one rounding + padding policy for numerics
 #   fmt_p()             one p-value display policy ("<.001" / "p < 0.001")
-#   format_stat_table() column-spec driven bordered ASCII table
+#   print_stat_table() column-spec driven bordered ASCII table
 #   for_each_group()    iterate grouped results uniformly
 # =============================================================================
 
@@ -59,7 +59,7 @@ fmt_p <- function(p, digits = 3, style = c("table", "compact")) {
 #' Replaces the hand-rolled "compute widths -> border -> sprintf rows ->
 #' border" blocks. Columns are auto-typed and can be overridden:
 #'
-#'   format_stat_table(df, digits = 3,
+#'   print_stat_table(df, digits = 3,
 #'                     col_types = c(p_adjusted = "pvalue", n = "int"),
 #'                     col_labels = c(p_adjusted = "Adj. p"))
 #'
@@ -75,7 +75,7 @@ fmt_p <- function(p, digits = 3, style = c("table", "compact")) {
 #' @param col_labels Named character vector overriding header labels
 #' @return invisible(df); prints as a side effect
 #' @noRd
-format_stat_table <- function(df, digits = 3, indent = 2,
+print_stat_table <- function(df, digits = 3, indent = 2,
                               col_types = NULL, col_labels = NULL) {
   if (nrow(df) == 0) return(invisible(df))
 
@@ -175,7 +175,7 @@ for_each_group <- function(results, group_vars, fun, header = TRUE) {
         }, character(1)),
         collapse = ", "
       )
-      cat("\nGroup:", label, "\n")
+      print_group_label(label)
     }
     fun(rows, combo)
   }
