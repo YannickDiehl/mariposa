@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,16 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.3" id="mariposa-073">mariposa 0.7.3<a class="anchor" aria-label="anchor" href="#mariposa-073"></a></h2>
+<p>CRAN resubmission (theme: make the print/cat console contract lexically visible — the 2026-09 second-round remark on <code>R/kendall_tau.R</code>).</p>
+<div class="section level3">
+<h3 id="cran-0-7-3">CRAN<a class="anchor" aria-label="anchor" href="#cran-0-7-3"></a></h3>
+<ul><li>The reviewer-flagged <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code> in <code>R/kendall_tau.R</code> sat in <code>.kendall_tau_spec$pair_extras</code>, a display callback that only ever ran inside the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> print layer — functionally exempt, but lexically indistinguishable from computation code. All three correlation <code>pair_extras</code> callbacks (kendall, pearson, spearman) now <strong>return</strong> formatted lines; the single <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code> lives in the engine’s <code>.print_cor_verbose()</code>. Output is byte-identical.</li>
+<li>The same lexical rule is now enforced package-wide: <code>format_stat_table()</code> was renamed to <code>print_stat_table()</code> (it prints, it never returned a formatted string), and <code>for_each_group()</code>’s group header line moved into a new <code>print_group_label()</code> helper. After this, every <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code>/<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> call in <code>R/</code> lives in a function whose name starts with <code>print</code>/<code>.print</code>.</li>
+<li>New static meta-test <code>test-console-discipline.R</code> locks the rule in: it parses every file in <code>R/</code> and fails if a <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code>, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, or <code><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines()</a></code> call appears in any top-level object not named <code>print*</code>/<code>.print*</code> (calls inside <code><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output()</a></code> are exempt as silent). Together with the runtime <code>test-silent-computation.R</code> (zero stdout from every analysis entry point), this makes the CRAN console contract regression-proof.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.2" id="mariposa-072">mariposa 0.7.2<a class="anchor" aria-label="anchor" href="#mariposa-072"></a></h2>
 <p>CRAN resubmission (theme: address all four points of the 2026-09 manual review).</p>
@@ -587,7 +597,7 @@
 <h3 id="audit-driven-math-fixes-post-phase-0-6-1">Audit-Driven Math Fixes (post-Phase-1)<a class="anchor" aria-label="anchor" href="#audit-driven-math-fixes-post-phase-0-6-1"></a></h3>
 <p>A second audit pass identified additional math defects and test fudges, all corrected in this release:</p>
 <ul><li>
-<code><a href="../reference/dunn_test.html">dunn_test()</a></code>: SE now includes the Dunn (1964) / Conover (1999) tie correction. Previous versions systematically under-estimated <code>|Z|</code> on tied data (e.g., Likert scales). Baselines regenerated from <code>PMCMRplus::kwAllPairsDunnTest</code> (exact match to 4 decimals).</li>
+<code><a href="../reference/dunn_test.html">dunn_test()</a></code>: SE now includes the Dunn (1964) / Conover (1999) tie correction. Previous versions systematically under-estimated <code>|Z|</code> on tied data (e.g., Likert scales). Baselines regenerated from <code><a href="https://rdrr.io/pkg/PMCMRplus/man/kwAllPairsDunnTest.html" class="external-link">PMCMRplus::kwAllPairsDunnTest</a></code> (exact match to 4 decimals).</li>
 <li>
 <code><a href="../reference/friedman_test.html">friedman_test()</a></code>: weighted branch now applies the tie correction consistently with <code><a href="https://rdrr.io/r/stats/friedman.test.html" class="external-link">stats::friedman.test</a></code> (unweighted branch). The inconsistency caused weighted chi-squared values to be too low for tied data.</li>
 <li>

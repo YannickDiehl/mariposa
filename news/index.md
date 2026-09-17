@@ -1,5 +1,40 @@
 # Changelog
 
+## mariposa 0.7.3
+
+CRAN resubmission (theme: make the print/cat console contract lexically
+visible — the 2026-09 second-round remark on `R/kendall_tau.R`).
+
+### CRAN
+
+- The reviewer-flagged [`cat()`](https://rdrr.io/r/base/cat.html) in
+  `R/kendall_tau.R` sat in `.kendall_tau_spec$pair_extras`, a display
+  callback that only ever ran inside the
+  [`summary()`](https://rdrr.io/r/base/summary.html) print layer —
+  functionally exempt, but lexically indistinguishable from computation
+  code. All three correlation `pair_extras` callbacks (kendall, pearson,
+  spearman) now **return** formatted lines; the single
+  [`cat()`](https://rdrr.io/r/base/cat.html) lives in the engine’s
+  `.print_cor_verbose()`. Output is byte-identical.
+- The same lexical rule is now enforced package-wide:
+  `format_stat_table()` was renamed to `print_stat_table()` (it prints,
+  it never returned a formatted string), and `for_each_group()`’s group
+  header line moved into a new `print_group_label()` helper. After this,
+  every
+  [`cat()`](https://rdrr.io/r/base/cat.html)/[`print()`](https://rdrr.io/r/base/print.html)
+  call in `R/` lives in a function whose name starts with
+  `print`/`.print`.
+- New static meta-test `test-console-discipline.R` locks the rule in: it
+  parses every file in `R/` and fails if a
+  [`cat()`](https://rdrr.io/r/base/cat.html),
+  [`print()`](https://rdrr.io/r/base/print.html), or
+  [`writeLines()`](https://rdrr.io/r/base/writeLines.html) call appears
+  in any top-level object not named `print*`/`.print*` (calls inside
+  [`capture.output()`](https://rdrr.io/r/utils/capture.output.html) are
+  exempt as silent). Together with the runtime
+  `test-silent-computation.R` (zero stdout from every analysis entry
+  point), this makes the CRAN console contract regression-proof.
+
 ## mariposa 0.7.2
 
 CRAN resubmission (theme: address all four points of the 2026-09 manual
@@ -1101,7 +1136,8 @@ all corrected in this release:
   SE now includes the Dunn (1964) / Conover (1999) tie correction.
   Previous versions systematically under-estimated `|Z|` on tied data
   (e.g., Likert scales). Baselines regenerated from
-  `PMCMRplus::kwAllPairsDunnTest` (exact match to 4 decimals).
+  [`PMCMRplus::kwAllPairsDunnTest`](https://rdrr.io/pkg/PMCMRplus/man/kwAllPairsDunnTest.html)
+  (exact match to 4 decimals).
 - [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md):
   weighted branch now applies the tie correction consistently with
   [`stats::friedman.test`](https://rdrr.io/r/stats/friedman.test.html)
