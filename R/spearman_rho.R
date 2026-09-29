@@ -2,8 +2,9 @@
 #'
 #' @description
 #' Calculates Spearman's rank correlation coefficients (rho) between variables with support
-#' for weighted correlations, grouped data, and multiple variable pairs. Provides
-#' significance testing and SPSS-compatible output formatting.
+#' for grouped data and multiple variable pairs. Provides significance testing and
+#' SPSS-compatible output formatting. Survey weights only select cases (see
+#' \code{weights}); the coefficient itself is unweighted, as in SPSS NONPAR CORR.
 #'
 #' Spearman's rho is a non-parametric measure of rank correlation that assesses monotonic
 #' relationships between variables. It is particularly suitable for ordinal data or when
@@ -88,7 +89,8 @@
 #' survey_data %>%
 #'   spearman_rho(life_satisfaction, political_orientation, trust_media)
 #'
-#' # Weighted correlations (mathematically correct, though SPSS may not apply weights)
+#' # Weights only filter cases (weight <= 0 or NA dropped); rho itself is
+#' # unweighted, matching SPSS NONPAR CORR
 #' survey_data %>%
 #'   spearman_rho(age, income, weights = sampling_weight)
 #'
@@ -244,6 +246,7 @@ spearman_rho <- function(data, ..., weights = NULL,
 #' @noRd
 .spearman_rho_spec <- list(
   class_name = "spearman_rho",
+  weights_filter_only = TRUE,
   result_names = c("correlations", "matrices", "variables", "weights",
                    "alternative", "use", "is_grouped", "groups", "n_obs"),
   matrices = list(
@@ -277,7 +280,9 @@ spearman_rho <- function(data, ..., weights = NULL,
     list(
       "Method" = "Spearman's rho (rank correlation)",
       "Variables" = paste(x$variables, collapse = ", "),
-      "Weights variable" = x$weights,
+      "Weights variable" = if (!is.null(x$weights)) {
+        paste0(x$weights, " (case filter only: weight <= 0 or NA excluded)")
+      },
       "Missing data handling" = paste(if ("use" %in% names(x)) x$use else "pairwise", "deletion")
     )
   },

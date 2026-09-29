@@ -32,7 +32,7 @@ Correlation measures how two variables move together. mariposa provides three me
 | Spearman's $\rho$ | `spearman_rho()` | Monotonic relationships, ordinal data, or data with outliers |
 | Kendall's $\tau$ | `kendall_tau()` | Ordinal data, small samples, or many tied values |
 
-All three support survey weights, multiple variables (correlation matrices), and grouped analysis.
+All three support multiple variables (correlation matrices), grouped analysis, and a `weights` argument. Pearson and Kendall compute weighted coefficients; for Spearman, following SPSS NONPAR CORR, weights only select cases (weight <= 0 or missing is excluded) and rho itself is unweighted.
 
 ## Pearson Correlation
 
@@ -172,8 +172,8 @@ kendall_result <- survey_data %>%
 comparison <- data.frame(
   Method = c("Pearson", "Spearman", "Kendall"),
   Correlation = c(pearson_result$correlations$correlation[1],
-                  spearman_result$correlations$correlation[1],
-                  kendall_result$correlations$correlation[1]),
+                  spearman_result$correlations$rho[1],
+                  kendall_result$correlations$tau[1]),
   P_Value = c(pearson_result$correlations$p_value[1],
               spearman_result$correlations$p_value[1],
               kendall_result$correlations$p_value[1])
@@ -232,7 +232,7 @@ Include the correlation coefficient, confidence interval, p-value, and sample si
 1. **Pearson** measures linear relationships between continuous variables
 2. **Spearman** measures monotonic relationships and works with ordinal data
 3. **Kendall** is the most robust choice for ordinal data and small samples
-4. All three support **weights**, **correlation matrices**, and **group_by()**
+4. All three support **correlation matrices** and **group_by()**; Pearson and Kendall are weighted, Spearman uses weights as a case filter only
 5. Correlation does **not** imply causation
 
 ## Next Steps

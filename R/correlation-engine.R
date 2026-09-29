@@ -41,6 +41,10 @@
 #                   after the pair columns (spearman)
 #     finalize_df   optional function(df) applied to the combined long
 #                   table (significance stars, r_squared, ...)
+#     weights_filter_only
+#                   TRUE when weights only select cases and never enter
+#                   the statistic (spearman, SPSS NONPAR CORR): the output
+#                   then carries no "Weighted" label
 #
 #   Print / summary display
 #     compact_title, stat_col, stat_label          compact print()
@@ -270,7 +274,9 @@
 #' Compact print driver shared by the three correlation classes
 #' @noRd
 .print_cor_result <- function(x, spec, digits = 3) {
-  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
+  weighted_tag <- if (!is.null(x$weights) && !isTRUE(spec$weights_filter_only)) {
+    " [Weighted]"
+  } else ""
   corrs <- x$correlations
 
   if (isTRUE(x$is_grouped)) {
@@ -337,7 +343,10 @@
   show_n   <- if (!is.null(x$show)) isTRUE(x$show$n_matrix) else TRUE
 
   # Header
-  title <- get_standard_title(spec$verbose_title, x$weights, "")
+  title <- get_standard_title(
+    spec$verbose_title,
+    if (isTRUE(spec$weights_filter_only)) NULL else x$weights, ""
+  )
   print_header(title)
 
   # Info section

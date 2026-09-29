@@ -412,7 +412,8 @@ test_that("print.spearman_rho: ungrouped, 3+ vars (compact)", {
 test_that("print.spearman_rho: ungrouped, weighted", {
   result <- spearman_rho(survey_data, age, income, weights = sampling_weight)
   output <- expect_prints(result, "Spearman Correlation")
-  expect_true(any(grepl("Weighted", output, fixed = TRUE)))
+  # weights only filter cases (SPSS NONPAR CORR): no "Weighted" label (0.7.4)
+  expect_false(any(grepl("Weighted", output, fixed = TRUE)))
 })
 
 test_that("print.spearman_rho: grouped", {

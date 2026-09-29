@@ -76,6 +76,15 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   `survey_data %>% describe(age)` works after `library(mariposa)` alone
   (it was only imported, giving 'could not find function "%>%"'). No
   masking message when dplyr is attached as well (identical object).
+* `spearman_rho()` no longer presents itself as a weighted correlation.
+  Weights only filter cases (SPSS NONPAR CORR convention), but the output
+  said "[Weighted]" / "Weighted Spearman's Rank Correlation Analysis", and
+  the help page's description and example spoke of weighted correlations.
+  The output now names the weights variable as "case filter only".
+* The correlation vignette's method comparison showed Pearson's r three
+  times: it read a non-existent `$correlation` column for Spearman and
+  Kendall (`NULL`), and `data.frame()` recycled the Pearson value. It now
+  reads `$rho` and `$tau`.
 
 # mariposa 0.7.3
 

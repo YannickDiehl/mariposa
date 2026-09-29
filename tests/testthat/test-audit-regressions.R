@@ -947,3 +947,17 @@ test_that("the magrittr pipe is re-exported", {
   expect_true("%>%" %in% getNamespaceExports("mariposa"))
   expect_identical(mariposa::`%>%`, dplyr::`%>%`)
 })
+
+test_that("spearman_rho output does not claim a weighted correlation", {
+  # 0.7.4 fix: weights only filter cases (SPSS NONPAR CORR convention),
+  # but the output said "[Weighted]" / "Weighted Spearman's Rank
+  # Correlation Analysis" and the docs spoke of weighted correlations.
+  data(survey_data)
+  r <- spearman_rho(survey_data, age, income, weights = sampling_weight)
+  out <- c(capture.output(print(r)), capture.output(print(summary(r))))
+  expect_false(any(grepl("Weighted", out, fixed = TRUE)))
+  expect_true(any(grepl("case filter only", out, fixed = TRUE)))
+  # the coefficient equals the unweighted rho on the weight > 0 cases
+  expect_equal(r$correlations$rho[1],
+               spearman_rho(survey_data, age, income)$correlations$rho[1])
+})
