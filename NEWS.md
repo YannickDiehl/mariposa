@@ -35,6 +35,12 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   weighted pair weight sqrt(w_i * w_j) is separable), and the correlation
   engine strips label classes before computing. Full ALLBUS 2023: 6 pairs
   in 0.1 s. Results are unchanged.
+* `group_by() %>% t_test()` no longer aborts with "arguments imply
+  differing number of rows: 1, 0" when a group lacks one level of
+  `group`. The per-group fallback itself built a 0-row data frame and
+  swallowed the real reason. The group now gets an all-`NA` row, a warning
+  naming the group and the reason, and `print()`/`summary()` say
+  "not computed for this group" instead of showing `NA` tables.
 
 # mariposa 0.7.3
 

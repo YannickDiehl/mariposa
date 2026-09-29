@@ -84,10 +84,7 @@ print_group_label <- function(label) {
 #' @noRd
 print_group_header <- function(group_values, prefix = "Group") {
   if (is.data.frame(group_values)) {
-    group_str <- paste(sapply(names(group_values), function(g) {
-      val <- group_values[[g]]
-      paste(g, "=", if (is.factor(val)) as.character(val) else val)
-    }), collapse = ", ")
+    group_str <- .format_group_label(group_values)
   } else {
     group_str <- paste(names(group_values), "=", group_values, collapse = ", ")
   }

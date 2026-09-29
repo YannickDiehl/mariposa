@@ -768,3 +768,28 @@ test_that("kendall_tau on labelled data equals the unlabelled result and is fast
   expect_equal(r_lab$correlations$p_value, r_raw$correlations$p_value)
   expect_lt(t_lab[["elapsed"]], 5)
 })
+
+test_that("grouped t_test keeps an NA row with a warning when a group cannot be tested", {
+  # 0.7.4 fix: the per-group error fallback built
+  # data.frame(..., group_stats = list(NULL)) - a 0-row frame - so the
+  # fallback itself crashed with "arguments imply differing number of
+  # rows: 1, 0" and the real reason (only one level in that group) was lost.
+  data(survey_data)
+  d <- dplyr::filter(survey_data, !(region == "East" & gender == "Male"))
+  g <- dplyr::group_by(d, region)
+
+  expect_warning(
+    r <- t_test(g, life_satisfaction, group = gender),
+    "East.*exactly 2 levels"
+  )
+  expect_equal(nrow(r$results), 2L)
+  east <- r$results[r$results$region == "East", ]
+  west <- r$results[r$results$region == "West", ]
+  expect_true(is.na(east$t_stat))
+  expect_false(is.na(west$t_stat))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("not computed", out, fixed = TRUE)))
+  out_s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("Not computed for this group", out_s, fixed = TRUE)))
+  expect_false(any(grepl("[NA, NA]", out_s, fixed = TRUE)))
+})

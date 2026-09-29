@@ -137,6 +137,18 @@ print_stat_table <- function(df, digits = 3, indent = 2,
   invisible(df)
 }
 
+#' Format a one-row group key as "var = value, var2 = value2"
+#'
+#' @param group_values One-row data frame of group values
+#' @return Character scalar
+#' @noRd
+.format_group_label <- function(group_values) {
+  paste(vapply(names(group_values), function(g) {
+    val <- group_values[[g]]
+    paste(g, "=", if (is.factor(val)) as.character(val) else val)
+  }, character(1)), collapse = ", ")
+}
+
 #' Iterate a grouped results table uniformly
 #'
 #' Replaces the ~30 hand-rolled "unique(results[group_vars]) + nested

@@ -230,25 +230,22 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
                                         var.equal, mu, alternative, conf.level)
           .t_test_result_row(test_result, var_name, group_info)
         }, error = function(e) {
-          data.frame(
-            group_info,
-            Variable = var_name,
-            t_stat = NA,
-            df = NA,
-            p_value = NA,
-            mean_diff = NA,
-            cohens_d = NA,
-            hedges_g = NA,
-            glass_delta = NA,
-            conf_int_lower = NA,
-            conf_int_upper = NA,
-            n1 = NA,
-            n2 = NA,
-            group_stats = list(NULL),
-            equal_var_result = list(NULL),
-            unequal_var_result = list(NULL),
-            is_weighted = NA
+          # This group cannot be tested (e.g. only one level of `group`
+          # present): say why, and keep an all-NA row so the other groups
+          # still report. Built through .t_test_result_row() so the columns
+          # match the successful rows exactly.
+          cli_warn(c(
+            "{.fn t_test} skipped {.var {var_name}} in group {.val {(.format_group_label(group_info))}}.",
+            "x" = "{conditionMessage(e)}"
+          ))
+          na_result <- list(
+            t_stat = NA_real_, df = NA_real_, p_value = NA_real_,
+            mean_diff = NA_real_, cohens_d = NA_real_,
+            conf_int = c(NA_real_, NA_real_), group_stats = NULL,
+            equal_var_result = NULL, unequal_var_result = NULL,
+            is_weighted = !is.null(w_name)
           )
+          .t_test_result_row(na_result, var_name, group_info)
         })
       })
 
@@ -731,6 +728,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
     cat(sprintf("\n--- %s ---\n\n", var_name))
 
+    # Group skipped at computation time (warned there): no NA tables
+    if (is.na(row_results$t_stat[idx]) && is.null(stats)) {
+      cat("  Not computed for this group (see warning).\n")
+      return(invisible(NULL))
+    }
+
     # Group means (gated by descriptives toggle)
     if (show_descriptives && show_group_means && !is.null(stats) && !is.null(stats$group1)) {
       cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
@@ -906,7 +909,9 @@ print.t_test <- function(x, digits = 3, ...) {
 
   cat(sprintf("t-Test: %s%s%s\n", var_name, group_tag, weighted_tag))
 
-  if (!is.na(g_val)) {
+  if (is.na(t_val)) {
+    cat("  not computed for this group (see warning)\n")
+  } else if (!is.na(g_val)) {
     g_interp <- if (abs(g_val) < 0.2) "negligible"
                 else if (abs(g_val) < 0.5) "small"
                 else if (abs(g_val) < 0.8) "medium"
