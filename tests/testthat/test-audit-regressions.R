@@ -686,3 +686,36 @@ test_that("weighted logistic_regression muffles the non-integer warning in any l
     logistic_regression(d, high_life ~ age + income, weights = sampling_weight)
   )
 })
+
+test_that("collinearity diagnostics ignore the aliased (excluded) term", {
+  # 0.7.4 fix: .lm_collinearity() inverted the correlation matrix of ALL
+  # model-matrix columns, including the one excluded for perfect
+  # collinearity. That matrix is singular, so the retained terms got either
+  # NA (and summary(collinearity = TRUE) showed no table) or rounding
+  # artefacts like VIF = -2.85e13, depending on floating-point luck.
+  data(survey_data)
+  d <- survey_data
+  lv <- levels(d$education)
+  for (i in seq_along(lv)) d[[paste0("ed", i)]] <- as.integer(d$education == lv[i])
+  f <- life_satisfaction ~ age + ed1 + ed2 + ed3 + ed4
+
+  for (w in list(NULL, "sampling_weight")) {
+    r <- suppressMessages(
+      if (is.null(w)) linear_regression(d, f)
+      else linear_regression(d, f, weights = sampling_weight)
+    )
+    keep <- !is.na(stats::coef(r))
+    X <- stats::model.matrix(r)[, keep, drop = FALSE][, -1]
+    cm <- if (is.null(w)) stats::cor(X) else
+      stats::cov.wt(X, wt = stats::weights(r), cor = TRUE)$cor
+    ref <- diag(solve(cm))
+
+    ct <- r$coef_table[r$coef_table$Term != "(Intercept)", ]
+    expect_equal(unname(ct$VIF), unname(ref[ct$Term]), tolerance = 1e-10)
+    expect_true(all(ct$VIF >= 1))
+    expect_equal(ct$Tolerance, 1 / ct$VIF, tolerance = 1e-12)
+
+    out <- capture.output(print(summary(r, collinearity = TRUE)))
+    expect_true(any(grepl("Collinearity Statistics", out, fixed = TRUE)))
+  }
+})

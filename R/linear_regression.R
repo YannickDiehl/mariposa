@@ -1348,11 +1348,16 @@ print.summary.linear_regression <- function(x, ...) {
 #' correlation matrix is used, consistent with the frequency-weight
 #' convention elsewhere in the file.
 #'
+#' Aliased columns (NA coefficient, excluded for perfect collinearity) are
+#' dropped first, as SPSS reports Tolerance/VIF for the retained terms
+#' only; keeping them makes the correlation matrix singular.
+#'
 #' @return tibble with columns term, tolerance, vif (NA when the
-#'   correlation matrix is singular, e.g. aliased terms)
+#'   correlation matrix is singular)
 #' @noRd
 .lm_collinearity <- function(model, weights_vec = NULL) {
   X <- stats::model.matrix(model)
+  X <- X[, !is.na(stats::coef(model)), drop = FALSE]
   terms_keep <- setdiff(colnames(X), "(Intercept)")
   if (length(terms_keep) == 0) {
     return(tibble::tibble(term = character(0), tolerance = numeric(0),

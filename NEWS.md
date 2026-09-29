@@ -21,6 +21,11 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   locales (e.g. "Nicht-ganzzahlige #Erfolge in einem binomial-GLM"). The
   muffling filter matched the English text only; it now rebuilds the
   message through R's own translation catalog.
+* `linear_regression()`: when a predictor is excluded for perfect
+  collinearity, Tolerance and VIF of the retained terms are now computed
+  without the excluded column. Previously the singular correlation matrix
+  yielded either `NA` (so `summary(collinearity = TRUE)` printed no
+  table) or rounding artefacts such as VIF = -2.85e13.
 
 # mariposa 0.7.3
 
