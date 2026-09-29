@@ -22,3 +22,5 @@
 ^vignettes/_.*$
 ^\.positai$
 ^CRAN-SUBMISSION$
+^CONTRIBUTING\.md$
+^paper$

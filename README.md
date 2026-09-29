@@ -1,6 +1,7 @@
 # mariposa <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/mariposa)](https://CRAN.R-project.org/package=mariposa)
 [![R-CMD-check](https://github.com/YannickDiehl/mariposa/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/YannickDiehl/mariposa/actions/workflows/R-CMD-check.yaml)
 [![test-coverage](https://github.com/YannickDiehl/mariposa/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/YannickDiehl/mariposa/actions/workflows/test-coverage.yaml)
 [![Codecov test coverage](https://codecov.io/gh/YannickDiehl/mariposa/branch/main/graph/badge.svg)](https://app.codecov.io/gh/YannickDiehl/mariposa?branch=main)
@@ -14,7 +15,10 @@ mariposa (*Marburg Initiative for Political and Social Analysis*) provides 80 fu
 ## Installation
 
 ```r
-# Install from GitHub
+# Install from CRAN
+install.packages("mariposa")
+
+# Or the development version from GitHub
 devtools::install_github("YannickDiehl/mariposa")
 ```
 
@@ -142,7 +146,7 @@ kw_result %>% dunn_test()  # Pairwise Dunn comparisons
 
 ### Flexible Output: Compact & Detailed
 
-Every analysis function provides two output levels. Typing the result name prints a compact one-line summary. Calling `summary()` produces the full SPSS-style output with all details. You can toggle individual sections on or off:
+Every analysis function provides two output levels. Typing the result name prints a compact one-line summary. Calling `summary()` produces the full SPSS-style output with all details. The descriptive table functions (`describe()`, `frequency()`, `crosstab()`, `multiple_response()`) print their full tables directly — there `summary()` just adds the section toggles. You can toggle individual sections on or off:
 
 ```r
 # Compact one-line summary (default)
@@ -187,9 +191,21 @@ survey_data %>%
 - [Regression Analysis](https://YannickDiehl.github.io/mariposa/articles/regression-analysis.html) - Linear and logistic regression
 - [Survey Weights Guide](https://YannickDiehl.github.io/mariposa/articles/survey-weights.html) - Working with weighted data
 
-## Support
+## Support and Contributing
 
-- [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug reports and feature requests
+- [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug reports, usage questions, and feature requests
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute code or documentation
+
+## Citation
+
+If you use mariposa in your research, please cite it:
+
+```r
+citation("mariposa")
+```
+
+> Diehl, Y. (2026). mariposa: SPSS-Compatible Statistical Tools for Survey Data.
+> R package version 0.7.3. https://CRAN.R-project.org/package=mariposa
 
 ## License
 
