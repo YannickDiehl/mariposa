@@ -85,6 +85,12 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   times: it read a non-existent `$correlation` column for Spearman and
   Kendall (`NULL`), and `data.frame()` recycled the Pearson value. It now
   reads `$rho` and `$tau`.
+* `codebook()` on a full SPSS survey file is ~6x faster (ALLBUS 2023,
+  5,246 x 579: 20.4 s -> 3.1 s), and `frequency()`, `to_label(drop_na =
+  FALSE)`, `unlabel()`, `drop_labels()` and the Stata/SAS readers speed up
+  on data with many missing values. Six places read tagged-NA letters with
+  `vapply(x, haven::na_tag, ...)`, splitting labelled vectors into one
+  vctrs object per element; they now share one vectorized reader.
 
 # mariposa 0.7.3
 

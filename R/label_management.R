@@ -514,9 +514,7 @@ drop_labels <- function(data, ..., drop_na = FALSE) {
   if (isTRUE(drop_na) && length(na_labels) > 0L) {
     # Keep only tagged NA labels whose tags exist in the data
     if (requireNamespace("haven", quietly = TRUE)) {
-      data_tags <- unique(vapply(
-        x[is.na(x)], haven::na_tag, character(1)
-      ))
+      data_tags <- unique(.na_tags(x[is.na(x)]))
       label_tags <- vapply(na_labels, haven::na_tag, character(1))
       na_labels <- na_labels[label_tags %in% data_tags]
     }

@@ -442,7 +442,7 @@ calculate_single_frequency <- function(x, w = NULL, sort_frq = "none", show_na =
 
   # Get tags for each NA observation
   na_mask <- is.na(x)
-  na_tags <- vapply(x[na_mask], haven::na_tag, character(1))
+  na_tags <- .na_tags(x[na_mask])
 
   # Count per tag (unweighted or weighted)
   unique_tags <- sort(unique(na_tags[!is.na(na_tags)]))

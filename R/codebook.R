@@ -238,10 +238,7 @@
     # Count system NAs (untagged)
     na_mask <- is.na(x)
     if (any(na_mask)) {
-      na_tags <- vapply(x[na_mask], function(v) {
-        tg <- haven::na_tag(v)
-        if (is.na(tg)) NA_character_ else tg
-      }, character(1))
+      na_tags <- .na_tags(x[na_mask])
       n_system_na <- sum(is.na(na_tags))
     }
   }

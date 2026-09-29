@@ -418,7 +418,7 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
   na_mask <- is.na(x)
   if (!any(na_mask)) return(x)
 
-  tags <- vapply(x[na_mask], haven::na_tag, character(1))
+  tags <- .na_tags(x[na_mask])
   unique_tags <- sort(unique(tags[!is.na(tags)]))
 
   if (length(unique_tags) == 0L) return(x)

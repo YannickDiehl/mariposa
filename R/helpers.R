@@ -22,6 +22,22 @@ NULL
   as.vector(unclass(x))
 }
 
+#' Vectorized NA tags
+#'
+#' The single reader for tagged-NA letters. vapply(x, haven::na_tag, ...)
+#' splits a labelled vector into one vctrs object per element (~75% of
+#' codebook() runtime on ALLBUS); haven::na_tag() is itself vectorized.
+#' Integers cannot carry tags (and na_tag() errors on them).
+#'
+#' @param x Numeric vector, possibly haven_labelled
+#' @return Character vector: the tag letter, NA for untagged or non-NA
+#' @noRd
+.na_tags <- function(x) {
+  x <- .plain_numeric(x)
+  if (!is.double(x)) return(rep(NA_character_, length(x)))
+  haven::na_tag(x)
+}
+
 # Weight Validation Functions
 # ---------------------------
 

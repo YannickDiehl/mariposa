@@ -344,11 +344,7 @@ unlabel <- function(data, ...) {
   if (is.double(x) && any(is.na(x)) &&
       requireNamespace("haven", quietly = TRUE)) {
     # Check for tagged NAs
-    has_tagged <- any(vapply(
-      x[is.na(x)],
-      function(v) !is.na(haven::na_tag(v)),
-      logical(1)
-    ))
+    has_tagged <- any(!is.na(.na_tags(x[is.na(x)])))
     if (has_tagged) {
       x <- strip_tags(x)
     }

@@ -961,3 +961,19 @@ test_that("spearman_rho output does not claim a weighted correlation", {
   expect_equal(r$correlations$rho[1],
                spearman_rho(survey_data, age, income)$correlations$rho[1])
 })
+
+test_that(".na_tags() equals element-wise haven::na_tag() for every input type", {
+  # 0.7.4 perf fix: six call sites read NA tags with
+  # vapply(x[na_mask], haven::na_tag, ...), which splits a labelled vector
+  # into one vctrs object per element - ~75% of codebook(allbus) runtime
+  # (20 s for ALLBUS 2023). .na_tags() is the single vectorized reader.
+  skip_if_not_installed("haven")
+  x <- c(1, haven::tagged_na("a"), NA, haven::tagged_na("b"), 5)
+  expect_identical(.na_tags(x), vapply(x, haven::na_tag, character(1)))
+  xl <- haven::labelled(x, c(one = 1))
+  expect_identical(.na_tags(xl), .na_tags(x))
+  expect_identical(.na_tags(xl[is.na(xl)]), c("a", NA, "b"))
+  # integers cannot carry tags (haven::na_tag() errors on them)
+  expect_identical(.na_tags(c(1L, NA, 3L)), rep(NA_character_, 3))
+  expect_identical(.na_tags(numeric(0)), character(0))
+})

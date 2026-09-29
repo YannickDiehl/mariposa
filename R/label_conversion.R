@@ -153,19 +153,13 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
   if (!isTRUE(drop_na) && length(na_labels) > 0L &&
       requireNamespace("haven", quietly = TRUE)) {
     na_idx <- which(is.na(raw))
-    for (k in na_idx) {
-      tag <- haven::na_tag(x[k])
-      if (!is.na(tag)) {
-        na_tag_labels <- vapply(na_labels, haven::na_tag, character(1))
-        match_idx <- match(tag, na_tag_labels)
-        if (!is.na(match_idx)) {
-          mapped[k] <- names(na_labels)[match_idx]
-          level_names <- c(level_names, names(na_labels)[match_idx])
-          code_map <- c(code_map, na_labels[match_idx])
-        }
-      }
-    }
-    level_names <- unique(level_names)
+    match_idx <- match(.na_tags(raw[na_idx]), .na_tags(na_labels))
+    hit <- !is.na(match_idx)
+    mapped[na_idx[hit]] <- names(na_labels)[match_idx[hit]]
+    # Levels in order of first appearance in the data, as before
+    first <- unique(match_idx[hit])
+    level_names <- unique(c(level_names, names(na_labels)[first]))
+    code_map <- c(code_map, na_labels[first])
   }
 
   # Handle unlabelled values
