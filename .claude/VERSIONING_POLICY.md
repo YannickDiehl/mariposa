@@ -58,9 +58,21 @@ The package has few users; breaking changes are acceptable but never casual:
 
 ## 5. Release discipline
 
+- **CRAN cadence (since 0.7.3 went live on CRAN, 2026-09):** exactly ONE
+  version number sits between the CRAN-live version and development.
+  All changes — however many themes accumulate over days or weeks — go
+  into that single next version (currently 0.7.4, one increment above
+  the live 0.7.3) until it is accepted and live on CRAN. Only then is
+  the next number (0.7.5) opened. Never stack multiple unreleased
+  version numbers on top of a CRAN release; CRAN's submission rhythm
+  (and its ~1-submission-per-1-2-months expectation) is the release
+  gate, not the theme. Within the accumulated NEWS entry, themes stay
+  separated as their own subsections. This supersedes the
+  "small and frequent" cadence below between CRAN releases.
 - **One theme per release.** A release is "hygiene", "print-layer
   refactor", "API rename" - not all three. If work naturally splits,
-  release twice.
+  release twice. (Between CRAN releases this applies to NEWS
+  subsections, not version numbers - see CRAN cadence above.)
 - **Small and frequent beats large and rare.** A release should be
   reviewable in one sitting from its NEWS entry.
 - **Every release**: green `devtools::test()`, clean
