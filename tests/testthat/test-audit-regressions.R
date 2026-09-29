@@ -906,3 +906,36 @@ test_that("statistics of an empty (all-missing) variable are NA, not NaN/-Inf", 
   rr <- expect_no_warning(w_range(d, empty)$results$range)
   expect_true(is.na(rr) && is.finite(rr) == FALSE && !is.infinite(rr))
 })
+
+test_that("to_label() keeps the original codes for to_numeric() and to_labelled()", {
+  # 0.7.4 fix: to_label() kept only the factor levels, so to_numeric()
+  # renumbered the codes sequentially (6 -> 3, 42 -> 4, 90 -> 5, 91 -> 6)
+  # and keep_labels = TRUE even attached the wrong labels (c = 3, ...).
+  skip_if_not_installed("haven")
+  labs <- c(a = 1, b = 2, c = 6, d = 42, e = 90, f = 91)
+  x <- haven::labelled(c(1, 2, 6, 42, 90, 91, 6), labs, label = "Test")
+  f <- to_label(x)
+
+  expect_equal(as.vector(to_numeric(f)), c(1, 2, 6, 42, 90, 91, 6))
+  expect_equal(attr(to_numeric(f, keep_labels = TRUE), "labels"), labs)
+  back <- to_labelled(f)
+  expect_equal(as.vector(unclass(back)), c(1, 2, 6, 42, 90, 91, 6))
+  expect_equal(attr(back, "labels", exact = TRUE), labs)
+
+  # sequential numbering stays available on request
+  expect_equal(as.vector(to_numeric(f, use_labels = FALSE)),
+               c(1, 2, 3, 4, 5, 6, 3))
+
+  # the map survives dplyr verbs in a data frame pipeline
+  d <- dplyr::tibble(x = x, n = 1:7)
+  d2 <- dplyr::filter(to_label(d, x), n > 2)
+  expect_equal(as.vector(to_numeric(d2$x)), c(6, 42, 90, 91, 6))
+
+  # unlabelled values kept via add_non_labelled keep their code as well
+  x2 <- haven::labelled(c(1, 5, 42), c(a = 1, d = 42))
+  expect_equal(as.vector(to_numeric(to_label(x2, add_non_labelled = TRUE))),
+               c(1, 5, 42))
+
+  # plain factors keep the documented behaviour
+  expect_equal(as.vector(to_numeric(factor(c("Male", "Female")))), c(2, 1))
+})

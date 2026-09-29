@@ -29,8 +29,12 @@ label. This is the reverse of \code{\link[=to_label]{to_label()}}.
 \details{
 \subsection{Factor Conversion}{
 
-When converting a factor, the integer codes (1, 2, 3, ...) become the
-numeric values and the factor levels become the value labels.
+When converting a factor created by \code{\link[=to_label]{to_label()}}, the original codes
+stored in its \code{"codes"} attribute are restored (the round trip
+\code{to_labelled(to_label(x))} returns the original values and labels).
+For other factors, or when \code{labels} is supplied, the integer codes
+(1, 2, 3, ...) become the numeric values and the factor levels become
+the value labels.
 }
 
 \subsection{Character Conversion}{

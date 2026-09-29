@@ -54,6 +54,14 @@ data ready for plotting, cross-tabulation, and regression analysis.
 For each labelled variable, the numeric codes are replaced by their
 associated value labels. The resulting factor levels are ordered by the
 original numeric values (not alphabetically).
+
+The original code of every level is kept in the factor's \code{"codes"}
+attribute (a named numeric vector, names = levels), so \code{\link[=to_numeric]{to_numeric()}}
+and \code{\link[=to_labelled]{to_labelled()}} can restore the original values (e.g. 6, 42, 90)
+instead of renumbering the levels 1, 2, 3. The attribute survives dplyr
+verbs (\code{filter()}, \code{mutate()}, \code{arrange()}, ...) but, like the variable
+label, is dropped by base subsetting (\code{x[i]}) and no longer applies once
+the levels are renamed or extended.
 \subsection{When to Use This}{
 
 Use \code{to_label()} when you:

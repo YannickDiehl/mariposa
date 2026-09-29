@@ -21,8 +21,9 @@ to_numeric(
 \item{...}{Optional: unquoted variable names (tidyselect supported). If
 empty, converts all factor columns.}
 
-\item{use_labels}{If \code{TRUE} (default), attempts to use the numeric value
-of factor levels (e.g., level \code{"3"} becomes \code{3}). If \code{FALSE}, uses
+\item{use_labels}{If \code{TRUE} (default), restores the original codes of
+a factor created by \code{\link[=to_label]{to_label()}}, otherwise uses the numeric value of
+factor levels (e.g., level \code{"3"} becomes \code{3}). If \code{FALSE}, uses
 sequential integers (1, 2, 3, ...).}
 
 \item{start_at}{If not \code{NULL}, the lowest numeric value in the output
@@ -48,13 +49,17 @@ numeric strings). For labelled variables, extracts the underlying numeric
 values.
 }
 \details{
-This function handles three input types:
+This function handles four input types:
 \enumerate{
+\item \strong{Factors from \code{\link[=to_label]{to_label()}}}: Restores the original codes
+stored in the \code{"codes"} attribute, so a \code{to_label()} /
+\code{to_numeric()} round trip returns the original values (6, 42, 90,
+...) instead of 1, 2, 3.
 \item \strong{Numeric factors} (levels like \code{"1"}, \code{"2"}, \code{"3"}): Extracts
 the numeric values from the level names.
-\item \strong{Text factors} (levels like \code{"Male"}, \code{"Female"}): Converts
-to sequential integers by default; use \code{use_labels = FALSE} to force
-this behavior even for numeric-looking levels.
+\item \strong{Other text factors} (levels like \code{"Male"}, \code{"Female"}):
+Converts to sequential integers (1, 2, 3, ... in level order). Use
+\code{use_labels = FALSE} to force this behavior for any factor.
 \item \strong{haven_labelled}: Extracts the underlying numeric vector,
 stripping the labelled class.
 }

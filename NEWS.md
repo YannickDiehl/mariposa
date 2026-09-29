@@ -64,6 +64,14 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   unweighted `w_mean()` returned `NaN`. The mean/range kernels and the
   unweighted branch of the `w_*` factory now short-circuit empty input
   the way the weighted branch already did.
+* `to_label()` now keeps the original code of every level in a `"codes"`
+  attribute, and `to_numeric()` / `to_labelled()` restore those codes.
+  Previously the round trip renumbered the values sequentially (6 -> 3,
+  42 -> 4, 90 -> 5, ...), and `to_numeric(keep_labels = TRUE)` attached
+  labels with the wrong codes. `use_labels = FALSE` still gives the
+  sequential 1..k numbering. The attribute survives dplyr verbs; after
+  base subsetting (`x[i]`) or renaming levels, the level-based conversion
+  applies as before.
 
 # mariposa 0.7.3
 

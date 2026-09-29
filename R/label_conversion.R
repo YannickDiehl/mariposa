@@ -42,6 +42,14 @@
 #' associated value labels. The resulting factor levels are ordered by the
 #' original numeric values (not alphabetically).
 #'
+#' The original code of every level is kept in the factor's `"codes"`
+#' attribute (a named numeric vector, names = levels), so [to_numeric()]
+#' and [to_labelled()] can restore the original values (e.g. 6, 42, 90)
+#' instead of renumbering the levels 1, 2, 3. The attribute survives dplyr
+#' verbs (`filter()`, `mutate()`, `arrange()`, ...) but, like the variable
+#' label, is dropped by base subsetting (`x[i]`) and no longer applies once
+#' the levels are renamed or extended.
+#'
 #' ## When to Use This
 #'
 #' Use `to_label()` when you:
@@ -130,6 +138,8 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
   level_order <- sort(valid_labels)
   level_names <- names(level_order)
   level_values <- unname(level_order)
+  # Original code of each level (see "codes" attribute below)
+  code_map <- stats::setNames(level_values, level_names)
 
   # Map data values to label text
   raw <- as.double(x)
@@ -151,6 +161,7 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
         if (!is.na(match_idx)) {
           mapped[k] <- names(na_labels)[match_idx]
           level_names <- c(level_names, names(na_labels)[match_idx])
+          code_map <- c(code_map, na_labels[match_idx])
         }
       }
     }
@@ -165,6 +176,7 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
       unlabelled_names <- as.character(unlabelled_vals)
       mapped[unlabelled_mask] <- as.character(raw[unlabelled_mask])
       level_names <- c(level_names, unlabelled_names)
+      code_map <- c(code_map, stats::setNames(unlabelled_vals, unlabelled_names))
     }
   }
 
@@ -174,11 +186,32 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
     result <- droplevels(result)
   }
 
+  # Keep the original code of every level so to_numeric() / to_labelled()
+  # can restore 6, 42, 90 instead of renumbering 1..k. A dedicated
+  # attribute (not "labels") so functions reading value labels keep
+  # treating the result as a plain factor.
+  lv <- levels(result)
+  attr(result, "codes") <- code_map[match(lv, names(code_map))]
+
   # Preserve variable label
   var_lbl <- attr(x, "label", exact = TRUE)
   if (!is.null(var_lbl)) attr(result, "label") <- var_lbl
 
   result
+}
+
+
+#' Original codes of a factor made by to_label(), or NULL
+#'
+#' Returns the named code vector (names = levels) only when it still covers
+#' every level exactly - after the levels were renamed or extended (e.g.
+#' forcats) the stored map no longer applies and callers fall back to the
+#' level-based conversion.
+#' @noRd
+.factor_codes <- function(x) {
+  codes <- attr(x, "codes", exact = TRUE)
+  if (is.null(codes) || !identical(names(codes), levels(x))) return(NULL)
+  codes
 }
 
 
@@ -284,8 +317,9 @@ to_character <- function(data, ..., drop_na = TRUE,
 #' @param data A data frame, tibble, or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
 #'   empty, converts all factor columns.
-#' @param use_labels If `TRUE` (default), attempts to use the numeric value
-#'   of factor levels (e.g., level `"3"` becomes `3`). If `FALSE`, uses
+#' @param use_labels If `TRUE` (default), restores the original codes of
+#'   a factor created by [to_label()], otherwise uses the numeric value of
+#'   factor levels (e.g., level `"3"` becomes `3`). If `FALSE`, uses
 #'   sequential integers (1, 2, 3, ...).
 #' @param start_at If not `NULL`, the lowest numeric value in the output
 #'   starts at this number. Default: `NULL` (use original values).
@@ -301,13 +335,17 @@ to_character <- function(data, ..., drop_na = TRUE,
 #'   input, returns a numeric vector.
 #'
 #' @details
-#' This function handles three input types:
+#' This function handles four input types:
 #' \enumerate{
+#'   \item **Factors from [to_label()]**: Restores the original codes
+#'     stored in the `"codes"` attribute, so a `to_label()` /
+#'     `to_numeric()` round trip returns the original values (6, 42, 90,
+#'     ...) instead of 1, 2, 3.
 #'   \item **Numeric factors** (levels like `"1"`, `"2"`, `"3"`): Extracts
 #'     the numeric values from the level names.
-#'   \item **Text factors** (levels like `"Male"`, `"Female"`): Converts
-#'     to sequential integers by default; use `use_labels = FALSE` to force
-#'     this behavior even for numeric-looking levels.
+#'   \item **Other text factors** (levels like `"Male"`, `"Female"`):
+#'     Converts to sequential integers (1, 2, 3, ... in level order). Use
+#'     `use_labels = FALSE` to force this behavior for any factor.
 #'   \item **haven_labelled**: Extracts the underlying numeric vector,
 #'     stripping the labelled class.
 #' }
@@ -386,19 +424,18 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
   if (is.factor(x)) {
     lvls <- levels(x)
 
-    if (isTRUE(use_labels)) {
-      # Try to parse levels as numbers
-      numeric_lvls <- suppressWarnings(as.numeric(lvls))
-      if (!any(is.na(numeric_lvls))) {
-        # Levels are numeric strings
-        result <- numeric_lvls[as.integer(x)]
-      } else {
-        # Non-numeric levels: use sequential integers
-        result <- as.integer(x)
-      }
+    codes <- .factor_codes(x)
+    numeric_lvls <- suppressWarnings(as.numeric(lvls))
+    level_vals <- if (!isTRUE(use_labels)) {
+      seq_along(lvls)
+    } else if (!is.null(codes)) {
+      unname(codes)            # original codes stored by to_label()
+    } else if (!any(is.na(numeric_lvls))) {
+      numeric_lvls             # levels are numeric strings
     } else {
-      result <- as.integer(x)
+      seq_along(lvls)          # text levels: sequential integers
     }
+    result <- level_vals[as.integer(x)]
 
     # Apply start_at offset
     if (!is.null(start_at)) {
@@ -409,12 +446,7 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
     if (!is.null(var_lbl)) attr(result, "label") <- var_lbl
 
     if (isTRUE(keep_labels)) {
-      vals <- if (isTRUE(use_labels)) {
-        numeric_lvls <- suppressWarnings(as.numeric(lvls))
-        if (!any(is.na(numeric_lvls))) numeric_lvls else seq_along(lvls)
-      } else {
-        seq_along(lvls)
-      }
+      vals <- level_vals
       if (!is.null(start_at)) {
         vals <- vals - min(vals, na.rm = TRUE) + start_at
       }
@@ -464,8 +496,12 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
 #' @details
 #' ## Factor Conversion
 #'
-#' When converting a factor, the integer codes (1, 2, 3, ...) become the
-#' numeric values and the factor levels become the value labels.
+#' When converting a factor created by [to_label()], the original codes
+#' stored in its `"codes"` attribute are restored (the round trip
+#' `to_labelled(to_label(x))` returns the original values and labels).
+#' For other factors, or when `labels` is supplied, the integer codes
+#' (1, 2, 3, ...) become the numeric values and the factor levels become
+#' the value labels.
 #'
 #' ## Character Conversion
 #'
@@ -529,7 +565,12 @@ to_labelled <- function(data, ..., labels = NULL, label = NULL) {
   if (is.factor(x)) {
     lvls <- levels(x)
     vals <- as.integer(x)
-    if (is.null(labels)) {
+    codes <- .factor_codes(x)
+    if (is.null(labels) && !is.null(codes)) {
+      # Factor from to_label(): restore the original codes and labels
+      vals <- unname(codes)[vals]
+      labels <- codes
+    } else if (is.null(labels)) {
       labels <- stats::setNames(seq_along(lvls), lvls)
     }
     result <- haven::labelled(as.double(vals), labels = labels,
