@@ -26,6 +26,15 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   without the excluded column. Previously the singular correlation matrix
   yielded either `NA` (so `summary(collinearity = TRUE)` printed no
   table) or rounding artefacts such as VIF = -2.85e13.
+* `kendall_tau()` is dramatically faster. The pair counts came from an
+  element-wise R loop over all n(n-1)/2 pairs, and on labelled
+  (`haven_labelled`) data every element access went through vctrs
+  dispatch: 400 labelled cases took 6.5 s, the full ALLBUS sample more than
+  20 minutes per pair. The counts now come from a vectorized kernel
+  (`.kendall_pair_counts()` in `R/kernels-weighted.R`, exploiting that the
+  weighted pair weight sqrt(w_i * w_j) is separable), and the correlation
+  engine strips label classes before computing. Full ALLBUS 2023: 6 pairs
+  in 0.1 s. Results are unchanged.
 
 # mariposa 0.7.3
 

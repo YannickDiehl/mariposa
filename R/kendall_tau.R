@@ -157,135 +157,41 @@ kendall_tau <- function(data, ..., weights = NULL,
 #' Calculate one weighted/unweighted Kendall's tau-b pair
 #' @noRd
 .kendall_pair <- function(x, y, w = NULL, alternative = "two.sided") {
-  if (!is.null(w)) {
-    # Remove missing values
-    valid <- !is.na(x) & !is.na(y) & !is.na(w) & w > 0
-    x <- x[valid]
-    y <- y[valid]
-    w <- w[valid]
+  # Remove missing values (and zero weights, which contribute no pairs)
+  valid <- !is.na(x) & !is.na(y)
+  if (!is.null(w)) valid <- valid & !is.na(w) & w > 0
+  x <- x[valid]
+  y <- y[valid]
+  if (!is.null(w)) w <- w[valid]
 
-    n <- length(x)
-    if (n < 2) {
-      return(list(
-        tau = NA_real_,
-        p_value = NA_real_,
-        z_score = NA_real_,
-        n = n
-      ))
-    }
-
-    # Calculate weighted Kendall's tau
-    # For weighted version, we weight each pair comparison
-    concordant <- 0
-    discordant <- 0
-    ties_x <- 0
-    ties_y <- 0
-    ties_both <- 0
-    total_weight <- 0
-
-    for (i in 1:(n-1)) {
-      for (j in (i+1):n) {
-        # Weight for this pair
-        pair_weight <- sqrt(w[i] * w[j])
-        total_weight <- total_weight + pair_weight
-
-        # Compare pairs
-        diff_x <- x[i] - x[j]
-        diff_y <- y[i] - y[j]
-
-        if (diff_x != 0 && diff_y != 0) {
-          if (sign(diff_x) == sign(diff_y)) {
-            concordant <- concordant + pair_weight
-          } else {
-            discordant <- discordant + pair_weight
-          }
-        } else if (diff_x == 0 && diff_y == 0) {
-          ties_both <- ties_both + pair_weight
-        } else if (diff_x == 0) {
-          ties_x <- ties_x + pair_weight
-        } else {
-          ties_y <- ties_y + pair_weight
-        }
-      }
-    }
-
-    # Calculate tau-b (adjusted for ties)
-    # Pairs tied on BOTH variables (ties_both) must be excluded from each
-    # factor, mirroring the unweighted (n0 - Tx - Txy) * (n0 - Ty - Txy)
-    # denominator below. With weights == 1 this reduces exactly to the
-    # unweighted tau-b.
-    numerator <- concordant - discordant
-    denominator <- sqrt((total_weight - ties_x - ties_both) *
-                          (total_weight - ties_y - ties_both))
-
-    if (denominator == 0) {
-      # Undefined coefficient (a variable with no untied pairs); NA, not 0
-      tau <- NA_real_
-    } else {
-      tau <- numerator / denominator
-    }
-
-    # For weighted analysis, use effective sample size
-    n_eff <- sum(w)
-
-  } else {
-    # Unweighted Kendall's tau - SPSS-compatible calculation
-    valid <- !is.na(x) & !is.na(y)
-    x <- x[valid]
-    y <- y[valid]
-
-    n <- length(x)
-    if (n < 2) {
-      return(list(
-        tau = NA_real_,
-        p_value = NA_real_,
-        z_score = NA_real_,
-        n = n
-      ))
-    }
-
-    # Manual calculation for SPSS compatibility
-    # Count concordant, discordant, and tied pairs
-    P <- 0  # concordant
-    Q <- 0  # discordant
-    Tx <- 0 # ties only in X
-    Ty <- 0 # ties only in Y
-    Txy <- 0 # ties in both
-
-    for (i in 1:(n-1)) {
-      for (j in (i+1):n) {
-        dx <- x[i] - x[j]
-        dy <- y[i] - y[j]
-
-        if (dx == 0 && dy == 0) {
-          Txy <- Txy + 1
-        } else if (dx == 0) {
-          Tx <- Tx + 1
-        } else if (dy == 0) {
-          Ty <- Ty + 1
-        } else if (sign(dx) == sign(dy)) {
-          P <- P + 1
-        } else {
-          Q <- Q + 1
-        }
-      }
-    }
-
-    # Total pairs
-    n0 <- n * (n - 1) / 2
-
-    # Kendall's tau-b formula (SPSS-compatible)
-    denominator <- sqrt((n0 - Tx - Txy) * (n0 - Ty - Txy))
-
-    if (denominator == 0) {
-      # Undefined coefficient (a variable with no untied pairs); NA, not 0
-      tau <- NA_real_
-    } else {
-      tau <- (P - Q) / denominator
-    }
-
-    n_eff <- n
+  n <- length(x)
+  if (n < 2) {
+    return(list(
+      tau = NA_real_,
+      p_value = NA_real_,
+      z_score = NA_real_,
+      n = n
+    ))
   }
+
+  # Concordance sums over all pairs (pair weight sqrt(w_i * w_j) when
+  # weighted, exact integer counts otherwise) - see .kendall_pair_counts()
+  # in kernels-weighted.R. Tau-b excludes pairs tied on x (resp. y),
+  # including pairs tied on both, from each denominator factor:
+  # sqrt((n0 - Tx - Txy) * (n0 - Ty - Txy)). With weights == 1 the weighted
+  # tau reduces exactly to the unweighted tau-b.
+  cnt <- .kendall_pair_counts(x, y, w)
+  denominator <- sqrt(cnt$untied_x * cnt$untied_y)
+
+  if (denominator == 0) {
+    # Undefined coefficient (a variable with no untied pairs); NA, not 0
+    tau <- NA_real_
+  } else {
+    tau <- cnt$S / denominator
+  }
+
+  # Weighted: SPSS frequency-weight N; unweighted: actual sample size
+  n_eff <- if (!is.null(w)) sum(w) else n
 
   # Undefined coefficient (e.g. constant variable): return NA row
   if (is.na(tau)) {
@@ -337,7 +243,7 @@ kendall_tau <- function(data, ..., weights = NULL,
         (2 * n * (n - 1))
 
       var_tau <- (var0 - var1 - var2) + var3 + var4
-      var_tau <- var_tau / ((n0 - Tx - Txy) * (n0 - Ty - Txy))
+      var_tau <- var_tau / (cnt$untied_x * cnt$untied_y)
     }
 
     se_tau <- sqrt(var_tau)

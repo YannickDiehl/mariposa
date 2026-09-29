@@ -719,3 +719,52 @@ test_that("collinearity diagnostics ignore the aliased (excluded) term", {
     expect_true(any(grepl("Collinearity Statistics", out, fixed = TRUE)))
   }
 })
+
+test_that("kendall_tau pair counts match a brute-force pair loop (weighted and unweighted)", {
+  # 0.7.4: the O(n^2) R loop was replaced by a vectorized counting kernel.
+  # Oracle: explicit loop over all pairs with pair weight sqrt(w_i * w_j).
+  brute <- function(x, y, w) {
+    tot <- num <- tx <- ty <- 0
+    n <- length(x)
+    for (i in 1:(n - 1)) for (j in (i + 1):n) {
+      pw <- sqrt(w[i] * w[j]); dx <- sign(x[i] - x[j]); dy <- sign(y[i] - y[j])
+      tot <- tot + pw; num <- num + pw * dx * dy
+      if (dx == 0) tx <- tx + pw
+      if (dy == 0) ty <- ty + pw
+    }
+    num / sqrt((tot - tx) * (tot - ty))
+  }
+  set.seed(7)
+  n <- 80
+  x <- sample(1:5, n, replace = TRUE)
+  y <- round(x + rnorm(n), 1)
+  w <- runif(n, 0.3, 2)
+  d <- dplyr::tibble(x = x, y = y, w = w)
+
+  expect_equal(kendall_tau(d, x, y)$correlations$tau[1],
+               brute(x, y, rep(1, n)), tolerance = 1e-12)
+  expect_equal(kendall_tau(d, x, y, weights = w)$correlations$tau[1],
+               brute(x, y, w), tolerance = 1e-12)
+  # continuous data (no ties) as well
+  z <- rnorm(n)
+  expect_equal(kendall_tau(dplyr::tibble(z = z, y = y), z, y)$correlations$tau[1],
+               brute(z, y, rep(1, n)), tolerance = 1e-12)
+})
+
+test_that("kendall_tau on labelled data equals the unlabelled result and is fast", {
+  # 0.7.4 fix: every x[i] in the pair loop dispatched through
+  # `[.haven_labelled` (vctrs), ~200x slower per access: 400 labelled cases
+  # took 6.5 s vs 0.1 s unlabelled, the full ALLBUS sample > 20 minutes.
+  skip_on_cran()
+  data(survey_data)
+  d <- survey_data[, c("trust_media", "trust_science")]
+  dl <- d
+  for (v in names(dl)) {
+    dl[[v]] <- haven::labelled(as.double(dl[[v]]), c(low = 1, high = 5))
+  }
+  t_lab <- system.time(r_lab <- kendall_tau(dl, trust_media, trust_science))
+  r_raw <- kendall_tau(d, trust_media, trust_science)
+  expect_equal(r_lab$correlations$tau, r_raw$correlations$tau)
+  expect_equal(r_lab$correlations$p_value, r_raw$correlations$p_value)
+  expect_lt(t_lab[["elapsed"]], 5)
+})

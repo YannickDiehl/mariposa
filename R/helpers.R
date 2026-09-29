@@ -6,6 +6,22 @@
 #' @importFrom dplyr %>%
 NULL
 
+#' Strip label classes from a numeric vector for computation
+#'
+#' haven_labelled(_spss) vectors route every `[`, arithmetic and comparison
+#' through vctrs S3 dispatch: element-wise loops over them are ~200x
+#' slower, and comparisons on labelled_spss vectors with NA and an
+#' `na_range` hit haven's lossy-cast check (`if (!any(lossy))` on NA).
+#' Computation code therefore works on the bare numbers. Tagged NAs stay
+#' NA (their payload bits survive), all attributes are dropped.
+#'
+#' @param x Numeric vector, possibly haven_labelled
+#' @return Bare double/integer vector without attributes
+#' @noRd
+.plain_numeric <- function(x) {
+  as.vector(unclass(x))
+}
+
 # Weight Validation Functions
 # ---------------------------
 

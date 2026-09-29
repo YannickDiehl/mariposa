@@ -118,6 +118,10 @@
   run_group <- function(group_data) {
     weights_vec <- if (!is.null(w_name)) group_data[[w_name]] else NULL
 
+    # Pair computations run on bare numbers: labelled vectors would send
+    # every element access through vctrs dispatch (see .plain_numeric)
+    for (v in var_names) group_data[[v]] <- .plain_numeric(group_data[[v]])
+
     # Handle listwise deletion if requested
     if (use == "listwise") {
       complete_cases <- complete.cases(group_data[var_names])

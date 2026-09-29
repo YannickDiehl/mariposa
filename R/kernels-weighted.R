@@ -135,6 +135,58 @@
        p_value = 2 * stats::pnorm(abs(Z), lower.tail = FALSE), N_pop = N_pop)
 }
 
+#' Kendall pair sums for tau-b (weighted or unweighted)
+#'
+#' Every pair (i, j) carries weight s_i * s_j with s = sqrt(w) (s = 1
+#' unweighted) - the sqrt(w_i * w_j) pair weighting of the weighted tau-b.
+#' Because that weight is separable, all pair sums follow from per-cell
+#' masses of the (x, y) cross-classification instead of an O(n^2) loop over
+#' pairs: O(n log n + k_x * k_y) time and O(k_y) extra memory, where k is
+#' the number of distinct values. Unweighted results are exact integer
+#' counts (P - Q, n0, Tx + Txy, ...).
+#'
+#' @param x,y Numeric vectors without NAs (bare numbers, see .plain_numeric)
+#' @param w Positive weights without NAs, or NULL for unweighted
+#' @return list: n0 = total pair weight, S = concordant - discordant,
+#'   untied_x = pair weight not tied on x (n0 - Tx - Txy), untied_y
+#'   likewise for y; untied_* is exactly 0 for a constant variable
+#' @noRd
+.kendall_pair_counts <- function(x, y, w = NULL) {
+  s <- if (is.null(w)) rep(1, length(x)) else sqrt(w)
+  xr <- match(x, sort(unique(x)))
+  yr <- match(y, sort(unique(y)))
+  kx <- max(xr)
+  ky <- max(yr)
+
+  # Mass (sum s) and sum s^2 per occupied cell; cells ordered by x, then y
+  key <- (xr - 1) * ky + yr
+  ukey <- sort(unique(key))
+  cells <- rowsum(cbind(s, s^2), key)
+  cx <- (ukey - 1) %/% ky + 1
+  cy <- (ukey - 1) %% ky + 1
+  m <- cells[, 1]
+
+  # Pairs within a set of observations: ((sum s)^2 - sum s^2) / 2
+  pair_mass <- function(mass) sum(mass[, 1]^2 - mass[, 2]) / 2
+  n0 <- (sum(s)^2 - sum(s^2)) / 2
+  untied_x <- if (kx == 1) 0 else n0 - pair_mass(rowsum(cells, cx))
+  untied_y <- if (ky == 1) 0 else n0 - pair_mass(rowsum(cells, cy))
+
+  # S: sweep x upwards; `cnt` holds the mass of already-swept (smaller-x)
+  # cells per y rank, so a cell pairs concordantly with the swept mass
+  # below its y and discordantly with the mass above it.
+  cnt <- numeric(ky)
+  S <- 0
+  for (idx in split(seq_along(ukey), cx)) {
+    below <- cumsum(cnt)
+    yk <- cy[idx]
+    S <- S + sum(m[idx] * ((below[yk] - cnt[yk]) - (below[ky] - below[yk])))
+    cnt[yk] <- cnt[yk] + m[idx]
+  }
+
+  list(n0 = n0, S = S, untied_x = untied_x, untied_y = untied_y)
+}
+
 
 # ============================================================================
 # STATISTICAL CALCULATION FUNCTIONS
