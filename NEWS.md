@@ -14,6 +14,14 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   `residuals=`, ...) and `digits=`. The compact one-line `print()` is
   unchanged for the hypothesis-test and model classes.
 
+## Bug fixes (2026-09 field report)
+
+* `logistic_regression()` with fractional `weights` no longer leaks the
+  "non-integer #successes in a binomial glm!" warning under non-English
+  locales (e.g. "Nicht-ganzzahlige #Erfolge in einem binomial-GLM"). The
+  muffling filter matched the English text only; it now rebuilds the
+  message through R's own translation catalog.
+
 # mariposa 0.7.3
 
 CRAN resubmission (theme: make the print/cat console contract lexically

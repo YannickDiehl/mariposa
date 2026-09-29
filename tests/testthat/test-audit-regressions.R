@@ -664,3 +664,25 @@ test_that("write_xpt() roundtrips data with integer columns", {
   back <- read_xpt(tmp)
   expect_equal(nrow(back), nrow(survey_data))
 })
+
+# --- 0.7.4: field-report fixes (2026-09) --------------------------------------
+
+test_that("weighted logistic_regression muffles the non-integer warning in any locale", {
+  # 0.7.4 fix: .glm_quiet_weights() matched the English warning text only,
+  # so under a German locale "Nicht-ganzzahlige #Erfolge in einem
+  # binomial-GLM" leaked through on every weighted fit.
+  skip_if_not(capabilities("NLS"))
+  old <- Sys.setLanguage("de")
+  on.exit(Sys.setLanguage(old), add = TRUE)
+  translated <- gettextf("non-integer #successes in a %s glm!", "binomial",
+                         domain = "R-stats")
+  skip_if(identical(translated, "non-integer #successes in a binomial glm!"),
+          "German R translations not installed")
+
+  data(survey_data)
+  d <- survey_data
+  d$high_life <- as.integer(d$life_satisfaction >= 4)
+  expect_no_warning(
+    logistic_regression(d, high_life ~ age + income, weights = sampling_weight)
+  )
+})

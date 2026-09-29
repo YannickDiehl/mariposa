@@ -318,11 +318,17 @@ logistic_regression <- function(data, formula = NULL,
 # non-convergence warnings ("fitted probabilities numerically 0 or 1
 # occurred", "algorithm did not converge") - exactly the pathologies a
 # survey analyst must see.
+# stats raises the warning via gettextf(), so it arrives translated (e.g.
+# "Nicht-ganzzahlige #Erfolge in einem binomial-GLM" under a German
+# locale); the target text is rebuilt through the same R-stats catalog so
+# the match holds in every locale.
 .glm_quiet_weights <- function(expr) {
+  target <- gettextf("non-integer #successes in a %s glm!", "binomial",
+                     domain = "R-stats")
   withCallingHandlers(
     expr,
     warning = function(w) {
-      if (grepl("non-integer #successes", conditionMessage(w), fixed = TRUE)) {
+      if (identical(conditionMessage(w), target)) {
         invokeRestart("muffleWarning")
       }
     }
