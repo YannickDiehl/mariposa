@@ -881,3 +881,28 @@ test_that("grouped print headers show factor levels and value labels, not codes"
   expect_equal(.format_group_label(data.frame(a = factor("x"), b = 2)),
                "a = x, b = 2")
 })
+
+test_that("statistics of an empty (all-missing) variable are NA, not NaN/-Inf", {
+  # 0.7.4 fix: mean(numeric(0)) is NaN and diff(range(numeric(0))) is -Inf
+  # (with two R warnings), so an all-missing variable or group showed
+  # Mean = NaN, Range = -Inf in describe() and the w_* functions.
+  data(survey_data)
+  d <- survey_data
+  d$empty <- NA_real_
+  for (w in list(NULL, "sampling_weight")) {
+    r <- expect_no_warning(
+      if (is.null(w)) describe(d, empty, show = "all")
+      else describe(d, empty, show = "all", weights = sampling_weight)
+    )
+    stats <- unlist(r$results[setdiff(names(r$results),
+                                      c("Variable", "empty_N", "empty_Missing",
+                                        "empty_Effective_N"))])
+    stats <- stats[vapply(stats, is.numeric, logical(1))]
+    expect_true(all(is.na(stats) & !is.nan(stats)))
+  }
+  expect_true(is.na(w_mean(d, empty)$results$mean) &&
+              !is.nan(w_mean(d, empty)$results$mean))
+  expect_true(is.na(w_mean(d, empty, weights = sampling_weight)$results$weighted_mean))
+  rr <- expect_no_warning(w_range(d, empty)$results$range)
+  expect_true(is.na(rr) && is.finite(rr) == FALSE && !is.infinite(rr))
+})

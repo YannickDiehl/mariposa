@@ -78,6 +78,9 @@
     if (!weighted) {
       # Unweighted
       if (na.rm) x <- x[!is.na(x)]
+      # Empty input: same short-circuit as the weighted branch (stat_fn on
+      # numeric(0) gave e.g. mean() = NaN)
+      if (length(x) == 0) return(empty_stat)
       return(stat_fn(x, w = NULL))
     } else {
       # Weighted
@@ -121,7 +124,7 @@
 
       if (is.null(w_vec)) {
         if (na.rm) x <- x[!is.na(x)]
-        stat_val <- stat_fn(x, w = NULL)
+        stat_val <- if (length(x) == 0) empty_stat else stat_fn(x, w = NULL)
         n_val <- if (length(x) == 0) empty_n else length(x)
         eff_n <- n_val
       } else {

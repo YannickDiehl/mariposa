@@ -231,7 +231,10 @@
 #' @noRd
 .w_mean <- function(x, weights = NULL, na.rm = TRUE) {
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
+
+  # No observed values: undefined, reported as NA (mean(numeric(0)) is NaN)
+  if (all(is.na(cleaned$x))) return(NA_real_)
+
   if (!cleaned$valid || is.null(cleaned$weights)) {
     return(mean(cleaned$x, na.rm = na.rm))
   }
@@ -311,13 +314,12 @@
 #' @noRd
 .w_range <- function(x, weights = NULL, na.rm = TRUE) {
   cleaned <- .validate_and_clean_weights(x, weights, na.rm)
-  
-  if (!cleaned$valid || is.null(cleaned$weights)) {
-    return(diff(range(cleaned$x, na.rm = na.rm)))
-  }
-  
-  # For weighted range, we still use the actual range of values
-  return(diff(range(cleaned$x, na.rm = na.rm)))
+
+  # No observed values: NA, not diff(range(numeric(0))) = -Inf + warnings
+  if (all(is.na(cleaned$x))) return(NA_real_)
+
+  # Weights do not change the range: it is the span of the observed values
+  diff(range(cleaned$x, na.rm = na.rm))
 }
 
 #' Weighted IQR using weighted quantiles

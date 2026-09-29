@@ -58,6 +58,12 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   instead of codes: the compact `print()` of ~20 classes showed
   `[region = 1]` instead of `[region = East]`, and labelled group
   variables showed their numeric codes everywhere.
+* Statistics of an empty (all-missing) variable or group are `NA`
+  instead of `NaN`/`-Inf`: `describe()` reported Mean = `NaN` and
+  Range = `-Inf` (plus two R warnings from `min()`/`max()`), and the
+  unweighted `w_mean()` returned `NaN`. The mean/range kernels and the
+  unweighted branch of the `w_*` factory now short-circuit empty input
+  the way the weighted branch already did.
 
 # mariposa 0.7.3
 
