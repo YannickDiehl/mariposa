@@ -91,7 +91,10 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from GitHub</span></span>
+<code class="sourceCode R"><span><span class="co"># Install from CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"mariposa"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or the development version from GitHub</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"YannickDiehl/mariposa"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -320,7 +323,7 @@
 <div class="section level3">
 <h3 id="flexible-output-compact--detailed">Flexible Output: Compact &amp; Detailed<a class="anchor" aria-label="anchor" href="#flexible-output-compact--detailed"></a>
 </h3>
-<p>Every analysis function provides two output levels. Typing the result name prints a compact one-line summary. Calling <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> produces the full SPSS-style output with all details. You can toggle individual sections on or off:</p>
+<p>Every analysis function provides two output levels. Typing the result name prints a compact one-line summary. Calling <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> produces the full SPSS-style output with all details. The descriptive table functions (<code><a href="reference/describe.html">describe()</a></code>, <code><a href="reference/frequency.html">frequency()</a></code>, <code><a href="reference/crosstab.html">crosstab()</a></code>, <code><a href="reference/multiple_response.html">multiple_response()</a></code>) print their full tables directly — there <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> just adds the section toggles. You can toggle individual sections on or off:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compact one-line summary (default)</span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -368,12 +371,24 @@ T-TEST GROUPS=gender(1 2)
 </ul>
 </div>
 <div class="section level2">
-<h2 id="support">Support<a class="anchor" aria-label="anchor" href="#support"></a>
+<h2 id="support-and-contributing">Support and Contributing<a class="anchor" aria-label="anchor" href="#support-and-contributing"></a>
 </h2>
 <ul>
 <li>
-<a href="https://github.com/YannickDiehl/mariposa/issues" class="external-link">GitHub Issues</a> - Bug reports and feature requests</li>
+<a href="https://github.com/YannickDiehl/mariposa/issues" class="external-link">GitHub Issues</a> - Bug reports, usage questions, and feature requests</li>
+<li>
+<a href="CONTRIBUTING.html">Contributing Guide</a> - How to contribute code or documentation</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use mariposa in your research, please cite it:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"mariposa"</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p>Diehl, Y. (2026). mariposa: SPSS-Compatible Statistical Tools for Survey Data. R package version 0.7.3. <a href="https://CRAN.R-project.org/package=mariposa" class="external-link uri">https://CRAN.R-project.org/package=mariposa</a></p>
+</blockquote>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -384,6 +399,7 @@ T-TEST GROUPS=gender(1 2)
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=mariposa" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/YannickDiehl/mariposa/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/YannickDiehl/mariposa/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -398,6 +414,12 @@ T-TEST GROUPS=gender(1 2)
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>

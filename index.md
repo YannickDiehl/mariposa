@@ -18,7 +18,10 @@ for per-function status.
 
 ``` r
 
-# Install from GitHub
+# Install from CRAN
+install.packages("mariposa")
+
+# Or the development version from GitHub
 devtools::install_github("YannickDiehl/mariposa")
 ```
 
@@ -154,8 +157,14 @@ kw_result %>% dunn_test()  # Pairwise Dunn comparisons
 Every analysis function provides two output levels. Typing the result
 name prints a compact one-line summary. Calling
 [`summary()`](https://rdrr.io/r/base/summary.html) produces the full
-SPSS-style output with all details. You can toggle individual sections
-on or off:
+SPSS-style output with all details. The descriptive table functions
+([`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),
+[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+[`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
+[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md))
+print their full tables directly — there
+[`summary()`](https://rdrr.io/r/base/summary.html) just adds the section
+toggles. You can toggle individual sections on or off:
 
 ``` r
 
@@ -229,10 +238,26 @@ survey_data %>%
   Guide](https://YannickDiehl.github.io/mariposa/articles/survey-weights.html) -
   Working with weighted data
 
-## Support
+## Support and Contributing
 
 - [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug
-  reports and feature requests
+  reports, usage questions, and feature requests
+- [Contributing
+  Guide](https://YannickDiehl.github.io/mariposa/CONTRIBUTING.md) - How
+  to contribute code or documentation
+
+## Citation
+
+If you use mariposa in your research, please cite it:
+
+``` r
+
+citation("mariposa")
+```
+
+> Diehl, Y. (2026). mariposa: SPSS-Compatible Statistical Tools for
+> Survey Data. R package version 0.7.3.
+> <https://CRAN.R-project.org/package=mariposa>
 
 ## License
 

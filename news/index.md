@@ -2,6 +2,8 @@
 
 ## mariposa 0.7.3
 
+CRAN release: 2026-09-28
+
 CRAN resubmission (theme: make the print/cat console contract lexically
 visible — the 2026-09 second-round remark on `R/kendall_tau.R`).
 

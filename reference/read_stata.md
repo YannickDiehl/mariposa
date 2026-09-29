@@ -117,6 +117,6 @@ if (requireNamespace("haven", quietly = TRUE)) {
 
   unlink(tmp)
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file1977783380b2.dta
+#> ✔ Wrote 16 variables (2500 obs.) to file1953cb2f8ad.dta
 # }
 ```
