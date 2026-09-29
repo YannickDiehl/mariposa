@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,15 @@
       <small>Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.4" id="mariposa-074-development">mariposa 0.7.4 (development)<a class="anchor" aria-label="anchor" href="#mariposa-074-development"></a></h2>
+<p>Accumulates all changes since 0.7.3 went live on CRAN (see <code>.claude/VERSIONING_POLICY.md</code> §5, CRAN cadence).</p>
+<div class="section level3">
+<h3 id="output-0-7-4">Output<a class="anchor" aria-label="anchor" href="#output-0-7-4"></a></h3>
+<ul><li>
+<code><a href="../reference/frequency.html">frequency()</a></code>, <code><a href="../reference/crosstab.html">crosstab()</a></code>, and <code><a href="../reference/multiple_response.html">multiple_response()</a></code> now print their full tables directly, matching <code><a href="../reference/describe.html">describe()</a></code>: the result of a descriptive table function <em>is</em> a table, so <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> no longer shows a compact placeholder with a “Use summary()” hint. <code>print(x)</code> is now identical to <code>print(summary(x))</code> with default toggles; <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> remains the place for section toggles (<code>frequency_table=</code>, <code>residuals=</code>, …) and <code>digits=</code>. The compact one-line <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> is unchanged for the hypothesis-test and model classes.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.3" id="mariposa-073">mariposa 0.7.3<a class="anchor" aria-label="anchor" href="#mariposa-073"></a></h2><p class="text-muted">CRAN release: 2026-09-28</p>
 <p>CRAN resubmission (theme: make the print/cat console contract lexically visible — the 2026-09 second-round remark on <code>R/kendall_tau.R</code>).</p>

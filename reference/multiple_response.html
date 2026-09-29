@@ -31,7 +31,7 @@ per group.
 
     <a class="navbar-brand me-2" href="../index.html">mariposa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -221,32 +221,74 @@ compatibility vignette).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Frequencies table: % of responses vs. % of cases</span></span></span>
 <span class="r-in"><span><span class="fu">multiple_response</span><span class="op">(</span><span class="va">trust</span>, <span class="va">gov</span>, <span class="va">media</span>, <span class="va">science</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple Response Set (3 options)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gov: n = 583 (23.3% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   media: n = 470 (18.8% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   science: n = 1479 (59.2% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Valid cases: 2500, total responses: 2532</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple Response Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Set: gov, media, science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Counted value: 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Frequencies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Option   Responses n  Responses %  % of Cases </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gov            583.0         23.0        23.3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   media          470.0         18.6        18.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   science       1479.0         58.4        59.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   % of Cases can sum above 100% (multiple mentions per case).</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Crossed against gender, with weights</span></span></span>
 <span class="r-in"><span><span class="fu">multiple_response</span><span class="op">(</span><span class="va">trust</span>, <span class="va">gov</span>, <span class="va">media</span>, <span class="va">science</span>,</span></span>
 <span class="r-in"><span>                  by <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple Response Set (3 options) BY gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gov: n = 586 (23.3% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   media: n = 477 (18.9% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   science: n = 1490 (59.2% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Valid cases: 2516, total responses: 2553</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Multiple Response Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Set: gov, media, science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Counted value: 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Weights Variable: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - By: gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Frequencies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Option   Responses n  Responses %  % of Cases </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gov            585.8         22.9        23.3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   media          476.5         18.7        18.9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   science       1490.3         58.4        59.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   % of Cases can sum above 100% (multiple mentions per case).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstab: set BY gender (% of cases per column)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Option          Male       Female </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gov      280 (23.4%)  306 (23.2%) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   media    214 (17.9%)  262 (19.8%) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   science  694 (58.1%)  797 (60.3%) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cases per column - Male: 1195, Female: 1321</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">multiple_response</span><span class="op">(</span><span class="va">trust</span>, <span class="va">gov</span>, <span class="va">media</span>, <span class="va">science</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact overview</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple Response Set (3 options)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gov: n = 583 (23.3% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   media: n = 470 (18.8% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   science: n = 1479 (59.2% of cases)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Valid cases: 2500, total responses: 2532</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple Response Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Set: gov, media, science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Counted value: 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Frequencies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Option   Responses n  Responses %  % of Cases </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gov            583.0         23.0        23.3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   media          470.0         18.6        18.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   science       1479.0         58.4        59.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   % of Cases can sum above 100% (multiple mentions per case).</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multiple Response Results</span>

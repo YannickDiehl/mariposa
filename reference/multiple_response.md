@@ -143,32 +143,74 @@ trust <- survey_data %>%
 
 # Frequencies table: % of responses vs. % of cases
 multiple_response(trust, gov, media, science)
-#> Multiple Response Set (3 options)
-#>   gov: n = 583 (23.3% of cases)
-#>   media: n = 470 (18.8% of cases)
-#>   science: n = 1479 (59.2% of cases)
-#>   Valid cases: 2500, total responses: 2532
-#> Use summary() for detailed output.
+#> 
+#> Multiple Response Results
+#> -------------------------
+#> - Set: gov, media, science
+#> - Counted value: 1
+#> 
+#> Frequencies
+#>   --------------------------------------------- 
+#>   Option   Responses n  Responses %  % of Cases 
+#>   --------------------------------------------- 
+#>   gov            583.0         23.0        23.3 
+#>   media          470.0         18.6        18.8 
+#>   science       1479.0         58.4        59.2 
+#>   --------------------------------------------- 
+#>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0
+#>   % of Cases can sum above 100% (multiple mentions per case).
 
 # Crossed against gender, with weights
 multiple_response(trust, gov, media, science,
                   by = gender, weights = sampling_weight)
-#> Multiple Response Set (3 options) BY gender [Weighted]
-#>   gov: n = 586 (23.3% of cases)
-#>   media: n = 477 (18.9% of cases)
-#>   science: n = 1490 (59.2% of cases)
-#>   Valid cases: 2516, total responses: 2553
-#> Use summary() for detailed output.
+#> 
+#> Weighted Multiple Response Results
+#> ----------------------------------
+#> - Set: gov, media, science
+#> - Counted value: 1
+#> - Weights Variable: sampling_weight
+#> - By: gender
+#> 
+#> Frequencies
+#>   --------------------------------------------- 
+#>   Option   Responses n  Responses %  % of Cases 
+#>   --------------------------------------------- 
+#>   gov            585.8         22.9        23.3 
+#>   media          476.5         18.7        18.9 
+#>   science       1490.3         58.4        59.2 
+#>   --------------------------------------------- 
+#>   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0
+#>   % of Cases can sum above 100% (multiple mentions per case).
+#> 
+#> Crosstab: set BY gender (% of cases per column)
+#>   --------------------------------- 
+#>   Option          Male       Female 
+#>   --------------------------------- 
+#>   gov      280 (23.4%)  306 (23.2%) 
+#>   media    214 (17.9%)  262 (19.8%) 
+#>   science  694 (58.1%)  797 (60.3%) 
+#>   --------------------------------- 
+#>   Cases per column - Male: 1195, Female: 1321
 
 # --- Three-layer output ---
 result <- multiple_response(trust, gov, media, science)
 result              # compact overview
-#> Multiple Response Set (3 options)
-#>   gov: n = 583 (23.3% of cases)
-#>   media: n = 470 (18.8% of cases)
-#>   science: n = 1479 (59.2% of cases)
-#>   Valid cases: 2500, total responses: 2532
-#> Use summary() for detailed output.
+#> 
+#> Multiple Response Results
+#> -------------------------
+#> - Set: gov, media, science
+#> - Counted value: 1
+#> 
+#> Frequencies
+#>   --------------------------------------------- 
+#>   Option   Responses n  Responses %  % of Cases 
+#>   --------------------------------------------- 
+#>   gov            583.0         23.0        23.3 
+#>   media          470.0         18.6        18.8 
+#>   science       1479.0         58.4        59.2 
+#>   --------------------------------------------- 
+#>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0
+#>   % of Cases can sum above 100% (multiple mentions per case).
 summary(result)     # full detailed output
 #> 
 #> Multiple Response Results

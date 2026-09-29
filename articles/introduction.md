@@ -98,9 +98,23 @@ survey_data %>%
 # Frequency table
 survey_data %>%
   frequency(education, weights = sampling_weight)
-#> Frequency: education [Weighted]
-#>   4 categories, N valid = 2516, missing = 0
-#> Use summary() for detailed output.
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
+#> education (Highest educational attainment)
+#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> 
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |
+#> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |
+#> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |
+#> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
+#> +------------------------+------------------------+--------+--------+--------+--------+
 ```
 
 ### 2. Transform Variables
@@ -232,6 +246,17 @@ Every analysis function in mariposa provides two output levels:
   compact one-line summary with the key statistic
 - **[`summary()`](https://rdrr.io/r/base/summary.html)**: Full
   SPSS-style output with all details
+
+The descriptive table functions —
+[`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),
+[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+[`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
+and
+[`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md)
+— are the exception: their result *is* a table, so
+[`print()`](https://rdrr.io/r/base/print.html) shows it in full and
+[`summary()`](https://rdrr.io/r/base/summary.html) adds the section
+toggles.
 
 You can toggle individual sections in the detailed output:
 

@@ -186,37 +186,134 @@ data(survey_data)
 
 # Basic categorical analysis
 survey_data %>% frequency(gender)
-#> Frequency: gender
-#>   2 categories, N valid = 2500, missing = 0
-#> Use summary() for detailed output.
+#> 
+#> Frequency Analysis Results
+#> --------------------------
+#> 
+#> gender (Gender)
+#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> 
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |
+#> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2500 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
+#> 
 
 # Multiple variables with weights
 survey_data %>% frequency(gender, region, weights = sampling_weight)
-#> Frequency: gender [Weighted]
-#>   2 categories, N valid = 2516, missing = 0
-#> Frequency: region [Weighted]
-#>   2 categories, N valid = 2516, missing = 0
-#> Use summary() for detailed output.
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
+#> gender (Gender)
+#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> 
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |   1195 |  47.48 |  47.48 |  47.48 |
+#> | Female | Female |   1321 |  52.52 |  52.52 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2516 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
+#> 
+#> 
+#> region (Region (East/West))
+#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> 
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   East |   East |    509 |  20.23 |  20.23 |  20.23 |
+#> |   West |   West |   2007 |  79.77 |  79.77 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2516 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
+#> 
 
 # Grouped analysis by region
 survey_data %>% 
   group_by(region) %>% 
   frequency(gender, weights = sampling_weight)
-#> Frequency: gender [Weighted]
-#>   [region = East] 2 categories, N valid = 509, missing = 0
-#>   [region = West] 2 categories, N valid = 2007, missing = 0
-#> Use summary() for detailed output.
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
+#> gender (Gender)
+#> 
+#> Group: region = East
+#> --------------------
+#> # total N=509 valid N=509 mean=NA sd=NA skewness=NA
+#> 
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |    249 |  49.01 |  49.01 |  49.01 |
+#> | Female | Female |    260 |  50.99 |  50.99 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |    509 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
+#> 
+#> 
+#> Group: region = West
+#> --------------------
+#> # total N=2007 valid N=2007 mean=NA sd=NA skewness=NA
+#> 
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |    945 |  47.09 |  47.09 |  47.09 |
+#> | Female | Female |   1062 |  52.91 |  52.91 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2007 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
+#> 
 
 # Education levels with sorting
 survey_data %>% frequency(education, sort_frq = "desc")
-#> Frequency: education
-#>   4 categories, N valid = 2500, missing = 0
-#> Use summary() for detailed output.
+#> 
+#> Frequency Analysis Results
+#> --------------------------
+#> 
+#> education (Highest educational attainment)
+#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> 
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |        Basic Secondary |        Basic Secondary |    841 |  33.64 |  33.64 |  33.64 |
+#> |     Academic Secondary |     Academic Secondary |    631 |  25.24 |  25.24 |  58.88 |
+#> | Intermediate Secondary | Intermediate Secondary |    629 |  25.16 |  25.16 |  84.04 |
+#> |             University |             University |    399 |  15.96 |  15.96 | 100.00 |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> |                  Total |                        |   2500 | 100.00 | 100.00 |        |
+#> +------------------------+------------------------+--------+--------+--------+--------+
+#> 
 
 # Employment status with custom display options
 survey_data %>% frequency(employment, weights = sampling_weight, 
                          show_na = TRUE, show_sum = TRUE)
-#> Frequency: employment [Weighted]
-#>   5 categories, N valid = 2516, missing = 0
-#> Use summary() for detailed output.
+#> 
+#> Weighted Frequency Analysis Results
+#> -----------------------------------
+#> 
+#> employment (Employment status)
+#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> 
+#> +------------+------------+--------+--------+--------+--------+
+#> |      Value |      Label |      N |  Raw % |Valid % | Cum. % |
+#> +------------+------------+--------+--------+--------+--------+
+#> |    Student |    Student |     80 |   3.18 |   3.18 |   3.18 |
+#> |   Employed |   Employed |   1603 |  63.71 |  63.71 |  66.89 |
+#> | Unemployed | Unemployed |    184 |   7.32 |   7.32 |  74.21 |
+#> |    Retired |    Retired |    534 |  21.21 |  21.21 |  95.41 |
+#> |      Other |      Other |    115 |   4.59 |   4.59 | 100.00 |
+#> +------------+------------+--------+--------+--------+--------+
+#> |      Total |            |   2516 | 100.00 | 100.00 |        |
+#> +------------+------------+--------+--------+--------+--------+
+#> 
 ```

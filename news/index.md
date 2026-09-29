@@ -1,5 +1,28 @@
 # Changelog
 
+## mariposa 0.7.4 (development)
+
+Accumulates all changes since 0.7.3 went live on CRAN (see
+`.claude/VERSIONING_POLICY.md` §5, CRAN cadence).
+
+### Output
+
+- [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md),
+  [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
+  and
+  [`multiple_response()`](https://YannickDiehl.github.io/mariposa/reference/multiple_response.md)
+  now print their full tables directly, matching
+  [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md):
+  the result of a descriptive table function *is* a table, so
+  [`print()`](https://rdrr.io/r/base/print.html) no longer shows a
+  compact placeholder with a “Use summary()” hint. `print(x)` is now
+  identical to `print(summary(x))` with default toggles;
+  [`summary()`](https://rdrr.io/r/base/summary.html) remains the place
+  for section toggles (`frequency_table=`, `residuals=`, …) and
+  `digits=`. The compact one-line
+  [`print()`](https://rdrr.io/r/base/print.html) is unchanged for the
+  hypothesis-test and model classes.
+
 ## mariposa 0.7.3
 
 CRAN release: 2026-09-28

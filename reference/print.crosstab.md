@@ -1,11 +1,18 @@
-# Print method for crosstab results (compact)
+# Print method for crosstab results
 
-Compact print method for objects of class `"crosstab"`. Shows the table
-variables, dimensions, and valid N, plus a reminder that no significance
-test is included.
+Prints the full cross-tabulation table (cell counts and percentages).
+The output of
+[`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+is a contingency table by nature, so
+[`print()`](https://rdrr.io/r/base/print.html) and
+[`summary()`](https://rdrr.io/r/base/summary.html) display the same
+table; [`summary()`](https://rdrr.io/r/base/summary.html) additionally
+offers section toggles (including cell `residuals`) and a `digits`
+option.
 
-For the full cross-tabulation table (cell counts and percentages), use
-[`summary()`](https://rdrr.io/r/base/summary.html).
+No significance test is included; use
+[`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
+for a test of independence.
 
 ## Usage
 
@@ -36,12 +43,28 @@ Invisibly returns the input object `x`.
 
 ``` r
 result <- crosstab(survey_data, gender, region)
-result              # compact overview
-#> Crosstab: gender x region
-#>   2 x 2 table, N = 2500
-#>   Note: no significance test included - use chi_square() for a test of independence.
-#> Use summary() for detailed output.
-summary(result)     # full cross-tabulation table
+result              # full cross-tabulation table
+#> 
+#> Crosstabulation: gender × region
+#> -------------------------------- 
+#> - Row variable: gender
+#> - Column variable: region
+#> - Percentages: Row percentages
+#> - N (valid): 2500
+#> 
+#> +------------+--------+--------+--------+
+#> |            |          region          |
+#> | gender     |   East |   West |  Total |
+#> +------------+--------+--------+--------+
+#> | Male       |    238 |    956 |   1194 |
+#> |   row %    |  19.9% |  80.1% | 100.0% |
+#> +------------+--------+--------+--------+
+#> | Female     |    247 |   1059 |   1306 |
+#> |   row %    |  18.9% |  81.1% | 100.0% |
+#> +============+========+========+========+
+#> | Total      |    485 |   2015 |   2500 |
+#> +------------+--------+--------+--------+
+summary(result)     # same table, with section toggles
 #> 
 #> Crosstabulation: gender × region
 #> -------------------------------- 

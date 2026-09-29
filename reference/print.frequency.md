@@ -1,17 +1,19 @@
-# Print method for frequency objects (compact)
+# Print method for frequency objects
 
-Compact print method for objects of class `"frequency"`. Shows one line
-per variable (and group combination) with the number of categories, the
-valid N, and the missing count.
-
-For the full frequency tables (counts, percentages, cumulative
-percentages), use [`summary()`](https://rdrr.io/r/base/summary.html).
+Prints the full frequency tables (counts, raw/valid/cumulative
+percentages, missing value breakdowns). The output of
+[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+is a frequency table by nature, so
+[`print()`](https://rdrr.io/r/base/print.html) and
+[`summary()`](https://rdrr.io/r/base/summary.html) display the same
+tables; [`summary()`](https://rdrr.io/r/base/summary.html) additionally
+offers section toggles and a `digits` option.
 
 ## Usage
 
 ``` r
 # S3 method for class 'frequency'
-print(x, digits = 3, ...)
+print(x, digits = 2, ...)
 ```
 
 ## Arguments
@@ -22,7 +24,7 @@ print(x, digits = 3, ...)
 
 - digits:
 
-  Number of decimal places to display (default: 3)
+  Number of decimal places to display (default: 2)
 
 - ...:
 
@@ -36,11 +38,24 @@ Invisibly returns the input object `x`.
 
 ``` r
 result <- frequency(survey_data, gender)
-result              # compact overview
-#> Frequency: gender
-#>   2 categories, N valid = 2500, missing = 0
-#> Use summary() for detailed output.
-summary(result)     # full frequency tables
+result              # full frequency tables
+#> 
+#> Frequency Analysis Results
+#> --------------------------
+#> 
+#> gender (Gender)
+#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> 
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
+#> +--------+--------+--------+--------+--------+--------+
+#> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |
+#> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |
+#> +--------+--------+--------+--------+--------+--------+
+#> |  Total |        |   2500 | 100.00 | 100.00 |        |
+#> +--------+--------+--------+--------+--------+--------+
+#> 
+summary(result)     # same tables, with section toggles
 #> 
 #> Frequency Analysis Results
 #> --------------------------
