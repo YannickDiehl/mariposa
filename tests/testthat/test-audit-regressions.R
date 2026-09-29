@@ -793,3 +793,35 @@ test_that("grouped t_test keeps an NA row with a warning when a group cannot be 
   expect_true(any(grepl("Not computed for this group", out_s, fixed = TRUE)))
   expect_false(any(grepl("[NA, NA]", out_s, fixed = TRUE)))
 })
+
+test_that("grouped mann_whitney / kruskal_wallis keep the NA row of an untestable group", {
+  # 0.7.4 fix: the error handler assigned results_list[[var]] inside its
+  # own function scope, so the NA row was discarded and the group vanished
+  # silently from the results (only a warning without the group name).
+  data(survey_data)
+  d <- dplyr::filter(survey_data, !(region == "East" & gender == "Male"))
+  expect_warning(
+    mw <- mann_whitney(dplyr::group_by(d, region), life_satisfaction,
+                       group = gender),
+    "East"
+  )
+  expect_equal(nrow(mw$results), 2L)
+  expect_true(is.na(mw$results$U[mw$results$region == "East"]))
+
+  d2 <- dplyr::filter(survey_data,
+                      region == "West" | education == "University")
+  expect_warning(
+    kw <- kruskal_wallis(dplyr::group_by(d2, region), life_satisfaction,
+                         group = education),
+    "East"
+  )
+  expect_equal(nrow(kw$results), 2L)
+  expect_true(is.na(kw$results$H[kw$results$region == "East"]))
+
+  for (res in list(mw, kw)) {
+    out <- c(capture.output(print(res)), capture.output(print(summary(res))))
+    expect_true(any(grepl("not computed for this group", out, ignore.case = TRUE)))
+    expect_false(any(grepl("H(NA)", out, fixed = TRUE)))
+    expect_false(any(grepl("U = NA", out, fixed = TRUE)))
+  }
+})

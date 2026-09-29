@@ -377,14 +377,14 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   }
 
   # Main computation function
-  compute_results <- function(data) {
+  compute_results <- function(data, key = NULL) {
     results_list <- list()
     
     for (var_name in var_names) {
-      tryCatch({
+      results_list[[var_name]] <- tryCatch({
         result <- perform_single_mann_whitney(data, var_name, g_name, w_name)
         
-        results_list[[var_name]] <- tibble(
+        tibble(
           Variable = var_name,
           U = result$U,
           W = result$W,
@@ -396,8 +396,12 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
         )
         
       }, error = function(e) {
-        cli_warn("Mann-Whitney test failed for variable {.var {var_name}}: {e$message}")
-        results_list[[var_name]] <- tibble(
+        # Keep an all-NA row (returned as the tryCatch value: assignments
+        # inside this handler would be local and the row lost)
+        where <- if (is.null(key)) "" else
+          paste0(" in group ", .format_group_label(key))
+        cli_warn("Mann-Whitney test failed for variable {.var {var_name}}{where}: {conditionMessage(e)}")
+        tibble(
           Variable = var_name,
           U = NA_real_,
           W = NA_real_,
@@ -416,7 +420,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   # Execute computation
   if (is_grouped) {
     results <- data %>%
-      group_modify(~ compute_results(.x))
+      group_modify(~ compute_results(.x, .y))
   } else {
     results <- compute_results(data)
   }
@@ -459,6 +463,12 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
                                      show_effect_sizes = TRUE) {
   cat(sprintf("\n--- %s ---\n", var_name))
   cat("\n")
+
+  # Group skipped at computation time (warned there): no NA tables
+  if (is.na(row_data$U) && is.null(stats)) {
+    cat("  Not computed for this group (see warning).\n\n")
+    return(invisible(NULL))
+  }
 
   # Print group rank means (gated by ranks toggle)
   if (show_ranks && !is.null(stats) && !is.null(stats$group1)) {
@@ -523,7 +533,9 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
   cat(sprintf("Mann-Whitney U Test: %s%s%s\n", var_name, group_tag, weighted_tag))
 
-  if (!is.na(r_val)) {
+  if (is.na(U_val)) {
+    cat("  not computed for this group (see warning)\n")
+  } else if (!is.na(r_val)) {
     r_interp <- if (abs(r_val) < 0.1) "negligible"
                 else if (abs(r_val) < 0.3) "small"
                 else if (abs(r_val) < 0.5) "medium"

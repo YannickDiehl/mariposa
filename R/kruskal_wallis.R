@@ -298,14 +298,14 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
   }
 
   # Main computation function (loops over variables)
-  compute_results <- function(data) {
+  compute_results <- function(data, key = NULL) {
     results_list <- list()
 
     for (var_name in var_names) {
-      tryCatch({
+      results_list[[var_name]] <- tryCatch({
         result <- perform_single_kw(data, var_name, g_name, w_name)
 
-        results_list[[var_name]] <- tibble(
+        tibble(
           Variable = var_name,
           H = result$H,
           df = result$df,
@@ -316,8 +316,12 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
         )
 
       }, error = function(e) {
-        cli_warn("Kruskal-Wallis test failed for variable {.var {var_name}}: {e$message}")
-        results_list[[var_name]] <- tibble(
+        # Keep an all-NA row (returned as the tryCatch value: assignments
+        # inside this handler would be local and the row lost)
+        where <- if (is.null(key)) "" else
+          paste0(" in group ", .format_group_label(key))
+        cli_warn("Kruskal-Wallis test failed for variable {.var {var_name}}{where}: {conditionMessage(e)}")
+        tibble(
           Variable = var_name,
           H = NA_real_,
           df = NA_integer_,
@@ -349,7 +353,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
   # Execute computation (with or without group_by)
   if (is_grouped) {
     results <- data %>%
-      group_modify(~ compute_results(.x))
+      group_modify(~ compute_results(.x, .y))
   } else {
     results <- compute_results(data)
   }
@@ -384,6 +388,12 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 .print_kw_variable_block <- function(var_name, row_data, stats, weights, digits,
                                      show_ranks = TRUE, show_results = TRUE) {
   print_header(var_name, newline_before = FALSE)
+
+  # Group skipped at computation time (warned there): no NA tables
+  if (is.na(row_data$H) && is.null(stats)) {
+    cat("  Not computed for this group (see warning).\n\n")
+    return(invisible(NULL))
+  }
 
   # Print group rank table (gated by ranks toggle)
   if (show_ranks && !is.null(stats)) {
@@ -450,6 +460,10 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 .print_kw_compact <- function(results, i, group_tag, weighted_tag, digits) {
   cat(sprintf("Kruskal-Wallis Test: %s%s%s\n",
               results$Variable[i], group_tag, weighted_tag))
+  if (is.na(results$H[i])) {
+    cat("  not computed for this group (see warning)\n")
+    return(invisible(NULL))
+  }
   cat(sprintf("  H(%s) = %s, %s %s, eps2 = %s, N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
               fmt_num(results$H[i], digits),

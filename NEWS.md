@@ -41,6 +41,12 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   swallowed the real reason. The group now gets an all-`NA` row, a warning
   naming the group and the reason, and `print()`/`summary()` say
   "not computed for this group" instead of showing `NA` tables.
+* `mann_whitney()` and `kruskal_wallis()`: a variable/group that cannot be
+  tested (e.g. a group lacking a level under `group_by()`) no longer
+  vanishes silently from `$results`. The error handler assigned its `NA`
+  row in its own scope, so the row was discarded. The row is now kept, the
+  warning names the group, and the print methods say "not computed for
+  this group".
 
 # mariposa 0.7.3
 
