@@ -591,7 +591,7 @@ print.reliability <- function(x, digits = 3, ...) {
   if (isTRUE(x$is_grouped)) {
     for (group_result in x$groups) {
       group_values <- group_result$group_values
-      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
       .print_reliability_compact(group_result, x$n_items, weighted_tag, digits)
     }

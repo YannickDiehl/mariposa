@@ -435,13 +435,11 @@
     groups <- unique(results[group_vars])
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      group_label <- paste(names(group_values), "=",
-                           vapply(group_values, as.character, character(1)),
-                           collapse = ", ")
+      group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
       rows <- results
       for (g in names(group_values)) {
-        rows <- rows[rows[[g]] == group_values[[g]], , drop = FALSE]
+        rows <- rows[.group_match(rows[[g]], group_values[[g]]), , drop = FALSE]
       }
       emit_block(rows)
     }

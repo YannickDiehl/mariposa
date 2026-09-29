@@ -246,7 +246,7 @@
           group_filter <- group_combinations[j, , drop = FALSE]
           group_results <- results
           for (grp in names(group_filter)) {
-            group_results <- group_results[group_results[[grp]] == group_filter[[grp]], ]
+            group_results <- group_results[.group_match(group_results[[grp]], group_filter[[grp]]), ]
           }
 
           if (nrow(group_results) > 0) {
@@ -357,8 +357,9 @@
 
   if (is_grouped_data) {
     for (group_val in unique(x$results[[x$groups[1]]])) {
-      group_results <- x$results[x$results[[x$groups[1]]] == group_val, ]
-      cat(sprintf("\nGroup: %s = %s\n", x$groups[1], group_val))
+      group_results <- x$results[.group_match(x$results[[x$groups[1]]], group_val), ]
+      cat(sprintf("\nGroup: %s\n",
+                  .format_group_label(group_results[1, x$groups[1], drop = FALSE])))
 
       for (var_name in unique(group_results$Variable)) {
         var_data <- group_results[group_results$Variable == var_name, ]

@@ -479,13 +479,13 @@ print.chi_square <- function(x, digits = 3, ...) {
     groups <- unique(x$results[x$groups])
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
 
       # Find row matching this group
       group_row <- x$results
       for (g in names(group_values)) {
-        group_row <- group_row[group_row[[g]] == group_values[[g]], ]
+        group_row <- group_row[.group_match(group_row[[g]], group_values[[g]]), ]
       }
       for (j in seq_len(nrow(group_row))) {
         .print_chi_square_compact(group_row, j, var_label, weighted_tag, digits)

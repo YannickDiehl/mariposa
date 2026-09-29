@@ -347,7 +347,7 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
       first_grp <- results_df[1, grp_cols, drop = FALSE]
       sub <- results_df[results_df$Variable == first_var, ]
       for (gc in grp_cols) {
-        sub <- sub[sub[[gc]] == first_grp[[gc]], ]
+        sub <- sub[.group_match(sub[[gc]], first_grp[[gc]]), ]
       }
       nrow(sub)
     } else {
@@ -554,7 +554,7 @@ print.summary.dunn_test <- function(x, ...) {
         # Filter results for current group
         group_results <- x$comparisons
         for (g in names(group_values)) {
-          group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+          group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
         }
 
         if (nrow(group_results) == 0) next

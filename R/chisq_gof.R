@@ -379,12 +379,12 @@ print.chisq_gof <- function(x, digits = 3, ...) {
 
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
 
       group_results <- x$results
       for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
       for (j in seq_len(nrow(group_results))) {
         .print_gof_compact(group_results, j, weighted_tag, digits)
@@ -486,7 +486,7 @@ print.summary.chisq_gof <- function(x, ...) {
 
       group_results <- x$results
       for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
 
       if (nrow(group_results) > 0 && show_results) {

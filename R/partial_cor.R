@@ -325,9 +325,9 @@ print.partial_cor <- function(x, digits = 3, ...) {
     groups <- unique(x$correlations[x$group_vars])
     for (gi in seq_len(nrow(groups))) {
       gv <- groups[gi, , drop = FALSE]
-      cat(sprintf("[%s]\n", paste(names(gv), "=", unlist(gv), collapse = ", ")))
+      cat(sprintf("[%s]\n", .format_group_label(gv)))
       corrs <- x$correlations
-      for (g in names(gv)) corrs <- corrs[corrs[[g]] == gv[[g]], ]
+      for (g in names(gv)) corrs <- corrs[.group_match(corrs[[g]], gv[[g]]), ]
       print_rows(corrs)
     }
   } else {
@@ -444,7 +444,7 @@ print.summary.partial_cor <- function(x, ...) {
       cat("\n")
       print_group_header(groups[gi, , drop = FALSE])
       corrs <- x$correlations
-      for (g in names(groups)) corrs <- corrs[corrs[[g]] == groups[gi, g][[1]], ]
+      for (g in names(groups)) corrs <- corrs[.group_match(corrs[[g]], groups[[g]][gi]), ]
       print_block(corrs, gi)
     }
   } else {

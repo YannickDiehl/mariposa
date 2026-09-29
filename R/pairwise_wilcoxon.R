@@ -505,7 +505,7 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
         # Filter results for current group
         group_results <- x$comparisons
         for (g in names(group_values)) {
-          group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+          group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
         }
 
         if (nrow(group_results) == 0) next

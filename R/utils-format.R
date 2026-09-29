@@ -139,14 +139,51 @@ print_stat_table <- function(df, digits = 3, indent = 2,
 
 #' Format a one-row group key as "var = value, var2 = value2"
 #'
+#' The single group-label policy for every grouped print path: factor
+#' levels and haven value labels are shown instead of codes (as SPSS split
+#' headers do), a missing key prints as "NA". Pasting a data frame
+#' directly - the historical pattern - printed factor codes ("region = 1").
+#'
 #' @param group_values One-row data frame of group values
 #' @return Character scalar
 #' @noRd
 .format_group_label <- function(group_values) {
   paste(vapply(names(group_values), function(g) {
-    val <- group_values[[g]]
-    paste(g, "=", if (is.factor(val)) as.character(val) else val)
+    val <- group_values[[g]][1]
+    shown <- if (is.na(val)) {
+      "NA"
+    } else if (is.factor(val)) {
+      as.character(val)
+    } else {
+      labs <- attr(val, "labels", exact = TRUE)
+      hit <- if (!is.null(labs)) {
+        match(.plain_numeric(val), .plain_numeric(labs))
+      } else NA_integer_
+      if (!is.na(hit)) names(labs)[hit] else as.character(val)
+    }
+    paste(g, "=", shown)
   }, character(1)), collapse = ", ")
+}
+
+#' NA-safe group-key match
+#'
+#' `x == value` is NA wherever x or value is NA, and indexing with NA rows
+#' yields all-NA ghost rows. Here an NA key matches NA entries (dplyr puts
+#' all missing keys - including every tagged NA - into one group) and
+#' never matches anything else. Labelled keys are compared as bare numbers
+#' (see .plain_numeric).
+#'
+#' @param x Group column of a results table
+#' @param value One group value
+#' @return Logical vector without NAs
+#' @noRd
+.group_match <- function(x, value) {
+  if (inherits(x, "haven_labelled")) {
+    x <- .plain_numeric(x)
+    value <- .plain_numeric(value)
+  }
+  eq <- x == value
+  (!is.na(eq) & eq) | (is.na(x) & is.na(value))
 }
 
 #' Iterate a grouped results table uniformly
@@ -174,20 +211,12 @@ for_each_group <- function(results, group_vars, fun, header = TRUE) {
     combo <- combos[i, , drop = FALSE]
     rows <- results
     for (g in group_vars) {
-      rows <- rows[rows[[g]] == combo[[g]], , drop = FALSE]
+      rows <- rows[.group_match(rows[[g]], combo[[g]]), , drop = FALSE]
     }
     if (nrow(rows) == 0) next
 
     if (header) {
-      label <- paste(
-        vapply(group_vars, function(g) {
-          val <- combo[[g]]
-          if (is.factor(val)) val <- as.character(val)
-          paste(g, "=", val)
-        }, character(1)),
-        collapse = ", "
-      )
-      print_group_label(label)
+      print_group_label(.format_group_label(combo[group_vars]))
     }
     fun(rows, combo)
   }

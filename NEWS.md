@@ -47,6 +47,17 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   row in its own scope, so the row was discarded. The row is now kept, the
   warning names the group, and the print methods say "not computed for
   this group".
+* Grouped output with a missing group key (`NA`, including tagged NAs from
+  SPSS files) is printed correctly. All grouped print methods selected a
+  group's rows with `==`, which is `NA` for a missing key: every group got
+  an extra all-`NA` ghost row, and the `NA` group showed only `NA` rows
+  instead of its statistics (`group_by() %>% describe()` was the reported
+  case; the pattern sat in ~30 print paths). Matching now goes through one
+  NA-safe helper.
+* Group headers in grouped output show factor levels and value labels
+  instead of codes: the compact `print()` of ~20 classes showed
+  `[region = 1]` instead of `[region = East]`, and labelled group
+  variables showed their numeric codes everywhere.
 
 # mariposa 0.7.3
 

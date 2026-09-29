@@ -216,15 +216,11 @@ print.w_quantile <- function(x, digits = 3, ...) {
       group_values <- groups[i, , drop = FALSE]
 
       # Format group info with factor levels if available
-      group_info <- vapply(names(group_values), function(g) {
-        val <- group_values[[g]]
-        if (is.factor(val)) paste(g, "=", levels(val)[val]) else paste(g, "=", val)
-      }, character(1))
-      group_info <- paste(group_info, collapse = ", ")
+      group_info <- .format_group_label(group_values)
 
       group_results <- x$results
       for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
       if (nrow(group_results) == 0) next
 

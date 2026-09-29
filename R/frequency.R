@@ -907,7 +907,7 @@ print.summary.frequency <- function(x, ...) {
         # Filter results for current group and variable
         group_results <- x$results
         for (g in names(group_values)) {
-          group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+          group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
         }
         group_results <- group_results[group_results$Variable == var, ]
 
@@ -916,7 +916,7 @@ print.summary.frequency <- function(x, ...) {
         # Get stats
         group_stats <- x$stats
         for (g in names(group_values)) {
-          group_stats <- group_stats[group_stats[[g]] == group_values[[g]], ]
+          group_stats <- group_stats[.group_match(group_stats[[g]], group_values[[g]]), ]
         }
         stats <- group_stats[group_stats$Variable == var, ]
 

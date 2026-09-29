@@ -277,12 +277,12 @@
     groups <- unique(corrs[x$groups])
     for (gi in seq_len(nrow(groups))) {
       group_values <- groups[gi, , drop = FALSE]
-      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
 
       group_corrs <- corrs
       for (g in names(group_values)) {
-        group_corrs <- group_corrs[group_corrs[[g]] == group_values[[g]], ]
+        group_corrs <- group_corrs[.group_match(group_corrs[[g]], group_values[[g]]), ]
       }
       .print_cor_compact(x, group_corrs, weighted_tag, digits, spec)
     }
@@ -356,7 +356,7 @@
 
       group_corrs <- x$correlations
       for (g in names(group_combinations)) {
-        group_corrs <- group_corrs[group_corrs[[g]] == group_combinations[gi, g], ]
+        group_corrs <- group_corrs[.group_match(group_corrs[[g]], group_combinations[[g]][gi]), ]
       }
 
       .print_cor_verbose(x, group_corrs, gi, show_cor, show_p, show_n, digits, spec)

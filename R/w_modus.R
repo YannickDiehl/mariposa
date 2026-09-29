@@ -154,9 +154,10 @@ print.w_modus <- function(x, digits = 3, ...) {
   if (is_grouped_data) {
     # Handle grouped results
     for (group_val in unique(x$results[[x$groups[1]]])) {
-      group_results <- x$results[x$results[[x$groups[1]]] == group_val, ]
+      group_results <- x$results[.group_match(x$results[[x$groups[1]]], group_val), ]
 
-      cat(sprintf("\nGroup: %s = %s\n", x$groups[1], group_val))
+      cat(sprintf("\nGroup: %s\n",
+                  .format_group_label(group_results[1, x$groups[1], drop = FALSE])))
 
       print_df <- group_results
       if (!is.null(x$weights)) {

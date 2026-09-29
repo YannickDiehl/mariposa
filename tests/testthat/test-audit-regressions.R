@@ -752,6 +752,7 @@ test_that("kendall_tau pair counts match a brute-force pair loop (weighted and u
 })
 
 test_that("kendall_tau on labelled data equals the unlabelled result and is fast", {
+  skip_if_not_installed("haven")
   # 0.7.4 fix: every x[i] in the pair loop dispatched through
   # `[.haven_labelled` (vctrs), ~200x slower per access: 400 labelled cases
   # took 6.5 s vs 0.1 s unlabelled, the full ALLBUS sample > 20 minutes.
@@ -824,4 +825,59 @@ test_that("grouped mann_whitney / kruskal_wallis keep the NA row of an untestabl
     expect_false(any(grepl("H(NA)", out, fixed = TRUE)))
     expect_false(any(grepl("U = NA", out, fixed = TRUE)))
   }
+})
+
+test_that("grouped print shows each group once, NA group with its own values", {
+  skip_if_not_installed("haven")
+  # 0.7.4 fix: grouped print methods selected a group's rows with
+  # `results[[g]] == value`. An NA group key makes that NA, and indexing
+  # with NA yields all-NA ghost rows: every group got an extra NA row, the
+  # NA group showed only NA rows and never its real statistics.
+  data(survey_data)
+  d <- survey_data[1:200, c("age", "region")]
+  reg <- ifelse(d$region == "East", 1, 2)
+  reg[1:6] <- haven::tagged_na("a")
+  reg[7:10] <- haven::tagged_na("b")
+  d$reg <- haven::labelled(reg, c(East = 1, West = 2,
+                                  "no answer" = haven::tagged_na("a")))
+  r <- describe(dplyr::group_by(d, reg), age)
+  out <- capture.output(print(r))
+
+  data_rows <- grep("^\\s+age\\s", out, value = TRUE)
+  expect_length(data_rows, 3L)                      # one row per group
+  expect_false(any(grepl("^\\s+age\\s+NA\\s+NA", data_rows)))
+  # the NA group's real statistics are shown (N = 10 valid, 0 missing)
+  expect_true(any(grepl("\\s10\\s+0\\s*$", data_rows)))
+
+  # same NA-safe matching in the shared for_each_group() iterator
+  res <- data.frame(g = c(1, NA, 2), v = 1:3)
+  seen <- list()
+  for_each_group(res, "g", function(rows, key) seen[[length(seen) + 1]] <<- rows$v,
+                 header = FALSE)
+  expect_equal(seen, list(1L, 2L, 3L))
+})
+
+test_that("grouped print headers show factor levels and value labels, not codes", {
+  # 0.7.4 fix: ~20 compact print methods pasted the one-row group data
+  # frame directly, which prints factor codes ("[region = 1]"); labelled
+  # group variables showed their numeric codes in every header.
+  skip_if_not_installed("haven")
+  data(survey_data)
+  out <- capture.output(print(
+    t_test(dplyr::group_by(survey_data, region), life_satisfaction,
+           group = gender)
+  ))
+  expect_true(any(grepl("[region = East]", out, fixed = TRUE)))
+  expect_false(any(grepl("[region = 1]", out, fixed = TRUE)))
+
+  d <- survey_data[1:200, c("age", "region")]
+  reg <- ifelse(d$region == "East", 1, 2)
+  reg[1:5] <- NA
+  d$reg <- haven::labelled(reg, c(East = 1, West = 2))
+  out2 <- capture.output(print(describe(dplyr::group_by(d, reg), age)))
+  expect_true(any(grepl("Group: reg = East", out2, fixed = TRUE)))
+  expect_true(any(grepl("Group: reg = NA", out2, fixed = TRUE)))
+
+  expect_equal(.format_group_label(data.frame(a = factor("x"), b = 2)),
+               "a = x, b = 2")
 })

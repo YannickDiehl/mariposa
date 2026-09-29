@@ -408,13 +408,13 @@ print.summary.multiple_response <- function(x, ...) {
       cat("\n")
       print_group_header(groups[gi, , drop = FALSE])
       rows <- x$results
-      for (g in names(groups)) rows <- rows[rows[[g]] == groups[gi, g][[1]], ]
+      for (g in names(groups)) rows <- rows[.group_match(rows[[g]], groups[[g]][gi]), ]
       if (show_freq) {
         emit_freq(rows, x$n_cases[gi], x$n_responses[gi], x$n_missing[gi])
       }
       if (show_ct) {
         ct_rows <- x$by_results
-        for (g in names(groups)) ct_rows <- ct_rows[ct_rows[[g]] == groups[gi, g][[1]], ]
+        for (g in names(groups)) ct_rows <- ct_rows[.group_match(ct_rows[[g]], groups[[g]][gi]), ]
         emit_ct(ct_rows)
       }
     }

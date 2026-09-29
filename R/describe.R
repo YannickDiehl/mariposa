@@ -407,7 +407,7 @@ print.summary.describe <- function(x, ...) {
     group_filter <- group_combinations[i, , drop = FALSE]
     filter_condition <- TRUE
     for (gvar in group_vars) {
-      filter_condition <- filter_condition & (results_df[[gvar]] == group_filter[[gvar]])
+      filter_condition <- filter_condition & .group_match(results_df[[gvar]], group_filter[[gvar]])
     }
     group_data <- results_df[filter_condition, , drop = FALSE]
 

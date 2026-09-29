@@ -295,9 +295,9 @@ print.marginal_effects <- function(x, digits = 3, ...) {
     groups <- unique(x$results[x$group_vars])
     for (gi in seq_len(nrow(groups))) {
       gv <- groups[gi, , drop = FALSE]
-      cat(sprintf("[%s]\n", paste(names(gv), "=", unlist(gv), collapse = ", ")))
+      cat(sprintf("[%s]\n", .format_group_label(gv)))
       rows <- x$results
-      for (g in names(gv)) rows <- rows[rows[[g]] == gv[[g]], ]
+      for (g in names(gv)) rows <- rows[.group_match(rows[[g]], gv[[g]]), ]
       print_rows(rows)
     }
   } else {

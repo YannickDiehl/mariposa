@@ -356,7 +356,7 @@ levene_test.t_test <- function(x, center = c("mean", "median"), ...) {
       # Filter data for this group combination
       group_data <- x$data
       for (g in names(group_filter)) {
-        group_data <- group_data[group_data[[g]] == group_filter[[g]], ]
+        group_data <- group_data[.group_match(group_data[[g]], group_filter[[g]]), ]
       }
       
       # Perform Levene test for this group
@@ -712,12 +712,12 @@ print.levene_test <- function(x, digits = 3, ...) {
 
     for (i in seq_len(nrow(groups))) {
       group_values <- groups[i, , drop = FALSE]
-      group_label <- paste(names(group_values), "=", group_values, collapse = ", ")
+      group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
 
       group_results <- results
       for (g in names(group_values)) {
-        group_results <- group_results[group_results[[g]] == group_values[[g]], ]
+        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
       group_results <- group_results[!is.na(group_results$Variable), ]
       for (j in seq_len(nrow(group_results))) {
@@ -868,11 +868,11 @@ print.summary.levene_test <- function(x, ...) {
         group_results <- x$results
         group_combination <- group_combinations[group_idx, , drop = FALSE]
         for (g in x$groups) {
-          group_results <- group_results[group_results[[g]] == group_combination[[g]], ]
+          group_results <- group_results[.group_match(group_results[[g]], group_combination[[g]]), ]
         }
       } else if (!is.null(group_column)) {
         group_value <- unique(x$results[[group_column]])[group_idx]
-        group_results <- x$results[x$results[[group_column]] == group_value, ]
+        group_results <- x$results[.group_match(x$results[[group_column]], group_value), ]
       } else {
         group_results <- x$results
       }
