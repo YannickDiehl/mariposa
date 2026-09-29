@@ -532,7 +532,7 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
   # Remove NA values
   valid_indices <- !is.na(x) & !is.na(g)
   if (!is.null(weight_name)) {
-    w <- data[[weight_name]]
+    w <- .plain_numeric(data[[weight_name]])  # SPSS weights: see .plain_numeric
     valid_indices <- valid_indices & !is.na(w)
     w <- w[valid_indices]
   }

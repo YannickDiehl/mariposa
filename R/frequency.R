@@ -148,6 +148,7 @@ frequency <- function(data, ..., weights = NULL, sort_frq = "none",
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
   
   # When show_unused is TRUE, force labels on (unused labels without label column make no sense)

@@ -113,6 +113,7 @@
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, weights, call = call)
+  data <- weights_info$data
   w_name <- weights_info$name
 
   n_vars <- length(var_names)

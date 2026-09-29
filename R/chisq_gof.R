@@ -142,6 +142,7 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
 
   # Process weights
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Validate all variables are categorical (before any computation)

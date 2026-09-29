@@ -145,26 +145,15 @@ crosstab.data.frame <- function(data, row, col,
   row_data <- data[[row_var]]
   col_data <- data[[col_var]]
 
-  # Handle weights
-  is_weighted <- !rlang::quo_is_null(weights_quo)
-  weights_var <- NULL
-  weights_vec <- NULL
-
-  if (is_weighted) {
-    weights_var <- rlang::as_name(weights_quo)
-    if (!weights_var %in% names(data)) {
-      cli_abort("Weights variable {.var {weights_var}} not found in data.")
-    }
-    weights_vec <- data[[weights_var]]
-
-    # Validate weights
-    if (!is.numeric(weights_vec)) {
-      cli_abort("Weights variable {.var {weights_var}} must be numeric.")
-    }
-    if (any(weights_vec < 0, na.rm = TRUE)) {
-      cli_warn("Negative weights detected. Results may be invalid.")
-    }
-  }
+  # Handle weights through the package-wide policy (.process_weights():
+  # bare numbers, negative weights are an error). crosstab() used to
+  # validate on its own - only warning on negative weights - and compared
+  # the raw column, which fails for SPSS weights containing NA.
+  weights_info <- .process_weights(data, weights_quo)
+  data <- weights_info$data
+  weights_var <- weights_info$name
+  weights_vec <- weights_info$vector
+  is_weighted <- !is.null(weights_var)
 
   # Handle missing values
   if (na.rm) {

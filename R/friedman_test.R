@@ -139,6 +139,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Helper function to perform Friedman test

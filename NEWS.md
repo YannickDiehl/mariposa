@@ -91,6 +91,19 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   on data with many missing values. Six places read tagged-NA letters with
   `vapply(x, haven::na_tag, ...)`, splitting labelled vectors into one
   vctrs object per element; they now share one vectorized reader.
+* Weights read from SPSS files work everywhere. A weight imported by
+  `read_spss()` is `haven_labelled_spss` with an `na_range` and format
+  attributes; once it contained `NA`, every comparison on it (`w < 0` in
+  the weights check, `w > 0` filters, ...) failed inside haven's cast
+  with "missing value where TRUE/FALSE needed", so every weighted function
+  aborted (reported for `crosstab()`, affected all of them). Weights are
+  now converted to plain numbers at the entry point.
+* `crosstab()` now validates weights through the package-wide policy:
+  negative weights are an error (previously only a warning, unlike every
+  other weighted function since 0.6.4).
+* `chi_square()` excludes cases with a missing weight. `NA` weights were
+  summed into the table and made `chisq.test()` abort ("all entries of
+  'x' must be nonnegative and finite").
 
 # mariposa 0.7.3
 

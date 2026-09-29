@@ -412,6 +412,7 @@ codebook <- function(data, ..., weights = NULL,
   # Process weights
   weights_quo <- rlang::enquo(weights)
   weights_info <- .process_weights(data, weights_quo)
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Select variables (all if ... is empty)

@@ -124,6 +124,7 @@ describe <- function(data, ..., weights = NULL,
 
   # Process weights parameter
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")

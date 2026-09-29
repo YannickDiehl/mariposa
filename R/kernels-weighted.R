@@ -205,6 +205,7 @@
   }
 
   # Package-wide policy: negative weights are an error, never a fallback
+  weights <- .plain_numeric(weights)
   .check_weights(weights)
 
   if (all(is.na(weights))) {

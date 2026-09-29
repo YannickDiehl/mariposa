@@ -148,6 +148,7 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
 
   # Process weights
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Helper to perform McNemar test on a single data slice

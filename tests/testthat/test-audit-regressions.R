@@ -977,3 +977,99 @@ test_that(".na_tags() equals element-wise haven::na_tag() for every input type",
   expect_identical(.na_tags(c(1L, NA, 3L)), rep(NA_character_, 3))
   expect_identical(.na_tags(numeric(0)), character(0))
 })
+
+test_that("labelled SPSS weights with NA work in every weighted entry point", {
+  # 0.7.4 fix: a weight read from SPSS is haven_labelled_spss with an
+  # na_range (ALLBUS: c(-Inf, -1)). Once it contains NA, every comparison
+  # on it (w < 0 in .check_weights(), w > 0 filters, ...) failed inside
+  # haven's lossy-cast check with "missing value where TRUE/FALSE needed",
+  # so every weighted function aborted. Weights are now stripped to bare
+  # numbers at the entry point; output must equal the plain-weight run.
+  skip_if_not_installed("haven")
+  set.seed(11)
+  n <- 150
+  dp <- dplyr::tibble(
+    y = rnorm(n, 50, 10), x2 = rnorm(n, 5, 2), x3 = rnorm(n, 10, 3),
+    ord1 = sample(1:4, n, TRUE), ord2 = sample(1:4, n, TRUE),
+    g2 = factor(sample(c("A", "B"), n, TRUE)),
+    g3 = factor(sample(c("A", "B", "C"), n, TRUE)),
+    bin = rbinom(n, 1, 0.4), bin2 = rbinom(n, 1, 0.5),
+    w = runif(n, 0.5, 1.5)
+  )
+  dp$i1 <- dp$y + rnorm(n, sd = 4)
+  dp$i2 <- dp$y + rnorm(n, sd = 4)
+  dp$i3 <- dp$y + rnorm(n, sd = 4)
+  dp$w[c(3, 17)] <- NA
+  dl <- dp
+  dl$w <- haven::labelled_spss(dp$w, na_range = c(-Inf, -1), label = "Weight")
+  # read_sav() always adds format attributes; any extra attribute sends
+  # haven's cast down the lossy-check path that fails on NA
+  attr(dl$w, "format.spss") <- "F8.2"
+
+  calls <- list(
+    describe = function(d) describe(d, y, weights = w),
+    frequency = function(d) frequency(d, g3, weights = w),
+    crosstab = function(d) crosstab(d, g2, g3, weights = w),
+    codebook = function(d) codebook(d, y, g3, weights = w, view = FALSE)$data,
+    w_mean = function(d) w_mean(d, y, weights = w),
+    w_median = function(d) w_median(d, y, weights = w),
+    w_sd = function(d) w_sd(d, y, weights = w),
+    w_quantile = function(d) w_quantile(d, y, weights = w),
+    w_modus = function(d) w_modus(d, ord1, weights = w),
+    t_test = function(d) t_test(d, y, group = g2, weights = w),
+    oneway_anova = function(d) oneway_anova(d, y, group = g3, weights = w),
+    tukey_test = function(d) tukey_test(oneway_anova(d, y, group = g3, weights = w)),
+    levene_test = function(d) levene_test(d, y, group = g3, weights = w),
+    factorial_anova = function(d) factorial_anova(d, dv = y, between = c(g2, g3), weights = w),
+    ancova = function(d) ancova(d, dv = y, between = c(g3), covariate = c(x2), weights = w),
+    chi_square = function(d) chi_square(d, g2, g3, weights = w),
+    fisher_test = function(d) fisher_test(d, g2, g3, weights = w),
+    chisq_gof = function(d) chisq_gof(d, g3, weights = w),
+    mcnemar_test = function(d) mcnemar_test(d, bin, bin2, weights = w),
+    binomial_test = function(d) binomial_test(d, bin, weights = w),
+    mann_whitney = function(d) mann_whitney(d, y, group = g2, weights = w),
+    kruskal_wallis = function(d) kruskal_wallis(d, y, group = g3, weights = w),
+    dunn_test = function(d) dunn_test(kruskal_wallis(d, y, group = g3, weights = w)),
+    wilcoxon_test = function(d) wilcoxon_test(d, y, x2, weights = w),
+    friedman_test = function(d) friedman_test(d, y, x2, x3, weights = w),
+    pearson_cor = function(d) pearson_cor(d, y, x2, weights = w),
+    spearman_rho = function(d) spearman_rho(d, ord1, ord2, weights = w),
+    kendall_tau = function(d) kendall_tau(d, ord1, ord2, weights = w),
+    partial_cor = function(d) partial_cor(d, y, x2, controls = x3, weights = w),
+    linear_regression = function(d) linear_regression(d, y ~ x2 + g2, weights = w),
+    logistic_regression = function(d) logistic_regression(d, bin ~ x2 + y, weights = w),
+    reliability = function(d) reliability(d, i1, i2, i3, weights = w),
+    efa = function(d) efa(d, i1, i2, i3, x2, x3, weights = w),
+    multiple_response = function(d) multiple_response(d, bin, bin2, weights = w),
+    std = function(d) std(d, y, weights = w)$y,
+    center = function(d) center(d, y, weights = w)$y
+  )
+  show <- function(r) capture.output(print(r))
+  for (nm in names(calls)) {
+    rl <- tryCatch(suppressWarnings(suppressMessages(calls[[nm]](dl))),
+                   error = function(e) e)
+    if (inherits(rl, "error")) {
+      fail(paste(nm, "errors:", conditionMessage(rl)))
+      next
+    }
+    rp <- suppressWarnings(suppressMessages(calls[[nm]](dp)))
+    expect_identical(show(rl), show(rp), label = paste(nm, "output"))
+  }
+})
+
+test_that("chi_square excludes cases with a missing weight", {
+  # 0.7.4 fix: xtabs(weights ~ ...) summed NA weights into the cells, so
+  # any missing weight made chisq.test() abort ("all entries of 'x' must be
+  # nonnegative and finite"). Cases with a missing weight are excluded, as
+  # in every other weighted function (and SPSS).
+  data(survey_data)
+  d <- survey_data
+  d$w <- d$sampling_weight
+  d$w[c(3, 17)] <- NA
+  r <- chi_square(d, gender, region, weights = w)
+  ref <- chi_square(d[!is.na(d$w), ], gender, region, weights = w)
+  expect_equal(r$results$chi_squared, ref$results$chi_squared)
+  expect_false(is.na(r$results$chi_squared))
+  g <- chi_square(dplyr::group_by(d, education), gender, region, weights = w)
+  expect_false(anyNA(g$results$chi_squared))
+})

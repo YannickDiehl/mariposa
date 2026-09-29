@@ -185,6 +185,7 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   # Process weights
   weights_quo <- rlang::enquo(weights)
   weights_info <- .process_weights(data, weights_quo)
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # ============================================================================

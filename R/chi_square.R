@@ -130,6 +130,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
   
   # Perform chi-squared test
@@ -151,7 +152,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
         if (!is.null(w_name)) {
           # Weighted test - round weights to integers for SPSS compatibility
           weights_data <- group_data[[w_name]]
-          tbl <- xtabs(weights_data ~ var1 + var2)
+          ok <- !is.na(weights_data)  # missing weight: case excluded
+          tbl <- xtabs(weights_data[ok] ~ var1[ok] + var2[ok])
           tbl <- round(tbl)  # Round to match SPSS behavior
         } else {
           # Unweighted test
@@ -200,7 +202,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     if (!is.null(w_name)) {
       # Weighted test - round weights to integers for SPSS compatibility
       weights_data <- data[[w_name]]
-      tbl <- xtabs(weights_data ~ var1 + var2)
+      ok <- !is.na(weights_data)  # missing weight: case excluded
+      tbl <- xtabs(weights_data[ok] ~ var1[ok] + var2[ok])
       tbl <- round(tbl)  # Round to match SPSS behavior
     } else {
       # Unweighted test

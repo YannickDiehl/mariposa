@@ -216,7 +216,10 @@ linear_regression <- function(data, formula = NULL,
     if (!weight_name %in% names(data)) {
       cli_abort("Weight variable {.var {weight_name}} not found in data.")
     }
-    weights_vec <- data[[weight_name]]
+    # Bare numbers in the vector AND the column (grouped fits re-read it):
+    # SPSS weights with NA fail every comparison (see .plain_numeric)
+    weights_vec <- .plain_numeric(data[[weight_name]])
+    data[[weight_name]] <- weights_vec
     .check_weights(weights_vec, weight_name)
   }
 

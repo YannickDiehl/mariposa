@@ -72,6 +72,7 @@
   if (!is.data.frame(data) && vector_ok(data)) {
     x <- data
     weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
+    if (!is.null(weights_vec)) weights_vec <- .plain_numeric(weights_vec)
 
     weighted <- .are_weights(weights_vec)
     if (weighted) .check_weights(weights_vec)
@@ -110,7 +111,10 @@
     if (!weights_name %in% names(data)) {
       cli_abort("Weights variable {.var {weights_name}} not found in data.")
     }
-    weights_vec <- data[[weights_name]]
+    # Bare numbers in the vector AND the column (the grouped path re-reads
+    # it): SPSS weights with NA fail every comparison (see .plain_numeric)
+    weights_vec <- .plain_numeric(data[[weights_name]])
+    data[[weights_name]] <- weights_vec
     .check_weights(weights_vec, weights_name)
   }
 

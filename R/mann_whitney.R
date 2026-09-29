@@ -183,6 +183,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Helper function to perform Mann-Whitney test for a single variable

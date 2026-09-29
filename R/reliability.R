@@ -176,6 +176,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
   # Process weights
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
 
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")

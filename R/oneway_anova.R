@@ -190,6 +190,7 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
   
   # Validate and prepare grouping variable

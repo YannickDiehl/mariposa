@@ -124,6 +124,7 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 
   # Resolve weights column
   weights_info <- .process_weights(data, weights_quo)
+  data <- weights_info$data
   w <- weights_info$vector
 
   # Validate weights + method combination
@@ -334,6 +335,7 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
 
   # Resolve weights column
   weights_info <- .process_weights(data, weights_quo)
+  data <- weights_info$data
   w <- weights_info$vector
 
   vars <- .process_variables(data, ...)

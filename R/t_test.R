@@ -210,6 +210,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Main execution logic

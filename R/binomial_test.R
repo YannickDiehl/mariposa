@@ -135,6 +135,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Helper function to perform binomial test for a single variable

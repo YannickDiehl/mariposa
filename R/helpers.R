@@ -90,7 +90,7 @@ NULL
     cli_abort(paste0(label, " must be numeric, not {.cls {class(weights)[1]}}."),
               call = call)
   }
-  n_neg <- sum(weights < 0, na.rm = TRUE)
+  n_neg <- sum(.plain_numeric(weights) < 0, na.rm = TRUE)
   if (n_neg > 0) {
     cli_abort(c(
       paste0(label, " must not contain negative values."),
@@ -139,7 +139,7 @@ NULL
 #' @noRd
 .process_weights <- function(data, weights_quo, call = rlang::caller_env()) {
   if (rlang::quo_is_null(weights_quo)) {
-    return(list(vector = NULL, name = NULL))
+    return(list(vector = NULL, name = NULL, data = data))
   }
 
   weights_name <- rlang::as_name(weights_quo)
@@ -154,9 +154,16 @@ NULL
     cli_abort("Weights variable {.var {weights_name}} must be numeric.", call = call)
   }
 
+  # Downstream code works on bare numbers: an SPSS weight
+  # (haven_labelled_spss with na_range) fails every comparison once it
+  # contains NA (see .plain_numeric). Callers take `data` back so later
+  # reads of the weights column see the stripped vector too.
+  weights_vec <- .plain_numeric(weights_vec)
+  data[[weights_name]] <- weights_vec
+
   .check_weights(weights_vec, weights_name, call = call)
 
-  list(vector = weights_vec, name = weights_name)
+  list(vector = weights_vec, name = weights_name, data = data)
 }
 
 #' Calculate effective sample size for weighted data

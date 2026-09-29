@@ -139,6 +139,7 @@ multiple_response <- function(data, ..., by = NULL, counted = 1,
   }
 
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Option labels from variable labels (exact match; codebook lesson)

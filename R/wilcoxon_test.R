@@ -134,6 +134,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   # Helper function to perform Wilcoxon signed-rank test for a single pair

@@ -237,7 +237,11 @@ test_that(".process_weights works with survey_data sampling_weight", {
   data(survey_data)
   sw_quo <- rlang::quo(sampling_weight)
   result <- mariposa:::.process_weights(survey_data, sw_quo)
-  expect_equal(result$vector, survey_data$sampling_weight)
+  # 0.7.4: weights come back as bare numbers (attributes such as the
+  # variable label dropped), in the vector and in the returned data
+  expect_equal(result$vector, survey_data$sampling_weight, ignore_attr = TRUE)
+  expect_null(attributes(result$vector))
+  expect_identical(result$data$sampling_weight, result$vector)
   expect_equal(result$name, "sampling_weight")
 })
 

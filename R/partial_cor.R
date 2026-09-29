@@ -150,6 +150,7 @@ partial_cor <- function(data, ..., controls, weights = NULL) {
   }
 
   weights_info <- .process_weights(data, rlang::enquo(weights))
+  data <- weights_info$data
   w_name <- weights_info$name
 
   is_grouped <- inherits(data, "grouped_df")
