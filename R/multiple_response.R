@@ -260,14 +260,18 @@ multiple_response <- function(data, ..., by = NULL, counted = 1,
 
 
 # ============================================================================
-# COMPACT PRINT METHOD
+# PRINT METHOD
 # ============================================================================
 
-#' Print multiple response results (compact)
+#' Print multiple response results
 #'
 #' @description
-#' Compact print method for objects of class \code{"multiple_response"}:
-#' one line per answer option with mentions and percent of cases.
+#' Prints the full SPSS-style MULT RESPONSE tables (frequencies and, when
+#' \code{by=} was used, the crosstab). The output of
+#' \code{multiple_response()} is a frequency table by nature, so
+#' \code{print()} and \code{summary()} display the same tables;
+#' \code{summary()} additionally offers section toggles and a
+#' \code{digits} option.
 #'
 #' @param x An object of class \code{"multiple_response"} returned by
 #'   \code{\link{multiple_response}}.
@@ -285,26 +289,7 @@ multiple_response <- function(data, ..., by = NULL, counted = 1,
 #' @export
 #' @method print multiple_response
 print.multiple_response <- function(x, digits = 1, ...) {
-  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-  by_tag <- if (!is.null(x$by)) sprintf(" BY %s", x$by) else ""
-  cat(sprintf("Multiple Response Set (%d options)%s%s\n",
-              length(x$variables), by_tag, weighted_tag))
-
-  if (x$is_grouped) {
-    n_groups <- nrow(unique(x$results[x$group_vars]))
-    cat(sprintf("  %d group combination(s) [Grouped: %s]\n",
-                n_groups, paste(x$group_vars, collapse = ", ")))
-  } else {
-    for (i in seq_len(nrow(x$results))) {
-      r <- x$results[i, ]
-      cat(sprintf("  %s: n = %.0f (%.*f%% of cases)\n",
-                  r$Option, r$n, digits, r$pct_cases))
-    }
-    cat(sprintf("  Valid cases: %.0f, total responses: %.0f\n",
-                x$n_cases, x$n_responses))
-  }
-
-  cat("Use summary() for detailed output.\n")
+  print(summary(x, digits = digits))
   invisible(x)
 }
 

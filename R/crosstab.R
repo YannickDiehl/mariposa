@@ -336,15 +336,17 @@ crosstab.grouped_df <- function(data, row, col,
   return(combined_result)
 }
 
-#' Print method for crosstab results (compact)
+#' Print method for crosstab results
 #'
 #' @description
-#' Compact print method for objects of class \code{"crosstab"}. Shows the
-#' table variables, dimensions, and valid N, plus a reminder that no
-#' significance test is included.
+#' Prints the full cross-tabulation table (cell counts and percentages).
+#' The output of \code{crosstab()} is a contingency table by nature, so
+#' \code{print()} and \code{summary()} display the same table;
+#' \code{summary()} additionally offers section toggles (including cell
+#' \code{residuals}) and a \code{digits} option.
 #'
-#' For the full cross-tabulation table (cell counts and percentages), use
-#' \code{summary()}.
+#' No significance test is included; use \code{\link{chi_square}} for a
+#' test of independence.
 #'
 #' @param x A crosstab result object
 #' @param digits Number of decimal places for percentages (default: 1)
@@ -353,42 +355,13 @@ crosstab.grouped_df <- function(data, row, col,
 #'
 #' @examples
 #' result <- crosstab(survey_data, gender, region)
-#' result              # compact overview
-#' summary(result)     # full cross-tabulation table
+#' result              # full cross-tabulation table
+#' summary(result)     # same table, with section toggles
 #'
 #' @export
 #' @method print crosstab
 print.crosstab <- function(x, digits = 1, ...) {
-  weighted_tag <- if (x$is_weighted) " [Weighted]" else ""
-  cat(sprintf("Crosstab: %s x %s%s\n", x$row_var, x$col_var, weighted_tag))
-
-  dim_line <- function(res, prefix = "") {
-    cat(sprintf("  %s%d x %d table, N = %s%s\n",
-                prefix,
-                length(res$row_levels), length(res$col_levels),
-                sprintf("%.0f", res$n_valid),
-                if (res$n_missing > 0) {
-                  sprintf(", missing = %.0f", res$n_missing)
-                } else {
-                  ""
-                }))
-  }
-
-  if (x$is_grouped) {
-    for (i in seq_along(x$results)) {
-      result <- x$results[[i]]
-      group_info <- result$group_info
-      group_label <- paste(names(group_info), "=",
-                           vapply(group_info, as.character, character(1)),
-                           collapse = ", ")
-      dim_line(result, prefix = sprintf("[%s] ", group_label))
-    }
-  } else {
-    dim_line(x)
-  }
-
-  cat("  Note: no significance test included - use chi_square() for a test of independence.\n")
-  cat("Use summary() for detailed output.\n")
+  print(summary(x, digits = digits))
   invisible(x)
 }
 

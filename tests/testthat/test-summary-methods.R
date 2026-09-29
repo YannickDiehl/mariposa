@@ -2497,17 +2497,17 @@ test_that("summary.frequency preserves original data", {
   expect_equal(s$options, result$options)
 })
 
-test_that("compact print.frequency works", {
+test_that("print.frequency shows the full tables (same as summary)", {
   result <- frequency(survey_data, gender)
-  output <- expect_compact_print(result, "Frequency: gender")
-  expect_true(any(grepl("categories", output, fixed = TRUE)))
-  expect_true(any(grepl("N valid = ", output, fixed = TRUE)))
+  expect_identical(capture.output(print(result)),
+                   capture.output(print(summary(result))))
 })
 
-test_that("compact print.frequency: weighted", {
+test_that("print.frequency: weighted shows the full tables", {
   result <- frequency(survey_data, gender, weights = sampling_weight)
-  output <- expect_compact_print(result, "Frequency")
-  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Weighted Frequency Analysis", output, fixed = TRUE)))
+  expect_true(any(grepl("Valid %", output, fixed = TRUE)))
 })
 
 test_that("summary.frequency: grouped produces output", {
@@ -2576,18 +2576,18 @@ test_that("summary.crosstab preserves original data", {
   expect_equal(s$n_valid, result$n_valid)
 })
 
-test_that("compact print.crosstab works", {
+test_that("print.crosstab shows the full table (same as summary)", {
   result <- crosstab(survey_data, gender, region)
-  output <- expect_compact_print(result, "Crosstab: gender x region")
-  expect_true(any(grepl("table, N = ", output, fixed = TRUE)))
-  expect_true(any(grepl("chi_square()", output, fixed = TRUE)))
+  expect_identical(capture.output(print(result)),
+                   capture.output(print(summary(result))))
 })
 
-test_that("compact print.crosstab: weighted", {
+test_that("print.crosstab: weighted shows the full table", {
   result <- crosstab(survey_data, gender, region,
                      weights = sampling_weight)
-  output <- expect_compact_print(result, "Crosstab")
-  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+  output <- capture.output(print(result))
+  expect_true(any(grepl("Crosstabulation", output, fixed = TRUE)))
+  expect_true(any(grepl("(weighted)", output, fixed = TRUE)))
 })
 
 test_that("summary.crosstab: grouped produces output", {

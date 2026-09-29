@@ -134,6 +134,11 @@ Every analysis function in mariposa provides two output levels:
 - **`print()`** (default): A compact one-line summary with the key statistic
 - **`summary()`**: Full SPSS-style output with all details
 
+The descriptive table functions — `describe()`, `frequency()`,
+`crosstab()`, and `multiple_response()` — are the exception: their result
+*is* a table, so `print()` shows it in full and `summary()` adds the
+section toggles.
+
 You can toggle individual sections in the detailed output:
 
 ```{r}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/multiple_response.R
 \name{print.multiple_response}
 \alias{print.multiple_response}
-\title{Print multiple response results (compact)}
+\title{Print multiple response results}
 \usage{
 \method{print}{multiple_response}(x, digits = 1, ...)
 }
@@ -18,8 +18,12 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Compact print method for objects of class \code{"multiple_response"}:
-one line per answer option with mentions and percent of cases.
+Prints the full SPSS-style MULT RESPONSE tables (frequencies and, when
+\code{by=} was used, the crosstab). The output of
+\code{multiple_response()} is a frequency table by nature, so
+\code{print()} and \code{summary()} display the same tables;
+\code{summary()} additionally offers section toggles and a
+\code{digits} option.
 }
 \examples{
 d <- survey_data

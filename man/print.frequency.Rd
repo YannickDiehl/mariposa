@@ -2,14 +2,14 @@
 % Please edit documentation in R/frequency.R
 \name{print.frequency}
 \alias{print.frequency}
-\title{Print method for frequency objects (compact)}
+\title{Print method for frequency objects}
 \usage{
-\method{print}{frequency}(x, digits = 3, ...)
+\method{print}{frequency}(x, digits = 2, ...)
 }
 \arguments{
 \item{x}{An object of class "frequency"}
 
-\item{digits}{Number of decimal places to display (default: 3)}
+\item{digits}{Number of decimal places to display (default: 2)}
 
 \item{...}{Additional arguments passed to print}
 }
@@ -17,16 +17,15 @@
 Invisibly returns the input object \code{x}.
 }
 \description{
-Compact print method for objects of class \code{"frequency"}. Shows
-one line per variable (and group combination) with the number of
-categories, the valid N, and the missing count.
-
-For the full frequency tables (counts, percentages, cumulative
-percentages), use \code{summary()}.
+Prints the full frequency tables (counts, raw/valid/cumulative
+percentages, missing value breakdowns). The output of
+\code{frequency()} is a frequency table by nature, so \code{print()}
+and \code{summary()} display the same tables; \code{summary()}
+additionally offers section toggles and a \code{digits} option.
 }
 \examples{
 result <- frequency(survey_data, gender)
-result              # compact overview
-summary(result)     # full frequency tables
+result              # full frequency tables
+summary(result)     # same tables, with section toggles
 
 }

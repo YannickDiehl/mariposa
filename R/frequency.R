@@ -724,74 +724,30 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort_frq, sho
   )
 }
 
-#' Print method for frequency objects (compact)
+#' Print method for frequency objects
 #'
 #' @description
-#' Compact print method for objects of class \code{"frequency"}. Shows
-#' one line per variable (and group combination) with the number of
-#' categories, the valid N, and the missing count.
-#'
-#' For the full frequency tables (counts, percentages, cumulative
-#' percentages), use \code{summary()}.
+#' Prints the full frequency tables (counts, raw/valid/cumulative
+#' percentages, missing value breakdowns). The output of
+#' \code{frequency()} is a frequency table by nature, so \code{print()}
+#' and \code{summary()} display the same tables; \code{summary()}
+#' additionally offers section toggles and a \code{digits} option.
 #'
 #' @param x An object of class "frequency"
-#' @param digits Number of decimal places to display (default: 3)
+#' @param digits Number of decimal places to display (default: 2)
 #' @param ... Additional arguments passed to print
 #'
 #' @return Invisibly returns the input object \code{x}.
 #'
 #' @examples
 #' result <- frequency(survey_data, gender)
-#' result              # compact overview
-#' summary(result)     # full frequency tables
+#' result              # full frequency tables
+#' summary(result)     # same tables, with section toggles
 #'
 #' @export
 #' @method print frequency
-print.frequency <- function(x, digits = 3, ...) {
-  weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-
-  # One-line summary: categories, valid N, missing count
-  compact_line <- function(rows, stats, prefix = "") {
-    n_categories <- sum(!is.na(rows$value))
-    n_valid <- stats$valid_n
-    n_missing <- stats$total_n - stats$valid_n
-    cat(sprintf("  %s%d categor%s, N valid = %s, missing = %s\n",
-                prefix, n_categories, if (n_categories == 1) "y" else "ies",
-                sprintf("%.0f", n_valid), sprintf("%.0f", n_missing)))
-  }
-
-  for (var in x$variables) {
-    cat(sprintf("Frequency: %s%s\n", var, weighted_tag))
-
-    if (x$is_grouped) {
-      unique_groups <- unique(x$results[x$groups])
-
-      for (i in seq_len(nrow(unique_groups))) {
-        group_values <- unique_groups[i, , drop = FALSE]
-        group_label <- paste(names(group_values), "=",
-                             vapply(group_values, as.character, character(1)),
-                             collapse = ", ")
-
-        rows <- x$results
-        stats <- x$stats
-        for (g in names(group_values)) {
-          rows <- rows[rows[[g]] == group_values[[g]], ]
-          stats <- stats[stats[[g]] == group_values[[g]], ]
-        }
-        rows <- rows[rows$Variable == var, ]
-        stats <- stats[stats$Variable == var, ]
-        if (nrow(stats) == 0) next
-
-        compact_line(rows, stats, prefix = sprintf("[%s] ", group_label))
-      }
-    } else {
-      rows <- x$results[x$results$Variable == var, ]
-      stats <- x$stats[x$stats$Variable == var, ]
-      compact_line(rows, stats)
-    }
-  }
-
-  cat("Use summary() for detailed output.\n")
+print.frequency <- function(x, digits = 2, ...) {
+  print(summary(x, digits = digits))
   invisible(x)
 }
 

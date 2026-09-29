@@ -54,19 +54,24 @@ test_that("print.describe: show = 'all'", {
 # ===========================================================================
 # 2. frequency()
 # ===========================================================================
-test_that("print.frequency: ungrouped, unweighted (compact)", {
+test_that("print.frequency: ungrouped, unweighted (full table)", {
   result <- frequency(survey_data, gender)
-  output <- expect_prints(result, "Frequency")
-  expect_true(any(grepl("categories", output, fixed = TRUE)))
-  expect_true(any(grepl("N valid = ", output, fixed = TRUE)))
-  expect_true(any(grepl("missing = ", output, fixed = TRUE)))
-  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
+  output <- expect_prints(result, "Frequency Analysis Results")
+  expect_true(any(grepl("Valid %", output, fixed = TRUE)))
+  expect_true(any(grepl("Total", output, fixed = TRUE)))
+  expect_false(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
+})
+
+test_that("print.frequency matches print(summary()) defaults", {
+  result <- frequency(survey_data, gender)
+  expect_identical(capture.output(print(result)),
+                   capture.output(print(summary(result))))
 })
 
 test_that("print.frequency: ungrouped, weighted", {
   result <- frequency(survey_data, gender, weights = sampling_weight)
-  output <- expect_prints(result, "Frequency")
-  expect_true(any(grepl("[Weighted]", output, fixed = TRUE)))
+  output <- expect_prints(result, "Weighted Frequency Analysis Results")
+  expect_true(any(grepl("Valid %", output, fixed = TRUE)))
 })
 
 test_that("print.frequency: grouped", {
@@ -90,12 +95,18 @@ test_that("print.frequency: toggled columns", {
 # ===========================================================================
 # 3. crosstab()
 # ===========================================================================
-test_that("print.crosstab: ungrouped, row pct (default, compact)", {
+test_that("print.crosstab: ungrouped, row pct (default, full table)", {
   result <- crosstab(survey_data, gender, region)
-  output <- expect_prints(result, "Crosstab")
-  expect_true(any(grepl("table, N = ", output, fixed = TRUE)))
-  expect_true(any(grepl("chi_square()", output, fixed = TRUE)))
-  expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
+  output <- expect_prints(result, "Crosstabulation")
+  expect_true(any(grepl("Row variable: gender", output, fixed = TRUE)))
+  expect_true(any(grepl("row %", output, fixed = TRUE)))
+  expect_false(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
+})
+
+test_that("print.crosstab matches print(summary()) defaults", {
+  result <- crosstab(survey_data, gender, region)
+  expect_identical(capture.output(print(result)),
+                   capture.output(print(summary(result))))
 })
 
 test_that("print.crosstab: ungrouped, weighted", {
@@ -974,22 +985,33 @@ test_that("print.partial_cor: grouped and weighted (compact)", {
 # multiple_response() (0.7.0)
 # ===========================================================================
 
-test_that("print.multiple_response: ungrouped (compact)", {
+test_that("print.multiple_response: ungrouped (full tables)", {
   d <- survey_data
   d$gov <- as.integer(d$trust_government >= 4)
   d$media <- as.integer(d$trust_media >= 4)
   result <- multiple_response(d, gov, media)
   output <- capture.output(print(result))
-  expect_true(any(grepl("Multiple Response Set", output, fixed = TRUE)))
-  expect_true(any(grepl("of cases", output, fixed = TRUE)))
+  expect_true(any(grepl("Multiple Response Results", output, fixed = TRUE)))
+  expect_true(any(grepl("% of Cases", output, fixed = TRUE)))
   expect_true(any(grepl("Valid cases", output, fixed = TRUE)))
+  expect_false(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
 
-test_that("print.multiple_response: grouped (compact)", {
+test_that("print.multiple_response matches print(summary()) defaults", {
+  d <- survey_data
+  d$gov <- as.integer(d$trust_government >= 4)
+  d$media <- as.integer(d$trust_media >= 4)
+  result <- multiple_response(d, gov, media)
+  expect_identical(capture.output(print(result)),
+                   capture.output(print(summary(result))))
+})
+
+test_that("print.multiple_response: grouped (full tables)", {
   d <- survey_data
   d$gov <- as.integer(d$trust_government >= 4)
   d$media <- as.integer(d$trust_media >= 4)
   result <- d |> dplyr::group_by(gender) |> multiple_response(gov, media)
   output <- capture.output(print(result))
-  expect_true(any(grepl("Grouped: gender", output, fixed = TRUE)))
+  expect_true(any(grepl("Grouped by: gender", output, fixed = TRUE)))
+  expect_true(any(grepl("Group: gender = ", output, fixed = TRUE)))
 })

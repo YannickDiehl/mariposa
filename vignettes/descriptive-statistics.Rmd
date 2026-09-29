@@ -193,8 +193,7 @@ trust_set <- survey_data %>%
   )
 
 trust_set %>%
-  multiple_response(gov, media, science, weights = sampling_weight) %>%
-  summary()
+  multiple_response(gov, media, science, weights = sampling_weight)
 ```
 
 Cross the set against a demographic with `by` — mentions and case-based
@@ -203,8 +202,7 @@ column percentages per group:
 ```{r}
 trust_set %>%
   multiple_response(gov, media, science, by = gender,
-                    weights = sampling_weight) %>%
-  summary()
+                    weights = sampling_weight)
 ```
 
 ## Data Dictionary with codebook()
