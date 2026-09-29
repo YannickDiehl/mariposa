@@ -57,7 +57,9 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
 * Group headers in grouped output show factor levels and value labels
   instead of codes: the compact `print()` of ~20 classes showed
   `[region = 1]` instead of `[region = East]`, and labelled group
-  variables showed their numeric codes everywhere.
+  variables showed their numeric codes everywhere (including the
+  `summary()` of `reliability()`/`efa()` and the grouped regression
+  output).
 * Statistics of an empty (all-missing) variable or group are `NA`
   instead of `NaN`/`-Inf`: `describe()` reported Mean = `NaN` and
   Range = `-Inf` (plus two R warnings from `min()`/`max()`), and the

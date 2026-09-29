@@ -661,8 +661,7 @@ print.logistic_regression <- function(x, ...) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
     cat(sprintf("Logistic Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
     for (grp in x$groups) {
-      grp_label <- paste(names(grp$group_values), "=",
-                         unlist(grp$group_values), collapse = ", ")
+      grp_label <- .format_group_label(grp$group_values)
       chi_sq <- grp$omnibus_test$chi_sq
       chi_df <- grp$omnibus_test$df
       chi_p <- grp$omnibus_test$p

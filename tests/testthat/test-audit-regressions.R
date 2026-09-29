@@ -1073,3 +1073,41 @@ test_that("chi_square excludes cases with a missing weight", {
   g <- chi_square(dplyr::group_by(d, education), gender, region, weights = w)
   expect_false(anyNA(g$results$chi_squared))
 })
+
+test_that("codebook(weights = ) still describes the weights variable with its label", {
+  # 0.7.4 follow-up: stripping weights to bare numbers (SPSS-weight fix)
+  # must not change how codebook() describes the weights column itself.
+  data(survey_data)
+  cb <- codebook(survey_data[, c("gender", "sampling_weight")],
+                 weights = sampling_weight, view = FALSE)
+  out <- capture.output(print(cb))
+  expect_true(any(grepl("2 labelled", out, fixed = TRUE)))
+})
+
+test_that("every grouped print path labels groups by level, not code", {
+  # 0.7.4 follow-up: summary() of reliability()/efa() stored the group key
+  # as a list (print_group_header() only recognised data frames), and the
+  # regression prints pasted the key themselves - both still showed codes.
+  skip_if_not_installed("haven")
+  data(survey_data)
+  g <- dplyr::group_by(survey_data, region)
+  rel <- capture.output(print(summary(
+    reliability(g, trust_government, trust_media, trust_science))))
+  expect_true(any(grepl("region = East", rel, fixed = TRUE)))
+  fa <- capture.output(print(summary(
+    efa(g, trust_government, trust_media, trust_science, life_satisfaction))))
+  expect_true(any(grepl("region = East", fa, fixed = TRUE)))
+
+  d <- survey_data
+  d$reg <- haven::labelled(ifelse(d$region == "East", 1, 2), c(East = 1, West = 2))
+  gl <- dplyr::group_by(d, reg)
+  lr <- linear_regression(gl, life_satisfaction ~ age)
+  lr_out <- c(capture.output(print(lr)), capture.output(print(summary(lr))))
+  expect_true(any(grepl("reg = East", lr_out, fixed = TRUE)))
+  expect_false(any(grepl("reg = 1", lr_out, fixed = TRUE)))
+  d$hi <- as.integer(d$life_satisfaction >= 4)
+  lg <- logistic_regression(dplyr::group_by(d, reg), hi ~ age)
+  lg_out <- c(capture.output(print(lg)), capture.output(print(summary(lg))))
+  expect_true(any(grepl("reg = East", lg_out, fixed = TRUE)))
+  expect_false(any(grepl("reg = 1", lg_out, fixed = TRUE)))
+})

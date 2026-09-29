@@ -83,7 +83,9 @@ print_group_label <- function(label) {
 #' @param prefix Text to print before group info
 #' @noRd
 print_group_header <- function(group_values, prefix = "Group") {
-  if (is.data.frame(group_values)) {
+  # One-row data frame or the equivalent named list of length-1 values
+  # (some classes store the key via as.list())
+  if (is.list(group_values)) {
     group_str <- .format_group_label(group_values)
   } else {
     group_str <- paste(names(group_values), "=", group_values, collapse = ", ")

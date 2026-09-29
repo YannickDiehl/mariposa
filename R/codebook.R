@@ -412,7 +412,9 @@ codebook <- function(data, ..., weights = NULL,
   # Process weights
   weights_quo <- rlang::enquo(weights)
   weights_info <- .process_weights(data, weights_quo)
-  data <- weights_info$data
+  # Only the (stripped) weights vector is used below. `data` keeps the
+  # original column: the weights variable is itself described in the
+  # codebook, with its label and class.
   w_name <- weights_info$name
 
   # Select variables (all if ... is empty)

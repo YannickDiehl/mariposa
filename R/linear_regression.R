@@ -1020,8 +1020,7 @@ print.linear_regression <- function(x, ...) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
     cat(sprintf("Linear Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
     for (grp in x$groups) {
-      grp_label <- paste(names(grp$group_values), "=",
-                         unlist(grp$group_values), collapse = ", ")
+      grp_label <- .format_group_label(grp$group_values)
       f_stat <- grp$anova_table$F_statistic[1]
       f_df1 <- as.integer(round(grp$anova_table$df[1]))
       f_df2 <- as.integer(round(grp$anova_table$df[2]))
