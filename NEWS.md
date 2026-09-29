@@ -72,6 +72,10 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
   sequential 1..k numbering. The attribute survives dplyr verbs; after
   base subsetting (`x[i]`) or renaming levels, the level-based conversion
   applies as before.
+* The pipe `%>%` is re-exported, so the documented
+  `survey_data %>% describe(age)` works after `library(mariposa)` alone
+  (it was only imported, giving 'could not find function "%>%"'). No
+  masking message when dplyr is attached as well (identical object).
 
 # mariposa 0.7.3
 

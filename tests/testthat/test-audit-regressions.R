@@ -939,3 +939,11 @@ test_that("to_label() keeps the original codes for to_numeric() and to_labelled(
   # plain factors keep the documented behaviour
   expect_equal(as.vector(to_numeric(factor(c("Male", "Female")))), c(2, 1))
 })
+
+test_that("the magrittr pipe is re-exported", {
+  # 0.7.4 fix: %>% was only imported, so after library(mariposa) alone the
+  # documented `survey_data %>% describe(age)` failed with
+  # 'could not find function "%>%"'.
+  expect_true("%>%" %in% getNamespaceExports("mariposa"))
+  expect_identical(mariposa::`%>%`, dplyr::`%>%`)
+})
