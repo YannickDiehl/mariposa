@@ -721,3 +721,34 @@ test_that("IO-11: write_xlsx() writes one block per group, rounded N", {
   n_line <- grep("^N=", txt_w, value = TRUE)
   expect_match(n_line, "^N=2516 ")
 })
+
+# IO-17: find_var() was regex-only: "BEFRAGTE(R)" matched "BEFRAGTER"
+# labels instead of the literal text, "(" leaked a TRE regex warning, and
+# an empty result printed as "<0 Zeilen>".
+io_find_df <- function() {
+  d <- data.frame(a = 1, b = 2, c = 3)
+  attr(d$a, "label") <- "ALTER: BEFRAGTE(R)"
+  attr(d$b, "label") <- "GESCHLECHT BEFRAGTER"
+  attr(d$c, "label") <- "Einkommen (netto)"
+  d
+}
+
+test_that("IO-17: find_var(fixed = TRUE) searches literal text", {
+  d <- io_find_df()
+  expect_equal(find_var(d, "BEFRAGTE(R)", fixed = TRUE)$name, "a")
+  # regex stays the default; a differing literal result is pointed out
+  expect_message(r <- find_var(d, "BEFRAGTE(R)"), "fixed = TRUE")
+  expect_equal(r$name, "b")
+  # a genuine regex without literal hits stays quiet
+  expect_no_message(r2 <- find_var(d, "^GESCH"))
+  expect_equal(r2$name, "b")
+})
+
+test_that("IO-17: invalid regex falls back to literal text, empty result is quiet", {
+  d <- io_find_df()
+  expect_no_warning(expect_message(r <- find_var(d, "("), "literal"))
+  expect_equal(r$name, c("a", "c"))
+  expect_message(out <- withVisible(find_var(d, "zzz")), "No variables")
+  expect_false(out$visible)
+  expect_equal(nrow(out$value), 0L)
+})

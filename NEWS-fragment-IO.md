@@ -159,3 +159,10 @@
   the first group's header, without group labels, and the Total row summed
   the groups (Raw % = 200). Weighted N is rounded like the console print
   ("N=2516", was "N=5245.99999999998").
+* `find_var()` gains `fixed = TRUE` for literal (case-insensitive) search,
+  e.g. label text with parentheses: `"BEFRAGTE(R)"` as a regular expression
+  matched "BEFRAGTER" instead. Regular expressions stay the default; a
+  message points to `fixed = TRUE` when the literal text would match other
+  variables, an invalid regular expression such as `"("` is searched as
+  text (the regex engine's warning no longer leaks), and an empty result
+  is returned invisibly instead of printing `<0 rows>`.
