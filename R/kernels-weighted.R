@@ -208,9 +208,12 @@
   weights <- .plain_numeric(weights)
   .check_weights(weights)
 
+  # SPSS WEIGHT BY excludes cases with a missing weight: no valid weight
+  # means no cases (e.g. one group_by() group), never an unweighted result.
+  # The entry helpers already reject a weights column without any valid
+  # value, so this is reached per group or subset.
   if (all(is.na(weights))) {
-    cli_warn("All weights are missing. Using unweighted calculation.")
-    return(list(x = x, weights = NULL, valid = FALSE))
+    return(list(x = x[0], weights = weights[0], valid = TRUE))
   }
   
   # Remove missing values if requested

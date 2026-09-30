@@ -336,6 +336,18 @@ crosstab.grouped_df <- function(data, row, col,
   results_list <- lapply(seq_along(data_list), function(i) {
     group_data <- data_list[[i]]
 
+    # A group without any positive weight has no cases (SPSS excludes
+    # cases with a zero or missing weight): leave it out with a warning
+    # instead of aborting the tables of every other group
+    if (!is.null(weights_var) &&
+        !any(group_data[[weights_var]] > 0, na.rm = TRUE)) {
+      cli_warn(c(
+        "No case in group {(.format_group_label(group_keys[i, , drop = FALSE]))} has a positive weight.",
+        "i" = "SPSS excludes cases with a zero or missing weight, so the group has no table."
+      ))
+      return(NULL)
+    }
+
     # Run crosstab for this group
     if (!is.null(weights_var)) {
       result <- crosstab.data.frame(group_data,
@@ -356,6 +368,7 @@ crosstab.grouped_df <- function(data, row, col,
     result$group_info <- group_keys[i, , drop = FALSE]
     result
   })
+  results_list <- Filter(Negate(is.null), results_list)
 
   # Combine results
   combined_result <- list(

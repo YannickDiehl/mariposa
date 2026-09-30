@@ -660,7 +660,8 @@ calculate_single_stats <- function(x, w = NULL) {
   } else {
     valid_idx <- !is.na(x) & !is.na(w)
     if (!any(valid_idx)) {
-      return(list(mean = NA, sd = NA, total_n = length(x), valid_n = 0, skewness = NA))
+      return(list(mean = NA, sd = NA, total_n = sum(w[!is.na(w)]),
+                  valid_n = 0, skewness = NA))
     }
     
     x_valid <- x[valid_idx]
@@ -702,17 +703,21 @@ process_variables <- function(data, var_names, w_name, sort_frq, show_na = TRUE,
     
     # Calculate frequencies and stats
     freq_result <- calculate_single_frequency(x, w, sort_frq, show_na, show_unused)
-    freq_result$Variable <- var_name
+    # rep(): a group without any case with a valid weight has no rows
+    freq_result$Variable <- rep(var_name, nrow(freq_result))
     
     stats <- calculate_single_stats(x, w)
     stats_df <- data.frame(Variable = var_name, mean = stats$mean, sd = stats$sd,
                           total_n = stats$total_n, valid_n = stats$valid_n,
                           skewness = stats$skewness, stringsAsFactors = FALSE)
     
-    # Add group information if provided
-    if (!is.null(group_info) && nrow(freq_result) > 0) {
-      group_info_expanded <- group_info[rep(1, nrow(freq_result)), , drop = FALSE]
-      freq_result <- cbind(group_info_expanded, freq_result)
+    # Add group information if provided (the stats row also for a group
+    # without any case with a valid weight, whose table has no rows)
+    if (!is.null(group_info)) {
+      if (nrow(freq_result) > 0) {
+        group_info_expanded <- group_info[rep(1, nrow(freq_result)), , drop = FALSE]
+        freq_result <- cbind(group_info_expanded, freq_result)
+      }
       stats_df <- cbind(group_info, stats_df)
     }
     
@@ -728,7 +733,7 @@ process_variables <- function(data, var_names, w_name, sort_frq, show_na = TRUE,
     frequencies_list <- lapply(frequencies_list, function(df) {
       missing_cols <- setdiff(all_cols, names(df))
       for (mc in missing_cols) {
-        df[[mc]] <- if (mc == "is_na_row") FALSE else NA
+        df[[mc]] <- rep(if (mc == "is_na_row") FALSE else NA, nrow(df))
       }
       df[all_cols]
     })
@@ -748,7 +753,14 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort_frq, sho
   group_keys <- dplyr::group_keys(data)
 
   results_list <- lapply(seq_along(data_list), function(i) {
-    process_variables(data_list[[i]], var_names, w_name, sort_frq, show_na, show_unused, group_keys[i, , drop = FALSE])
+    key <- group_keys[i, , drop = FALSE]
+    if (!is.null(w_name) && all(is.na(data_list[[i]][[w_name]]))) {
+      cli_warn(c(
+        "No case in group {(.format_group_label(key))} has a valid weight.",
+        "i" = "SPSS excludes cases with a missing weight, so the group has no frequency table."
+      ))
+    }
+    process_variables(data_list[[i]], var_names, w_name, sort_frq, show_na, show_unused, key)
   })
   
   freq_parts <- lapply(results_list, `[[`, "frequencies")
@@ -759,7 +771,7 @@ calculate_grouped_frequencies <- function(data, var_names, w_name, sort_frq, sho
     freq_parts <- lapply(freq_parts, function(df) {
       missing_cols <- setdiff(all_cols, names(df))
       for (mc in missing_cols) {
-        df[[mc]] <- if (mc == "is_na_row") FALSE else NA
+        df[[mc]] <- rep(if (mc == "is_na_row") FALSE else NA, nrow(df))
       }
       df[all_cols]
     })

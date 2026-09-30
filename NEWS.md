@@ -1144,6 +1144,13 @@ reference output showed mariposa was wrong.
 
 ### Across functions
 
+* A `group_by()` group in which no case has a valid weight has no cases,
+  as SPSS excludes cases with a missing weight: `describe()` computed
+  that group unweighted (printed under "Weighted Descriptive Statistics"
+  with N = 0 and one warning per statistic), `frequency()` failed with
+  "Ersetzung hat 1 Zeile, Daten haben 0" and a grouped `crosstab()`
+  aborted for all groups. The group now shows N = 0 (`describe()`) or is
+  left out with a warning naming it (`frequency()`, `crosstab()`).
 * The `weights` argument of every analysis function documents the forms it
   accepts since this release: a column name (unquoted or as a string), an
   expression such as `sampling_weight * 2`, or a numeric vector with one

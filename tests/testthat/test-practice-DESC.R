@@ -782,3 +782,53 @@ test_that("DESC-22: codebook console output uses no thousands separators", {
   outs <- capture.output(print(summary(cb, variable_details = FALSE)))
   expect_true(any(grepl("Observations: 2500", outs, fixed = TRUE)))
 })
+
+# --- 0.7.4 audit: a group whose weights are all missing --------------------------
+
+test_that("describe: a group without valid weights has no cases, not unweighted stats", {
+  # Was: the kernel fell back to the unweighted calculation with a warning
+  # per statistic, so the group printed unweighted mean/SD under "Weighted
+  # Descriptive Statistics" with N = 0. SPSS WEIGHT BY excludes cases whose
+  # weight is missing, so the group is empty.
+  d <- survey_data
+  d$w <- ifelse(d$region == "East", NA, d$sampling_weight)
+  expect_no_warning(
+    r <- d |> dplyr::group_by(region) |> describe(age, weights = w)
+  )
+  east <- r$results[r$results$region == "East", ]
+  expect_true(is.na(east$age_Mean))
+  expect_true(is.na(east$age_SD))
+  expect_equal(east$age_N, 0)
+  west <- r$results[r$results$region == "West", ]
+  expect_equal(west$age_Mean,
+               mariposa:::.w_mean(d$age[d$region == "West"],
+                                  d$w[d$region == "West"]))
+})
+
+test_that("frequency: a group without valid weights is left out with a warning", {
+  # Was: "Ersetzung hat 1 Zeile, Daten haben 0" (a zero-row table got a
+  # Variable column of length 1, then lost its group columns).
+  d <- survey_data
+  d$w <- ifelse(d$region == "East", NA, d$sampling_weight)
+  expect_warning(
+    r <- d |> dplyr::group_by(region) |> frequency(education, weights = w),
+    "region = East"
+  )
+  expect_false("East" %in% as.character(r$frequencies$region))
+  expect_equal(r$stats$total_n[r$stats$region == "East"], 0)
+  expect_output(print(r), "region = West")
+})
+
+test_that("crosstab: a group without positive weights is left out with a warning", {
+  # Was: the per-group weight check aborted the whole grouped crosstab
+  # ("Weights variable `w` has no positive value") although the other
+  # groups had valid weights.
+  d <- survey_data
+  d$w <- ifelse(d$region == "East", NA, d$sampling_weight)
+  expect_warning(
+    r <- d |> dplyr::group_by(region) |> crosstab(gender, education, weights = w),
+    "region = East"
+  )
+  expect_length(r$results, 1)
+  expect_output(print(r), "region = West")
+})
