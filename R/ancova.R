@@ -413,10 +413,9 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 .compute_ancova_levene <- function(model, data, dv_name, between_names, w_name) {
   z <- abs(unname(stats::residuals(model)))
   if (!is.null(w_name)) {
-    # /REGWGT: the WLS model lives in the sqrt(w) space, so SPSS tests
-    # sqrt(w) * |residual| (reproduces ancova_output.txt 2a/2b/4a/4b/6a
-    # exactly) - and w == 1 reduces to the unweighted test
-    z <- sqrt(data[[w_name]]) * z
+    # /REGWGT: SPSS tests sqrt(w) * |residual| (reproduces ancova_output.txt
+    # 2a/2b/4a/4b/6a exactly); w == 1 reduces to the unweighted test
+    z <- .w_regwgt_levene_dev(z, data[[w_name]])
   }
   g <- interaction(data[between_names], drop = TRUE, sep = "_")
   levene_aov <- summary(stats::aov(z ~ g))[[1]]

@@ -657,8 +657,8 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
       group_idx <- g == level
       group_y <- y[group_idx]
       group_w <- w_vec[group_idx]
-      center <- sum(group_y * group_w) / sum(group_w)
-      z_values[group_idx] <- sqrt(w_vec[group_idx]) * abs(group_y - center)
+      center <- .w_mean(group_y, group_w)
+      z_values[group_idx] <- .w_regwgt_levene_dev(group_y - center, group_w)
     }
 
     levene_aov <- summary(stats::aov(z_values ~ g))[[1]]
@@ -1009,10 +1009,10 @@ tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
           gw <- w[idx]
           gy <- y[idx]
           list(
-            mean = sum(gy * gw) / sum(gw),
+            mean = .w_mean(gy, gw),
             n = length(gy),
             weighted_n = sum(gw),
-            var = sum(gw * (gy - sum(gy * gw) / sum(gw))^2) / (sum(gw) - 1)
+            var = .w_var(gy, gw)
           )
         })
         names(group_stats) <- group_levels

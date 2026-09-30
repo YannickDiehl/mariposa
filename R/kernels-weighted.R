@@ -568,3 +568,22 @@
 .w_round_case_weights <- function(w) {
   round(w)
 }
+
+# ============================================================================
+# /REGWGT MODELS (factorial_anova(), ancova())
+# ============================================================================
+
+#' Levene deviations of a /REGWGT model (SPSS UNIANOVA)
+#'
+#' A WLS model lives in the sqrt(w) space (sqrt(w) y = sqrt(w) X b + e), so
+#' SPSS's Levene test of a /REGWGT analysis uses the absolute deviations
+#' scaled by sqrt(w); w == 1 gives the unweighted test. The WEIGHT BY
+#' semantics of UNIANOVA await the pending SPSS reference run.
+#'
+#' @param dev Deviations from the cell centre (or model residuals)
+#' @param w Regression weights
+#' @return Numeric vector sqrt(w) * |dev|
+#' @noRd
+.w_regwgt_levene_dev <- function(dev, w) {
+  sqrt(w) * abs(dev)
+}
