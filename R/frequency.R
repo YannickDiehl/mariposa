@@ -379,7 +379,10 @@ calculate_single_frequency <- function(x, w = NULL, sort_frq = "none", show_na =
     }
 
     result <- data.frame(
-      value = unique_vals,
+      # factor categories as text, like the unweighted branch: a factor
+      # value column turned the numeric values of the next variable into
+      # NA when the tables of several variables were row-bound
+      value = if (is.factor(unique_vals)) as.character(unique_vals) else unique_vals,
       label = get_value_labels(x, as.character(unique_vals)),
       freq = freq_weighted,
       prc = prc,

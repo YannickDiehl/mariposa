@@ -42,3 +42,9 @@
   `mcnemar_test()`, `chi_square()` and the Friedman note of
   `pairwise_wilcoxon()` use the same whole-number formatter (the latter
   printed "N = 9.36e+09" for large sums of weights).
+* Weighted `frequency()` of a factor together with a numeric variable
+  (`frequency(survey_data, education, life_satisfaction, weights =
+  sampling_weight)`) no longer turns the numeric variable's categories
+  into `NA` (listed under "Total missing") with the base-R warning
+  "invalid factor level, NA generated": the weighted branch kept the
+  factor as the value column when the tables were combined.

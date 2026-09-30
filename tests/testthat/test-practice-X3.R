@@ -163,6 +163,31 @@ test_that("DESC-22: counts carry no thousands separators (codebook HTML, MW U)",
   expect_true(any(grepl("U = 26095.5,", out2, fixed = TRUE)))
 })
 
+# --- Sweep: weighted frequency() of a factor and a numeric variable -----------
+
+test_that("sweep: weighted frequency() of a factor next to a numeric variable", {
+  # The weighted branch kept the factor as the value column; rbind() with
+  # the numeric variable's rows coerced its values 1..5 to factor NA
+  # ("ungueltiges Faktorniveau, NA erzeugt"): every category of
+  # life_satisfaction printed as NA under "Total missing".
+  expect_no_warning(
+    f <- frequency(survey_data, education, life_satisfaction,
+                   weights = sampling_weight)
+  )
+  ls <- f$results[f$results$Variable == "life_satisfaction", ]
+  expect_identical(sum(!is.na(ls$value)), 5L)
+  u <- frequency(survey_data, life_satisfaction, weights = sampling_weight)
+  expect_equal(ls$freq, u$results$freq)
+  out <- capture.output(print(f))
+  expect_false(any(grepl("|            NA |  119", out, fixed = TRUE)))
+  # grouped as well
+  expect_no_warning(
+    fg <- frequency(dplyr::group_by(survey_data, region), education,
+                    life_satisfaction, weights = sampling_weight)
+  )
+  expect_true(all(c(1, 5) %in% suppressWarnings(as.numeric(fg$results$value))))
+})
+
 # --- EDGE-23: one group-header style, no trailing blanks in headers -----------
 
 test_that("EDGE-23: verbose group headers share one style without a trailing blank", {
