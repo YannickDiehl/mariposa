@@ -136,3 +136,11 @@
 * `multiple_response(by = )` with a labelled `by` variable heads the
   crosstab columns with the value labels in code order (it showed the
   codes, e.g. "1"/"2" for ALLBUS `eastwest`).
+* `multiple_response()` tables: counts are whole numbers (unweighted
+  counts printed as "583.0"; weighted counts had one decimal in the
+  frequencies table but none in the crosstab), the frequencies table ends
+  with a Total row, and the crosstab has a Total column and a
+  "Total (cases)" row as in SPSS MULT RESPONSE (replacing the unwrapped
+  "Cases per column" footer). Factor or character indicators whose levels
+  do not contain `counted` (e.g. "no"/"yes" with the default
+  `counted = 1`) are an error instead of silently counting 0 mentions.

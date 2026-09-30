@@ -535,12 +535,17 @@ print.summary.describe <- function(x, ...) {
 #' @param digits Decimal places for the statistics
 #' @param width Console width
 #' @param col_digits Named integer vector overriding `digits` per column
+#' @param count_cols Columns shown as whole numbers
+#' @param footer_rows Number of final rows (totals) set off by a rule
+#' @param align Named character vector ("left"/"right") overriding the
+#'   default alignment (text left, numbers right) per column
 #' @noRd
 .print_desc_table <- function(df, digits = 3, width = getOption("width", 80),
-                              col_digits = NULL) {
+                              col_digits = NULL,
+                              count_cols = c("N", "Missing"),
+                              footer_rows = 0L, align = NULL) {
   if (is.null(df) || nrow(df) == 0) return(invisible(NULL))
 
-  count_cols <- c("N", "Missing")
   cells <- lapply(names(df), function(nm) {
     v <- df[[nm]]
     if (nm %in% count_cols) {
@@ -554,6 +559,9 @@ print.summary.describe <- function(x, ...) {
   })
   names(cells) <- names(df)
   is_text <- vapply(df, function(v) !is.numeric(v), logical(1))
+  if (!is.null(align)) {
+    for (nm in intersect(names(align), names(df))) is_text[[nm]] <- align[[nm]] == "left"
+  }
   col_w <- vapply(names(df), function(nm) {
     max(nchar(nm, type = "width"), nchar(cells[[nm]], type = "width"), 1L)
   }, integer(1))
@@ -598,6 +606,7 @@ print.summary.describe <- function(x, ...) {
     cat(header, "\n", sep = "")
     cat(rule, "\n", sep = "")
     for (i in seq_len(nrow(df))) {
+      if (footer_rows > 0 && i == nrow(df) - footer_rows + 1L) cat(rule, "\n", sep = "")
       cat(line_for(vapply(cols, function(j) cells[[j]][i], character(1))), "\n", sep = "")
     }
     cat(rule, "\n", sep = "")

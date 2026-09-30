@@ -24,7 +24,10 @@
 #' @param by Optional categorical variable (unquoted) to cross the set
 #'   against (SPSS \code{MULT RESPONSE ... BY factor}).
 #' @param counted The value that counts as a mention (default \code{1},
-#'   matching SPSS dichotomy sets with counted value 1).
+#'   matching SPSS dichotomy sets with counted value 1). For factor or
+#'   character indicators give the level that marks a mention, e.g.
+#'   \code{counted = "yes"}; a value that does not occur among their
+#'   levels is an error.
 #' @param weights Optional survey weights (unquoted variable name),
 #'   treated as frequency weights matching SPSS \code{WEIGHT BY}.
 #'
@@ -100,8 +103,8 @@
 #'
 #' # --- Three-layer output ---
 #' result <- multiple_response(trust, gov, media, science)
-#' result              # compact overview
-#' summary(result)     # full detailed output
+#' result              # full tables
+#' summary(result)     # same tables, with section toggles
 #'
 #' @seealso
 #' \code{\link{frequency}} for single-variable frequency tables.
@@ -125,6 +128,21 @@ multiple_response <- function(data, ..., by = NULL, counted = 1,
   var_names <- names(vars)
   if (length(var_names) < 2) {
     cli_abort("A multiple response set needs at least two indicator variables.")
+  }
+
+  # Factor/character indicators are compared as text: counted = 1 against
+  # levels "no"/"yes" silently gave 0 mentions
+  for (v in var_names) {
+    x <- data[[v]]
+    if (is.factor(x) || is.character(x)) {
+      vals <- if (is.factor(x)) levels(x) else sort(unique(x[!is.na(x)]))
+      if (!as.character(counted) %in% vals) {
+        cli_abort(c(
+          "Indicator {.var {v}} has no value equal to {.arg counted} = {.val {counted}}.",
+          "i" = "Its values are {.val {vals}}; set {.arg counted} to the one that marks a mention."
+        ))
+      }
+    }
   }
 
   by_quo <- rlang::enquo(by)
@@ -381,34 +399,46 @@ print.summary.multiple_response <- function(x, ...) {
   if (x$is_grouped) info[["Grouped by"]] <- paste(x$group_vars, collapse = ", ")
   print_info_section(info)
 
+  # Counts are shown as whole numbers (SPSS; weighted counts are sums of
+  # weights, display-rounded), percentages with `digits` decimals
+  pct_txt <- function(v) ifelse(is.na(v), "", formatC(v, format = "f", digits = digits))
+
   emit_freq <- function(rows, n_cases, n_responses, n_missing) {
     cat("\nFrequencies\n")
-    df <- rows[c("Label", "n", "pct_responses", "pct_cases")]
-    print_stat_table(df, digits = digits,
-                      col_types = c(n = "num", pct_responses = "num",
-                                    pct_cases = "num"),
-                      col_labels = c(Label = "Option", n = "Responses n",
-                                     pct_responses = "Responses %",
-                                     pct_cases = "% of Cases"))
+    df <- data.frame(
+      Option = c(rows$Label, "Total"),
+      `Responses n` = c(rows$n, n_responses),
+      `Responses %` = c(rows$pct_responses, if (n_responses > 0) 100 else NA),
+      `% of Cases` = c(rows$pct_cases, sum(rows$pct_cases)),
+      check.names = FALSE, stringsAsFactors = FALSE
+    )
+    .print_desc_table(df, digits = digits, count_cols = "Responses n",
+                      footer_rows = 1L)
     cat(sprintf("  Valid cases: %.0f | Total responses: %.0f | Excluded (all missing): %.0f\n",
                 n_cases, n_responses, n_missing))
     cat("  % of Cases can sum above 100% (multiple mentions per case).\n")
   }
 
-  emit_ct <- function(rows) {
+  # SPSS MULT RESPONSE crosstab: count and % of the column's cases per
+  # cell, a Total column (all valid cases) and a Total row with the number
+  # of cases (respondents) per column
+  emit_ct <- function(rows, total_rows, n_cases) {
     cat(sprintf("\nCrosstab: set BY %s (%% of cases per column)\n", x$by))
     levels <- unique(rows$by_level)
-    wide <- data.frame(Option = unique(rows$Label), stringsAsFactors = FALSE)
+    options <- unique(rows$Label)
+    cell <- function(n, p) sprintf("%.0f (%s%%)", n, pct_txt(p))
+    wide <- data.frame(Option = c(options, "Total (cases)"), stringsAsFactors = FALSE)
     for (lv in levels) {
       sub <- rows[rows$by_level == lv, ]
-      wide[[lv]] <- sprintf(paste0("%.0f (%.", digits, "f%%)"),
-                            sub$n, sub$pct_cases)
+      wide[[lv]] <- c(cell(sub$n, sub$pct_cases),
+                      sprintf("%.0f", sub$n_cases_level[1]))
     }
-    print_stat_table(wide, digits = digits)
-    n_line <- vapply(levels, function(lv) {
-      sprintf("%s: %.0f", lv, rows$n_cases_level[rows$by_level == lv][1])
-    }, character(1))
-    cat("  Cases per column - ", paste(n_line, collapse = ", "), "\n", sep = "")
+    wide[["Total"]] <- c(cell(total_rows$n, total_rows$pct_cases),
+                         sprintf("%.0f", n_cases))
+    right <- stats::setNames(rep("right", length(levels) + 1L), c(levels, "Total"))
+    .print_desc_table(wide, digits = digits, count_cols = character(0),
+                      footer_rows = 1L, align = right)
+    cat("  Percentages and totals are based on cases (respondents).\n")
   }
 
   if (x$is_grouped) {
@@ -424,12 +454,12 @@ print.summary.multiple_response <- function(x, ...) {
       if (show_ct) {
         ct_rows <- x$by_results
         for (g in names(groups)) ct_rows <- ct_rows[.group_match(ct_rows[[g]], groups[[g]][gi]), ]
-        emit_ct(ct_rows)
+        emit_ct(ct_rows, rows, x$n_cases[gi])
       }
     }
   } else {
     if (show_freq) emit_freq(x$results, x$n_cases, x$n_responses, x$n_missing)
-    if (show_ct) emit_ct(x$by_results)
+    if (show_ct) emit_ct(x$by_results, x$results, x$n_cases)
   }
 
   invisible(x)

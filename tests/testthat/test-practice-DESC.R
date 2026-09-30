@@ -731,3 +731,40 @@ test_that("DESC-19: multiple_response(by = <labelled>) shows value labels", {
   r2 <- multiple_response(d2, gov, media, by = reg_lab)
   expect_equal(unique(r2$by_results$by_level), c("East", "West"))
 })
+
+
+# --- DESC-20: multiple_response() tables ----------------------------------------
+
+test_that("DESC-20: multiple_response tables: integer counts, totals, factor indicators", {
+  # Unweighted counts printed as "583.0", weighted counts had one decimal
+  # in the frequencies table but none in the crosstab, neither table had
+  # the Total row/column SPSS MULT RESPONSE shows, the "Cases per column"
+  # footer ran past the console width, and factor indicators ("no"/"yes")
+  # silently counted 0 mentions with counted = 1.
+  d <- .mr_data()
+  out <- capture.output(print(multiple_response(d, gov, media, science)))
+  expect_false(any(grepl("583.0", out, fixed = TRUE)))
+  expect_true(any(grepl("^\\s*gov\\s+583\\s", out)))
+  tot <- out[grepl("^\\s*Total\\s", out)]
+  expect_length(tot, 1L)
+  expect_true(grepl(" 2532 ", tot) && grepl("100.0", tot))
+
+  rw <- multiple_response(d, gov, media, science, by = gender,
+                          weights = sampling_weight)
+  outw <- capture.output(print(rw))
+  expect_false(any(grepl("585.8", outw, fixed = TRUE)))
+  expect_true(any(grepl("^\\s*gov\\s+586\\s", outw)))
+  expect_false(any(grepl("Cases per column", outw)))
+  ct_hdr <- outw[grepl("Male", outw) & grepl("Female", outw)]
+  expect_true(any(grepl("Total", ct_hdr)))
+  ct_tot <- outw[grepl("^\\s*Total", outw) & grepl("1195", outw)]
+  expect_length(ct_tot, 1L)
+  expect_true(grepl("1321", ct_tot) && grepl("2516", ct_tot))
+
+  d2 <- d |>
+    mutate(gf = factor(gov, levels = 0:1, labels = c("no", "yes")),
+           mf = factor(media, levels = 0:1, labels = c("no", "yes")))
+  expect_error(multiple_response(d2, gf, mf), "counted")
+  rf <- multiple_response(d2, gf, mf, counted = "yes")
+  expect_equal(rf$results$n, multiple_response(d, gov, media)$results$n)
+})
