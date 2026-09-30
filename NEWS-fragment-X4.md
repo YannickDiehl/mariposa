@@ -61,3 +61,9 @@
   correlation matrices, rotation sums, iteration counts); the ML initial
   communalities of all 6 ML reference runs; `ancova()` Levene tests of the
   6 unweighted reference runs.
+* Weighted `ancova()`: Levene's test uses sqrt(w) * |WLS residual| of the
+  full model, as SPSS UNIANOVA does with /REGWGT. This reproduces all five
+  weighted SPSS references exactly (e.g. 0.902 instead of 0.880) and
+  restores the rule that `weights = 1` gives the unweighted result (the
+  residual-based unweighted test made the old cell-mean-based weighted
+  test disagree with it).

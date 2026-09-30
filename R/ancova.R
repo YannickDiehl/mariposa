@@ -408,10 +408,13 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 #' @return Tibble with f, df1, df2, p
 #' @noRd
 .compute_ancova_levene <- function(model, data, dv_name, between_names, w_name) {
-  if (!is.null(w_name)) {
-    return(.compute_factorial_levene(data, dv_name, between_names, w_name))
-  }
   z <- abs(unname(stats::residuals(model)))
+  if (!is.null(w_name)) {
+    # /REGWGT: the WLS model lives in the sqrt(w) space, so SPSS tests
+    # sqrt(w) * |residual| (reproduces ancova_output.txt 2a/2b/4a/4b/6a
+    # exactly) - and w == 1 reduces to the unweighted test
+    z <- sqrt(data[[w_name]]) * z
+  }
   g <- interaction(data[between_names], drop = TRUE, sep = "_")
   levene_aov <- summary(stats::aov(z ~ g))[[1]]
   tibble::tibble(

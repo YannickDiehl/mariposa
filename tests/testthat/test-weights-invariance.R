@@ -89,6 +89,16 @@ test_that("factorial_anova: weights == 1 reproduces unweighted F/p", {
   expect_equal(tw$p, tu$p, tolerance = TOL)
 })
 
+test_that("ancova: weights == 1 reproduces the unweighted Levene test", {
+  # 0.7.4: the unweighted Levene became residual-based (SPSS UNIANOVA);
+  # the weighted one must reduce to it (sqrt(1) * |residual|)
+  lw <- ancova(inv_data, dv = y, between = c(g3), covariate = c(x2),
+               weights = w1)$levene_test
+  lu <- ancova(inv_data, dv = y, between = c(g3), covariate = c(x2))$levene_test
+  expect_equal(lw$f, lu$f, tolerance = TOL)
+  expect_equal(lw$p, lu$p, tolerance = TOL)
+})
+
 test_that("ancova: weights == 1 reproduces unweighted F/p", {
   tw <- ancova(inv_data, dv = y, between = c(g3), covariate = c(x2),
                weights = w1)$anova_table
