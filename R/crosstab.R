@@ -179,7 +179,14 @@ crosstab.data.frame <- function(data, row, col,
     row_data <- .na_as_category(row_data)
     col_data <- .na_as_category(col_data)
   }
-  n_missing <- sum(!valid_cases)
+  # Missing cases as SPSS's Case Processing Summary counts them: with
+  # weights the sum of the weights of the excluded cases (it was an
+  # unweighted count next to a weighted N)
+  n_missing <- if (is_weighted) {
+    sum(weights_vec[!valid_cases & has_weight])
+  } else {
+    sum(!valid_cases)
+  }
 
   row_data <- row_data[valid_cases]
   col_data <- col_data[valid_cases]
@@ -515,7 +522,9 @@ print.summary.crosstab <- function(x, ...) {
     "Percentages" = pct_label,
     "Weights variable" = x$weights_var,
     "N (valid)" = n_label,
-    "Missing" = if (x$n_missing > 0) sprintf("%.0f", x$n_missing) else NULL
+    "Missing" = if (round(x$n_missing) > 0) {
+      sprintf(if (x$is_weighted) "%.0f (weighted)" else "%.0f", x$n_missing)
+    }
   )
   print_info_section(test_info)
   cat("\n")

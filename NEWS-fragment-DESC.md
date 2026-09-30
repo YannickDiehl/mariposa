@@ -119,3 +119,6 @@
 * `crosstab()` shows observed categories only, as SPSS CROSSTABS does: an
   empty factor level (e.g. after `filter(employment != "Student")`) used
   to print a "0 0 0" row with a row percentage of "100.0%" of zero cases.
+* Weighted `crosstab()` reports missing cases like SPSS's Case Processing
+  Summary: as the sum of their weights (it printed an unweighted count
+  next to the weighted "N (valid)").

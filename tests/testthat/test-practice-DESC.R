@@ -622,3 +622,22 @@ test_that("DESC-08: crosstab drops empty categories instead of showing 100% of 0
   rw <- crosstab(d, employment, gender, weights = sampling_weight)
   expect_false("Student" %in% rw$row_levels)
 })
+
+
+# --- DESC-21 (crosstab part): weighted missing ----------------------------------
+
+test_that("DESC-21: weighted crosstab reports valid and missing cases as sums of weights", {
+  # The header combined a weighted "N (valid)" with an unweighted count of
+  # missing cases. SPSS's Case Processing Summary reports both weighted.
+  r <- crosstab(survey_data, life_satisfaction, gender, weights = sampling_weight)
+  miss_w <- with(survey_data, sum(sampling_weight[is.na(life_satisfaction) | is.na(gender)]))
+  valid_w <- with(survey_data, sum(sampling_weight[!is.na(life_satisfaction) & !is.na(gender)]))
+  expect_equal(r$n_missing, miss_w)
+  expect_equal(r$n_valid, valid_w)
+  out <- capture.output(print(r))
+  expect_true(any(grepl(sprintf("Missing: %.0f", miss_w), out, fixed = TRUE)))
+  expect_true(any(grepl(sprintf("N (valid): %.0f", valid_w), out, fixed = TRUE)))
+  # unweighted: plain counts
+  ru <- crosstab(survey_data, life_satisfaction, gender)
+  expect_equal(ru$n_missing, sum(is.na(survey_data$life_satisfaction)))
+})
