@@ -74,21 +74,21 @@
 #' # Load required packages and data
 #' library(dplyr)
 #' data(survey_data)
-#' 
+#'
 #' # Basic unweighted analysis
 #' survey_data %>% describe(age)
-#' 
+#'
 #' # Weighted analysis
 #' survey_data %>% describe(age, weights = sampling_weight)
-#' 
+#'
 #' # Multiple variables with custom statistics
-#' survey_data %>% describe(age, income, life_satisfaction, 
-#'                         weights = sampling_weight, 
+#' survey_data %>% describe(age, income, life_satisfaction,
+#'                         weights = sampling_weight,
 #'                         show = c("mean", "sd", "skew"))
-#' 
+#'
 #' # Grouped analysis
-#' survey_data %>% 
-#'   group_by(region) %>% 
+#' survey_data %>%
+#'   group_by(region) %>%
 #'   describe(age, weights = sampling_weight)
 #'
 #' @seealso
@@ -104,19 +104,19 @@
 #' @family descriptive
 #' @export
 describe <- function(data, ..., weights = NULL,
-                     show = "short", 
+                     show = "short",
                      probs = c(0.25, 0.5, 0.75),
-                     na.rm = TRUE, 
+                     na.rm = TRUE,
                      excess = TRUE) {
-  
+
   # ============================================================================
   # INPUT VALIDATION AND SETUP
   # ============================================================================
-  
+
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }
-  
+
   # Validate show: an unknown value (e.g. "min") used to be ignored
   # silently, leaving a table with nothing but N and Missing
   valid_show <- c("short", "all", "mean", "median", "sd", "se", "var",
@@ -138,7 +138,7 @@ describe <- function(data, ..., weights = NULL,
   } else if ("short" %in% show) {
     show <- c("mean", "median", "sd", "range", "iqr", "skew")
   }
-  
+
   # Get variable names using tidyselect
   vars <- .process_variables(data, ...)
   vars <- .drop_grouping_vars(data, vars)
@@ -153,24 +153,24 @@ describe <- function(data, ..., weights = NULL,
   # Process weights parameter
   weights_info <- .process_weights(data, rlang::enquo(weights))
   data <- weights_info$data
-  
+
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
-  
+
   # ============================================================================
   # MAIN CALCULATION LOGIC
   # ============================================================================
-  
+
   if (is_grouped) {
     results_df <- .calculate_grouped_stats(data, vars, weights_info, show, probs, na.rm, excess)
   } else {
     results_df <- .calculate_ungrouped_stats(data, vars, weights_info, show, probs, na.rm, excess)
   }
-  
+
   # ============================================================================
   # CREATE RESULT OBJECT
   # ============================================================================
-  
+
   result <- list(
     results = results_df,
     variables = names(vars),
@@ -180,7 +180,7 @@ describe <- function(data, ..., weights = NULL,
     show = show,
     probs = probs
   )
-  
+
   class(result) <- "describe"
   return(result)
 }
@@ -193,22 +193,22 @@ describe <- function(data, ..., weights = NULL,
 #' @noRd
 .calculate_ungrouped_stats <- function(data, vars, weights_info, show, probs, na.rm, excess) {
   results_list <- list()
-  
+
   for (i in seq_along(vars)) {
     var_name <- names(vars)[i]
     x <- data[[var_name]]
     w <- weights_info$vector
-    
+
     # Calculate all statistics for this variable
     var_stats <- .calculate_variable_stats(x, w, var_name, show, probs, na.rm, excess)
-    
+
     # Add to results with variable prefix for column names
     for (stat_name in names(var_stats)) {
       col_name <- paste0(var_name, "_", stat_name)
       results_list[[col_name]] <- var_stats[[stat_name]]
     }
   }
-  
+
   return(tibble::tibble(!!!results_list))
 }
 
@@ -219,25 +219,25 @@ describe <- function(data, ..., weights = NULL,
     dplyr::group_modify(~ {
       group_data <- .x
       results_list <- list()
-      
+
       for (i in seq_along(vars)) {
         var_name <- names(vars)[i]
         x <- group_data[[var_name]]
         w <- if (!is.null(weights_info$name)) group_data[[weights_info$name]] else NULL
-        
+
         # Calculate all statistics for this variable in this group
         var_stats <- .calculate_variable_stats(x, w, var_name, show, probs, na.rm, excess)
-        
+
         # Add to results with variable prefix for column names
         for (stat_name in names(var_stats)) {
           col_name <- paste0(var_name, "_", stat_name)
           results_list[[col_name]] <- var_stats[[stat_name]]
         }
       }
-      
+
       tibble::tibble(!!!results_list)
     })
-  
+
   return(results %>% dplyr::ungroup())
 }
 
@@ -245,7 +245,7 @@ describe <- function(data, ..., weights = NULL,
 #' @noRd
 .calculate_variable_stats <- function(x, w, var_name, show, probs, na.rm, excess) {
   stats_list <- list()
-  
+
   # Calculate missing values count
   n_missing <- sum(is.na(x))
 
@@ -439,42 +439,20 @@ print.summary.describe <- function(x, ...) {
 .print_ungrouped_results <- function(x, is_weighted, digits = 3) {
   output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted,
                                  digits = digits, probs = x$probs)
-  print(output_df, row.names = FALSE)
-
-  # Print footer border
-  print_separator(get_table_width(output_df))
+  cat("\n")
+  .print_describe_table(output_df, digits = digits)
 }
 
 #' Print results for grouped data
 #' @noRd
 .print_grouped_results <- function(x, is_weighted, digits = 3) {
-  group_vars <- x$group_vars
-  results_df <- x$results
-
-  # Get unique group combinations
-  group_combinations <- results_df %>%
-    dplyr::select(dplyr::all_of(group_vars)) %>%
-    dplyr::distinct()
-
-  for (i in seq_len(nrow(group_combinations))) {
-    # Filter data for this group
-    group_filter <- group_combinations[i, , drop = FALSE]
-    filter_condition <- TRUE
-    for (gvar in group_vars) {
-      filter_condition <- filter_condition & .group_match(results_df[[gvar]], group_filter[[gvar]])
-    }
-    group_data <- results_df[filter_condition, , drop = FALSE]
-
-    # Print group header using standardized helper
-    print_group_header(group_filter)
-
-    # Create and print output
+  # One "Group: var = value, ..." line per group combination (value
+  # labels, NA-safe matching), then that group's table
+  for_each_group(x$results, x$group_vars, function(group_data, combo) {
     temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted,
                                      digits = digits, probs = x$probs)
-    print_separator(get_table_width(temp_output))
-    print(temp_output, row.names = FALSE)
-    print_separator(get_table_width(temp_output))
-  }
+    .print_describe_table(temp_output, digits = digits)
+  })
 }
 
 #' Create formatted output data frame for printing
@@ -482,19 +460,19 @@ print.summary.describe <- function(x, ...) {
 .create_output_df <- function(results_df, variables, show, is_weighted, digits = 3,
                               probs = c(0.25, 0.5, 0.75)) {
   output_rows <- list()
-  
+
   for (var_name in variables) {
     row_data <- list(Variable = var_name)
-    
+
     # Extract statistics for this variable
     for (stat in show) {
-      col_name <- paste0(var_name, "_", 
+      col_name <- paste0(var_name, "_",
                         switch(stat,
                                "mean" = "Mean", "median" = "Median", "sd" = "SD",
                                "se" = "SE", "var" = "Variance", "range" = "Range",
                                "iqr" = "IQR", "skew" = "Skewness", "kurtosis" = "Kurtosis",
                                "mode" = "Mode", "quantiles" = "Q25"))
-      
+
       if (stat == "quantiles") {
         # Quantile columns by their exact names: a regex prefix match
         # (grep("^var_Q")) also caught variables such as income_Quintile
@@ -505,7 +483,7 @@ print.summary.describe <- function(x, ...) {
         for (q_name in .desc_quantile_name(q_probs)) {
           q_col <- paste0(var_name, "_", q_name)
           if (q_col %in% names(results_df)) {
-            row_data[[q_name]] <- round(results_df[[q_col]], digits)
+            row_data[[q_name]] <- results_df[[q_col]]
           }
         }
       } else if (col_name %in% names(results_df)) {
@@ -515,37 +493,116 @@ print.summary.describe <- function(x, ...) {
                              "se" = "SE", "var" = "Variance", "range" = "Range",
                              "iqr" = "IQR", "skew" = "Skewness", "kurtosis" = "Kurtosis",
                              "mode" = "Mode")
-          row_data[[stat_name]] <- round(value, digits)
+          row_data[[stat_name]] <- value
         } else {
           row_data[["Mode"]] <- value
         }
       }
     }
-    
+
     # N and Missing as SPSS prints them: counts, or with weights the sums
     # of weights (rounded for display; Kish's effective N is not SPSS's N)
     n_col <- paste0(var_name, "_N")
     if (n_col %in% names(results_df)) {
-      row_data$N <- round(results_df[[n_col]], 0)
+      row_data$N <- results_df[[n_col]]
     }
     missing_col <- paste0(var_name, "_Missing")
     if (missing_col %in% names(results_df)) {
-      row_data$Missing <- round(results_df[[missing_col]], 0)
+      row_data$Missing <- results_df[[missing_col]]
     }
-    
+
     output_rows[[length(output_rows) + 1]] <- row_data
   }
-  
+
   # Convert to data frame
   output_df <- do.call(rbind, lapply(output_rows, function(x) {
-    data.frame(x, stringsAsFactors = FALSE)
+    data.frame(x, stringsAsFactors = FALSE, check.names = FALSE)
   }))
-  
+
   return(output_df)
 }
 
-# Note: .get_border function removed - using standardized get_table_width from print_helpers.R
- 
+#' Print the describe() statistics table
+#'
+#' Bordered table sized to its content (the borders used to be a fixed 40
+#' dashes). Statistics use one decimal policy per column (fmt_num), N and
+#' Missing are whole numbers (sums of weights are display-rounded, as in
+#' SPSS). A table wider than the console is split into column blocks that
+#' each repeat the Variable column (print.data.frame's own wrapping lost
+#' it).
+#'
+#' @param df Data frame from .create_output_df()
+#' @param digits Decimal places for the statistics
+#' @param width Console width
+#' @noRd
+.print_describe_table <- function(df, digits = 3, width = getOption("width", 80)) {
+  if (is.null(df) || nrow(df) == 0) return(invisible(NULL))
+
+  count_cols <- c("N", "Missing")
+  cells <- lapply(names(df), function(nm) {
+    v <- df[[nm]]
+    if (nm == "Variable") {
+      as.character(v)
+    } else if (nm %in% count_cols) {
+      ifelse(is.na(v), "", sprintf("%.0f", round(v)))
+    } else if (is.numeric(v)) {
+      fmt_num(v, digits)
+    } else {
+      ifelse(is.na(v), "", as.character(v))
+    }
+  })
+  names(cells) <- names(df)
+  col_w <- vapply(names(df), function(nm) {
+    max(nchar(nm, type = "width"), nchar(cells[[nm]], type = "width"), 1L)
+  }, integer(1))
+
+  indent <- "  "
+  # Two spaces between columns; one when that lets the table fit the
+  # console without splitting it into blocks
+  gap <- if (nchar(indent) + sum(col_w) + 2L * (length(col_w) - 1L) <= width) 2L else 1L
+  first_w <- col_w[[1]]
+
+  # Split the statistic columns into blocks that fit the console width;
+  # every block repeats the Variable column
+  others <- seq_along(col_w)[-1]
+  blocks <- list()
+  current <- integer(0)
+  used <- nchar(indent) + first_w
+  for (j in others) {
+    need <- gap + col_w[[j]]
+    if (length(current) > 0 && used + need > width) {
+      blocks[[length(blocks) + 1]] <- current
+      current <- integer(0)
+      used <- nchar(indent) + first_w
+    }
+    current <- c(current, j)
+    used <- used + need
+  }
+  if (length(current) > 0) blocks[[length(blocks) + 1]] <- current
+
+  for (b in seq_along(blocks)) {
+    cols <- c(1L, blocks[[b]])
+    line_for <- function(values) {
+      parts <- vapply(seq_along(cols), function(k) {
+        j <- cols[k]
+        pad_utf8(values[k], col_w[[j]], align = if (j == 1L) "left" else "right")
+      }, character(1))
+      paste0(indent, paste(parts, collapse = strrep(" ", gap)))
+    }
+    header <- line_for(names(df)[cols])
+    rule <- paste0(indent, strrep("-", nchar(header, type = "width") - nchar(indent)))
+    if (b > 1) cat("\n")
+    cat(rule, "\n", sep = "")
+    cat(header, "\n", sep = "")
+    cat(rule, "\n", sep = "")
+    for (i in seq_len(nrow(df))) {
+      cat(line_for(vapply(cols, function(j) cells[[j]][i], character(1))), "\n", sep = "")
+    }
+    cat(rule, "\n", sep = "")
+  }
+  invisible(NULL)
+}
+
 
 
 #' Result/display name of a quantile column ("Q25" for probs = 0.25)

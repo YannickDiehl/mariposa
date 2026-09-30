@@ -151,3 +151,44 @@ test_that("DESC-13: weighted describe() prints N = sum of weights and weighted M
   row <- out[grepl("^\\s*income\\s", out)]
   expect_true(any(grepl(" 2201 ", row)) && any(grepl(" 315\\b", row)))
 })
+
+
+# --- DESC-16: describe() table layout -----------------------------------------
+
+test_that("DESC-16: describe() tables are sized to content and wrap with the Variable column", {
+  # Grouped output put a 40-dash separator right under the group underline
+  # (double rule), the footer was always 40 dashes whatever the table
+  # width, and tables wider than the console were wrapped by
+  # print.data.frame so the continuation block lost the Variable column.
+  rule <- function(l) grepl("^\\s*-+\\s*$", l)
+
+  out <- capture.output(print(survey_data |> group_by(region) |> describe(age, income)))
+  r <- rule(out)
+  expect_false(any(r[-1] & r[-length(r)]))            # never two rules in a row
+  hdr <- which(grepl("^\\s*Variable\\s", out))
+  expect_length(hdr, 2L)                               # one table per group
+  for (h in hdr) {
+    expect_true(rule(out[h - 1]) && rule(out[h + 1]))
+    expect_equal(nchar(trimws(out[h - 1])), nchar(trimws(out[h])))
+  }
+
+  # One decimal policy per column (no "50" next to "50.550"); the title
+  # underline is not directly followed by the table rule
+  out_u <- capture.output(print(describe(survey_data, age, income)))
+  r_u <- rule(out_u)
+  expect_false(any(r_u[-1] & r_u[-length(r_u)]))
+  age_row <- out_u[grepl("^\\s*age\\s", out_u)]
+  expect_length(age_row, 1L)                           # fits in one block
+  expect_true(grepl("50\\.000", age_row))              # Median of age
+
+  # A table wider than the console is split into column blocks that each
+  # repeat the Variable column
+  old <- options(width = 60)
+  on.exit(options(old))
+  out_w <- capture.output(print(describe(survey_data, age, income, show = "all")))
+  expect_true(all(nchar(out_w) <= 60))
+  expect_gte(sum(grepl("^\\s*Variable\\s", out_w)), 2L)
+  data_rows <- out_w[grepl("[0-9]", out_w) & !rule(out_w) &
+                       !grepl("^\\s*Variable\\s", out_w)]
+  expect_true(all(grepl("^\\s*(age|income)\\s", data_rows)))
+})

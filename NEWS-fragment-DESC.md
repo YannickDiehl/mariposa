@@ -27,3 +27,9 @@
   `Effective_N` and no Missing column. The effective N stays available in
   `$results` (`<variable>_Effective_N`); `<variable>_Missing` is now the
   weighted missing count for weighted analyses.
+* `describe()` output: the table is sized to its content (the borders were
+  always 40 dashes), grouped output no longer stacks the table rule
+  directly under the group underline, every statistic column uses the
+  same number of decimals (no `50` next to `50.550`), and a table wider
+  than the console is split into column blocks that each repeat the
+  Variable column (the continuation block used to lose it).
