@@ -773,8 +773,11 @@ test_that("print.reliability: ungrouped, weighted", {
 })
 
 test_that("print.reliability: grouped", {
-  result <- survey_data %>% group_by(region) %>%
-    reliability(trust_government, trust_media, trust_science)
+  # East is a Heywood case for omega (warned, alpha unaffected)
+  expect_warning(
+    result <- survey_data %>% group_by(region) %>%
+      reliability(trust_government, trust_media, trust_science),
+    "Heywood")
   expect_prints(result, "Reliability")
 })
 
@@ -811,8 +814,11 @@ test_that("print.efa: PCA + none", {
 })
 
 test_that("print.efa: ML extraction (compact)", {
-  result <- efa(survey_data, trust_government, trust_media, trust_science,
-                life_satisfaction, extraction = "ml")
+  # Kaiser suggests 2 factors; ML with 4 variables supports only 1 (warned)
+  expect_warning(
+    result <- efa(survey_data, trust_government, trust_media, trust_science,
+                  life_satisfaction, extraction = "ml"),
+    "at most 1")
   output <- expect_prints(result, "Exploratory Factor Analysis")
   expect_true(any(grepl("ML", output, fixed = TRUE)))
 })

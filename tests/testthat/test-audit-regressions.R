@@ -274,10 +274,10 @@ test_that("logistic_regression surfaces separation warnings", {
   x <- rnorm(n)
   y <- as.integer(x > 0)  # perfectly separated
   d <- dplyr::tibble(y = y, x = x, w = runif(n, 0.5, 1.5))
-  expect_warning(
-    logistic_regression(d, y ~ x, weights = w),
-    "probabilities|converge"
-  )
+  # glm() raises both warnings here; each must reach the user
+  warns <- testthat::capture_warnings(logistic_regression(d, y ~ x, weights = w))
+  expect_true(any(grepl("probabilities", warns)))
+  expect_true(any(grepl("converge", warns)))
 })
 
 # --- Phase 5: cleanup regressions ---------------------------------------------
@@ -1104,8 +1104,11 @@ test_that("every grouped print path labels groups by level, not code", {
   skip_if_not_installed("haven")
   data(survey_data)
   g <- dplyr::group_by(survey_data, region)
-  rel <- capture.output(print(summary(
-    reliability(g, trust_government, trust_media, trust_science))))
+  # East is a Heywood case for omega (warned, alpha unaffected)
+  expect_warning(
+    rel_fit <- reliability(g, trust_government, trust_media, trust_science),
+    "Heywood")
+  rel <- capture.output(print(summary(rel_fit)))
   expect_true(any(grepl("region = East", rel, fixed = TRUE)))
   fa <- capture.output(print(summary(
     efa(g, trust_government, trust_media, trust_science, life_satisfaction))))
