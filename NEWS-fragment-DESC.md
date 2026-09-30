@@ -144,3 +144,6 @@
   "Cases per column" footer). Factor or character indicators whose levels
   do not contain `counted` (e.g. "no"/"yes" with the default
   `counted = 1`) are an error instead of silently counting 0 mentions.
+* `codebook()` console output (`print()`/`summary()`) writes counts
+  without thousands separators ("2500 observations"), like every other
+  table in the package and SPSS's default output.

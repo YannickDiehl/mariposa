@@ -768,3 +768,17 @@ test_that("DESC-20: multiple_response tables: integer counts, totals, factor ind
   rf <- multiple_response(d2, gf, mf, counted = "yes")
   expect_equal(rf$results$n, multiple_response(d, gov, media)$results$n)
 })
+
+
+# --- DESC-22: thousands separators ----------------------------------------------
+
+test_that("DESC-22: codebook console output uses no thousands separators", {
+  # Every table prints counts without separators (SPSS default: 2500),
+  # but the codebook header wrote "2,500 observations".
+  cb <- codebook(survey_data, view = FALSE)
+  out <- capture.output(print(cb))
+  expect_true(any(grepl("2500 observations", out, fixed = TRUE)))
+  expect_false(any(grepl("2,500", out, fixed = TRUE)))
+  outs <- capture.output(print(summary(cb, variable_details = FALSE)))
+  expect_true(any(grepl("Observations: 2500", outs, fixed = TRUE)))
+})

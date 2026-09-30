@@ -1005,10 +1005,12 @@ print.codebook <- function(x, ...) {
   }, character(1))
 
   cat(sprintf("\nCodebook: %s\n", info$name))
+  # Counts without thousands separators, as in every other table (SPSS
+  # default output)
   cat(sprintf("%s variable%s | %s observation%s",
               info$n_selected,
               if (info$n_selected == 1) "" else "s",
-              format(info$nrow, big.mark = ","),
+              info$nrow,
               if (info$nrow == 1) "" else "s"))
   if (info$n_labelled > 0) cat(sprintf(" | %s labelled", info$n_labelled))
   cat("\n")
@@ -1090,7 +1092,7 @@ print.summary.codebook <- function(x, ...) {
   # Overview section
   if (isTRUE(x$show$overview)) {
     cat(sprintf("  Dataset: %s\n", info$name))
-    cat(sprintf("  Observations: %s\n", format(info$nrow, big.mark = ",")))
+    cat(sprintf("  Observations: %s\n", info$nrow))
     cat(sprintf("  Variables: %d (%d numeric, %d factor, %d character)\n",
                 info$n_selected, info$n_numeric, info$n_factors, info$n_character))
     cat(sprintf("  Variables with labels: %d\n", info$n_labelled))
