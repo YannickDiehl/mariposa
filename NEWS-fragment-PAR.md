@@ -58,3 +58,12 @@
   instead of a bare "0", df as 2419 / 2384.147, weighted N as whole
   numbers ("1149", not "1149.0"), and `digits` applies to every column.
   Tables with umlaut labels stay aligned. (PAR-15, PAR-21, PAR-26)
+* `summary(oneway_anova())` prints an SPSS-style Descriptives table (N,
+  Mean, Std. Deviation, Std. Error and the confidence interval of each
+  group mean at `conf.level`) and formats the ANOVA, Welch and effect-size
+  tables with fixed decimals and `digits`. With `conf.level = 0.99` the
+  header said 99% but no interval was printed anywhere; weighted N printed
+  as "618.0", Mean Square as "289.79" next to "1.077", and `digits` had no
+  effect. `tukey_test()` and `scheffe_test()` on a `oneway_anova()` result
+  now default to the ANOVA's `conf.level` instead of silently using 95%.
+  (PAR-19, PAR-21)

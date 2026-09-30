@@ -801,6 +801,8 @@ print.oneway_anova <- function(x, digits = 3, ...) {
   }
   x$results$sig <- sapply(p_numeric, add_significance_stars)
 
+  ci_label <- paste0(format(100 * x$conf.level), "% CI")
+
   # Resolve show toggles (default TRUE when called without summary object)
   show_descriptives <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
   show_anova_table  <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
@@ -813,51 +815,46 @@ print.oneway_anova <- function(x, digits = 3, ...) {
     anova_table <- var_results$anova_table[[idx]]
     welch_result <- var_results$welch_result[[idx]]
 
-    cat(sprintf("\n--- %s ---\n", var))
-    cat("\n")
+    cat(sprintf("\n--- %s ---\n\n", var))
 
-    # Descriptive statistics (gated)
+    # Descriptive statistics (gated): SPSS ONEWAY "Descriptives" with the
+    # confidence interval for each group mean at `conf.level`
     if (show_descriptives && !is.null(stats)) {
-      if (is_weighted) {
-        cat("Weighted Descriptive Statistics by Group:\n")
-        for (level in names(stats)) {
-          stat <- stats[[level]]
-          cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.1f\n",
-                      level, stat$mean, stat$sd, stat$weighted_n))
-        }
-      } else {
-        cat("Descriptive Statistics by Group:\n")
-        for (level in names(stats)) {
-          stat <- stats[[level]]
-          cat(sprintf("  %s: mean = %.3f, sd = %.3f, n = %.0f\n",
-                      level, stat$mean, stat$sd, stat$n))
-        }
-      }
+      cat(sprintf("%sDescriptive Statistics:\n", if (is_weighted) "Weighted " else ""))
+      num <- function(field) vapply(stats, function(st) {
+        as.numeric(st[[field]] %||% NA_real_)
+      }, numeric(1))
+      n_shown <- if (is_weighted) num("weighted_n") else num("n")
+      .print_table_utf8(data.frame(
+        Group = names(stats),
+        N = formatC(round(n_shown), format = "d"),
+        Mean = fmt_num(num("mean"), digits),
+        `Std. Deviation` = fmt_num(num("sd"), digits),
+        `Std. Error` = fmt_num(num("se"), digits),
+        Lower = fmt_num(num("ci_lower"), digits),
+        Upper = fmt_num(num("ci_upper"), digits),
+        check.names = FALSE, stringsAsFactors = FALSE
+      ), col_labels = c(Group = x$group,
+                        Lower = paste(ci_label, "Lower"),
+                        Upper = paste(ci_label, "Upper")))
     }
 
     # ANOVA table (gated)
     if (show_anova_table) {
       if (!is.null(anova_table)) {
         cat(sprintf("\n%s:\n", ifelse(is_weighted, "Weighted ANOVA Results", "ANOVA Results")))
-
-        # Format ANOVA table for display
-        display_table <- anova_table
-        display_table$Sum_Squares <- round(display_table$Sum_Squares, 3)
-        display_table$Mean_Square <- ifelse(display_table$Mean_Square == "", "",
-                                           round(as.numeric(display_table$Mean_Square), 3))
-        display_table$F <- ifelse(display_table$F == "", "",
-                                 round(as.numeric(display_table$F), 3))
-        display_table$p_value <- ifelse(display_table$p_value == "", "",
-                                       ifelse(as.numeric(display_table$p_value) < 0.001, "<.001",
-                                             round(as.numeric(display_table$p_value), 3)))
-
-        f_sig <- var_results$sig[idx]
-        display_table$sig <- c(f_sig, "", "")
-
-        border_width <- paste(rep("-", 80), collapse = "")
-        cat(border_width, "\n")
-        print(display_table, row.names = FALSE, na.print = "")
-        cat(border_width, "\n")
+        at_num <- function(col) suppressWarnings(as.numeric(anova_table[[col]]))
+        f_p <- at_num("p_value")
+        .print_table_utf8(data.frame(
+          Source = anova_table$Source,
+          `Sum of Squares` = fmt_num(at_num("Sum_Squares"), digits),
+          df = .fmt_df(at_num("df"), digits),
+          `Mean Square` = fmt_num(at_num("Mean_Square"), digits),
+          F = fmt_num(at_num("F"), digits),
+          Sig = fmt_p(f_p, digits),
+          sig = add_significance_stars(f_p),
+          check.names = FALSE, stringsAsFactors = FALSE
+        ), col_labels = c(Source = "", sig = ""))
       }
 
       # Welch test (part of anova_table section). SPSS ONEWAY prints it as
@@ -870,19 +867,15 @@ print.oneway_anova <- function(x, digits = 3, ...) {
                       welch_result$note %||% "see warning"))
         } else {
           welch_p <- as.numeric(welch_result$p.value)
-          welch_table <- data.frame(
+          .print_table_utf8(data.frame(
             Test = "Welch",
             Statistic = fmt_num(as.numeric(welch_result$statistic), digits),
-            df1 = formatC(as.numeric(welch_result$parameter[1]), format = "d"),
-            df2 = fmt_num(as.numeric(welch_result$parameter[2]), digits),
+            df1 = .fmt_df(welch_result$parameter[1], digits),
+            df2 = .fmt_df(welch_result$parameter[2], digits),
             Sig = fmt_p(welch_p, digits),
             sig = add_significance_stars(welch_p),
             stringsAsFactors = FALSE
-          )
-          print_stat_table(welch_table, digits = digits,
-                           col_types = c(Statistic = "char", df1 = "char",
-                                         df2 = "char", Sig = "char"),
-                           col_labels = c(Test = "", sig = ""))
+          ), col_labels = c(Test = "", sig = ""))
         }
       }
     }
@@ -905,18 +898,15 @@ print.oneway_anova <- function(x, digits = 3, ...) {
                                if (abs(eta_val) < 0.06) "small" else
                                if (abs(eta_val) < 0.14) "medium" else "large"
 
-        effect_df <- data.frame(
-          Variable = var,
-          Eta_Squared = round(eta_val, 3),
-          Epsilon_Squared = round(epsilon_val, 3),
-          Omega_Squared = round(omega_val, 3),
-          Effect_Size = effect_size_category,
-          stringsAsFactors = FALSE
-        )
-
         cat("\nEffect Sizes:\n")
-        cat(paste(rep("-", 12), collapse = ""), "\n")
-        print(effect_df, row.names = FALSE)
+        .print_table_utf8(data.frame(
+          Variable = var,
+          `Eta Squared` = fmt_num(eta_val, digits),
+          `Epsilon Squared` = fmt_num(epsilon_val, digits),
+          `Omega Squared` = fmt_num(omega_val, digits),
+          Magnitude = effect_size_category,
+          check.names = FALSE, stringsAsFactors = FALSE
+        ))
       }
     }
     cat("\n")

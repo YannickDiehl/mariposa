@@ -11,7 +11,8 @@
 #' - Insurance against finding differences that aren't real
 #'
 #' @param x ANOVA results from \code{oneway_anova()}
-#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#' @param conf.level Confidence level for intervals. Default: the
+#'   \code{conf.level} of the \code{oneway_anova()} result (usually 0.95).
 #' @param ... Additional arguments (currently unused)
 #'
 #' @return Pairwise comparison results showing:
@@ -139,6 +140,9 @@ scheffe_test.default <- function(x, conf.level = 0.95, ...) {
 scheffe_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   # Shared engine in R/posthoc-pairwise.R (Scheffe-specific core in
   # .scheffe_stats(): (k-1)*F critical values)
+  # Default: the confidence level of the ANOVA (conf.level passed to
+  # oneway_anova()), so 99 percent there does not silently become 95 here
+  if (missing(conf.level)) conf.level <- x$conf.level %||% 0.95
   .pairwise_posthoc(x, method = "scheffe", conf.level = conf.level)
 }
 

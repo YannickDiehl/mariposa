@@ -12,7 +12,8 @@
 #' - A way to make all possible comparisons while controlling error rates
 #'
 #' @param x ANOVA results from \code{oneway_anova()}
-#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#' @param conf.level Confidence level for intervals. Default: the
+#'   \code{conf.level} of the \code{oneway_anova()} result (usually 0.95).
 #' @param ... Additional arguments (currently unused)
 #'
 #' @return Pairwise comparison results showing:
@@ -139,6 +140,9 @@ tukey_test.default <- function(x, conf.level = 0.95, ...) {
 tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   # Shared engine in R/posthoc-pairwise.R (Tukey-specific cores in
   # .tukey_stats(); unweighted path delegates to stats::TukeyHSD)
+  # Default: the confidence level of the ANOVA (conf.level passed to
+  # oneway_anova()), so 99 percent there does not silently become 95 here
+  if (missing(conf.level)) conf.level <- x$conf.level %||% 0.95
   .pairwise_posthoc(x, method = "tukey", conf.level = conf.level)
 }
 #' Print Tukey HSD test results (compact)

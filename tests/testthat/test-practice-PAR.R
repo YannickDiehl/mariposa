@@ -308,3 +308,35 @@ test_that("PAR-21/PAR-26: t_test() summary tables: SPSS formats, Group Statistic
   t_row <- out2[grepl("^ +Equal variances assumed", out2)]
   expect_match(t_row, "-1\\.07 ")
 })
+
+# --- PAR-19 / PAR-21: oneway_anova() summary and conf.level --------------------
+
+test_that("PAR-19: oneway conf.level reaches the descriptives CI and the post-hoc tests", {
+  # The header said "99%" but no interval was printed anywhere, and
+  # tukey_test() on the result silently used 95%.
+  r <- oneway_anova(survey_data, life_satisfaction, group = education,
+                    conf.level = 0.99)
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("99% CI Lower", out, fixed = TRUE)))
+  gs <- r$results$group_stats[[1]][["Basic Secondary"]]
+  expect_true(any(grepl(sprintf("%.3f", gs$ci_lower), out, fixed = TRUE)))
+  expect_equal(tukey_test(r)$conf.level, 0.99)
+  expect_equal(scheffe_test(r)$conf.level, 0.99)
+  expect_equal(tukey_test(r, conf.level = 0.9)$conf.level, 0.9)
+})
+
+test_that("PAR-21: oneway summary tables use fixed decimals, integer N and digits", {
+  # Weighted n printed as "618.0", Mean Square as "289.79" next to "1.077",
+  # effect sizes and descriptives ignored `digits`.
+  r <- oneway_anova(survey_data, life_satisfaction, group = education,
+                    weights = sampling_weight)
+  out <- capture.output(print(summary(r)))
+  expect_false(any(grepl("618.0", out, fixed = TRUE)))
+  expect_true(any(grepl("^ +Basic Secondary +816 ", out)))
+  between <- out[grepl("^ +Between Groups", out)]
+  expect_match(between, "241\\.130 +3 +80\\.377 +65\\.333 +<\\.001")
+  out2 <- capture.output(print(summary(r, digits = 2)))
+  expect_true(any(grepl("65.33", out2, fixed = TRUE)))
+  expect_true(any(grepl("^ +life_satisfaction +0\\.07 ", out2)))
+  expect_true(any(grepl("^ +Basic Secondary +816 +3\\.21 ", out2)))
+})
