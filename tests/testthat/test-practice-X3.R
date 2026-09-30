@@ -59,3 +59,26 @@ test_that("FMT-ALIGN: leading text columns of print_stat_table() are left-aligne
   out2 <- capture.output(mariposa:::print_stat_table(num_first, digits = 3))
   expect_match(out2[4], "^    1\\.500")
 })
+
+# --- REG-16 / SCALE: legacy correlation-matrix printer ------------------------
+
+test_that("REG-16: the legacy .print_cor_matrix()/.print_single_pair() are gone", {
+  # .print_cor_matrix() raised options(width) temporarily, dropped to 2
+  # decimals above 6 variables ignoring digits and printed a 0.0000
+  # diagonal; reliability() now prints its own numbered matrix and the
+  # correlation classes use .print_cor_matrix_fit(). Neither helper had a
+  # caller left, only tests kept them alive.
+  ns <- asNamespace("mariposa")
+  expect_false(exists(".print_cor_matrix", envir = ns, inherits = FALSE))
+  expect_false(exists(".print_single_pair", envir = ns, inherits = FALSE))
+  # reliability honours digits for more than 6 items and leaves width alone
+  set.seed(3)
+  f <- stats::rnorm(200)
+  d <- as.data.frame(replicate(7, round(f + stats::rnorm(200), 1)))
+  old <- getOption("width")
+  out <- capture.output(print(summary(reliability(d, dplyr::everything()),
+                                      digits = 4)))
+  expect_identical(getOption("width"), old)
+  i <- grep("Inter-Item Correlation Matrix", out, fixed = TRUE)
+  expect_true(any(grepl("1\\.0000", out[i:(i + 12)])))
+})
