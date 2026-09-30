@@ -57,7 +57,14 @@
 #'   \item{factor_correlations}{Factor correlation matrix (oblimin/promax only, NULL otherwise)}
 #'   \item{variables}{Character vector of variable names}
 #'   \item{weights}{Weights variable name or NULL}
-#'   \item{n}{Sample size}
+#'   \item{item_statistics}{Tibble with mean, SD, analysis N and missing N
+#'     per item. With \code{use = "pairwise"} each item uses its own valid
+#'     cases; with \code{use = "complete"} all items use the complete cases.}
+#'   \item{n}{Sample size: the smallest pairwise N (\code{use = "pairwise"},
+#'     the N of Bartlett's test as in SPSS) or the number of complete cases
+#'     (\code{use = "complete"}); the sum of weights when weighted}
+#'   \item{use}{The missing-data handling used (\code{"pairwise"} or
+#'     \code{"complete"})}
 #'   \item{col_prefix}{Column name prefix: \code{"PC"} for PCA, \code{"Factor"} for ML}
 #'   \item{sort}{Whether loadings are sorted}
 #'   \item{blank}{Suppression threshold}
@@ -516,8 +523,8 @@ efa <- function(data, ...,
   # DESCRIPTIVE STATISTICS
   # ============================================================================
 
-  # Per-variable descriptive stats (pairwise N)
-  item_stats <- .efa_item_stats(data, var_names, weights_vec)
+  # Per-variable descriptive stats (Analysis N follows `use`)
+  item_stats <- .efa_item_stats(data, var_names, weights_vec, use)
 
   # ============================================================================
   # RETURN RESULT
@@ -545,6 +552,7 @@ efa <- function(data, ...,
     factor_correlations = factor_correlations,
     item_statistics = item_stats,
     n = n_bartlett,
+    use = use,
     col_prefix = col_prefix
   )
 }
@@ -1132,29 +1140,36 @@ efa <- function(data, ...,
 
 #' Compute per-item descriptive statistics for EFA
 #' @noRd
-.efa_item_stats <- function(data, var_names, weights_vec) {
+.efa_item_stats <- function(data, var_names, weights_vec, use = "pairwise") {
+  mat <- .efa_item_matrix(data, var_names)
+  # SPSS "Descriptive Statistics": with pairwise deletion every item uses
+  # its own valid cases; with listwise deletion all items use the cases
+  # the analysis is based on (the complete cases).
+  in_analysis <- if (use == "complete") {
+    stats::complete.cases(mat)
+  } else {
+    rep(TRUE, nrow(mat))
+  }
+  if (!is.null(weights_vec)) in_analysis <- in_analysis & !is.na(weights_vec)
+
   stats_list <- lapply(var_names, function(v) {
-    x <- data[[v]]
-    valid <- !is.na(x)
+    x <- mat[, v]
+    valid <- in_analysis & !is.na(x)
+    xv <- x[valid]
     if (!is.null(weights_vec)) {
-      valid <- valid & !is.na(weights_vec)
       w <- weights_vec[valid]
-      xv <- x[valid]
-      wm <- sum(xv * w) / sum(w)
-      wvar <- sum(w * (xv - wm)^2) / (sum(w) - 1)
       tibble::tibble(
         variable = v,
-        mean = wm,
-        sd = sqrt(wvar),
+        mean = if (length(xv)) .w_mean(xv, w) else NA_real_,
+        sd = if (length(xv) > 1) sqrt(.w_var(xv, w)) else NA_real_,
         analysis_n = sum(w),
         missing_n = sum(!valid)
       )
     } else {
-      xv <- x[valid]
       tibble::tibble(
         variable = v,
-        mean = mean(xv),
-        sd = stats::sd(xv),
+        mean = if (length(xv)) mean(xv) else NA_real_,
+        sd = if (length(xv) > 1) stats::sd(xv) else NA_real_,
         analysis_n = length(xv),
         missing_n = sum(!valid)
       )
@@ -1281,11 +1296,26 @@ print.efa <- function(x, digits = 3, ...) {
   # Squared Loadings", cumulative %); for ML this is not the eigenvalue share
   total_var_pct <- .efa_extraction_variance(res)$cumulative_prc[n_factors]
 
+  n_info <- .efa_n_info(res)
   cat(sprintf("Exploratory Factor Analysis: %d items, %d %s (%s/%s)%s\n",
               n_vars, n_factors, component_label,
               extraction_label, rotation_label, weighted_tag))
-  cat(sprintf("  %s, Variance explained: %s%%\n",
-              kmo_text, fmt_num(total_var_pct, 1)))
+  cat(sprintf("  %s, Variance explained: %s%%, N = %s (%s)\n",
+              kmo_text, fmt_num(total_var_pct, 1), n_info$value, n_info$basis))
+}
+
+#' Sample size of an EFA and what it refers to
+#'
+#' With pairwise deletion every correlation has its own N; the smallest
+#' one is the N of Bartlett's test (SPSS). With listwise deletion it is the
+#' number of complete cases. Weighted N is the sum of weights.
+#' @return list(value = formatted N, basis = "smallest pairwise"/"listwise")
+#' @noRd
+.efa_n_info <- function(res) {
+  list(
+    value = formatC(res$n, format = "f", digits = 0),
+    basis = if (identical(res$use, "complete")) "listwise" else "smallest pairwise"
+  )
 }
 
 
@@ -1308,6 +1338,8 @@ print.efa <- function(x, digits = 3, ...) {
 #' @param pattern_matrix Show pattern matrix (oblimin/promax)? (Default: TRUE)
 #' @param structure_matrix Show structure matrix (oblimin/promax)? (Default: TRUE)
 #' @param factor_correlations Show factor correlation matrix (oblimin/promax)? (Default: TRUE)
+#' @param descriptives Show the per-item descriptive statistics (mean, SD,
+#'   analysis N, missing N; SPSS \code{/PRINT UNIVARIATE})? (Default: TRUE)
 #' @param digits Number of decimal places (Default: 3)
 #' @param ... Additional arguments (ignored)
 #'
@@ -1326,8 +1358,9 @@ summary.efa <- function(object, kmo_bartlett = TRUE, communalities = TRUE,
                         variance_explained = TRUE, unrotated_matrix = TRUE,
                         rotated_matrix = TRUE, pattern_matrix = TRUE,
                         structure_matrix = TRUE, factor_correlations = TRUE,
-                        digits = 3, ...) {
+                        descriptives = TRUE, digits = 3, ...) {
   show <- list(
+    descriptives = descriptives,
     kmo_bartlett = kmo_bartlett,
     communalities = communalities,
     variance_explained = variance_explained,
@@ -1404,6 +1437,7 @@ print.summary.efa <- function(x, ...) {
   show_pattern <- if (!is.null(x$show)) isTRUE(x$show$pattern_matrix) else TRUE
   show_structure <- if (!is.null(x$show)) isTRUE(x$show$structure_matrix) else TRUE
   show_factor_cor <- if (!is.null(x$show)) isTRUE(x$show$factor_correlations) else TRUE
+  show_desc <- if (!is.null(x$show)) !isFALSE(x$show$descriptives) else TRUE
 
   blank <- x$blank %||% 0.40
   sort_loadings <- x$sort %||% TRUE
@@ -1430,6 +1464,22 @@ print.summary.efa <- function(x, ...) {
     "N of Factors" = as.character(x$n_factors),
     "Weights" = x$weights
   ))
+  n_info <- .efa_n_info(x)
+  cat(sprintf("- N (%s): %s%s\n", n_info$basis, n_info$value,
+              if (!is.null(x$weights)) " (weighted)" else ""))
+
+  # Descriptive Statistics (SPSS /PRINT UNIVARIATE)
+  if (show_desc && !is.null(x$item_statistics)) {
+    cat("\nDescriptive Statistics\n")
+    desc <- as.data.frame(x$item_statistics)
+    print_stat_table(
+      desc, digits = digits,
+      col_types = c(analysis_n = "int", missing_n = "int"),
+      col_labels = c(variable = "Variable", mean = "Mean",
+                     sd = "Std. Deviation", analysis_n = "Analysis N",
+                     missing_n = "Missing N")
+    )
+  }
 
   # KMO and Bartlett's Test
   if (show_kmo) {

@@ -35,3 +35,9 @@
   A separate warning appears when there are no more cases than variables.
   Bartlett's and the goodness-of-fit significance use the SPSS style
   ("<.001") instead of "0.000".
+* `efa()` shows its sample size. `print()` adds "N = 2168 (smallest
+  pairwise)" (or "(listwise)"), `summary()` an N line and SPSS's
+  "Descriptive Statistics" table (mean, SD, analysis N, missing N; new
+  toggle `descriptives`). With `use = "complete"`, `$item_statistics` now
+  describes the complete cases the analysis uses; the analysis N was
+  pairwise before.

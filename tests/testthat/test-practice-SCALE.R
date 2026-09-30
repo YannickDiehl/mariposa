@@ -234,3 +234,36 @@ test_that("SCALE-04: fewer cases than variables are flagged", {
   expect_true(is.na(cnd$result$kmo$overall))
   expect_false(anyNA(cnd$result$unrotated_loadings))
 })
+
+# --- SCALE-13: sample size -----------------------------------------------------
+
+test_that("SCALE-13: efa() shows N in print() and summary()", {
+  # e$n existed but was never printed; with pairwise deletion the smallest
+  # pairwise N was invisible.
+  e <- efa(survey_data, political_orientation, environmental_concern,
+           life_satisfaction, trust_government, trust_media, trust_science)
+  out <- capture.output(print(e))
+  expect_true(any(grepl(sprintf("N = %d (smallest pairwise)", e$n), out,
+                        fixed = TRUE)))
+  s <- capture.output(print(summary(e)))
+  expect_true(any(grepl(sprintf("N (smallest pairwise): %d", e$n), s,
+                        fixed = TRUE)))
+  expect_true(any(grepl("Descriptive Statistics", s, fixed = TRUE)))
+  expect_true(any(grepl("Analysis N", s, fixed = TRUE)))
+})
+
+test_that("SCALE-13: use = 'complete' reports the listwise N per item", {
+  # item_statistics$analysis_n stayed pairwise with use = "complete".
+  e <- efa(survey_data, political_orientation, environmental_concern,
+           life_satisfaction, trust_government, trust_media, trust_science,
+           use = "complete")
+  cc <- stats::complete.cases(survey_data[, e$variables])
+  expect_equal(e$n, sum(cc))
+  expect_true(all(e$item_statistics$analysis_n == sum(cc)))
+  expect_true(all(e$item_statistics$missing_n == sum(!cc)))
+  expect_equal(e$item_statistics$mean[1],
+               mean(survey_data$political_orientation[cc]))
+  out <- capture.output(print(e))
+  expect_true(any(grepl(sprintf("N = %d (listwise)", sum(cc)), out,
+                        fixed = TRUE)))
+})
