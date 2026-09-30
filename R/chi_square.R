@@ -121,227 +121,31 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     cli_abort("Exactly two variables must be specified for {.fn chi_square}.")
   }
 
-  # Build label maps for display (before any subsetting)
-  label_maps <- stats::setNames(
-    list(.build_label_map(data[[var_names[1]]]),
-         .build_label_map(data[[var_names[2]]])),
-    var_names
-  )
-
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
   data <- weights_info$data
   w_name <- weights_info$name
-  
-  # Perform chi-squared test
+
+  # One test per data slice (the whole data or one group_by() group)
+  run_slice <- function(slice, key = NULL) {
+    w <- if (!is.null(w_name)) slice[[w_name]] else NULL
+    .chi_square_one(slice[[var_names[1]]], slice[[var_names[2]]], w,
+                    correct = correct, var_names = var_names, key = key)
+  }
+
   if (is_grouped) {
-    # Group analysis
     data_list <- dplyr::group_split(data)
     group_keys <- dplyr::group_keys(data)
-    
     results_list <- lapply(seq_along(data_list), function(i) {
-      group_data <- data_list[[i]]
-      group_info <- group_keys[i, , drop = FALSE]
-      
-      # Test for this group
-      result <- tryCatch({
-        # Extract variables
-        var1 <- group_data[[var_names[1]]]
-        var2 <- group_data[[var_names[2]]]
-        
-        if (!is.null(w_name)) {
-          # Weighted test - round weights to integers for SPSS compatibility
-          weights_data <- group_data[[w_name]]
-          ok <- !is.na(weights_data)  # missing weight: case excluded
-          tbl <- xtabs(weights_data[ok] ~ var1[ok] + var2[ok])
-          tbl <- round(tbl)  # Round to match SPSS behavior
-        } else {
-          # Unweighted test
-          tbl <- table(var1, var2)
-        }
-        names(dimnames(tbl)) <- var_names
-
-        test_result <- chisq.test(tbl, correct = correct)
-
-        # Create results entry
-        data.frame(
-          group_info,
-          chi_squared = as.numeric(test_result$statistic),
-          df = as.numeric(test_result$parameter),
-          p_value = test_result$p.value,
-          n = sum(tbl),
-          observed = I(list(test_result$observed)),
-          expected = I(list(test_result$expected)),
-          residuals = I(list(test_result$residuals)),
-          stringsAsFactors = FALSE
-        )
-      }, error = function(e) {
-        # Return NA results if chi-squared test fails
-        data.frame(
-          group_info,
-          chi_squared = NA_real_,
-          df = NA_integer_,
-          p_value = NA_real_,
-          n = NA_integer_,
-          observed = I(list(NULL)),
-          expected = I(list(NULL)), 
-          residuals = I(list(NULL)),
-          stringsAsFactors = FALSE
-        )
-      })
+      key <- group_keys[i, , drop = FALSE]
+      cbind(key, run_slice(data_list[[i]], key))
     })
-    
-    # Combine all results
     results_df <- do.call(rbind, results_list)
-    
+    rownames(results_df) <- NULL
   } else {
-    # Single analysis for whole dataset
-    var1 <- data[[var_names[1]]]
-    var2 <- data[[var_names[2]]]
-    
-    if (!is.null(w_name)) {
-      # Weighted test - round weights to integers for SPSS compatibility
-      weights_data <- data[[w_name]]
-      ok <- !is.na(weights_data)  # missing weight: case excluded
-      tbl <- xtabs(weights_data[ok] ~ var1[ok] + var2[ok])
-      tbl <- round(tbl)  # Round to match SPSS behavior
-    } else {
-      # Unweighted test
-      tbl <- table(var1, var2)
-    }
-    names(dimnames(tbl)) <- var_names
-
-    test_result <- chisq.test(tbl, correct = correct)
-
-    # Create results dataframe
-    results_df <- data.frame(
-      chi_squared = as.numeric(test_result$statistic),
-      df = as.numeric(test_result$parameter),
-      p_value = test_result$p.value,
-      n = sum(tbl),
-      stringsAsFactors = FALSE
-    )
-    
-    # Add tables as list columns
-    results_df$observed <- list(test_result$observed)
-    results_df$expected <- list(test_result$expected)
-    results_df$residuals <- list(test_result$residuals)
-  }
-  
-  # Warn if any expected cell counts are < 5
-  for (i in seq_len(nrow(results_df))) {
-    exp_tbl <- results_df$expected[[i]]
-    if (!is.null(exp_tbl)) {
-      n_low <- sum(exp_tbl < 5)
-      if (n_low > 0) {
-        pct_low <- round(100 * n_low / length(exp_tbl), 1)
-        cli_warn("{n_low} cell{?s} ({pct_low}%) ha{?s/ve} expected count < 5. Chi-squared approximation may be unreliable.")
-      }
-    }
+    results_df <- run_slice(data)
   }
 
-  # Calculate effect sizes
-  results_df$cramers_v <- NA_real_
-  results_df$phi <- NA_real_
-  results_df$gamma <- NA_real_
-  results_df$contingency_c <- NA_real_
-  results_df$table_rows <- NA_integer_
-  results_df$table_cols <- NA_integer_
-
-  # Add p-value fields for effect sizes
-  results_df$phi_p_value <- NA_real_
-  results_df$cramers_v_p_value <- NA_real_
-  results_df$gamma_p_value <- NA_real_
-
-  for (i in seq_len(nrow(results_df))) {
-    if (!is.null(results_df$observed[[i]]) && !is.na(results_df$chi_squared[i])) {
-      # Calculate effect sizes
-      n <- results_df$n[i]
-      chi_squared <- results_df$chi_squared[i]
-
-      # Get table dimensions
-      r <- nrow(results_df$observed[[i]])
-      c <- ncol(results_df$observed[[i]])
-
-      # Store dimensions for conditional display
-      results_df$table_rows[i] <- r
-      results_df$table_cols[i] <- c
-
-      # Phi coefficient (most meaningful for 2x2 tables)
-      results_df$phi[i] <- sqrt(chi_squared / n)
-
-      # Cramer's V (appropriate for any table size)
-      results_df$cramers_v[i] <- sqrt(chi_squared / (n * min(r - 1, c - 1)))
-
-      # Contingency coefficient C
-      results_df$contingency_c[i] <- sqrt(chi_squared / (chi_squared + n))
-
-      # Phi and Cramer's V p-values are the same as chi-squared p-value
-      results_df$phi_p_value[i] <- results_df$p_value[i]
-      results_df$cramers_v_p_value[i] <- results_df$p_value[i]
-
-      # Goodman and Kruskal's Gamma
-      # Calculate concordant (C_ij) and discordant (D_ij) pair counts per cell
-      obs_table <- results_df$observed[[i]]
-
-      # For each cell (i,j), compute:
-      #   C_ij = sum of all cells below-right (concordant with this cell)
-      #   D_ij = sum of all cells below-left (discordant with this cell)
-      C_mat <- matrix(0, nrow = r, ncol = c)
-      D_mat <- matrix(0, nrow = r, ncol = c)
-
-      for (row1 in 1:r) {
-        for (col1 in 1:c) {
-          # Concordant: cells below and to the right
-          if (row1 < r && col1 < c) {
-            for (row2 in (row1 + 1):r) {
-              for (col2 in (col1 + 1):c) {
-                C_mat[row1, col1] <- C_mat[row1, col1] + obs_table[row2, col2]
-              }
-            }
-          }
-          # Discordant: cells below and to the left
-          if (row1 < r && col1 > 1) {
-            for (row2 in (row1 + 1):r) {
-              for (col2 in 1:(col1 - 1)) {
-                D_mat[row1, col1] <- D_mat[row1, col1] + obs_table[row2, col2]
-              }
-            }
-          }
-        }
-      }
-
-      # P = total concordant pairs, Q = total discordant pairs
-      P <- as.numeric(sum(obs_table * C_mat))
-      Q <- as.numeric(sum(obs_table * D_mat))
-
-      # Calculate Gamma
-      if ((P + Q) > 0) {
-        results_df$gamma[i] <- (P - Q) / (P + Q)
-        gamma <- results_df$gamma[i]
-
-        # ASE0 under null hypothesis (SPSS method)
-        # Formula: ASE0 = (2 / (P + Q)) * sqrt(sum(n_ij * (C_ij - D_ij)^2) - (P - Q)^2 / n)
-        # Reference: Goodman & Kruskal (1963); Agresti (2002)
-        sum_nij_diff_sq <- sum(as.numeric(obs_table) * (C_mat - D_mat)^2)
-        inner <- sum_nij_diff_sq - (P - Q)^2 / n
-
-        if (inner > 0) {
-          ase0 <- (2 / (P + Q)) * sqrt(inner)
-
-          # Z-statistic and two-tailed p-value (SPSS approach)
-          z_stat <- gamma / ase0
-          results_df$gamma_p_value[i] <- 2 * (1 - pnorm(abs(z_stat)))
-        } else {
-          results_df$gamma_p_value[i] <- NA_real_
-        }
-      } else {
-        results_df$gamma[i] <- 0
-        results_df$gamma_p_value[i] <- NA_real_
-      }
-    }
-  }
-  
   # Create result object
   result <- list(
     results = results_df,
@@ -349,12 +153,171 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     weights = w_name,
     correct = correct,
     is_grouped = is_grouped,
-    groups = group_vars,
-    label_maps = label_maps
+    groups = group_vars
   )
   
   class(result) <- "chi_square"
   return(result)
+}
+
+#' Chi-square test and effect sizes for one data slice
+#'
+#' Builds the contingency table from the observed categories only (SPSS
+#' CROSSTABS: empty factor levels, e.g. left over after filter(), are not
+#' categories; with weights the cell counts are rounded as SPSS does and a
+#' category whose rounded count is 0 is dropped). A table with fewer than
+#' two rows or columns (constant variable) is not testable: the row is
+#' returned with NA statistics, a `reason`, and a warning naming the
+#' variables and group.
+#'
+#' @param v1,v2 The two variables (one slice)
+#' @param w Weights or NULL
+#' @param correct Yates continuity correction (2x2 only, as chisq.test)
+#' @param var_names Names of the two variables
+#' @param key One-row group key or NULL
+#' @return One-row data frame
+#' @noRd
+.chi_square_one <- function(v1, v2, w, correct, var_names, key = NULL) {
+  where <- .np_where(key)
+  f1 <- .np_factor(v1)
+  f2 <- .np_factor(v2)
+  ok <- !is.na(f1) & !is.na(f2)
+  if (!is.null(w)) {
+    ok <- ok & !is.na(w)  # missing weight: case excluded
+    w_ok <- w[ok]
+    g1 <- f1[ok]
+    g2 <- f2[ok]
+    tbl <- round(stats::xtabs(w_ok ~ g1 + g2))  # SPSS rounds cell counts
+  } else {
+    tbl <- table(f1[ok], f2[ok])
+  }
+  tbl <- tbl[rowSums(tbl) > 0, colSums(tbl) > 0, drop = FALSE]
+  names(dimnames(tbl)) <- var_names
+  n <- sum(tbl)
+  r <- nrow(tbl)
+  c <- ncol(tbl)
+
+  empty_row <- function(reason) {
+    data.frame(
+      chi_squared = NA_real_, df = NA_real_, p_value = NA_real_,
+      n = n,
+      observed = I(list(tbl)), expected = I(list(NULL)),
+      residuals = I(list(NULL)),
+      cramers_v = NA_real_, phi = NA_real_, gamma = NA_real_,
+      contingency_c = NA_real_,
+      table_rows = r, table_cols = c,
+      phi_p_value = NA_real_, cramers_v_p_value = NA_real_,
+      gamma_p_value = NA_real_,
+      reason = reason,
+      stringsAsFactors = FALSE
+    )
+  }
+
+  if (r < 2 || c < 2) {
+    one_cat <- var_names[c(r < 2, c < 2)]
+    reason <- if (n == 0) {
+      "no valid cases"
+    } else {
+      paste0(paste(one_cat, collapse = " and "),
+             if (length(one_cat) == 1) " has" else " have",
+             " only one observed category")
+    }
+    cli_warn(c(
+      "Chi-squared test not computed for {.var {var_names[1]}} × {.var {var_names[2]}}{where}.",
+      "x" = "{reason}."
+    ))
+    return(empty_row(reason))
+  }
+
+  test_result <- stats::chisq.test(tbl, correct = correct)
+  chi_squared <- as.numeric(test_result$statistic)
+  p_value <- test_result$p.value
+
+  # SPSS footnotes cells with an expected count below 5
+  exp_tbl <- test_result$expected
+  n_low <- sum(exp_tbl < 5)
+  if (n_low > 0) {
+    pct_low <- round(100 * n_low / length(exp_tbl), 1)
+    cli_warn("{n_low} cell{?s} ({pct_low}%){where} ha{?s/ve} expected count < 5. Chi-squared approximation may be unreliable.")
+  }
+
+  gam <- .goodman_gamma_stats(tbl)
+
+  data.frame(
+    chi_squared = chi_squared,
+    df = as.numeric(test_result$parameter),
+    p_value = p_value,
+    n = n,
+    observed = I(list(test_result$observed)),
+    expected = I(list(exp_tbl)),
+    residuals = I(list(test_result$residuals)),
+    # Phi and Cramer's V share the chi-square p-value (SPSS)
+    cramers_v = sqrt(chi_squared / (n * min(r - 1, c - 1))),
+    phi = sqrt(chi_squared / n),
+    gamma = gam$gamma,
+    contingency_c = sqrt(chi_squared / (chi_squared + n)),
+    table_rows = r,
+    table_cols = c,
+    phi_p_value = p_value,
+    cramers_v_p_value = p_value,
+    gamma_p_value = gam$p_value,
+    reason = NA_character_,
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Goodman and Kruskal's gamma with its ASE0-based p-value (SPSS)
+#'
+#' @param obs_table Contingency table (rows and columns in category order)
+#' @return list(gamma, p_value)
+#' @noRd
+.goodman_gamma_stats <- function(obs_table) {
+  r <- nrow(obs_table)
+  c <- ncol(obs_table)
+  n <- sum(obs_table)
+  # For each cell (i,j):
+  #   C_ij = sum of all cells below-right (concordant with this cell)
+  #   D_ij = sum of all cells below-left (discordant with this cell)
+  C_mat <- matrix(0, nrow = r, ncol = c)
+  D_mat <- matrix(0, nrow = r, ncol = c)
+
+  for (row1 in 1:r) {
+    for (col1 in 1:c) {
+      if (row1 < r && col1 < c) {
+        for (row2 in (row1 + 1):r) {
+          for (col2 in (col1 + 1):c) {
+            C_mat[row1, col1] <- C_mat[row1, col1] + obs_table[row2, col2]
+          }
+        }
+      }
+      if (row1 < r && col1 > 1) {
+        for (row2 in (row1 + 1):r) {
+          for (col2 in 1:(col1 - 1)) {
+            D_mat[row1, col1] <- D_mat[row1, col1] + obs_table[row2, col2]
+          }
+        }
+      }
+    }
+  }
+
+  # P = total concordant pairs, Q = total discordant pairs
+  P <- as.numeric(sum(obs_table * C_mat))
+  Q <- as.numeric(sum(obs_table * D_mat))
+
+  if ((P + Q) == 0) return(list(gamma = 0, p_value = NA_real_))
+
+  gamma <- (P - Q) / (P + Q)
+  # ASE0 under the null hypothesis (SPSS method):
+  #   ASE0 = (2 / (P + Q)) * sqrt(sum(n_ij * (C_ij - D_ij)^2) - (P - Q)^2 / n)
+  # Reference: Goodman & Kruskal (1963); Agresti (2002)
+  inner <- sum(as.numeric(obs_table) * (C_mat - D_mat)^2) - (P - Q)^2 / n
+  p_value <- if (inner > 0) {
+    ase0 <- (2 / (P + Q)) * sqrt(inner)
+    2 * (1 - stats::pnorm(abs(gamma / ase0)))
+  } else {
+    NA_real_
+  }
+  list(gamma = gamma, p_value = p_value)
 }
 
 # Helper functions for print method
@@ -373,47 +336,29 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   is_2x2 <- (rows == 2 && cols == 2)
   n <- df$n[i]
 
-  phi <- df$phi[i]
-  gamma <- df$gamma[i]
-  cramers_v_p <- df$cramers_v_p_value[i]
-  phi_p <- df$phi_p_value[i]
-  gamma_p <- df$gamma_p_value[i]
+  measure <- c("Cramer's V", if (is_2x2) "Phi", "Gamma")
+  value <- c(cramers_v, if (is_2x2) df$phi[i], df$gamma[i])
+  p <- c(df$cramers_v_p_value[i], if (is_2x2) df$phi_p_value[i],
+         df$gamma_p_value[i])
+  interp <- c(.interpret_cramers_v(cramers_v),
+              if (is_2x2) .interpret_phi(df$phi[i]),
+              .interpret_gamma(df$gamma[i]))
+
+  effect_table <- data.frame(
+    Measure = measure,
+    Value = value,
+    p = p,
+    stars = add_significance_stars(p),
+    Interpretation = interp,
+    stringsAsFactors = FALSE
+  )
 
   cat("\nEffect Sizes:\n")
-  border_width <- paste(rep("-", 70), collapse = "")
-  cat(border_width, "\n")
-
-  fmt_p <- function(p) ifelse(p < 0.001, "<.001", round(p, digits))
-
-  if (is_2x2) {
-    effect_table <- data.frame(
-      Measure = c("Cramer's V", "Phi", "Gamma"),
-      Value = round(c(cramers_v, phi, gamma), digits),
-      p_value = c(fmt_p(cramers_v_p), fmt_p(phi_p), fmt_p(gamma_p)),
-      sig = c(as.character(add_significance_stars(cramers_v_p)),
-              as.character(add_significance_stars(phi_p)),
-              as.character(add_significance_stars(gamma_p))),
-      Interpretation = c(.interpret_cramers_v(cramers_v),
-                         .interpret_phi(phi),
-                         .interpret_gamma(gamma)),
-      stringsAsFactors = FALSE
-    )
-  } else {
-    effect_table <- data.frame(
-      Measure = c("Cramer's V", "Gamma"),
-      Value = round(c(cramers_v, gamma), digits),
-      p_value = c(fmt_p(cramers_v_p), fmt_p(gamma_p)),
-      sig = c(as.character(add_significance_stars(cramers_v_p)),
-              as.character(add_significance_stars(gamma_p))),
-      Interpretation = c(.interpret_cramers_v(cramers_v),
-                         .interpret_gamma(gamma)),
-      stringsAsFactors = FALSE
-    )
-  }
-
-  print(effect_table, row.names = FALSE)
-  cat(border_width, "\n")
-  cat(sprintf("Table size: %d\u00d7%d | N = %d\n", rows, cols, n))
+  print_stat_table(effect_table, digits = digits, indent = 0,
+                   col_types = c(Value = "num"),
+                   col_labels = c(p = "p value", stars = ""))
+  cat(sprintf("Table size: %d\u00d7%d | N = %s\n", as.integer(rows),
+              as.integer(cols), format(n, big.mark = "")))
 
   if (!is_2x2) {
     cat("Note: Phi coefficient only shown for 2x2 tables\n")
@@ -443,12 +388,6 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   if (abs_g < 0.1) return("Weak")
   if (abs_g < 0.3) return("Moderate")
   return("Strong")
-}
-
-.format_p_value <- function(p, digits = 3) {
-  if (is.na(p)) return("     -")
-  if (p < 0.001) return(" <.001")
-  return(sprintf(" %5.3f", p))
 }
 
 #' Print chi-squared test results (compact)
@@ -519,7 +458,11 @@ print.chi_square <- function(x, digits = 3, ...) {
 
   cat(sprintf("Chi-Squared Test: %s%s\n", var_label, weighted_tag))
 
-  if (!is.na(v_val)) {
+  if (is.na(chi_val)) {
+    reason <- results$reason[i]
+    cat(sprintf("  not computed (%s)\n",
+                if (is.null(reason) || is.na(reason)) "see warning" else reason))
+  } else if (!is.na(v_val)) {
     v_interp <- .interpret_cramers_v(v_val)
     cat(sprintf("  chi2(%d) = %.*f, %s %s, V = %.*f (%s), N = %d\n",
                 as.integer(df_val), digits, chi_val,
@@ -602,118 +545,95 @@ print.summary.chi_square <- function(x, ...) {
   print_header(test_type)
 
   # Resolve show toggles (default TRUE when called without summary object)
-  show_observed     <- if (!is.null(x$show)) isTRUE(x$show$observed) else TRUE
-  show_expected     <- if (!is.null(x$show)) isTRUE(x$show$expected) else TRUE
-  show_results      <- if (!is.null(x$show)) isTRUE(x$show$results) else TRUE
-  show_effect_sizes <- if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
+  show <- list(
+    observed     = if (!is.null(x$show)) isTRUE(x$show$observed) else TRUE,
+    expected     = if (!is.null(x$show)) isTRUE(x$show$expected) else TRUE,
+    results      = if (!is.null(x$show)) isTRUE(x$show$results) else TRUE,
+    effect_sizes = if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
+  )
 
-  # Add significance stars
-  sig <- sapply(x$results$p_value, add_significance_stars)
+  cat("\n")
+  test_info <- list(
+    "Variables" = paste(x$variables[1], "\u00d7", x$variables[2]),
+    "Grouped by" = if (isTRUE(x$is_grouped)) paste(x$groups, collapse = ", "),
+    "Weights variable" = x$weights,
+    "Continuity correction" = if (isTRUE(x$correct)) "Yates' correction applied (2x2 tables)" else NULL
+  )
+  print_info_section(test_info)
 
-  if (!x$is_grouped) {
-    # Test info section
-    cat("\n")
-    test_info <- list(
-      "Variables" = paste(x$variables[1], "\u00d7", x$variables[2]),
-      "Weights variable" = x$weights,
-      "Continuity correction" = if (x$correct) "Yates' correction applied" else NULL
-    )
-    print_info_section(test_info)
-    cat("\n")
-
-    # Observed frequencies (gated)
-    if (show_observed) {
-      obs_display <- .relabel_matrix(x$results$observed[[1]], x$label_maps)
-      cat("Observed Frequencies:\n")
-      print(obs_display)
-    }
-
-    # Expected frequencies (gated)
-    if (show_expected) {
-      exp_display <- .relabel_matrix(x$results$expected[[1]], x$label_maps)
-      cat("\nExpected Frequencies:\n")
-      print(round(exp_display, digits))
-    }
-
-    # Chi-squared test results (gated)
-    if (show_results) {
-      results_table <- data.frame(
-        Chi_squared = round(x$results$chi_squared[1], digits),
-        df = x$results$df[1],
-        p_value = ifelse(x$results$p_value[1] < 0.001,
-                       "<.001", round(x$results$p_value[1], digits)),
-        sig = as.character(sig[1])
-      )
-
-      cat("\nChi-Squared Test Results:\n")
-      border_width <- paste(rep("-", 50), collapse = "")
-      cat(border_width, "\n")
-      print(results_table, row.names = FALSE)
-      cat(border_width, "\n")
-    }
-
-    # Effect sizes (gated)
-    if (show_effect_sizes) {
-      .print_chi_effect_sizes(x$results, 1, digits)
-    }
-
+  if (!isTRUE(x$is_grouped)) {
+    .print_chi_block(x$results, 1, digits, show)
   } else {
-    # Grouped tests
-    cat("\nVariables tested:", paste(x$variables, collapse = " \u00d7 "), "\n")
-    cat("Grouped by:", paste(x$groups, collapse = ", "), "\n")
-
-    results_table <- x$results
-
-    for (i in seq_len(nrow(results_table))) {
-      group_values <- results_table[i, x$groups, drop = FALSE]
-      print_group_header(group_values)
-      cat("\n")
-
-      # Observed frequencies (gated)
-      if (show_observed) {
-        obs_display <- .relabel_matrix(results_table$observed[[i]], x$label_maps)
-        cat("Observed Frequencies:\n")
-        print(obs_display)
-      }
-
-      # Expected frequencies (gated)
-      if (show_expected) {
-        exp_display <- .relabel_matrix(results_table$expected[[i]], x$label_maps)
-        cat("\nExpected Frequencies:\n")
-        print(round(exp_display, digits))
-      }
-
-      # Chi-squared test results (gated)
-      if (show_results) {
-        test_results <- data.frame(
-          Chi_squared = round(results_table$chi_squared[i], digits),
-          df = results_table$df[i],
-          p_value = ifelse(results_table$p_value[i] < 0.001,
-                         "<.001", round(results_table$p_value[i], digits)),
-          sig = as.character(sig[i])
-        )
-
-        cat("\nChi-Squared Test Results:\n")
-        border_width <- paste(rep("-", 50), collapse = "")
-        cat(border_width, "\n")
-        print(test_results, row.names = FALSE)
-        cat(border_width, "\n")
-      }
-
-      # Effect sizes (gated)
-      if (show_effect_sizes) {
-        .print_chi_effect_sizes(results_table, i, digits)
-      }
+    for (i in seq_len(nrow(x$results))) {
+      print_group_header(x$results[i, x$groups, drop = FALSE])
+      .print_chi_block(x$results, i, digits, show)
     }
   }
 
-  if (show_results || show_effect_sizes) {
+  if (show$results || show$effect_sizes) {
     print_significance_legend()
   }
 
   invisible(x)
 }
 
+#' Print the tables of one chi-square test (one slice)
+#' @param results Results data frame
+#' @param i Row index
+#' @param digits Decimal places
+#' @param show Named list of section toggles
+#' @noRd
+.print_chi_block <- function(results, i, digits, show) {
+  obs <- results$observed[[i]]
+
+  if (show$observed && !is.null(obs)) {
+    cat("\nObserved Frequencies:\n")
+    .print_chi_matrix(obs, digits = 0)
+  }
+
+  if (is.na(results$chi_squared[i])) {
+    reason <- results$reason[i]
+    cat(sprintf("\nChi-squared test not computed (%s).\n",
+                if (is.null(reason) || is.na(reason)) "see warning" else reason))
+    return(invisible(NULL))
+  }
+
+  if (show$expected) {
+    cat("\nExpected Frequencies:\n")
+    .print_chi_matrix(results$expected[[i]], digits = digits)
+  }
+
+  if (show$results) {
+    cat("\nChi-Squared Test Results:\n")
+    tab <- data.frame(
+      Statistic = "Pearson Chi-Square",
+      Value = results$chi_squared[i],
+      df = results$df[i],
+      p = results$p_value[i],
+      stars = add_significance_stars(results$p_value[i]),
+      stringsAsFactors = FALSE
+    )
+    print_stat_table(tab, digits = digits, indent = 0,
+                     col_types = c(Value = "num", df = "int"),
+                     col_labels = c(Statistic = "", p = "p value", stars = ""))
+  }
+
+  if (show$effect_sizes) {
+    .print_chi_effect_sizes(results, i, digits)
+  }
+  invisible(NULL)
+}
+
+#' Print a contingency matrix with fixed decimals and full labels
+#' @param mat Table/matrix with named dimnames
+#' @param digits Decimals (0 for counts)
+#' @noRd
+.print_chi_matrix <- function(mat, digits) {
+  vals <- unclass(mat)
+  out <- matrix(formatC(as.numeric(vals), format = "f", digits = digits),
+                nrow = nrow(vals), dimnames = dimnames(vals))
+  print(out, quote = FALSE, right = TRUE)
+}
 
 # Extract a single effect-size column from a chi_square result as a plain
 # numeric vector, named by the group values for grouped input.

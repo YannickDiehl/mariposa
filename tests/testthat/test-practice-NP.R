@@ -72,3 +72,78 @@ test_that("NP-24 chisq_gof warns when expected counts fall below 5", {
   d <- data.frame(x = factor(c(rep("a", 8), "b", "c")))
   expect_warning(chisq_gof(d, x), "expected")
 })
+
+# --- NP-06 / EDGE-03: empty factor levels ------------------------------------
+
+test_that("NP-06 chi_square and effect sizes ignore empty factor levels", {
+  # Was: an unused level (e.g. after filter()) gave chi2 = NaN, V = NaN,
+  # df counted the phantom level. SPSS uses the observed categories.
+  d <- dplyr::mutate(survey_data,
+                     gender3 = factor(gender, levels = c("Male", "Female", "Diverse")))
+  ref <- chi_square(survey_data, gender, region)
+  r <- chi_square(d, gender3, region)
+  expect_equal(r$results$chi_squared, ref$results$chi_squared)
+  expect_equal(r$results$df, 1)
+  expect_equal(unname(cramers_v(d, gender3, region)),
+               unname(cramers_v(survey_data, gender, region)))
+  expect_equal(unname(goodman_gamma(d, gender3, region)),
+               unname(goodman_gamma(survey_data, gender, region)))
+
+  # EDGE-03: the same after filter()
+  f <- dplyr::filter(survey_data, education != "University")
+  r2 <- chi_square(f, education, region)
+  expect_false(is.nan(r2$results$chi_squared))
+  expect_equal(r2$results$df, 2)
+})
+
+test_that("NP-06 grouped chi_square has no silent NA row from empty levels", {
+  # Was: the root of the silent NA row of grouped chi_square().
+  d <- dplyr::filter(survey_data, !(region == "East" & education == "University"))
+  r <- chi_square(dplyr::group_by(d, region), gender, education)
+  expect_false(anyNA(r$results$chi_squared))
+  expect_equal(r$results$df[r$results$region == "East"], 2)
+})
+
+test_that("NP-06 chisq_gof drops phantom categories", {
+  # Was: the unused level entered as an observed 0 (chi2 1257.5, df 2).
+  d <- dplyr::mutate(survey_data,
+                     gender3 = factor(gender, levels = c("Male", "Female", "Diverse")))
+  r <- chisq_gof(d, gender3)
+  expect_equal(r$results$chi_squared, chisq_gof(survey_data, gender)$results$chi_squared)
+  expect_equal(r$results$df, 1)
+  f <- dplyr::filter(survey_data, education != "University")
+  expect_equal(chisq_gof(f, education)$results$df, 2)
+  # explicit expected must match the observed categories
+  expect_error(chisq_gof(d, gender3, expected = c(.4, .4, .2)), "categor")
+})
+
+test_that("NP-06 grouped chisq_gof skips a group with one observed category", {
+  # Was: a constant variable in one group gave chi2 = 485 (phantom level).
+  d <- dplyr::filter(survey_data, !(region == "East" & gender == "Female"))
+  expect_warning(
+    r <- chisq_gof(dplyr::group_by(d, region), gender),
+    "East"
+  )
+  expect_true(is.na(r$results$chi_squared[r$results$region == "East"]))
+  expect_false(is.na(r$results$chi_squared[r$results$region == "West"]))
+})
+
+# --- NP-09: constant variable -------------------------------------------------
+
+test_that("NP-09 chi_square and effect sizes handle a constant variable", {
+  # Was: "Ersetzung hat Laenge 0" crash (phi/cramers_v/goodman_gamma too).
+  d <- dplyr::mutate(survey_data, const = "x")
+  expect_warning(r <- chi_square(d, const, region), "const")
+  expect_true(is.na(r$results$chi_squared))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("not computed", out)))
+  expect_false(any(grepl("= ,", out, fixed = TRUE)))
+  out_s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("not computed", out_s)))
+  expect_warning(v <- cramers_v(d, const, region), "const")
+  expect_true(is.na(v))
+  expect_warning(p <- phi(d, region, const), "const")
+  expect_true(is.na(p))
+  expect_warning(g <- goodman_gamma(d, const, region), "const")
+  expect_true(is.na(g))
+})

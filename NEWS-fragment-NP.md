@@ -11,3 +11,15 @@
   error. Categories with an expected count below 5 now trigger a warning,
   as in `chi_square()`, and a group that cannot be tested is reported
   with a warning naming the group instead of an unexplained `NA` row.
+* `chi_square()`, `phi()`, `cramers_v()`, `goodman_gamma()` and
+  `chisq_gof()` use the categories that actually occur in the data, as
+  SPSS does. An empty factor level (typically left over after
+  `filter()`) made chi-square, V and gamma `NaN` - also the cause of the
+  silent `NA` row of grouped `chi_square()` - and gave `chisq_gof()` a
+  phantom category with an extra degree of freedom (chi2 = 1257.5
+  instead of 5.0). A constant variable no longer crashes
+  `chi_square()` and the effect-size helpers ("replacement has length
+  zero"): the result is `NA` with a warning naming the variable (and
+  group), and the output says "not computed (x has only one observed
+  category)". The `summary()` tables show full value labels (no longer
+  cut at 20 characters) and fixed decimals.

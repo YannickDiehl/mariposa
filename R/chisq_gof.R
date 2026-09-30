@@ -168,7 +168,9 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
       valid <- valid & !is.na(w)
       w <- w[valid]
     }
-    vals <- vals[valid]
+    raw <- vals[valid]
+    # Observed categories only (SPSS): no phantom empty factor levels
+    vals <- .np_factor(raw)
 
     if (!is.null(w_name)) {
       freq_tbl <- xtabs(w ~ vals)
@@ -176,6 +178,11 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     } else {
       freq_tbl <- table(vals)
     }
+    # A category whose rounded weighted count is 0 is not observed either
+    keep <- as.numeric(freq_tbl) > 0
+    codes <- .np_codes(raw, names(freq_tbl))
+    freq_tbl <- freq_tbl[keep]
+    attr(freq_tbl, "codes") <- codes[keep]
     freq_tbl
   }
 
@@ -194,6 +201,9 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
 
     n <- sum(freq_tbl)
     k <- length(freq_tbl)
+    if (k < 2) {
+      cli_abort("{.var {var_name}} has {k} observed categor{?y/ies}; at least 2 are needed.")
+    }
 
     # Determine expected frequencies
     if (!is.null(expected_props)) {
@@ -272,8 +282,9 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
             )
           )
         }, error = function(e) {
+          where <- .np_where(key)
           cli_warn(c(
-            "Chi-square goodness-of-fit test skipped for {.var {vn}}{.np_where(key)}.",
+            "Chi-square goodness-of-fit test skipped for {.var {vn}}{where}.",
             "x" = "{conditionMessage(e)}"
           ))
           cbind(key, na_row(vn))
