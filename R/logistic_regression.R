@@ -55,7 +55,11 @@
 #'   \code{broom::augment()}) dispatch natively without unwrapping.
 #'   \code{summary()} returns the SPSS-style mariposa summary; for
 #'   the raw glm summary use \code{stats::summary.glm()} on the same
-#'   object.
+#'   object. \code{confint()} returns Wald intervals on the log-odds
+#'   scale (the SPSS method; \code{exp(confint(model))} gives the
+#'   "C.I. for EXP(B)" of the summary), profile-likelihood intervals via
+#'   \code{confint(model, method = "profile")}; see
+#'   \code{\link{confint.logistic_regression}}.
 #'
 #'   For grouped data, returns a list of class \code{"logistic_regression"}
 #'   with \code{$groups} holding one fitted glm-inheriting result per group.
@@ -1058,4 +1062,62 @@ predict.logistic_regression <- function(object, ...) {
 anova.logistic_regression <- function(object, ...) {
   .glr_require_glm(object, "anova")
   NextMethod()
+}
+
+#' Confidence intervals for logistic regression coefficients
+#'
+#' @description
+#' Confidence intervals for the coefficients B (log-odds scale) of a
+#' \code{\link{logistic_regression}} model.
+#'
+#' The default \code{method = "wald"} gives Wald intervals
+#' (\eqn{B \pm z_{1-\alpha/2} \cdot SE}), the interval SPSS LOGISTIC
+#' REGRESSION reports as "95\% C.I. for EXP(B)" and the one
+#' \code{summary()} prints: \code{exp(confint(model))} reproduces the
+#' Lower/Upper columns of the coefficients table. \code{method = "profile"}
+#' gives the profile-likelihood intervals of \code{stats::confint()} for
+#' \code{glm} objects.
+#'
+#' @param object A \code{logistic_regression} result (ungrouped).
+#' @param parm Coefficients to compute intervals for (names or indices;
+#'   default all).
+#' @param level Confidence level (default 0.95).
+#' @param method \code{"wald"} (default, SPSS) or \code{"profile"}.
+#' @param ... Passed to the underlying \code{confint} method.
+#' @return A matrix with one row per coefficient and columns for the lower
+#'   and upper limits (log-odds scale).
+#'
+#' @examples
+#' survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction >= 4)
+#' model <- logistic_regression(survey_data, high_satisfaction ~ age + gender)
+#' confint(model)        # Wald (SPSS)
+#' exp(confint(model))   # SPSS "95% C.I. for EXP(B)"
+#'
+#' @export
+#' @method confint logistic_regression
+confint.logistic_regression <- function(object, parm, level = 0.95,
+                                        method = c("wald", "profile"), ...) {
+  .glr_require_glm(object, "confint")
+  method <- match.arg(method)
+  fit <- .glr_strip_class(object)
+  if (method == "wald") {
+    stats::confint.default(fit, parm = parm, level = level, ...)
+  } else {
+    .glm_quiet_weights(stats::confint(fit, parm = parm, level = level, ...))
+  }
+}
+
+#' Profile likelihood for a logistic_regression model
+#'
+#' Dispatches to the \code{glm} method (\code{stats::profile()}); used by
+#' \code{confint(model, method = "profile")}.
+#'
+#' @param fitted A \code{logistic_regression} result (ungrouped).
+#' @param ... Passed to \code{stats::profile()}.
+#' @return A \code{"profile"} object, as returned for \code{glm} fits.
+#' @export
+#' @method profile logistic_regression
+profile.logistic_regression <- function(fitted, ...) {
+  .glr_require_glm(fitted, "profile")
+  .glm_quiet_weights(stats::profile(.glr_strip_class(fitted), ...))
 }

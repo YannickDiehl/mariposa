@@ -91,9 +91,28 @@ augment.linear_regression <- function(x, ...) {
 tidy.logistic_regression <- function(x, conf.int = FALSE, conf.level = 0.95,
                                      exponentiate = FALSE, ...) {
   .glr_broom_require_glm(x, "tidy")
-  broom::tidy(.glr_strip_class(x),
-              conf.int = conf.int, conf.level = conf.level,
-              exponentiate = exponentiate, ...)
+  out <- .glm_quiet_weights(
+    broom::tidy(.glr_strip_class(x), conf.int = FALSE,
+                exponentiate = FALSE, ...)
+  )
+  if (isTRUE(conf.int)) {
+    # Wald intervals - the SPSS "C.I. for EXP(B)" that summary() prints
+    # (see confint.logistic_regression). broom's glm tidier would profile
+    # the likelihood instead: different numbers, and one non-integer
+    # warning per profiling fit for weighted models.
+    ci <- confint.logistic_regression(x, level = conf.level)
+    idx <- match(out$term, rownames(ci))
+    out$conf.low <- unname(ci[idx, 1])
+    out$conf.high <- unname(ci[idx, 2])
+  }
+  if (isTRUE(exponentiate)) {
+    out$estimate <- exp(out$estimate)
+    if (isTRUE(conf.int)) {
+      out$conf.low <- exp(out$conf.low)
+      out$conf.high <- exp(out$conf.high)
+    }
+  }
+  out
 }
 
 glance.logistic_regression <- function(x, ...) {
