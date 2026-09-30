@@ -223,6 +223,28 @@ test_that("NP-24 Phi is reported for tables larger than 2x2, as in SPSS", {
               label = "2b Cramer's V (4x5)")
 })
 
+test_that("known note: small expected counts warn once, in English", {
+  # Was: base chisq.test()'s "Chi-squared approximation may be incorrect"
+  # (German here: "Chi-Quadrat-Approximation kann inkorrekt sein") leaked
+  # next to mariposa's own expected-count warning - twice the same news.
+  small <- data.frame(a = factor(c("A", "A", "A", "B", "B")),
+                      b = factor(c("X", "X", "Y", "X", "Y")))
+  collect <- function(expr) {
+    msgs <- character()
+    withCallingHandlers(expr, warning = function(w) {
+      msgs <<- c(msgs, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    })
+    msgs
+  }
+  for (f in list(chi_square, cramers_v, goodman_gamma, phi)) {
+    msgs <- collect(f(small, a, b))
+    expect_length(msgs, 1)
+    expect_match(msgs, "expected count")
+  }
+  expect_length(collect(chi_square(small, a, b, correct = TRUE)), 1)
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

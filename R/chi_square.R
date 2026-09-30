@@ -249,7 +249,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     return(empty_row(reason))
   }
 
-  test_result <- stats::chisq.test(tbl, correct = correct)
+  test_result <- .chisq_test_quiet(tbl, correct = correct)
   chi_squared <- as.numeric(test_result$statistic)
   p_value <- test_result$p.value
 
@@ -258,7 +258,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   # the Pearson statistic, never from the corrected one.
   corrected <- isTRUE(correct) && r == 2 && c == 2
   if (corrected) {
-    pearson <- stats::chisq.test(tbl, correct = FALSE)
+    pearson <- .chisq_test_quiet(tbl, correct = FALSE)
     pearson_chi <- as.numeric(pearson$statistic)
     pearson_p <- pearson$p.value
   } else {
@@ -299,6 +299,31 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     gamma_p_value = gam$p_value,
     reason = NA_character_,
     stringsAsFactors = FALSE
+  )
+}
+
+#' chisq.test() without its "approximation may be incorrect" warning
+#'
+#' mariposa warns about expected counts below 5 itself (naming the cells,
+#' in English); the base warning said the same again, translated under
+#' non-English locales. Only that specific warning is muffled - matched
+#' through R's own translation catalog, so it works in every locale.
+#'
+#' @param tbl Contingency table
+#' @param correct Continuity correction flag passed to chisq.test()
+#' @return The htest object
+#' @noRd
+.chisq_test_quiet <- function(tbl, correct) {
+  approx_msg <- gettext("Chi-squared approximation may be incorrect",
+                        domain = "R-stats")
+  withCallingHandlers(
+    stats::chisq.test(tbl, correct = correct),
+    warning = function(w) {
+      if (conditionMessage(w) %in%
+          c(approx_msg, "Chi-squared approximation may be incorrect")) {
+        invokeRestart("muffleWarning")
+      }
+    }
   )
 }
 

@@ -48,3 +48,8 @@
   ordinal (ordered factor or numeric). For nominal variables such as
   gender x region its sign depends on the arbitrary category order.
   `goodman_gamma()` still computes gamma on request.
+* `chi_square()` and the effect-size helpers warn once about expected
+  counts below 5. Base `chisq.test()` added its own "Chi-squared
+  approximation may be incorrect" warning (German: "Chi-Quadrat-
+  Approximation kann inkorrekt sein") next to mariposa's message; that
+  specific warning is now muffled in every locale.
