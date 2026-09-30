@@ -1670,3 +1670,15 @@ df.residual.linear_regression <- function(object, ...) {
   if (is.null(f)) return("")
   paste(trimws(deparse(f, width.cutoff = 500L)), collapse = " ")
 }
+
+#' Display a (possibly weighted) sample size as a whole number
+#'
+#' sprintf("%d") needs an R integer: a weighted N above 2^31 (expansion
+#' weights) failed with "invalid format '%d'", and a non-integer double
+#' failed as well. Rounds for display only (Charter 5.1).
+#' @noRd
+.fmt_n <- function(n) {
+  out <- formatC(round(as.numeric(n)), format = "f", digits = 0)
+  out[is.na(n)] <- "NA"
+  out
+}

@@ -17,7 +17,8 @@
 #' @param formula A formula specifying the model (e.g., \code{y ~ x1 + x2}).
 #'   If provided, \code{dependent} and \code{predictors} are ignored.
 #' @param dependent The dependent variable (unquoted). Used with \code{predictors}
-#'   when no formula is given. Must be binary (0/1 or two-level factor).
+#'   when no formula is given. Must have exactly two distinct values
+#'   (e.g. 0/1, 1/2, a two-level factor); see Technical Details.
 #' @param predictors Predictor variable(s) (unquoted, supports tidyselect).
 #'   Used with \code{dependent} when no formula is given.
 #' @param weights Optional survey weights (unquoted variable name). When
@@ -45,6 +46,8 @@
 #'   \item{omnibus_test}{List with chi_sq, df, p for overall model test}
 #'   \item{classification}{List with table, overall_pct, pct_correct_0, pct_correct_1}
 #'   \item{hosmer_lemeshow}{List with chi_sq, df, p (goodness-of-fit test)}
+#'   \item{dv_encoding}{Tibble Original -> Internal (0/1) of the outcome
+#'     categories (SPSS "Dependent Variable Encoding")}
 #'   \item{n}{Sample size (listwise complete cases; weighted N when weighted)}
 #'   \item{formula, dependent, predictor_names, weighted, weight_name, is_grouped, conf.level}{Call metadata.}
 #' }
@@ -100,9 +103,18 @@
 #'
 #' ## Technical Details
 #'
-#' \strong{Dependent Variable}: Must be binary. Factors with exactly 2 levels
-#' are automatically converted to 0/1 (first level = 0, second level = 1).
-#' Numeric variables must contain only 0 and 1 values.
+#' \strong{Dependent Variable}: Any variable with exactly two distinct
+#' observed values, coded internally as 0/1 like SPSS LOGISTIC REGRESSION
+#' does: for numeric and labelled variables the lower value becomes 0 and
+#' the higher 1 (so 1/2 and 0/1 codings give the same model); for factors
+#' unused levels are dropped and the first remaining level becomes 0;
+#' character values are ordered alphabetically; logicals code
+#' \code{FALSE} = 0, \code{TRUE} = 1. The model predicts the probability of
+#' the category coded 1 - the compact print names it
+#' (\code{[P(y = category)]}), and \code{summary()} shows the SPSS
+#' "Dependent Variable Encoding" table (also stored as
+#' \code{$dv_encoding}). A grouped analysis uses one encoding for all
+#' groups.
 #'
 #' \strong{Missing Data}: Listwise deletion is used (matching SPSS LOGISTIC
 #' REGRESSION default behavior).
@@ -251,6 +263,12 @@ logistic_regression <- function(data, formula = NULL,
     cli_abort("Variable(s) not found in data: {paste(missing_vars, collapse = ', ')}.")
   }
 
+  # Outcome encoding (SPSS "Dependent Variable Encoding"), fixed once on
+  # the cases in the analysis so every group models the same category
+  in_analysis <- stats::complete.cases(data[, all_vars, drop = FALSE])
+  if (has_weights) in_analysis <- in_analysis & !is.na(weights_vec)
+  dv_encoding <- .logistic_dv_encoding(data[[dep_name]][in_analysis], dep_name)
+
   # ============================================================================
   # GROUPED ANALYSIS
   # ============================================================================
@@ -267,7 +285,7 @@ logistic_regression <- function(data, formula = NULL,
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
 
       result <- .glm_core(grp_data, model_formula, dep_name, pred_names,
-                          grp_weights, conf.level, factors)
+                          grp_weights, conf.level, factors, dv_encoding)
       gv <- as.list(group_keys[i, , drop = FALSE])
       gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
       result$group_values <- gv
@@ -291,13 +309,15 @@ logistic_regression <- function(data, formula = NULL,
         weight_name = weight_name,
         is_grouped = TRUE,
         group_vars = group_vars,
-        conf.level = conf.level
+        conf.level = conf.level,
+        dv_encoding = .logistic_encoding_table(dv_encoding),
+        dv_labels = dv_encoding$short
       ),
       class = "logistic_regression"
     )
   } else {
     result <- .glm_core(data, model_formula, dep_name, pred_names,
-                        weights_vec, conf.level, factors)
+                        weights_vec, conf.level, factors, dv_encoding)
     # result IS the fitted glm (with mariposa slots attached).
     result$formula <- model_formula
     result$dependent <- dep_name
@@ -346,7 +366,7 @@ logistic_regression <- function(data, formula = NULL,
 #' Core logistic regression computation
 #' @noRd
 .glm_core <- function(data, formula, dep_name, pred_names, weights_vec,
-                      conf.level, factors = "dummy") {
+                      conf.level, factors = "dummy", dv_encoding = NULL) {
 
   all_vars <- c(dep_name, pred_names)
 
@@ -379,20 +399,20 @@ logistic_regression <- function(data, formula = NULL,
     }
   }
 
-  # Validate binary DV
-  dv <- data_complete[[dep_name]]
-  if (is.factor(dv)) {
-    if (nlevels(dv) != 2) {
-      cli_abort("Dependent variable must be binary (exactly 2 levels).")
-    }
-    data_complete[[dep_name]] <- as.numeric(dv) - 1  # first level=0, second=1
-    dv <- data_complete[[dep_name]]
-  } else {
-    unique_vals <- sort(unique(dv))
-    if (!all(unique_vals %in% c(0, 1))) {
-      cli_abort("Dependent variable must be binary (0/1).")
-    }
+  # Binary DV -> internal 0/1 (SPSS "Dependent Variable Encoding"). The
+  # encoding is fixed once for the whole data set (see logistic_regression)
+  # so that every group of a grouped analysis models the same category.
+  if (is.null(dv_encoding)) {
+    dv_encoding <- .logistic_dv_encoding(data_complete[[dep_name]], dep_name)
   }
+  y01 <- .logistic_apply_encoding(data_complete[[dep_name]], dv_encoding)
+  if (length(unique(y01)) < 2) {
+    cli_abort(c(
+      "Dependent variable {.var {dep_name}} has only one observed value ({.val {dv_encoding$short[unique(y01) + 1]}}) here.",
+      i = "Logistic regression needs cases in both outcome categories."
+    ), class = "mariposa_degenerate_fit")
+  }
+  data_complete[[dep_name]] <- y01
 
   # ============================================================================
   # FIT MODEL
@@ -567,7 +587,93 @@ logistic_regression <- function(data, formula = NULL,
   out$classification   <- classification
   out$hosmer_lemeshow  <- hosmer_lemeshow
   out$n                <- n_report
+  out$dv_encoding      <- .logistic_encoding_table(dv_encoding)
+  out$dv_labels        <- dv_encoding$short
   out
+}
+
+
+#' Encoding of a binary outcome (SPSS "Dependent Variable Encoding")
+#'
+#' Accepts any variable with exactly two distinct observed values, like
+#' SPSS LOGISTIC REGRESSION: numeric/labelled - the lower value is coded
+#' 0, the higher 1; factor - unused levels are dropped, the first
+#' remaining level is 0; character - alphabetical order (as glm() orders
+#' character levels); logical - FALSE = 0, TRUE = 1.
+#'
+#' @param x Outcome values of the cases in the analysis
+#' @param dep_name Variable name (messages)
+#' @return list(type, values, original, short): original = display text
+#'   "value (label)", short = label if any, else value
+#' @noRd
+.logistic_dv_encoding <- function(x, dep_name) {
+  if (is.logical(x)) {
+    type <- "logical"
+    vals <- sort(unique(x[!is.na(x)]))
+    original <- short <- as.character(vals)
+  } else if (is.factor(x)) {
+    type <- "factor"
+    vals <- levels(droplevels(x[!is.na(x)]))
+    original <- short <- vals
+  } else if (is.character(x)) {
+    type <- "character"
+    vals <- sort(unique(x[!is.na(x)]))
+    original <- short <- vals
+  } else if (is.numeric(x)) {
+    type <- "numeric"
+    xv <- .plain_numeric(x)
+    vals <- sort(unique(xv[!is.na(xv)]))
+    original <- short <- as.character(vals)
+    labs <- attr(x, "labels", exact = TRUE)
+    if (!is.null(labs) && length(vals) > 0) {
+      hit <- match(vals, .plain_numeric(labs))
+      has <- !is.na(hit)
+      short[has] <- names(labs)[hit[has]]
+      original[has] <- paste0(original[has], " (", short[has], ")")
+    }
+  } else {
+    cli_abort(c(
+      "Dependent variable {.var {dep_name}} must be binary.",
+      x = "It is of class {.cls {class(x)[1]}}.",
+      i = "Use a numeric, factor, character or logical variable with two values."
+    ))
+  }
+
+  k <- length(vals)
+  if (k == 0) {
+    cli_abort("Dependent variable {.var {dep_name}} has no non-missing values.")
+  }
+  if (k == 1) {
+    cli_abort(c(
+      "Dependent variable {.var {dep_name}} has only one observed value ({.val {short}}).",
+      i = "Logistic regression needs cases in both outcome categories."
+    ), class = "mariposa_degenerate_fit")
+  }
+  if (k > 2) {
+    shown <- if (k > 6) c(short[1:5], "...") else short
+    cli_abort(c(
+      "Dependent variable {.var {dep_name}} must be binary: it has {k} distinct values.",
+      x = "Values: {paste(shown, collapse = ', ')}",
+      i = "Recode it into two categories first, e.g. with {.fn rec}."
+    ))
+  }
+  list(type = type, values = vals, original = original, short = short)
+}
+
+#' Map an outcome to internal 0/1 with a fixed encoding
+#' @noRd
+.logistic_apply_encoding <- function(x, enc) {
+  switch(enc$type,
+    logical = as.integer(x),
+    numeric = as.integer(.plain_numeric(x) == enc$values[2]),
+    as.integer(as.character(x) == enc$values[2])
+  )
+}
+
+#' Encoding table stored on the result (Original Value -> Internal Value)
+#' @noRd
+.logistic_encoding_table <- function(enc) {
+  tibble::tibble(Original = enc$original, Internal = c(0L, 1L))
 }
 
 
@@ -660,38 +766,32 @@ logistic_regression <- function(data, formula = NULL,
 print.logistic_regression <- function(x, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
   formula_str <- .formula_label(x$formula)
+  # The modelled category (internal value 1), e.g. "[P(vote = yes)]"
+  outcome_tag <- if (!is.null(x$dv_labels)) {
+    sprintf(" [P(%s = %s)]", x$dependent, x$dv_labels[2])
+  } else ""
+
+  fit_line <- function(m) {
+    sprintf("Nagelkerke R2 = %.3f, chi2(%d) = %.2f, %s, Accuracy = %.1f%%, N = %s",
+            m$model_summary$nagelkerke_r2,
+            as.integer(m$omnibus_test$df), m$omnibus_test$chi_sq,
+            format_p_stars(m$omnibus_test$p),
+            m$classification$overall_pct,
+            .fmt_n(m$n))
+  }
 
   if (isTRUE(x$is_grouped)) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
-    cat(sprintf("Logistic Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
+    cat(sprintf("Logistic Regression: %s%s%s%s\n", formula_str, outcome_tag,
+                weighted_tag, grouped_tag))
     for (grp in x$groups) {
-      grp_label <- .format_group_label(grp$group_values)
-      chi_sq <- grp$omnibus_test$chi_sq
-      chi_df <- grp$omnibus_test$df
-      chi_p <- grp$omnibus_test$p
-      p_str <- format_p_compact(chi_p)
-      stars <- add_significance_stars(chi_p)
-      cat(sprintf("  %s: Nagelkerke R2 = %.3f, chi2(%d) = %.2f, %s %s, Accuracy = %.1f%%, N = %d\n",
-                  grp_label,
-                  grp$model_summary$nagelkerke_r2,
-                  chi_df, chi_sq,
-                  p_str, stars,
-                  grp$classification$overall_pct,
-                  grp$n))
+      cat(sprintf("  %s: %s\n", .format_group_label(grp$group_values),
+                  fit_line(grp)))
     }
   } else {
-    cat(sprintf("Logistic Regression: %s%s\n", formula_str, weighted_tag))
-    chi_sq <- x$omnibus_test$chi_sq
-    chi_df <- x$omnibus_test$df
-    chi_p <- x$omnibus_test$p
-    p_str <- format_p_compact(chi_p)
-    stars <- add_significance_stars(chi_p)
-    cat(sprintf("  Nagelkerke R2 = %.3f, chi2(%d) = %.2f, %s %s, Accuracy = %.1f%%, N = %d\n",
-                x$model_summary$nagelkerke_r2,
-                chi_df, chi_sq,
-                p_str, stars,
-                x$classification$overall_pct,
-                x$n))
+    cat(sprintf("Logistic Regression: %s%s%s\n", formula_str, outcome_tag,
+                weighted_tag))
+    cat(sprintf("  %s\n", fit_line(x)))
   }
 
   invisible(x)
@@ -805,6 +905,9 @@ print.summary.logistic_regression <- function(x, ...) {
   show_class <- if (!is.null(x$show)) isTRUE(x$show$classification) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
 
+  cat("\n")
+  .print_dv_encoding(x$dv_encoding)
+
   if (show_omnibus) {
     cat("\n")
     .print_omnibus_test(x$omnibus_test)
@@ -822,7 +925,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
   if (show_class) {
     cat("\n")
-    .print_classification_table(x$classification)
+    .print_classification_table(x$classification, x$dv_labels)
   }
 
   if (show_coefs) {
@@ -860,11 +963,14 @@ print.summary.logistic_regression <- function(x, ...) {
   show_class <- if (!is.null(x$show)) isTRUE(x$show$classification) else TRUE
   show_coefs <- if (!is.null(x$show)) isTRUE(x$show$coefficients) else TRUE
 
+  cat("\n")
+  .print_dv_encoding(x$dv_encoding)
+
   for (grp in x$groups) {
     cat("\n")
     print_group_header(grp$group_values)
 
-    cat(sprintf("  N: %d\n", grp$n))
+    cat(sprintf("  N: %s\n", .fmt_n(grp$n)))
 
     if (show_omnibus) {
       cat("\n")
@@ -883,7 +989,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
     if (show_class) {
       cat("\n")
-      .print_classification_table(grp$classification)
+      .print_classification_table(grp$classification, x$dv_labels)
     }
 
     if (show_coefs) {
@@ -945,28 +1051,40 @@ print.summary.logistic_regression <- function(x, ...) {
 }
 
 
-#' Print classification table
+#' Print the Dependent Variable Encoding table (SPSS)
 #' @noRd
-.print_classification_table <- function(cls) {
-  cat(sprintf("  Classification Table (cutoff = %.2f)\n", cls$cutoff))
-  w <- 65
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-20s %20s %20s\n", "", "Predicted", ""))
-  cat(sprintf("  %-20s %10s %10s %15s\n",
-              "Observed", "0", "1", "% Correct"))
-  cat(paste0("  ", strrep("-", w), "\n"))
+.print_dv_encoding <- function(enc) {
+  if (is.null(enc)) return(invisible(NULL))
+  cat("  Dependent Variable Encoding\n")
+  print_stat_table(data.frame(`Original Value` = enc$Original,
+                              `Internal Value` = enc$Internal,
+                              check.names = FALSE, stringsAsFactors = FALSE))
+}
 
+
+#' Print classification table
+#'
+#' Rows and columns carry the outcome categories (value labels / factor
+#' levels) instead of the internal 0/1 codes.
+#' @noRd
+.print_classification_table <- function(cls, labels = c("0", "1")) {
+  cat(sprintf(
+    "  Classification Table (cutoff = %.2f; rows: observed, columns: predicted)\n",
+    cls$cutoff))
+  labels <- labels %||% c("0", "1")
   incorrect_0 <- cls$n_0 - cls$correct_0
   incorrect_1 <- cls$n_1 - cls$correct_1
-
-  cat(sprintf("  %-20s %10d %10d %14.1f\n",
-              "0", cls$correct_0, incorrect_0, cls$pct_correct_0))
-  cat(sprintf("  %-20s %10d %10d %14.1f\n",
-              "1", incorrect_1, cls$correct_1, cls$pct_correct_1))
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-20s %10s %10s %14.1f\n",
-              "Overall Percentage", "", "", cls$overall_pct))
-  cat(paste0("  ", strrep("-", w), "\n"))
+  pct <- function(v) ifelse(is.na(v), "", sprintf("%.1f", v))
+  tab <- data.frame(
+    Observed = c(labels, "Overall Percentage"),
+    c0 = c(cls$correct_0, incorrect_1, NA),
+    c1 = c(incorrect_0, cls$correct_1, NA),
+    correct = pct(c(cls$pct_correct_0, cls$pct_correct_1, cls$overall_pct)),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(tab, col_types = c(c0 = "int", c1 = "int"),
+                   col_labels = c(c0 = labels[1], c1 = labels[2],
+                                  correct = "% Correct"))
 }
 
 

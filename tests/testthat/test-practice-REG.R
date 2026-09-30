@@ -200,3 +200,63 @@ test_that("REG-06: weighted lm generics follow the SPSS frequency-weight df", {
   expect_equal(gl$nobs, sw)
   expect_equal(gl$df.residual, sw - 3)
 })
+
+# REG-07: logistic_regression() rejected SPSS-style binary outcomes: 1/2
+# coding ("must be binary (0/1)") and factors with an unused level (as
+# to_label() leaves them).
+# REG-08: the output never said which category is modelled.
+test_that("REG-07/08: any two-valued outcome is accepted and its encoding shown", {
+  d <- .reg_sd2()
+  ref <- logistic_regression(d, high_sat ~ age + income)
+
+  # 1/2 coding: lower value = 0, higher = 1 (SPSS)
+  d$sat12 <- d$high_sat + 1L
+  m12 <- logistic_regression(d, sat12 ~ age + income)
+  expect_equal(unname(coef(m12)), unname(coef(ref)))
+  expect_equal(m12$dv_encoding$Internal, c(0L, 1L))
+  expect_equal(m12$dv_encoding$Original, c("1", "2"))
+
+  # Factor with an unused level: dropped; first remaining level = 0
+  d$sat_f <- factor(ifelse(d$high_sat == 1, "satisfied", "not satisfied"),
+                    levels = c("unused", "not satisfied", "satisfied"))
+  mf <- logistic_regression(d, sat_f ~ age + income)
+  expect_equal(unname(coef(mf)), unname(coef(ref)))
+  expect_equal(mf$dv_encoding$Original, c("not satisfied", "satisfied"))
+
+  # Character and logical outcomes
+  d$sat_chr <- as.character(d$sat_f)
+  expect_equal(unname(coef(logistic_regression(d, sat_chr ~ age + income))),
+               unname(coef(ref)))
+  d$sat_lgl <- d$high_sat == 1
+  expect_equal(unname(coef(logistic_regression(d, sat_lgl ~ age + income))),
+               unname(coef(ref)))
+
+  # Output states the modelled category
+  out <- capture.output(print(mf))
+  expect_true(any(grepl("P(sat_f = satisfied)", out, fixed = TRUE)))
+  out_s <- capture.output(print(summary(mf)))
+  expect_true(any(grepl("Dependent Variable Encoding", out_s, fixed = TRUE)))
+  expect_true(any(grepl("not satisfied", out_s, fixed = TRUE)))
+
+  skip_if_not_installed("haven")
+  d$sat_lab <- haven::labelled(d$sat12, c(unzufrieden = 1, zufrieden = 2))
+  ml <- logistic_regression(d, sat_lab ~ age + income)
+  expect_equal(unname(coef(ml)), unname(coef(ref)))
+  expect_true(any(grepl("P(sat_lab = zufrieden)",
+                        capture.output(print(ml)), fixed = TRUE)))
+  out_l <- capture.output(print(summary(ml)))
+  expect_true(any(grepl("2 (zufrieden)", out_l, fixed = TRUE)))
+})
+
+# REG-21 (logistic part): a constant outcome gave "Nagelkerke R2 = -Inf ...
+# Accuracy = 100%"; outcomes with more than two values or a character
+# outcome gave cryptic messages.
+test_that("REG-21: non-binary and constant outcomes get clear errors", {
+  d <- .reg_sd2()
+  d$one <- 1L
+  expect_error(logistic_regression(d, one ~ age), "only one observed value")
+  expect_error(logistic_regression(d, life_satisfaction ~ age),
+               "5 distinct values")
+  d$chr3 <- c("a", "b", "c")[(seq_len(nrow(d)) %% 3) + 1]
+  expect_error(logistic_regression(d, chr3 ~ age), "3 distinct values")
+})

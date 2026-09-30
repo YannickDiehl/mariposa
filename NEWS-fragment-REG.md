@@ -35,3 +35,14 @@
   weights: with `weights = w * 3`, `summary()` showed SE = .0527 but
   `tidy()` .0916, and `nobs()` returned 2115 cases instead of N = 6388.
   Unweighted models are unchanged.
+* `logistic_regression()` accepts every outcome with exactly two values,
+  as SPSS does: 1/2 codings (lower value = 0, higher = 1), factors with
+  an unused level (as `to_label()` leaves them; unused levels are
+  dropped, the first remaining level = 0), labelled, character and
+  logical outcomes. It used to demand 0/1 or a factor with exactly two
+  levels. The output now says which category is modelled: the compact
+  print shows `[P(y = category)]`, `summary()` starts with the SPSS
+  "Dependent Variable Encoding" table, and the classification table is
+  labelled with the categories instead of 0/1. A constant outcome
+  (previously "Nagelkerke R2 = -Inf ... Accuracy = 100%") and outcomes
+  with more than two values now stop with a clear message.
