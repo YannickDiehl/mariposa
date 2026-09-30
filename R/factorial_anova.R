@@ -965,25 +965,21 @@ tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
           )
         }
       } else {
-        # Unweighted: use standard TukeyHSD
+        # Unweighted: use standard TukeyHSD, re-oriented to the SPSS
+        # "(I) - (J)" convention of the weighted path
         one_way_formula <- stats::as.formula(paste(dv_name, "~", factor_name))
         one_way_aov <- stats::aov(one_way_formula, data = data_complete)
         tukey_result <- stats::TukeyHSD(one_way_aov, conf.level = conf.level)
-
-        tukey_data <- tukey_result[[factor_name]]
-        comparisons <- rownames(tukey_data)
-
-        for (j in seq_along(comparisons)) {
-          results_list[[length(results_list) + 1]] <- data.frame(
-            Factor = factor_name,
-            Comparison = comparisons[j],
-            Estimate = tukey_data[j, "diff"],
-            conf_low = tukey_data[j, "lwr"],
-            conf_high = tukey_data[j, "upr"],
-            p_adjusted = tukey_data[j, "p adj"],
-            stringsAsFactors = FALSE
-          )
-        }
+        lv <- levels(droplevels(g))
+        mse_1way <- sum(stats::residuals(one_way_aov)^2) / one_way_aov$df.residual
+        tk <- .tukeyhsd_to_ij(tukey_result[[factor_name]], lv,
+                              n = as.numeric(table(droplevels(g))[lv]),
+                              mse = mse_1way)
+        results_list[[length(results_list) + 1]] <- data.frame(
+          Factor = factor_name,
+          tk[, c("Comparison", "Estimate", "conf_low", "conf_high", "p_adjusted")],
+          stringsAsFactors = FALSE
+        )
       }
     }, error = function(e) {
       cli_warn("Tukey test failed for factor {.var {factor_name}}: {e$message}")

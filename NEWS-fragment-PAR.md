@@ -88,3 +88,13 @@
   "Welch's t-test" after `oneway_anova()` and `factorial_anova()`. The
   compact line no longer ends in "p = 0.125 , variances equal". (PAR-14,
   PAR-21)
+* `tukey_test()` and `scheffe_test()` report every comparison in the SPSS
+  "(I) - (J)" orientation (I before J in the category order, difference =
+  mean(I) - mean(J)) with a spaced separator, identically for the
+  unweighted, weighted, Scheffe and `factorial_anova()` paths, and add the
+  standard error of the difference. Unweighted Tukey rows came from
+  `TukeyHSD()` as "Intermediate Secondary-Basic Secondary 0.497" (later
+  minus earlier, unspaced) while weighted Tukey and Scheffe printed
+  "Basic Secondary - Intermediate Secondary -0.490". The comparison tables
+  stay aligned with umlaut labels (they were padded by bytes). (PAR-11,
+  PAR-22)

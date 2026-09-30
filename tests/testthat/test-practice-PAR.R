@@ -447,3 +447,53 @@ test_that("PAR-21: levene summary: p as <.001, SPSS df, digits; compact without 
   out_c <- capture.output(print(levene_test(d, life_satisfaction, group = gender)))
   expect_false(any(grepl(" ,", out_c, fixed = TRUE)))
 })
+
+# --- PAR-11 / PAR-22: post-hoc row convention and alignment --------------------
+
+test_that("PAR-11: Tukey/Scheffe rows follow SPSS (I) - (J) on every path", {
+  # Unweighted Tukey printed TukeyHSD's "Intermediate Secondary-Basic
+  # Secondary 0.497" (later minus earlier, unspaced), weighted Tukey and
+  # Scheffe "Basic Secondary - Intermediate Secondary -0.490".
+  ow <- oneway_anova(survey_data, life_satisfaction, group = education)
+  oww <- oneway_anova(survey_data, life_satisfaction, group = education,
+                      weights = sampling_weight)
+  expected <- c("Basic Secondary - Intermediate Secondary",
+                "Basic Secondary - Academic Secondary",
+                "Basic Secondary - University",
+                "Intermediate Secondary - Academic Secondary",
+                "Intermediate Secondary - University",
+                "Academic Secondary - University")
+  for (r in list(tukey_test(ow), tukey_test(oww), scheffe_test(ow),
+                 scheffe_test(oww))) {
+    expect_identical(r$results$Comparison, expected)
+    expect_true(all(r$results$Estimate < 0))
+  }
+  tk <- tukey_test(ow)
+  # SPSS Multiple Comparisons, Std. Error of (I) Basic - (J) Intermediate
+  assert_spss(tk$results$SE[1], 0.059, tier = "display", precision = 3,
+              label = "PAR-11 Tukey Std. Error")  # tukey_test_output.txt:15
+  expect_equal(tk$results$t_value, tk$results$Estimate / tk$results$SE)
+
+  fa <- factorial_anova(survey_data, dv = life_satisfaction,
+                        between = c(gender, education))
+  fw <- factorial_anova(survey_data, dv = life_satisfaction,
+                        between = c(gender, education), weights = sampling_weight)
+  ft <- tukey_test(fa)
+  expect_true("Male - Female" %in% ft$results$Comparison)
+  expect_identical(ft$results$Comparison, tukey_test(fw)$results$Comparison)
+  expect_identical(ft$results$Comparison, scheffe_test(fa)$results$Comparison)
+})
+
+test_that("PAR-22: post-hoc tables stay aligned with umlaut labels", {
+  # print_stat_table() padded with sprintf() (bytes): every umlaut shifted
+  # the rest of its row one column to the left.
+  d <- survey_data
+  levels(d$education) <- c("Hauptschule", "Realschule", "Abitur", "Universität")
+  out <- capture.output(print(summary(
+    tukey_test(oneway_anova(d, life_satisfaction, group = education)),
+    parameters = FALSE, interpretation = FALSE
+  )))
+  rows <- out[grepl(" - ", out) & grepl("[0-9]\\.[0-9]{3}", out)]
+  expect_length(rows, 6L)
+  expect_length(unique(nchar(rows, type = "width")), 1L)
+})

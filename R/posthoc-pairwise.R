@@ -147,24 +147,18 @@
   reason <- .dv_degenerate_reason(y, g)
   if (!is.null(reason)) .not_computed(reason)
 
-  # Unweighted Tukey HSD: delegate to stats::TukeyHSD (verbatim original path)
+  # Unweighted Tukey HSD: delegate to stats::TukeyHSD (verbatim original
+  # path), re-oriented to the SPSS "(I) - (J)" convention of the other paths
   if (method == "tukey" && is.null(weight_name)) {
     aov_result <- aov(y ~ g)
     tukey_result <- TukeyHSD(aov_result, conf.level = conf.level)
+    mse <- sum(stats::residuals(aov_result)^2) / aov_result$df.residual
 
-    # Extract results
-    tukey_data <- tukey_result$g
-    comparisons <- rownames(tukey_data)
-
-    results_df <- data.frame(
-      Variable = var_name,
-      Comparison = comparisons,
-      Estimate = tukey_data[, "diff"],
-      conf_low = tukey_data[, "lwr"],
-      conf_high = tukey_data[, "upr"],
-      p_adjusted = tukey_data[, "p adj"],
-      stringsAsFactors = FALSE
-    )
+    results_df <- .tukeyhsd_to_ij(tukey_result$g, group_levels,
+                                  n = as.numeric(table(g)[group_levels]),
+                                  mse = mse)
+    results_df <- cbind(Variable = var_name, results_df,
+                        stringsAsFactors = FALSE)
 
     return(results_df)
   }
@@ -287,6 +281,42 @@
 
   results_df <- do.call(rbind, results_list)
   return(results_df)
+}
+
+#' TukeyHSD() rows in the SPSS "(I) - (J)" orientation
+#'
+#' TukeyHSD() reports "B-A" = mean(B) - mean(A) for every pair (later level
+#' minus earlier level, unspaced separator). SPSS Multiple Comparisons list
+#' "(I) - (J)" = mean(I) - mean(J) with I before J in the category order,
+#' which is what the weighted and Scheffe paths always did. TukeyHSD() rows
+#' come in the order of utils::combn(levels, 2) (lower triangle, column
+#' major), so row r is the pair combn(levels, 2)[, r]: no need to parse
+#' the (ambiguous, for hyphenated labels) row names. Sign and interval are
+#' flipped; the adjusted p-value is symmetric.
+#'
+#' @param tk One TukeyHSD() matrix (diff, lwr, upr, p adj)
+#' @param levels Factor levels in order
+#' @param n Group sizes (same order as levels)
+#' @param mse Error mean square of the ANOVA (for the SPSS Std. Error)
+#' @return data.frame Comparison, Estimate, SE, t_value, conf_low,
+#'   conf_high, p_adjusted
+#' @noRd
+.tukeyhsd_to_ij <- function(tk, levels, n, mse) {
+  pairs <- utils::combn(seq_along(levels), 2)
+  i <- pairs[1, ]
+  j <- pairs[2, ]
+  est <- -as.numeric(tk[, "diff"])
+  se <- sqrt(mse * (1 / n[i] + 1 / n[j]))
+  data.frame(
+    Comparison = paste(levels[i], "-", levels[j]),
+    Estimate = est,
+    SE = se,
+    t_value = est / se,
+    conf_low = -as.numeric(tk[, "upr"]),
+    conf_high = -as.numeric(tk[, "lwr"]),
+    p_adjusted = as.numeric(tk[, "p adj"]),
+    stringsAsFactors = FALSE
+  )
 }
 
 #' Pairwise post-hoc engine for oneway_anova results
@@ -479,16 +509,27 @@
 #' @return invisible(NULL)
 #' @noRd
 .print_posthoc_table <- function(rows, digits) {
-  tbl <- rows[, c("Comparison", "Estimate", "conf_low",
-                  "conf_high", "p_adjusted", "sig")]
-  print_stat_table(
-    tbl,
-    digits = digits,
-    col_types = c(Estimate = "num", conf_low = "num", conf_high = "num"),
-    col_labels = c(Estimate = "Difference", conf_low = "Lower CI",
-                   conf_high = "Upper CI", p_adjusted = "p-value",
-                   sig = "Sig")
+  p <- as.numeric(rows$p_adjusted)
+  se <- if ("SE" %in% names(rows)) as.numeric(rows$SE) else rep(NA_real_, nrow(rows))
+  # SPSS Multiple Comparisons layout: "(I) - (J)", Mean Difference (I-J),
+  # Std. Error, adjusted Sig., confidence interval. Display-width padding
+  # keeps labels with umlauts aligned (print_stat_table() pads by bytes).
+  tbl <- data.frame(
+    Comparison = rows$Comparison,
+    Difference = fmt_num(as.numeric(rows$Estimate), digits),
+    SE = fmt_num(se, digits),
+    Sig = fmt_p(p, digits),
+    Lower = fmt_num(as.numeric(rows$conf_low), digits),
+    Upper = fmt_num(as.numeric(rows$conf_high), digits),
+    sig = add_significance_stars(p),
+    stringsAsFactors = FALSE
   )
+  if (all(is.na(se))) tbl$SE <- NULL
+  .print_table_utf8(tbl, col_labels = c(
+    Comparison = "(I) - (J)", Difference = "Mean Difference (I-J)",
+    SE = "Std. Error", Sig = "p-value", Lower = "Lower CI",
+    Upper = "Upper CI", sig = ""
+  ))
   invisible(NULL)
 }
 
@@ -537,6 +578,7 @@
 
   print_interpretation <- function() {
     cat("\nInterpretation:\n")
+    cat("- (I) - (J): mean of the first group (I) minus mean of the second (J)\n")
     cat("- Positive differences: First group > Second group\n")
     cat("- Negative differences: First group < Second group\n")
     cat("- Confidence intervals not containing 0 indicate significant differences\n")
