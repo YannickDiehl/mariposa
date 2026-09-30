@@ -75,6 +75,7 @@ reference:
   - write_stata
   - write_xpt
   - write_xlsx
+  - as.data.frame.mariposa
 
 - title: "Label Management"
   desc: "Inspect, modify, and convert labelled survey data"
