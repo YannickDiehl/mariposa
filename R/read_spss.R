@@ -476,7 +476,8 @@ na_frequencies <- function(x) {
   tag_map <- attr(x, "na_tag_map")
   labels  <- attr(x, "labels")
 
-  na_mask <- is.na(x)
+  raw <- .plain_numeric(x)
+  na_mask <- is.na(raw)
   if (!any(na_mask)) {
     return(data.frame(
       tag = character(0), n = integer(0),
@@ -485,7 +486,7 @@ na_frequencies <- function(x) {
     ))
   }
 
-  tags <- vapply(x[na_mask], haven::na_tag, character(1))
+  tags <- .na_tags(raw[na_mask])
   tag_tbl <- table(tags, useNA = "always")
 
   result <- data.frame(
@@ -504,7 +505,7 @@ na_frequencies <- function(x) {
   # Add value labels
   if (!is.null(labels)) {
     na_labels <- labels[is.na(labels)]
-    label_tags <- vapply(na_labels, haven::na_tag, character(1))
+    label_tags <- .na_tags(na_labels)
     label_lookup <- stats::setNames(names(na_labels), label_tags)
     result$label <- label_lookup[result$tag]
   } else {
@@ -571,21 +572,13 @@ untag_na <- function(x) {
     return(strip_tags(x))
   }
 
-  raw <- as.double(x)
-  na_positions <- which(is.na(x))
-
-  if (length(na_positions) == 0L) return(raw)
-
-  # Get the tag for each NA position
-  na_tags <- vapply(x[na_positions], haven::na_tag, character(1))
-
-  # Replace each tagged NA with its original code
-  for (j in seq_along(na_positions)) {
-    tag <- na_tags[j]
-    if (!is.na(tag) && tag %in% names(tag_map)) {
-      raw[na_positions[j]] <- tag_map[tag]
-    }
-  }
+  # Vectorized: one tag read for the whole vector. The former per-element
+  # vapply(x[na_positions], haven::na_tag) split the labelled vector into
+  # one vctrs object per missing value (untag_na over ALLBUS: 9 s).
+  raw <- as.double(.plain_numeric(x))
+  tags <- .na_tags(raw)
+  hit <- !is.na(tags) & tags %in% names(tag_map)
+  raw[hit] <- unname(tag_map)[match(tags[hit], names(tag_map))]
 
   raw
 }

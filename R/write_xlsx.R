@@ -853,7 +853,21 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 #' Build the Labels reference sheet from a data frame
 #' @noRd
 .build_labels_sheet <- function(data) {
+  # Rows are collected as column vectors per variable and bound once at the
+  # end: rbind() of thousands of one-row data frames (plus a per-row
+  # vapply(haven::na_tag)) dominated write_xlsx() on ALLBUS.
   rows <- list()
+  add_rows <- function(value, value_label, type) {
+    n <- length(value)
+    rows[[length(rows) + 1L]] <<- list(
+      Variable = rep(col_name, n),
+      Variable_Label = rep(var_label, n),
+      Value = as.character(value),
+      Value_Label = as.character(value_label),
+      Type = rep(type, n),
+      Column_Type = rep(col_type, n)
+    )
+  }
 
   for (col_name in names(data)) {
     x <- data[[col_name]]
@@ -876,111 +890,56 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 
     # Value labels (non-NA entries, excluding values claimed by na_tag_map)
     if (!is.null(labels_attr)) {
-      non_na_mask <- !is.na(labels_attr)
-      if (any(non_na_mask)) {
-        valid_labels <- labels_attr[non_na_mask]
-        # Exclude values that are in na_tag_map (those are missing, not valid)
-        if (!is.null(tag_map)) {
-          in_tag_map <- unname(valid_labels) %in% unname(tag_map)
-          valid_labels <- valid_labels[!in_tag_map]
-        }
-        for (j in seq_along(valid_labels)) {
-          rows[[length(rows) + 1L]] <- data.frame(
-            Variable = col_name,
-            Variable_Label = var_label,
-            Value = as.character(valid_labels[j]),
-            Value_Label = names(valid_labels)[j],
-            Type = "valid",
-            Column_Type = col_type,
-            stringsAsFactors = FALSE
-          )
-        }
-        if (length(valid_labels) > 0L) has_content <- TRUE
+      valid_labels <- labels_attr[!is.na(labels_attr)]
+      # Exclude values that are in na_tag_map (those are missing, not valid)
+      if (!is.null(tag_map)) {
+        valid_labels <- valid_labels[!unname(valid_labels) %in% unname(tag_map)]
+      }
+      if (length(valid_labels) > 0L) {
+        add_rows(unname(valid_labels), names(valid_labels), "valid")
+        has_content <- TRUE
       }
     }
 
     # Factor levels (if not haven-labelled)
     if (is.factor(x) && is.null(labels_attr)) {
-      lvls <- levels(x)
-      for (lv in lvls) {
-        rows[[length(rows) + 1L]] <- data.frame(
-          Variable = col_name,
-          Variable_Label = var_label,
-          Value = lv,
-          Value_Label = lv,
-          Type = "valid",
-          Column_Type = col_type,
-          stringsAsFactors = FALSE
-        )
-      }
+      add_rows(levels(x), levels(x), "valid")
       has_content <- TRUE
     }
 
     # Tagged NA entries
     if (!is.null(tag_map)) {
-      for (k in seq_along(tag_map)) {
-        code <- tag_map[k]
-        tag_char <- names(tag_map)[k]
-
-        na_label <- ""
-        if (!is.null(labels_attr)) {
-          # First: try tagged NA entries (normal case after .tag_spss_missing_values)
-          na_entries <- labels_attr[is.na(labels_attr)]
-          if (length(na_entries) > 0L && requireNamespace("haven", quietly = TRUE)) {
-            na_tags <- vapply(na_entries, haven::na_tag, character(1))
-            match_idx <- match(tag_char, na_tags)
-            if (!is.na(match_idx)) {
-              na_label <- names(na_entries)[match_idx]
-            }
-          }
-          # Fallback: look up the numeric code in non-NA labels
-          # (covers the case where labels were not converted to tagged NAs)
-          if (!nzchar(na_label)) {
-            non_na_entries <- labels_attr[!is.na(labels_attr)]
-            code_match <- match(code, unname(non_na_entries))
-            if (!is.na(code_match)) {
-              na_label <- names(non_na_entries)[code_match]
-            }
-          }
+      na_label <- rep("", length(tag_map))
+      if (!is.null(labels_attr)) {
+        # First: tagged NA entries (normal case after .tag_spss_missing_values)
+        na_entries <- labels_attr[is.na(labels_attr)]
+        if (length(na_entries) > 0L) {
+          hit <- match(names(tag_map), .na_tags(na_entries))
+          na_label[!is.na(hit)] <- names(na_entries)[hit[!is.na(hit)]]
         }
-
-        rows[[length(rows) + 1L]] <- data.frame(
-          Variable = col_name,
-          Variable_Label = var_label,
-          Value = as.character(code),
-          Value_Label = na_label,
-          Type = "missing",
-          Column_Type = col_type,
-          stringsAsFactors = FALSE
-        )
+        # Fallback: look up the numeric code in non-NA labels
+        # (covers the case where labels were not converted to tagged NAs)
+        non_na_entries <- labels_attr[!is.na(labels_attr)]
+        code_hit <- match(unname(tag_map), unname(non_na_entries))
+        fill <- !nzchar(na_label) & !is.na(code_hit)
+        na_label[fill] <- names(non_na_entries)[code_hit[fill]]
       }
+      add_rows(unname(tag_map), na_label, "missing")
       has_content <- TRUE
     }
 
     # Variable with label but no value labels: still include
     if (!has_content && nzchar(var_label)) {
-      rows[[length(rows) + 1L]] <- data.frame(
-        Variable = col_name,
-        Variable_Label = var_label,
-        Value = "",
-        Value_Label = "",
-        Type = "",
-        Column_Type = col_type,
-        stringsAsFactors = FALSE
-      )
+      add_rows("", "", "")
     }
   }
 
-  if (length(rows) == 0L) {
-    return(data.frame(
-      Variable = character(0), Variable_Label = character(0),
-      Value = character(0), Value_Label = character(0),
-      Type = character(0), Column_Type = character(0),
-      stringsAsFactors = FALSE
-    ))
-  }
-
-  do.call(rbind, rows)
+  cols <- c("Variable", "Variable_Label", "Value", "Value_Label", "Type",
+            "Column_Type")
+  out <- lapply(stats::setNames(cols, cols), function(nm) {
+    as.character(unlist(lapply(rows, `[[`, nm), use.names = FALSE))
+  })
+  as.data.frame(out, stringsAsFactors = FALSE)
 }
 
 

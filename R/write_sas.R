@@ -175,46 +175,28 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
   # input, so integers (which can carry no tags) pass through untouched.
   if (!is.double(x)) return(x)
 
-  na_idx <- which(is.na(x))
-  if (length(na_idx) == 0L) return(x)
+  # Vectorized tag read (the former per-element haven::na_tag() loop went
+  # through vctrs dispatch for every missing value)
+  raw <- .plain_numeric(x)
+  tags <- .na_tags(raw)
+  lower <- !is.na(tags) & tags != toupper(tags)
+  if (!any(lower)) return(x)
 
-  needs_retag <- FALSE
-  new_tags <- character(length(na_idx))
-
-  for (j in seq_along(na_idx)) {
-    tag <- haven::na_tag(x[na_idx[j]])
-    if (!is.na(tag) && tag != toupper(tag)) {
-      needs_retag <- TRUE
-      new_tags[j] <- toupper(tag)
-    } else {
-      new_tags[j] <- tag %||% ""
-    }
-  }
-
-  if (!needs_retag) return(x)
-
-  # Rebuild tagged NAs with uppercase tags
-  for (j in seq_along(na_idx)) {
-    tag <- new_tags[j]
-    if (nzchar(tag) && !is.na(tag)) {
-      x[na_idx[j]] <- haven::tagged_na(tag)
-    }
-  }
+  # Rebuild tagged NAs with uppercase tags, keeping all attributes of x
+  raw[lower] <- haven::tagged_na(toupper(tags[lower]))
+  attributes(raw) <- attributes(x)
+  x <- raw
 
   # Update value labels: remap any tagged NA labels from lowercase to uppercase
-
   labels <- attr(x, "labels", exact = TRUE)
   if (!is.null(labels)) {
-    new_labels <- labels
-    for (k in seq_along(labels)) {
-      if (is.na(labels[k])) {
-        old_tag <- haven::na_tag(labels[k])
-        if (!is.na(old_tag) && old_tag != toupper(old_tag)) {
-          new_labels[k] <- haven::tagged_na(toupper(old_tag))
-        }
-      }
+    lab_raw <- .plain_numeric(labels)
+    lab_tags <- .na_tags(lab_raw)
+    lab_lower <- !is.na(lab_tags) & lab_tags != toupper(lab_tags)
+    if (any(lab_lower)) {
+      lab_raw[lab_lower] <- haven::tagged_na(toupper(lab_tags[lab_lower]))
+      attr(x, "labels") <- stats::setNames(lab_raw, names(labels))
     }
-    attr(x, "labels") <- new_labels
   }
 
   x

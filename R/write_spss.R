@@ -143,7 +143,7 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
       na_entries   <- labels[is.na(labels)]
 
       if (length(na_entries) > 0L) {
-        na_tags <- vapply(na_entries, haven::na_tag, character(1))
+        na_tags <- .na_tags(na_entries)
         for (j in seq_along(na_entries)) {
           tag <- na_tags[j]
           if (!is.na(tag) && tag %in% names(tag_map)) {
