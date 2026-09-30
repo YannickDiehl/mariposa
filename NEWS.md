@@ -1461,10 +1461,15 @@ but were never asserted. These are now fixed and asserted:
 * The Display-tier p-value tolerance of `assert_spss()` is one unit of the
   last printed decimal. A relative 1% was added on top, which let a p of
   .975 drift by ten units; every reference p matches at the tighter bound.
+* The SPSS validation tests now compare about 14,600 SPSS reference values
+  (every value in the reference outputs that mariposa computes, except the
+  weighted runs pending a WEIGHT BY reference): a value-by-value audit had
+  found most of them matching but never asserted, and the few mismatches
+  hiding there (see "SPSS parity audit" above).
 * `vignette("spss-compatibility")` is regenerated: it lists EXC-001/EXC-002
-  with their reason (it still said "No active Tier-3 exceptions") and the
-  updated assertion counts of `ancova()`, `crosstab()`, `describe()`,
-  `efa()` and `t_test()`.
+  with their reason (it still said "No active Tier-3 exceptions") and counts
+  the SPSS values each validation file compares when it runs (it counted
+  `assert_spss()` call sites, which data-driven tests understate).
 
 # mariposa 0.7.3
 

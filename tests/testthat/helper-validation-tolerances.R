@@ -189,6 +189,11 @@ assert_spss <- function(actual, expected,
 
   tier <- match.arg(tier)
 
+  # The compatibility-vignette generator counts executed comparisons per
+  # tier (data-driven tests loop, so call sites say little about depth)
+  tally_path <- Sys.getenv("MARIPOSA_ASSERT_TALLY", "")
+  if (nzchar(tally_path)) cat(tier, "\n", file = tally_path, append = TRUE, sep = "")
+
   # Special-case: SPSS prints "<.001" for very small p-values.
   if (is.character(expected) && identical(expected, "<.001")) {
     testthat::expect_lt(actual, 0.001,

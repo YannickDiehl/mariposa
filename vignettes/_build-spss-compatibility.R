@@ -161,10 +161,44 @@ count_assertions <- function(path) {
     legacy = legacy_eq)
 }
 
+# Executed comparisons per tier: run each validation file with the helper's
+# tally switched on (MARIPOSA_ASSERT_TALLY). The tests are data-driven, so a
+# single assert_spss() call site can check hundreds of SPSS values; counting
+# call sites understated the depth. Falls back to the static count when a
+# file cannot be run.
+run_tally <- function(path) {
+  tally <- tempfile(fileext = ".txt")
+  old_tally <- Sys.getenv("MARIPOSA_ASSERT_TALLY", unset = NA)
+  old_cran <- Sys.getenv("NOT_CRAN", unset = NA)
+  Sys.setenv(MARIPOSA_ASSERT_TALLY = tally, NOT_CRAN = "true")
+  on.exit({
+    if (is.na(old_tally)) Sys.unsetenv("MARIPOSA_ASSERT_TALLY") else Sys.setenv(MARIPOSA_ASSERT_TALLY = old_tally)
+    if (is.na(old_cran)) Sys.unsetenv("NOT_CRAN") else Sys.setenv(NOT_CRAN = old_cran)
+  })
+  ok <- tryCatch({
+    suppressMessages(suppressWarnings(
+      testthat::test_file(path, reporter = testthat::SilentReporter$new())
+    ))
+    TRUE
+  }, error = function(e) FALSE)
+  if (!ok || !file.exists(tally)) return(NULL)
+  tiers <- readLines(tally, warn = FALSE)
+  c(spec = sum(tiers == "spec"), display = sum(tiers == "display"),
+    exception = sum(tiers == "exception"), total = length(tiers))
+}
+
+pkg_loaded <- tryCatch({
+  suppressMessages(pkgload::load_all(repo_root, quiet = TRUE))
+  TRUE
+}, error = function(e) FALSE)
+
 per_file_stats <- lapply(validation_files, function(p) {
+  counts <- count_assertions(p)
+  runtime <- if (pkg_loaded) run_tally(p)
+  if (!is.null(runtime)) counts[names(runtime)] <- runtime
   list(file = basename(p), fn = sub("-", "_", sub("^test-(.*)-spss-validation\\.R$",
                                                   "\\1", basename(p))),
-       counts = count_assertions(p))
+       counts = counts)
 })
 
 
@@ -281,8 +315,10 @@ rmd_lines <- c(
   "",
   "## Per-Function Status",
   "",
-  "The columns show how many `assert_spss()` calls per tier the validation file",
-  "contains. \"Total\" is the total number of charter-compliant assertions.",
+  "The columns show how many SPSS reference values per tier the validation file",
+  "checks when it runs. \"Total\" is the total number of charter-compliant",
+  "comparisons. The `w_*` functions share one validation file, whose total each",
+  "of them shows.",
   "",
   "The \"Internal (Tier 4)\" column flags statistics that have no SPSS",
   "reference and are therefore R-only: for the rank-based family the",
