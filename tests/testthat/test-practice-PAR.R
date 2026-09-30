@@ -775,3 +775,16 @@ test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles
   skip_if(!file.exists(src), "R/ sources not available")
   expect_false(any(grepl("marginal_means", readLines(src), fixed = TRUE)))
 })
+
+# --- 0.7.4 audit: weighted factorial Levene by median ------------------------------
+
+test_that("levene_test(center = 'median') refuses a weighted factorial_anova", {
+  # Was: the median-based recomputation used the unweighted raw values and
+  # silently returned the unweighted test (F 21.150 = unweighted) for a
+  # weighted model.
+  fa <- factorial_anova(survey_data, dv = income,
+                        between = c(gender, region, education),
+                        weights = sampling_weight)
+  expect_error(levene_test(fa, center = "median"), "weighted")
+  expect_s3_class(levene_test(fa), "levene_test")
+})

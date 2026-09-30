@@ -377,6 +377,10 @@ reference output showed mariposa was wrong.
 
 ### Parametric tests
 
+* `levene_test(center = "median")` on a weighted `factorial_anova()` is an
+  error instead of silently returning the unweighted test (the median
+  recomputation used the raw, unweighted values). The mean-based test,
+  which SPSS UNIANOVA reports for weighted models, is unchanged.
 * `t_test()`, `oneway_anova()`, `factorial_anova()`, `ancova()` and the
   post-hoc tests on their results order the groups of a numeric or
   labelled grouping variable by code, as SPSS does, and show value labels

@@ -1250,7 +1250,14 @@ levene_test.factorial_anova <- function(x, center = c("mean", "median"), ...) {
     )
   }
 
-  # Median-based: recompute
+  # Median-based: recompute (unweighted only - the recomputation works on
+  # the raw values and would silently return the unweighted test)
+  if (!is.null(x$weights)) {
+    cli_abort(c(
+      "A median-based Levene test is not available for a weighted {.fn factorial_anova}.",
+      "i" = "Use {.code center = \"mean\"} (the default), the Levene statistic SPSS UNIANOVA reports for weighted models."
+    ))
+  }
   y <- x$data[[x$call_info$dv]]
   g <- interaction(x$data[x$call_info$factors], drop = TRUE, sep = "_")
   g_levels <- levels(g)
