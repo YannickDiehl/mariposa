@@ -27,3 +27,11 @@
 * `marginal_effects()` on a grouped model whose grouping variable is
   haven-labelled no longer aborts with "arguments imply differing number
   of rows: 1, 2".
+* Weighted `linear_regression()`: `vcov()`, `confint()`, `nobs()`,
+  `df.residual()`, `anova()`, `predict()` (standard errors/intervals),
+  `broom::tidy()` and `broom::glance()` now use the SPSS frequency-weight
+  convention of `summary()` (N = `sum(w)`, residual df = `sum(w) - rank`).
+  They were inherited from `lm()`, which treats weights as analytic
+  weights: with `weights = w * 3`, `summary()` showed SE = .0527 but
+  `tidy()` .0916, and `nobs()` returned 2115 cases instead of N = 6388.
+  Unweighted models are unchanged.

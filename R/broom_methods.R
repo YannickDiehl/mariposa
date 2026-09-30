@@ -70,12 +70,41 @@
 
 tidy.linear_regression <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
   .lr_broom_require_lm(x, "tidy")
-  broom::tidy(.lr_strip_class(x), conf.int = conf.int, conf.level = conf.level, ...)
+  out <- broom::tidy(.lr_strip_class(x), conf.int = conf.int,
+                     conf.level = conf.level, ...)
+  if (!is.null(x$spss_weights)) {
+    # Weighted: SPSS frequency-weight SE / t / p / CI (as in summary())
+    # instead of lm's analytic-weight values
+    se <- sqrt(diag(vcov.linear_regression(x)))
+    idx <- match(out$term, names(se))
+    out$std.error <- unname(se[idx])
+    out$statistic <- out$estimate / out$std.error
+    out$p.value <- 2 * stats::pt(abs(out$statistic),
+                                 df = x$spss_weights$df_residual,
+                                 lower.tail = FALSE)
+    if (isTRUE(conf.int)) {
+      ci <- confint.linear_regression(x, level = conf.level)
+      out$conf.low <- unname(ci[idx, 1])
+      out$conf.high <- unname(ci[idx, 2])
+    }
+  }
+  out
 }
 
 glance.linear_regression <- function(x, ...) {
   .lr_broom_require_lm(x, "glance")
-  broom::glance(.lr_strip_class(x), ...)
+  out <- broom::glance(.lr_strip_class(x), ...)
+  if (!is.null(x$spss_weights)) {
+    # Weighted: fit statistics under SPSS frequency weights (N = sum(w)),
+    # identical to the summary() Model Summary / ANOVA tables
+    out$adj.r.squared <- x$model_summary$adj_R_squared
+    out$sigma <- x$model_summary$std_error
+    out$statistic <- x$anova_table$F_statistic[1]
+    out$p.value <- x$anova_table$Sig[1]
+    out$df.residual <- x$spss_weights$df_residual
+    out$nobs <- x$spss_weights$sum_w
+  }
+  out
 }
 
 augment.linear_regression <- function(x, ...) {

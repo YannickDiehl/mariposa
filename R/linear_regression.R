@@ -117,7 +117,17 @@
 #'
 #' \strong{Weights}: When weights are specified, they are treated as frequency
 #' weights (matching SPSS WEIGHT BY behavior). The model is fitted using weighted
-#' least squares via \code{lm(weights = ...)}.
+#' least squares via \code{lm(weights = ...)}; the coefficients are those of
+#' \code{lm()}, but N is \code{sum(w)} and the residual df are
+#' \code{sum(w) - rank} (unrounded), as in SPSS. \code{lm()} itself treats
+#' weights as analytic (precision) weights with df = cases - rank, so the
+#' inherited generics are adjusted to the SPSS convention:
+#' \code{vcov()}, \code{confint()}, \code{nobs()} (unrounded \code{sum(w)}),
+#' \code{df.residual()}, \code{anova()} (single model), \code{predict()}
+#' (standard errors and intervals), \code{broom::tidy()} and
+#' \code{broom::glance()} all agree with \code{summary()}.
+#' \code{stats::summary.lm()}, \code{logLik()}, \code{AIC()} and
+#' \code{BIC()} keep lm's analytic-weight definitions.
 #'
 #' \strong{Standardized Coefficients}: Beta = B * (SD_x / SD_y). This matches
 #' the SPSS standardized coefficient output. Not available for the intercept.
@@ -592,6 +602,13 @@ linear_regression <- function(data, formula = NULL,
   out$model_summary <- model_stats
   out$descriptives <- descriptives
   out$n            <- n_report
+  if (!is.null(weights_vec)) {
+    # Frequency-weight quantities for the inherited lm generics (vcov,
+    # confint, nobs, df.residual, anova, predict, broom): lm() itself
+    # treats weights as analytic weights with df = cases - rank.
+    out$spss_weights <- list(sum_w = sw, df_residual = df_residual,
+                             sigma = sigma_spss)
+  }
   out
 }
 
@@ -1500,6 +1517,12 @@ print.summary.linear_regression <- function(x, ...) {
 #' @method predict linear_regression
 predict.linear_regression <- function(object, ...) {
   .lr_require_lm(object, "predict")
+  fw <- object$spss_weights
+  if (!is.null(fw) && !"scale" %in% names(list(...))) {
+    # Weighted: residual scale and df of the SPSS frequency-weight fit
+    return(stats::predict(.lr_strip_class(object), ...,
+                          scale = fw$sigma, df = fw$df_residual))
+  }
   NextMethod()
 }
 
@@ -1517,6 +1540,118 @@ predict.linear_regression <- function(object, ...) {
 #' @method anova linear_regression
 anova.linear_regression <- function(object, ...) {
   .lr_require_lm(object, "anova")
+  fw <- object$spss_weights
+  if (is.null(fw) || length(list(...)) > 0) {
+    return(NextMethod())
+  }
+  # Weighted single-model table: residual df = sum(w) - rank (SPSS
+  # frequency weights) instead of lm's cases - rank
+  a <- stats::anova(.lr_strip_class(object))
+  res <- nrow(a)
+  a[res, "Df"] <- fw$df_residual
+  a[res, "Mean Sq"] <- a[res, "Sum Sq"] / fw$df_residual
+  if (res > 1) {
+    terms_rows <- seq_len(res - 1)
+    f <- a[terms_rows, "Mean Sq"] / a[res, "Mean Sq"]
+    a[terms_rows, "F value"] <- f
+    a[terms_rows, "Pr(>F)"] <- stats::pf(f, a[terms_rows, "Df"],
+                                         fw$df_residual, lower.tail = FALSE)
+  }
+  a
+}
+
+#' Variance-covariance matrix of a linear_regression model
+#'
+#' Unweighted models: \code{stats::vcov()} of the \code{lm}. Weighted
+#' models: the covariance matrix under SPSS frequency weights (residual
+#' variance with \code{sum(w) - rank} df), whose square-rooted diagonal
+#' equals the Std.Error column of \code{summary()}.
+#'
+#' @param object A \code{linear_regression} result (ungrouped, listwise).
+#' @param ... Passed to \code{stats::vcov()}.
+#' @return A square numeric matrix.
+#' @export
+#' @method vcov linear_regression
+vcov.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "vcov")
+  v <- stats::vcov(.lr_strip_class(object), ...)
+  fw <- object$spss_weights
+  if (!is.null(fw)) {
+    # lm's residual variance uses (cases - rank) df, SPSS's (sum(w) - rank);
+    # the unscaled (X'WX)^-1 part is identical
+    v <- v * object$df.residual / fw$df_residual
+  }
+  v
+}
+
+#' Confidence intervals for linear_regression coefficients
+#'
+#' t-based intervals for B. For weighted models they use the SPSS
+#' frequency-weight standard errors and df (\code{sum(w) - rank}) and
+#' equal the CI columns of \code{summary()}.
+#'
+#' @param object A \code{linear_regression} result (ungrouped, listwise).
+#' @param parm Coefficients to compute intervals for (names or indices;
+#'   default all).
+#' @param level Confidence level (default 0.95).
+#' @param ... Not used.
+#' @return A matrix with one row per coefficient and columns for the lower
+#'   and upper limits.
+#' @export
+#' @method confint linear_regression
+confint.linear_regression <- function(object, parm, level = 0.95, ...) {
+  .lr_require_lm(object, "confint")
+  fw <- object$spss_weights
+  if (is.null(fw)) return(NextMethod())
+  cf <- stats::coef(object)
+  ses <- sqrt(diag(vcov.linear_regression(object)))
+  pnames <- names(ses)
+  if (missing(parm)) {
+    parm <- pnames
+  } else if (is.numeric(parm)) {
+    parm <- pnames[parm]
+  }
+  a <- (1 - level) / 2
+  a <- c(a, 1 - a)
+  fac <- stats::qt(a, fw$df_residual)
+  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+  ci <- array(NA_real_, dim = c(length(parm), 2L), dimnames = list(parm, pct))
+  ci[] <- cf[parm] + ses[parm] %o% fac
+  ci
+}
+
+#' Number of observations of a linear_regression model
+#'
+#' Unweighted: the number of complete cases. Weighted: the unrounded sum
+#' of the frequency weights of the complete cases - SPSS's N (the
+#' summary shows it rounded).
+#'
+#' @param object A \code{linear_regression} result (ungrouped, listwise).
+#' @param ... Not used.
+#' @return A single number.
+#' @export
+#' @method nobs linear_regression
+nobs.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "nobs")
+  fw <- object$spss_weights
+  if (!is.null(fw)) return(fw$sum_w)
+  NextMethod()
+}
+
+#' Residual degrees of freedom of a linear_regression model
+#'
+#' Weighted models: \code{sum(w) - rank} (SPSS frequency weights,
+#' non-integer); unweighted: the \code{lm} value.
+#'
+#' @param object A \code{linear_regression} result (ungrouped, listwise).
+#' @param ... Not used.
+#' @return A single number.
+#' @export
+#' @method df.residual linear_regression
+df.residual.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "df.residual")
+  fw <- object$spss_weights
+  if (!is.null(fw)) return(fw$df_residual)
   NextMethod()
 }
 

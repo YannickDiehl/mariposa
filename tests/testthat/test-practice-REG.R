@@ -148,3 +148,55 @@ test_that("REG-04: grouped marginal_effects() with a labelled group variable", {
   expect_true(any(grepl("reg = West", out, fixed = TRUE)))
   expect_no_error(capture.output(print(summary(me))))
 })
+
+# REG-06: weighted linear_regression - summary() used SPSS frequency-weight
+# df (N = sum(w)), but vcov()/confint()/nobs()/tidy()/glance()/anova()
+# inherited lm's analytic-weight df: SE .0527 in the summary vs .0916 in
+# tidy(), nobs() 2115 vs N 6388.
+test_that("REG-06: weighted lm generics follow the SPSS frequency-weight df", {
+  d <- survey_data
+  d$w3 <- d$sampling_weight * 3
+  m <- linear_regression(d, life_satisfaction ~ age + income, weights = w3)
+  ct <- m$coef_table
+  cc <- stats::complete.cases(d[c("life_satisfaction", "age", "income")])
+  sw <- sum(d$w3[cc])
+
+  expect_equal(nobs(m), sw)
+  expect_equal(df.residual(m), sw - 3)
+  expect_equal(unname(sqrt(diag(vcov(m)))), unname(ct$Std.Error))
+  ci <- confint(m)
+  expect_equal(unname(ci[, 1]), unname(ct$CI_lower))
+  expect_equal(unname(ci[, 2]), unname(ct$CI_upper))
+  expect_equal(colnames(confint(m, level = 0.9)), c("5 %", "95 %"))
+  expect_equal(rownames(confint(m, parm = "age")), "age")
+
+  a <- anova(m)
+  expect_equal(a["Residuals", "Df"], sw - 3)
+  m1 <- linear_regression(d, life_satisfaction ~ age, weights = w3)
+  a1 <- anova(m1)
+  expect_equal(a1["age", "F value"], m1$anova_table$F_statistic[1])
+  expect_equal(a1["age", "Pr(>F)"], m1$anova_table$Sig[1])
+
+  p <- predict(m, newdata = head(d), se.fit = TRUE)
+  X <- stats::model.matrix(~ age + income, head(d))
+  expect_equal(unname(p$se.fit), unname(sqrt(diag(X %*% vcov(m) %*% t(X)))))
+  expect_equal(p$df, sw - 3)
+
+  # Unweighted models keep lm's own generics
+  mu <- linear_regression(d, life_satisfaction ~ age + income)
+  ref <- stats::lm(life_satisfaction ~ age + income, data = d)
+  expect_equal(unname(vcov(mu)), unname(vcov(ref)))
+  expect_equal(nobs(mu), nobs(ref))
+
+  skip_if_not_installed("broom")
+  td <- broom::tidy(m, conf.int = TRUE)
+  expect_equal(td$std.error, unname(ct$Std.Error))
+  expect_equal(td$p.value, unname(ct$p))
+  expect_equal(td$conf.low, unname(ct$CI_lower))
+  gl <- broom::glance(m)
+  expect_equal(gl$adj.r.squared, m$model_summary$adj_R_squared)
+  expect_equal(gl$sigma, m$model_summary$std_error)
+  expect_equal(gl$statistic, m$anova_table$F_statistic[1])
+  expect_equal(gl$nobs, sw)
+  expect_equal(gl$df.residual, sw - 3)
+})
