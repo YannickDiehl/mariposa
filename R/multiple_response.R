@@ -158,13 +158,19 @@ multiple_response <- function(data, ..., by = NULL, counted = 1,
     per_group <- lapply(seq_along(group_split), function(i) {
       .mr_block(group_split[[i]], var_names, labels, by_name, counted, w_name)
     })
-    results <- tibble::as_tibble(do.call(rbind, lapply(seq_along(per_group), function(i) {
-      cbind(group_keys[i, , drop = FALSE], per_group[[i]]$results)
-    })))
+    # Prefix each group's table with its key, repeated to the table's rows:
+    # cbind() of the one-row key did not recycle a haven_labelled key
+    # ("arguments imply differing number of rows: 1, 2")
+    with_key <- function(i, tab) {
+      dplyr::bind_cols(group_keys[rep(i, nrow(tab)), , drop = FALSE], tab)
+    }
+    results <- dplyr::bind_rows(lapply(seq_along(per_group), function(i) {
+      with_key(i, per_group[[i]]$results)
+    }))
     by_results <- if (!is.null(by_name)) {
-      tibble::as_tibble(do.call(rbind, lapply(seq_along(per_group), function(i) {
-        cbind(group_keys[i, , drop = FALSE], per_group[[i]]$by_results)
-      })))
+      dplyr::bind_rows(lapply(seq_along(per_group), function(i) {
+        with_key(i, per_group[[i]]$by_results)
+      }))
     } else {
       NULL
     }

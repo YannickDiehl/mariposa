@@ -685,3 +685,30 @@ test_that("DESC-05: crosstab shows full labels, per-column widths and variable l
   expect_true(all(nchar(out3[grepl("^[|+]", out3)]) <= 80))
   expect_true(any(grepl("Intermediate", out3)))
 })
+
+
+# --- EDGE-05: multiple_response() grouped by a labelled variable --------------
+
+.mr_data <- function() {
+  survey_data |>
+    mutate(gov = as.integer(trust_government >= 4),
+           media = as.integer(trust_media >= 4),
+           science = as.integer(trust_science >= 4))
+}
+
+test_that("EDGE-05: multiple_response() works on data grouped by a labelled variable", {
+  # cbind() of a one-row group key holding a haven_labelled column with
+  # the per-group table failed: "arguments imply differing number of rows:
+  # 1, 2".
+  skip_if_not_installed("haven")
+  d <- .mr_data()
+  d$reg_lab <- haven::labelled(as.integer(d$region), c(East = 1, West = 2))
+  r <- expect_no_error(multiple_response(dplyr::group_by(d, reg_lab), gov, media))
+  expect_equal(nrow(r$results), 4L)
+  out <- capture.output(print(r))
+  expect_true(any(grepl("reg_lab = East", out)))
+  expect_true(any(grepl("reg_lab = West", out)))
+  rb <- expect_no_error(multiple_response(dplyr::group_by(d, reg_lab), gov, media,
+                                          by = gender))
+  expect_equal(nrow(rb$by_results), 8L)
+})

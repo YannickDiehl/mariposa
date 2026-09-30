@@ -130,3 +130,6 @@
   table would be wider than the console, and the title and the column
   spanner show the variable labels, as SPSS does, instead of the
   variable names.
+* `multiple_response()` on data grouped by a labelled variable (e.g.
+  ALLBUS `eastwest`) no longer aborts with "arguments imply differing
+  number of rows: 1, 2".
