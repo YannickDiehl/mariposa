@@ -138,8 +138,9 @@
 #'
 #' @param df Data frame of pre-formatted (character) columns
 #' @param col_labels Named character vector of header labels
+#' @param left Number of leading (label) columns to left-align
 #' @noRd
-.print_table_utf8 <- function(df, col_labels = NULL) {
+.print_table_utf8 <- function(df, col_labels = NULL, left = 1L) {
   labels <- stats::setNames(names(df), names(df))
   if (!is.null(col_labels)) labels[names(col_labels)] <- col_labels
   for (j in seq_along(df)) {
@@ -147,7 +148,7 @@
     vals <- as.character(df[[j]])
     vals[is.na(vals)] <- ""
     w <- max(nchar(c(labels[[nm]], vals), type = "width"), 1L)
-    align <- if (j == 1) "left" else "right"
+    align <- if (j <= left) "left" else "right"
     df[[j]] <- vapply(vals, pad_utf8, character(1), width = w, align = align,
                       USE.NAMES = FALSE)
     labels[[nm]] <- pad_utf8(labels[[nm]], w, align)

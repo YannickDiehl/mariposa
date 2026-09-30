@@ -566,62 +566,11 @@ print.ancova <- function(x, digits = 3, ...) {
   factor_str <- paste(info$factors, collapse = ", ")
   cov_str <- paste(info$covariates, collapse = ", ")
 
-  cat(sprintf("ANCOVA: %s by %s, covariate: %s%s\n",
-              info$dv, factor_str, cov_str, weighted_tag))
-
-  # Extract effect rows (skip Corrected Model, Intercept, Error, Total, Corrected Total)
-  at <- x$anova_table
-  skip_rows <- c("Corrected Model", "Intercept", "Error", "Total", "Corrected Total")
-  effect_idx <- which(!at$source %in% skip_rows)
-
-  if (length(effect_idx) == 0) {
-    cat("  No effects found\n")
-    invisible(return(x))
-  }
-
-  # Build labels: mark covariates with "(covariate)" suffix
-  effect_labels <- character(length(effect_idx))
-  for (k in seq_along(effect_idx)) {
-    src <- at$source[effect_idx[k]]
-    # Replace " * " with ":" for compact display
-    label <- gsub(" \\* ", ":", src)
-    if (src %in% info$covariates) {
-      label <- paste0(label, " (covariate)")
-    }
-    effect_labels[k] <- label
-  }
-  max_label_width <- max(nchar(effect_labels))
-
-  for (k in seq_along(effect_idx)) {
-    i <- effect_idx[k]
-    label <- effect_labels[k]
-    f_val <- at$f[i]
-    df_val <- at$df[i]
-    p_val <- at$p[i]
-    eta_val <- at$partial_eta_sq[i]
-
-    # Get residual df
-    error_row <- which(at$source == "Error")
-    df_error <- at$df[error_row]
-
-    p_str <- format_p_compact(p_val, digits)
-    stars <- add_significance_stars(p_val)
-
-    # Show N only on last effect line
-    n_suffix <- ""
-    if (k == length(effect_idx)) {
-      n_suffix <- sprintf(", N = %d", info$n_total)
-    }
-
-    cat(sprintf("  %-*s F(%d, %d) = %.*f, %s %s, eta2p = %.*f%s\n",
-                max_label_width + 1,
-                paste0(label, ":"),
-                df_val, df_error,
-                digits, f_val,
-                p_str, stars,
-                digits, eta_val,
-                n_suffix))
-  }
+  # N once in the title (it was appended to the last effect line only)
+  cat(sprintf("ANCOVA: %s by %s, covariate: %s%s, N = %s\n",
+              info$dv, factor_str, cov_str, weighted_tag,
+              formatC(info$n_total, format = "d")))
+  .print_effect_lines(x$anova_table, digits, covariates = info$covariates)
 
   invisible(x)
 }
@@ -697,7 +646,6 @@ print.summary.ancova <- function(x, ...) {
   digits <- x$digits
   info <- x$call_info
   n_factors <- length(info$factors)
-  n_covariates <- length(info$covariates)
 
   if (n_factors > 1) {
     design_label <- paste0(n_factors, "-Way ANCOVA")
@@ -721,7 +669,7 @@ print.summary.ancova <- function(x, ...) {
     "Dependent variable" = info$dv,
     "Factor(s)" = factor_str,
     "Covariate(s)" = cov_str,
-    "Type III Sum of Squares" = paste("Type", info$ss_type),
+    "Sum of squares" = "Type III",
     "Weights variable" = info$weight_name,
     "N (complete cases)" = as.character(info$n_total),
     "Missing" = as.character(info$n_missing)
@@ -735,115 +683,41 @@ print.summary.ancova <- function(x, ...) {
   show_emm     <- if (!is.null(x$show)) isTRUE(x$show$marginal_means) else TRUE
   show_levene  <- if (!is.null(x$show)) isTRUE(x$show$levene_test) else TRUE
 
-  # ---- ANOVA TABLE (between_subjects) ----
-  if (show_between) {
-    cat("Tests of Between-Subjects Effects\n")
-    at <- x$anova_table
-
-    fmt_ss <- format(round(at$ss, digits), nsmall = digits, big.mark = "")
-    fmt_df <- format(at$df)
-    fmt_ms <- ifelse(is.na(at$ms), "",
-                     format(round(at$ms, digits), nsmall = digits, big.mark = ""))
-    fmt_f <- ifelse(is.na(at$f), "",
-                    format(round(at$f, digits), nsmall = digits))
-    fmt_p <- ifelse(is.na(at$p), "",
-                    ifelse(at$p < 0.001, "<.001",
-                           format(round(at$p, digits), nsmall = digits)))
-    fmt_eta <- ifelse(is.na(at$partial_eta_sq), "",
-                      format(round(at$partial_eta_sq, digits), nsmall = digits))
-
-    fmt_sig <- vapply(at$p, function(pv) {
-      if (is.na(pv)) return("")
-      as.character(add_significance_stars(pv))
-    }, character(1))
-
-    display_df <- data.frame(
-      Source = at$source,
-      `Type III SS` = fmt_ss,
-      df = fmt_df,
-      `Mean Square` = fmt_ms,
-      F = fmt_f,
-      Sig. = fmt_p,
-      `Partial Eta Sq` = fmt_eta,
-      ` ` = fmt_sig,
-      check.names = FALSE,
-      stringsAsFactors = FALSE
-    )
-
-    border_width <- max(nchar(capture.output(print(display_df, row.names = FALSE))),
-                        40)
-    border <- paste(rep("-", border_width), collapse = "")
-    cat(border, "\n")
-    print(display_df, row.names = FALSE, right = FALSE)
-    cat(border, "\n")
-
-    # R-Squared footnote
-    cat(sprintf("R Squared = %s (Adjusted R Squared = %s)\n",
-                format(round(x$r_squared["r_squared"], digits), nsmall = digits),
-                format(round(x$r_squared["adj_r_squared"], digits), nsmall = digits)))
-  }
+  if (show_between) .print_between_subjects(x, digits)
 
   # ---- PARAMETER ESTIMATES ----
   if (show_params) {
     cat("\nParameter Estimates\n")
     pe <- x$parameter_estimates
-
-    fmt_pe <- data.frame(
+    .print_table_utf8(data.frame(
       Parameter = pe$parameter,
-      B = format(round(pe$b, digits), nsmall = digits),
-      `Std. Error` = format(round(pe$se, digits), nsmall = digits),
-      t = format(round(pe$t, digits), nsmall = digits),
-      Sig. = ifelse(pe$p < 0.001, "<.001",
-                    format(round(pe$p, digits), nsmall = digits)),
-      `Lower Bound` = format(round(pe$ci_lower, digits), nsmall = digits),
-      `Upper Bound` = format(round(pe$ci_upper, digits), nsmall = digits),
-      `Partial Eta Sq` = format(round(pe$partial_eta_sq, digits), nsmall = digits),
-      check.names = FALSE,
+      B = fmt_num(pe$b, digits),
+      SE = fmt_num(pe$se, digits),
+      t = fmt_num(pe$t, digits),
+      Sig = fmt_p(pe$p, digits),
+      Lower = fmt_num(pe$ci_lower, digits),
+      Upper = fmt_num(pe$ci_upper, digits),
+      Eta = fmt_num(pe$partial_eta_sq, digits),
       stringsAsFactors = FALSE
-    )
-
-    pe_border <- max(nchar(capture.output(print(fmt_pe, row.names = FALSE))), 40)
-    cat(paste(rep("-", pe_border), collapse = ""), "\n")
-    print(fmt_pe, row.names = FALSE, right = FALSE)
-    cat(paste(rep("-", pe_border), collapse = ""), "\n")
+    ), col_labels = c(SE = "Std. Error", Lower = "95% CI Lower",
+                      Upper = "95% CI Upper", Eta = "Partial Eta Squared"))
   }
 
   # ---- ESTIMATED MARGINAL MEANS ----
   if (show_emm) {
     cat("\nEstimated Marginal Means\n")
     cat("(Evaluated at covariate means)\n")
-
     emm <- x$estimated_marginal_means
-    fmt_emm <- emm
-    for (bn in info$factors) {
-      fmt_emm[[bn]] <- as.character(fmt_emm[[bn]])
-    }
-    fmt_emm$mean <- format(round(emm$mean, digits), nsmall = digits)
-    fmt_emm$se <- format(round(emm$se, digits), nsmall = digits)
-    fmt_emm$ci_lower <- format(round(emm$ci_lower, digits), nsmall = digits)
-    fmt_emm$ci_upper <- format(round(emm$ci_upper, digits), nsmall = digits)
-    names(fmt_emm)[names(fmt_emm) == "mean"] <- "Mean"
-    names(fmt_emm)[names(fmt_emm) == "se"] <- "Std. Error"
-    names(fmt_emm)[names(fmt_emm) == "ci_lower"] <- "Lower Bound"
-    names(fmt_emm)[names(fmt_emm) == "ci_upper"] <- "Upper Bound"
-
-    emm_border <- max(nchar(capture.output(print(fmt_emm, row.names = FALSE))),
-                      40)
-    cat(paste(rep("-", emm_border), collapse = ""), "\n")
-    print(as.data.frame(fmt_emm), row.names = FALSE, right = FALSE)
-    cat(paste(rep("-", emm_border), collapse = ""), "\n")
+    tbl <- as.data.frame(lapply(emm[info$factors], as.character),
+                         stringsAsFactors = FALSE, check.names = FALSE)
+    tbl$Mean <- fmt_num(emm$mean, digits)
+    tbl$`Std. Error` <- fmt_num(emm$se, digits)
+    tbl$`95% CI Lower` <- fmt_num(emm$ci_lower, digits)
+    tbl$`95% CI Upper` <- fmt_num(emm$ci_upper, digits)
+    .print_table_utf8(tbl, left = length(info$factors))
   }
 
-  # ---- LEVENE'S TEST ----
-  if (show_levene) {
-    cat("\nLevene's Test of Equality of Error Variances\n")
-    lev <- x$levene_test
-    cat(sprintf("  F(%d, %d) = %s, p = %s\n",
-                lev$df1, lev$df2,
-                format(round(lev$f, digits), nsmall = digits),
-                ifelse(lev$p < 0.001, "<.001",
-                       format(round(lev$p, digits), nsmall = digits))))
-  }
+  if (show_levene) .print_levene_line(x$levene_test, digits)
 
   # Significance legend
   if (show_between || show_levene) {

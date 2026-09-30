@@ -98,3 +98,13 @@
   "Basic Secondary - Intermediate Secondary -0.490". The comparison tables
   stay aligned with umlaut labels (they were padded by bytes). (PAR-11,
   PAR-22)
+* `factorial_anova()` and `ancova()` output: the Tests of Between-Subjects
+  Effects table no longer wraps at 80 columns (Partial Eta Squared and the
+  stars moved into a second block) and shows sums of squares with fixed
+  decimals instead of scientific notation (1.754652e+09); the header reads
+  "Sum of squares: Type III" instead of "Type III Sum of Squares: Type 3";
+  Levene's test prints "p < 0.001 ***" instead of "p = <.001"; the
+  compact print shows N once in its title instead of on the last effect
+  line only; descriptives, parameter estimates and marginal means honour
+  `digits`. The `?factorial_anova` examples no longer call a
+  non-existent `summary(marginal_means = FALSE)` toggle. (PAR-20, PAR-26)

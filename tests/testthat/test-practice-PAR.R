@@ -497,3 +497,46 @@ test_that("PAR-22: post-hoc tables stay aligned with umlaut labels", {
   expect_length(rows, 6L)
   expect_length(unique(nchar(rows, type = "width")), 1L)
 })
+
+# --- PAR-20: factorial_anova() / ancova() output ------------------------------
+
+test_that("PAR-20: factorial/ancova summaries: one block, fixed decimals, SS type, digits", {
+  # print(data.frame) wrapped the effect table at 80 columns, sums of squares
+  # printed as 1.754652e+09, "Type III Sum of Squares: Type 3", Levene
+  # "p = <.001", N only on the last compact line, descriptives ignored digits.
+  fa <- factorial_anova(survey_data, dv = income, between = c(gender, education))
+  out <- capture.output(print(summary(fa)))
+  expect_false(any(grepl("e+0", out, fixed = TRUE)))
+  expect_false(any(grepl("Type 3", out, fixed = TRUE)))
+  expect_true(any(grepl("Type III", out, fixed = TRUE)))
+  expect_false(any(grepl("p = <", out, fixed = TRUE)))
+  hdr <- out[grepl("Source", out, fixed = TRUE)]
+  expect_length(hdr, 1L)
+  expect_match(hdr, "Partial Eta Squared")
+  expect_match(out[grepl("^ +Corrected Model", out)], "\\*\\*\\* *$")
+
+  comp <- capture.output(print(fa))
+  expect_match(comp[1], "N = 2186")
+  expect_false(any(grepl("N = ", comp[-1], fixed = TRUE)))
+
+  out1 <- capture.output(print(summary(fa, digits = 1)))
+  expect_true(any(grepl("^ +Male +Basic Secondary +2803\\.4 ", out1)))
+
+  an <- ancova(survey_data, dv = income, between = education, covariate = age)
+  out_a <- capture.output(print(summary(an)))
+  expect_false(any(grepl("e+0", out_a, fixed = TRUE)))
+  expect_false(any(grepl("Type 3", out_a, fixed = TRUE)))
+  expect_false(any(grepl("p = <", out_a, fixed = TRUE)))
+  expect_length(out_a[grepl("Source", out_a, fixed = TRUE)], 1L)
+  comp_a <- capture.output(print(an))
+  expect_match(comp_a[1], "N = 2186")
+})
+
+test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
+  # The example called summary(result, marginal_means = FALSE), a toggle
+  # factorial_anova's summary() does not have (silently ignored).
+  expect_false("marginal_means" %in% names(formals(summary.factorial_anova)))
+  src <- testthat::test_path("..", "..", "R", "factorial_anova.R")
+  skip_if(!file.exists(src), "R/ sources not available")
+  expect_false(any(grepl("marginal_means", readLines(src), fixed = TRUE)))
+})
