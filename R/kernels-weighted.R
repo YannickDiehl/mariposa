@@ -291,6 +291,26 @@
   return(sqrt(.w_var(x, weights, na.rm)))
 }
 
+#' Weighted SD as SPSS UNIANOVA /REGWGT prints it
+#'
+#' Descriptive Statistics of a /REGWGT run: weighted mean and weighted sum
+#' of squares, but n - 1 cases as the divisor - regression weights are not
+#' frequencies, so N stays the number of cases. (WEIGHT BY would divide by
+#' sum(w) - 1, see .w_sd().)
+#'
+#' @param x Numeric vector
+#' @param w Weights
+#' @return Numeric scalar (NA with fewer than 2 cases)
+#' @noRd
+.w_sd_regwgt <- function(x, w) {
+  ok <- !is.na(x) & !is.na(w)
+  x <- x[ok]
+  w <- w[ok]
+  if (length(x) < 2) return(NA_real_)
+  m <- sum(w * x) / sum(w)
+  sqrt(sum(w * (x - m)^2) / (length(x) - 1))
+}
+
 #' Weighted standard error using SPSS formula
 #' @noRd
 .w_se <- function(x, weights = NULL, na.rm = TRUE) {

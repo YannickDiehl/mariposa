@@ -103,6 +103,29 @@ spss_levene <- list(
              f = 97.401, df1 = 3L, df2 = 2004L, p = "<.001")
 )
 
+test_that("Test 2a: weighted cell descriptives — match SPSS /REGWGT", {
+  # /REGWGT: weighted mean, SD with the weighted sum of squares over n - 1,
+  # N = number of cases (0.7.4 audit: the SD divided by sum(w))
+  cells <- list(
+    "Basic Secondary"        = list(mean = 2759.2606, sd = 791.04390,  n = 735L),  # ancova_output.txt:294
+    "Intermediate Secondary" = list(mean = 3590.2177, sd = 1003.80253, n = 548L),  # ancova_output.txt:295
+    "Academic Secondary"     = list(mean = 4225.3255, sd = 1191.04073, n = 548L),  # ancova_output.txt:296
+    "University"             = list(mean = 5331.3370, sd = 1636.49099, n = 355L)   # ancova_output.txt:297
+  )
+  r <- ancova(survey_data, dv = income, between = education, covariate = age,
+              weights = sampling_weight)
+  d <- r$descriptives
+  for (lv in names(cells)) {
+    row <- d[d$education == lv, , drop = FALSE]
+    assert_spss(as.numeric(row$mean), cells[[lv]]$mean, tier = "display",
+                precision = 4, label = sprintf("[2a %s] mean", lv))
+    assert_spss(as.numeric(row$sd), cells[[lv]]$sd, tier = "display",
+                precision = 5, label = sprintf("[2a %s] SD", lv))
+    assert_spss_count(as.numeric(row$n), cells[[lv]]$n,
+                      label = sprintf("[2a %s] N", lv))
+  }
+})
+
 test_that("Levene (unweighted 1a-1c, 3a-3b, 5a): matches SPSS UNIANOVA", {
   for (id in names(spss_levene)) {
     s <- spss_levene[[id]]

@@ -1409,6 +1409,9 @@ but were never asserted. These are now fixed and asserted:
   increases dominated (trust_science - trust_government: +25.945 instead
   of SPSS's -25.945); the tests compared |Z| only. An empty rank
   category has mean rank 0 (SPSS: .00) instead of `NA`.
+* Weighted `factorial_anova()`/`ancova()` cell standard deviations match
+  SPSS's /REGWGT Descriptive Statistics (weighted sum of squares over
+  n - 1): they divided by the sum of weights (1.207 instead of 1.238).
 
 ## Validation
 

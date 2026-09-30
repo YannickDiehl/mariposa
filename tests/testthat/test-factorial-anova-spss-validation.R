@@ -75,3 +75,32 @@ test_that("Test 1a: factorial life_sat ~ gender * region — matches SPSS", {
     }
   }
 })
+
+
+# =============================================================================
+# Weighted cell descriptives (/REGWGT reference, 0.7.4 audit)
+# =============================================================================
+# The weighted references use UNIANOVA /REGWGT: weighted cell means, SD with
+# the weighted sum of squares over n - 1, N = number of cases.
+
+spss_values$test_2a_cells <- list(
+  list(gender = "Male",   region = "East", mean = 3.66, sd = 1.238, n = 228L),   # factorial_anova_output.txt:255
+  list(gender = "Male",   region = "West", mean = 3.58, sd = 1.147, n = 921L),   # factorial_anova_output.txt:256
+  list(gender = "Female", region = "East", mean = 3.59, sd = 1.230, n = 237L),   # factorial_anova_output.txt:258
+  list(gender = "Female", region = "West", mean = 3.66, sd = 1.128, n = 1035L)   # factorial_anova_output.txt:259
+)
+
+test_that("Test 2a: weighted cell descriptives — match SPSS /REGWGT", {
+  r <- factorial_anova(survey_data, dv = life_satisfaction,
+                       between = c(gender, region), weights = sampling_weight)
+  d <- r$descriptives
+  for (cell in spss_values$test_2a_cells) {
+    row <- d[d$gender == cell$gender & d$region == cell$region, , drop = FALSE]
+    lab <- sprintf("[2a %s/%s]", cell$gender, cell$region)
+    assert_spss(as.numeric(row$mean), cell$mean, tier = "display",
+                precision = 2, label = paste(lab, "mean"))
+    assert_spss(as.numeric(row$sd), cell$sd, tier = "display",
+                precision = 3, label = paste(lab, "SD"))
+    assert_spss_count(as.numeric(row$n), cell$n, label = paste(lab, "N"))
+  }
+})

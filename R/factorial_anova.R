@@ -608,9 +608,11 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     cell_y <- y[idx]
 
     if (!is.null(w_name)) {
+      # UNIANOVA /REGWGT descriptives (the weighted references): weighted
+      # mean, weighted SS over n - 1 cases
       cell_w <- data[[w_name]][idx]
-      cell_mean <- sum(cell_y * cell_w) / sum(cell_w)
-      cell_sd <- sqrt(sum(cell_w * (cell_y - cell_mean)^2) / sum(cell_w))
+      cell_mean <- .w_mean(cell_y, cell_w)
+      cell_sd <- .w_sd_regwgt(cell_y, cell_w)
     } else {
       cell_mean <- mean(cell_y)
       cell_sd <- stats::sd(cell_y)
