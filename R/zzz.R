@@ -26,6 +26,12 @@
   s3_register("broom::tidy",    "logistic_regression")
   s3_register("broom::glance",  "logistic_regression")
   s3_register("broom::augment", "logistic_regression")
+
+  # broom::tidy() for every other analysis result: the main export table
+  # with broom's column names (R/result-export.R)
+  for (cls in .xp_tidy_classes) {
+    s3_register("broom::tidy", cls, method = .xp_tidy)
+  }
 }
 
 
@@ -43,21 +49,26 @@ s3_register <- function(generic, class, method = NULL) {
 
   caller <- parent.frame()
 
-  get_method_fn <- paste0("get_method_", class)
-  if (is.null(method)) {
-    method_fn <- get(paste0(generic, ".", class), envir = caller)
-  } else {
-    stopifnot(is.function(method))
-    method_fn <- method
+  # A method passed explicitly (one function shared by several classes) is
+  # used as is; otherwise the "<generic>.<class>" function of the caller.
+  # The load hook resolves it the same way - it used to look the method up
+  # by name only, which fails for a shared method.
+  get_method <- function() {
+    if (is.null(method)) {
+      get(paste0(generic, ".", class), envir = caller)
+    } else {
+      method
+    }
   }
+  if (!is.null(method)) stopifnot(is.function(method))
+  method_fn <- get_method()
 
   # Always register hook in case package is later unloaded & reloaded
   setHook(
     packageEvent(package, "onLoad"),
     function(...) {
       ns <- asNamespace(package)
-      method_fn <- get(paste0(generic, ".", class), envir = caller)
-      registerS3method(generic, class, method_fn, envir = ns)
+      registerS3method(generic, class, get_method(), envir = ns)
     }
   )
 

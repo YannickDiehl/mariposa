@@ -28,3 +28,261 @@ test_that("NP-22 dunn_test() and pairwise_wilcoxon() expose their table as $resu
   expect_identical(pw$results, pw$comparisons)
   expect_equal(nrow(pw$results), 3L)
 })
+
+# --- UX-EXPORT (PAR-25, NP-22, SCALE-20, EDGE-20): as.data.frame() / tidy() ----
+
+# One result object of every exported result class (small, fast calls)
+x2_results <- function() {
+  d <- survey_data
+  set.seed(11)
+  d$b1 <- rbinom(nrow(d), 1, 0.5)
+  d$b2 <- rbinom(nrow(d), 1, 0.5)
+  d$b3 <- rbinom(nrow(d), 1, 0.4)
+  ow <- oneway_anova(d, age, group = education)
+  kw <- kruskal_wallis(d, age, group = education)
+  fr <- friedman_test(d, trust_government, trust_media, trust_science)
+  lg <- logistic_regression(d, gender ~ age)
+  suppressWarnings(list(
+    ancova = ancova(d, dv = income, between = c(gender), covariate = c(age)),
+    binomial_test = binomial_test(d, gender),
+    chi_square = chi_square(d, gender, region),
+    chisq_gof = chisq_gof(d, region),
+    codebook = codebook(d, age, gender, view = FALSE),
+    crosstab = crosstab(d, gender, region),
+    describe = describe(d, age, income),
+    dunn_test = dunn_test(kw),
+    efa = efa(d, trust_government, trust_media, trust_science,
+              political_orientation, life_satisfaction),
+    factorial_anova = factorial_anova(d, dv = income,
+                                      between = c(gender, region)),
+    fisher_test = fisher_test(d, gender, region),
+    frequency = frequency(d, gender, education),
+    friedman_test = fr,
+    kendall_tau = kendall_tau(d, age, income),
+    kruskal_wallis = kw,
+    levene_test = levene_test(d, age, group = gender),
+    linear_regression = linear_regression(d, income ~ age + gender),
+    logistic_regression = lg,
+    mann_whitney = mann_whitney(d, age, group = gender),
+    marginal_effects = marginal_effects(lg),
+    mcnemar_test = mcnemar_test(d, b1, b2),
+    multiple_response = multiple_response(d, b1, b2, b3),
+    normality_test = normality_test(d, age, income),
+    oneway_anova = ow,
+    pairwise_wilcoxon = pairwise_wilcoxon(fr),
+    partial_cor = partial_cor(d, age, income, controls = life_satisfaction),
+    pearson_cor = pearson_cor(d, age, income, life_satisfaction),
+    reliability = reliability(d, trust_government, trust_media, trust_science),
+    scheffe_test = scheffe_test(ow),
+    spearman_rho = spearman_rho(d, age, income),
+    t_test = t_test(d, age, income, group = gender),
+    tukey_test = tukey_test(ow),
+    w_iqr = w_iqr(d, age),
+    w_kurtosis = w_kurtosis(d, age),
+    w_mean = w_mean(d, age, income, weights = sampling_weight),
+    w_median = w_median(d, age),
+    w_modus = w_modus(d, age),
+    w_quantile = w_quantile(d, age, income),
+    w_range = w_range(d, age),
+    w_sd = w_sd(d, age),
+    w_se = w_se(d, age),
+    w_skew = w_skew(d, age),
+    w_var = w_var(d, age),
+    wilcoxon_test = wilcoxon_test(d, x = trust_government, y = trust_media)
+  ))
+}
+
+test_that("UX-EXPORT every result class has an as.data.frame() method", {
+  # Was: as.data.frame() failed for every class ("cannot coerce class
+  # '"t_test"' to a data.frame"). Guard: any class with a print() method
+  # (i.e. every result class, including future ones) must be convertible.
+  s3 <- getNamespaceInfo(asNamespace("mariposa"), "S3methods")
+  result_classes <- unique(s3[s3[, 1] == "print" &
+                                !startsWith(s3[, 2], "summary."), 2])
+  expect_gt(length(result_classes), 40)
+  missing <- result_classes[vapply(result_classes, function(cls) {
+    is.null(utils::getS3method("as.data.frame", cls, optional = TRUE))
+  }, logical(1))]
+  expect_identical(missing, character(0))
+})
+
+test_that("UX-EXPORT as.data.frame() gives a flat, CSV-writable table for every class", {
+  # Was: as.data.frame() errored, and $results had list-columns
+  # (group_stats, observed tables), so write.csv() failed as well.
+  res <- x2_results()
+  csv <- tempfile(fileext = ".csv")
+  on.exit(unlink(csv))
+  for (cls in names(res)) {
+    x <- res[[cls]]
+    expect_s3_class(x, cls)
+    df <- as.data.frame(x)
+    expect_identical(class(df), "data.frame", info = cls)
+    expect_gt(nrow(df), 0)
+    expect_false(any(vapply(df, is.list, logical(1))), info = cls)
+    expect_identical(rownames(df), as.character(seq_len(nrow(df))),
+                     info = cls)
+    expect_no_error(utils::write.csv(df, csv, row.names = FALSE))
+    tb <- tibble::as_tibble(x)
+    expect_s3_class(tb, "tbl_df")
+    expect_equal(as.data.frame(tb), df, info = cls)
+  }
+})
+
+test_that("UX-EXPORT t_test/mann_whitney rows carry the flattened group statistics", {
+  # Was: group names, means and SDs were only in the group_stats
+  # list-column.
+  tt <- t_test(survey_data, age, income, group = gender)
+  df <- as.data.frame(tt)
+  expect_equal(df$Variable, c("age", "income"))
+  expect_equal(df$t_stat, tt$results$t_stat)
+  expect_equal(df$p_value, tt$results$p_value)
+  expect_equal(df$group1, c("Male", "Male"))
+  expect_equal(df$group2, c("Female", "Female"))
+  expect_equal(df$mean1[1], tt$results$group_stats[[1]]$group1$mean)
+  expect_equal(df$sd2[2], tt$results$group_stats[[2]]$group2$sd)
+  expect_false("group_stats" %in% names(df))
+
+  one <- as.data.frame(t_test(survey_data, age, mu = 50))
+  expect_equal(one$mean, mean(survey_data$age))
+
+  mw <- as.data.frame(mann_whitney(survey_data, age, group = gender))
+  expect_equal(mw$n1 + mw$n2, 2500)
+  expect_true(all(c("mean_rank1", "mean_rank2", "U", "Z") %in% names(mw)))
+})
+
+test_that("UX-EXPORT describe() and w_quantile() become one row per variable", {
+  # Was: the wide "<variable>_<statistic>" layout (one row per group, one
+  # column per variable and statistic) could not be tabulated directly.
+  d <- dplyr::mutate(survey_data, trust = trust_media)
+  ds <- describe(d, trust, trust_media, age)
+  df <- as.data.frame(ds)
+  expect_equal(df$Variable, c("trust", "trust_media", "age"))
+  expect_equal(df$Mean, c(ds$results$trust_Mean, ds$results$trust_media_Mean,
+                          ds$results$age_Mean))
+  expect_true(all(c("Median", "SD", "N", "Missing") %in% names(df)))
+  expect_false(any(grepl("_Mean$", names(df))))
+
+  wq <- as.data.frame(w_quantile(survey_data, age, income))
+  expect_equal(wq$Variable, c("age", "income"))
+  expect_true(all(c("Min", "25%", "50%", "Max") %in% names(wq)))
+})
+
+test_that("UX-EXPORT grouped results have the group keys as leading label columns", {
+  # Was: no conversion; labelled grouping variables must appear as their
+  # value labels (not codes), in SPSS order, as the first columns.
+  skip_if_not_installed("haven")
+  d <- survey_data
+  d$reg <- haven::labelled(as.integer(d$region), labels = c(East = 1, West = 2))
+  g <- dplyr::group_by(d, reg)
+
+  ds <- as.data.frame(describe(g, age, income))
+  expect_equal(names(ds)[1:2], c("reg", "Variable"))
+  expect_s3_class(ds$reg, "factor")
+  expect_equal(as.character(ds$reg), c("East", "East", "West", "West"))
+  expect_equal(ds$Variable, c("age", "income", "age", "income"))
+
+  tt <- as.data.frame(t_test(g, age, group = gender))
+  expect_equal(names(tt)[1], "reg")
+  expect_equal(as.character(tt$reg), c("East", "West"))
+
+  rel <- suppressWarnings(reliability(dplyr::group_by(survey_data, region),
+                                      trust_government, trust_media,
+                                      trust_science))
+  rel <- as.data.frame(rel)
+  expect_equal(nrow(rel), 2L)
+  expect_equal(names(rel)[1], "region")
+  expect_true(all(c("alpha", "n_items", "n") %in% names(rel)))
+
+  lr <- as.data.frame(linear_regression(dplyr::group_by(survey_data, region),
+                                        income ~ age))
+  expect_equal(names(lr)[1:2], c("region", "Term"))
+  expect_equal(nrow(lr), 4L)
+
+  ct <- as.data.frame(crosstab(dplyr::group_by(survey_data, region),
+                               gender, education))
+  expect_equal(names(ct)[1:3], c("region", "gender", "education"))
+  expect_equal(sum(ct$n), 2500)
+})
+
+test_that("UX-EXPORT crosstab(), frequency(), efa(), reliability() tables", {
+  # Was: no tabular export for these classes at all.
+  ct <- crosstab(survey_data, gender, region)
+  df <- as.data.frame(ct)
+  expect_equal(nrow(df), 4L)
+  expect_equal(sum(df$n), ct$total)
+  expect_equal(levels(df$gender), c("Male", "Female"))
+  expect_true(all(c("row_pct", "expected", "adj_residual") %in% names(df)))
+
+  fr <- as.data.frame(frequency(survey_data, income))
+  expect_true("missing" %in% names(fr))
+  expect_equal(sum(fr$freq), 2500)
+  expect_equal(sum(fr$missing), 1L)
+
+  ef <- as.data.frame(efa(survey_data, trust_government, trust_media,
+                          trust_science, political_orientation,
+                          life_satisfaction))
+  expect_equal(nrow(ef), 5L)
+  expect_true(all(c("Variable", "communality") %in% names(ef)))
+
+  rl <- as.data.frame(reliability(survey_data, trust_government,
+                                  trust_media, trust_science))
+  expect_equal(nrow(rl), 1L)
+  expect_equal(rl$n_items, 3L)
+})
+
+test_that("UX-EXPORT frequency() with tagged missing values drops the summary rows", {
+  # Was: the tagged-NA layout mixes "Total Valid"/"Total Missing" rows into
+  # $results; a data table must only hold categories.
+  skip_if_not_installed("haven")
+  x <- haven::labelled(
+    c(1, 2, 2, 1, 3, haven::tagged_na("a"), haven::tagged_na("b"), NA, 2, 1),
+    labels = c(Low = 1, Mid = 2, High = 3,
+               "No answer" = haven::tagged_na("a"),
+               Refused = haven::tagged_na("b")))
+  attr(x, "na_tag_map") <- c(a = -9, b = -8)
+  df <- as.data.frame(frequency(data.frame(r = x), r))
+  expect_false(any(df$label %in% c("Total Valid", "Total Missing")))
+  expect_equal(sum(df$freq), 10)
+  expect_equal(df$value[df$label == "No answer"], -9)
+  expect_equal(sum(df$missing), 3L)
+})
+
+test_that("UX-EXPORT broom::tidy() works for the test classes with broom names", {
+  # Was: tidy() worked only for the two regressions.
+  skip_if_not_installed("broom")
+  res <- x2_results()
+  for (cls in setdiff(names(res), c("codebook", "linear_regression",
+                                    "logistic_regression"))) {
+    td <- broom::tidy(res[[cls]])
+    expect_s3_class(td, "tbl_df")
+    expect_gt(nrow(td), 0)
+  }
+  tt <- broom::tidy(res$t_test)
+  expect_true(all(c("variable", "estimate", "statistic", "parameter",
+                    "p.value", "conf.low", "conf.high", "method",
+                    "alternative") %in% names(tt)))
+  expect_equal(tt$statistic, res$t_test$results$t_stat)
+
+  ow <- broom::tidy(res$oneway_anova)
+  expect_true(all(c("statistic", "num.df", "den.df", "p.value") %in% names(ow)))
+
+  tk <- broom::tidy(res$tukey_test)
+  expect_true(all(c("contrast", "estimate", "adj.p.value") %in% names(tk)))
+
+  fa <- broom::tidy(res$factorial_anova)
+  expect_true(all(c("term", "sumsq", "meansq", "statistic", "p.value") %in%
+                    names(fa)))
+
+  nt <- broom::tidy(res$normality_test)
+  expect_equal(nrow(nt), 4L)
+  expect_setequal(unique(nt$method),
+                  c("Kolmogorov-Smirnov (Lilliefors)", "Shapiro-Wilk"))
+
+  pc <- broom::tidy(res$pearson_cor)
+  expect_false("sig" %in% names(pc))
+  expect_equal(pc$estimate, res$pearson_cor$correlations$correlation)
+
+  # The regressions keep their lm/glm tidiers
+  expect_true(all(c("term", "std.error") %in%
+                    names(broom::tidy(res$linear_regression))))
+})
