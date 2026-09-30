@@ -149,3 +149,8 @@
 * The compact `oneway_anova()` line no longer leaves a dangling space
   ("p = 0.396 , eta2 = ...") and prints the total N also when the weights
   sum to more than 2^31 (was "N = NA"). (PAR-21)
+* `normality_test()` names the variable (and, for grouped data, the
+  group) it cannot test - no variance or fewer than 3 valid values - in a
+  warning and prints "not computed (<reason>)" instead of silent "n/a"
+  results; the Tests of Normality table stays aligned with umlaut
+  variable names. (EDGE-13)

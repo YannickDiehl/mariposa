@@ -107,7 +107,11 @@ test_that("Shapiro-Wilk is NA above n = 5000 (SPSS convention), KS still compute
 
 test_that("Constant and too-short variables yield NA instead of erroring", {
   d <- tibble(const = rep(1, 50), short = c(1, 2, rep(NA, 48)))
-  r <- normality_test(d, const, short)
+  # 0.7.4 (EDGE-13): each untestable variable is named in a warning
+  expect_warning(
+    expect_warning(r <- normality_test(d, const, short), "const"),
+    "short"
+  )
   expect_true(all(is.na(r$results$ks_statistic)))
   expect_true(all(is.na(r$results$shapiro_w)))
   assert_spss_count(r$results$n[r$results$Variable == "short"], 2L,

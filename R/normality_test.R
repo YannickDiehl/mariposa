@@ -152,7 +152,8 @@ normality_test <- function(data, ...) {
     group_keys <- dplyr::group_keys(data)
 
     results <- do.call(rbind, lapply(seq_along(group_split), function(i) {
-      rows <- .normality_rows(group_split[[i]], var_names)
+      rows <- .normality_rows(group_split[[i]], var_names,
+                              group_keys[i, , drop = FALSE])
       cbind(group_keys[i, , drop = FALSE], rows)
     }))
     results <- tibble::as_tibble(results)
@@ -175,20 +176,30 @@ normality_test <- function(data, ...) {
 
 #' Compute the per-variable normality-test rows for one data block
 #' @noRd
-.normality_rows <- function(data, var_names) {
+.normality_rows <- function(data, var_names, group_info = NULL) {
   rows <- lapply(var_names, function(v) {
-    x <- data[[v]]
+    x <- .plain_numeric(data[[v]])
     x <- x[!is.na(x)]
     n <- length(x)
 
     ks_stat <- ks_p <- sw_w <- sw_p <- NA_real_
 
-    if (n >= 4 && stats::sd(x) > 0) {
+    # Neither test is defined for fewer than 3 values or a constant
+    # variable: say so (naming variable and group) instead of silent NAs
+    reason <- .dv_degenerate_reason(x)
+    if (is.null(reason) && n < 3) {
+      reason <- sprintf("too few valid values (n = %d)", n)
+    }
+    if (!is.null(reason)) {
+      .warn_not_computed("normality_test", v, reason, group_info)
+    }
+
+    if (is.null(reason) && n >= 4 && stats::sd(x) > 0) {
       ks <- .lilliefors_test(x)
       ks_stat <- ks$statistic
       ks_p <- ks$p
     }
-    if (n >= 3 && n <= 5000 && stats::sd(x) > 0) {
+    if (is.null(reason) && n >= 3 && n <= 5000 && stats::sd(x) > 0) {
       sw <- tryCatch(stats::shapiro.test(x), error = function(e) NULL)
       if (!is.null(sw)) {
         sw_w <- unname(sw$statistic)
@@ -203,7 +214,8 @@ normality_test <- function(data, ...) {
       ks_df = n,
       ks_p = ks_p,
       shapiro_w = sw_w,
-      shapiro_p = sw_p
+      shapiro_p = sw_p,
+      note = reason %||% NA_character_
     )
   })
   do.call(rbind, rows)
@@ -298,6 +310,10 @@ print.normality_test <- function(x, ...) {
   } else {
     for (i in seq_len(nrow(x$results))) {
       r <- x$results[i, ]
+      if ("note" %in% names(r) && !is.na(r$note)) {
+        cat(sprintf("  %s: not computed (%s)\n", r$Variable, r$note))
+        next
+      }
       sw_str <- if (is.na(r$shapiro_w)) {
         "Shapiro-Wilk n/a"
       } else {
@@ -384,22 +400,26 @@ print.summary.normality_test <- function(x, ...) {
   print_info_section(info)
 
   if (isTRUE(x$show$tests)) {
-    stat_cols <- c("Variable", "ks_statistic", "ks_df", "ks_p",
-                   "shapiro_w", "shapiro_p")
-    labels <- c(ks_statistic = "KS", ks_df = "df", ks_p = "KS p",
-                shapiro_w = "W", shapiro_p = "W p")
+    # Display-width padding keeps variable names with umlauts aligned
+    table_for <- function(rows) {
+      .print_table_utf8(data.frame(
+        Variable = rows$Variable,
+        KS = fmt_num(rows$ks_statistic, digits),
+        df = formatC(rows$ks_df, format = "d"),
+        KS_p = fmt_p(rows$ks_p, digits),
+        W = fmt_num(rows$shapiro_w, digits),
+        W_p = fmt_p(rows$shapiro_p, digits),
+        stringsAsFactors = FALSE
+      ), col_labels = c(KS_p = "KS p", W_p = "W p"))
+    }
 
     cat("\nTests of Normality\n")
     if (x$is_grouped) {
       for_each_group(x$results, x$group_vars, function(rows, group_values) {
-        print_stat_table(rows[stat_cols], digits = digits,
-                          col_types = c(ks_p = "pvalue", shapiro_p = "pvalue"),
-                          col_labels = labels)
+        table_for(rows)
       })
     } else {
-      print_stat_table(x$results[stat_cols], digits = digits,
-                        col_types = c(ks_p = "pvalue", shapiro_p = "pvalue"),
-                        col_labels = labels)
+      table_for(x$results)
     }
 
     cat("\nKS = Kolmogorov-Smirnov statistic with Lilliefors significance correction.\n")

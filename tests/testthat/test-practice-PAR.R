@@ -724,6 +724,24 @@ test_that("PAR-21: oneway compact line without dangling space, N for huge weight
   expect_true(any(grepl("N = 2[0-9]{10}", out2)))
 })
 
+test_that("EDGE-13: normality_test() names the variable and group it cannot test", {
+  # A constant variable or a group without data gave silent "n/a" results.
+  d <- survey_data
+  d$const <- 3
+  expect_warning(r <- normality_test(d, const), "const.*no variance")
+  expect_true(any(grepl("not computed", capture.output(print(r)), fixed = TRUE)))
+  d2 <- survey_data
+  d2$income[d2$region == "East"] <- NA
+  expect_warning(normality_test(dplyr::group_by(d2, region), income),
+                 "region = East")
+  # umlaut variable names stay aligned in the summary table
+  d3 <- survey_data
+  d3$`Größe` <- d3$age
+  out <- capture.output(print(summary(normality_test(d3, age, `Größe`))))
+  rows <- out[grepl("^ +(age|Gr)", out)]
+  expect_length(unique(nchar(rows, type = "width")), 1L)
+})
+
 test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
   # The example called summary(result, marginal_means = FALSE), a toggle
   # factorial_anova's summary() does not have (silently ignored).
