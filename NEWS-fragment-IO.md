@@ -121,3 +121,8 @@
   variable and the group (e.g. "`x` (g = a): the spread (sd) is zero").
   The weighted mean/SD now come from the shared SPSS kernels (results
   unchanged).
+* `write_spss()` and `write_stata()` export a factor created by
+  `to_label()` with its original codes and value labels: haven renumbered
+  it 1..k (ALLBUS `dm06` codes 100, 120, ... became 1, 2, ...), although
+  the factor carries its codes. Other factors are still written as 1..k
+  with their levels as labels.

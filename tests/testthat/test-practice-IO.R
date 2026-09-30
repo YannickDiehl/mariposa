@@ -542,3 +542,30 @@ test_that("IO-24: the zero-SD warning names variable and group", {
   expect_warning(std(d[1:2, ], x), "`x`")
   expect_warning(std(dplyr::group_by(d, g), x), "g = a")
 })
+
+# IO-14: write_spss()/write_stata() renumbered a to_label() factor to 1..k
+# (ALLBUS dm06 codes 100, 120, ... became 1, 2, ...), ignoring its "codes"
+# attribute.
+test_that("IO-14: exporters keep the original codes of to_label() factors", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(100, 120, 140, 100),
+                       labels = c(low = 100, mid = 120, high = 140),
+                       label = "Income band")
+  d <- data.frame(id = 1:4)
+  d$x <- to_label(x)
+  tf <- tempfile(fileext = ".sav")
+  tf2 <- tempfile(fileext = ".dta")
+  on.exit(unlink(c(tf, tf2)))
+  suppressMessages(write_spss(d, tf))
+  back <- read_spss(tf)
+  expect_equal(as.numeric(back$x), c(100, 120, 140, 100))
+  expect_equal(attr(back$x, "labels"), c(low = 100, mid = 120, high = 140))
+  expect_equal(attr(back$x, "label"), "Income band")
+  suppressMessages(write_stata(d, tf2))
+  back2 <- read_stata(tf2)
+  expect_equal(as.numeric(back2$x), c(100, 120, 140, 100))
+  # a plain factor is still written as 1..k with its levels as labels
+  d$f <- factor(c("b", "a", "b", "a"))
+  suppressMessages(write_spss(d, tf))
+  expect_equal(as.numeric(read_spss(tf)$f), c(2, 1, 2, 1))
+})

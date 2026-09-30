@@ -122,6 +122,7 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
 #' @return The data frame with columns converted for SPSS export.
 #' @noRd
 .prepare_for_spss <- function(data) {
+  data <- .restore_factor_codes(data)
   data <- .promote_bare_labels(data)
   orphaned <- character(0)
 
@@ -236,6 +237,24 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
     ))
   }
 
+  data
+}
+
+
+#' Write factors made by to_label() with their original codes
+#'
+#' haven writes a factor as 1..k with the levels as labels. A to_label()
+#' factor carries its original codes ("codes" attribute, e.g. 100, 120,
+#' 140): converting it back with to_labelled() exports those codes and
+#' labels instead of renumbering them. Other factors are left to haven.
+#' @noRd
+.restore_factor_codes <- function(data) {
+  for (i in seq_len(ncol(data))) {
+    x <- data[[i]]
+    if (is.factor(x) && !is.null(.factor_codes(x))) {
+      data[[i]] <- .to_labelled_vec(x)
+    }
+  }
   data
 }
 
