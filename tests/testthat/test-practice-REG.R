@@ -318,3 +318,103 @@ test_that("REG-21: an all-missing predictor is named in the error", {
   expect_error(linear_regression(d[1:3, ], life_satisfaction ~ age + income + trust_media),
                "complete case")
 })
+
+# REG-11 (+EDGE-07): dependent=/predictors= pasted names into a formula
+# without backticks - non-syntactic names ("my var", "Zufriedenheit (0-10)")
+# failed with a parse error.
+test_that("REG-11: SPSS-style interface handles non-syntactic names", {
+  d <- .reg_sd2()[c("life_satisfaction", "high_sat", "age", "income")]
+  names(d) <- c("my var", "hoch zufrieden", "Alter (Jahre)", "income")
+  m <- linear_regression(d, dependent = `my var`,
+                         predictors = c(`Alter (Jahre)`, income))
+  ref <- stats::lm(`my var` ~ `Alter (Jahre)` + income, data = d)
+  expect_equal(unname(coef(m)), unname(coef(ref)))
+  expect_no_error(capture.output(print(summary(m))))
+  ml <- logistic_regression(d, dependent = `hoch zufrieden`,
+                            predictors = c(`Alter (Jahre)`, income))
+  expect_equal(length(coef(ml)), 3L)
+})
+
+# REG-12: log(income) ~ age said "Variable(s) not found in data: log.";
+# y ~ . and y ~ 1 failed cryptically.
+test_that("REG-12: transformed outcome, dot and intercept-only formulas", {
+  d <- .reg_sd2()
+  m <- linear_regression(d, log(income) ~ age)
+  ref <- stats::lm(log(income) ~ age, data = d)
+  expect_equal(unname(coef(m)), unname(coef(ref)))
+  expect_equal(m$model_summary$R_squared, summary(ref)$r.squared)
+  expect_equal(m$descriptives$Variable[1], "log(income)")
+  expect_equal(m$descriptives$Mean[1], mean(log(d$income[!is.na(d$income) & !is.na(d$age)])))
+  expect_no_error(capture.output(print(summary(m))))
+  # Weighted: SPSS frequency-weight R2 of the transformed outcome
+  mw <- linear_regression(d, log(income) ~ age, weights = sampling_weight)
+  refw <- stats::lm(log(income) ~ age, data = d, weights = sampling_weight)
+  expect_equal(unname(coef(mw)), unname(coef(refw)))
+  expect_equal(mw$model_summary$R_squared, summary(refw)$r.squared)
+
+  expect_error(logistic_regression(d, I(high_sat == 1) ~ age),
+               "single variable")
+  expect_error(linear_regression(d, cbind(income, age) ~ gender),
+               "single variable")
+
+  # y ~ . : all other columns except weights and grouping variables
+  ds <- d[c("life_satisfaction", "age", "income", "trust_media",
+            "sampling_weight", "region")]
+  md <- linear_regression(dplyr::group_by(ds, region), life_satisfaction ~ .,
+                          weights = sampling_weight)
+  expect_equal(md$predictor_names, c("age", "income", "trust_media"))
+  mdu <- linear_regression(ds[c("life_satisfaction", "age", "income")],
+                           life_satisfaction ~ .)
+  expect_equal(names(coef(mdu)), c("(Intercept)", "age", "income"))
+
+  expect_error(linear_regression(d, life_satisfaction ~ 1), "no predictor")
+  expect_error(logistic_regression(d, high_sat ~ 1), "no predictor")
+  expect_error(linear_regression(d, life_satisfaction ~ age + life_satisfaction),
+               "both the dependent variable and a predictor")
+  expect_error(linear_regression(d, life_satisfaction ~ age + nope),
+               "not found.*nope")
+})
+
+# REG-20: tidyselect helpers that also select the dependent variable (e.g.
+# where(is.numeric)) put it among the predictors; character predictors
+# produced NA descriptives plus base-R warnings; anova() on a weighted
+# logistic model leaked non-integer warnings.
+test_that("REG-20: DV/weights excluded from selected predictors, character predictors", {
+  d <- survey_data[c("life_satisfaction", "age", "income", "trust_media",
+                     "sampling_weight")]
+  expect_message(
+    m <- linear_regression(d, dependent = life_satisfaction,
+                           predictors = where(is.numeric),
+                           weights = sampling_weight),
+    "life_satisfaction"
+  )
+  expect_equal(m$predictor_names, c("age", "income", "trust_media"))
+
+  d2 <- .reg_sd2()
+  d2$gender_chr <- as.character(d2$gender)
+  expect_no_warning(mc <- linear_regression(d2, life_satisfaction ~ age + gender_chr))
+  expect_true("gender_chrMale" %in% names(coef(mc)))
+  expect_false(anyNA(mc$descriptives$Mean))
+  expect_no_warning(logistic_regression(d2, high_sat ~ age + gender_chr))
+
+  mw <- logistic_regression(d2, high_sat ~ age + gender, weights = sampling_weight)
+  expect_no_warning(anova(mw))
+})
+
+# REG-21: weights = sampling_weight * 2 failed with "Can't convert a call to
+# a string."
+test_that("REG-21: weights can be an expression", {
+  d <- .reg_sd2()
+  d$w2 <- d$sampling_weight * 2
+  m <- linear_regression(d, life_satisfaction ~ age, weights = sampling_weight * 2)
+  ref <- linear_regression(d, life_satisfaction ~ age, weights = w2)
+  expect_equal(m$coef_table$Std.Error, ref$coef_table$Std.Error)
+  expect_equal(m$weight_name, "sampling_weight * 2")
+  expect_true(any(grepl("sampling_weight * 2", capture.output(print(summary(m))),
+                        fixed = TRUE)))
+  ml <- logistic_regression(d, high_sat ~ age, weights = sampling_weight * 2)
+  refl <- logistic_regression(d, high_sat ~ age, weights = w2)
+  expect_equal(ml$coef_table$S.E., refl$coef_table$S.E.)
+  expect_error(linear_regression(d, life_satisfaction ~ age, weights = nope * 2),
+               "weights")
+})

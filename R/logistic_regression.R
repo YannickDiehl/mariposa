@@ -20,10 +20,14 @@
 #'   when no formula is given. Must have exactly two distinct values
 #'   (e.g. 0/1, 1/2, a two-level factor); see Technical Details.
 #' @param predictors Predictor variable(s) (unquoted, supports tidyselect).
-#'   Used with \code{dependent} when no formula is given.
-#' @param weights Optional survey weights (unquoted variable name). When
-#'   specified, weighted maximum likelihood estimation is used, matching
-#'   SPSS WEIGHT BY behavior.
+#'   Used with \code{dependent} when no formula is given. The dependent,
+#'   weights and grouping variables are never used as predictors (a
+#'   selection such as \code{where(is.numeric)} drops them with a message).
+#'   Character predictors are entered as factors.
+#' @param weights Optional survey weights (unquoted variable name, or an
+#'   expression such as \code{sampling_weight * 2}). When specified,
+#'   weighted maximum likelihood estimation is used, matching SPSS WEIGHT BY
+#'   behavior.
 #' @param conf.level Confidence level for odds ratio intervals (default 0.95).
 #' @param factors How factor predictors are entered into the model:
 #'   \code{"dummy"} (default, matches base R \code{glm()}) expands a factor
@@ -208,60 +212,24 @@ logistic_regression <- function(data, formula = NULL,
 
   factors <- match.arg(factors)
 
-  # Process weights
-  weights_quo <- rlang::enquo(weights)
-  has_weights <- !rlang::quo_is_null(weights_quo)
-  weight_name <- NULL
-  weights_vec <- NULL
+  # Process weights (a column name or an expression such as w * 2)
+  wi <- .regression_weights(data, rlang::enquo(weights))
+  data <- wi$data
+  weight_name <- wi$name
+  weights_vec <- wi$vec
+  has_weights <- !is.null(weight_name)
 
-  if (has_weights) {
-    weight_name <- rlang::as_name(weights_quo)
-    if (!weight_name %in% names(data)) {
-      cli_abort("Weight variable {.var {weight_name}} not found in data.")
-    }
-    # Bare numbers in the vector AND the column (grouped fits re-read it):
-    # SPSS weights with NA fail every comparison (see .plain_numeric)
-    weights_vec <- .plain_numeric(data[[weight_name]])
-    data[[weight_name]] <- weights_vec
-    .check_weights(weights_vec, weight_name)
-  }
-
-  # Build formula
-  if (!is.null(formula)) {
-    if (!inherits(formula, "formula")) {
-      cli_abort("{.arg formula} must be a formula object (e.g., {.code y ~ x1 + x2}).")
-    }
-    model_formula <- formula
-    dep_name <- as.character(formula[[2]])
-    pred_names <- all.vars(formula[[3]])
-  } else {
-    dep_quo <- rlang::enquo(dependent)
-    pred_quo <- rlang::enquo(predictors)
-
-    if (rlang::quo_is_null(dep_quo)) {
-      cli_abort("Either {.arg formula} or {.arg dependent} must be specified.")
-    }
-
-    dep_name <- rlang::as_name(dep_quo)
-
-    pred_pos <- tidyselect::eval_select(pred_quo, data)
-    pred_names <- names(pred_pos)
-
-    if (length(pred_names) == 0) {
-      cli_abort("At least one predictor variable must be specified.")
-    }
-
-    model_formula <- stats::as.formula(
-      paste(dep_name, "~", paste(pred_names, collapse = " + "))
-    )
-  }
-
-  # Validate variables exist
+  # Build and validate the formula (both interfaces). The outcome must be a
+  # plain variable: its two values define the SPSS encoding.
+  fb <- .build_regression_formula(
+    data, formula, rlang::enquo(dependent), rlang::enquo(predictors),
+    weight_name = weight_name, allow_lhs_call = FALSE,
+    env = parent.frame()
+  )
+  model_formula <- fb$formula
+  dep_name <- fb$dep_name
+  pred_names <- fb$pred_names
   all_vars <- c(dep_name, pred_names)
-  missing_vars <- setdiff(all_vars, names(data))
-  if (length(missing_vars) > 0) {
-    cli_abort("Variable(s) not found in data: {paste(missing_vars, collapse = ', ')}.")
-  }
 
   # Outcome encoding (SPSS "Dependent Variable Encoding"), fixed once on
   # the cases in the analysis so every group models the same category
@@ -384,6 +352,14 @@ logistic_regression <- function(data, formula = NULL,
 
   if (n_actual < length(pred_names) + 2) {
     .abort_insufficient_cases(data, all_vars, n_actual, length(pred_names))
+  }
+
+  # Character predictors are categorical: enter them as factors (as glm()
+  # would), so the numeric mode and the AMEs treat them like factors
+  for (v in pred_names) {
+    if (is.character(data_complete[[v]])) {
+      data_complete[[v]] <- factor(data_complete[[v]])
+    }
   }
 
   # Factor predictor handling — see @param factors documentation.
@@ -1184,7 +1160,9 @@ predict.logistic_regression <- function(object, ...) {
 #' @method anova logistic_regression
 anova.logistic_regression <- function(object, ...) {
   .glr_require_glm(object, "anova")
-  NextMethod()
+  # anova.glm refits the sub-models: muffle the expected fractional
+  # frequency-weight warning of each refit (weighted models)
+  .glm_quiet_weights(stats::anova(.glr_strip_class(object), ...))
 }
 
 #' Confidence intervals for logistic regression coefficients

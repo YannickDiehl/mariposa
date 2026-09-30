@@ -15,13 +15,19 @@
 #' @param data Your survey data (a data frame or tibble). If grouped
 #'   (via \code{dplyr::group_by()}), separate regressions are run for each group.
 #' @param formula A formula specifying the model (e.g., \code{y ~ x1 + x2}).
-#'   If provided, \code{dependent} and \code{predictors} are ignored.
+#'   If provided, \code{dependent} and \code{predictors} are ignored. The
+#'   outcome may be transformed (\code{log(income) ~ age}); \code{y ~ .}
+#'   uses all other columns except the weights and grouping variables.
 #' @param dependent The dependent variable (unquoted). Used with \code{predictors}
 #'   when no formula is given.
 #' @param predictors Predictor variable(s) (unquoted, supports tidyselect).
-#'   Used with \code{dependent} when no formula is given.
-#' @param weights Optional survey weights (unquoted variable name). When
-#'   specified, weighted least squares (WLS) is used, matching SPSS WEIGHT BY.
+#'   Used with \code{dependent} when no formula is given. The dependent,
+#'   weights and grouping variables are never used as predictors (a
+#'   selection such as \code{where(is.numeric)} drops them with a message).
+#'   Character predictors are entered as factors.
+#' @param weights Optional survey weights (unquoted variable name, or an
+#'   expression such as \code{sampling_weight * 2}). When specified,
+#'   weighted least squares (WLS) is used, matching SPSS WEIGHT BY.
 #' @param use How to handle missing data: \code{"listwise"} (default) drops any
 #'   case with a missing value on any variable (matching SPSS /MISSING LISTWISE).
 #'   \code{"pairwise"} computes the regression from a pairwise
@@ -215,62 +221,29 @@ linear_regression <- function(data, formula = NULL,
   use <- match.arg(use)
   factors <- match.arg(factors)
 
-  # Process weights
-  weights_quo <- rlang::enquo(weights)
-  has_weights <- !rlang::quo_is_null(weights_quo)
-  weight_name <- NULL
-  weights_vec <- NULL
+  # Process weights (a column name or an expression such as w * 2)
+  wi <- .regression_weights(data, rlang::enquo(weights))
+  data <- wi$data
+  weight_name <- wi$name
+  weights_vec <- wi$vec
+  has_weights <- !is.null(weight_name)
 
-  if (has_weights) {
-    weight_name <- rlang::as_name(weights_quo)
-    if (!weight_name %in% names(data)) {
-      cli_abort("Weight variable {.var {weight_name}} not found in data.")
-    }
-    # Bare numbers in the vector AND the column (grouped fits re-read it):
-    # SPSS weights with NA fail every comparison (see .plain_numeric)
-    weights_vec <- .plain_numeric(data[[weight_name]])
-    data[[weight_name]] <- weights_vec
-    .check_weights(weights_vec, weight_name)
-  }
+  # Build and validate the formula (both interfaces)
+  fb <- .build_regression_formula(
+    data, formula, rlang::enquo(dependent), rlang::enquo(predictors),
+    weight_name = weight_name, allow_lhs_call = TRUE,
+    env = parent.frame()
+  )
+  model_formula <- fb$formula
+  dep_name <- fb$dep_name
+  dep_vars <- fb$dep_vars
+  pred_names <- fb$pred_names
 
-  # Build formula
-  if (!is.null(formula)) {
-    # Formula interface
-    if (!inherits(formula, "formula")) {
-      cli_abort("{.arg formula} must be a formula object (e.g., {.code y ~ x1 + x2}).")
-    }
-    model_formula <- formula
-    dep_name <- as.character(formula[[2]])
-    pred_names <- all.vars(formula[[3]])
-  } else {
-    # SPSS-style interface
-    dep_quo <- rlang::enquo(dependent)
-    pred_quo <- rlang::enquo(predictors)
-
-    if (rlang::quo_is_null(dep_quo)) {
-      cli_abort("Either {.arg formula} or {.arg dependent} must be specified.")
-    }
-
-    dep_name <- rlang::as_name(dep_quo)
-
-    # Process predictors using tidyselect
-    pred_pos <- tidyselect::eval_select(pred_quo, data)
-    pred_names <- names(pred_pos)
-
-    if (length(pred_names) == 0) {
-      cli_abort("At least one predictor variable must be specified.")
-    }
-
-    model_formula <- stats::as.formula(
-      paste(dep_name, "~", paste(pred_names, collapse = " + "))
-    )
-  }
-
-  # Validate variables exist
-  all_vars <- c(dep_name, pred_names)
-  missing_vars <- setdiff(all_vars, names(data))
-  if (length(missing_vars) > 0) {
-    cli_abort("Variable(s) not found in data: {paste(missing_vars, collapse = ', ')}.")
+  if (use == "pairwise" && !identical(dep_vars, dep_name)) {
+    cli_abort(c(
+      "{.code use = \"pairwise\"} needs a plain dependent variable, not {.code {dep_name}}.",
+      i = "Create the transformed variable in the data first, or use {.code use = \"listwise\"}."
+    ))
   }
 
   # ============================================================================
@@ -289,7 +262,8 @@ linear_regression <- function(data, formula = NULL,
     fits <- .fit_groups(group_split, group_keys, function(grp_data) {
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
       result <- .lm_core(grp_data, model_formula, dep_name, pred_names,
-                         grp_weights, use, standardized, conf.level, factors)
+                         grp_weights, use, standardized, conf.level, factors,
+                         dep_vars = dep_vars)
       # Each listwise group result IS an lm — tag it as linear_regression so
       # predict()/anova()/broom generics on a single group dispatch natively.
       if (inherits(result, "lm")) {
@@ -320,7 +294,8 @@ linear_regression <- function(data, formula = NULL,
     )
   } else {
     result <- .lm_core(data, model_formula, dep_name, pred_names,
-                       weights_vec, use, standardized, conf.level, factors)
+                       weights_vec, use, standardized, conf.level, factors,
+                       dep_vars = dep_vars)
     # Listwise: result IS the lm (mariposa slots attached).
     # Pairwise: result is a custom list (no fitted lm available).
     result$formula <- model_formula
@@ -349,7 +324,8 @@ linear_regression <- function(data, formula = NULL,
 #' Core linear regression computation
 #' @noRd
 .lm_core <- function(data, formula, dep_name, pred_names, weights_vec,
-                     use, standardized, conf.level, factors = "dummy") {
+                     use, standardized, conf.level, factors = "dummy",
+                     dep_vars = dep_name) {
 
   # Dispatch to pairwise implementation if requested
   if (use == "pairwise") {
@@ -369,7 +345,7 @@ linear_regression <- function(data, formula = NULL,
                              standardized, conf.level, factors))
   }
 
-  all_vars <- c(dep_name, pred_names)
+  all_vars <- unique(c(dep_vars, pred_names))
 
   # Listwise deletion (SPSS MISSING LISTWISE)
   complete <- stats::complete.cases(data[, all_vars, drop = FALSE])
@@ -382,6 +358,14 @@ linear_regression <- function(data, formula = NULL,
 
   if (n < length(pred_names) + 2) {
     .abort_insufficient_cases(data, all_vars, n, length(pred_names))
+  }
+
+  # Character predictors are categorical: enter them as factors (as lm()
+  # would), so descriptives and the numeric mode treat them like factors
+  for (v in pred_names) {
+    if (is.character(data_complete[[v]])) {
+      data_complete[[v]] <- factor(data_complete[[v]])
+    }
   }
 
   # Factor predictor handling — see @param factors documentation.
@@ -401,7 +385,7 @@ linear_regression <- function(data, formula = NULL,
   }
   # The dependent variable is always coerced to numeric (it is the response,
   # never categorical — use logistic_regression() for binary outcomes).
-  if (is.factor(data_complete[[dep_name]])) {
+  if (identical(dep_vars, dep_name) && is.factor(data_complete[[dep_name]])) {
     data_complete[[dep_name]] <- as.numeric(data_complete[[dep_name]])
   }
 
@@ -416,6 +400,18 @@ linear_regression <- function(data, formula = NULL,
   } else {
     model <- stats::lm(formula, data = data_complete)
   }
+
+  # A transformation can still yield NA (e.g. log of a negative value);
+  # lm() drops those rows - keep data and weights aligned with the fit
+  if (!is.null(model$na.action)) {
+    drop_rows <- as.integer(model$na.action)
+    data_complete <- data_complete[-drop_rows, , drop = FALSE]
+    if (!is.null(weights_vec)) weights_vec <- weights_vec[-drop_rows]
+    n <- nrow(data_complete)
+  }
+  # The response as fitted - differs from the raw column for a
+  # transformed outcome such as log(income)
+  y <- as.numeric(stats::model.response(model$model))
 
   # Perfectly collinear terms come back as NA coefficients; SPSS excludes
   # such variables from the equation with a note. Surface the exclusion
@@ -433,7 +429,8 @@ linear_regression <- function(data, formula = NULL,
   # DESCRIPTIVE STATISTICS (matching SPSS output)
   # ============================================================================
 
-  descriptives <- .lm_descriptives(data_complete, all_vars, weights_vec)
+  descriptives <- .lm_descriptives(data_complete, dep_name, y, pred_names,
+                                   weights_vec)
 
   # ============================================================================
   # SPSS-COMPATIBLE WEIGHTED STATISTICS
@@ -465,8 +462,7 @@ linear_regression <- function(data, formula = NULL,
     residuals_raw <- stats::residuals(model)
     ss_residual <- sum(weights_vec * residuals_raw^2)
 
-    # Weighted total SS
-    y <- data_complete[[dep_name]]
+    # Weighted total SS (y = the fitted response, see above)
     wm_y <- stats::weighted.mean(y, weights_vec)
     ss_total <- sum(weights_vec * (y - wm_y)^2)
     ss_regression <- ss_total - ss_residual
@@ -575,7 +571,7 @@ linear_regression <- function(data, formula = NULL,
 
     coef_table <- .lm_coefficients(model, model_summary, data_complete,
                                    dep_name, pred_names, weights_vec,
-                                   standardized, conf.level)
+                                   standardized, conf.level, y = y)
   }
 
   # Collinearity diagnostics (SPSS REGRESSION: Tolerance, VIF per term)
@@ -629,7 +625,12 @@ linear_regression <- function(data, formula = NULL,
   # Pairwise deletion operates on a numeric correlation matrix, so factor
   # predictors cannot be dummy-expanded here. Either coerce (factors="numeric")
   # or refuse to proceed.
-  factor_vars <- all_vars[vapply(data[all_vars], is.factor, logical(1))]
+  factor_vars <- all_vars[vapply(data[all_vars], function(x) {
+    is.factor(x) || is.character(x)
+  }, logical(1))]
+  for (v in factor_vars) {
+    if (is.character(data[[v]])) data[[v]] <- factor(data[[v]])
+  }
   if (length(factor_vars) > 0) {
     if (factors == "dummy") {
       cli_abort(c(
@@ -878,9 +879,13 @@ linear_regression <- function(data, formula = NULL,
 #' \code{REGRESSION} prints in its Descriptive Statistics block (ordinal-as-
 #' scale summary), regardless of how the factor is entered into the model.
 #' @noRd
-.lm_descriptives <- function(data, var_names, weights_vec) {
-  desc_list <- lapply(var_names, function(v) {
-    x <- data[[v]]
+.lm_descriptives <- function(data, dep_name, y, pred_names, weights_vec) {
+  var_names <- c(dep_name, pred_names)
+  desc_list <- lapply(seq_along(var_names), function(i) {
+    v <- var_names[i]
+    # Outcome: the fitted response (a transformed outcome such as
+    # log(income) has no column of its own)
+    x <- if (i == 1L) y else data[[v]]
     if (is.factor(x)) {
       # Descriptives are informational; coerce only here, model uses dummy coding
       x <- as.numeric(x)
@@ -946,7 +951,8 @@ linear_regression <- function(data, formula = NULL,
 #' Compute coefficients table with standardized coefficients
 #' @noRd
 .lm_coefficients <- function(model, model_summary, data, dep_name, pred_names,
-                             weights_vec, standardized, conf.level) {
+                             weights_vec, standardized, conf.level,
+                             y = data[[dep_name]]) {
 
   coefs <- model_summary$coefficients
   # summary() drops aliased (NA) coefficients while confint() keeps them as
@@ -964,7 +970,6 @@ linear_regression <- function(data, formula = NULL,
   beta <- rep(NA_real_, n_terms)
 
   if (standardized) {
-    y <- data[[dep_name]]
     X <- stats::model.matrix(model)
 
     if (!is.null(weights_vec)) {
@@ -1659,6 +1664,175 @@ df.residual.linear_regression <- function(object, ...) {
 .formula_label <- function(f) {
   if (is.null(f)) return("")
   paste(trimws(deparse(f, width.cutoff = 500L)), collapse = " ")
+}
+
+#' Backtick non-syntactic variable names for formula text
+#' @noRd
+.bt_name <- function(x) {
+  ifelse(make.names(x) == x, x,
+         paste0("`", gsub("`", "\\\\`", x), "`"))
+}
+
+#' Resolve the weights argument of the regression functions
+#'
+#' A bare column name (or string) is looked up in the data; any other
+#' expression (sampling_weight * 2, survey_data$w) is evaluated with the
+#' data as mask and stored as a column named by its text, so grouped fits
+#' and the printed "Weights" line keep working - rlang::as_name() used to
+#' abort with "Can't convert a call to a string".
+#'
+#' @return list(data, name, vec); name/vec NULL when unweighted
+#' @noRd
+.regression_weights <- function(data, weights_quo, call = rlang::caller_env()) {
+  if (rlang::quo_is_null(weights_quo)) {
+    return(list(data = data, name = NULL, vec = NULL))
+  }
+  expr <- rlang::quo_get_expr(weights_quo)
+  if (rlang::is_symbol(expr) || rlang::is_string(expr)) {
+    name <- rlang::as_name(weights_quo)
+    if (!name %in% names(data)) {
+      cli_abort("Weight variable {.var {name}} not found in data.", call = call)
+    }
+    vec <- data[[name]]
+  } else if (rlang::is_call(expr, c("all_of", "any_of"))) {
+    pos <- tidyselect::eval_select(weights_quo, data)
+    if (length(pos) != 1) {
+      cli_abort("{.arg weights} must select exactly one variable.", call = call)
+    }
+    name <- names(pos)
+    vec <- data[[name]]
+  } else {
+    name <- paste(trimws(deparse(expr, width.cutoff = 500L)), collapse = " ")
+    vec <- tryCatch(
+      rlang::eval_tidy(weights_quo, data),
+      error = function(e) {
+        cli_abort(c(
+          "Could not evaluate {.arg weights} = {.code {name}}.",
+          x = "{conditionMessage(e)}"
+        ), call = call)
+      }
+    )
+    if (length(vec) == 1L) vec <- rep(vec, nrow(data))
+    if (length(vec) != nrow(data)) {
+      cli_abort(
+        "{.arg weights} = {.code {name}} gives {length(vec)} value{?s}, but the data have {nrow(data)} rows.",
+        call = call
+      )
+    }
+  }
+  # Bare numbers in the vector AND the column (grouped fits re-read it):
+  # SPSS weights with NA fail every comparison (see .plain_numeric)
+  vec <- .plain_numeric(vec)
+  .check_weights(vec, name, call = call)
+  data[[name]] <- vec
+  list(data = data, name = name, vec = vec)
+}
+
+#' Build and validate the model formula of the regression functions
+#'
+#' One place for both interfaces:
+#' - formula: a transformed outcome (log(income) ~ age) is allowed when
+#'   allow_lhs_call = TRUE (linear) - its raw variables are validated, not
+#'   the function names ("Variable(s) not found in data: log."); `y ~ .`
+#'   expands to all other columns except the weights and grouping
+#'   variables; intercept-only models and an outcome that is also a
+#'   predictor are refused with a clear message.
+#' - dependent/predictors: names are backticked (non-syntactic names such
+#'   as "my var" failed to parse), and the outcome, weights and grouping
+#'   variables are dropped from a tidyselect predictor selection such as
+#'   where(is.numeric) with a message.
+#'
+#' @return list(formula, dep_name (label), dep_vars (raw variables of the
+#'   outcome), pred_names (raw predictor variables))
+#' @noRd
+.build_regression_formula <- function(data, formula, dep_quo, pred_quo,
+                                      weight_name = NULL,
+                                      allow_lhs_call = TRUE,
+                                      env = rlang::caller_env(2),
+                                      call = rlang::caller_env()) {
+  group_vars <- if (inherits(data, "grouped_df")) dplyr::group_vars(data) else character(0)
+
+  if (!is.null(formula)) {
+    if (!inherits(formula, "formula")) {
+      cli_abort("{.arg formula} must be a formula object (e.g., {.code y ~ x1 + x2}).",
+                call = call)
+    }
+    if (length(formula) != 3L) {
+      cli_abort("{.arg formula} needs a dependent variable on the left: {.code y ~ x1 + x2}.",
+                call = call)
+    }
+    lhs <- formula[[2]]
+    lhs_text <- paste(trimws(deparse(lhs, width.cutoff = 500L)), collapse = " ")
+    if (!is.name(lhs) && (!allow_lhs_call || rlang::is_call(lhs, "cbind") ||
+                          length(all.vars(lhs)) != 1L)) {
+      cli_abort(c(
+        "The dependent variable must be a single variable, not {.code {lhs_text}}.",
+        i = "Create the variable in the data first, then use its name."
+      ), call = call)
+    }
+    dep_vars <- all.vars(lhs)
+    dep_name <- if (is.name(lhs)) as.character(lhs) else lhs_text
+
+    if ("." %in% all.vars(formula[[3]])) {
+      cols <- setdiff(names(data), c(dep_vars, weight_name, group_vars))
+      tt <- stats::terms(formula,
+                         data = as.data.frame(data)[0, cols, drop = FALSE])
+      labels <- attr(tt, "term.labels")
+      if (length(labels) > 0) {
+        formula <- stats::reformulate(labels, response = lhs,
+                                      intercept = attr(tt, "intercept") == 1L,
+                                      env = environment(formula))
+      }
+    }
+    pred_names <- all.vars(formula[[3]])
+  } else {
+    if (rlang::quo_is_null(dep_quo)) {
+      cli_abort("Either {.arg formula} or {.arg dependent} must be specified.",
+                call = call)
+    }
+    dep_name <- tryCatch(rlang::as_name(dep_quo), error = function(e) {
+      cli_abort(c(
+        "{.arg dependent} must be a single variable name.",
+        i = "Use the formula interface for a transformed outcome, e.g. {.code log(y) ~ x}."
+      ), call = call)
+    })
+    dep_vars <- dep_name
+    pred_names <- names(tidyselect::eval_select(pred_quo, data))
+    dropped <- intersect(pred_names, c(dep_name, weight_name, group_vars))
+    if (length(dropped) > 0) {
+      cli_inform(c(
+        i = "Not used as predictor{?s}: {.var {dropped}} (dependent, weights or grouping variable)."
+      ))
+      pred_names <- setdiff(pred_names, dropped)
+    }
+    if (length(pred_names) == 0) {
+      cli_abort("At least one predictor variable must be specified.", call = call)
+    }
+    formula <- stats::as.formula(
+      paste(.bt_name(dep_name), "~", paste(.bt_name(pred_names), collapse = " + ")),
+      env = env
+    )
+  }
+
+  missing_vars <- setdiff(c(dep_vars, pred_names), names(data))
+  if (length(missing_vars) > 0) {
+    cli_abort("Variable{?s} not found in data: {.var {missing_vars}}.", call = call)
+  }
+  if (length(attr(stats::terms(formula), "term.labels")) == 0) {
+    ftxt <- .formula_label(formula)
+    cli_abort(c(
+      "The model has no predictor: {.code {ftxt}}.",
+      i = "A regression needs at least one predictor, e.g. {.code y ~ x}."
+    ), call = call)
+  }
+  both <- intersect(dep_vars, pred_names)
+  if (length(both) > 0) {
+    cli_abort("{.var {both}} cannot be both the dependent variable and a predictor.",
+              call = call)
+  }
+
+  list(formula = formula, dep_name = dep_name, dep_vars = dep_vars,
+       pred_names = pred_names)
 }
 
 #' Display a (possibly weighted) sample size as a whole number

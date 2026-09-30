@@ -55,3 +55,22 @@
   for the number of predictors" without saying which group. The message
   itself now names an all-missing variable ("`x` has no non-missing
   values") or gives the case count.
+* Model specification in `linear_regression()` / `logistic_regression()`:
+  - `dependent =` / `predictors =` work with non-syntactic names such as
+    `` `my var` `` or `` `Zufriedenheit (0-10)` `` (they were pasted into
+    the formula without backticks: parse error).
+  - `linear_regression(data, log(income) ~ age)` fits the transformed
+    outcome instead of failing with "Variable(s) not found in data: log.";
+    `logistic_regression()` says the outcome must be a single variable.
+  - `y ~ .` uses all other columns except the weights and grouping
+    variables; `y ~ 1` and an outcome that is also a predictor stop with
+    a clear message.
+  - A predictor selection that also picks the outcome, the weights or a
+    grouping variable (e.g. `predictors = where(is.numeric)`) drops them
+    with a message instead of regressing the outcome on itself.
+  - Character predictors enter as factors (no more `NA` descriptives and
+    base-R warnings).
+  - `weights =` accepts an expression such as `sampling_weight * 2`
+    (it failed with "Can't convert a call to a string").
+  - `anova()` on a weighted logistic model no longer leaks
+    "non-integer #successes" warnings.
