@@ -77,3 +77,8 @@
   and group means were labelled as if they were codes. Value labels,
   missing-value metadata and the class are now copied only when the target
   still holds the source's codes; the variable label is always copied.
+* `set_na(data, -9, -8, tag = FALSE)` (the documented example) no longer
+  strips the labels of every numeric column (`survey_data`: 15 variable
+  labels -> 6). Variable labels, the value labels of the remaining codes,
+  the `haven_labelled` class and existing missing-value types are kept;
+  integer columns stay integer.

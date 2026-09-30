@@ -113,21 +113,11 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
     if (isTRUE(tag)) {
       data <- .tag_user_missing_values(data, na_values, "spss", verbose)
     } else {
-      n_converted <- 0L
+      # Same per-column path as the named form, so labels are kept
       for (i in seq_len(ncol(data))) {
         if (!is.numeric(data[[i]])) next
-        raw <- as.double(data[[i]])
-        for (val in na_values) {
-          mask <- !is.na(raw) & raw == val
-          if (any(mask)) {
-            raw[mask] <- NA_real_
-            n_converted <- n_converted + sum(mask)
-          }
-        }
-        data[[i]] <- raw
-      }
-      if (verbose && n_converted > 0L) {
-        cli::cli_inform("Set {n_converted} value{?s} to NA.")
+        data[[i]] <- .set_na_vec(data[[i]], na_values, tag = FALSE,
+                                 verbose = verbose)
       }
     }
   } else {
@@ -157,25 +147,30 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
   if (length(na_values) == 0L) return(x)
 
   if (!isTRUE(tag)) {
-    # Simple replacement with regular NA
-    raw <- as.double(x)
-    n_replaced <- 0L
-    for (val in na_values) {
-      mask <- !is.na(raw) & raw == val
-      n_replaced <- n_replaced + sum(mask)
-      raw[mask] <- NA_real_
-    }
-    # Preserve labels (remove labels for the now-missing values)
+    # Simple replacement with regular NA. Variable label, value labels of
+    # the remaining codes, the labelled class and existing missing types
+    # are kept (they used to be stripped, e.g. by the documented
+    # set_na(survey_data, -9, -8, tag = FALSE)).
+    raw <- .plain_numeric(x)
+    mask <- !is.na(raw) & raw %in% na_values
+    n_replaced <- sum(mask)
     labels <- attr(x, "labels", exact = TRUE)
-    if (!is.null(labels)) {
-      labels <- labels[!is.na(labels) & !unname(labels) %in% na_values]
-      attr(raw, "labels") <- if (length(labels) > 0L) labels else NULL
-    }
-    attr(raw, "label") <- attr(x, "label", exact = TRUE)
     if (verbose && n_replaced > 0L) {
       cli::cli_inform("Set {n_replaced} value{?s} to NA.")
     }
-    return(raw)
+    if (is.null(labels) && !inherits(x, "haven_labelled")) {
+      if (n_replaced > 0L) x[mask] <- NA
+      return(x)
+    }
+    raw <- as.double(raw)
+    raw[mask] <- NA_real_
+    if (!is.null(labels)) {
+      lab_vals <- as.double(.plain_numeric(labels))
+      labels <- labels[!is.na(lab_vals) & !lab_vals %in% na_values]
+    }
+    return(.with_label_meta(raw, x, labels = labels,
+                            label = attr(x, "label", exact = TRUE),
+                            labelled = TRUE))
   }
 
   # Tagged NA replacement

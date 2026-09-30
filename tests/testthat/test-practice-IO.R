@@ -370,3 +370,25 @@ test_that("IO-07: copy_labels() copies value labels only to compatible columns",
   expect_equal(as.numeric(r3$x), c(1, 9))
   expect_equal(attr(r3$y, "labels"), c(m = 1, f = 2))
 })
+
+# IO-08: set_na(df, -9, -8, tag = FALSE) (the documented example) stripped
+# every variable and value label of the numeric columns.
+test_that("IO-08: set_na(tag = FALSE) keeps variable and value labels", {
+  r <- set_na(survey_data, -9, -8, tag = FALSE)
+  expect_equal(var_label(r), var_label(survey_data))
+  expect_identical(r$age, survey_data$age)
+  skip_if_not_installed("haven")
+  d <- tibble::tibble(
+    q = haven::labelled(c(1, -9, 2, -8), labels = c(yes = 1, no = 2,
+                                                   "n.a." = -9),
+                        label = "Question")
+  )
+  r2 <- set_na(d, -9, -8, tag = FALSE)
+  expect_s3_class(r2$q, "haven_labelled")
+  expect_equal(attr(r2$q, "labels"), c(yes = 1, no = 2))
+  expect_equal(attr(r2$q, "label"), "Question")
+  expect_equal(sum(is.na(r2$q)), 2L)
+  # named form and vector form behave the same
+  expect_equal(attr(set_na(d, q = -9, tag = FALSE)$q, "label"), "Question")
+  expect_s3_class(set_na(d$q, -9, tag = FALSE), "haven_labelled")
+})
