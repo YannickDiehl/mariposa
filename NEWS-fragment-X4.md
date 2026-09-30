@@ -44,6 +44,9 @@
   extraction and rotation sums, transformation matrix. The remaining
   reference runs end without convergence in SPSS itself (a model with
   0 degrees of freedom and Heywood cases); see Validation.
+* `levene_test()` compact print: a whole-number weighted `df2` above 2^31
+  (sums of weights in the billions) printed as `F(1, NA)` with an integer
+  overflow warning; it is now printed in full.
 
 ## Validation (for the lead: NEWS "## Validation" subsection)
 

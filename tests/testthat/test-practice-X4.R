@@ -90,6 +90,19 @@ test_that("X4-ANCOVA-LEVENE: levene_test() works on ancova() results", {
   expect_identical(levene_test(w)$weights, "sampling_weight")
 })
 
+test_that("X4-EDGE-17: Levene compact line with a weighted df2 beyond 2^31", {
+  # The whole-number df2 went through as.integer() / formatC(format = "d"):
+  # with sums of weights above 2^31 it printed "F(1, NA)" and warned
+  # (German: "NAs durch Umwandlung in den Integer-Bereich erzeugt").
+  d <- survey_data
+  d$w <- 1e7
+  lv <- levene_test(d, life_satisfaction, group = gender, weights = w)
+  expect_gt(lv$results$df2, 2^31)
+  expect_no_warning(out <- capture.output(print(lv)))
+  expect_true(any(grepl(sprintf("F(1, %s)", format(lv$results$df2, scientific = FALSE)),
+                        out, fixed = TRUE)))
+})
+
 # --- X4-PROMAX: SPSS FACTOR promax rotation -----------------------------------
 
 .six_items <- function(d, ...) {

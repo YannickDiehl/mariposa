@@ -539,7 +539,8 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
   df2_str <- if (is.na(df2)) {
     "NA"
   } else if (abs(df2 - round(df2)) < 1e-8) {
-    formatC(as.integer(round(df2)), format = "d")
+    # format "f": "d" coerces to integer (NA beyond 2^31 for huge weights)
+    formatC(round(df2), format = "f", digits = 0)
   } else {
     fmt_num(df2, 1)
   }
