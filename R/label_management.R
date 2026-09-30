@@ -432,7 +432,7 @@ copy_labels <- function(data, source) {
     # forced onto it: the factor became int+lbl 1, 2, 3 with labels 1/5/9.
     if (.labels_compatible(tgt, src)) {
       if (is.integer(tgt) && is.double(src)) tgt <- as.double(tgt)
-      for (a in c("labels", "na_tag_map", "na_tag_format", "na_values",
+      for (a in c("labels", "na_tag_map", "na_tag_format", "spss_missing", "na_values",
                   "na_range")) {
         val <- attr(src, a, exact = TRUE)
         if (!is.null(val)) attr(tgt, a) <- val

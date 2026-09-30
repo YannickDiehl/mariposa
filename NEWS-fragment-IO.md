@@ -126,3 +126,14 @@
   it 1..k (ALLBUS `dm06` codes 100, 120, ... became 1, 2, ...), although
   the factor carries its codes. Other factors are still written as 1..k
   with their levels as labels.
+* `read_spss()` -> `write_spss()` round trips the SPSS missing-value
+  definitions exactly and quietly. `read_spss()` kept only the codes that
+  occur, so an unchanged ALLBUS export produced 133 warnings ("4 discrete
+  missing codes exceed SPSS's limit of 3 ... range -42--8") and rewrote
+  `LOWEST THRU -1` as `-42 THRU -8`. The original definition is now
+  remembered (attribute `spss_missing`) and written back while it fits
+  (ALLBUS 2023: all 579 definitions and values identical, no warning).
+  Variables with more than 3 codes otherwise use SPSS's "range plus one
+  discrete value" form when that avoids valid values (e.g. codes 0, 7, 8,
+  9 around valid 1-6, which used to be an error), reported in one message
+  with readable ranges ("-11 to -8 and -42").

@@ -360,7 +360,7 @@ unlabel <- function(data, ...) {
   # Remove all label-related attributes
   attrs_to_remove <- c(
     "label", "labels",
-    "na_tag_map", "na_tag_format",
+    "na_tag_map", "na_tag_format", "spss_missing",
     "na_values", "na_range",
     "format.spss", "format.stata", "format.sas",
     "display_width"

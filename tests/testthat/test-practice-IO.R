@@ -569,3 +569,56 @@ test_that("IO-14: exporters keep the original codes of to_label() factors", {
   suppressMessages(write_spss(d, tf))
   expect_equal(as.numeric(read_spss(tf)$f), c(2, 1, 2, 1))
 })
+
+# IO-15: write_spss() on unchanged ALLBUS data emitted ~133 warnings ("4
+# discrete missing codes exceed SPSS's limit of 3 ... range -42--8"):
+# read_spss() forgot the original definition (LOWEST THRU -1), >3 codes
+# always became a min-max range with one warning per variable.
+test_that("IO-15: read_spss() -> write_spss() keeps the original missing spec", {
+  skip_if_not_installed("haven")
+  make <- function(v) haven::labelled_spss(v, labels = c(yes = 1, no = 2),
+                                           na_range = c(-Inf, -1))
+  d <- tibble::tibble(a = make(c(1, 2, -42, -11, -9, -8)),
+                      b = make(c(2, 1, -11, -9, -8, -42)))
+  tf <- tempfile(fileext = ".sav")
+  tf2 <- tempfile(fileext = ".sav")
+  on.exit(unlink(c(tf, tf2)))
+  haven::write_sav(d, tf)
+  imported <- read_spss(tf)
+  msgs <- character(0)
+  expect_no_warning(withCallingHandlers(
+    write_spss(imported, tf2),
+    message = function(m) {
+      msgs <<- c(msgs, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    }
+  ))
+  expect_false(any(grepl("missing", msgs)))
+  back <- haven::read_sav(tf2, user_na = TRUE)
+  expect_equal(attr(back$a, "na_range"), c(-Inf, -1))
+  expect_equal(as.numeric(unclass(back$a)), c(1, 2, -42, -11, -9, -8))
+})
+
+test_that("IO-15: >3 codes use range + one discrete value, one message", {
+  skip_if_not_installed("haven")
+  x <- set_na(c(1, 2, 3, -42, -11, -9, -8), -42, -11, -9, -8)
+  d <- tibble::tibble(a = x, b = x, c = x)
+  tf <- tempfile(fileext = ".sav")
+  on.exit(unlink(tf))
+  msgs <- character(0)
+  expect_no_warning(
+    withCallingHandlers(
+      write_spss(d, tf),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+  )
+  range_msgs <- grep("range", msgs, value = TRUE)
+  expect_length(range_msgs, 1L)
+  expect_match(range_msgs, "-11 to -8")
+  back <- haven::read_sav(tf, user_na = TRUE)
+  expect_equal(attr(back$a, "na_range"), c(-11, -8))
+  expect_equal(attr(back$a, "na_values"), -42)
+})

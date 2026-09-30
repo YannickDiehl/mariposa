@@ -235,6 +235,11 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
     # Store the tag-to-code mapping for recovery
     attr(new_x, "na_tag_map") <- stats::setNames(missing_vals, tag_chars)
     attr(new_x, "na_tag_format") <- "spss"
+    # ... and the original SPSS definition (e.g. LOWEST THRU -1), so that
+    # write_spss() can restore it exactly instead of rebuilding it from the
+    # codes that happen to occur
+    attr(new_x, "spss_missing") <- list(na_values = na_values,
+                                        na_range = na_range)
 
     data[[i]] <- new_x
     n_vars_converted <- n_vars_converted + 1L
@@ -684,6 +689,7 @@ strip_tags <- function(x) {
     attr(out, "na_tag_map") <- tag_map
     attr(out, "na_tag_format") <- attr(x, "na_tag_format", exact = TRUE) %||%
       "spss"
+    attr(out, "spss_missing") <- attr(x, "spss_missing", exact = TRUE)
   }
   out
 }

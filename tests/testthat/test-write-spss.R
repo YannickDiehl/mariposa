@@ -321,9 +321,11 @@ test_that("write_spss handles >3 missing codes via na_range", {
 
   # Verify the file is readable and missing values are preserved
   read_back <- haven::read_sav(tmp, user_na = TRUE)
+  # SPSS form "range + one discrete value", the tightest that fits
   na_rng <- attr(read_back$q1, "na_range")
   expect_false(is.null(na_rng))
-  expect_equal(na_rng, c(-42, -8))
+  expect_equal(na_rng, c(-11, -8))
+  expect_equal(attr(read_back$q1, "na_values"), -42)
 
   # Valid values still present
   valid <- as.double(read_back$q1[!is.na(read_back$q1)])

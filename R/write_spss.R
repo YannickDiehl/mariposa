@@ -28,7 +28,14 @@
 #' codes (e.g., -9, -8). `write_spss()` reverses this process: tagged NAs are
 #' converted back to their original numeric codes, and the SPSS user-defined
 #' missing value specification is reconstructed so that the exported `.sav`
-#' file has the same missing value definitions as the original.
+#' file has the same missing value definitions as the original:
+#' [read_spss()] remembers the original definition (e.g. `LOWEST THRU -1`),
+#' which is written back as long as it still covers every missing code and
+#' no valid value. Otherwise up to 3 codes are written as discrete values;
+#' more codes use SPSS's "range plus one discrete value" form (the tightest
+#' that contains no valid value), announced in one message. If no such
+#' range exists, the export stops with an error instead of declaring valid
+#' values missing.
 #'
 #' ## Cross-Format Export
 #'
@@ -125,6 +132,7 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
   data <- .restore_factor_codes(data)
   data <- .promote_bare_labels(data)
   orphaned <- character(0)
+  ranged <- character(0)
 
   for (i in seq_len(ncol(data))) {
     x <- data[[i]]
@@ -189,45 +197,29 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
       labels <- valid_labels
     }
 
-    # SPSS allows at most 3 discrete na_values, or 1 na_range (+ 1 discrete).
-    # When more than 3 codes exist, use na_range to cover them.
-    if (length(na_codes) <= 3L) {
-      data[[i]] <- haven::labelled_spss(
-        raw,
-        labels = labels,
-        na_values = na_codes,
-        label = attr(x, "label", exact = TRUE)
-      )
-    } else {
-      # Use a range covering all missing codes
-      na_rng <- c(min(na_codes), max(na_codes))
+    # SPSS allows at most 3 discrete na_values, or 1 na_range + 1 discrete
+    # value. .spss_missing_spec() restores the original definition of an
+    # imported variable when it still fits, else builds the tightest spec.
+    spec <- .spss_missing_spec(raw, na_codes,
+                               attr(x, "spss_missing", exact = TRUE),
+                               names(data)[i])
+    if (isTRUE(spec$announce)) ranged <- c(ranged, spec$text)
 
-      # Guard: the min-max range must not swallow valid values. With codes
-      # like c(0, 7, 8, 9) the range 0-9 would silently mark every valid
-      # value 1-6 as user-missing in the exported file - data corruption,
-      # not a formatting detail.
-      observed_valid <- unique(raw[!is.na(raw) & !(raw %in% na_codes)])
-      caught <- observed_valid[observed_valid >= na_rng[1] &
-                                 observed_valid <= na_rng[2]]
-      if (length(caught) > 0) {
-        cli::cli_abort(c(
-          "Cannot export missing-value codes of {.var {names(data)[i]}} to SPSS.",
-          "x" = "SPSS allows at most 3 discrete missing codes; the {length(na_codes)} codes ({paste(sort(na_codes), collapse = ', ')}) would be written as range {na_rng[1]}-{na_rng[2]}, which contains the valid value{?s} {paste(sort(caught), collapse = ', ')}.",
-          "i" = "Recode the missing codes to a contiguous block (e.g. with {.fn rec}) or reduce them to 3 codes before exporting."
-        ))
-      }
-      cli::cli_warn(c(
-        "Variable {.var {names(data)[i]}}: {length(na_codes)} discrete missing codes exceed SPSS's limit of 3.",
-        "i" = "Writing them as missing range {na_rng[1]}-{na_rng[2]} instead."
-      ))
+    data[[i]] <- haven::labelled_spss(
+      raw,
+      labels = labels,
+      na_values = spec$na_values,
+      na_range = spec$na_range,
+      label = attr(x, "label", exact = TRUE)
+    )
+  }
 
-      data[[i]] <- haven::labelled_spss(
-        raw,
-        labels = labels,
-        na_range = na_rng,
-        label = attr(x, "label", exact = TRUE)
-      )
-    }
+  if (length(ranged) > 0L) {
+    cli::cli_inform(c(
+      "i" = "SPSS allows at most 3 discrete missing codes; {length(ranged)} variable{?s} with more {?is/are} written with a missing range:",
+      stats::setNames(utils::head(ranged, 5L), rep("*", min(5L, length(ranged)))),
+      if (length(ranged) > 5L) c(" " = paste0("... and ", length(ranged) - 5L, " more."))
+    ))
   }
 
   if (length(orphaned) > 0L) {
@@ -238,6 +230,81 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
   }
 
   data
+}
+
+
+#' SPSS missing-value specification for a set of missing codes
+#'
+#' 1. The original definition of an imported variable (read_spss() keeps it
+#'    in the "spss_missing" attribute, e.g. LOWEST THRU -1) when it still
+#'    covers every code and catches no valid value: exact round trip.
+#' 2. Up to 3 codes: discrete values.
+#' 3. More: a range plus one discrete value (the narrower of "all but the
+#'    lowest" / "all but the highest"), else one range over all codes -
+#'    whichever catches no valid value. Announced once by the caller.
+#' 4. Otherwise an error: every range would swallow valid values.
+#'
+#' @return list(na_values, na_range, announce, text)
+#' @noRd
+.spss_missing_spec <- function(raw, na_codes, original, var_name) {
+  na_codes <- sort(unique(na_codes))
+  valid <- unique(raw[!is.na(raw) & !(raw %in% na_codes)])
+  in_range <- function(v, rng) length(rng) == 2L & v >= rng[1] & v <= rng[2]
+  catches <- function(values, rng) {
+    any(valid %in% values) || any(in_range(valid, rng))
+  }
+
+  if (!is.null(original) && is.list(original)) {
+    o_vals <- original$na_values
+    o_rng <- original$na_range
+    covered <- na_codes %in% o_vals | in_range(na_codes, o_rng)
+    fits <- (length(o_rng) == 2L && length(o_vals) <= 1L) ||
+      (length(o_rng) == 0L && length(o_vals) <= 3L)
+    if (fits && all(covered) && !catches(o_vals, o_rng)) {
+      return(list(na_values = o_vals, na_range = o_rng, announce = FALSE))
+    }
+  }
+
+  if (length(na_codes) <= 3L) {
+    return(list(na_values = na_codes, na_range = NULL, announce = FALSE))
+  }
+
+  n <- length(na_codes)
+  candidates <- list(
+    list(na_values = na_codes[1], na_range = na_codes[c(2, n)]),
+    list(na_values = na_codes[n], na_range = na_codes[c(1, n - 1)]),
+    list(na_values = NULL, na_range = na_codes[c(1, n)])
+  )
+  ok <- vapply(candidates, function(cand) {
+    !catches(cand$na_values, cand$na_range)
+  }, logical(1))
+  if (!any(ok)) {
+    full <- na_codes[c(1, n)]
+    rng_txt <- .fmt_missing_range(full)
+    caught <- sort(valid[in_range(valid, full)])
+    cli::cli_abort(c(
+      "Cannot export missing-value codes of {.var {var_name}} to SPSS.",
+      "x" = "SPSS allows at most 3 discrete missing codes (or a range plus one); the {n} codes {.val {na_codes}} need the range {rng_txt}, which contains the valid {cli::qty(length(caught))}value{?s} {.val {caught}}.",
+      "i" = "Recode the missing codes to a contiguous block (e.g. with {.fn rec}) or reduce them to 3 codes before exporting."
+    ))
+  }
+  widths <- vapply(candidates, function(cand) diff(cand$na_range), numeric(1))
+  widths[!ok] <- Inf
+  best <- candidates[[which.min(widths)]]
+  text <- paste0(var_name, ": ", .fmt_missing_range(best$na_range),
+                 if (!is.null(best$na_values)) {
+                   paste0(" and ", format(best$na_values))
+                 })
+  c(best, list(announce = TRUE, text = text))
+}
+
+
+#' Readable SPSS missing range: "-11 to -8", "LOWEST to -1"
+#' @noRd
+.fmt_missing_range <- function(rng) {
+  lo <- if (is.infinite(rng[1])) "LOWEST" else format(rng[1])
+  hi <- if (is.infinite(rng[2])) "HIGHEST" else format(rng[2])
+  paste(lo, "to", hi)
 }
 
 

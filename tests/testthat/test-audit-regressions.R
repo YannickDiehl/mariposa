@@ -240,16 +240,19 @@ test_that("sort_frq sorts by frequency and keeps cumulative percent monotone", {
 test_that("write_spss refuses a na_range that would swallow valid values", {
   # Audit finding: 4+ missing codes fell back to a min-max na_range without
   # checking whether valid values lie inside - silent data corruption.
-  v <- haven::labelled(c(1, 2, 3, 4, 5, 6, 0, 7, 8, 9),
+  # (0.7.4 practice test, IO-15: codes 0, 7, 8, 9 are now written as range
+  # 7-9 plus the discrete value 0; only a set no range+value form can
+  # cover without valid values errors.)
+  v <- haven::labelled(c(1, 2, 4, 5, 6, 8, 0, 3, 7, 9),
                        labels = c(One = 1, Six = 6))
-  d <- set_na(dplyr::tibble(v = v), v = c(0, 7, 8, 9))
+  d <- set_na(dplyr::tibble(v = v), v = c(0, 3, 7, 9))
   expect_error(write_spss(d, tempfile(fileext = ".sav")), "valid value")
 
-  # Contiguous codes: allowed, but announced
+  # Contiguous codes: allowed, but announced (one message)
   v2 <- haven::labelled(c(1, 2, 3, 6, 7, 8, 9), labels = c(One = 1))
   d2 <- set_na(dplyr::tibble(v = v2), v = c(6, 7, 8, 9))
-  expect_warning(
-    suppressMessages(write_spss(d2, tempfile(fileext = ".sav"))),
+  expect_message(
+    write_spss(d2, tempfile(fileext = ".sav")),
     "missing range"
   )
 })

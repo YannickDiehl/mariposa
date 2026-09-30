@@ -143,6 +143,7 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
     # Clean up mariposa-specific attributes
     attr(x, "na_tag_map") <- NULL
     attr(x, "na_tag_format") <- NULL
+    attr(x, "spss_missing") <- NULL
     data[[i]] <- x
   }
 

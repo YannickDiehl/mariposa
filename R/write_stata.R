@@ -141,6 +141,7 @@ write_stata <- function(data, path, version = 14) {
     # Clean up mariposa-specific attributes (haven doesn't need them)
     attr(x, "na_tag_map") <- NULL
     attr(x, "na_tag_format") <- NULL
+    attr(x, "spss_missing") <- NULL
     data[[i]] <- x
   }
 
