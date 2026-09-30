@@ -10,8 +10,9 @@
 # sums, not unweighted N=2500). The reference was apparently generated
 # with WEIGHT BY active throughout.
 #
-# Therefore: weighted scenarios validate against SPSS; unweighted scenarios
-# are R-only Tier-4 baselines (captured from mariposa unweighted).
+# Therefore: weighted scenarios validate against SPSS here; the unweighted
+# gender x region table is validated against the unweighted CROSSTABS run
+# in fisher_test_output.txt (same table, N = 2500).
 # =============================================================================
 
 library(testthat)
@@ -30,6 +31,18 @@ spss_values <- list(
     phi = 0.015,
     cramers_v = 0.015,
     gamma = 0.037           # chi_squared_output.txt:31
+  ),
+
+  # ---- Unweighted gender x region (CROSSTABS in the Fisher reference) ---
+  unweighted_gender_region = list(
+    chi_squared = 0.415,    # fisher_test_output.txt:27
+    df = 1L,                # fisher_test_output.txt:27
+    p = 0.519,              # fisher_test_output.txt:27
+    continuity = 0.353,     # fisher_test_output.txt:28
+    continuity_p = 0.553,   # fisher_test_output.txt:28
+    n = 2500L,              # fisher_test_output.txt:32
+    phi = 0.013,            # fisher_test_output.txt:39
+    cramers_v = 0.013       # fisher_test_output.txt:40
   )
 )
 
@@ -58,16 +71,24 @@ test_that("Test 2a: chi_square gender × region weighted — matches SPSS", {
 })
 
 
-test_that("Test 1a: chi_square gender × region unweighted — R-only Tier-4", {
-  # SPSS unweighted reference is corrupted (treated as weighted above).
-  # Use mariposa-only baseline captured 2026-05-19.
-  r <- survey_data |> chi_square(gender, region)
-  res <- r$results[1, ]
-  assert_spss(as.numeric(res$chi_squared), 0.415,
-              tier = "display", precision = 3,
-              label = "[1a R-only] chi² (unweighted)")
-  assert_spss_count(as.numeric(res$n), 2500L,
-                    label = "[1a R-only] N (unweighted)")
+test_that("Test 1a: chi_square gender × region unweighted — matches SPSS", {
+  spss <- spss_values$unweighted_gender_region
+  res <- (survey_data |> chi_square(gender, region))$results[1, ]
+  assert_spss(as.numeric(res$chi_squared), spss$chi_squared,
+              tier = "display", precision = 3, label = "[1a] chi²")
+  assert_spss_count(as.numeric(res$df), spss$df, label = "[1a] df")
+  assert_spss(as.numeric(res$p_value), spss$p, tier = "display",
+              precision = 3, what = "p_value", label = "[1a] p-value")
+  assert_spss_count(as.numeric(res$n), spss$n, label = "[1a] N")
+  assert_spss(as.numeric(res$phi), spss$phi, tier = "display",
+              precision = 3, label = "[1a] phi")
+  assert_spss(as.numeric(res$cramers_v), spss$cramers_v, tier = "display",
+              precision = 3, label = "[1a] Cramer's V")
+  cc <- (survey_data |> chi_square(gender, region, correct = TRUE))$results[1, ]
+  assert_spss(as.numeric(cc$chi_squared), spss$continuity, tier = "display",
+              precision = 3, label = "[1a] continuity correction")
+  assert_spss(as.numeric(cc$p_value), spss$continuity_p, tier = "display",
+              precision = 3, what = "p_value", label = "[1a] continuity p")
 })
 
 
