@@ -849,14 +849,14 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     # rounded sum of weights, as SPSS displays it.
     if (show_descriptives && show_group_means && !is.null(stats) && !is.null(stats$group1)) {
       gs <- list(stats$group1, stats$group2)
-      num <- function(field) vapply(gs, function(s) as.numeric(s[[field]] %||% NA_real_), numeric(1))
+      gs_num <- function(field) vapply(gs, function(s) as.numeric(s[[field]] %||% NA_real_), numeric(1))
       cat(sprintf("\n%sGroup Statistics:\n", weighted_prefix))
       .print_table_utf8(data.frame(
         Group = vapply(gs, function(s) as.character(s$name), character(1)),
-        N = formatC(round(num("n")), format = "d"),
-        Mean = fmt_num(num("mean"), digits),
-        `Std. Deviation` = fmt_num(num("sd"), digits),
-        `Std. Error Mean` = fmt_num(num("se"), digits),
+        N = formatC(round(gs_num("n")), format = "d"),
+        Mean = fmt_num(gs_num("mean"), digits),
+        `Std. Deviation` = fmt_num(gs_num("sd"), digits),
+        `Std. Error Mean` = fmt_num(gs_num("se"), digits),
         check.names = FALSE, stringsAsFactors = FALSE
       ), col_labels = c(Group = x$group))
     }
@@ -870,11 +870,11 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         # from the exact p (rounding first turned p = 0.0008 into "**")
         tests <- list(row_results$equal_var_result[[idx]],
                       row_results$unequal_var_result[[idx]])
-        num <- function(f) vapply(tests, function(t) {
+        test_num <- function(f) vapply(tests, function(t) {
           v <- t[[f]]
           if (is.null(v) || length(v) == 0) NA_real_ else as.numeric(v[1])
         }, numeric(1))
-        p_vals <- num("p.value")
+        p_vals <- test_num("p.value")
         mean_diff <- vapply(tests, function(t) {
           as.numeric(t$estimate[1] - t$estimate[2])
         }, numeric(1))
@@ -882,13 +882,13 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         ci_hi <- vapply(tests, function(t) as.numeric(t$conf.int[2]), numeric(1))
         tbl <- data.frame(
           Assumption = c("Equal variances assumed", "Equal variances not assumed"),
-          t = fmt_num(num("statistic"), digits),
+          t = fmt_num(test_num("statistic"), digits),
           # SPSS prints the Student df as a whole number (weighted:
           # sum(w) - 2 rounded), the Welch df with decimals
-          df = .fmt_df(c(round(num("parameter")[1]), num("parameter")[2]), digits),
+          df = .fmt_df(c(round(test_num("parameter")[1]), test_num("parameter")[2]), digits),
           p = fmt_p(p_vals, digits),
-          `Mean Diff.` = fmt_num(ifelse(is.na(num("statistic")), NA_real_, mean_diff), digits),
-          `SE Diff.` = fmt_num(num("stderr"), digits),
+          `Mean Diff.` = fmt_num(ifelse(is.na(test_num("statistic")), NA_real_, mean_diff), digits),
+          `SE Diff.` = fmt_num(test_num("stderr"), digits),
           Lower = fmt_num(ci_lo, digits),
           Upper = fmt_num(ci_hi, digits),
           sig = add_significance_stars(p_vals),
