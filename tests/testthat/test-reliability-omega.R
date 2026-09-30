@@ -5,7 +5,7 @@
 # solution (stats::factanal on the (weighted) correlation matrix). SPSS v27+
 # offers omega in RELIABILITY, but IBM's algorithm documentation is not
 # publicly retrievable and no SPSS v29 reference run exists yet (pending:
-# .claude/spss-syntax-omega-references.sps). Per Charter §4 the statistic is
+# .claude/spss-syntax-0.7.4-references.sps). Per Charter §4 the statistic is
 # therefore Tier 4 (Internal) and validated here by:
 #   1. a parameter-recovery test on simulated congeneric data,
 #   2. an exact cross-check against a manual factanal-based computation,

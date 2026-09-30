@@ -91,7 +91,7 @@ tier4_weighted <- c("mann_whitney", "kruskal_wallis", "wilcoxon_test",
 # Tier 4), named per function. reliability()'s McDonald's omega (0.6.13) is
 # a one-factor ML solution; IBM does not publicly document the SPSS omega
 # algorithm and no SPSS v29 reference run exists yet
-# (.claude/spss-syntax-omega-references.sps), so omega/omega_std/
+# (.claude/spss-syntax-0.7.4-references.sps), so omega/omega_std/
 # omega_if_deleted are Internal (Tier 4) in both the weighted and the
 # unweighted path. Remove the entry once the reference run lands.
 # logistic_regression has no SPSS v29 reference output at all: its

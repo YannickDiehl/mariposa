@@ -542,7 +542,7 @@
 # function uses the same rule: CROSSTABS rounds the sum of the weights per
 # cell (/COUNT ROUND CELL, the default), the binomial test rounds each case
 # weight. Which rule the other NPAR TESTS procedures follow awaits the
-# WEIGHT BY reference run (.claude/spss-syntax-0.7.4-weights.sps).
+# WEIGHT BY reference run (.claude/spss-syntax-0.7.4-references.sps).
 
 #' Weighted cell counts, rounded per cell (SPSS /COUNT ROUND CELL)
 #'

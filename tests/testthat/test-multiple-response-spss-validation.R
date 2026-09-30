@@ -3,7 +3,7 @@
 # =============================================================================
 # Purpose: Validate that multiple_response() implements the SPSS
 # MULT RESPONSE dichotomy-set semantics, without an SPSS reference run
-# (pending, see .claude/BACKLOG.md and spss-syntax-0.7.0-references.sps).
+# (pending, see .claude/BACKLOG.md and spss-syntax-0.7.4-references.sps).
 #
 # Oracle: direct hand-computation from the indicator matrix (colSums /
 # weighted sums), independent of the implementation's matrix algebra.

@@ -394,7 +394,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   # obtained by rescaling loadings/uniquenesses via the (weighted)
   # covariance diagonal. n.obs follows the package's frequency-weight
   # convention (unrounded sum(w), Charter §5.1). Pending the SPSS v29
-  # reference run (.claude/spss-syntax-omega-references.sps, 0.6.13) this
+  # reference run (.claude/spss-syntax-0.7.4-references.sps, 0.6.13) this
   # statistic is Tier 4 / Internal per the Validation Charter (§4).
   # References: McDonald (1999); Hayes & Coutts (2020).
 
