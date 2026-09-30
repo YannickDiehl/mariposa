@@ -360,6 +360,47 @@ test_that("NP-10 fisher_test accepts simulate.p.value and B", {
   expect_match(r$method, "2000")
 })
 
+# --- NP-11: ordered factors in the rank tests ---------------------------------
+
+test_that("NP-11 rank tests accept ordered factors via their codes", {
+  # Was: mann_whitney() failed with "'x' must be numeric", wilcoxon_test()
+  # with "'-' not meaningful for factors" and printed "Z = ,";
+  # kruskal_wallis()/friedman_test() accepted them.
+  d <- dplyr::mutate(
+    survey_data,
+    edu_code = as.integer(education),
+    t_gov = factor(trust_government, levels = 1:5, ordered = TRUE),
+    t_med = factor(trust_media, levels = 1:5, ordered = TRUE),
+    t_sci = factor(trust_science, levels = 1:5, ordered = TRUE)
+  )
+  mw_f <- mann_whitney(d, education, group = gender)$results
+  mw_i <- mann_whitney(d, edu_code, group = gender)$results
+  expect_equal(mw_f$Z, mw_i$Z)
+  expect_equal(mw_f$U, mw_i$U)
+
+  wt_f <- wilcoxon_test(d, x = t_gov, y = t_med)$results
+  wt_i <- wilcoxon_test(d, x = trust_government, y = trust_media)$results
+  expect_equal(wt_f$Z, wt_i$Z)
+
+  kw_f <- kruskal_wallis(d, education, group = region)$results
+  kw_i <- kruskal_wallis(d, edu_code, group = region)$results
+  expect_equal(kw_f$H, kw_i$H)
+
+  fr_f <- friedman_test(d, t_gov, t_med, t_sci)$results
+  fr_i <- friedman_test(d, trust_government, trust_media, trust_science)$results
+  expect_equal(fr_f$chi_squared, fr_i$chi_squared)
+})
+
+test_that("NP-11 rank tests reject nominal variables with a clear error", {
+  # Was: a nominal factor ran (kruskal_wallis) or produced
+  # "not computed for this group" without a group (mann_whitney).
+  expect_error(mann_whitney(survey_data, employment, group = gender),
+               "ordered")
+  expect_error(kruskal_wallis(survey_data, gender, group = education),
+               "ordered")
+  expect_error(wilcoxon_test(survey_data, x = gender, y = region), "ordered")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

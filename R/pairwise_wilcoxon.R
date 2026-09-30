@@ -166,8 +166,8 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
   # Reuses the exact algorithm from wilcoxon_test.R
   perform_single_pw_wilcoxon <- function(data, var1_name, var2_name,
                                          weight_name = NULL) {
-    x_vals <- data[[var1_name]]
-    y_vals <- data[[var2_name]]
+    x_vals <- .np_rank_values(data[[var1_name]])
+    y_vals <- .np_rank_values(data[[var2_name]])
 
     # Remove NA values (pairwise deletion)
     valid_indices <- !is.na(x_vals) & !is.na(y_vals)

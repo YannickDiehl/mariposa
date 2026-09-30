@@ -179,6 +179,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
+  .np_check_rank_vars(data, var_names)
 
   # Process group variable (required for Mann-Whitney test)
   group_quo <- enquo(group)
@@ -206,8 +207,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
   # Helper function to perform Mann-Whitney test for a single variable
   perform_single_mann_whitney <- function(data, var_name, group_name, weight_name = NULL) {
-    # Get the variable values
-    x <- data[[var_name]]
+    # Get the variable values (ordered factors ranked by level order)
+    x <- .np_rank_values(data[[var_name]])
     g <- data[[group_name]]
     
     # Remove NA values

@@ -148,6 +148,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
+  .np_check_rank_vars(data, var_names)
 
   # Process group variable (required for Kruskal-Wallis)
   if (missing(group)) {
@@ -168,8 +169,8 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
   # Helper function to perform Kruskal-Wallis test for a single variable
   perform_single_kw <- function(data, var_name, group_name, weight_name = NULL) {
-    # Get variable values
-    x <- data[[var_name]]
+    # Get variable values (ordered factors ranked by level order)
+    x <- .np_rank_values(data[[var_name]])
     g <- data[[group_name]]
 
     # Remove NA values

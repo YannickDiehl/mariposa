@@ -32,6 +32,46 @@
   droplevels(.group_factor(x))
 }
 
+#' Values to rank for the rank tests
+#'
+#' Ordered factors are ranked by their level order (integer codes), as
+#' kruskal_wallis()/friedman_test() effectively did and SPSS does with the
+#' codes of an ordinal variable; labelled variables by their numeric codes
+#' (tagged NAs become NA); logicals as 0/1.
+#'
+#' @param x Vector
+#' @return Numeric vector
+#' @noRd
+.np_rank_values <- function(x) {
+  if (is.ordered(x)) return(as.integer(x))
+  if (inherits(x, "haven_labelled")) return(.plain_numeric(x))
+  if (is.logical(x)) return(as.numeric(x))
+  x
+}
+
+#' Check that the variables of a rank test are ordinal or metric
+#'
+#' @param data Data frame
+#' @param vars Variable names
+#' @return invisible(TRUE); aborts for nominal/character variables
+#' @noRd
+.np_check_rank_vars <- function(data, vars, call = rlang::caller_env()) {
+  for (v in vars) {
+    x <- data[[v]]
+    if (is.ordered(x) || is.logical(x) || (is.numeric(x) && !is.factor(x))) next
+    kind <- if (is.factor(x)) {
+      "a nominal (unordered) factor"
+    } else {
+      paste0("of type <", class(x)[1], ">")
+    }
+    cli_abort(c(
+      "{.var {v}} is {kind}; rank tests need a numeric variable or an ordered factor.",
+      "i" = "For ordinal categories use {.code factor(x, levels = ..., ordered = TRUE)}; for nominal variables use {.fn chi_square}."
+    ), call = call)
+  }
+  invisible(TRUE)
+}
+
 #' Codes behind the levels of a .np_factor() result
 #'
 #' @param x The original vector

@@ -132,6 +132,14 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
   x_name <- names(x_var)[1]
   y_name <- names(y_var)[1]
+  .np_check_rank_vars(data, c(x_name, y_name))
+  if (is.ordered(data[[x_name]]) && is.ordered(data[[y_name]]) &&
+      !identical(levels(data[[x_name]]), levels(data[[y_name]]))) {
+    cli_abort(c(
+      "{.var {x_name}} and {.var {y_name}} are ordered factors with different levels.",
+      "i" = "Paired differences need the same scale; give both the same levels."
+    ))
+  }
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))
@@ -140,8 +148,9 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
   # Helper function to perform Wilcoxon signed-rank test for a single pair
   perform_single_wilcoxon <- function(data, x_name, y_name, weight_name = NULL) {
-    x_vals <- data[[x_name]]
-    y_vals <- data[[y_name]]
+    # ordered factors are compared by their level codes
+    x_vals <- .np_rank_values(data[[x_name]])
+    y_vals <- .np_rank_values(data[[y_name]])
 
     # Remove NA values (pairwise deletion)
     valid_indices <- !is.na(x_vals) & !is.na(y_vals)

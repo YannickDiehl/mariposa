@@ -157,8 +157,8 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
   # Helper function to perform Dunn test for a single variable
   perform_single_dunn <- function(data, var_name, group_name,
                                   weight_name = NULL, p_adjust_method) {
-    # Get variable values
-    y <- data[[var_name]]
+    # Get variable values (ordered factors ranked by level order)
+    y <- .np_rank_values(data[[var_name]])
     g <- data[[group_name]]
 
     # Remove NA values

@@ -90,3 +90,11 @@
   choose it directly; before, `simulate.p.value = TRUE` was silently
   swallowed by `...`. A group that cannot be tested under `group_by()`
   is reported with a warning instead of a silent `NA` row.
+* The rank tests treat ordered factors consistently as ordinal: they are
+  ranked by their level order. `mann_whitney()` aborted with "'x' must be
+  numeric" and `wilcoxon_test()` with "'-' not meaningful for factors"
+  (printing "Z = ,"), while `kruskal_wallis()` and `friedman_test()`
+  accepted them. A nominal (unordered) factor or character variable is
+  now a clear error in all four tests instead of running silently
+  (`kruskal_wallis(gender, group = education)`) or failing with "not
+  computed for this group" outside any `group_by()`.

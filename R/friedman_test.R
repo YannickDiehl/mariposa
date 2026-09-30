@@ -128,6 +128,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
+  .np_check_rank_vars(data, var_names)
 
   # Friedman requires at least 3 related measurements
   if (length(var_names) < 3) {
@@ -145,8 +146,12 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 
   # Helper function to perform Friedman test
   perform_single_friedman <- function(data, var_names, weight_name = NULL) {
-    # Build matrix of measurements (rows = subjects, cols = variables)
-    mat <- as.matrix(data[, var_names, drop = FALSE])
+    # Build matrix of measurements (rows = subjects, cols = variables);
+    # ordered factors enter with their level codes
+    mat <- do.call(cbind, lapply(var_names, function(v) {
+      as.numeric(.np_rank_values(data[[v]]))
+    }))
+    colnames(mat) <- var_names
 
     # Remove rows with any NA (listwise deletion, matching SPSS)
     if (!is.null(weight_name)) {
