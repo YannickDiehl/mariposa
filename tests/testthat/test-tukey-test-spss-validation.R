@@ -147,3 +147,30 @@ test_that("Test 6a: ANOVA conf.level = .90 keeps the 95% Tukey CI — matches SP
                 precision = 2, label = sprintf("[6a] %s CI upper", pname))
   }
 })
+
+
+# =============================================================================
+# Test 1f: income by employment (5 groups) — 4-decimal confidence limits
+# =============================================================================
+# Needs the studentized-range quantile to more digits than qtukey() gives
+# (about 1e-8 relative): 214.4432484 would print as 214.4432.
+
+spss_values$test_1f_income_employment <- list(
+  "Student - Employed"      = list(diff = 907.63143,  se = 180.90363, p = "<.001", ci_lower = 413.7538,  ci_upper = 1401.5090),  # tukey_test_output.txt:174
+  "Student - Unemployed"    = list(diff = 987.65360,  se = 209.86916, p = "<.001", ci_lower = 414.6984,  ci_upper = 1560.6088),  # tukey_test_output.txt:175
+  "Student - Retired"       = list(diff = 886.02319,  se = 188.62321, p = "<.001", ci_lower = 371.0707,  ci_upper = 1400.9757),  # tukey_test_output.txt:176
+  "Student - Other"         = list(diff = 833.29779,  se = 226.68174, p = 0.002,   ci_lower = 214.4433,  ci_upper = 1452.1523),  # tukey_test_output.txt:177
+  "Employed - Unemployed"   = list(diff = 80.02217,   se = 119.34373, p = 0.963,   ci_lower = -245.7933, ci_upper = 405.8376),   # tukey_test_output.txt:179
+  "Employed - Retired"      = list(diff = -21.60824,  se = 76.00378,  p = 0.999,   ci_lower = -229.1031, ci_upper = 185.8866),   # tukey_test_output.txt:180
+  "Employed - Other"        = list(diff = -74.33364,  se = 146.90974, p = 0.987,   ci_lower = -475.4059, ci_upper = 326.7386),   # tukey_test_output.txt:181
+  "Unemployed - Retired"    = list(diff = -101.63041, se = 130.74983, p = 0.937,   ci_lower = -458.5852, ci_upper = 255.3243),   # tukey_test_output.txt:184
+  "Unemployed - Other"      = list(diff = -154.35581, se = 181.38747, p = 0.914,   ci_lower = -649.5543, ci_upper = 340.8427),   # tukey_test_output.txt:185
+  "Retired - Other"         = list(diff = -52.72540,  se = 156.31719, p = 0.997,   ci_lower = -479.4806, ci_upper = 374.0298)    # tukey_test_output.txt:189
+)
+
+test_that("Test 1f: Tukey income by employment — matches SPSS", {
+  av <- survey_data |> oneway_anova(income, group = employment)
+  compare_tukey_pairs(tukey_test(av)$results,
+                      spss_values$test_1f_income_employment,
+                      prec_diff = 5, prec_ci = 4, scenario = "1f")
+})

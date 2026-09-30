@@ -1394,6 +1394,10 @@ but were never asserted. These are now fixed and asserted:
   statistics moved SE, confidence limits and Sig. off SPSS (e.g. SE
   62.521 instead of 62.534, Sig. .089 instead of .090); about 550 printed
   values in the reference runs.
+* `tukey_test()` confidence limits use the studentized range quantile to
+  full precision. `qtukey()` is accurate to about 1e-8, which moved
+  4-decimal limits of income differences (214.4432 instead of SPSS's
+  214.4433).
 
 ## Validation
 

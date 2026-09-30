@@ -1033,7 +1033,7 @@ tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
           p_adj <- stats::ptukey(q_stat, k, df_error, lower.tail = FALSE)
 
           # Confidence interval
-          q_crit <- stats::qtukey(conf.level, k, df_error)
+          q_crit <- .qtukey_precise(conf.level, k, df_error)
           ci_lower <- diff - q_crit * se
           ci_upper <- diff + q_crit * se
 
@@ -1057,7 +1057,8 @@ tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
         mse_1way <- sum(stats::residuals(one_way_aov)^2) / one_way_aov$df.residual
         tk <- .tukeyhsd_to_ij(tukey_result[[factor_name]], lv,
                               n = as.numeric(table(droplevels(g))[lv]),
-                              mse = mse_1way)
+                              mse = mse_1way, df = one_way_aov$df.residual,
+                              conf.level = conf.level)
         results_list[[length(results_list) + 1]] <- data.frame(
           Factor = factor_name,
           tk[, c("Comparison", "Estimate", "conf_low", "conf_high", "p_adjusted")],

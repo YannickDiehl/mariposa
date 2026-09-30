@@ -35,7 +35,7 @@
   t_stat <- diff / se
 
   # Critical value from studentized range distribution
-  q_crit <- qtukey(conf.level, n_groups, df) / sqrt(2)
+  q_crit <- .qtukey_precise(conf.level, n_groups, df) / sqrt(2)
 
   # Confidence interval
   margin <- q_crit * se
@@ -53,6 +53,26 @@
     conf_high = conf_high,
     p_adjusted = p_adjusted
   )
+}
+
+#' Studentized range quantile to full precision
+#'
+#' qtukey() is accurate to about 1e-8 relative, which moves 4-decimal SPSS
+#' confidence limits of large differences (income: 214.4432484 instead of
+#' SPSS's 214.4433). Refined by inverting ptukey() around qtukey()'s value.
+#'
+#' @param p Probability (confidence level)
+#' @param nmeans Number of groups
+#' @param df Error degrees of freedom
+#' @return Quantile q
+#' @noRd
+.qtukey_precise <- function(p, nmeans, df) {
+  q0 <- stats::qtukey(p, nmeans, df)
+  f <- function(q) stats::ptukey(q, nmeans, df) - p
+  lower <- q0 * (1 - 1e-4)
+  upper <- q0 * (1 + 1e-4)
+  if (!is.finite(q0) || f(lower) * f(upper) > 0) return(q0)
+  stats::uniroot(f, c(lower, upper), tol = 1e-13)$root
 }
 
 #' Scheffe critical-value / p-value / CI core
@@ -156,7 +176,8 @@
 
     results_df <- .tukeyhsd_to_ij(tukey_result$g, group_levels,
                                   n = as.numeric(table(g)[group_levels]),
-                                  mse = mse)
+                                  mse = mse, df = aov_result$df.residual,
+                                  conf.level = conf.level)
     results_df <- cbind(Variable = var_name, results_df,
                         stringsAsFactors = FALSE)
 
@@ -285,22 +306,26 @@
 #' @param levels Factor levels in order
 #' @param n Group sizes (same order as levels)
 #' @param mse Error mean square of the ANOVA (for the SPSS Std. Error)
+#' @param df Error degrees of freedom of the ANOVA
+#' @param conf.level Confidence level
 #' @return data.frame Comparison, Estimate, SE, t_value, conf_low,
 #'   conf_high, p_adjusted
 #' @noRd
-.tukeyhsd_to_ij <- function(tk, levels, n, mse) {
+.tukeyhsd_to_ij <- function(tk, levels, n, mse, df, conf.level) {
   pairs <- utils::combn(seq_along(levels), 2)
   i <- pairs[1, ]
   j <- pairs[2, ]
   est <- -as.numeric(tk[, "diff"])
   se <- sqrt(mse * (1 / n[i] + 1 / n[j]))
+  # Same limits as TukeyHSD(), with the precise studentized range quantile
+  margin <- .qtukey_precise(conf.level, length(levels), df) / sqrt(2) * se
   data.frame(
     Comparison = paste(levels[i], "-", levels[j]),
     Estimate = est,
     SE = se,
     t_value = est / se,
-    conf_low = -as.numeric(tk[, "upr"]),
-    conf_high = -as.numeric(tk[, "lwr"]),
+    conf_low = est - margin,
+    conf_high = est + margin,
     p_adjusted = as.numeric(tk[, "p adj"]),
     stringsAsFactors = FALSE
   )
