@@ -290,7 +290,8 @@ row_count <- function(data, ..., count, na.rm = TRUE) {
     }
     as.matrix(data[, numeric_cols, drop = FALSE])
   } else {
-    vars <- .process_variables(data, ...)
+    # Row-wise, not per group: a grouping variable may be part of the row
+    vars <- .process_variables(data, ..., drop_groups = FALSE, call = call)
     var_names <- names(vars)
 
     for (var_name in var_names) {

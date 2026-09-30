@@ -110,11 +110,20 @@ NULL
 #' Handles the ... expressions passed to statistical functions and returns a named
 #' vector of column positions.
 #'
+#' Grouping columns of grouped data are dropped from the selection
+#' (.drop_grouping_vars(), as dplyr::across() does) unless
+#' `drop_groups = FALSE` (transformations such as rec() may recode a
+#' grouping variable).
+#'
 #' @param data A data frame
 #' @param ... Variable selection expressions (tidyselect compatible)
+#' @param drop_groups Drop the grouping columns of grouped data from the
+#'   selection (with a message)?
+#' @param call Environment of the user-facing function
 #' @return Named integer vector of column positions
 #' @noRd
-.process_variables <- function(data, ..., call = rlang::caller_env()) {
+.process_variables <- function(data, ..., drop_groups = TRUE,
+                               call = rlang::caller_env()) {
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.", call = call)
   }
@@ -125,6 +134,7 @@ NULL
     cli_abort("No variables selected. Please specify at least one variable.", call = call)
   }
 
+  if (drop_groups) vars <- .drop_grouping_vars(data, vars, call = call)
   vars
 }
 
@@ -336,4 +346,39 @@ get_value_labels <- function(x, freq_names) {
     return(factor(match(v, vals), levels = seq_along(vals), labels = lv))
   }
   factor(g)
+}
+
+# Entry helpers (argument and input handling)
+# -------------------------------------------
+
+#' Drop grouping variables from a variable selection
+#'
+#' Selecting a grouping column of grouped data (explicitly, or through a
+#' helper such as where(is.numeric)) made the analyses crash or misbehave:
+#' group_modify() hands each group's data without its grouping columns, and
+#' within a group the grouping variable is a constant (correlations with
+#' zero SD, reliability using it as an item, t-tests on constant data). As
+#' dplyr::across() does, grouping columns are excluded from the analysed
+#' variables; a message says so. Called by .process_variables().
+#'
+#' @param data Data frame (possibly grouped)
+#' @param vars Named integer vector from .process_variables()
+#' @param call Caller environment for the error
+#' @return `vars` without grouping columns; errors when nothing is left
+#' @noRd
+.drop_grouping_vars <- function(data, vars, call = rlang::caller_env()) {
+  if (!inherits(data, "grouped_df")) return(vars)
+  grp <- intersect(names(vars), dplyr::group_vars(data))
+  if (length(grp) == 0) return(vars)
+  vars <- vars[!names(vars) %in% grp]
+  if (length(vars) == 0) {
+    cli_abort(c(
+      "No variables left to analyze.",
+      "x" = "{.var {grp}} {?is a/are} grouping variable{?s}; {?it defines/they define} the groups."
+    ), call = call)
+  }
+  cli::cli_inform(
+    "Grouping variable{?s} {.var {grp}} {?is/are} not analyzed ({?it defines/they define} the groups)."
+  )
+  vars
 }

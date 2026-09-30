@@ -125,7 +125,6 @@
   }
 
   vars <- .process_variables(data, ..., call = call)
-  vars <- .drop_grouping_vars(data, vars, call = call)
   var_names <- names(vars)
 
   # Selected variables must suit the statistic (numeric, except for the
@@ -434,37 +433,6 @@ print.summary.w_statistic <- function(x, ...) {
 #' @noRd
 .w_has_missing <- function(x, w = NULL) {
   anyNA(x) || (!is.null(w) && anyNA(w))
-}
-
-
-#' Drop grouping variables from a variable selection
-#'
-#' Selecting a grouping column of grouped data (explicitly, or through a
-#' helper such as where(is.numeric)) made describe() and the w_* functions
-#' crash: group_modify() hands each group's data without its grouping
-#' columns. As dplyr::across() does, grouping columns are excluded from the
-#' analysed variables; a message says so.
-#'
-#' @param data Data frame (possibly grouped)
-#' @param vars Named integer vector from .process_variables()
-#' @param call Caller environment for the error
-#' @return `vars` without grouping columns; errors when nothing is left
-#' @noRd
-.drop_grouping_vars <- function(data, vars, call = rlang::caller_env()) {
-  if (!inherits(data, "grouped_df")) return(vars)
-  grp <- intersect(names(vars), dplyr::group_vars(data))
-  if (length(grp) == 0) return(vars)
-  vars <- vars[!names(vars) %in% grp]
-  if (length(vars) == 0) {
-    cli_abort(c(
-      "No variables left to analyze.",
-      "x" = "{.var {grp}} {?is a/are} grouping variable{?s}; {?it defines/they define} the groups."
-    ), call = call)
-  }
-  cli::cli_inform(
-    "Grouping variable{?s} {.var {grp}} {?is/are} not analyzed ({?it defines/they define} the groups)."
-  )
-  vars
 }
 
 

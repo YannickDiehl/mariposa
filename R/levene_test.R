@@ -171,6 +171,7 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
     cli_abort("At least one variable must be specified.", call = call)
   }
   vars <- tidyselect::eval_select(rlang::expr(c(!!!dots)), data = data)
+  vars <- .drop_grouping_vars(data, vars, call = call)
   var_names <- names(vars)
   if (length(var_names) == 0) {
     cli_abort("At least one variable must be specified.", call = call)

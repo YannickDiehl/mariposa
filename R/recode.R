@@ -216,7 +216,9 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   # DATA FRAME INPUT
   # ============================================================================
 
-  vars <- .process_variables(data, ...)
+  # Recoding is not a per-group computation: a grouping variable may be
+  # recoded too
+  vars <- .process_variables(data, ..., drop_groups = FALSE)
 
   for (i in vars) {
     col_name <- names(data)[i]
@@ -870,7 +872,7 @@ to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
   # DATA FRAME INPUT
   # ============================================================================
 
-  vars <- .process_variables(data, ...)
+  vars <- .process_variables(data, ..., drop_groups = FALSE)
   dummy_cols <- tibble::tibble(.rows = nrow(data))
 
   for (i in vars) {
