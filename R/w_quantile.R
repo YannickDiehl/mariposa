@@ -235,7 +235,10 @@ print.summary.w_quantile <- function(x, ...) {
   }
 
   if (isTRUE(x$is_grouped)) {
-    for_each_group(x$results, x$groups, function(rows, combo) emit(rows))
+    for_each_group(x$results, x$groups, function(rows, combo) {
+      cat("\n")
+      emit(rows)
+    })
   } else {
     cat("\n")
     emit(x$results)

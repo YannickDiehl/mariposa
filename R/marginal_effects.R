@@ -502,12 +502,13 @@ print.summary.marginal_effects <- function(x, ...) {
       print_stat_table(df, col_labels = labels)
     }
 
-    cat("\n")
     if (x$is_grouped) {
       for_each_group(x$results, x$group_vars, function(rows, group_values) {
+        cat("\n")
         emit(rows)
       })
     } else {
+      cat("\n")
       emit(x$results)
     }
 

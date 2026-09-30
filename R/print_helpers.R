@@ -20,7 +20,7 @@
 print_header <- function(title, newline_before = TRUE) {
   if (newline_before) cat("\n")
   cat(title, "\n", sep = "")
-  cat(paste(rep("-", nchar(title)), collapse = ""), "\n", sep = "")
+  cat(strrep("-", nchar(title, type = "width")), "\n", sep = "")
 }
 
 #' Print test information section
@@ -65,16 +65,21 @@ print_significance_legend <- function(show = TRUE) {
   }
 }
 
-#' Print the plain one-line group label used by for_each_group()
+#' Print the group header used by for_each_group()
 #'
-#' Bare "Group: ..." line without the underline that
-#' \code{print_group_header()} adds.
+#' The single verbose group-header style: "Group: var = value, ..." plus a
+#' dash underline of the same display width (as print_group_header()).
+#' It printed "Group: ... " with a trailing blank and no underline, one of
+#' four header styles in the verbose outputs.
 #'
 #' @param label Pre-formatted "var = value, ..." string
+#' @param prefix Text before the label
 #' @return invisible(NULL)
 #' @noRd
-print_group_label <- function(label) {
-  cat("\nGroup:", label, "\n")
+print_group_label <- function(label, prefix = "Group") {
+  header_text <- paste0(prefix, ": ", label)
+  cat("\n", header_text, "\n",
+      strrep("-", nchar(header_text, type = "width")), "\n", sep = "")
   invisible(NULL)
 }
 
@@ -90,9 +95,7 @@ print_group_header <- function(group_values, prefix = "Group") {
   } else {
     group_str <- paste(names(group_values), "=", group_values, collapse = ", ")
   }
-  header_text <- paste0(prefix, ": ", group_str)
-  cat("\n", header_text, "\n", sep = "")
-  cat(paste(rep("-", nchar(header_text)), collapse = ""), "\n", sep = "")
+  print_group_label(group_str, prefix)
 }
 
 #' Pad strings to a given display width (UTF-8 safe)
@@ -158,7 +161,10 @@ format_number <- function(x, digits = 3, scientific = FALSE) {
 #' @noRd
 get_standard_title <- function(test_name, weights = NULL, suffix = "Results") {
   prefix <- if (!is.null(weights)) "Weighted " else ""
-  paste0(prefix, test_name, " ", suffix)
+  # an empty suffix left a trailing blank ("Pearson Correlation "), and the
+  # underline came out one dash longer than the visible title
+  if (nzchar(suffix)) paste0(prefix, test_name, " ", suffix)
+  else paste0(prefix, test_name)
 }
 
 #' Print standard test parameters

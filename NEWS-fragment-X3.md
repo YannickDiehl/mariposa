@@ -21,3 +21,11 @@
   and no longer raise integer-coercion warnings in the t-test, one-way
   ANOVA, factorial ANOVA/ANCOVA, Levene and reliability tables: every
   count is formatted as a whole number without integer coercion.
+* Grouped output uses one group-header style in every verbose table:
+  `describe()`, the `w_*()` functions and the summaries of
+  `levene_test()`, `normality_test()`, `marginal_effects()` and the
+  post-hoc tests printed "Group: region = East " with a trailing blank and
+  no underline, all other summaries an underlined header. Section titles
+  without a suffix ("Pearson Correlation", "Chi-Squared Test of
+  Independence", "Levene's Test for Homogeneity of Variance") no longer end
+  in a blank with an underline one dash too long.

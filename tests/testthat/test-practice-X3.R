@@ -106,3 +106,63 @@ test_that("REG-16: the legacy .print_cor_matrix()/.print_single_pair() are gone"
   i <- grep("Inter-Item Correlation Matrix", out, fixed = TRUE)
   expect_true(any(grepl("1\\.0000", out[i:(i + 12)])))
 })
+
+# --- EDGE-23: one group-header style, no trailing blanks in headers -----------
+
+test_that("EDGE-23: verbose group headers share one style without a trailing blank", {
+  # describe()/w_*()/levene summary printed "Group: region = East " (cat()
+  # added a blank, no underline) while every other summary underlined the
+  # header: four header styles for the same thing.
+  hdr <- capture.output(mariposa:::print_group_label("region = East"))
+  expect_identical(hdr, c("", "Group: region = East", "--------------------"))
+  expect_identical(
+    hdr,
+    capture.output(mariposa:::print_group_header(
+      data.frame(region = factor("East", levels = c("East", "West")))
+    ))
+  )
+  g <- dplyr::group_by(survey_data, region)
+  for (out in list(capture.output(print(describe(g, age))),
+                   capture.output(print(w_mean(g, age))),
+                   capture.output(print(summary(levene_test(g, age,
+                                                            group = gender)))))) {
+    i <- grep("^Group: region = East", out)
+    expect_length(i, 1L)
+    expect_identical(out[i], "Group: region = East")
+    expect_match(out[i + 1L], "^-{20}$")
+  }
+})
+
+test_that("EDGE-23: grouped tables never follow the header underline directly", {
+  # With the underlined header a table rule right below it would make a
+  # double rule; each grouped table is separated by a blank line.
+  rule <- function(l) grepl("^\\s*-+\\s*$", l)
+  g <- dplyr::group_by(survey_data, region)
+  for (out in list(capture.output(print(describe(g, age))),
+                   capture.output(print(w_mean(g, age))),
+                   capture.output(print(w_quantile(g, age))),
+                   capture.output(print(summary(normality_test(g, age)))))) {
+    r <- rule(out)
+    expect_false(any(r[-1] & r[-length(r)]))
+  }
+})
+
+test_that("EDGE-23: section titles without a suffix end without a blank", {
+  # get_standard_title(name, w, "") returned "name " - the underline of
+  # "Pearson Correlation " was one dash longer than the title.
+  expect_identical(mariposa:::get_standard_title("Levene's Test", NULL, ""),
+                   "Levene's Test")
+  expect_identical(mariposa:::get_standard_title("Levene's Test", "w", ""),
+                   "Weighted Levene's Test")
+  out <- capture.output(print(summary(pearson_cor(survey_data, age, income,
+                                                  life_satisfaction))))
+  i <- grep("^Pearson Correlation", out)[1]
+  expect_identical(out[i], "Pearson Correlation")
+  expect_identical(nchar(out[i + 1L]), nchar(out[i]))
+  for (out in list(
+    capture.output(print(summary(chi_square(survey_data, education, gender)))),
+    capture.output(print(summary(levene_test(survey_data, age, group = gender))))
+  )) {
+    expect_false(any(grepl("[^ ] $", out)))
+  }
+})

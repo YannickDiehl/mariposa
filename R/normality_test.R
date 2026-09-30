@@ -416,6 +416,7 @@ print.summary.normality_test <- function(x, ...) {
     cat("\nTests of Normality\n")
     if (x$is_grouped) {
       for_each_group(x$results, x$group_vars, function(rows, group_values) {
+        cat("\n")
         table_for(rows)
       })
     } else {

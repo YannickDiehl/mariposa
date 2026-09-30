@@ -453,6 +453,8 @@ print.summary.describe <- function(x, ...) {
   # One "Group: var = value, ..." line per group combination (value
   # labels, NA-safe matching), then that group's table
   for_each_group(x$results, x$group_vars, function(group_data, combo) {
+    # blank line between the underlined group header and the table rule
+    cat("\n")
     temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted,
                                      digits = digits, probs = x$probs)
     .print_desc_table(temp_output, digits = digits)
