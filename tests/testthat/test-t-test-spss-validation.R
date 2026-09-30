@@ -687,10 +687,9 @@ spss_values <- list(
 #'   - One-Sample Test:       t, df, Sig (1-/2-sided), Mean Difference, CI bounds
 #'
 #' mariposa's t_test() result$results columns for one-sample:
-#'   - t_stat, df, p_value, mean_diff (the OBSERVED mean, not the difference),
-#'     conf_int_lower/upper (the OBSERVED-mean CI)
-#'
-#' SPSS's "Mean Difference" = observed_mean - mu, so we adjust on the R side.
+#'   - t_stat, df, p_value, mean_diff (observed mean - mu, as SPSS),
+#'     conf_int_lower/upper (CI of the difference, as SPSS)
+#'   - group_stats: means, n, sd, se (SPSS "One-Sample Statistics")
 #'
 #' @param r_result A t_test result object (one-sample form)
 #' @param spss     The corresponding spss_values entry
@@ -698,7 +697,6 @@ spss_values <- list(
 compare_one_sample <- function(r_result, spss, scenario) {
 
   r <- r_result$results[1, ]
-  mu <- r_result$mu %||% 0
 
   # ---- t-statistic (Display) -----------------------------------------------
   # SPSS prints t to 3 decimals → Display tier, precision = 3 (tol ±5e-4).
@@ -728,10 +726,10 @@ compare_one_sample <- function(r_result, spss, scenario) {
               tier = "display", precision = 3,
               label = sprintf("[%s] one-sided p", scenario))
 
-  # ---- Mean Difference (= R's mean_diff - mu) ----------------------------
-  # mariposa stores result$results$mean_diff = the observed (weighted) mean
-  # for the one-sample case (R/t_test.R:354). SPSS reports the difference.
-  r_mean_diff <- r$mean_diff - mu
+  # ---- Mean Difference (observed mean - mu) ------------------------------
+  # Since 0.7.4 mariposa stores the difference itself (PAR-06); earlier
+  # versions stored the observed mean and this helper subtracted mu.
+  r_mean_diff <- r$mean_diff
   # Precision in SPSS varies: 3 dp for life_satisfaction, 5 dp for income/age.
   # We pick precision per the SPSS print width; the spss_values comment shows.
   precision <- if (abs(spss$mean_diff) >= 100) 4L else 3L
@@ -739,9 +737,9 @@ compare_one_sample <- function(r_result, spss, scenario) {
               tier = "display", precision = precision,
               label = sprintf("[%s] Mean Difference", scenario))
 
-  # ---- CI for Mean Difference (= R's CI - mu) ----------------------------
-  r_ci_lower <- r$conf_int_lower - mu
-  r_ci_upper <- r$conf_int_upper - mu
+  # ---- CI for Mean Difference --------------------------------------------
+  r_ci_lower <- r$conf_int_lower
+  r_ci_upper <- r$conf_int_upper
 
   ci_precision <- if (abs(spss$ci_lower) >= 100) 4L else 2L
   assert_spss(r_ci_lower, spss$ci_lower,
@@ -758,14 +756,20 @@ compare_one_sample <- function(r_result, spss, scenario) {
                       label = sprintf("[%s] N", scenario))
   }
 
-  # ---- Descriptives gap ------------------------------------------------
-  # TODO Phase 2: mariposa's t_test() does NOT expose Mean, SD, SE in
-  # result$results for one-sample tests. SPSS prints these as the
-  # "One-Sample Statistics" table. Adding a $descriptives field to t_test()
-  # would let us validate spss$mean (3.63), spss$sd (1.153), spss$se (0.023).
-  # Currently we can only assert mean_diff (which we derive from r$mean_diff,
-  # and which equals the observed mean - mu).
-  # See R/t_test.R structure() at line 649.
+  # ---- One-Sample Statistics: Mean, SD, SE (0.7.4, PAR-06) --------------
+  # SPSS prints 2 decimals for the life_satisfaction mean and 3 for its
+  # SD/SE; 4 (mean) and 5 (SD, SE) for income and age.
+  st <- r$group_stats[[1]]
+  wide <- abs(spss$mean) >= 10
+  assert_spss(st$means, spss$mean,
+              tier = "display", precision = if (wide) 4L else 2L,
+              label = sprintf("[%s] Mean", scenario))
+  assert_spss(st$sd, spss$sd,
+              tier = "display", precision = if (wide) 5L else 3L,
+              label = sprintf("[%s] Std. Deviation", scenario))
+  assert_spss(st$se, spss$se,
+              tier = "display", precision = if (wide) 5L else 3L,
+              label = sprintf("[%s] Std. Error Mean", scenario))
 
   invisible(NULL)
 }

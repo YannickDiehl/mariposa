@@ -39,3 +39,12 @@
   not available", the post-hoc tests dropped the group without a word,
   and `levene_test()` warned "in group 1" (the factor code). (PAR-18,
   EDGE-13)
+* One-sample `t_test()` follows the SPSS One-Sample Test: `mean_diff` is
+  now the mean minus the test value `mu` (was: the mean itself, e.g.
+  3.628 instead of 0.628) and `conf_int_lower`/`conf_int_upper` are the
+  confidence interval of that difference. The weighted interval now
+  follows `alternative` (it was always two-sided). `summary()` shows the
+  test value, alternative, confidence level and a One-Sample Statistics
+  table (N, Mean, Std. Deviation, Std. Error Mean) and no longer prints an
+  effect-size legend for effect sizes a one-sample test does not have.
+  (PAR-05, PAR-06)

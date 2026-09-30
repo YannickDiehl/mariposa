@@ -428,7 +428,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     if (length(x) < 2) .not_computed("fewer than 2 valid values")
     if (is.null(weight_name)) {
       test_result <- t.test(x, mu = mu, alternative = alternative, conf.level = conf.level)
-      group_stats <- list(means = mean(x, na.rm = TRUE), n = length(x))
+      sd_x <- stats::sd(x)
+      group_stats <- list(means = mean(x), n = length(x), sd = sd_x,
+                          se = sd_x / sqrt(length(x)))
     } else {
       # Weighted one-sample t-test (SPSS frequency-weights convention)
       #
@@ -441,6 +443,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       weighted_mean <- sum(x * w) / sum(w)
       sw <- sum(w)                     # unrounded; used in all calculations
       n_display <- round(sw)           # rounded; only for display/N column
+      if (sw <= 1) .not_computed("sum of weights <= 1: no variance estimate")
 
       # Variance using sum(w) - 1 in denominator (SPSS frequency weights)
       numerator <- sum(w * (x - weighted_mean)^2)
@@ -461,7 +464,15 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         p_value <- pt(t_stat, df, lower.tail = FALSE)
       }
 
-      conf_int <- weighted_mean + c(-1, 1) * qt((1 + conf.level)/2, df) * se
+      # Confidence interval of the mean, one-sided for one-sided
+      # alternatives (as t.test() and the two-sample path do)
+      conf_int <- if (alternative == "two.sided") {
+        weighted_mean + c(-1, 1) * qt((1 + conf.level)/2, df) * se
+      } else if (alternative == "less") {
+        c(-Inf, weighted_mean + qt(conf.level, df) * se)
+      } else {
+        c(weighted_mean - qt(conf.level, df) * se, Inf)
+      }
 
       test_result <- list(
         statistic = t_stat,
@@ -471,15 +482,18 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         estimate = weighted_mean
       )
       # group_stats reports the SPSS-displayed (rounded) N
-      group_stats <- list(means = weighted_mean, n = n_display)
+      group_stats <- list(means = weighted_mean, n = n_display,
+                          sd = weighted_sd, se = se)
     }
 
+    # SPSS One-Sample Test: "Mean Difference" = mean - test value, and the
+    # confidence interval of that difference (not of the mean)
     return(list(
       t_stat = as.numeric(test_result$statistic),
       df = as.numeric(test_result$parameter),
       p_value = as.numeric(test_result$p.value),
-      mean_diff = as.numeric(test_result$estimate),
-      conf_int = as.numeric(test_result$conf.int),
+      mean_diff = as.numeric(test_result$estimate) - mu,
+      conf_int = as.numeric(test_result$conf.int) - mu,
       cohens_d = list(cohens_d = NA, hedges_g = NA, glass_delta = NA),
       group_levels = NULL,
       group_stats = group_stats,
@@ -790,12 +804,25 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       print_test_parameters(test_params)
       cat("\n")
     }
+  } else {
+    # One-sample test: the SPSS "Test Value" and the test settings
+    cat("\n")
+    print_info_section(list(
+      "Test value (mu)" = format(x$mu),
+      "Weights variable" = weights_name
+    ))
+    print_test_parameters(list(alternative = x$alternative,
+                               conf.level = x$conf.level))
+    cat("\n")
   }
 
   # Resolve show toggles (default TRUE when called without summary object)
   show_descriptives <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
   show_results      <- if (!is.null(x$show)) isTRUE(x$show$results) else TRUE
   show_effect_sizes <- if (!is.null(x$show)) isTRUE(x$show$effect_sizes) else TRUE
+  # Effect sizes exist only for two-sample tests: no legend for tables
+  # that are never printed (one-sample)
+  any_effects <- show_effect_sizes && any(!is.na(x$results$cohens_d))
 
   # Internal helper: print a single variable row from a results data frame
   .print_var_row <- function(row_results, idx, show_group_means) {
@@ -848,22 +875,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         print(spss_df, row.names = FALSE)
         cat(border, "\n")
       } else {
-        results_df <- data.frame(
-          Assumption = "t-test",
-          t_stat = round(row_results$t_stat[idx], digits),
-          df = round(row_results$df[idx], digits),
-          p_value = round(row_results$p_value[idx], digits),
-          mean_diff = round(row_results$mean_diff[idx], digits),
-          conf_int = sprintf("[%.3f, %.3f]",
-                            row_results$conf_int_lower[idx],
-                            row_results$conf_int_upper[idx]),
-          sig = row_results$sig[idx]
-        )
-        cat(sprintf("\n%s:\n", results_label))
-        border <- paste(rep("-", 70), collapse = "")
-        cat(border, "\n")
-        print(results_df, row.names = FALSE)
-        cat(border, "\n")
+        .print_t_test_one_sample(row_results, idx, x, digits,
+                                 show_descriptives)
       }
     }
 
@@ -912,7 +925,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   if (show_results) {
     print_significance_legend()
   }
-  if (show_effect_sizes) {
+  if (any_effects) {
     cat("\nEffect Size Interpretation:\n")
     cat("- Cohen's d: pooled standard deviation (classic)\n")
     cat("- Hedges' g: bias-corrected Cohen's d (preferred)\n")
@@ -921,6 +934,48 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     cat("- Medium effect: |effect| ~ 0.5\n")
     cat("- Large effect: |effect| ~ 0.8\n")
   }
+}
+
+#' One-sample blocks of the verbose t-test output (SPSS layout)
+#'
+#' "One-Sample Statistics" (N, Mean, Std. Deviation, Std. Error Mean) and
+#' "One-Sample Test" (t, df, p, Mean Difference = mean - test value, CI of
+#' the difference).
+#' @noRd
+.print_t_test_one_sample <- function(row_results, idx, x, digits,
+                                     show_descriptives = TRUE) {
+  stats <- row_results$group_stats[[idx]]
+  weighted <- !is.null(x$weights)
+  if (show_descriptives && !is.null(stats)) {
+    cat(sprintf("\n%sOne-Sample Statistics:\n", if (weighted) "Weighted " else ""))
+    print_stat_table(data.frame(
+      N = formatC(round(stats$n), format = "d"),
+      Mean = fmt_num(stats$means, digits),
+      `Std. Deviation` = fmt_num(stats$sd %||% NA_real_, digits),
+      `Std. Error Mean` = fmt_num(stats$se %||% NA_real_, digits),
+      check.names = FALSE, stringsAsFactors = FALSE
+    ), digits = digits)
+  }
+  p_val <- as.numeric(row_results$p_value[idx])
+  ci_label <- paste0(format(100 * x$conf.level), "% CI")
+  tbl <- data.frame(
+    t = fmt_num(row_results$t_stat[idx], digits),
+    df = .fmt_df(row_results$df[idx], digits),
+    p = fmt_p(p_val, digits),
+    `Mean Difference` = fmt_num(row_results$mean_diff[idx], digits),
+    Lower = fmt_num(row_results$conf_int_lower[idx], digits),
+    Upper = fmt_num(row_results$conf_int_upper[idx], digits),
+    sig = add_significance_stars(p_val),
+    check.names = FALSE, stringsAsFactors = FALSE
+  )
+  cat(sprintf("\n%sOne-Sample Test (test value = %s):\n",
+              if (weighted) "Weighted " else "", format(x$mu)))
+  print_stat_table(tbl, digits = digits,
+                   col_types = c(p = "char"),
+                   col_labels = c(Lower = paste(ci_label, "Lower"),
+                                  Upper = paste(ci_label, "Upper"),
+                                  sig = ""))
+  invisible(NULL)
 }
 
 #' Print t-test results (compact)

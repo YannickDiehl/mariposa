@@ -113,3 +113,16 @@
     paste0(" in group ", .format_group_label(group_info))
   } else ""
 }
+
+#' Degrees of freedom for display
+#'
+#' Whole numbers without decimals (2419), others with `digits` decimals
+#' (Welch 2384.147; weighted sum(w) - 1), as in SPSS tables. NA -> "".
+#' @noRd
+.fmt_df <- function(df, digits = 3) {
+  df <- as.numeric(df)
+  whole <- !is.na(df) & abs(df - round(df)) < 1e-8
+  out <- fmt_num(df, digits)
+  out[whole] <- formatC(round(df[whole]), format = "d")
+  out
+}

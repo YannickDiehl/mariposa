@@ -218,3 +218,47 @@ test_that("PAR-18: grouped oneway/tukey/levene warn with the group label", {
   expect_warning(lv <- levene_test(r), "region = East")
   expect_false(any(grepl("in group 1", tryCatch(levene_test(r), warning = conditionMessage))))
 })
+
+# --- PAR-05 / PAR-06: one-sample t-test ---------------------------------------
+
+test_that("PAR-05: the weighted one-sample CI follows `alternative`", {
+  # The weighted CI was always two-sided ([3.579, 3.671] for "greater",
+  # unweighted gives a one-sided [3.590, Inf)).
+  r <- t_test(survey_data, life_satisfaction, mu = 3.5,
+              alternative = "greater", weights = sampling_weight)
+  expect_identical(r$results$conf_int_upper, Inf)
+  expect_true(is.finite(r$results$conf_int_lower))
+  r_less <- t_test(survey_data, life_satisfaction, mu = 3.5,
+                   alternative = "less", weights = sampling_weight)
+  expect_identical(r_less$results$conf_int_lower, -Inf)
+  # the w == 1 case reproduces the unweighted one-sided interval
+  d <- survey_data
+  d$one <- 1
+  rw <- t_test(d, life_satisfaction, mu = 3.5, alternative = "greater",
+               weights = one)
+  ru <- t_test(d, life_satisfaction, mu = 3.5, alternative = "greater")
+  expect_equal(rw$results$conf_int_lower, ru$results$conf_int_lower)
+})
+
+test_that("PAR-06: one-sample mean difference and CI are relative to mu (SPSS)", {
+  # mean_diff held the mean (3.628) and the CI the CI of the mean; SPSS's
+  # One-Sample Test shows Mean Difference .628 and the CI of the difference.
+  r <- t_test(survey_data, life_satisfaction, mu = 3)
+  ref <- stats::t.test(survey_data$life_satisfaction, mu = 3)
+  expect_equal(r$results$mean_diff, unname(ref$estimate) - 3)
+  expect_equal(c(r$results$conf_int_lower, r$results$conf_int_upper),
+               as.numeric(ref$conf.int) - 3)
+  assert_spss(r$results$mean_diff, 0.628, tier = "display", precision = 3,
+              label = "PAR-06 one-sample Mean Difference")  # t_test_output.txt:18
+
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("Test value", out)))
+  expect_true(any(grepl("Alternative hypothesis", out)))
+  expect_true(any(grepl("Confidence level", out)))
+  expect_true(any(grepl("Std. Deviation", out, fixed = TRUE)))
+  expect_true(any(grepl("2421", out, fixed = TRUE)))        # N
+  expect_true(any(grepl("1.153", out, fixed = TRUE)))       # SD (SPSS 1.153)
+  # no legend for effect sizes that are not shown
+  expect_false(any(grepl("Effect Size Interpretation", out, fixed = TRUE)))
+  expect_false(any(grepl("Cohen", out, fixed = TRUE)))
+})
