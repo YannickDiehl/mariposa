@@ -20,6 +20,15 @@
 #' @param row The row variable (categorical)
 #' @param col The column variable (categorical)
 #' @param weights Optional survey weights for population-representative results
+#' @param simulate.p.value Compute the p-value by Monte Carlo simulation
+#'   instead of exactly? (Default: FALSE). For large tables (many rows and
+#'   columns, large N) the exact network algorithm can run out of memory
+#'   ("FEXACT error"); \code{fisher_test()} then switches to the Monte Carlo
+#'   p-value automatically with a warning. SPSS offers the same choice
+#'   (Exact Tests: "Exact" or "Monte Carlo"). Call \code{set.seed()} first
+#'   for reproducible Monte Carlo results.
+#' @param B Number of Monte Carlo replicates (Default: 10000, the SPSS
+#'   default number of samples).
 #' @param ... Additional arguments (currently unused)
 #'
 #' @return Test results showing whether two categorical variables are related,
@@ -104,7 +113,8 @@
 #'
 #' @family hypothesis_tests
 #' @export
-fisher_test <- function(data, row, col, weights = NULL, ...) {
+fisher_test <- function(data, row, col, weights = NULL,
+                        simulate.p.value = FALSE, B = 10000, ...) {
 
   # Input validation
   if (!is.data.frame(data)) {
@@ -142,7 +152,7 @@ fisher_test <- function(data, row, col, weights = NULL, ...) {
   w_name <- weights_info$name
 
   # Helper to perform Fisher test on a single data slice
-  perform_single_fisher <- function(data_slice) {
+  perform_single_fisher <- function(data_slice, key = NULL) {
     r <- data_slice[[row_name]]
     cc <- data_slice[[col_name]]
 
@@ -167,7 +177,7 @@ fisher_test <- function(data, row, col, weights = NULL, ...) {
     n <- sum(tbl)
 
     # Perform Fisher's exact test
-    ft <- fisher.test(tbl, workspace = 2e7)
+    ft <- .fisher_exact_or_mc(tbl, simulate.p.value, B, key)
 
     list(
       p_value = ft$p.value,
@@ -184,7 +194,7 @@ fisher_test <- function(data, row, col, weights = NULL, ...) {
 
     results_list <- lapply(seq_along(data_list), function(i) {
       tryCatch({
-        res <- perform_single_fisher(data_list[[i]])
+        res <- perform_single_fisher(data_list[[i]], group_keys_df[i, , drop = FALSE])
         cbind(
           group_keys_df[i, , drop = FALSE],
           data.frame(
@@ -195,6 +205,11 @@ fisher_test <- function(data, row, col, weights = NULL, ...) {
           )
         )
       }, error = function(e) {
+        where <- .np_where(group_keys_df[i, , drop = FALSE])
+        cli_warn(c(
+          "Fisher's exact test skipped{where}.",
+          "x" = "{conditionMessage(e)}"
+        ))
         cbind(
           group_keys_df[i, , drop = FALSE],
           data.frame(
@@ -454,4 +469,36 @@ print.summary.fisher_test <- function(x, ...) {
     print_significance_legend()
   }
   invisible(x)
+}
+
+#' Fisher's exact test with a Monte Carlo fallback
+#'
+#' The FEXACT network algorithm fails on larger tables ("FEXACT error 501:
+#' the hash table key cannot be computed", "LDKEY is too small", ...). SPSS
+#' offers a Monte Carlo p-value for that case; so does fisher.test(). The
+#' fallback is announced with a warning naming the group.
+#'
+#' @param tbl Contingency table
+#' @param simulate Use the Monte Carlo p-value from the start?
+#' @param B Monte Carlo replicates
+#' @param key One-row group key or NULL (for the warning)
+#' @return htest object
+#' @noRd
+.fisher_exact_or_mc <- function(tbl, simulate, B, key = NULL) {
+  if (isTRUE(simulate)) {
+    return(stats::fisher.test(tbl, simulate.p.value = TRUE, B = B))
+  }
+  tryCatch(
+    stats::fisher.test(tbl, workspace = 2e7),
+    error = function(e) {
+      msg <- conditionMessage(e)
+      if (!grepl("FEXACT|LDKEY|LDSTP|workspace", msg)) stop(e)
+      where <- .np_where(key)
+      cli_warn(c(
+        "Exact p-value not computable for this {nrow(tbl)}x{ncol(tbl)} table{where}; using a Monte Carlo p-value ({B} replicates).",
+        "i" = "SPSS offers the same Monte Carlo option; use {.code set.seed()} for reproducible results or {.code simulate.p.value = TRUE} to choose it directly."
+      ))
+      stats::fisher.test(tbl, simulate.p.value = TRUE, B = B)
+    }
+  )
 }

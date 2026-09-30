@@ -336,6 +336,30 @@ test_that("NP-14 pairwise_wilcoxon reports the N of each pair", {
   expect_true(any(grepl(as.character(fr$results$n), out, fixed = TRUE)))
 })
 
+# --- NP-10: fisher_test on larger tables --------------------------------------
+
+test_that("NP-10 fisher_test falls back to Monte Carlo when FEXACT fails", {
+  # Was: raw "FEXACT error 501 ... hash table key" abort for a 4x5 table.
+  set.seed(42)
+  expect_warning(
+    r <- fisher_test(survey_data, row = education, col = employment),
+    "Monte Carlo"
+  )
+  expect_true(is.numeric(r$p_value) && r$p_value > 0 && r$p_value <= 1)
+  expect_match(r$method, "simulated")
+})
+
+test_that("NP-10 fisher_test accepts simulate.p.value and B", {
+  # Was: simulate.p.value = TRUE landed in `...` and was ignored.
+  set.seed(1)
+  expect_no_warning(
+    r <- fisher_test(survey_data, row = education, col = employment,
+                     simulate.p.value = TRUE, B = 2000)
+  )
+  expect_match(r$method, "simulated")
+  expect_match(r$method, "2000")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

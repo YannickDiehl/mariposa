@@ -82,3 +82,11 @@
   deletion, exactly like the SPSS `/WILCOXON` tests the results are
   validated against), while `friedman_test()` uses complete cases. The
   comparison table prints p-values in SPSS style (`<.001`, `.123`).
+* `fisher_test()` handles larger tables: instead of aborting with the raw
+  "FEXACT error 501 ... hash table key cannot be computed" it now falls
+  back to a Monte Carlo p-value with a warning (SPSS offers the same
+  "Monte Carlo" option next to "Exact"). The new arguments
+  `simulate.p.value` and `B` (default 10000 replicates, the SPSS default)
+  choose it directly; before, `simulate.p.value = TRUE` was silently
+  swallowed by `...`. A group that cannot be tested under `group_by()`
+  is reported with a warning instead of a silent `NA` row.
