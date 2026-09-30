@@ -14,3 +14,9 @@
   (`probs = 1/3` gives `Q33.33`, not `Q33.3333333333333`), no longer
   prints Q50 next to the identical Median, and reports undefined
   statistics of a constant variable as `NA` instead of `NaN`.
+* `describe()` and the `w_*` functions on grouped data no longer crash when
+  the selection contains a grouping variable (explicitly or through a
+  helper such as `where(is.numeric)`); errors ranged from "'x' is NULL"
+  and "quantile.haven_labelled() not implemented" to a dplyr internal
+  error. As in `dplyr::across()`, grouping variables are excluded from the
+  analysed variables, with a message.

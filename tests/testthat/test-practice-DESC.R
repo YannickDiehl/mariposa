@@ -103,3 +103,30 @@ test_that("DESC-15: describe() validates show and prints no NaN or duplicates", 
   expect_false(any(vapply(rk$results, function(v) any(is.nan(v)), logical(1))))
   expect_false(any(grepl("NaN", capture.output(print(rk)))))
 })
+
+
+# --- EDGE-08: grouping variable inside the selection ---------------------------
+
+test_that("EDGE-08: describe()/w_* drop grouping variables from the selection", {
+  # Selecting the grouping variable itself (explicitly or via
+  # where(is.numeric)) crashed: "'x' ist NULL" in describe(), a dplyr
+  # internal error in w_mean(). Like dplyr::across(), grouping columns are
+  # now excluded, with a message.
+  g <- survey_data |> mutate(g = as.integer(region)) |> group_by(g)
+  expect_message(r <- describe(g, age, g), "Grouping variable")
+  expect_equal(r$variables, "age")
+  expect_message(r2 <- describe(g, where(is.numeric)), "Grouping variable")
+  expect_false("g" %in% r2$variables)
+  expect_true("age" %in% r2$variables)
+  expect_message(w <- w_mean(g, age, g, weights = sampling_weight),
+                 "Grouping variable")
+  expect_equal(w$variables, "age")
+  expect_equal(nrow(w$results), 2L)
+  expect_error(suppressMessages(describe(g, g)), "grouping")
+
+  skip_if_not_installed("haven")
+  d <- survey_data
+  d$lab <- haven::labelled(as.integer(d$region), c(East = 1, West = 2))
+  expect_message(r3 <- describe(group_by(d, lab), age, lab), "Grouping variable")
+  expect_equal(r3$variables, "age")
+})

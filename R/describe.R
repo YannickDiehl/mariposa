@@ -137,6 +137,7 @@ describe <- function(data, ..., weights = NULL,
   
   # Get variable names using tidyselect
   vars <- .process_variables(data, ...)
+  vars <- .drop_grouping_vars(data, vars)
 
   # Validate that all selected variables are numeric (describe-specific)
   for (var_name in names(vars)) {
