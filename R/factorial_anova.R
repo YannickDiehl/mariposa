@@ -37,6 +37,12 @@
 #'   \item{call_info}{List with metadata (dv, factors, weighted, n_total, n_missing)}
 #' }
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
+#'   For data grouped with \code{group_by()}, one ANOVA is computed per group:
+#'   the tables carry the group keys as leading columns, \code{group_results}
+#'   holds the complete result of each group (\code{NULL}, with a warning, for
+#'   a group that cannot be analysed), and \code{print()}, \code{summary()},
+#'   \code{tukey_test()}, \code{scheffe_test()} and \code{levene_test()} report
+#'   per group.
 #'
 #' @details
 #' ## Understanding the Results
@@ -112,6 +118,11 @@
 #' survey_data %>%
 #'   factorial_anova(dv = life_satisfaction, between = c(gender, region),
 #'                   weights = sampling_weight)
+#'
+#' # Separate ANOVA for each region
+#' survey_data %>%
+#'   group_by(region) %>%
+#'   factorial_anova(dv = life_satisfaction, between = c(gender, education))
 #'
 #' # Three-way ANOVA
 #' survey_data %>%
@@ -192,6 +203,23 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
   data <- weights_info$data
   w_name <- weights_info$name
 
+  # Grouped data (group_by()): one complete analysis per group, the
+  # weighting semantics of each group's fit are those of an ungrouped call
+  if (inherits(data, "grouped_df")) {
+    return(.factorial_anova_grouped(data, dv_name, between_names, w_name, ss_type))
+  }
+
+  .factorial_anova_fit(data, dv_name, between_names, w_name, ss_type, call = rlang::current_env())
+}
+
+#' One factorial_anova (the whole data or one group of a grouped analysis)
+#'
+#' Problems that make the analysis impossible (too few cases, a factor with
+#' one level, a DV without variance) abort for ungrouped data and skip the
+#' group with a warning naming it for grouped data (.fit_problem()).
+#' @noRd
+.factorial_anova_fit <- function(data, dv_name, between_names, w_name, ss_type, group_info = NULL,
+                    call = rlang::caller_env()) {
   # ============================================================================
   # DATA PREPARATION
   # ============================================================================
@@ -211,7 +239,8 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
   n_missing <- sum(!complete_idx)
 
   if (n_total < length(between_names) + 2) {
-    cli_abort("Insufficient observations ({n_total}) after removing missing values.")
+    .fit_problem(sprintf("insufficient observations (%d) after removing missing values",
+                         n_total), dv_name, group_info, call)
   }
 
   # Convert factors: ensure all between variables are factors
@@ -220,6 +249,11 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     data_complete[[bn]] <- .group_factor(data_complete[[bn]])
     # Drop unused levels
     data_complete[[bn]] <- droplevels(data_complete[[bn]])
+    if (nlevels(data_complete[[bn]]) < 2) {
+      .fit_problem(sprintf("factor `%s` has only one level with valid data (%s)",
+                           bn, paste(levels(data_complete[[bn]]), collapse = "")),
+                   dv_name, group_info, call)
+    }
   }
 
   # A constant DV (or one constant within every cell) has SS = 0/0 up to
@@ -228,13 +262,8 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     data_complete[[dv_name]],
     interaction(data_complete[between_names], drop = TRUE)
   )
-  if (!is.null(reason)) {
-    cli_abort(c(
-      "Dependent variable {.var {dv_name}} cannot be analysed.",
-      "x" = "{reason}"
-    ))
-  }
-  .warn_empty_cells("factorial_anova", data_complete, between_names)
+  if (!is.null(reason)) .fit_problem(reason, dv_name, group_info, call)
+  .warn_empty_cells("factorial_anova", data_complete, between_names, group_info)
 
   # ============================================================================
   # MODEL FITTING WITH TYPE III SS
@@ -345,6 +374,52 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
 # ==============================================================================
 # INTERNAL HELPERS
 # ==============================================================================
+
+#' Grouped factorial ANOVA: one fit per group_by() group
+#'
+#' The per-group tables are bound into the top-level tables with the group
+#' keys as leading columns; the complete per-group results (for print,
+#' summary and post-hoc tests) are kept in $group_results (NULL for a group
+#' that could not be analysed, reason in $group_notes).
+#' @noRd
+.factorial_anova_grouped <- function(data, dv_name, between_names, w_name,
+                                     ss_type) {
+  g <- .grouped_model_fits("factorial_anova", data, dv_name, function(d, gi) {
+    .factorial_anova_fit(d, dv_name, between_names, w_name, ss_type,
+                         group_info = gi)
+  })
+  fits <- g$fits
+  ok <- !vapply(fits, is.null, logical(1))
+  structure(
+    list(
+      anova_table = .bind_group_tables(fits, g$keys, "anova_table"),
+      descriptives = .bind_group_tables(fits, g$keys, "descriptives"),
+      levene_test = .bind_group_tables(fits, g$keys, "levene_test"),
+      r_squared = NULL,
+      model = NULL,
+      lm_model = NULL,
+      call_info = list(
+        dv = dv_name,
+        factors = between_names,
+        weighted = !is.null(w_name),
+        weight_name = w_name,
+        n_total = sum(vapply(fits[ok], function(f) f$call_info$n_total, numeric(1))),
+        n_missing = sum(vapply(fits[ok], function(f) f$call_info$n_missing, numeric(1))),
+        ss_type = ss_type
+      ),
+      data = NULL,
+      variables = dv_name,
+      group = between_names,
+      weights = w_name,
+      is_grouped = TRUE,
+      groups = g$group_vars,
+      group_keys = g$keys,
+      group_results = fits,
+      group_notes = g$notes
+    ),
+    class = "factorial_anova"
+  )
+}
 
 #' Parse between-subjects factor specification
 #' @param between_quo Quosure from enquo(between)
@@ -641,6 +716,17 @@ print.factorial_anova <- function(x, digits = 3, ...) {
   weighted_tag <- if (info$weighted) " [Weighted]" else ""
   factor_str <- paste(info$factors, collapse = ", ")
 
+  if (isTRUE(x$is_grouped)) {
+    cat(sprintf("Factorial ANOVA (%d-Way): %s by %s%s\n",
+                n_factors, info$dv, factor_str, weighted_tag))
+    .print_grouped_fits(x, function(fit, label) {
+      cat(sprintf("[%s] N = %s\n", label,
+                  formatC(fit$call_info$n_total, format = "d")))
+      .print_effect_lines(fit$anova_table, digits)
+    })
+    return(invisible(x))
+  }
+
   # N once in the title (it was appended to the last effect line only)
   cat(sprintf("Factorial ANOVA (%d-Way): %s by %s%s, N = %s\n",
               n_factors, info$dv, factor_str, weighted_tag,
@@ -832,13 +918,15 @@ print.summary.factorial_anova <- function(x, ...) {
   # Info section
   cat("\n")
   factor_str <- paste(info$factors, collapse = " x ")
+  grouped <- isTRUE(x$is_grouped)
   test_info <- list(
     "Dependent variable" = info$dv,
     "Factors" = factor_str,
     "Sum of squares" = "Type III",
     "Weights variable" = info$weight_name,
-    "N (complete cases)" = as.character(info$n_total),
-    "Missing" = as.character(info$n_missing)
+    "Grouped by" = if (grouped) paste(x$groups, collapse = ", "),
+    "N (complete cases)" = if (!grouped) as.character(info$n_total),
+    "Missing" = if (!grouped) as.character(info$n_missing)
   )
   print_info_section(test_info)
   cat("\n")
@@ -848,12 +936,23 @@ print.summary.factorial_anova <- function(x, ...) {
   show_desc    <- if (!is.null(x$show)) isTRUE(x$show$descriptives) else TRUE
   show_levene  <- if (!is.null(x$show)) isTRUE(x$show$levene_test) else TRUE
 
-  if (show_between) .print_between_subjects(x, digits)
-  if (show_desc) {
-    .print_cell_descriptives(x$descriptives, info$factors, digits,
-                             weighted = !is.null(x$weights))
+  sections <- function(fit) {
+    if (show_between) .print_between_subjects(fit, digits)
+    if (show_desc) {
+      .print_cell_descriptives(fit$descriptives, info$factors, digits,
+                               weighted = !is.null(x$weights))
+    }
+    if (show_levene) .print_levene_line(fit$levene_test, digits)
   }
-  if (show_levene) .print_levene_line(x$levene_test, digits)
+  if (grouped) {
+    .print_grouped_fits(x, function(fit, label) {
+      cat(sprintf("N (complete cases): %s, Missing: %s\n\n",
+                  fit$call_info$n_total, fit$call_info$n_missing))
+      sections(fit)
+    }, style = "header")
+  } else {
+    sections(x)
+  }
 
   # Significance legend (show if any section with p-values was printed)
   if (show_between || show_levene) {
@@ -870,6 +969,9 @@ print.summary.factorial_anova <- function(x, ...) {
 
 #' @export
 tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
+  if (isTRUE(x$is_grouped)) {
+    return(.factorial_posthoc_grouped(x, "tukey", conf.level))
+  }
 
   info <- x$call_info
 
@@ -988,6 +1090,9 @@ tukey_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
 
 #' @export
 scheffe_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
+  if (isTRUE(x$is_grouped)) {
+    return(.factorial_posthoc_grouped(x, "scheffe", conf.level))
+  }
 
   info <- x$call_info
 
@@ -1090,6 +1195,28 @@ scheffe_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
 levene_test.factorial_anova <- function(x, center = c("mean", "median"), ...) {
   center <- rlang::arg_match(center)
 
+  if (isTRUE(x$is_grouped)) {
+    rows <- lapply(seq_along(x$group_results), function(i) {
+      fit <- x$group_results[[i]]
+      if (is.null(fit)) return(NULL)
+      res <- levene_test.factorial_anova(fit, center = center)$results
+      dplyr::bind_cols(x$group_keys[rep(i, nrow(res)), , drop = FALSE], res)
+    })
+    return(structure(
+      list(
+        results = dplyr::bind_rows(rows),
+        variables = x$call_info$dv,
+        group = paste(x$call_info$factors, collapse = " * "),
+        weights = x$weights,
+        center = center,
+        is_grouped = TRUE,
+        groups = x$groups,
+        original_test = x
+      ),
+      class = "levene_test"
+    ))
+  }
+
   # Recompute if median-based is requested, otherwise return stored result
   if (center == "mean") {
     return(
@@ -1146,5 +1273,37 @@ levene_test.factorial_anova <- function(x, center = c("mean", "median"), ...) {
       original_test = x
     ),
     class = "levene_test"
+  )
+}
+
+
+#' Post-hoc tests on a grouped factorial ANOVA: one run per group
+#' @noRd
+.factorial_posthoc_grouped <- function(x, method, conf.level) {
+  fn <- if (method == "tukey") tukey_test.factorial_anova else scheffe_test.factorial_anova
+  rows <- lapply(seq_along(x$group_results), function(i) {
+    fit <- x$group_results[[i]]
+    if (is.null(fit)) return(NULL)
+    gi <- x$group_keys[i, , drop = FALSE]
+    res <- tryCatch(fn(fit, conf.level = conf.level)$results, error = function(e) {
+      .warn_not_computed(paste0(method, "_test"), x$call_info$dv,
+                         conditionMessage(e), gi)
+      NULL
+    })
+    if (is.null(res) || nrow(res) == 0) return(NULL)
+    dplyr::bind_cols(gi[rep(1, nrow(res)), , drop = FALSE], res)
+  })
+  structure(
+    list(
+      results = dplyr::bind_rows(rows),
+      conf.level = conf.level,
+      call_info = x$call_info,
+      is_factorial = TRUE,
+      is_grouped = TRUE,
+      groups = x$groups,
+      weights = x$call_info$weight_name,
+      group = paste(x$call_info$factors, collapse = " x ")
+    ),
+    class = paste0(method, "_test")
   )
 }

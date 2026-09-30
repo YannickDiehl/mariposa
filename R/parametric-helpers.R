@@ -226,3 +226,81 @@
   ), call = NULL)
   invisible(cells)
 }
+
+#' Abort (ungrouped) or skip the group (grouped) when a model cannot be fit
+#' @noRd
+.fit_problem <- function(reason, dv_name, group_info = NULL,
+                         call = rlang::caller_env()) {
+  if (!is.null(group_info)) .not_computed(reason)
+  cli_abort(c(
+    "Dependent variable {.var {dv_name}} cannot be analysed.",
+    "x" = "{reason}"
+  ), call = call)
+}
+
+#' Run a model fit once per group_by() group
+#'
+#' @param fn Function name for warnings
+#' @param data grouped_df
+#' @param dv_name Dependent variable (for warnings)
+#' @param fit_fun function(group_data, group_info) returning a result list
+#' @return list(group_vars, keys, fits, notes): fits is NULL (and notes the
+#'   reason) for a group that could not be analysed; a warning names it
+#' @noRd
+.grouped_model_fits <- function(fn, data, dv_name, fit_fun) {
+  group_vars <- dplyr::group_vars(data)
+  data_list <- dplyr::group_split(data)
+  keys <- dplyr::group_keys(data)
+  notes <- rep(NA_character_, length(data_list))
+  fits <- lapply(seq_along(data_list), function(i) {
+    gi <- keys[i, , drop = FALSE]
+    skip <- function(e) {
+      notes[i] <<- conditionMessage(e)
+      .warn_not_computed(fn, dv_name, conditionMessage(e), gi)
+      NULL
+    }
+    tryCatch({
+      res <- fit_fun(dplyr::ungroup(data_list[[i]]), gi)
+      res$group_info <- gi
+      res
+    }, mariposa_not_computed = skip, error = skip)
+  })
+  list(group_vars = group_vars, keys = keys, fits = fits, notes = notes)
+}
+
+#' Bind one table of every group fit, group keys as leading columns
+#' @noRd
+.bind_group_tables <- function(fits, keys, element) {
+  rows <- lapply(seq_along(fits), function(i) {
+    tab <- fits[[i]][[element]]
+    if (is.null(tab) || nrow(tab) == 0) return(NULL)
+    dplyr::bind_cols(keys[rep(i, nrow(tab)), , drop = FALSE],
+                     tibble::as_tibble(tab))
+  })
+  dplyr::bind_rows(rows)
+}
+
+#' Iterate the per-group fits of a grouped factorial_anova / ancova result
+#'
+#' @param x Grouped result (group_results, group_keys, group_notes)
+#' @param fun function(fit, label) printing one group
+#' @param style "compact" ("[label]" lines) or "header" (print_group_header)
+#' @noRd
+.print_grouped_fits <- function(x, fun, style = c("compact", "header")) {
+  style <- match.arg(style)
+  for (i in seq_along(x$group_results)) {
+    keys <- x$group_keys[i, , drop = FALSE]
+    label <- .format_group_label(keys)
+    fit <- x$group_results[[i]]
+    if (style == "header") print_group_header(keys)
+    if (is.null(fit)) {
+      note <- x$group_notes[i]
+      if (style == "compact") cat(sprintf("[%s]\n", label))
+      cat(sprintf("  not computed (%s)\n",
+                  if (!is.na(note)) note else "see warning"))
+      next
+    }
+    fun(fit, label)
+  }
+  invisible(NULL)
+}

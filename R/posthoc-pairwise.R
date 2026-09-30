@@ -607,9 +607,19 @@
     x$results$sig <- sapply(x$results$p_adjusted, add_significance_stars)
 
     if (show_comparisons) {
-      for (fct in unique(x$results$Factor)) {
-        cat(sprintf("\n--- Factor: %s ---\n\n", fct))
-        .print_posthoc_table(x$results[x$results$Factor == fct, ], digits)
+      factor_tables <- function(rows) {
+        for (fct in unique(rows$Factor)) {
+          cat(sprintf("\n--- Factor: %s ---\n\n", fct))
+          .print_posthoc_table(rows[rows$Factor == fct, ], digits)
+        }
+      }
+      if (isTRUE(x$is_grouped) && length(x$groups) > 0 &&
+          all(x$groups %in% names(x$results))) {
+        for_each_group(x$results, x$groups, function(rows, group_values) {
+          factor_tables(rows)
+        })
+      } else {
+        factor_tables(x$results)
       }
 
       print_significance_legend()

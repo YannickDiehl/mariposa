@@ -47,6 +47,10 @@
 #'   \item{call_info}{List with metadata (dv, factors, covariates, weighted, etc.)}
 #' }
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
+#'   For data grouped with \code{group_by()}, one ANCOVA is computed per group:
+#'   the tables carry the group keys as leading columns and
+#'   \code{group_results} holds the complete result of each group
+#'   (\code{NULL}, with a warning, for a group that cannot be analysed).
 #'
 #' @details
 #' ## Understanding the Results
@@ -194,6 +198,23 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   data <- weights_info$data
   w_name <- weights_info$name
 
+  # Grouped data (group_by()): one complete analysis per group, the
+  # weighting semantics of each group's fit are those of an ungrouped call
+  if (inherits(data, "grouped_df")) {
+    return(.ancova_grouped(data, dv_name, between_names, covariate_names, w_name, ss_type))
+  }
+
+  .ancova_fit(data, dv_name, between_names, covariate_names, w_name, ss_type, call = rlang::current_env())
+}
+
+#' One ancova (the whole data or one group of a grouped analysis)
+#'
+#' Problems that make the analysis impossible (too few cases, a factor with
+#' one level, a DV without variance) abort for ungrouped data and skip the
+#' group with a warning naming it for grouped data (.fit_problem()).
+#' @noRd
+.ancova_fit <- function(data, dv_name, between_names, covariate_names, w_name, ss_type, group_info = NULL,
+                    call = rlang::caller_env()) {
   # ============================================================================
   # DATA PREPARATION
   # ============================================================================
@@ -211,7 +232,8 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   n_missing <- sum(!complete_idx)
 
   if (n_total < length(between_names) + length(covariate_names) + 2) {
-    cli_abort("Insufficient observations ({n_total}) after removing missing values.")
+    .fit_problem(sprintf("insufficient observations (%d) after removing missing values",
+                         n_total), dv_name, group_info, call)
   }
 
   # Convert factors
@@ -219,6 +241,11 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
     # SPSS order (by code) and value labels instead of codes
     data_complete[[bn]] <- .group_factor(data_complete[[bn]])
     data_complete[[bn]] <- droplevels(data_complete[[bn]])
+    if (nlevels(data_complete[[bn]]) < 2) {
+      .fit_problem(sprintf("factor `%s` has only one level with valid data (%s)",
+                           bn, paste(levels(data_complete[[bn]]), collapse = "")),
+                   dv_name, group_info, call)
+    }
   }
 
   # A constant DV (or one constant within every cell) has SS = 0/0 up to
@@ -227,13 +254,8 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
     data_complete[[dv_name]],
     interaction(data_complete[between_names], drop = TRUE)
   )
-  if (!is.null(reason)) {
-    cli_abort(c(
-      "Dependent variable {.var {dv_name}} cannot be analysed.",
-      "x" = "{reason}"
-    ))
-  }
-  .warn_empty_cells("ancova", data_complete, between_names)
+  if (!is.null(reason)) .fit_problem(reason, dv_name, group_info, call)
+  .warn_empty_cells("ancova", data_complete, between_names, group_info)
 
   # ============================================================================
   # MODEL FITTING WITH TYPE III SS
@@ -362,6 +384,51 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 # ==============================================================================
 # INTERNAL HELPERS
 # ==============================================================================
+
+#' Grouped ANCOVA: one fit per group_by() group (see .factorial_anova_grouped)
+#' @noRd
+.ancova_grouped <- function(data, dv_name, between_names, covariate_names,
+                            w_name, ss_type) {
+  g <- .grouped_model_fits("ancova", data, dv_name, function(d, gi) {
+    .ancova_fit(d, dv_name, between_names, covariate_names, w_name, ss_type,
+                group_info = gi)
+  })
+  fits <- g$fits
+  ok <- !vapply(fits, is.null, logical(1))
+  structure(
+    list(
+      anova_table = .bind_group_tables(fits, g$keys, "anova_table"),
+      parameter_estimates = .bind_group_tables(fits, g$keys, "parameter_estimates"),
+      descriptives = .bind_group_tables(fits, g$keys, "descriptives"),
+      estimated_marginal_means = .bind_group_tables(fits, g$keys, "estimated_marginal_means"),
+      emm_main_effects = NULL,
+      levene_test = .bind_group_tables(fits, g$keys, "levene_test"),
+      r_squared = NULL,
+      model = NULL,
+      call_info = list(
+        dv = dv_name,
+        factors = between_names,
+        covariates = covariate_names,
+        weighted = !is.null(w_name),
+        weight_name = w_name,
+        n_total = sum(vapply(fits[ok], function(f) f$call_info$n_total, numeric(1))),
+        n_missing = sum(vapply(fits[ok], function(f) f$call_info$n_missing, numeric(1))),
+        ss_type = ss_type
+      ),
+      data = NULL,
+      variables = dv_name,
+      group = between_names,
+      weights = w_name,
+      is_grouped = TRUE,
+      groups = g$group_vars,
+      group_keys = g$keys,
+      group_results = fits,
+      group_notes = g$notes
+    ),
+    class = "ancova"
+  )
+}
+
 
 #' Build ANCOVA table from lm model and drop1 results
 #' @noRd
@@ -679,6 +746,17 @@ print.ancova <- function(x, digits = 3, ...) {
   factor_str <- paste(info$factors, collapse = ", ")
   cov_str <- paste(info$covariates, collapse = ", ")
 
+  if (isTRUE(x$is_grouped)) {
+    cat(sprintf("ANCOVA: %s by %s, covariate: %s%s\n",
+                info$dv, factor_str, cov_str, weighted_tag))
+    .print_grouped_fits(x, function(fit, label) {
+      cat(sprintf("[%s] N = %s\n", label,
+                  formatC(fit$call_info$n_total, format = "d")))
+      .print_effect_lines(fit$anova_table, digits, covariates = info$covariates)
+    })
+    return(invisible(x))
+  }
+
   # N once in the title (it was appended to the last effect line only)
   cat(sprintf("ANCOVA: %s by %s, covariate: %s%s, N = %s\n",
               info$dv, factor_str, cov_str, weighted_tag,
@@ -778,14 +856,16 @@ print.summary.ancova <- function(x, ...) {
   cat("\n")
   factor_str <- paste(info$factors, collapse = " x ")
   cov_str <- paste(info$covariates, collapse = ", ")
+  grouped <- isTRUE(x$is_grouped)
   test_info <- list(
     "Dependent variable" = info$dv,
     "Factor(s)" = factor_str,
     "Covariate(s)" = cov_str,
     "Sum of squares" = "Type III",
     "Weights variable" = info$weight_name,
-    "N (complete cases)" = as.character(info$n_total),
-    "Missing" = as.character(info$n_missing)
+    "Grouped by" = if (grouped) paste(x$groups, collapse = ", "),
+    "N (complete cases)" = if (!grouped) as.character(info$n_total),
+    "Missing" = if (!grouped) as.character(info$n_missing)
   )
   print_info_section(test_info)
   cat("\n")
@@ -796,60 +876,71 @@ print.summary.ancova <- function(x, ...) {
   show_emm     <- if (!is.null(x$show)) isTRUE(x$show$marginal_means) else TRUE
   show_levene  <- if (!is.null(x$show)) isTRUE(x$show$levene_test) else TRUE
 
-  if (show_between) .print_between_subjects(x, digits)
+  sections <- function(fit) {
+    if (show_between) .print_between_subjects(fit, digits)
 
-  # ---- PARAMETER ESTIMATES ----
-  if (show_params) {
-    cat("\nParameter Estimates\n")
-    pe <- x$parameter_estimates
-    redundant <- if ("redundant" %in% names(pe)) pe$redundant else rep(FALSE, nrow(pe))
-    .print_table_utf8(data.frame(
-      Parameter = pe$parameter,
-      B = ifelse(redundant, "0 (a)", .fmt_coef(pe$b, digits)),
-      SE = .fmt_coef(pe$se, digits),
-      t = fmt_num(pe$t, digits),
-      Sig = fmt_p(pe$p, digits),
-      Lower = .fmt_coef(pe$ci_lower, digits),
-      Upper = .fmt_coef(pe$ci_upper, digits),
-      Eta = fmt_num(pe$partial_eta_sq, digits),
-      stringsAsFactors = FALSE
-    ), col_labels = c(SE = "Std. Error", Lower = "95% CI Lower",
-                      Upper = "95% CI Upper", Eta = "Partial Eta Squared"))
-    if (any(redundant)) {
-      cat("(a) This parameter is set to zero because it is redundant (SPSS coding: the\n")
-      cat("    last category of each factor is the reference).\n")
-    }
-  }
-
-  # ---- ESTIMATED MARGINAL MEANS ----
-  if (show_emm) {
-    cat("\nEstimated Marginal Means\n")
-    cat("(Evaluated at covariate means)\n")
-    emm_table <- function(emm, factors) {
-      if (all(is.na(emm$mean))) {
-        cat("  not estimable (the design has empty cells)\n")
-        return(invisible(NULL))
+    # ---- PARAMETER ESTIMATES ----
+    if (show_params) {
+      cat("\nParameter Estimates\n")
+      pe <- fit$parameter_estimates
+      redundant <- if ("redundant" %in% names(pe)) pe$redundant else rep(FALSE, nrow(pe))
+      .print_table_utf8(data.frame(
+        Parameter = pe$parameter,
+        B = ifelse(redundant, "0 (a)", .fmt_coef(pe$b, digits)),
+        SE = .fmt_coef(pe$se, digits),
+        t = fmt_num(pe$t, digits),
+        Sig = fmt_p(pe$p, digits),
+        Lower = .fmt_coef(pe$ci_lower, digits),
+        Upper = .fmt_coef(pe$ci_upper, digits),
+        Eta = fmt_num(pe$partial_eta_sq, digits),
+        stringsAsFactors = FALSE
+      ), col_labels = c(SE = "Std. Error", Lower = "95% CI Lower",
+                        Upper = "95% CI Upper", Eta = "Partial Eta Squared"))
+      if (any(redundant)) {
+        cat("(a) This parameter is set to zero because it is redundant (SPSS coding: the\n")
+        cat("    last category of each factor is the reference).\n")
       }
-      tbl <- as.data.frame(lapply(emm[factors], as.character),
-                           stringsAsFactors = FALSE, check.names = FALSE)
-      tbl$Mean <- fmt_num(emm$mean, digits)
-      tbl$`Std. Error` <- fmt_num(emm$se, digits)
-      tbl$`95% CI Lower` <- fmt_num(emm$ci_lower, digits)
-      tbl$`95% CI Upper` <- fmt_num(emm$ci_upper, digits)
-      .print_table_utf8(tbl, left = length(factors))
     }
-    # Main effects first (SPSS /EMMEANS=TABLES(factor)), then the cells
-    for (f in names(x$emm_main_effects)) {
-      cat(sprintf("\n%s\n", f))
-      emm_table(x$emm_main_effects[[f]], f)
-    }
-    if (length(info$factors) > 1) {
-      cat(sprintf("\n%s\n", paste(info$factors, collapse = " * ")))
-    }
-    emm_table(x$estimated_marginal_means, info$factors)
-  }
 
-  if (show_levene) .print_levene_line(x$levene_test, digits)
+    # ---- ESTIMATED MARGINAL MEANS ----
+    if (show_emm) {
+      cat("\nEstimated Marginal Means\n")
+      cat("(Evaluated at covariate means)\n")
+      emm_table <- function(emm, factors) {
+        if (all(is.na(emm$mean))) {
+          cat("  not estimable (the design has empty cells)\n")
+          return(invisible(NULL))
+        }
+        tbl <- as.data.frame(lapply(emm[factors], as.character),
+                             stringsAsFactors = FALSE, check.names = FALSE)
+        tbl$Mean <- fmt_num(emm$mean, digits)
+        tbl$`Std. Error` <- fmt_num(emm$se, digits)
+        tbl$`95% CI Lower` <- fmt_num(emm$ci_lower, digits)
+        tbl$`95% CI Upper` <- fmt_num(emm$ci_upper, digits)
+        .print_table_utf8(tbl, left = length(factors))
+      }
+      # Main effects first (SPSS /EMMEANS=TABLES(factor)), then the cells
+      for (f in names(fit$emm_main_effects)) {
+        cat(sprintf("\n%s\n", f))
+        emm_table(fit$emm_main_effects[[f]], f)
+      }
+      if (length(info$factors) > 1) {
+        cat(sprintf("\n%s\n", paste(info$factors, collapse = " * ")))
+      }
+      emm_table(fit$estimated_marginal_means, info$factors)
+    }
+
+    if (show_levene) .print_levene_line(fit$levene_test, digits)
+  }
+  if (grouped) {
+    .print_grouped_fits(x, function(fit, label) {
+      cat(sprintf("N (complete cases): %s, Missing: %s\n\n",
+                  fit$call_info$n_total, fit$call_info$n_missing))
+      sections(fit)
+    }, style = "header")
+  } else {
+    sections(x)
+  }
 
   # Significance legend
   if (show_between || show_levene) {

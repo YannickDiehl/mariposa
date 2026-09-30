@@ -629,6 +629,57 @@ test_that("PAR-08/PAR-09: empty design cells: warning, untestable effects marked
                                     between = c(gender, education)))
 })
 
+test_that("PAR-04: factorial_anova() and ancova() honour group_by()", {
+  # Both ignored the grouping silently: one pooled table, is_grouped FALSE.
+  g <- dplyr::group_by(survey_data, region)
+  east_d <- dplyr::filter(survey_data, region == "East")
+  fa <- factorial_anova(g, dv = life_satisfaction, between = c(gender, education))
+  expect_true(fa$is_grouped)
+  expect_identical(fa$groups, "region")
+  east <- factorial_anova(east_d, dv = life_satisfaction, between = c(gender, education))
+  expect_equal(fa$anova_table$f[fa$anova_table$region == "East"], east$anova_table$f)
+  expect_true(any(grepl("region = East", capture.output(print(fa)), fixed = TRUE)))
+  out_s <- capture.output(print(summary(fa)))
+  expect_true(any(grepl("Group: region = West", out_s, fixed = TRUE)))
+  expect_length(grep("Tests of Between-Subjects Effects", out_s, fixed = TRUE), 2L)
+
+  # weighting semantics per group are those of the ungrouped call
+  fw <- factorial_anova(g, dv = life_satisfaction, between = c(gender, education),
+                        weights = sampling_weight)
+  east_w <- factorial_anova(east_d, dv = life_satisfaction,
+                            between = c(gender, education), weights = sampling_weight)
+  expect_equal(fw$anova_table$f[fw$anova_table$region == "East"], east_w$anova_table$f)
+
+  tk <- tukey_test(fa)
+  expect_true("region" %in% names(tk$results))
+  expect_equal(tk$results$Estimate[tk$results$region == "East"],
+               tukey_test(east)$results$Estimate)
+  expect_true(any(grepl("region = East", capture.output(print(summary(tk))), fixed = TRUE)))
+  expect_true("region" %in% names(scheffe_test(fa)$results))
+  lv <- levene_test(fa)
+  expect_equal(nrow(lv$results), 2L)
+  expect_equal(lv$results$F_statistic[lv$results$region == "East"], east$levene_test$f)
+
+  an <- ancova(g, dv = income, between = education, covariate = age)
+  east_a <- ancova(east_d, dv = income, between = education, covariate = age)
+  expect_true(an$is_grouped)
+  expect_equal(an$anova_table$f[an$anova_table$region == "East"], east_a$anova_table$f)
+  expect_equal(nrow(an$parameter_estimates), 2L * nrow(east_a$parameter_estimates))
+  out_a <- c(capture.output(print(an)), capture.output(print(summary(an))))
+  expect_true(any(grepl("region = East", out_a, fixed = TRUE)))
+
+  # a group that cannot be analysed is skipped with a warning naming it
+  d <- survey_data
+  d$life_satisfaction[d$region == "East"] <- 3
+  expect_warning(
+    fc <- factorial_anova(dplyr::group_by(d, region), dv = life_satisfaction,
+                          between = c(gender, education)),
+    "region = East"
+  )
+  expect_true(any(grepl("not computed", capture.output(print(fc)), fixed = TRUE)))
+  expect_false(any(fc$anova_table$region == "East"))
+})
+
 test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
   # The example called summary(result, marginal_means = FALSE), a toggle
   # factorial_anova's summary() does not have (silently ignored).

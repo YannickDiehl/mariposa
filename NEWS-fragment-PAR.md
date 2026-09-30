@@ -128,3 +128,11 @@
   NA" (factorial) or F = -Inf (ANCOVA). The Corrected Model df is the
   rank of the design minus 1, as in SPSS (unchanged for complete designs).
   (PAR-08, PAR-09)
+* `factorial_anova()` and `ancova()` honour `group_by()`: one complete
+  analysis per group, with the group keys as leading columns of the
+  result tables, per-group `print()`/`summary()` output, and grouped
+  `tukey_test()`, `scheffe_test()` and `levene_test()` on the result. Both
+  ignored the grouping silently and reported one pooled table. A group
+  that cannot be analysed (e.g. no variance, a factor with one level) is
+  skipped with a warning naming the group. The weighting of each group's
+  fit is that of an ungrouped call. (PAR-04, EDGE-02)
