@@ -133,7 +133,7 @@
   bad <- var_names[!vapply(var_names, function(v) vector_ok(data[[v]]), logical(1))]
   if (length(bad) > 0) {
     cli_abort(c(
-      "{cli::qty(bad)}Variable{?s} {.var {bad}} {?is/are} not numeric.",
+      "Variable{?s} {.var {bad}} {?is/are} not numeric.",
       "i" = "{.fn {class_name}} needs numeric variables; use {.fn w_modus} or {.fn frequency} for categorical ones."
     ), call = call)
   }
