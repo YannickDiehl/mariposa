@@ -17,3 +17,13 @@
   (it covered only the two regressions), using broom's column names
   (`statistic`, `p.value`, `parameter`/`num.df`/`den.df`, `estimate`,
   `conf.low`, `conf.high`, `adj.p.value`, `method`).
+* `write_xlsx()` exports analysis results. `crosstab()` results are
+  written in the SPSS table layout (Count and the requested "% within"
+  / "% of Total" rows per category, Total row and column; one block per
+  group), every other result (e.g. `describe()`, `t_test()`,
+  `oneway_anova()`, `reliability()`, `linear_regression()`) as its result
+  table followed by the secondary tables (group descriptives, mean ranks,
+  item statistics, model summary, ...). A named list may now mix data
+  frames with any result (`list(Descriptives = describe(...), Data = df)`
+  was rejected), and unsupported objects get a clear error instead of
+  "no applicable method for 'write_xlsx'".

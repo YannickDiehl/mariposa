@@ -286,3 +286,104 @@ test_that("UX-EXPORT broom::tidy() works for the test classes with broom names",
   expect_true(all(c("term", "std.error") %in%
                     names(broom::tidy(res$linear_regression))))
 })
+
+# --- UX-EXPORT (IO-26, PAR-25, NP-22): write_xlsx() for analysis results ------
+
+# Cell values of a sheet as a character matrix (no header interpretation)
+x2_sheet <- function(file, sheet) {
+  df <- openxlsx2::read_xlsx(file, sheet = sheet, col_names = FALSE,
+                             skip_empty_rows = FALSE, skip_empty_cols = FALSE)
+  m <- as.matrix(df)
+  m[is.na(m)] <- ""
+  dimnames(m) <- NULL
+  m
+}
+
+test_that("IO-26 write_xlsx() exports describe(), t_test() and other results", {
+  # Was: write_xlsx() had no method for describe/crosstab/test results
+  # ("no applicable method"), and a list containing one was rejected.
+  skip_if_not_installed("openxlsx2")
+  tmp <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tmp))
+
+  tt <- t_test(survey_data, age, income, group = gender)
+  expect_invisible(write_xlsx(tt, tmp))
+  expect_equal(openxlsx2::wb_load(tmp)$get_sheet_names(),
+               c(`t-Test` = "t-Test"))
+  m <- x2_sheet(tmp, "t-Test")
+  expect_equal(m[1, 1], "t-Test")
+  back <- openxlsx2::read_xlsx(tmp, sheet = "t-Test", start_row = 2)
+  expect_equal(back$Variable[1:2], c("age", "income"))
+  expect_equal(back$t_stat[1:2], tt$results$t_stat)
+
+  ow <- oneway_anova(survey_data, age, group = education)
+  write_xlsx(ow, tmp)
+  m <- x2_sheet(tmp, 1)
+  expect_true("Descriptives" %in% m[, 1])      # secondary table below
+  expect_true("University" %in% m[, 2])
+
+  ds <- describe(dplyr::group_by(survey_data, region), age)
+  write_xlsx(ds, tmp)
+  back <- openxlsx2::read_xlsx(tmp, sheet = 1, start_row = 2)
+  expect_equal(back$region, c("East", "West"))
+  expect_equal(back$Mean, as.data.frame(ds)$Mean)
+})
+
+test_that("IO-26 write_xlsx() writes crosstabs in the SPSS table layout", {
+  # Was: no crosstab export at all.
+  skip_if_not_installed("openxlsx2")
+  tmp <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tmp))
+
+  ct <- crosstab(survey_data, gender, region, percentages = "all")
+  write_xlsx(ct, tmp)
+  m <- x2_sheet(tmp, "Crosstabulation")
+  expect_equal(m[1, 1], "gender * region Crosstabulation")
+  expect_equal(m[3, ], c("gender", "", "East", "West", "Total"))
+  male <- which(m[, 1] == "Male")
+  expect_equal(m[male, 2], "Count")
+  expect_equal(as.numeric(m[male, 3:5]),
+               unname(c(unclass(ct$table)["Male", ], ct$row_totals[["Male"]])))
+  expect_equal(m[male + 1:3, 2],
+               c("% within gender", "% within region", "% of Total"))
+  total <- which(m[, 1] == "Total")
+  expect_equal(as.numeric(m[total, 5]), ct$total)
+
+  # Grouped: one block per group, titled with the group
+  write_xlsx(crosstab(dplyr::group_by(survey_data, region), gender,
+                      education), tmp)
+  m <- x2_sheet(tmp, 1)
+  titles <- grep("Crosstabulation", m[, 1], value = TRUE)
+  expect_equal(titles,
+               c("gender * education Crosstabulation (region = East)",
+                 "gender * education Crosstabulation (region = West)"))
+})
+
+test_that("IO-26 write_xlsx() lists may mix data frames and any result", {
+  # Was: list elements other than data frames/frequency/codebook were
+  # rejected ("All list elements must be data frames, ...").
+  skip_if_not_installed("openxlsx2")
+  tmp <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tmp))
+  res <- x2_results()
+  expect_no_error(suppressMessages(write_xlsx(res, tmp)))
+  sheets <- openxlsx2::wb_load(tmp)$get_sheet_names()
+  expect_equal(unname(sheets), names(res))
+
+  write_xlsx(list(Deskriptiv = describe(survey_data, age, income),
+                  Kreuztabelle = crosstab(survey_data, gender, region),
+                  Daten = head(survey_data)), tmp)
+  sheets <- openxlsx2::wb_load(tmp)$get_sheet_names()
+  expect_true(all(c("Deskriptiv", "Kreuztabelle", "Daten") %in% sheets))
+})
+
+test_that("IO-26 write_xlsx() names unsupported objects instead of dispatch errors", {
+  # Was: "no applicable method for 'write_xlsx' applied to an object of
+  # class ..." (German under a German locale).
+  tmp <- tempfile(fileext = ".xlsx")
+  expect_error(write_xlsx(matrix(1:4, 2), tmp), "cannot export")
+  expect_error(write_xlsx(summary(t_test(survey_data, age, group = gender)),
+                          tmp),
+               "not its")
+  expect_false(file.exists(tmp))
+})

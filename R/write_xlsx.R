@@ -10,7 +10,7 @@
 #' a "Labels" reference sheet is automatically included so that reviewers
 #' can look up what each numeric code means -- even without R access.
 #'
-#' Three input types are supported:
+#' Four input types are supported:
 #' \enumerate{
 #'   \item **Data frame**: Exports the data plus a "Labels" reference sheet
 #'     with variable labels, value labels, and missing value codes.
@@ -18,14 +18,18 @@
 #'     HTML viewer -- with values, value labels, and frequencies stacked
 #'     inside each cell, tagged NAs separated by a line, and an overview
 #'     sheet with dataset metadata.
+#'   \item **Analysis results**: [frequency()] and [crosstab()] tables in
+#'     their printed layout; every other result (e.g. [describe()],
+#'     [t_test()], [oneway_anova()], [reliability()],
+#'     [linear_regression()]) as its result tables.
 #'   \item **Named list**: Each list element becomes a separate sheet.
-#'     Elements can be data frames, [frequency()] results, or [codebook()]
-#'     results -- types can be mixed freely. For data frame elements, a
+#'     Elements can be data frames, [codebook()] results, or any analysis
+#'     result -- types can be mixed freely. For data frame elements, a
 #'     combined "Labels" sheet is appended.
 #' }
 #'
-#' @param x Object to export: a data frame, a [codebook()] result, or a
-#'   named list of data frames.
+#' @param x Object to export: a data frame, a [codebook()] result, an
+#'   analysis result, or a named list of these.
 #' @param file Path to the output `.xlsx` file. Must end in `.xlsx`.
 #' @param overwrite Overwrite existing file? Default: `TRUE`.
 #' @param ... Additional arguments passed to methods:
@@ -65,10 +69,14 @@
 #'   \item Want to export a codebook for manual review or documentation
 #'   \item Need to combine multiple tables (data, codebook, frequencies) in
 #'     one Excel file
+#'   \item Want to hand analysis results (descriptives, crosstabs, test
+#'     results) to colleagues as Excel tables
 #' }
 #'
 #' @seealso [codebook()] for generating codebook objects,
 #'   [frequency()] for frequency tables,
+#'   [as.data.frame()][as.data.frame.mariposa] for analysis results as data
+#'   frames,
 #'   [read_spss()], [read_por()], [read_stata()], [read_sas()],
 #'   [read_xpt()], [read_xlsx()] for importing labelled data
 #'
@@ -196,14 +204,15 @@ write_xlsx.list <- function(x, file, labels = TRUE, overwrite = TRUE, ...) {
     ))
   }
 
-  # Validate: all elements must be supported types
+  # Validate: all elements must be supported types (analysis results such
+  # as describe() or t_test() used to be rejected here)
   supported_types <- vapply(x, function(el) {
-    is.data.frame(el) || inherits(el, "frequency") || inherits(el, "codebook")
+    is.data.frame(el) || !is.na(.xp_class(el))
   }, logical(1))
   if (any(!supported_types)) {
     bad <- names(x)[!supported_types]
     cli::cli_abort(c(
-      "All list elements must be data frames, {.cls frequency}, or {.cls codebook} objects.",
+      "All list elements must be data frames or mariposa results (e.g. {.fn describe}, {.fn crosstab}, {.fn t_test}, {.fn codebook}).",
       "x" = "Unsupported element{?s}: {.val {bad}}"
     ))
   }
@@ -229,6 +238,10 @@ write_xlsx.list <- function(x, file, labels = TRUE, overwrite = TRUE, ...) {
     } else if (inherits(el, "codebook")) {
       # Codebook: write codebook sheet (without separate Overview)
       .write_codebook_sheet(wb, el, sheet_name = sheet_name)
+
+    } else if (!is.data.frame(el)) {
+      # Any other analysis result: its tables (crosstab: table layout)
+      .write_result_sheet(wb, sheet_name, el)
 
     } else if (is.data.frame(el)) {
       # Data frame: standard export with header styling
@@ -294,6 +307,61 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   wb$add_worksheet("Frequency")
 
   .write_frequency_tables(wb, "Frequency", x)
+
+  openxlsx2::wb_save(wb, file = file, overwrite = overwrite)
+  invisible(file)
+}
+
+
+# ---- analysis results (default method) -----------------------------------------
+
+#' @describeIn write_xlsx Export any other mariposa analysis result (e.g.
+#'   [describe()], [crosstab()], [t_test()], [reliability()],
+#'   [linear_regression()]) to one sheet. [crosstab()] results are written
+#'   in the SPSS table layout (counts and the requested percentages per
+#'   row category, with totals); all other results as the table
+#'   [as.data.frame()][as.data.frame.mariposa] returns, followed by the
+#'   secondary tables SPSS
+#'   shows next to it (group descriptives, mean ranks, item statistics,
+#'   model summary, ...). Grouped results keep the grouping variables as
+#'   leading columns (crosstabs get one block per group).
+#'
+#' @examples
+#' if (requireNamespace("openxlsx2", quietly = TRUE)) {
+#'   # Analysis results: one sheet each, or several in one workbook
+#'   tmp_res <- tempfile(fileext = ".xlsx")
+#'   t_test(survey_data, age, income, group = gender) |> write_xlsx(tmp_res)
+#'
+#'   tmp_list <- tempfile(fileext = ".xlsx")
+#'   write_xlsx(
+#'     list(
+#'       "Descriptives" = describe(survey_data, age, income),
+#'       "Crosstab"     = crosstab(survey_data, gender, region),
+#'       "ANOVA"        = oneway_anova(survey_data, age, group = education)
+#'     ),
+#'     tmp_list
+#'   )
+#'
+#'   unlink(c(tmp_res, tmp_list))
+#' }
+#'
+#' @export
+write_xlsx.default <- function(x, file, overwrite = TRUE, ...) {
+  if (is.na(.xp_class(x))) {
+    hint <- if (any(startsWith(class(x), "summary."))) {
+      c("i" = "Export the result itself, not its {.fn summary}.")
+    }
+    cli::cli_abort(c(
+      "{.fn write_xlsx} cannot export an object of class {.cls {class(x)}}.",
+      "i" = "Supported: data frames, named lists, {.fn codebook}, {.fn frequency} and the results of mariposa's analysis functions.",
+      hint
+    ))
+  }
+  .check_openxlsx2()
+  .validate_xlsx_path(file, overwrite)
+
+  wb <- openxlsx2::wb_workbook()
+  .write_result_sheet(wb, .xp_title(.xp_class(x)), x)
 
   openxlsx2::wb_save(wb, file = file, overwrite = overwrite)
   invisible(file)
@@ -1324,4 +1392,171 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   .add_row("Generated", format(Sys.time(), "%Y-%m-%d %H:%M"))
 
   do.call(rbind, rows)
+}
+
+
+# ============================================================================
+# Analysis Result Sheets
+# ============================================================================
+
+#' Write one analysis result to a new worksheet
+#'
+#' crosstab() gets its table layout; every other result class writes the
+#' tables of .xp_tables() (R/result-export.R) stacked vertically, each with
+#' a bold title row and a styled header.
+#' @noRd
+.write_result_sheet <- function(wb, sheet, x) {
+  sheet <- .sanitize_sheet_name(sheet)
+  wb$add_worksheet(sheet)
+  if (inherits(x, "crosstab")) {
+    .write_crosstab_blocks(wb, sheet, x)
+  } else {
+    .write_table_blocks(wb, sheet, .xp_tables(x))
+  }
+  invisible(wb)
+}
+
+#' Stack titled tables on one worksheet
+#' @noRd
+.write_table_blocks <- function(wb, sheet, tables) {
+  cur_row <- 1L
+  max_cols <- 1L
+  for (k in seq_along(tables)) {
+    tbl <- tables[[k]]
+    .write_block_title(wb, sheet, cur_row, names(tables)[k])
+    cur_row <- cur_row + 1L
+    if (ncol(tbl) > 0L) {
+      # Factors (group keys, categories) as their labels
+      for (j in seq_along(tbl)) {
+        if (is.factor(tbl[[j]])) tbl[[j]] <- as.character(tbl[[j]])
+      }
+      wb$add_data(sheet = sheet, x = tbl, dims = paste0("A", cur_row),
+                  na.strings = "")
+      .style_header_cells(wb, sheet, cur_row, ncol(tbl))
+      max_cols <- max(max_cols, ncol(tbl))
+      cur_row <- cur_row + nrow(tbl) + 1L
+    }
+    cur_row <- cur_row + 2L
+  }
+  wb$set_col_widths(sheet = sheet, cols = seq_len(max_cols), widths = "auto")
+  invisible(wb)
+}
+
+#' Bold title row above a result table
+#' @noRd
+.write_block_title <- function(wb, sheet, row, text) {
+  wb$add_data(sheet = sheet, x = text, dims = paste0("A", row),
+              col_names = FALSE)
+  wb$add_font(sheet = sheet, dims = paste0("A", row), bold = TRUE, size = 12)
+}
+
+#' Header styling for a table header in an arbitrary row
+#' @noRd
+.style_header_cells <- function(wb, sheet, row, ncol) {
+  if (ncol == 0L) return(invisible(NULL))
+  dims <- paste0("A", row, ":", openxlsx2::int2col(ncol), row)
+  wb$add_font(sheet = sheet, dims = dims, bold = TRUE,
+              color = openxlsx2::wb_color("FFFFFF"))
+  wb$add_fill(sheet = sheet, dims = dims,
+              color = openxlsx2::wb_color("3B3F51"))
+}
+
+#' One crosstab as an SPSS-layout data block
+#'
+#' Rows: every row category with its Count and the requested percentage
+#' rows ("% within <row>", "% within <column>", "% of Total"), then the
+#' Total block; columns: row category, statistic, column categories,
+#' Total. Values stay numeric (percentages unrounded).
+#' @noRd
+.crosstab_xlsx_block <- function(ct) {
+  lab <- function(lv, map) unname(.apply_labels(lv, map, max_width = Inf))
+  row_lv <- lab(ct$row_levels, ct$row_label_map)
+  col_lv <- lab(ct$col_levels, ct$col_label_map)
+  nr <- length(row_lv)
+  nc <- length(col_lv)
+  total <- ct$total
+  within_row <- paste("% within", ct$row_var)
+  within_col <- paste("% within", ct$col_var)
+
+  stat_rows <- function(count, row_pct, col_pct, total_pct) {
+    out <- list(Count = count)
+    if (!is.null(ct$row_pct)) out[[within_row]] <- row_pct
+    if (!is.null(ct$col_pct)) out[[within_col]] <- col_pct
+    if (!is.null(ct$total_pct)) out[["% of Total"]] <- total_pct
+    out
+  }
+  cells <- function(m, i) if (is.null(m)) rep(NA_real_, nc) else unclass(m)[i, ]
+
+  lines <- vector("list", nr + 1L)
+  for (i in seq_len(nr)) {
+    share <- ct$row_totals[i] / total * 100
+    lines[[i]] <- list(label = row_lv[i], stats = stat_rows(
+      count = c(cells(ct$table, i), ct$row_totals[i]),
+      row_pct = c(cells(ct$row_pct, i), 100),
+      col_pct = c(cells(ct$col_pct, i), share),
+      total_pct = c(cells(ct$total_pct, i), share)))
+  }
+  # Total block as SPSS prints it: % within the row variable and % of
+  # total are the column shares, % within the column variable is 100
+  col_share <- ct$col_totals / total * 100
+  lines[[nr + 1L]] <- list(label = "Total", stats = stat_rows(
+    count = c(ct$col_totals, total),
+    row_pct = c(col_share, 100),
+    col_pct = rep(100, nc + 1L),
+    total_pct = c(col_share, 100)))
+
+  block <- do.call(rbind, lapply(lines, function(l) {
+    m <- do.call(rbind, lapply(l$stats, function(v) unname(as.numeric(v))))
+    out <- data.frame(first = c(l$label, rep("", nrow(m) - 1L)),
+                      stat = names(l$stats), stringsAsFactors = FALSE)
+    cbind(out, as.data.frame(m))
+  }))
+  names(block) <- c(ct$row_var, "", col_lv, "Total")
+  rownames(block) <- NULL
+  block
+}
+
+#' crosstab() in the SPSS layout: one block per (group) table
+#' @noRd
+.write_crosstab_blocks <- function(wb, sheet, x) {
+  tables <- if (isTRUE(x$is_grouped)) x$results else list(x)
+  cur_row <- 1L
+  max_cols <- 1L
+  for (ct in tables) {
+    block <- .crosstab_xlsx_block(ct)
+    last_col <- openxlsx2::int2col(ncol(block))
+
+    title <- paste(ct$row_var, "*", ct$col_var, "Crosstabulation")
+    if (!is.null(ct$group_info)) {
+      title <- paste0(title, " (", .format_group_label(ct$group_info), ")")
+    }
+    .write_block_title(wb, sheet, cur_row, title)
+    cur_row <- cur_row + 1L
+    # Column variable above its categories, as in the SPSS header
+    wb$add_data(sheet = sheet, x = ct$col_var, dims = paste0("C", cur_row),
+                col_names = FALSE)
+    wb$add_font(sheet = sheet, dims = paste0("C", cur_row), bold = TRUE)
+    cur_row <- cur_row + 1L
+
+    wb$add_data(sheet = sheet, x = block, dims = paste0("A", cur_row),
+                na.strings = "")
+    .style_header_cells(wb, sheet, cur_row, ncol(block))
+    rows <- cur_row + seq_len(nrow(block))
+    # Counts as integers, percentages with one decimal (SPSS display)
+    for (k in seq_along(rows)) {
+      wb$add_numfmt(sheet = sheet,
+                    dims = paste0("C", rows[k], ":", last_col, rows[k]),
+                    numfmt = if (block[[2]][k] == "Count") "0" else "0.0")
+    }
+    # Total block in bold
+    total_first <- rows[which(block[[1]] == "Total")[1]]
+    wb$add_font(sheet = sheet,
+                dims = paste0("A", total_first, ":", last_col,
+                              rows[length(rows)]),
+                bold = TRUE)
+    max_cols <- max(max_cols, ncol(block))
+    cur_row <- rows[length(rows)] + 4L
+  }
+  wb$set_col_widths(sheet = sheet, cols = seq_len(max_cols), widths = "auto")
+  invisible(wb)
 }
