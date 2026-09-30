@@ -109,6 +109,7 @@
 #' @family hypothesis_tests
 #' @export
 wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
+  .check_required("data")
   .reject_partial_args()
 
   # Input validation

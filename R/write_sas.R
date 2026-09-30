@@ -64,6 +64,8 @@
 #'
 #' @export
 write_xpt <- function(data, path, version = 5, name = NULL) {
+  .check_required(c("data", "path"))
+  .check_value_arg("path", "a file path (a character string)")
   .check_haven("SAS transport export")
 
   if (!is.data.frame(data)) {

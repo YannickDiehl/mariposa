@@ -109,6 +109,7 @@
 #' @export
 std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
                 na.rm = TRUE) {
+  .check_required("data")
 
   method <- match.arg(method, choices = c("sd", "2sd", "mad", "gmd"))
 
@@ -342,6 +343,7 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 #' @family transform
 #' @export
 center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
+  .check_required("data")
 
   # ============================================================================
   # VECTOR INPUT

@@ -163,6 +163,7 @@
 mann_whitney <- function(data, ..., group, weights = NULL, mu = 0, 
                              alternative = c("two.sided", "less", "greater"),
                              conf.level = 0.95) {
+  .check_required("data")
   
   # Input validation
   if (!is.data.frame(data)) {
@@ -189,8 +190,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     cli_abort("{.arg group} is required for Mann-Whitney test.")
   }
 
-  g_var <- eval_select(expr(!!group_quo), data = data)
-  g_name <- names(g_var)[1]  # Take first name
+  g_name <- .select_group(data, group_quo)
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))

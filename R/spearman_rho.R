@@ -13,7 +13,8 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The variables you want to correlate. List two for a single
 #'   correlation or more for a correlation matrix. You can use helpers like
-#'   \code{starts_with("trust")}.
+#'   \code{starts_with("trust")}. Numeric variables or ordered factors
+#'   (ranked by their level order).
 #' @param weights Optional survey weights. Following the SPSS NONPAR CORR
 #'   convention, weights are used only to filter cases (rows with weight
 #'   <= 0 or NA are dropped); the rank correlation itself is computed
@@ -139,6 +140,7 @@
 spearman_rho <- function(data, ..., weights = NULL,
                         alternative = c("two.sided", "less", "greater"),
                         use = c("pairwise", "listwise"), na.rm = NULL) {
+  .check_required("data")
   .correlate(
     data, ...,
     weights = rlang::enquo(weights),
@@ -256,6 +258,7 @@ spearman_rho <- function(data, ..., weights = NULL,
 #' @noRd
 .spearman_rho_spec <- list(
   class_name = "spearman_rho",
+  ordinal_ok = TRUE,
   weights_filter_only = TRUE,
   result_names = c("correlations", "matrices", "variables", "weights",
                    "alternative", "use", "is_grouped", "groups", "n_obs"),

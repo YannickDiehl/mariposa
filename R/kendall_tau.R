@@ -12,7 +12,8 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The variables you want to correlate. List two for a single
 #'   correlation or more for a correlation matrix. You can use helpers like
-#'   \code{starts_with("trust")}.
+#'   \code{starts_with("trust")}. Numeric variables or ordered factors
+#'   (ranked by their level order).
 #' @param weights Optional survey weights for population-representative results.
 #' @param alternative Direction of the test:
 #'   \itemize{
@@ -143,6 +144,7 @@
 kendall_tau <- function(data, ..., weights = NULL,
                         alternative = c("two.sided", "less", "greater"),
                         use = c("pairwise", "listwise"), na.rm = NULL) {
+  .check_required("data")
   .correlate(
     data, ...,
     weights = rlang::enquo(weights),
@@ -280,6 +282,7 @@ kendall_tau <- function(data, ..., weights = NULL,
 #' @noRd
 .kendall_tau_spec <- list(
   class_name = "kendall_tau",
+  ordinal_ok = TRUE,
   result_names = c("correlations", "n_obs", "matrices", "variables", "weights",
                    "alternative", "use", "is_grouped", "groups", "group_keys"),
   matrices = list(

@@ -122,6 +122,7 @@
 #' @family posthoc
 #' @export
 scheffe_test <- function(x, conf.level = 0.95, ...) {
+  .check_required("x", hint = "Pass the result of {.fn oneway_anova} or {.fn factorial_anova}.")
   .reject_partial_args()
   UseMethod("scheffe_test")
 }

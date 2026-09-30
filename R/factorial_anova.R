@@ -142,6 +142,7 @@
 #' @family hypothesis_tests
 #' @export
 factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
+  .check_required(c("data", "dv", "between"))
 
   # ============================================================================
   # INPUT VALIDATION

@@ -75,6 +75,7 @@
 #'
 #' @export
 read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE) {
+  .check_required("path")
   .check_haven("SPSS import")
   .check_file_type(path, "sav", "read_spss")
 
@@ -128,6 +129,7 @@ read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE) {
 #'
 #' @export
 read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
+  .check_required("path")
   .check_haven("SPSS portable import")
   .check_file_type(path, "por", "read_por")
 
@@ -565,6 +567,7 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 #' @family data-import
 #' @export
 na_frequencies <- function(x, ...) {
+  .check_required("x")
   .check_haven("tagged NA inspection")
 
   if (is.data.frame(x)) {
@@ -697,6 +700,7 @@ na_frequencies <- function(x, ...) {
 #' @family data-import
 #' @export
 untag_na <- function(x, ...) {
+  .check_required("x")
   .check_haven("tagged NA recovery")
   if (is.data.frame(x)) {
     return(.tag_fun_df(x, untag_na, rlang::enexprs(...),
@@ -781,6 +785,7 @@ untag_na <- function(x, ...) {
 #' @family data-import
 #' @export
 strip_tags <- function(x, ...) {
+  .check_required("x")
   if (is.data.frame(x)) {
     return(.tag_fun_df(x, strip_tags, rlang::enexprs(...),
                        rlang::expr(c(...))))

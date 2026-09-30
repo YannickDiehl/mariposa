@@ -109,6 +109,7 @@ describe <- function(data, ..., weights = NULL,
                      probs = c(0.25, 0.5, 0.75),
                      na.rm = TRUE,
                      excess = TRUE) {
+  .check_required("data")
 
   # ============================================================================
   # INPUT VALIDATION AND SETUP

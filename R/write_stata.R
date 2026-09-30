@@ -66,6 +66,8 @@
 #'
 #' @export
 write_stata <- function(data, path, version = 14) {
+  .check_required(c("data", "path"))
+  .check_value_arg("path", "a file path (a character string)")
   .check_haven("Stata export")
 
   if (!is.data.frame(data)) {

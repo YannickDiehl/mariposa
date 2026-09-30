@@ -214,6 +214,7 @@ efa <- function(data, ...,
                 sort = TRUE,
                 blank = 0.40,
                 na.rm = TRUE) {
+  .check_required("data")
 
   # ============================================================================
   # INPUT VALIDATION

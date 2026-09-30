@@ -388,6 +388,7 @@ codebook <- function(data, ..., weights = NULL,
                      max_values = 10, max_len = 50,
                      sort_by_name = FALSE,
                      file = NULL, view = interactive()) {
+  .check_required("data")
 
   # Input validation
   if (!is.data.frame(data)) {

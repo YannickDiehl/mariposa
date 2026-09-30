@@ -85,6 +85,8 @@
 #' @export
 find_var <- function(data, pattern, search = c("name_label", "name", "label"),
                      fixed = FALSE) {
+  .check_required(c("data", "pattern"))
+  .check_value_arg("pattern", "a single character string")
 
   # ============================================================================
   # INPUT VALIDATION

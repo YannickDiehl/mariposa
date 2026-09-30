@@ -88,6 +88,7 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
                      drop_unused = FALSE, add_non_labelled = FALSE,
                      drop.na = NULL, drop.unused = NULL,
                      add.non.labelled = NULL) {
+  .check_required("data")
   # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
   # The formals stay as NULL sentinels because `...` is consumed by
   # tidyselect: without them, an old dot-case name would silently be
@@ -343,6 +344,7 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
 to_character <- function(data, ..., drop_na = TRUE,
                          add_non_labelled = FALSE,
                          drop.na = NULL, add.non.labelled = NULL) {
+  .check_required("data")
   # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
   # The formals stay as NULL sentinels because `...` is consumed by
   # tidyselect: without them, an old dot-case name would silently be
@@ -457,6 +459,7 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
                        keep_labels = FALSE,
                        use.labels = NULL, start.at = NULL,
                        keep.labels = NULL) {
+  .check_required("data")
   # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
   # The formals stay as NULL sentinels because `...` is consumed by
   # tidyselect: without them, an old dot-case name would silently be
@@ -619,6 +622,7 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
 #'
 #' @export
 to_labelled <- function(data, ..., labels = NULL, label = NULL) {
+  .check_required("data")
   .check_haven("{.fn to_labelled}")
 
   if (!is.data.frame(data)) {

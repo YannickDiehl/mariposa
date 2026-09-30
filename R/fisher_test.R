@@ -115,6 +115,7 @@
 #' @export
 fisher_test <- function(data, row, col, weights = NULL,
                         simulate.p.value = FALSE, B = 10000, ...) {
+  .check_required(c("data", "row", "col"))
   .reject_partial_args()
   .check_dots_unused(...)
 

@@ -115,6 +115,7 @@
 #' @export
 binomial_test <- function(data, ..., p = 0.50, weights = NULL,
                            conf.level = 0.95) {
+  .check_required("data")
 
   # Input validation
   if (!is.data.frame(data)) {

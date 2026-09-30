@@ -314,3 +314,121 @@ test_that("haven-not-loaded: labelled data from readRDS() work without haven loa
     expect_match(run_fresh(cl), "RESULT: OK", fixed = TRUE, info = cl)
   }
 })
+
+
+# --- EDGE-14/15: missing required arguments -------------------------------------
+
+test_that("EDGE-14: every exported function names a missing first argument", {
+  # Calling a function without its data gave base-R errors (localized:
+  # 'Argument "data" fehlt (ohne Standardwert)'), crosstab() and
+  # write_xlsx() "no applicable method ... class NULL", marginal_effects()
+  # "Could not evaluate cli {} expression".
+  ns <- asNamespace("mariposa")
+  fns <- sort(getNamespaceExports("mariposa"))
+  fns <- fns[!grepl("^(print|summary)\\.|^%|<-$", fns)]
+  for (f in fns) {
+    fn <- get(f, envir = ns)
+    if (!is.function(fn)) next
+    first <- names(formals(fn))[1]
+    err <- tryCatch(fn(), error = function(e) e)
+    expect_s3_class(err, "rlang_error")
+    msg <- conditionMessage(err)
+    expect_match(msg, "missing, with no default", fixed = TRUE, info = f)
+    expect_match(msg, paste0("`", first, "`"), fixed = TRUE, info = f)
+  }
+})
+
+test_that("EDGE-14: missing required arguments beyond the data are named", {
+  # oneway_anova(data, age) said "Can't extract column with `g_name`",
+  # ancova()/factorial_anova() 'Argument "between_expr" fehlt',
+  # fisher_test()/mcnemar_test() 'Argument "x" fehlt'.
+  d <- survey_data
+  expect_error(oneway_anova(d, age), "`group` is missing")
+  expect_error(ancova(d, life_satisfaction, between = education),
+               "`covariate` is missing")
+  expect_error(ancova(d, life_satisfaction, covariate = age), "`between` is missing")
+  expect_error(ancova(d), "`dv`, `between`, and `covariate` are missing")
+  expect_error(factorial_anova(d, life_satisfaction), "`between` is missing")
+  expect_error(fisher_test(d, gender), "`col` is missing")
+  expect_error(mcnemar_test(d, gender), "`var2` is missing")
+  expect_error(find_var(d), "`pattern` is missing")
+  expect_error(copy_labels(d), "`source` is missing")
+  expect_error(write_spss(d), "`path` is missing")
+  expect_error(write_xlsx(d), "`file` is missing")
+})
+
+test_that("EDGE-15: a bare name where a value is expected is named", {
+  # linear_regression(data, age) and find_var(data, age) failed with the
+  # localized "Objekt 'age' nicht gefunden".
+  d <- survey_data
+  expect_error(linear_regression(d, age), "`formula` must be a formula")
+  expect_error(logistic_regression(d, gender), "`formula` must be a formula")
+  expect_error(find_var(d, age), "`pattern` must be")
+  expect_error(copy_labels(d, age), "`source` must be")
+  expect_error(write_spss(d, age), "`path` must be")
+})
+
+test_that("EDGE-14: weights without any positive value are refused at the entry", {
+  # All-zero weights failed deep inside with localized base-R errors
+  # (binomial_test "'n' muss eine positive, ganze Zahl >= 'x' sein", efa
+  # and kruskal_wallis "Fehlender Wert, wo TRUE/FALSE noetig ist",
+  # reliability "unendliche oder fehlende Werte", logistic_regression
+  # "Objekt 'fit' nicht gefunden"); describe() fell back to an unweighted
+  # analysis when all weights were missing.
+  d <- survey_data
+  d$w0 <- 0
+  d$wna <- NA_real_
+  expect_error(binomial_test(d, gender, weights = w0), "no positive value")
+  expect_error(efa(d, trust_government, trust_media, trust_science,
+                   life_satisfaction, weights = w0), "no positive value")
+  expect_error(reliability(d, trust_government, trust_media, trust_science,
+                           weights = w0), "no positive value")
+  expect_error(logistic_regression(d, gender ~ age, weights = w0), "no positive value")
+  expect_error(chi_square(d, gender, region, weights = w0), "no positive value")
+  expect_error(describe(d, age, weights = wna), "no positive value")
+  expect_error(w_mean(d, age, weights = w0), "no positive value")
+  # Zero weights for some cases stay allowed (those cases are excluded)
+  d$wsome <- ifelse(d$region == "East", 0, 1)
+  expect_no_error(describe(d, age, weights = wsome))
+})
+
+test_that("EDGE-14: `group` given as an expression gets a clear error", {
+  # group = region == "East" failed with the localized "Objekt 'region'
+  # nicht gefunden" inside a tidyselect error.
+  d <- survey_data
+  expect_error(t_test(d, age, group = gender == "Male"), "not a variable name")
+  expect_error(oneway_anova(d, age, group = as.factor(region)), "mutate")
+  expect_error(kruskal_wallis(d, age, group = region == "East"), "not a variable name")
+  expect_error(mann_whitney(d, age, group = region == "East"), "not a variable name")
+  expect_error(levene_test(d, age, group = region == "East"), "not a variable name")
+  # several columns
+  expect_error(oneway_anova(d, age, group = c(region, education)),
+               "exactly one variable")
+  # tidyselect forms keep working
+  expect_no_error(t_test(d, age, group = "gender"))
+  expect_no_error(t_test(d, age, group = all_of("gender")))
+})
+
+test_that("EDGE-15: rank correlations take ordered factors like the rank tests", {
+  # spearman_rho()/kendall_tau() rejected the ordered factor education
+  # ("not numeric") although mann_whitney()/kruskal_wallis() rank it by
+  # its level order.
+  d <- survey_data
+  codes <- d |> mutate(education = as.integer(education))
+  expect_equal(spearman_rho(d, education, income)$correlations$rho,
+               spearman_rho(codes, education, income)$correlations$rho)
+  expect_equal(kendall_tau(d, education, income)$correlations$tau,
+               kendall_tau(codes, education, income)$correlations$tau)
+  # Pearson needs interval data: still an error
+  expect_error(pearson_cor(d, education, income), "not numeric")
+  expect_error(spearman_rho(d, gender, income), "ordered factors")
+})
+
+test_that("EDGE-15: w_mean() on a Date names the variable", {
+  # Unweighted w_mean() of a Date already said "not numeric"; the weighted
+  # call failed inside the arithmetic.
+  d <- data.frame(day = as.Date("2026-01-01") + 0:9, w = rep(1, 10))
+  expect_error(w_mean(d, day), "`day` is not numeric")
+  expect_error(w_mean(d, day, weights = w), "`day` is not numeric")
+  expect_error(w_mean(d$day, weights = d$w), "numeric")
+})

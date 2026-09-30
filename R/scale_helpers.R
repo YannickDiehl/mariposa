@@ -79,6 +79,7 @@
 #' @family scale
 #' @export
 pomps <- function(x, scale_min = NULL, scale_max = NULL) {
+  .check_required("x")
 
   # ============================================================================
   # INPUT VALIDATION

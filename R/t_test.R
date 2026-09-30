@@ -174,6 +174,7 @@
 t_test <- function(data, ..., group = NULL, weights = NULL,
                   var.equal = FALSE, mu = 0, alternative = c("two.sided", "less", "greater"),
                   conf.level = 0.95) {
+  .check_required("data")
 
   # Input validation
   if (!is.data.frame(data)) {
@@ -224,8 +225,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   # Process group variable
   group_quo <- enquo(group)
   if (!quo_is_null(group_quo)) {
-    g_var <- eval_select(expr(!!group_quo), data = data)
-    g_name <- names(g_var)
+    g_name <- .select_group(data, group_quo)
     # SPSS order (by code, not by first appearance: the sign of t must not
     # depend on the row order) and value labels instead of codes
     data[[g_name]] <- .group_factor(data[[g_name]])

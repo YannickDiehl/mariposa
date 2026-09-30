@@ -80,6 +80,20 @@
 #'
 #' @export
 set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
+  .check_required("data")
+  # `...` holds values, not a variable selection: a bare column name
+  # (set_na(data, age)) failed with the localized "object 'age' not found"
+  exprs <- rlang::enexprs(...)
+  bare <- vapply(exprs, is.symbol, logical(1)) & !nzchar(rlang::names2(exprs))
+  if (is.data.frame(data) && any(bare)) {
+    cols <- intersect(vapply(exprs[bare], as.character, character(1)), names(data))
+    if (length(cols) > 0) {
+      cli::cli_abort(c(
+        "{.fn set_na} takes the values to set missing, not variable names: {.var {cols}}.",
+        "i" = "For one variable use name-value pairs, e.g. {.code set_na(data, {cols[1]} = c(-9, -8))}."
+      ))
+    }
+  }
   dots <- list(...)
 
   # Remove named arguments that are parameters, not data
@@ -323,6 +337,7 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
 #'
 #' @export
 unlabel <- function(data, ...) {
+  .check_required("data")
   .ensure_haven(data)
   if (!is.data.frame(data)) {
     return(.unlabel_vec(data))

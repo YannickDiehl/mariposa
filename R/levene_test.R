@@ -121,6 +121,7 @@
 #' @family posthoc
 #' @export
 levene_test <- function(x, ...) {
+  .check_required("x", hint = "Pass a data frame (with {.arg group}) or the result of {.fn t_test}, {.fn oneway_anova} or {.fn factorial_anova}.")
   UseMethod("levene_test")
 }
 
@@ -187,10 +188,7 @@ levene_test.data.frame <- function(x, ..., group, weights = NULL, center = c("me
   if (rlang::quo_is_missing(group_quo) || rlang::quo_is_null(group_quo)) {
     cli_abort("{.arg group} is required for Levene's test.", call = call)
   }
-  g_name <- names(tidyselect::eval_select(rlang::expr(!!group_quo), data = data))
-  if (length(g_name) != 1) {
-    cli_abort("{.arg group} must select exactly one variable.", call = call)
-  }
+  g_name <- .select_group(data, group_quo, call = call)
 
   weights_info <- .process_weights(data, weights_quo, call = call)
 

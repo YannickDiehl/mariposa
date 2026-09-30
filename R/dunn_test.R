@@ -130,6 +130,7 @@
 #' @family posthoc
 #' @export
 dunn_test <- function(x, ...) {
+  .check_required("x", hint = "Pass the result of {.fn kruskal_wallis}, e.g. {.code kruskal_wallis(data, dv, group = g) |> dunn_test()}.")
   UseMethod("dunn_test")
 }
 

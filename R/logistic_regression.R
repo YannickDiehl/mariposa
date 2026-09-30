@@ -205,6 +205,9 @@ logistic_regression <- function(data, formula = NULL,
                                 weights = NULL,
                                 conf.level = 0.95,
                                 factors = c("dummy", "numeric")) {
+  .check_required("data")
+  .check_value_arg("formula", "a formula such as {.code y ~ x1 + x2}",
+                   hint = "Or name the variables: {.code dependent = y, predictors = c(x1, x2)}.")
 
   # ============================================================================
   # INPUT VALIDATION & FORMULA CONSTRUCTION

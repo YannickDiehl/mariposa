@@ -108,6 +108,7 @@
 #' @family regression
 #' @export
 marginal_effects <- function(model, conf.level = 0.95, ...) {
+  .check_required("model", hint = "Pass the result of {.fn logistic_regression}.")
   .reject_partial_args()
   UseMethod("marginal_effects")
 }

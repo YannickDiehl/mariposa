@@ -100,6 +100,7 @@
 #' @family scale
 #' @export
 row_means <- function(data, ..., min_valid = NULL, na.rm = TRUE) {
+  .check_required("data")
 
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame or tibble.")
@@ -158,6 +159,7 @@ row_means <- function(data, ..., min_valid = NULL, na.rm = TRUE) {
 #' @family scale
 #' @export
 row_sums <- function(data, ..., min_valid = NULL, na.rm = TRUE) {
+  .check_required("data")
 
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame or tibble.")
@@ -216,6 +218,7 @@ row_sums <- function(data, ..., min_valid = NULL, na.rm = TRUE) {
 #' @family scale
 #' @export
 row_count <- function(data, ..., count, na.rm = TRUE) {
+  .check_required("data")
 
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame or tibble.")

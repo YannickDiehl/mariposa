@@ -50,3 +50,26 @@
   `write_xlsx()` likewise. The entry helpers now load haven's namespace
   when a selected data set or vector is labelled (and say that haven is
   needed when it is not installed).
+* Calling a function without a required argument gives a clear error
+  naming it ("Argument `covariate` is missing, with no default."), in every
+  exported function. Previously base-R errors surfaced from inside, often
+  localized and naming internal arguments: 'Argument "data" fehlt (ohne
+  Standardwert)', `oneway_anova(data, age)` "Can't extract column with
+  `g_name`", `ancova()`/`factorial_anova()` 'Argument "between_expr"
+  fehlt', `fisher_test()`/`mcnemar_test()` 'Argument "x" fehlt',
+  `crosstab()`/`write_xlsx()` "no applicable method ... class NULL". A bare
+  variable name where a value is expected (`linear_regression(data, age)`,
+  `find_var(data, age)`, a `path`) is named instead of "object 'age' not
+  found"; `set_na(data, age)` explains that it takes values, not variable
+  names.
+* Weights without any positive value (all zero or missing) are refused
+  with one clear error. The analyses failed deep inside with base-R errors
+  ("'n' must be a positive integer", "missing value where TRUE/FALSE
+  needed", "object 'fit' not found"), and `describe()` silently fell back to
+  an unweighted analysis when all weights were missing.
+* `group =` given as an expression (`group = region == "East"`) explains
+  that the grouping variable must be created first (it failed with "object
+  'region' not found"); a `group` selecting no or several columns is an
+  error naming the selection. `spearman_rho()` and `kendall_tau()` accept
+  ordered factors (ranked by level order) like `mann_whitney()` and
+  `kruskal_wallis()`; they rejected e.g. `education` as "not numeric".

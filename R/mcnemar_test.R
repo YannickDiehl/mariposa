@@ -109,6 +109,7 @@
 #' @export
 mcnemar_test <- function(data, var1, var2, weights = NULL,
                          correct = TRUE, ...) {
+  .check_required(c("data", "var1", "var2"))
   .reject_partial_args()
   .check_dots_unused(...)
 

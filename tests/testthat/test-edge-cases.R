@@ -206,12 +206,15 @@ test_that("describe errors on negative weights (package-wide policy)", {
   )
 })
 
-test_that("describe warns on all-NA weights", {
+test_that("describe errors on all-NA weights", {
+  # 0.7.4: no positive weight means no valid case (SPSS WEIGHT BY); the
+  # silent fall-back to an unweighted analysis (with one warning per
+  # statistic) is gone - .process_weights() refuses such weights.
   bad_data <- survey_data
   bad_data$na_wt <- rep(NA_real_, nrow(bad_data))
-  expect_warning(
+  expect_error(
     describe(bad_data, age, weights = na_wt),
-    "NA|missing|unweighted"
+    "no positive value"
   )
 })
 

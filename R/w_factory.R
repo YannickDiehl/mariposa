@@ -65,6 +65,7 @@
                          empty_stat = NA_real_, empty_n = 0L,
                          vector_ok = is.numeric,
                          call = rlang::caller_env()) {
+  .check_required("data", env = call)
 
   # Capture the weights expression once as a quosure. Because the w_*
   # wrappers pass weights = {{ weights }}, this quosure carries the

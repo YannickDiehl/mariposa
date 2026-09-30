@@ -76,6 +76,7 @@
 #'
 #' @export
 read_stata <- function(path, encoding = NULL, tag_na = NULL, verbose = FALSE) {
+  .check_required("path")
   .check_haven("Stata import")
   .check_file_type(path, "dta", "read_stata")
 

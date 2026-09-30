@@ -104,10 +104,22 @@
               call = call)
   }
 
-  # Validate that all selected variables are numeric
+  # Validate that all selected variables are numeric. The rank correlations
+  # (spec$ordinal_ok) take an ordered factor by its level order, as the
+  # rank tests (mann_whitney(), kruskal_wallis()) do.
   for (var_name in var_names) {
-    if (!is.numeric(data[[var_name]])) {
-      cli_abort("Variable {.var {var_name}} is not numeric.", call = call)
+    x <- data[[var_name]]
+    if (isTRUE(spec$ordinal_ok) && is.ordered(x)) {
+      data[[var_name]] <- as.integer(x)
+      next
+    }
+    if (!is.numeric(x)) {
+      cli_abort(c(
+        "Variable {.var {var_name}} is not numeric.",
+        "i" = if (isTRUE(spec$ordinal_ok)) {
+          "Rank correlations take numeric variables or ordered factors."
+        }
+      ), call = call)
     }
   }
 

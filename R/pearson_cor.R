@@ -151,6 +151,7 @@
 pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
                         alternative = c("two.sided", "less", "greater"),
                         use = c("pairwise", "listwise"), na.rm = NULL) {
+  .check_required("data")
   .correlate(
     data, ...,
     weights = rlang::enquo(weights),

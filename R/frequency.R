@@ -124,6 +124,7 @@ frequency <- function(data, ..., weights = NULL, sort_frq = "none",
                      sort.frq = NULL, show.na = NULL, show.prc = NULL,
                      show.valid = NULL, show.sum = NULL, show.labels = NULL,
                      show.unused = NULL) {
+  .check_required("data")
 
   if (!is.data.frame(data)) cli_abort("{.arg data} must be a data frame.")
 

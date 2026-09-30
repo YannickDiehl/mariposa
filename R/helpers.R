@@ -216,6 +216,14 @@ NULL
   data[[weights_name]] <- weights_vec
 
   .check_weights(weights_vec, weights_name, call = call)
+  # Without any positive weight every case is excluded (SPSS: no valid
+  # cases); the analyses used to fail deep inside with base-R errors
+  if (length(weights_vec) > 0 && !any(weights_vec > 0, na.rm = TRUE)) {
+    cli_abort(c(
+      "Weights variable {.var {weights_name}} has no positive value.",
+      "x" = "All weights are zero or missing, so every case would be excluded."
+    ), call = call)
+  }
 
   list(vector = weights_vec, name = weights_name, data = data)
 }
@@ -655,4 +663,107 @@ get_value_labels <- function(x, freq_names) {
     ), call = call)
   }
   invisible(TRUE)
+}
+
+#' Clear error for missing required arguments
+#'
+#' Called first in exported functions: a missing required argument used to
+#' surface as a base-R error from deep inside the function (localized
+#' 'Argument "data" fehlt (ohne Standardwert)', an internal name such as
+#' 'Argument "x" fehlt' or 'Argument "between_expr" fehlt', "Can't extract
+#' column with `g_name`", "no applicable method for ... class NULL").
+#'
+#' @param args Names of the required arguments of the calling function
+#' @param hint Optional extra hint (cli markup without interpolation)
+#' @param env The calling function's environment
+#' @noRd
+.check_required <- function(args, hint = NULL, env = rlang::caller_env()) {
+  miss <- args[vapply(args, function(a) eval(call("missing", as.name(a)), env),
+                      logical(1))]
+  if (length(miss) == 0) return(invisible(TRUE))
+  # A misspelled name in `...` (grp = for group) is the better message
+  fn <- tryCatch(rlang::frame_fn(env), error = function(e) NULL)
+  if (is.function(fn) && "..." %in% names(formals(fn))) {
+    .check_dot_names(eval(quote(...names()), env), call = env)
+  }
+  fn_name <- .frame_fn_name(env)
+  needs <- if (length(args) > 1 && !is.na(fn_name)) {
+    paste0("{.fn ", .cli_escape(fn_name), "} needs {.arg {args}}.")
+  }
+  cli_abort(c(
+    "Argument{?s} {.arg {miss}} {?is/are} missing, with no default.",
+    "i" = needs,
+    "i" = hint
+  ), call = env)
+}
+
+#' Select the grouping variable of a test (`group =`)
+#'
+#' One column by name, string or tidyselect helper. An expression
+#' (`group = region == "East"`) failed with the localized "object 'region'
+#' not found" inside a tidyselect error; no or several columns led to
+#' "Can't extract column with `g_name`" further down.
+#'
+#' @param data Data frame
+#' @param group_quo Quosure of the `group` argument
+#' @return The column name
+#' @noRd
+.select_group <- function(data, group_quo, call = rlang::caller_env()) {
+  expr <- rlang::quo_get_expr(group_quo)
+  txt <- paste(trimws(deparse(expr, width.cutoff = 500L)), collapse = " ")
+  selectors <- c("all_of", "any_of", "starts_with", "ends_with", "contains",
+                 "matches", "num_range", "where", "last_col", "everything",
+                 "c", ":", "-", "!", "(")
+  pos <- tryCatch(
+    tidyselect::eval_select(rlang::expr(!!group_quo), data = data),
+    error = function(e) {
+      if (rlang::is_call(expr) && !rlang::is_call(expr, selectors)) {
+        cli_abort(c(
+          "{.arg group} must name one variable of {.arg data}.",
+          "x" = "{.code {txt}} is an expression, not a variable name.",
+          "i" = "Create the grouping variable first, e.g. {.code data |> mutate(g = {txt})}, then use {.code group = g}."
+        ), call = call)
+      }
+      stop(e)
+    }
+  )
+  if (length(pos) != 1) {
+    cli_abort(c(
+      "{.arg group} must select exactly one variable.",
+      "x" = if (length(pos) == 0) "{.code {txt}} selects none." else
+        "{.code {txt}} selects {length(pos)}: {.var {names(pos)}}."
+    ), call = call)
+  }
+  names(pos)
+}
+
+#' Clear error when a value argument cannot be evaluated
+#'
+#' For arguments that take a value, not a column name (a formula, a pattern,
+#' a path, a data frame): a bare column name there failed with the localized
+#' "Objekt 'age' nicht gefunden". Forces the argument and names it.
+#'
+#' @param arg Name of the argument (string)
+#' @param what What the argument must be (cli markup), e.g. "a file path"
+#' @param hint Optional extra hint (cli markup without interpolation)
+#' @param env The calling function's environment
+#' @return The value of the argument (invisibly)
+#' @noRd
+.check_value_arg <- function(arg, what, hint = NULL, env = rlang::caller_env()) {
+  tryCatch(
+    invisible(eval(as.name(arg), env)),
+    error = function(e) {
+      expr <- eval(call("substitute", as.name(arg)), env)
+      txt <- paste(trimws(deparse(expr, width.cutoff = 500L)), collapse = " ")
+      cli_abort(c(
+        paste0("{.arg {arg}} must be ", what, "."),
+        "x" = if (is.symbol(expr)) {
+          "Object {.code {txt}} not found (a variable name is not accepted here)."
+        } else {
+          "{.code {txt}} could not be evaluated: {conditionMessage(e)}"
+        },
+        "i" = hint
+      ), call = env)
+    }
+  )
 }

@@ -120,6 +120,7 @@
 #' @family hypothesis_tests
 #' @export
 chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
+  .check_required("data")
 
   # Input validation
   if (!is.data.frame(data)) {

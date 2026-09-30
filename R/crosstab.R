@@ -118,6 +118,7 @@ crosstab <- function(data, row, col,
                     percentages = c("row", "none", "col", "total", "all"),
                     na.rm = TRUE,
                     digits = 1) {
+  .check_required("data")
   .reject_partial_args()
   UseMethod("crosstab")
 }

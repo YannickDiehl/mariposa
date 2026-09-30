@@ -135,6 +135,7 @@
 #' @export
 kruskal_wallis <- function(data, ..., group, weights = NULL,
                            conf.level = 0.95) {
+  .check_required("data")
 
   # Input validation
   if (!is.data.frame(data)) {
@@ -159,8 +160,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     cli_abort("{.arg group} is required for Kruskal-Wallis test.")
   }
 
-  g_var <- eval_select(expr(!!group_quo), data = data)
-  g_name <- names(g_var)[1]
+  g_name <- .select_group(data, group_quo)
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))

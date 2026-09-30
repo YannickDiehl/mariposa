@@ -119,6 +119,7 @@
 #' @family hypothesis_tests
 #' @export
 chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
+  .check_required("data")
   
   # Get data structure
   is_grouped <- inherits(data, "grouped_df")
@@ -739,6 +740,7 @@ print.summary.chi_square <- function(x, ...) {
 #' @family effect_sizes
 #' @export
 phi <- function(data, ..., weights = NULL) {
+  .check_required("data")
   .check_dot_names(names(rlang::enquos(...)))
   res <- chi_square(data, ..., weights = {{ weights }})
   .extract_chi_effect_size(res, "phi")
@@ -747,6 +749,7 @@ phi <- function(data, ..., weights = NULL) {
 #' @rdname phi
 #' @export
 cramers_v <- function(data, ..., weights = NULL) {
+  .check_required("data")
   .check_dot_names(names(rlang::enquos(...)))
   res <- chi_square(data, ..., weights = {{ weights }})
   .extract_chi_effect_size(res, "cramers_v")
@@ -755,6 +758,7 @@ cramers_v <- function(data, ..., weights = NULL) {
 #' @rdname phi
 #' @export
 goodman_gamma <- function(data, ..., weights = NULL) {
+  .check_required("data")
   .check_dot_names(names(rlang::enquos(...)))
   res <- chi_square(data, ..., weights = {{ weights }})
   .extract_chi_effect_size(res, "gamma")

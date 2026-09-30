@@ -115,6 +115,7 @@
 #' @family hypothesis_tests
 #' @export
 friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
+  .check_required("data")
 
   # Input validation
   if (!is.data.frame(data)) {

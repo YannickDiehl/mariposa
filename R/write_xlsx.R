@@ -114,6 +114,8 @@
 #'
 #' @export
 write_xlsx <- function(x, file, ...) {
+  .check_required(c("x", "file"))
+  .check_value_arg("file", "a file path (a character string)")
   if (is.data.frame(x)) .ensure_haven(x)
   UseMethod("write_xlsx")
 }

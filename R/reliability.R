@@ -160,6 +160,7 @@
 #' @family scale
 #' @export
 reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
+  .check_required("data")
 
   # ============================================================================
   # INPUT VALIDATION AND SETUP

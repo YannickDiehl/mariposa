@@ -130,6 +130,7 @@
 #' @family hypothesis_tests
 #' @export
 ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
+  .check_required(c("data", "dv", "between", "covariate"))
 
   # ============================================================================
   # INPUT VALIDATION

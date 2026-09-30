@@ -115,6 +115,7 @@
 #' @family descriptive
 #' @export
 normality_test <- function(data, ...) {
+  .check_required("data")
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame or tibble.")
   }

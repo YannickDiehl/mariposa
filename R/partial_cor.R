@@ -114,6 +114,7 @@
 #' @family correlation
 #' @export
 partial_cor <- function(data, ..., controls, weights = NULL) {
+  .check_required("data")
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame or tibble.")
   }

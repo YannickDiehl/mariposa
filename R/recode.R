@@ -183,6 +183,7 @@
 rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
                 var_label = NULL, val_labels = NULL,
                 as.factor = NULL, var.label = NULL, val.labels = NULL) {
+  .check_required("data")
 
   # ---- Removed dot-case arguments: hard error (see VERSIONING_POLICY.md, 4).
   # The formals stay as NULL sentinels because `...` is consumed by
@@ -858,6 +859,7 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 #' @family recode
 #' @export
 to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
+  .check_required("data")
 
   suffix <- match.arg(suffix, choices = c("val", "label"))
 

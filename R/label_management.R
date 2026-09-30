@@ -84,6 +84,7 @@
 #'
 #' @export
 var_label <- function(data, ...) {
+  .check_required("data")
   # --- Single vector input ---
   if (!is.data.frame(data)) {
     dots <- rlang::enexprs(...)
@@ -284,6 +285,7 @@ var_label <- function(data, ...) {
 #'
 #' @export
 val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
+  .check_required("data")
   # --- Single vector input ---
   if (!is.data.frame(data)) {
     dots <- rlang::enexprs(...)
@@ -465,6 +467,8 @@ val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
 #'
 #' @export
 copy_labels <- function(data, source) {
+  .check_required(c("data", "source"))
+  .check_value_arg("source", "a data frame")
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame.")
   }
@@ -585,6 +589,7 @@ copy_labels <- function(data, source) {
 #'
 #' @export
 drop_labels <- function(data, ..., drop_na = FALSE) {
+  .check_required("data")
   .ensure_haven(data)
   if (!is.data.frame(data)) {
     # Single vector

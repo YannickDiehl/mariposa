@@ -100,6 +100,7 @@
 #' @export
 read_xlsx <- function(path, sheet = NULL, labels = TRUE,
                       verbose = FALSE, ...) {
+  .check_required("path")
   .check_openxlsx2()
   .validate_xlsx_read_path(path)
   .check_file_type(path, c("xlsx", "zip"), "read_xlsx")

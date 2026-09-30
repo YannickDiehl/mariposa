@@ -147,6 +147,7 @@
 #' @export
 oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE, 
                       conf.level = 0.95) {
+  .check_required(c("data", "group"))
   
   # Input validation
   if (!is.data.frame(data)) {
@@ -185,8 +186,7 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
     cli_abort("{.arg group} is required for ANOVA.")
   }
 
-  g_var <- eval_select(expr(!!group_quo), data = data)
-  g_name <- names(g_var)
+  g_name <- .select_group(data, group_quo)
 
   # Process weights using centralized helper
   weights_info <- .process_weights(data, rlang::enquo(weights))

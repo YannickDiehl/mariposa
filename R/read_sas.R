@@ -77,6 +77,7 @@
 #' @export
 read_sas <- function(path, catalog_file = NULL, encoding = NULL,
                      catalog_encoding = NULL, tag_na = NULL, verbose = FALSE) {
+  .check_required("path")
   .check_haven("SAS import")
 
   # Automatically delegate .xpt files to read_xpt()
@@ -163,6 +164,7 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
 #'
 #' @export
 read_xpt <- function(path, tag_na = NULL, verbose = FALSE) {
+  .check_required("path")
   .check_haven("SAS transport import")
   .check_file_type(path, "xpt", "read_xpt")
 

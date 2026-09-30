@@ -138,6 +138,7 @@
 #' @family posthoc
 #' @export
 pairwise_wilcoxon <- function(x, ...) {
+  .check_required("x", hint = "Pass the result of {.fn friedman_test}, e.g. {.code friedman_test(data, t1, t2, t3) |> pairwise_wilcoxon()}.")
   UseMethod("pairwise_wilcoxon")
 }
 
