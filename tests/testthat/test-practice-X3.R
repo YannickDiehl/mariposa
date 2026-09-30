@@ -237,6 +237,24 @@ test_that("EDGE-23: grouped normality_test() compact print shows the results", {
   expect_false(any(grepl("group combination", out, fixed = TRUE)))
 })
 
+test_that("EDGE-23: grouped regression compact prints use [group] lines", {
+  # Regressions printed "  region = East: R2 = ..." while every other
+  # compact print puts the group on its own "[region = East]" line.
+  d <- survey_data
+  d$hi <- as.integer(d$life_satisfaction >= 4)
+  g <- dplyr::group_by(d, region)
+  for (o in list(linear_regression(g, life_satisfaction ~ age),
+                 logistic_regression(g, hi ~ age))) {
+    out <- capture.output(print(o))
+    expect_true(any(grepl("[Grouped: region]", out, fixed = TRUE)))
+    i <- which(out == "[region = East]")
+    expect_length(i, 1L)
+    expect_match(out[i + 1L], "^  (Nagelkerke )?R2 = ")
+    expect_true("[region = West]" %in% out)
+    expect_false(any(grepl("region = East:", out, fixed = TRUE)))
+  }
+})
+
 test_that("EDGE-23: every compact test/model print points to summary()", {
   # Only about half of the compact prints (rank tests, chi-square family,
   # Levene, normality, partial_cor) ended with the summary() hint; t-test,

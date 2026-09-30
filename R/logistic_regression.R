@@ -794,7 +794,7 @@ print.logistic_regression <- function(x, digits = 3, ...) {
     cat(sprintf("Logistic Regression: %s%s%s%s\n", formula_str, outcome_tag,
                 weighted_tag, grouped_tag))
     for (grp in x$groups) {
-      cat(sprintf("  %s: %s\n", .format_group_label(grp$group_values),
+      cat(sprintf("[%s]\n  %s\n", .format_group_label(grp$group_values),
                   fit_line(grp)))
     }
     .print_skipped_groups(x$skipped_groups)

@@ -296,7 +296,9 @@ test_that("REG-10: a degenerate group is skipped with a warning naming it", {
   expect_length(m$groups, 1L)
   expect_equal(m$groups[[1]]$group_values$grp, "big")
   out <- capture.output(print(m))
-  expect_true(any(grepl("grp = tiny: not computed", out, fixed = TRUE)))
+  i <- which(out == "[grp = tiny]")  # [group] line, as every compact print
+  expect_length(i, 1L)
+  expect_match(out[i + 1L], "^  not computed")
   out_s <- capture.output(print(summary(m)))
   expect_true(any(grepl("not computed", out_s, fixed = TRUE)))
 
@@ -305,8 +307,10 @@ test_that("REG-10: a degenerate group is skipped with a warning naming it", {
     "grp = tiny"
   )
   expect_length(ml$groups, 1L)
-  expect_true(any(grepl("grp = tiny: not computed",
-                        capture.output(print(ml)), fixed = TRUE)))
+  out_l <- capture.output(print(ml))
+  i <- which(out_l == "[grp = tiny]")
+  expect_length(i, 1L)
+  expect_match(out_l[i + 1L], "^  not computed")
   expect_no_error(capture.output(print(summary(ml))))
   expect_no_error(marginal_effects(ml))
 

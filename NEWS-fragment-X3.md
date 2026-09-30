@@ -62,3 +62,8 @@
   `factorial_anova()`, `ancova()`, the three correlation functions, both
   regressions, `reliability()` and `efa()` did not show it, the rank tests,
   chi-square family, Levene and normality tests did).
+* Grouped compact prints of `linear_regression()` and
+  `logistic_regression()` put each group on its own `[region = East]`
+  line (they printed "  region = East: R2 = ..."), like every other
+  compact print; a skipped group shows "not computed (reason)" under its
+  `[group]` line.

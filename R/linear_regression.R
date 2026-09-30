@@ -1086,7 +1086,7 @@ print.linear_regression <- function(x, digits = 3, ...) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
     cat(sprintf("Linear Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
     for (grp in x$groups) {
-      cat(sprintf("  %s: %s\n", .format_group_label(grp$group_values),
+      cat(sprintf("[%s]\n  %s\n", .format_group_label(grp$group_values),
                   fit_line(grp)))
     }
     .print_skipped_groups(x$skipped_groups)
@@ -2156,7 +2156,7 @@ df.residual.linear_regression <- function(object, ...) {
       print_group_header(s$group_values)
       cat(sprintf("  Model not computed: %s\n", s$reason))
     } else {
-      cat(sprintf("  %s: not computed (%s)\n",
+      cat(sprintf("[%s]\n  not computed (%s)\n",
                   .format_group_label(s$group_values), s$reason))
     }
   }
