@@ -204,6 +204,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   if (!quo_is_null(group_quo)) {
     g_var <- eval_select(expr(!!group_quo), data = data)
     g_name <- names(g_var)
+    # SPSS order (by code, not by first appearance: the sign of t must not
+    # depend on the row order) and value labels instead of codes
+    data[[g_name]] <- .group_factor(data[[g_name]])
   } else {
     g_name <- NULL
   }
@@ -284,13 +287,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       alternative = alternative,
       conf.level = conf.level,
       group_levels = if (!is.null(g_name)) {
-        g_var <- data[[g_name]]
-        if (is.factor(g_var)) {
-          all_levels <- levels(g_var)
-          all_levels[all_levels %in% unique(g_var)]
-        } else {
-          unique(g_var)
-        }
+        all_levels <- levels(data[[g_name]])
+        all_levels[all_levels %in% data[[g_name]]]
       } else NULL,
       data = data[, unique(c(var_names, g_name, w_name, grp_vars)), drop = FALSE]
     ),
@@ -460,13 +458,10 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     # Two-sample t-test
     g <- data[[group_name]][valid_indices]
 
-    # Get unique levels preserving factor order
-    if (is.factor(g)) {
-      all_levels <- levels(g)
-      g_levels <- all_levels[all_levels %in% unique(g)]
-    } else {
-      g_levels <- unique(g)
-    }
+    # Levels in factor order (t_test() converted `group` with
+    # .group_factor(): SPSS code order, value labels)
+    g <- .group_factor(g)
+    g_levels <- levels(g)[levels(g) %in% g]
 
     if (length(g_levels) != 2) {
       cli_abort(c(

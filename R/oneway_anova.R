@@ -197,18 +197,15 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   g_values <- data[[g_name]]
   
   # Handle different variable types for grouping
-  if (is.factor(g_values)) {
-    # Factor: use existing levels that have data
-    g_levels <- levels(g_values)[levels(g_values) %in% unique(g_values)]
-  } else if (is.character(g_values) || is.numeric(g_values)) {
-    # Non-factor: get unique values and convert to factor for ANOVA
-    g_levels <- unique(g_values[!is.na(g_values)])
-    # Convert to factor for proper ANOVA handling
-    data[[g_name]] <- factor(data[[g_name]])
-    g_values <- data[[g_name]]
-  } else {
+  if (!(is.factor(g_values) || is.character(g_values) || is.numeric(g_values))) {
     cli_abort("Grouping variable {.var {g_name}} must be numeric, character, or factor.")
   }
+  # SPSS order (by code) and value labels instead of codes; the factor is
+  # stored in $data, so tukey_test()/scheffe_test()/levene_test() on the
+  # result see the same labels
+  data[[g_name]] <- .group_factor(g_values)
+  g_values <- data[[g_name]]
+  g_levels <- levels(g_values)[levels(g_values) %in% g_values]
   
   if (length(g_levels) < 2) {
     cli_abort(c(
@@ -539,12 +536,9 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
     cli_abort("Variable {.var {var_name}}: After removing NAs, grouping variable must have at least 2 levels.")
   }
 
-  # Get group levels
-  if (is.factor(g)) {
-    group_levels <- levels(g)[levels(g) %in% unique(g)]
-  } else {
-    group_levels <- unique(g)
-  }
+  # Get group levels (factor order; oneway_anova() converted `group`)
+  g <- droplevels(.group_factor(g))
+  group_levels <- levels(g)
 
   group_stats <- .anova_descriptives(y, g, w, group_levels, conf.level)
   classical <- .anova_classical(y, g, w, group_levels)

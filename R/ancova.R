@@ -210,9 +210,8 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 
   # Convert factors
   for (bn in between_names) {
-    if (!is.factor(data_complete[[bn]])) {
-      data_complete[[bn]] <- factor(data_complete[[bn]])
-    }
+    # SPSS order (by code) and value labels instead of codes
+    data_complete[[bn]] <- .group_factor(data_complete[[bn]])
     data_complete[[bn]] <- droplevels(data_complete[[bn]])
   }
 

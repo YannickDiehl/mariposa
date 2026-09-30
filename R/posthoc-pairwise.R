@@ -131,12 +131,10 @@
   y <- y[valid_indices]
   g <- g[valid_indices]
 
-  # Get group levels
-  if (is.factor(g)) {
-    group_levels <- levels(g)[levels(g) %in% unique(g)]
-  } else {
-    group_levels <- unique(g)
-  }
+  # Get group levels (factor order, value labels; unused levels dropped so
+  # that TukeyHSD() sees only groups with data)
+  g <- droplevels(.group_factor(g))
+  group_levels <- levels(g)
 
   if (length(group_levels) < 2) {
     return(NULL)
