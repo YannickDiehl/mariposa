@@ -40,7 +40,9 @@
 #' @details
 #' For each labelled variable, the numeric codes are replaced by their
 #' associated value labels. The resulting factor levels are ordered by the
-#' original numeric values (not alphabetically).
+#' original numeric values (not alphabetically). Distinct codes that share a
+#' label text (e.g. ".." for the unlabelled points of a scale) stay distinct
+#' levels with their code appended: `".. (2)"`, `".. (3)"`.
 #'
 #' The original code of every level is kept in the factor's `"codes"`
 #' attribute (a named numeric vector, names = levels), so [to_numeric()]
@@ -137,17 +139,19 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
   # Build level order: sorted by numeric value
   level_order <- sort(valid_labels)
   level_names <- names(level_order)
-  level_values <- unname(level_order)
+  level_values <- as.double(.plain_numeric(level_order))
+  # Distinct codes sharing a label text (ALLBUS uses ".." for unlabelled
+  # scale points) get their code appended, as in .group_factor(): merging
+  # them into one level lost data and broke the to_numeric() round trip.
+  dup <- level_names %in% level_names[duplicated(level_names)]
+  level_names[dup] <- paste0(level_names[dup], " (", level_values[dup], ")")
   # Original code of each level (see "codes" attribute below)
   code_map <- stats::setNames(level_values, level_names)
 
   # Map data values to label text
-  raw <- as.double(x)
-  mapped <- rep(NA_character_, length(raw))
-
-  for (j in seq_along(level_values)) {
-    mapped[!is.na(raw) & raw == level_values[j]] <- level_names[j]
-  }
+  raw <- as.double(.plain_numeric(x))
+  mapped <- level_names[match(raw, level_values)]
+  mapped[is.na(raw)] <- NA_character_
 
   # Handle tagged NAs
   if (!isTRUE(drop_na) && length(na_labels) > 0L &&

@@ -284,3 +284,21 @@ test_that("IO-18: the ' (recoded)' label suffix does not stack", {
   r2 <- rec(r1, rules = "1:3=copy")
   expect_equal(attr(r2, "label"), "Trust (recoded)")
 })
+
+# IO-04: to_label()/to_character() merged distinct codes sharing a label
+# text (ALLBUS ".." on scale points 2-6: one level), and the to_numeric()
+# round trip turned 3-6 into 2.
+test_that("IO-04: duplicate label texts stay distinct levels", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(1, 2, 3, 4, 5, 6, 7, 2, 6),
+                       labels = c("none" = 1, ".." = 2, ".." = 3, ".." = 4,
+                                  ".." = 5, ".." = 6, "full" = 7))
+  f <- to_label(x)
+  expect_equal(nlevels(f), 7L)
+  expect_equal(levels(f)[1:3], c("none", ".. (2)", ".. (3)"))
+  expect_equal(to_numeric(f), c(1, 2, 3, 4, 5, 6, 7, 2, 6))
+  expect_equal(as.numeric(to_labelled(f)), c(1, 2, 3, 4, 5, 6, 7, 2, 6))
+  ch <- to_character(x)
+  expect_equal(length(unique(ch)), 7L)
+  expect_equal(ch[2], ".. (2)")
+})

@@ -57,3 +57,9 @@
   (`"[niedrig; gering]"`); `"dicho(x)"` and a missing `rules` argument give
   clear English errors instead of leaked base-R (German) messages; the
   `" (recoded)"` label suffix is no longer appended again on every call.
+* `to_label()` and `to_character()` no longer merge distinct codes that
+  share a label text. ALLBUS labels the scale points 2-6 of 88 items "..",
+  so e.g. `pt12` collapsed into three levels ("GAR KEIN VERTRAUEN", "..",
+  "GROSSES VERTRAUEN") and the `to_numeric()` round trip turned 3-6 into 2.
+  Duplicate texts now get their code appended (`".. (2)"`, `".. (3)"`), the
+  same rule the test functions use for grouping variables.
