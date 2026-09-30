@@ -4,7 +4,12 @@
 \alias{find_var}
 \title{Find Variables by Name or Label}
 \usage{
-find_var(data, pattern, search = c("name_label", "name", "label"))
+find_var(
+  data,
+  pattern,
+  search = c("name_label", "name", "label"),
+  fixed = FALSE
+)
 }
 \arguments{
 \item{data}{A data frame (typically imported from SPSS with \code{\link{read_spss}}).}
@@ -15,6 +20,14 @@ names and/or labels. Case-insensitive by default.}
 \item{search}{Where to search: \code{"name_label"} (default) searches both
 variable names and labels, \code{"name"} searches only names, \code{"label"}
 searches only labels.}
+
+\item{fixed}{If \code{TRUE}, \code{pattern} is searched as literal text
+(case-insensitive), e.g. \code{find_var(data, "BEFRAGTE(R)", fixed =
+  TRUE)} for label text with parentheses. Default \code{FALSE}: regular
+expression. A pattern that is not a valid regular expression (e.g.
+\code{"("}) is searched as literal text automatically, and a message
+points to \code{fixed = TRUE} when the literal text would give other
+matches.}
 }
 \value{
 A data frame with columns:
@@ -23,6 +36,8 @@ A data frame with columns:
 \item{name}{Variable name}
 \item{label}{Variable label (or \code{""} if none)}
 }
+Without matches, an empty data frame is returned invisibly (with a
+message).
 }
 \description{
 Searches for variables in your data by matching a pattern against variable
@@ -52,6 +67,11 @@ case-insensitive. Some examples:
 \item \code{"^q[0-9]+"} — matches variable names like q1, q23, q104
 \item \code{"zufried"} — finds German labels containing "Zufriedenheit"
 }
+
+Label text often contains characters with a special meaning in regular
+expressions, such as parentheses: \code{"BEFRAGTE(R)"} as a regular
+expression matches "BEFRAGTER". Use \code{fixed = TRUE} to search for
+the text exactly as written.
 }
 }
 \examples{
@@ -66,6 +86,9 @@ find_var(survey_data, "satisfaction", search = "label")
 
 # Use regex to find numbered items
 find_var(survey_data, "^q[0-9]+", search = "name")
+
+# Literal text with regex characters, e.g. parentheses in a label
+find_var(survey_data, "(1=left", fixed = TRUE)
 
 }
 \seealso{

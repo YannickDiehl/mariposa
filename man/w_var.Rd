@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("trust")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, you get the simple sample variance.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted variance(s) with sample size information,
@@ -39,7 +41,9 @@ variance is in squared units (e.g., years-squared for age), it is often
 easier to interpret the standard deviation (\code{\link{w_sd}}) instead.
 \item \strong{Effective N}: How many independent observations your weighted data
 represents. Always less than or equal to the actual sample size.
-\item \strong{N}: The actual number of observations used in the calculation.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 }
 

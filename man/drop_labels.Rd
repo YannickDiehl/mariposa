@@ -10,7 +10,7 @@ drop_labels(data, ..., drop_na = FALSE)
 \item{data}{A data frame or a single vector.}
 
 \item{...}{Optional: unquoted variable names (tidyselect supported). If
-empty, applies to all labelled columns.}
+empty, applies to all labelled and factor columns.}
 
 \item{drop_na}{If \code{TRUE}, also removes tagged NA labels. Default: \code{FALSE}
 (tagged NA labels are preserved even if no tagged NAs of that type exist).}
@@ -19,24 +19,35 @@ empty, applies to all labelled columns.}
 The data with unused labels removed.
 }
 \description{
-Removes value labels for values that are not present in the data. This is
-useful after filtering or subsetting, when some categories may no longer
-exist but their labels remain attached.
+Removes value labels for values that are not present in the data, and
+unused levels of factors. This is useful after filtering or subsetting,
+when some categories may no longer exist but their labels remain
+attached.
 }
 \details{
 This is useful after subsetting data (e.g., filtering out a category).
 The removed category's label still exists on the variable, which can
 cause confusing output in \code{\link[=frequency]{frequency()}} or \code{\link[=codebook]{codebook()}}.
 \code{drop_labels()} cleans this up by keeping only labels for values
-actually present in the data.
+actually present in the data. For factors, unused levels are dropped;
+the variable label and the original codes of a \code{\link[=to_label]{to_label()}} factor are
+kept.
 
 By default, tagged NA labels are preserved (\code{drop_na = FALSE}) because
 they represent missing value types, not substantive categories.
 }
 \examples{
-# After filtering, region == 4 no longer exists but its label remains
-data_subset <- dplyr::filter(survey_data, region != 4)
+# After filtering, "Basic Secondary" no longer occurs but remains a level
+data_subset <- dplyr::filter(survey_data, education != "Basic Secondary")
+levels(data_subset$education)
 data_clean <- drop_labels(data_subset)
+levels(data_clean$education)
+
+# Value labels of labelled vectors
+if (requireNamespace("haven", quietly = TRUE)) {
+  x <- haven::labelled(c(1, 2, 2), labels = c(low = 1, mid = 2, high = 3))
+  drop_labels(x)   # the unused label "high" is removed
+}
 
 }
 \seealso{

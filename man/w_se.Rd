@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("trust")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, you get the simple sample standard error.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted standard error(s) with sample size information,
@@ -37,7 +39,9 @@ values mean more precise estimates. You can build a 95\% confidence
 interval as: weighted mean +/- 1.96 * weighted SE.
 \item \strong{Effective N}: How many independent observations your weighted data
 represents. Weights that vary a lot reduce effective N, increasing the SE.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 }
 

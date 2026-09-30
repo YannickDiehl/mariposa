@@ -13,7 +13,12 @@ chi_square(data, ..., weights = NULL, correct = FALSE)
 
 \item{weights}{Optional survey weights for population-representative results}
 
-\item{correct}{Apply continuity correction for small samples? (Default: FALSE)}
+\item{correct}{Apply Yates' continuity correction to a 2x2 table?
+(Default: FALSE). The corrected statistic is reported as
+\code{chi_squared}; as in SPSS (which prints "Pearson Chi-Square" and
+"Continuity Correction" side by side), the uncorrected Pearson value is
+kept in \code{pearson_chi_squared} and Phi / Cramer's V are always
+computed from it.}
 }
 \value{
 Test results showing whether the variables are related, including:
@@ -56,8 +61,14 @@ The test tells you:
 \item 0.3-0.5: Medium relationship
 \item 0.5 or higher: Large relationship
 }
-\item \strong{Phi}: Only for 2x2 tables (similar interpretation as Cramer's V)
-\item \strong{Gamma}: For ordinal data (-1 to +1, shows direction of relationship)
+\item \strong{Phi}: sqrt(chi-squared / N). Reported for every table, as SPSS
+does; in a 2x2 table it equals Cramer's V, in larger tables it can
+exceed 1 (use Cramer's V there)
+\item \strong{Gamma}: For two ordinal variables (-1 to +1, shows the direction of
+the relationship). Shown by \code{summary()} only when both variables
+are ordered factors or numeric; for nominal variables its sign depends
+on the arbitrary category order. \code{goodman_gamma()} always
+computes it.
 }
 }
 

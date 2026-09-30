@@ -21,16 +21,22 @@ linear_regression(
 (via \code{dplyr::group_by()}), separate regressions are run for each group.}
 
 \item{formula}{A formula specifying the model (e.g., \code{y ~ x1 + x2}).
-If provided, \code{dependent} and \code{predictors} are ignored.}
+If provided, \code{dependent} and \code{predictors} are ignored. The
+outcome may be transformed (\code{log(income) ~ age}); \code{y ~ .}
+uses all other columns except the weights and grouping variables.}
 
 \item{dependent}{The dependent variable (unquoted). Used with \code{predictors}
 when no formula is given.}
 
 \item{predictors}{Predictor variable(s) (unquoted, supports tidyselect).
-Used with \code{dependent} when no formula is given.}
+Used with \code{dependent} when no formula is given. The dependent,
+weights and grouping variables are never used as predictors (a
+selection such as \code{where(is.numeric)} drops them with a message).
+Character predictors are entered as factors.}
 
-\item{weights}{Optional survey weights (unquoted variable name). When
-specified, weighted least squares (WLS) is used, matching SPSS WEIGHT BY.}
+\item{weights}{Optional survey weights (unquoted variable name, or an
+expression such as \code{sampling_weight * 2}). When specified,
+weighted least squares (WLS) is used, matching SPSS WEIGHT BY.}
 
 \item{use}{How to handle missing data: \code{"listwise"} (default) drops any
 case with a missing value on any variable (matching SPSS /MISSING LISTWISE).
@@ -54,7 +60,11 @@ when factor predictors carry ordered meaning (e.g., 4-level education).
 Note that for \emph{ordered} factors, "dummy" applies R's default
 polynomial contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}),
 not treatment dummies; convert with
-\code{factor(x, ordered = FALSE)} first if you want dummy coding.}
+\code{factor(x, ordered = FALSE)} first if you want dummy coding.
+\code{factors} applies to factors only: labelled predictors from SPSS
+files (\code{haven_labelled}) are numeric and enter with their numeric
+codes, exactly as in SPSS REGRESSION; \code{summary()} notes them.
+Convert them with \code{\link{to_label}} first to get dummy coding.}
 }
 \value{
 For ungrouped + listwise data, an object of class
@@ -145,7 +155,17 @@ results closer to SPSS output when data has varying patterns of missingness.
 
 \strong{Weights}: When weights are specified, they are treated as frequency
 weights (matching SPSS WEIGHT BY behavior). The model is fitted using weighted
-least squares via \code{lm(weights = ...)}.
+least squares via \code{lm(weights = ...)}; the coefficients are those of
+\code{lm()}, but N is \code{sum(w)} and the residual df are
+\code{sum(w) - rank} (unrounded), as in SPSS. \code{lm()} itself treats
+weights as analytic (precision) weights with df = cases - rank, so the
+inherited generics are adjusted to the SPSS convention:
+\code{vcov()}, \code{confint()}, \code{nobs()} (unrounded \code{sum(w)}),
+\code{df.residual()}, \code{anova()} (single model), \code{predict()}
+(standard errors and intervals), \code{broom::tidy()} and
+\code{broom::glance()} all agree with \code{summary()}.
+\code{stats::summary.lm()}, \code{logLik()}, \code{AIC()} and
+\code{BIC()} keep lm's analytic-weight definitions.
 
 \strong{Standardized Coefficients}: Beta = B * (SD_x / SD_y). This matches
 the SPSS standardized coefficient output. Not available for the intercept.

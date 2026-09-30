@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("trust")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, you get the simple sample skewness.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted skewness value(s) with sample size information,
@@ -44,7 +46,9 @@ whether values tend to trail off more to the left or right:
 }
 \item \strong{Effective N}: How many independent observations your weighted data
 represents.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
 High skewness suggests you might want to use the median instead of the mean

@@ -18,26 +18,36 @@ the target are left unchanged.
 }
 \description{
 Copies variable labels, value labels, and tagged NA metadata from a source
-data frame to a target data frame. This is essential after dplyr operations
-like \code{\link[dplyr:filter]{dplyr::filter()}}, \code{\link[dplyr:select]{dplyr::select()}}, or \code{\link[dplyr:mutate]{dplyr::mutate()}} which can
-strip label attributes.
+data frame to a target data frame. dplyr verbs such as \code{\link[dplyr:filter]{dplyr::filter()}},
+\code{\link[dplyr:select]{dplyr::select()}} or \code{\link[dplyr:arrange]{dplyr::arrange()}} keep labels; they are lost by
+base-R conversions and computations (e.g. \code{as.numeric()}, \code{ifelse()},
+arithmetic on labelled vectors), by \code{\link[=merge]{merge()}} / \code{rbind()} of plain data
+frames, or by a detour through CSV. \code{copy_labels()} restores them from
+the original data.
 }
 \details{
-The following attributes are copied for each shared column:
+The variable label (\code{"label"}) is always copied. The following are
+copied only when the target column still holds the source's codes (a
+numeric column whose values are observed values or labelled codes of the
+source column):
 \itemize{
-\item \code{"label"} — variable label
 \item \code{"labels"} — value labels
 \item \code{"na_tag_map"} — tagged NA mapping
 \item \code{"na_tag_format"} — tagged NA format (spss/stata/sas)
+\item \code{"na_values"}, \code{"na_range"} — SPSS missing-value definitions
 \item \code{"class"} — vector class (e.g., \code{haven_labelled})
 }
+A converted column (e.g. a factor from \code{\link[=to_label]{to_label()}}) or a summarised one
+(e.g. group means) keeps its own type and gets the variable label only.
 }
 \examples{
-# Labels are lost after dplyr operations
-data_subset <- dplyr::filter(survey_data, age >= 18)
+# as.numeric() drops the variable label
+data_plain <- dplyr::mutate(survey_data, age = as.numeric(age))
+attr(data_plain$age, "label")
 
-# Restore them
-data_subset <- copy_labels(data_subset, survey_data)
+# Restore it
+data_plain <- copy_labels(data_plain, survey_data)
+attr(data_plain$age, "label")
 
 }
 \seealso{

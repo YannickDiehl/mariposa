@@ -66,8 +66,15 @@ scale instead of (or alongside) odds ratios
 \subsection{Technical Details}{
 
 Continuous predictors use a centered numerical derivative of the
-predicted probability; factor predictors use the average discrete
-change against the reference level. Standard errors come from the
+predicted probability; factor, character and logical predictors use
+the average discrete change against the reference level (the first
+level; \code{FALSE} for logicals). Effects are computed per
+\emph{variable} from the original data: a variable that enters through
+several terms (\code{x + I(x^2)}, \code{poly(x, 2)}, \code{log(x)},
+interactions) gets one AME that moves all of those terms together. A
+numeric variable that enters only as a categorical term (e.g.
+\code{factor(x)}) cannot be differentiated; it is skipped with a
+warning. Standard errors come from the
 delta method with the analytic gradient of the AME with respect to
 the coefficients and the model's Wald covariance matrix, matching the
 default in Stata's \code{margins} and R's \pkg{margins} package.

@@ -16,7 +16,9 @@ variables or use helpers like \code{starts_with("income")}}
 not affect the range calculation. The range depends only on the observed
 minimum and maximum values.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 The range (max - min) with sample size information,
@@ -37,7 +39,9 @@ weighted statistics, though the range itself is not affected by weights
 range indicates that at least some values are far apart.
 \item \strong{Effective N}: Reported when weights are provided, for consistency with
 other weighted statistics.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
 Note: The range is sensitive to outliers. A single extreme value can

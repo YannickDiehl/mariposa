@@ -15,7 +15,9 @@ set_na(data, ..., tag = TRUE, verbose = FALSE)
 (e.g., \code{set_na(data, -9, -8)})
 \item \strong{Named pairs}: Applied to specific variables
 (e.g., \code{set_na(data, income = c(-9, -8), age = -1)})
-}}
+}
+Factors are left unchanged (with a warning when named explicitly):
+\code{set_na()} works on numeric codes.}
 
 \item{tag}{If \code{TRUE} (default), uses tagged NAs to preserve distinct
 missing types. The resulting tagged NAs integrate with

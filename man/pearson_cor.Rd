@@ -32,7 +32,9 @@ be drastically too narrow — in that case, normalize weights so that
 \item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
 
 \item{alternative}{Direction of the test: \code{"two.sided"} (default),
-\code{"less"}, or \code{"greater"}.}
+\code{"less"}, or \code{"greater"}. A one-sided test gets the matching
+one-sided confidence interval (\code{[-1, upper]} for \code{"less"},
+\code{[lower, 1]} for \code{"greater"}), as \code{stats::cor.test()}.}
 
 \item{use}{How to handle missing values:
 \itemize{

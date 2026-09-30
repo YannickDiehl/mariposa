@@ -32,7 +32,9 @@ crosstab(
 \item \code{"none"}: Just counts, no percentages
 }}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, missing values of either variable form their own
+\code{"NA"} row or column.}
 
 \item{digits}{Decimal places for percentages (Default: 1)}
 }
@@ -68,11 +70,21 @@ The crosstab table shows:
 SPSS \code{/CELLS=ASRESID}): which cells deviate from independence.
 After a significant \code{\link{chi_square}} test, cells with
 |adj. residual| > 2 are the ones driving the association.
-For weighted tables the residuals are computed on the unrounded
-weighted cell counts; an SPSS v29 reference run for the residuals is
-pending, so they are currently verified against the Haberman formula
-(\code{chisq.test()$stdres}) rather than SPSS output.
+For weighted tables the residuals are computed on the rounded
+weighted cell counts (see below); an SPSS v29 reference run for the
+residuals is pending, so they are currently verified against the
+Haberman formula (\code{chisq.test()$stdres}) rather than SPSS output.
 }
+}
+
+\subsection{Weighted Tables}{
+
+As SPSS CROSSTABS does by default (\code{/COUNT ROUND CELL}), each
+weighted cell count is rounded to a whole number first; the row and
+column totals are sums of the rounded cells and all percentages come
+from the rounded counts. The table total can therefore differ by a few
+cases from the rounded sum of weights shown as "N (valid)" (SPSS: 2518
+vs. 2516 for education x employment in \code{survey_data}).
 }
 
 \subsection{When to Use This}{

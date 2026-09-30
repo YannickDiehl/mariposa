@@ -22,22 +22,23 @@ levene_test(x, ...)
 
 \method{levene_test}{mann_whitney}(x, ...)
 
-\method{levene_test}{grouped_df}(x, variable, group = NULL, weights = NULL, center = "mean", ...)
+\method{levene_test}{grouped_df}(x, ..., group, weights = NULL, center = c("mean", "median"))
 }
 \arguments{
-\item{x}{Either your data or test results from \code{t_test()} or \code{oneway_anova()}}
+\item{x}{Either your data (a data frame, optionally grouped with
+\code{group_by()}) or test results from \code{t_test()},
+\code{oneway_anova()} or \code{factorial_anova()}}
 
-\item{...}{Variables to test (when using data frame)}
+\item{...}{Variables to test (when using a data frame). List several
+variables or use tidyselect helpers like \code{starts_with("trust")}.}
 
-\item{group}{The grouping variable for comparison}
+\item{group}{The grouping variable for comparison (unquoted or a string)}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Must be numeric and non-negative (the package-wide weights
+policy).}
 
 \item{center}{How to measure center: \code{"mean"} (default) or \code{"median"} (more robust)}
-
-\item{variable}{Variable to test (when using grouped data frame)}
-
-\item{data}{Your survey data (when x is not a test result)}
 }
 \value{
 Test results showing:

@@ -4,7 +4,15 @@
 \alias{fisher_test}
 \title{Fisher's Exact Test for Small Samples}
 \usage{
-fisher_test(data, row, col, weights = NULL, ...)
+fisher_test(
+  data,
+  row,
+  col,
+  weights = NULL,
+  simulate.p.value = FALSE,
+  B = 10000,
+  ...
+)
 }
 \arguments{
 \item{data}{Your survey data (data frame or tibble)}
@@ -14,6 +22,17 @@ fisher_test(data, row, col, weights = NULL, ...)
 \item{col}{The column variable (categorical)}
 
 \item{weights}{Optional survey weights for population-representative results}
+
+\item{simulate.p.value}{Compute the p-value by Monte Carlo simulation
+instead of exactly? (Default: FALSE). For large tables (many rows and
+columns, large N) the exact network algorithm can run out of memory
+("FEXACT error"); \code{fisher_test()} then switches to the Monte Carlo
+p-value automatically with a warning. SPSS offers the same choice
+(Exact Tests: "Exact" or "Monte Carlo"). Call \code{set.seed()} first
+for reproducible Monte Carlo results.}
+
+\item{B}{Number of Monte Carlo replicates (Default: 10000, the SPSS
+default number of samples).}
 
 \item{...}{Additional arguments (currently unused)}
 }

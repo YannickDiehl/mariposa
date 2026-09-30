@@ -34,7 +34,8 @@ recoded variables (e.g., \code{"_r"}). If \code{NULL} (default), the
 original columns are overwritten in-place.}
 
 \item{var_label}{A new variable label. If \code{NULL}, the existing label
-is kept with \code{" (recoded)"} appended.}
+is kept with \code{" (recoded)"} appended (once: recoding a recoded
+variable does not stack the suffix).}
 
 \item{val_labels}{A named character vector of value labels for the new
 values (e.g., \code{c("1" = "Low", "2" = "Medium", "3" = "High")}).
@@ -51,7 +52,12 @@ swallowed by \code{...}.)}
 \value{
 If \code{data} is a vector, a recoded vector is returned. If
 \code{data} is a data frame, the modified data frame is returned
-(invisibly).
+(invisibly). A recoded variable is \code{haven_labelled} whenever it
+carries value labels or the missing-value types of an imported variable,
+so the labels survive \code{\link{write_spss}()} and
+\code{\link{write_stata}()}. With \code{as_factor = TRUE} the factor
+levels are ordered by code and named by the result's value labels
+(unlabelled values keep their code as level name).
 }
 \description{
 \code{rec()} recodes values of a variable using an intuitive string syntax.
@@ -68,11 +74,13 @@ Rules are specified as a semicolon-separated string of
 \strong{Syntax}       \tab \strong{Meaning}        \tab \strong{Example} \cr
 \code{"old=new"}      \tab Single value             \tab \code{"1=0; 2=1"} \cr
 \code{"lo:hi=new"}    \tab Range of values          \tab \code{"1:3=1; 4:6=2"} \cr
+\code{"a,b=new"}      \tab List of values/ranges    \tab \code{"1,2=1; 3,4:5=2"} \cr
 \code{"old=new [Label]"} \tab Inline value label    \tab \code{"1:2=1 [Low]; 3:5=2 [High]"} \cr
 \code{"else=new"}     \tab Catch-all for unmatched  \tab \code{"1=1; else=NA"} \cr
 \code{"copy"}         \tab Keep original value      \tab \code{"1:3=copy; else=NA"} \cr
 \code{"min"/"max"}    \tab Dynamic boundaries       \tab \code{"min:3=1; 4:max=2"} \cr
 \code{"rev"}          \tab Reverse scale            \tab \code{"rev"} \cr
+\code{"rev(lo, hi)"}  \tab Reverse a lo-hi scale    \tab \code{"rev(1, 5)"} \cr
 \code{"dicho"}        \tab Median split             \tab \code{"dicho"} \cr
 \code{"dicho(x)"}     \tab Fixed cut-point          \tab \code{"dicho(3)"} \cr
 \code{"mean"}         \tab Mean split               \tab \code{"mean"} \cr
@@ -81,7 +89,29 @@ Rules are specified as a semicolon-separated string of
 \code{"val=NA"}       \tab Set values to NA          \tab \code{"-9=NA; -8=NA"} \cr
 }
 
-Rules are evaluated in order — the first matching rule wins.
+Rules are evaluated in order — the first matching rule wins. Keywords
+(\code{else}, \code{copy}, \code{NA}, \code{min}, \code{max},
+\code{rev}, \code{dicho}, \code{mean}, \code{quart}) are
+case-insensitive. A range must be written low to high (\code{"1:5"}, not
+\code{"5:1"}). Inline labels may contain semicolons
+(\code{"1:2=1 [low; poor]"}).
+
+Valid values that match no rule become \code{NA}, with a warning listing
+them: add \code{"else=copy"} to keep them (what SPSS's in-place
+\code{RECODE} does) or \code{"else=NA"} to confirm.
+}
+
+\subsection{Missing Values of Imported Data}{
+
+Missing values keep their type (the tagged NAs of \code{\link{read_spss}()},
+e.g. "no answer" vs. "not applicable") unless an \code{"NA=..."} or
+\code{"else=..."} rule recodes them, like SPSS's \code{RECODE} keeps
+user-missing codes. \code{\link{na_frequencies}()}, \code{frequency()}
+and \code{\link{write_spss}()} therefore still see them on the result.
+A \code{haven_labelled_spss} vector (from
+\code{haven::read_sav(user_na = TRUE)}) is first converted to this
+tagged-NA form, so its user-missing codes are neither reversed nor
+recoded as valid values.
 }
 
 \subsection{Decimal Values}{
@@ -107,8 +137,14 @@ but more compact and self-documenting. If both inline labels and
 
 \subsection{Special Modes}{
 
-\code{"rev"} reverses the scale by computing
-\code{max(x) + min(x) - x}. Value labels are mirrored accordingly.
+\code{"rev"} reverses the scale by computing \code{hi + lo - x}. The
+scale range \code{lo}-\code{hi} is taken from the value labels of the
+valid codes (together with the observed values), so an item answered
+only with 2-5 on a labelled 1-5 scale becomes 4-1, not 5-2. Without
+value labels the observed minimum and maximum are used and a message
+says so; set the range explicitly with \code{"rev(lo, hi)"}, e.g.
+\code{rules = "rev(1, 5)"}. Value labels are mirrored accordingly;
+missing values keep their type.
 
 \code{"dicho"} dichotomizes at the median: values \eqn{\le} median become 0,
 values \eqn{>} median become 1.
@@ -134,7 +170,7 @@ data <- rec(survey_data, trust_government,
 
 # Reverse a scale (with suffix to keep original)
 data <- rec(survey_data, trust_government, trust_media,
-            rules = "rev", suffix = "_r")
+            rules = "rev(1, 5)", suffix = "_r")
 
 # Dichotomize at the median
 data <- rec(survey_data, age, rules = "dicho", suffix = "_d")

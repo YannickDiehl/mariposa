@@ -17,7 +17,9 @@ pomps(x, scale_min = NULL, scale_max = NULL)
 }
 \value{
 A numeric vector of the same length as \code{x}, with values
-rescaled to the 0-100 range.
+rescaled to the 0-100 range. The variable label of \code{x} is kept;
+missing values (including the SPSS missing types of imported data)
+become plain \code{NA}, as in an SPSS \code{COMPUTE}.
 }
 \description{
 \code{pomps()} transforms scores to a 0-100 scale using the Percent of
@@ -49,7 +51,9 @@ range:
 }
 
 Using theoretical values ensures that the transformation is consistent
-across samples and time points.
+across samples and time points. Values outside the range (e.g. an
+unrecoded "don't know" = 9 on a 1-5 scale) give scores below 0 or above
+100; \code{pomps()} warns about them, so recode missing codes first.
 }
 
 \subsection{When to Use This}{

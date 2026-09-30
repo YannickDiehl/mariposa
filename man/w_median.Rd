@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("income")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, you get the simple sample median.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted median(s) with sample size information,
@@ -35,7 +37,9 @@ values, making it a robust measure of the "typical" value in your population.
 50\% of the population (by weight) falls below this value, 50\% above.
 \item \strong{Effective N}: How many independent observations your weighted data
 represents.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
 Comparing the weighted median to the weighted mean is informative:

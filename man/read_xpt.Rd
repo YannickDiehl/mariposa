@@ -40,7 +40,7 @@ When \code{tag_na} is used, \code{\link[=untag_na]{untag_na()}} can recover the 
 if (requireNamespace("haven", quietly = TRUE)) {
   # Roundtrip through a temporary .xpt transport file
   tmp <- tempfile(fileext = ".xpt")
-  write_xpt(survey_data, tmp)
+  write_xpt(survey_data, tmp, version = 8)  # names longer than 8 chars
   data <- read_xpt(tmp)
 
   # Read with numeric missing codes tagged as distinct NA types

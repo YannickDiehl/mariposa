@@ -19,7 +19,11 @@ raw value (e.g., \code{gender_1}), \code{"label"} uses the value label
 
 \item{ref}{A value to use as reference category (omitted from output).
 If \code{NULL} (default), all categories get a dummy variable.
-Set to a specific value for n-1 coding (e.g., for regression).}
+Set to a specific value for n-1 coding (e.g., for regression). For a
+factor, give a level name (\code{ref = "Male"}) or a number: the
+original code of a \code{\link{to_label}()} factor, otherwise the level
+position (\code{ref = 1} = first level). A \code{ref} that matches no
+category is an error.}
 
 \item{append}{If \code{TRUE} (default), the dummy columns are appended to
 the original data frame. If \code{FALSE}, only the dummy columns are
@@ -43,8 +47,11 @@ column naming and handles \code{haven_labelled} vectors correctly.
 
 With \code{suffix = "val"}: \code{{varname}_{value}} (e.g., \code{gender_1},
 \code{gender_2}). With \code{suffix = "label"}: \code{{varname}_{label}}
-where labels are cleaned (spaces replaced with \code{_}, special characters
-removed).
+where labels are cleaned (umlauts transliterated, e.g. "männlich" ->
+\code{maennlich}; spaces replaced with \code{_}; other special
+characters removed). Values without a usable label (e.g. "..") use their
+value; labels shared by several values get the value appended, so every
+category keeps its own column.
 }
 
 \subsection{Reference Category}{

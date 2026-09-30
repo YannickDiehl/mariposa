@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("income")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, you get the simple sample IQR.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted IQR(s) with sample size information,
@@ -35,7 +37,9 @@ the IQR is not affected by outliers, making it a robust measure of spread.
 population. A larger IQR means more spread in the central part of the data.
 \item \strong{Effective N}: How many independent observations your weighted data
 represents.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
 The IQR is especially useful when your data is skewed. For example, with

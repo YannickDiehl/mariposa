@@ -20,7 +20,10 @@ to_label(
 \item{data}{A data frame, tibble, or a single vector.}
 
 \item{...}{Optional: unquoted variable names (tidyselect supported). If
-empty, converts all \code{haven_labelled} columns.}
+empty, converts every \code{haven_labelled} column whose values are all
+value-labelled; metric variables (e.g. age with labels only for its
+missing codes), weights and partially labelled variables are left
+unchanged with a message. Selected variables are always converted.}
 
 \item{ordered}{If \code{TRUE}, creates an ordered factor. Default: \code{FALSE}.}
 
@@ -33,7 +36,8 @@ Default: \code{FALSE}.}
 
 \item{add_non_labelled}{If \code{TRUE}, values without labels are included as
 factor levels using their numeric value as the level name.
-Default: \code{FALSE} (unlabelled values become \code{NA}).}
+Default: \code{FALSE} (unlabelled values become \code{NA}, with a warning naming
+the variables).}
 
 \item{drop.na, drop.unused, add.non.labelled}{Defunct dot-case argument
 names, removed in mariposa 0.6.9. Calling the function with any of
@@ -53,7 +57,9 @@ data ready for plotting, cross-tabulation, and regression analysis.
 \details{
 For each labelled variable, the numeric codes are replaced by their
 associated value labels. The resulting factor levels are ordered by the
-original numeric values (not alphabetically).
+original numeric values (not alphabetically). Distinct codes that share a
+label text (e.g. ".." for the unlabelled points of a scale) stay distinct
+levels with their code appended: \code{".. (2)"}, \code{".. (3)"}.
 
 The original code of every level is kept in the factor's \code{"codes"}
 attribute (a named numeric vector, names = levels), so \code{\link[=to_numeric]{to_numeric()}}

@@ -26,7 +26,9 @@ Default: \code{c(0, 0.25, 0.5, 0.75, 1)} for the minimum, 25th percentile,
 median, 75th percentile, and maximum. Use \code{c(0.1, 0.5, 0.9)} for
 deciles, or \code{c(0.25, 0.5, 0.75)} for quartiles only.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted quantile(s) with sample size information,
@@ -48,7 +50,9 @@ in the weighted population. For example, if the weighted 25th percentile
 of income is 35,000, then 25\% of the population earns less than that.
 \item \strong{Effective N}: How many independent observations your weighted data
 represents.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
 Common percentiles and their meaning:

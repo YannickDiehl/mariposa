@@ -17,7 +17,8 @@ employment). Must have at least 2 groups (3+ for meaningful use).}
 
 \item{weights}{Optional survey weights for population-representative results}
 
-\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
+\item{conf.level}{Not used. Rank tests report no confidence interval (SPSS
+\code{NPAR TESTS} neither); kept for backward compatibility.}
 }
 \value{
 Test results showing whether groups differ, including:

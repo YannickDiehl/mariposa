@@ -28,15 +28,25 @@ implemented. Passing 2 issues a warning and computes Type III.}
 An object of class \code{"ancova"} containing:
 \describe{
 \item{anova_table}{Tibble with Source, SS, df, MS, F, p, Partial Eta Squared}
-\item{parameter_estimates}{Tibble with regression coefficients (B, SE, t, p)}
+\item{parameter_estimates}{Tibble with regression coefficients (B, SE,
+t, p, CI, partial eta squared) in SPSS coding: one row per category,
+the last category of each factor is the reference and reported as a
+redundant 0 (\code{redundant = TRUE})}
 \item{descriptives}{Tibble with unadjusted cell means, SDs, and Ns}
-\item{estimated_marginal_means}{Tibble with adjusted means (covariates at grand mean)}
+\item{estimated_marginal_means}{Tibble with adjusted cell means (covariates at grand mean)}
+\item{emm_main_effects}{For 2+ factors: named list of tibbles with the
+adjusted main-effect means (unweighted average of the cell means, as
+SPSS \code{/EMMEANS=TABLES(factor)}); NULL for one factor}
 \item{levene_test}{Tibble with Levene's test results}
 \item{r_squared}{R-squared and Adjusted R-squared}
 \item{model}{The underlying lm model object}
 \item{call_info}{List with metadata (dv, factors, covariates, weighted, etc.)}
 }
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
+For data grouped with \code{group_by()}, one ANCOVA is computed per group:
+the tables carry the group keys as leading columns and
+\code{group_results} holds the complete result of each group
+(\code{NULL}, with a warning, for a group that cannot be analysed).
 }
 \description{
 \code{ancova()} tests whether group means differ after controlling for one or

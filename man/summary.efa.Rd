@@ -14,6 +14,7 @@
   pattern_matrix = TRUE,
   structure_matrix = TRUE,
   factor_correlations = TRUE,
+  descriptives = TRUE,
   digits = 3,
   ...
 )
@@ -36,6 +37,9 @@
 \item{structure_matrix}{Show structure matrix (oblimin/promax)? (Default: TRUE)}
 
 \item{factor_correlations}{Show factor correlation matrix (oblimin/promax)? (Default: TRUE)}
+
+\item{descriptives}{Show the per-item descriptive statistics (mean, SD,
+analysis N, missing N; SPSS \code{/PRINT UNIVARIATE})? (Default: TRUE)}
 
 \item{digits}{Number of decimal places (Default: 3)}
 

@@ -4,15 +4,21 @@
 \alias{strip_tags}
 \title{Strip Tags from Tagged NAs}
 \usage{
-strip_tags(x)
+strip_tags(x, ...)
 }
 \arguments{
-\item{x}{A numeric vector with tagged NAs.}
+\item{x}{A numeric vector with tagged NAs, or a data frame.}
+
+\item{...}{For a data frame: the columns to convert (tidyselect). If
+empty, every numeric column is converted. Ignored for vectors.}
 }
 \value{
-A numeric vector where all tagged NAs have been replaced with
-regular \code{NA}. Value labels for missing types are removed; labels for
-valid values are preserved.
+The input with all tagged NAs replaced by regular \code{NA}. Value
+labels for missing types are removed; labels for valid values and the
+variable label are preserved. A \code{haven_labelled} input stays
+\code{haven_labelled}, so the labels survive \code{\link[=write_spss]{write_spss()}} and
+\code{\link[=write_stata]{write_stata()}}. A data frame is returned with the selected columns
+converted.
 }
 \description{
 Converts all tagged NAs to regular (untagged) \code{NA} values, effectively

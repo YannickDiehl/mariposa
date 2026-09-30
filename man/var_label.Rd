@@ -2,9 +2,12 @@
 % Please edit documentation in R/label_management.R
 \name{var_label}
 \alias{var_label}
+\alias{var_label<-}
 \title{Get or Set Variable Labels}
 \usage{
 var_label(data, ...)
+
+var_label(x) <- value
 }
 \arguments{
 \item{data}{A data frame, tibble, or a single vector.}
@@ -13,6 +16,13 @@ var_label(data, ...)
 If empty, returns labels for all variables.
 In SET mode: named pairs where the name is a variable and the value is
 the label string. Use \code{NULL} to remove a label.}
+
+\item{x}{For the replacement form: a vector or a data frame.}
+
+\item{value}{For the replacement form: a single character string (or
+\code{NULL} to remove the label) for a vector; for a data frame a named list
+or named character vector, names = columns (a \code{NULL} entry removes that
+label). Columns not named keep their labels.}
 }
 \value{
 \itemize{
@@ -73,10 +83,16 @@ data <- var_label(survey_data,
 # REMOVE: set to NULL
 data <- var_label(data, age = NULL)
 
+# Replacement form
+x <- c(1, 2, 3)
+var_label(x) <- "Score"
+d <- survey_data
+var_label(d) <- list(age = "Age of respondent", gender = "Gender identity")
+
 }
 \seealso{
 \code{\link[=val_labels]{val_labels()}} for value labels, \code{\link[=codebook]{codebook()}} for viewing all
-metadata, \code{\link[=copy_labels]{copy_labels()}} for preserving labels after dplyr operations
+metadata, \code{\link[=copy_labels]{copy_labels()}} for restoring labels lost by base-R operations
 
 Other labels:
 \code{\link[=copy_labels]{copy_labels()}},

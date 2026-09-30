@@ -4,19 +4,28 @@
 \alias{na_frequencies}
 \title{Frequency Table of Missing Value Types}
 \usage{
-na_frequencies(x)
+na_frequencies(x, ...)
 }
 \arguments{
-\item{x}{A numeric vector with tagged NAs.}
+\item{x}{A numeric vector with tagged NAs, or a data frame.}
+
+\item{...}{For a data frame: the variables to tabulate (tidyselect). If
+empty, every numeric variable with missing values is tabulated.}
 }
 \value{
-A data frame with columns:
-\item{tag}{The tag character (e.g., a-z for Stata, A-Z for SAS,
-a-z/A-Z/0-9 for SPSS)}
-\item{n}{Number of cases with this missing type}
-\item{code}{The original missing value code: numeric SPSS codes (e.g.,
--9, -8) or native format codes (e.g., ".a" for Stata, ".A" for SAS)}
+A data frame with one row per missing type, ordered by code like
+the missing block of \code{\link[=frequency]{frequency()}} (system missing last, listed only
+when it occurs):
+\item{code}{The original missing value code: numeric for SPSS codes
+(e.g., -9, -8), character for native format codes (e.g., ".a" for
+Stata, ".A" for SAS)}
 \item{label}{The value label for this missing type (if available)}
+\item{n}{Number of cases with this missing type}
+\item{prc}{Percent of all cases}
+\item{tag}{The internal tag character of the tagged NA}
+For a data frame, a first column \code{variable} names the variable. Without
+any missing values the (empty) result is returned invisibly with a
+message.
 }
 \description{
 Shows a breakdown of the different types of missing values in a variable
@@ -29,9 +38,9 @@ if (requireNamespace("haven", quietly = TRUE)) {
   # Declare -9/-8 as distinct tagged missing types, then inspect them
   x <- set_na(c(1, 2, -9, 3, -8, -9), -9, -8)
   na_frequencies(x)
-  #   tag n code label
-  # 1   a 2   -9  <NA>
-  # 2   b 1   -8  <NA>
+  #   code label n      prc tag
+  # 1   -9  <NA> 2 33.33333   a
+  # 2   -8  <NA> 1 16.66667   b
 }
 }
 

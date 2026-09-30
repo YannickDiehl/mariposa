@@ -12,7 +12,8 @@ tukey_test(x, conf.level = 0.95, ...)
 \arguments{
 \item{x}{ANOVA results from \code{oneway_anova()}}
 
-\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
+\item{conf.level}{Confidence level for intervals. Default: the
+\code{conf.level} of the \code{oneway_anova()} result (usually 0.95).}
 
 \item{...}{Additional arguments (currently unused)}
 }

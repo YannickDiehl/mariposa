@@ -22,14 +22,19 @@ logistic_regression(
 If provided, \code{dependent} and \code{predictors} are ignored.}
 
 \item{dependent}{The dependent variable (unquoted). Used with \code{predictors}
-when no formula is given. Must be binary (0/1 or two-level factor).}
+when no formula is given. Must have exactly two distinct values
+(e.g. 0/1, 1/2, a two-level factor); see Technical Details.}
 
 \item{predictors}{Predictor variable(s) (unquoted, supports tidyselect).
-Used with \code{dependent} when no formula is given.}
+Used with \code{dependent} when no formula is given. The dependent,
+weights and grouping variables are never used as predictors (a
+selection such as \code{where(is.numeric)} drops them with a message).
+Character predictors are entered as factors.}
 
-\item{weights}{Optional survey weights (unquoted variable name). When
-specified, weighted maximum likelihood estimation is used, matching
-SPSS WEIGHT BY behavior.}
+\item{weights}{Optional survey weights (unquoted variable name, or an
+expression such as \code{sampling_weight * 2}). When specified,
+weighted maximum likelihood estimation is used, matching SPSS WEIGHT BY
+behavior.}
 
 \item{conf.level}{Confidence level for odds ratio intervals (default 0.95).}
 
@@ -43,7 +48,11 @@ subcommand is given. The "numeric" mode emits a one-line
 \emph{ordered} factors, "dummy" applies R's default polynomial
 contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}), not
 treatment dummies; convert with \code{factor(x, ordered = FALSE)}
-first if you want dummy coding.}
+first if you want dummy coding. \code{factors} applies to factors
+only: labelled predictors from SPSS files (\code{haven_labelled}) are
+numeric and enter with their numeric codes, as in SPSS LOGISTIC
+REGRESSION without \code{/CATEGORICAL}; \code{summary()} notes them.
+Convert them with \code{\link{to_label}} first to get dummy coding.}
 }
 \value{
 For ungrouped data, an object of class
@@ -55,6 +64,8 @@ For ungrouped data, an object of class
 \item{omnibus_test}{List with chi_sq, df, p for overall model test}
 \item{classification}{List with table, overall_pct, pct_correct_0, pct_correct_1}
 \item{hosmer_lemeshow}{List with chi_sq, df, p (goodness-of-fit test)}
+\item{dv_encoding}{Tibble Original -> Internal (0/1) of the outcome
+categories (SPSS "Dependent Variable Encoding")}
 \item{n}{Sample size (listwise complete cases; weighted N when weighted)}
 \item{formula, dependent, predictor_names, weighted, weight_name, is_grouped, conf.level}{Call metadata.}
 }
@@ -65,7 +76,11 @@ generics (\code{predict()}, \code{anova()}, \code{vcov()},
 \code{broom::augment()}) dispatch natively without unwrapping.
 \code{summary()} returns the SPSS-style mariposa summary; for
 the raw glm summary use \code{stats::summary.glm()} on the same
-object.
+object. \code{confint()} returns Wald intervals on the log-odds
+scale (the SPSS method; \code{exp(confint(model))} gives the
+"C.I. for EXP(B)" of the summary), profile-likelihood intervals via
+\code{confint(model, method = "profile")}; see
+\code{\link{confint.logistic_regression}}.
 
 For grouped data, returns a list of class \code{"logistic_regression"}
 with \code{$groups} holding one fitted glm-inheriting result per group.
@@ -120,9 +135,18 @@ For continuous outcomes, use \code{\link{linear_regression}} instead.
 
 \subsection{Technical Details}{
 
-\strong{Dependent Variable}: Must be binary. Factors with exactly 2 levels
-are automatically converted to 0/1 (first level = 0, second level = 1).
-Numeric variables must contain only 0 and 1 values.
+\strong{Dependent Variable}: Any variable with exactly two distinct
+observed values, coded internally as 0/1 like SPSS LOGISTIC REGRESSION
+does: for numeric and labelled variables the lower value becomes 0 and
+the higher 1 (so 1/2 and 0/1 codings give the same model); for factors
+unused levels are dropped and the first remaining level becomes 0;
+character values are ordered alphabetically; logicals code
+\code{FALSE} = 0, \code{TRUE} = 1. The model predicts the probability of
+the category coded 1 - the compact print names it
+(\code{[P(y = category)]}), and \code{summary()} shows the SPSS
+"Dependent Variable Encoding" table (also stored as
+\code{$dv_encoding}). A grouped analysis uses one encoding for all
+groups.
 
 \strong{Missing Data}: Listwise deletion is used (matching SPSS LOGISTIC
 REGRESSION default behavior).

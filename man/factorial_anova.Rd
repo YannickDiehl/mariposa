@@ -32,6 +32,12 @@ An object of class \code{"factorial_anova"} containing:
 \item{call_info}{List with metadata (dv, factors, weighted, n_total, n_missing)}
 }
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
+For data grouped with \code{group_by()}, one ANOVA is computed per group:
+the tables carry the group keys as leading columns, \code{group_results}
+holds the complete result of each group (\code{NULL}, with a warning, for
+a group that cannot be analysed), and \code{print()}, \code{summary()},
+\code{tukey_test()}, \code{scheffe_test()} and \code{levene_test()} report
+per group.
 }
 \description{
 \code{factorial_anova()} tests whether group means differ across two or more
@@ -120,6 +126,11 @@ survey_data \%>\%
   factorial_anova(dv = life_satisfaction, between = c(gender, region),
                   weights = sampling_weight)
 
+# Separate ANOVA for each region
+survey_data \%>\%
+  group_by(region) \%>\%
+  factorial_anova(dv = life_satisfaction, between = c(gender, education))
+
 # Three-way ANOVA
 survey_data \%>\%
   factorial_anova(dv = income, between = c(gender, region, education))
@@ -133,7 +144,7 @@ result \%>\% levene_test()
 # --- Three-layer output ---
 result              # compact overview
 summary(result)     # full detailed output with all sections
-summary(result, marginal_means = FALSE)  # hide estimated marginal means
+summary(result, descriptives = FALSE)  # hide the cell descriptives
 
 }
 \references{

@@ -19,7 +19,7 @@ Invisibly returns the input object \code{x}.
 Displays the detailed SPSS-style output for a factorial ANOVA, with
 sections controlled by the boolean parameters passed to
 \code{\link{summary.factorial_anova}}.  Sections include the ANOVA table
-with Type III sums of squares, effect sizes, estimated marginal means,
+with Type III sums of squares and effect sizes, the cell descriptives,
 and Levene's test for homogeneity of variances.
 }
 \examples{
@@ -27,7 +27,7 @@ result <- factorial_anova(survey_data,
                           dv = life_satisfaction,
                           between = c(gender, education))
 summary(result)                          # all sections
-summary(result, marginal_means = FALSE)  # hide marginal means
+summary(result, levene_test = FALSE)  # hide Levene's test
 
 }
 \seealso{

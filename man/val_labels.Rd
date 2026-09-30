@@ -54,6 +54,9 @@ the numeric codes. This is the standard used by \code{\link[=read_spss]{read_sps
 By default, SET mode replaces all existing value labels. Use \code{.add = TRUE}
 to keep existing labels and only add new ones. If a value already has a
 label, the new label overwrites it.
+
+Value labels belong to numeric codes: setting them on a factor or a
+character column is an error (convert it with \code{\link[=to_labelled]{to_labelled()}} first).
 }
 }
 \examples{

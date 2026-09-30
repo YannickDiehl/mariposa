@@ -19,7 +19,10 @@ against \code{counted}.}
 against (SPSS \code{MULT RESPONSE ... BY factor}).}
 
 \item{counted}{The value that counts as a mention (default \code{1},
-matching SPSS dichotomy sets with counted value 1).}
+matching SPSS dichotomy sets with counted value 1). For factor or
+character indicators give the level that marks a mention, e.g.
+\code{counted = "yes"}; a value that does not occur among their
+levels is an error.}
 
 \item{weights}{Optional survey weights (unquoted variable name),
 treated as frequency weights matching SPSS \code{WEIGHT BY}.}
@@ -115,8 +118,8 @@ multiple_response(trust, gov, media, science,
 
 # --- Three-layer output ---
 result <- multiple_response(trust, gov, media, science)
-result              # compact overview
-summary(result)     # full detailed output
+result              # full tables
+summary(result)     # same tables, with section toggles
 
 }
 \seealso{

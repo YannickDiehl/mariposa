@@ -34,7 +34,14 @@ tagged NAs with an \code{na_tag_map} attribute mapping tag characters to origina
 codes (e.g., -9, -8). \code{write_spss()} reverses this process: tagged NAs are
 converted back to their original numeric codes, and the SPSS user-defined
 missing value specification is reconstructed so that the exported \code{.sav}
-file has the same missing value definitions as the original.
+file has the same missing value definitions as the original:
+\code{\link[=read_spss]{read_spss()}} remembers the original definition (e.g. \verb{LOWEST THRU -1}),
+which is written back as long as it still covers every missing code and
+no valid value. Otherwise up to 3 codes are written as discrete values;
+more codes use SPSS's "range plus one discrete value" form (the tightest
+that contains no valid value), announced in one message. If no such
+range exists, the export stops with an error instead of declaring valid
+values missing.
 }
 
 \subsection{Cross-Format Export}{
@@ -43,6 +50,17 @@ When exporting data originally imported from Stata or SAS (with native
 extended missing values like \code{.a}-\code{.z} or \code{.A}-\code{.Z}), these cannot be
 represented as SPSS user-defined missing values. In this case, they are
 written as system missing (regular \code{NA}) with a warning.
+}
+
+\subsection{Derived Variables}{
+
+Arithmetic on an imported variable (e.g. \code{x + 1} inside \code{mutate()})
+keeps its tagged NAs but loses the code map, so the original codes are
+unknown. Such values are written as system missing with a warning
+naming the variables. \code{\link[=rec]{rec()}} keeps the map; \code{\link[=std]{std()}}, \code{\link[=center]{center()}},
+\code{\link[=pomps]{pomps()}} and \code{\link[=to_numeric]{to_numeric()}} return plain \code{NA} by design. Numeric
+columns that carry a bare \code{"labels"} attribute (without the
+\code{haven_labelled} class) are exported with their value labels.
 }
 
 \subsection{When to Use This}{

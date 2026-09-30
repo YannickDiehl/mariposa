@@ -17,7 +17,9 @@ to_character(
 \item{data}{A data frame, tibble, or a single vector.}
 
 \item{...}{Optional: unquoted variable names (tidyselect supported). If
-empty, converts all \code{haven_labelled} columns.}
+empty, converts every \code{haven_labelled} column whose values are all
+value-labelled (metric variables are left unchanged with a message, as
+in \code{\link[=to_label]{to_label()}}).}
 
 \item{drop_na}{If \code{TRUE} (default), tagged NAs become regular \code{NA}.}
 

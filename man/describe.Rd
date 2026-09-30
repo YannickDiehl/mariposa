@@ -28,11 +28,19 @@ Without weights, you describe your sample. With weights, you describe the popula
 \item \code{"short"} (default): Essential stats (mean, median, SD, range, IQR, skewness)
 \item \code{"all"}: Everything including variance, kurtosis, mode, quantiles
 \item Custom list: Choose specific stats like \code{c("mean", "sd", "range")}
+from \code{"mean"}, \code{"median"}, \code{"sd"}, \code{"se"},
+\code{"var"}, \code{"range"}, \code{"iqr"}, \code{"skew"},
+\code{"kurtosis"}, \code{"mode"}, \code{"quantiles"}. Unknown names
+are an error.
 }}
 
-\item{probs}{For quantiles, which percentiles to show (default: 25th, 50th, 75th)}
+\item{probs}{For quantiles, which percentiles to show (default: 25th, 50th,
+75th). The 50th percentile is the median; when the median is shown it
+is not printed a second time (the result keeps both columns).}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 
 \item{excess}{For kurtosis, show excess kurtosis? (Default: TRUE, easier to interpret)}
 }
@@ -65,6 +73,10 @@ Key statistics and what they tell you:
 \item \strong{IQR}: Interquartile range - the middle 50\% of values
 \item \strong{Skewness}: Whether data leans left (negative) or right (positive)
 \item \strong{Kurtosis}: Whether you have unusual outliers
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as in SPSS FREQUENCIES with
+\code{WEIGHT BY}. Kish's effective sample size is kept in the result
+(\code{<variable>_Effective_N}) but not printed.
 }
 }
 
@@ -101,13 +113,13 @@ survey_data \%>\% describe(age)
 survey_data \%>\% describe(age, weights = sampling_weight)
 
 # Multiple variables with custom statistics
-survey_data \%>\% describe(age, income, life_satisfaction, 
-                        weights = sampling_weight, 
+survey_data \%>\% describe(age, income, life_satisfaction,
+                        weights = sampling_weight,
                         show = c("mean", "sd", "skew"))
 
 # Grouped analysis
-survey_data \%>\% 
-  group_by(region) \%>\% 
+survey_data \%>\%
+  group_by(region) \%>\%
   describe(age, weights = sampling_weight)
 
 }

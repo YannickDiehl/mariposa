@@ -7,17 +7,22 @@
 row_means(data, ..., min_valid = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{data}{Your survey data (a data frame or tibble). When used inside
-\code{mutate()}, pass \code{.} or use \code{pick()}.}
+\item{data}{Your survey data (a data frame or tibble). Inside
+\code{mutate()}, the recommended form is \code{pick()}:
+\code{mutate(score = row_means(pick(item1, item2, item3)))}. It also
+works in a grouped \code{mutate()}; \code{.} (the magrittr placeholder)
+is the whole data set and therefore only works without groups.}
 
 \item{...}{The variables to average. Use bare column names separated by
 commas, or tidyselect helpers like \code{starts_with("trust")}. If no
 variables are specified, all numeric columns in \code{data} are used
-(useful with \code{pick()}).}
+(useful with \code{pick()}; non-numeric columns are ignored with a
+warning).}
 
 \item{min_valid}{Minimum number of non-missing values required to compute
-a mean. If a row has fewer valid values, \code{NA} is returned. Default
-is \code{NULL} (compute mean if at least 1 value is valid).}
+a mean (a whole number). If a row has fewer valid values, \code{NA} is
+returned. Default is \code{NULL} (compute mean if at least 1 value is
+valid).}
 
 \item{na.rm}{Remove missing values before calculating? Default: \code{TRUE}.}
 }
@@ -72,13 +77,20 @@ Use \code{row_means()} after checking reliability with
 library(dplyr)
 data(survey_data)
 
-# Create a trust scale from 3 items
+# Create a trust scale from 3 items (recommended: pick())
+survey_data <- survey_data \%>\%
+  mutate(m_trust = row_means(pick(trust_government, trust_media,
+                                  trust_science)))
+
+# tidyselect helpers inside pick(); also works after group_by()
+survey_data <- survey_data \%>\%
+  group_by(region) \%>\%
+  mutate(m_trust = row_means(pick(starts_with("trust")))) \%>\%
+  ungroup()
+
+# Alternative without groups: the data placeholder `.`
 survey_data <- survey_data \%>\%
   mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
-
-# Using pick()
-survey_data <- survey_data \%>\%
-  mutate(m_trust = row_means(pick(starts_with("trust"))))
 
 # Require at least 2 valid items (like SPSS MEAN.2)
 survey_data <- survey_data \%>\%

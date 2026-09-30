@@ -16,7 +16,7 @@
 line? (Default: TRUE)}
 
 \item{digits}{Number of decimal places for percentages and summary
-statistics (Default: 2).}
+statistics (Default: 2); the statistics keep at least two decimals.}
 
 \item{...}{Additional arguments (not used).}
 }

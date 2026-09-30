@@ -17,7 +17,8 @@ The difference is computed as \code{y - x}}
 
 \item{weights}{Optional survey weights for population-representative results}
 
-\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95 percent)}
+\item{conf.level}{Not used. Rank tests report no confidence interval (SPSS
+\code{NPAR TESTS} neither); kept for backward compatibility.}
 }
 \value{
 Test results showing whether the two measurements differ, including:

@@ -48,9 +48,13 @@ For one-sample tests, your benchmark value.}
 Test results showing whether groups differ, including:
 \itemize{
 \item t-statistic and p-value for statistical significance
-\item Mean difference and confidence interval
+\item Mean difference and confidence interval (one-sample tests: mean minus
+\code{mu} and the interval of that difference, as in the SPSS
+One-Sample Test)
 \item Effect sizes (Cohen's d, Hedges' g, Glass' Delta)
-\item Group statistics (mean, SD, sample size)
+\item Group statistics (mean, SD, standard error of the mean, sample size)
+\item A \code{note} column that explains why a variable (or group) was not
+computed, e.g. no variance or only one group with valid data
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
 }

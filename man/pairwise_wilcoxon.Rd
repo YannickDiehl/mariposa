@@ -25,6 +25,7 @@ Pairwise comparison results showing:
 \item Which measurement pairs are significantly different
 \item Z-statistics from Wilcoxon signed-rank tests
 \item Adjusted p-values (controlling for multiple comparisons)
+\item The number of cases of each pair (\code{n})
 }
 }
 \description{
@@ -45,8 +46,13 @@ Think of it as:
 \strong{Z-Statistics}: Based on the Wilcoxon signed-rank test for each pair
 \itemize{
 \item Large absolute Z values indicate big differences between two measurements
-\item Positive Z: Values in var1 tend to be higher than var2
-\item Negative Z: Values in var2 tend to be higher than var1
+\item Z is computed from the differences \code{var2 - var1}, like
+\code{wilcoxon_test(x = var1, y = var2)} and the SPSS pair
+"var2 - var1"
+\item Positive Z: Values in var2 (Var 2) tend to be higher than var1
+\item Negative Z: Values in var1 (Var 1) tend to be higher than var2
+\item SPSS prints the same |Z| always with a negative sign and a footnote
+("Based on positive/negative ranks") telling the direction
 }
 
 \strong{Adjusted P-values}: Control for multiple comparisons
@@ -65,6 +71,16 @@ For each pair of measurements, the Wilcoxon signed-rank test:
 \item Computes a Z-statistic based on the rank sums
 \item Uses normal approximation with tie correction
 }
+}
+
+\subsection{Which Cases Are Used}{
+
+Each pair uses all cases with valid values on both of its variables
+(pairwise deletion), exactly like the individual SPSS
+\code{NPAR TESTS /WILCOXON} tests these results are validated against.
+\code{friedman_test()} uses only cases complete on all variables
+(listwise, as SPSS \code{/FRIEDMAN}), so a pair's \code{n} can be larger
+than the Friedman N.
 }
 
 \subsection{P-Value Adjustment Methods}{

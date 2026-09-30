@@ -49,6 +49,14 @@ effects. This replaces sjmisc's separate \code{de_mean()} function.
 When \code{weights} is provided, the weighted mean is used for centering.
 This accounts for survey design in the centering computation.
 }
+
+\subsection{Missing Values}{
+
+The result is a plain numeric variable (value labels are dropped, the
+variable label is kept with " (centered)" appended). Missing values of
+imported data, including their SPSS missing types, become plain
+\code{NA}, as in an SPSS \code{COMPUTE}.
+}
 }
 \examples{
 library(dplyr)

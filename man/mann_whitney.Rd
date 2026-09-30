@@ -25,16 +25,24 @@ treatment/control). Must have exactly two groups.}
 
 \item{weights}{Optional survey weights for population-representative results}
 
-\item{mu}{The hypothesized difference (Default: 0, meaning no difference)}
+\item{mu}{The hypothesized location shift of group 1 against group 2
+(Default: 0, meaning no difference; this is the SPSS test). As in
+\code{wilcox.test()}, group-1 values are shifted by \code{mu} before
+ranking, so U, W, Z, r and p all refer to the same hypothesis. Only
+\code{mu = 0} is available with \code{weights}.}
 
 \item{alternative}{Direction of the test:
 \itemize{
-\item \code{"two.sided"} (default): Test if groups are different
+\item \code{"two.sided"} (default): Test if groups are different.
+Z is reported as SPSS does, from the smaller U (never positive).
 \item \code{"greater"}: Test if group 1 > group 2
 \item \code{"less"}: Test if group 1 < group 2
-}}
+}
+For a one-sided test Z is directional (positive when group 1 tends to
+have higher values), so its sign matches the p-value.}
 
-\item{conf.level}{Confidence level for intervals (Default: 0.95 = 95\%)}
+\item{conf.level}{Not used. Rank tests report no confidence interval
+(SPSS \code{NPAR TESTS} neither); kept for backward compatibility.}
 }
 \value{
 Test results showing whether groups differ, including:
@@ -79,10 +87,9 @@ The test tells you:
 \strong{Effect Size r} (How big is the difference?):
 \itemize{
 \item |r| < 0.1: Negligible difference
-\item |r| ~ 0.1: Small difference
-\item |r| ~ 0.3: Medium difference
-\item |r| ~ 0.5: Large difference
-\item |r| > 0.5: Very large difference
+\item 0.1 to < 0.3: Small difference
+\item 0.3 to < 0.5: Medium difference
+\item 0.5 or higher: Large difference
 }
 
 \strong{Rank Mean Difference}:

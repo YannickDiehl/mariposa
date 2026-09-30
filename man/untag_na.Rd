@@ -4,16 +4,22 @@
 \alias{untag_na}
 \title{Convert Tagged NAs Back to Original Codes}
 \usage{
-untag_na(x)
+untag_na(x, ...)
 }
 \arguments{
-\item{x}{A numeric vector with tagged NAs.}
+\item{x}{A numeric vector with tagged NAs, or a data frame.}
+
+\item{...}{For a data frame: the columns to convert (tidyselect). If
+empty, every numeric column is converted. Ignored for vectors.}
 }
 \value{
-A numeric vector where tagged NAs with numeric codes have been
-replaced with their original values (e.g., -9, -8, -42). System NAs
-(untagged) remain as \code{NA}. For native Stata/SAS tagged NAs (no numeric
-codes), falls back to \code{\link[=strip_tags]{strip_tags()}} behavior with a warning.
+The input with tagged NAs that have numeric codes replaced by
+their original values (e.g., -9, -8, -42). System NAs (untagged)
+remain \code{NA}. Value labels and the variable label are kept (labels of
+missing types are attached to their codes again), so the result is
+\code{haven_labelled} when the input was. For native Stata/SAS tagged NAs
+(no numeric codes), falls back to \code{\link[=strip_tags]{strip_tags()}} behavior with a
+warning. A data frame is returned with the selected columns converted.
 }
 \description{
 Replaces tagged NAs with their original missing value codes. Works with

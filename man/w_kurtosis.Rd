@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("trust")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, you get the simple sample kurtosis.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 
 \item{excess}{Show excess kurtosis? (Default: TRUE, matching SPSS). Excess
 kurtosis subtracts 3 so that a normal distribution has kurtosis of 0,
@@ -49,7 +51,9 @@ a normal distribution:
 }
 \item \strong{Effective N}: How many independent observations your weighted data
 represents.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
 Kurtosis is often checked together with skewness to assess normality. Both

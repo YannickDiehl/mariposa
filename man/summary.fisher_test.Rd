@@ -24,7 +24,8 @@ A \code{summary.fisher_test} object.
 \description{
 Creates a summary object that produces detailed output when printed,
 including the contingency table of observed frequencies and the test
-results table with method, exact p-value, and sample size.
+results table with method, exact p-value, sample size, and (for 2x2
+tables) the odds ratio with its 95\\% confidence interval.
 }
 \examples{
 result <- fisher_test(survey_data, row = gender, col = region)

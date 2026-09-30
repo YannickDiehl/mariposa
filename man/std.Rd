@@ -75,6 +75,15 @@ When \code{data} is grouped (via \code{group_by()}), standardization is
 performed separately within each group. This is useful for within-group
 comparisons. Weights are also subsetted per group.
 }
+
+\subsection{Missing Values}{
+
+The result is a plain numeric variable (value labels are dropped, the
+variable label is kept with " (standardized)" appended). Missing values
+of imported data, including their SPSS missing types, become plain
+\code{NA} -- as SPSS's \code{DESCRIPTIVES /SAVE} gives system-missing
+z-scores.
+}
 }
 \examples{
 library(dplyr)

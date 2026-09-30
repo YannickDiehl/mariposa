@@ -23,8 +23,9 @@ efa(
 \item{...}{The items to analyze. Use bare column names separated by commas,
 or tidyselect helpers like \code{starts_with("trust")}.}
 
-\item{n_factors}{Number of components to extract. Default \code{NULL} uses
-the Kaiser criterion (eigenvalue > 1).}
+\item{n_factors}{Number of components to extract (a whole number).
+Default \code{NULL} uses the Kaiser criterion (eigenvalue > 1). A single
+component cannot be rotated; it is shown unrotated with SPSS's note.}
 
 \item{rotation}{Rotation method: \code{"varimax"} (default, orthogonal),
 \code{"oblimin"} (oblique, allows correlated factors),
@@ -37,7 +38,8 @@ goodness-of-fit testing, assumes multivariate normality).}
 \item{weights}{Optional survey weights for population-representative results.}
 
 \item{use}{How to handle missing data for correlation computation:
-\code{"pairwise"} (default, matches SPSS) or \code{"complete"} (listwise).}
+\code{"pairwise"} (default, matches SPSS) or \code{"complete"} (listwise;
+\code{"listwise"} is accepted as an alias).}
 
 \item{sort}{Logical. Sort loadings by size within each component? Default \code{TRUE}.}
 
@@ -53,7 +55,12 @@ An \code{efa} result object containing:
 \item{loadings}{Component loading matrix (rotated if rotation applied)}
 \item{unrotated_loadings}{Unrotated component matrix}
 \item{eigenvalues}{All eigenvalues from the correlation matrix}
-\item{variance_explained}{Tibble with Total, \% of Variance, Cumulative \%}
+\item{variance_explained}{Tibble with the initial eigenvalues: Total,
+\% of Variance, Cumulative \% (one row per variable)}
+\item{extraction_variance}{Tibble with the extraction sums of squared
+loadings of the extracted components/factors (SPSS "Extraction Sums
+of Squared Loadings"). For ML this is the variance the common factors
+explain - the figure the compact print reports.}
 \item{rotation_variance}{Tibble with rotation sums of squared loadings}
 \item{communalities}{Extraction communalities for each variable}
 \item{kmo}{List with overall KMO and per-item MSA values}
@@ -69,8 +76,18 @@ An \code{efa} result object containing:
 \item{structure_matrix}{Structure matrix (oblimin/promax only, NULL otherwise)}
 \item{factor_correlations}{Factor correlation matrix (oblimin/promax only, NULL otherwise)}
 \item{variables}{Character vector of variable names}
+\item{variable_labels}{Named character vector with the variable labels
+(\code{NA} where a variable has none); \code{summary()} shows them
+next to the names, shortened to the console width in the tables}
 \item{weights}{Weights variable name or NULL}
-\item{n}{Sample size}
+\item{item_statistics}{Tibble with mean, SD, analysis N and missing N
+per item. With \code{use = "pairwise"} each item uses its own valid
+cases; with \code{use = "complete"} all items use the complete cases.}
+\item{n}{Sample size: the smallest pairwise N (\code{use = "pairwise"},
+the N of Bartlett's test as in SPSS) or the number of complete cases
+(\code{use = "complete"}); the sum of weights when weighted}
+\item{use}{The missing-data handling used (\code{"pairwise"} or
+\code{"complete"})}
 \item{col_prefix}{Column name prefix: \code{"PC"} for PCA, \code{"Factor"} for ML}
 \item{sort}{Whether loadings are sorted}
 \item{blank}{Suppression threshold}

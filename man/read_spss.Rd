@@ -28,8 +28,12 @@ A tibble with the SPSS data. When \code{tag_na = TRUE}:
 \item The original SPSS missing codes can be recovered via
 \code{\link[=na_frequencies]{na_frequencies()}}, \code{\link[=untag_na]{untag_na()}}, or \code{\link[haven:na_tag]{haven::na_tag()}}
 \item Each tagged variable has an \code{"na_tag_map"} attribute mapping
-tag characters to original SPSS codes
+tag characters to original SPSS codes, and an \code{"spss_missing"}
+attribute with the original missing-value definition (used by
+\code{\link[=write_spss]{write_spss()}} for an exact round trip)
 }
+A file that is not an SPSS \code{.sav} file (e.g. a Stata or Excel file)
+is reported with its apparent type and the matching reader.
 }
 \description{
 Reads an SPSS \code{.sav} file and preserves user-defined missing values as

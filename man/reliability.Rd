@@ -31,6 +31,12 @@ fewer than 3 items)}
 Deleted, and Omega if Item Deleted}
 \item{inter_item_cor}{Inter-item correlation matrix}
 \item{n}{Sample size (listwise)}
+\item{variable_labels}{Named character vector with the items' variable
+labels (\code{NA} where an item has none); \code{summary()} lists
+them next to the item names}
+\item{removed_items}{Items removed for zero variance, or \code{NULL}}
+\item{negative_items}{When alpha is negative: the items with a negative
+corrected item-total correlation (candidates for reverse-coding)}
 }
 Use \code{summary()} for the full SPSS-style output with toggleable sections.
 }
@@ -89,7 +95,13 @@ model without each item, mirroring Alpha if Item Deleted.
 A one-factor model needs at least 3 items to be identified: with fewer
 than 3 items the omega fields are \code{NA} (alpha is still computed),
 and Omega if Item Deleted is \code{NA} whenever the reduced scale would
-fall below 3 items.
+fall below 3 items. Omega is also \code{NA}, with a warning, when the
+items' correlation matrix is singular or the one-factor solution is a
+Heywood case (an item's uniqueness at the lower bound, i.e. a loading
+of about 1: the "factor" is then that single item, not the scale).
+
+Items with zero variance are removed from the scale with a warning, as
+SPSS RELIABILITY does (\code{$removed_items}).
 }
 
 \subsection{Weighted variants and validation status}{

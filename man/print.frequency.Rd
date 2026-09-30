@@ -9,7 +9,8 @@
 \arguments{
 \item{x}{An object of class "frequency"}
 
-\item{digits}{Number of decimal places to display (default: 2)}
+\item{digits}{Number of decimal places of the percentages (default: 2);
+the summary statistics line uses at least two decimals.}
 
 \item{...}{Additional arguments passed to print}
 }

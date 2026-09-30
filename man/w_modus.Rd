@@ -16,7 +16,9 @@ like \code{starts_with("trust")}}
 \item{weights}{Survey weights to make results representative of your population.
 Without weights, the mode is simply the most frequent value in your sample.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted mode(s) with sample size information,
@@ -40,11 +42,15 @@ population. For weighted data, the mode is the value whose observations
 have the largest total weight.
 \item \strong{Effective N}: How many independent observations your weighted data
 represents.
-\item \strong{N}: The actual number of observations used.
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 
-If multiple values share the highest weighted frequency (ties), the first
-value encountered is returned.
+If multiple values share the highest (weighted) frequency, the smallest
+value (for factors: the first level) is returned, as in SPSS; the print
+flags such results ("Multiple modes exist") and \code{$results$n_modes}
+holds the number of tied values.
 }
 
 \subsection{When to Use This}{

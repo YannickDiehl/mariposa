@@ -9,7 +9,7 @@
   crosstab_table = TRUE,
   percentages = TRUE,
   residuals = FALSE,
-  digits = 1,
+  digits = object$digits \%||\% 1,
   ...
 )
 }
@@ -29,7 +29,8 @@ significant \code{\link{chi_square}} test, cells with an absolute
 adjusted residual above roughly 2 are the ones deviating from
 independence. (Default: FALSE, matching SPSS's opt-in cell display)}
 
-\item{digits}{Number of decimal places for percentages (Default: 1).}
+\item{digits}{Number of decimal places for percentages (Default: the
+\code{digits} given to \code{\link{crosstab}}, i.e. 1 unless set).}
 
 \item{...}{Additional arguments (not used).}
 }

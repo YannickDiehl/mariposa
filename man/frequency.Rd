@@ -51,9 +51,11 @@ population estimates.}
 
 \item{show_prc}{Show raw percentages including missing values? (Default: TRUE)}
 
-\item{show_valid}{Show percentages excluding missing values? (Default: TRUE)}
+\item{show_valid}{Show percentages excluding missing values? (Default: TRUE).
+The cumulative percentages are cumulative valid percentages, so
+\code{show_valid = FALSE} hides them too.}
 
-\item{show_sum}{Show cumulative totals? (Default: TRUE)}
+\item{show_sum}{Show the cumulative (valid) percentages? (Default: TRUE)}
 
 \item{show_labels}{Show category labels if available? (Default: "auto" - shows
 labels when they exist)}
@@ -62,8 +64,9 @@ labels when they exist)}
 observations? (Default: FALSE). When TRUE, values that have labels defined
 (e.g., from statistical software files) but no cases in the data are
 included with frequency 0. This is useful for labelled datasets where
-unused categories should still appear in the output. Automatically enables
-label display.}
+unused categories should still appear in the output. The same applies
+to empty factor levels, which are hidden by default (as SPSS lists only
+observed values). Automatically enables label display.}
 
 \item{sort.frq, show.na, show.prc, show.valid, show.sum, show.labels, show.unused}{Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
 the function with any of them is an error; use the snake_case
@@ -88,13 +91,22 @@ Think of it as creating a summary table that shows:
 \details{
 \subsection{Understanding the Results}{
 
-The frequency table shows:
+The frequency table follows the SPSS FREQUENCIES layout:
 \itemize{
-\item \strong{Freq}: Number of responses in each category
-\item \strong{\%}: Percentage including missing values (use for "response rate")
+\item \strong{N}: Number of responses in each category (weighted: sum of weights,
+displayed rounded)
+\item \strong{Raw \%}: Percentage including missing values (use for "response rate")
 \item \strong{Valid \%}: Percentage excluding missing values (use for "among those who answered")
-\item \strong{Cum \%}: Running total percentage (helps identify cutoff points)
+\item \strong{Cum. \%}: Running total of the valid percentages (helps identify cutoff points)
+\item \strong{Total valid}, the missing categories, \strong{Total missing} (with two
+or more missing categories) and the grand \strong{Total}; without missing
+values a single \strong{Total} row ends the table.
 }
+
+Factors, character and logical variables show their categories in the
+Value column; labelled numeric variables show the code and its label.
+Long labels are never cut; they wrap when the table would be wider than
+the console.
 }
 
 \subsection{When to Use This}{

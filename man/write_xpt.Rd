@@ -12,8 +12,10 @@ write_xpt(data, path, version = 5, name = NULL)
 \item{path}{Path to the output file. Must end in \code{.xpt}.}
 
 \item{version}{SAS transport file version. Either \code{5} (default, SAS
-Transport v5, most compatible) or \code{8} (SAS Transport v8, supports
-longer variable names).}
+Transport v5, most compatible, variable names of up to 8 characters)
+or \code{8} (SAS Transport v8, names of up to 32 characters). Longer names
+are truncated with a warning; if truncation would create duplicate
+names, the export stops.}
 
 \item{name}{Member name for the dataset within the transport file. If
 \code{NULL}, derived from the file name. Maximum 8 characters for version 5.}
@@ -55,7 +57,7 @@ preserve full label metadata. Variable labels are preserved.
 if (requireNamespace("haven", quietly = TRUE)) {
   # Roundtrip: write to a temporary .xpt transport file, read back
   tmp <- tempfile(fileext = ".xpt")
-  write_xpt(survey_data, tmp)
+  write_xpt(survey_data, tmp, version = 8)  # names longer than 8 chars
   data <- read_xpt(tmp)
 
   unlink(tmp)

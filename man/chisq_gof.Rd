@@ -11,9 +11,16 @@ chisq_gof(data, ..., expected = NULL, weights = NULL)
 
 \item{...}{One or more categorical variables to test (tidyselect supported)}
 
-\item{expected}{Optional numeric vector of expected proportions (must sum to 1).
-Only used when a single variable is tested. If NULL (default), equal
-proportions are assumed.}
+\item{expected}{Optional numeric vector of expected proportions, one per
+category. If NULL (default), equal proportions are assumed (SPSS
+\code{/EXPECTED=EQUAL}). Applied to every selected variable, so each
+variable must have that many categories. A named vector is matched to
+the categories by name (category label, or the code of a labelled
+variable); an unnamed vector is used in category order. As in SPSS
+\code{/EXPECTED=50 30 20}, values may also be counts or any relative
+frequencies: they are divided by their sum. Proportions (all values
+below 1) must sum to 1; a sum within 0.01 of 1 (e.g. 0.995 from
+rounding) is rescaled with a message.}
 
 \item{weights}{Optional survey weights for population-representative results}
 }

@@ -15,7 +15,9 @@ variables or use helpers like \code{starts_with("income")}}
 \item{weights}{Survey weights to make the average representative of your population.
 Without weights, you get the simple sample average.}
 
-\item{na.rm}{Remove missing values before calculating? (Default: TRUE)}
+\item{na.rm}{Remove missing values before calculating? (Default: TRUE).
+With \code{FALSE}, the result for a variable that contains missing
+values is \code{NA} (as in base R).}
 }
 \value{
 Population-weighted average(s) with sample size information
@@ -42,7 +44,9 @@ population-representative averages. Weights correct for:
 \itemize{
 \item \strong{Weighted Mean}: The population-representative average
 \item \strong{Effective N}: How many independent observations your weighted data represents
-\item \strong{N}: Actual number of observations used
+\item \strong{N / Missing}: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+\code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 }
 }
 

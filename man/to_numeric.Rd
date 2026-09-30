@@ -29,8 +29,10 @@ sequential integers (1, 2, 3, ...).}
 \item{start_at}{If not \code{NULL}, the lowest numeric value in the output
 starts at this number. Default: \code{NULL} (use original values).}
 
-\item{keep_labels}{If \code{TRUE}, the former factor levels are stored as
-value labels on the result. Default: \code{FALSE}.}
+\item{keep_labels}{If \code{TRUE}, the result is a \code{haven_labelled} vector:
+the former factor levels (or the existing value labels and missing-value
+types of a labelled input) are kept, so they survive \code{\link[=write_spss]{write_spss()}}.
+Default: \code{FALSE} (plain numeric; missing-value types become \code{NA}).}
 
 \item{use.labels, start.at, keep.labels}{Defunct dot-case argument names,
 removed in mariposa 0.6.9. Calling the function with any of them is an
@@ -61,7 +63,8 @@ the numeric values from the level names.
 Converts to sequential integers (1, 2, 3, ... in level order). Use
 \code{use_labels = FALSE} to force this behavior for any factor.
 \item \strong{haven_labelled}: Extracts the underlying numeric vector,
-stripping the labelled class.
+stripping the labelled class. Missing-value types of imported data
+(tagged NAs) become plain \code{NA}.
 }
 }
 \examples{

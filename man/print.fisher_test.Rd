@@ -4,12 +4,12 @@
 \alias{print.fisher_test}
 \title{Print Fisher's exact test results (compact)}
 \usage{
-\method{print}{fisher_test}(x, digits = 4, ...)
+\method{print}{fisher_test}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"fisher_test"}}
 
-\item{digits}{Number of decimal places (default: 4)}
+\item{digits}{Number of decimal places (default: 3)}
 
 \item{...}{Additional arguments (currently unused)}
 }
@@ -19,7 +19,7 @@ Invisibly returns the input object \code{x}.
 \description{
 Compact print method for objects of class \code{"fisher_test"}.
 Shows a one-line summary with the exact p-value, significance stars,
-and sample size.
+the odds ratio for 2x2 tables, and sample size.
 
 For the full detailed output (contingency table, test results), use
 \code{summary()}.

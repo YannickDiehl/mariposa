@@ -11,10 +11,16 @@ row_count(data, ..., count, na.rm = TRUE)
 
 \item{...}{The variables to check. Supports tidyselect.}
 
-\item{count}{The value to count.}
+\item{count}{The value(s) to count: one value (\code{count = 5}) or a
+set (\code{count = c(4, 5)} counts cells equal to 4 or 5, like SPSS's
+\code{COUNT n = v1 TO v5 (4, 5)}). \code{NA} counts missing values
+(SPSS keyword \code{MISSING}). Missing codes of imported data (e.g.
+-9 read by \code{\link{read_spss}()} as a tagged NA) are counted when
+listed, as SPSS's \code{COUNT} counts user-missing values.}
 
 \item{na.rm}{If \code{TRUE} (default), \code{NA} values are ignored.
-If \code{FALSE}, any row containing \code{NA} returns \code{NA}.}
+If \code{FALSE}, any row containing a missing value that is not
+counted returns \code{NA}.}
 }
 \value{
 An integer vector with one value per row — the count of how
@@ -33,6 +39,13 @@ data(survey_data)
 survey_data <- survey_data \%>\%
   mutate(n_top = row_count(., trust_government, trust_media,
                            trust_science, count = 5))
+
+# Top-2 box (4 or 5) and number of missing answers per respondent
+survey_data <- survey_data \%>\%
+  mutate(n_top2 = row_count(., trust_government, trust_media,
+                            trust_science, count = c(4, 5)),
+         n_miss = row_count(., trust_government, trust_media,
+                            trust_science, count = NA))
 
 }
 \seealso{
