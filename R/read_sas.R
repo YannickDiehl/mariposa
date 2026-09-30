@@ -91,11 +91,14 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
     cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")
   }
 
+  # haven rejects an explicit NULL catalog_encoding ("Expected string vector
+  # of length 1"); its own default is the data file's encoding, where NULL
+  # means "" (auto-detect). Resolve the documented fallback here.
   data <- haven::read_sas(
     data_file = path,
     catalog_file = catalog_file,
     encoding = encoding,
-    catalog_encoding = catalog_encoding
+    catalog_encoding = catalog_encoding %||% encoding %||% ""
   )
 
   # Step 1: detect native special missing values (shared helper)
