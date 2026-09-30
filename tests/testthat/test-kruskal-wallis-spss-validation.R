@@ -43,6 +43,7 @@
 #   H statistic — Display(3)
 #   df          — Spec (count)
 #   p-value     — Display(3), boundary-rounding guard
+#   Order       — exact: Ranks table rows as SPSS lists them, splits East/West
 # =============================================================================
 
 library(testthat)
@@ -182,6 +183,13 @@ compare_kw <- function(row, gs, spss, scenario) {
                       label = sprintf("[%s] total N", scenario))
   }
 
+  # ---- Ranks table row order ----
+  # spss$descriptives lists the groups in the order SPSS prints them (see
+  # the ascending line citations), e.g. Student, Employed, Unemployed,
+  # Retired, Other; group_stats (and print()/summary()) must match it
+  expect_identical(names(gs), names(spss$descriptives),
+                   label = sprintf("[%s] Ranks table group order", scenario))
+
   # ---- Per-group descriptives ----
   for (lvl in names(spss$descriptives)) {
     expected <- spss$descriptives[[lvl]]
@@ -253,6 +261,9 @@ test_that("Test 3a: KW life_satisfaction by education, grouped by region — mat
   r <- survey_data |>
     group_by(region) |>
     kruskal_wallis(life_satisfaction, group = education)
+  # split files in SPSS order: East before West
+  expect_identical(as.character(r$results$region), c("East", "West"),
+                   label = "split-file order (East, West)")
   for (rg in c("East", "West")) {
     cell <- extract_grouped_cell(r, rg)
     compare_kw(cell$row, cell$gs,
@@ -265,6 +276,9 @@ test_that("Test 3b: KW income by employment, grouped by region — matches SPSS"
   r <- survey_data |>
     group_by(region) |>
     kruskal_wallis(income, group = employment)
+  # split files in SPSS order: East before West
+  expect_identical(as.character(r$results$region), c("East", "West"),
+                   label = "split-file order (East, West)")
   for (rg in c("East", "West")) {
     cell <- extract_grouped_cell(r, rg)
     compare_kw(cell$row, cell$gs,
