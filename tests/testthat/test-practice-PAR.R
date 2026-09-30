@@ -128,6 +128,14 @@ test_that("PAR-01/PAR-24: t_test() skips constant or empty variables with a clea
   expect_match(msg, "exactly 2 groups")
   expect_match(msg, "oneway_anova")
   expect_false(grepl("Caused by", msg))
+
+  # grouped data: 3 groups overall but exactly 2 within each group still works
+  d2 <- survey_data
+  d2$g3 <- ifelse(d2$region == "East",
+                  ifelse(d2$gender == "Male", "a", "b"),
+                  ifelse(d2$gender == "Male", "a", "c"))
+  r3 <- t_test(dplyr::group_by(d2, region), life_satisfaction, group = g3)
+  expect_false(anyNA(r3$results$t_stat))
 })
 
 # --- PAR-07 / PAR-17: groups whose variance is undefined or zero --------------

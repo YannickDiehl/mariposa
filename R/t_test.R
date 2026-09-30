@@ -230,7 +230,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     # depend on the row order) and value labels instead of codes
     data[[g_name]] <- .group_factor(data[[g_name]])
     g_present <- levels(data[[g_name]])[levels(data[[g_name]]) %in% data[[g_name]]]
-    if (length(g_present) != 2) {
+    # Grouped data may use different pairs of groups per group_by() group
+    # (checked per group, see .t_test_single()); ungrouped data must have 2
+    if (length(g_present) < 2 || (!is_grouped && length(g_present) != 2)) {
       cli_abort(c(
         "Grouping variable {.var {g_name}} must have exactly 2 groups.",
         "x" = if (length(g_present) > 0) {
