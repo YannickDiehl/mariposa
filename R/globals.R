@@ -68,7 +68,7 @@ utils::globalVariables(c(
   # Linear regression output columns
   "Term", "B", "Std.Error", "Beta", "t", "p", "CI_lower", "CI_upper",
   "Source", "Sum_of_Squares", "Mean_Square", "F_statistic", "Sig",
-  "Std.Deviation", ".wt",
+  "Std.Deviation", ".wt", ".mu0",
 
   # Logistic regression output columns
   "S.E.", "Wald", "Sig.", "Exp(B)",
