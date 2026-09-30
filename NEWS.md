@@ -110,6 +110,12 @@ VERSIONING_POLICY §3).
 
 ## Output
 
+* Tables stay one block like SPSS wherever that can be displayed: in a
+  knitted HTML document (R Markdown, Quarto, pkgdown) wide `describe()`
+  tables and correlation/reliability matrices are no longer split into
+  column blocks at the console width of 80, and labels are not shortened.
+  In the console they are still split only when one block would be wider
+  than the console.
 * `frequency()`, `crosstab()`, and `multiple_response()` now print
   their full tables directly, matching `describe()`: the result of a
   descriptive table function *is* a table, so `print()` no longer shows

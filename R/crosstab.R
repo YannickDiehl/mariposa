@@ -530,7 +530,7 @@ print.summary.crosstab <- function(x, ...) {
 .print_single_crosstab <- function(x, digits = 1, show_table = TRUE,
                                    show_percentages = TRUE,
                                    show_residuals = FALSE,
-                                   width = getOption("width", 80)) {
+                                   width = .output_width()) {
   show_residuals <- show_residuals && !is.null(x$adj_residuals)
 
   # Variable labels as SPSS shows them (names when a variable has none)

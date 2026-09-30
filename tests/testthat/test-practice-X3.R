@@ -362,3 +362,27 @@ test_that("fmt_num rounds halves up like SPSS, not to the even digit", {
   expect_identical(mariposa:::fmt_num(c(NA, 1), 1), c("", "1.0"))
   expect_identical(mariposa:::fmt_num(-0.0004, 3), "0.000")
 })
+
+# --- Tables as one block wherever they can be shown so (maintainer decision) ------
+
+test_that("knitted HTML prints wide tables as one block, the console splits them", {
+  # Rule (2026-09-30): tables stay one block like SPSS whenever that can be
+  # displayed. A knitted HTML page scrolls wide blocks, so the console
+  # width (80 in knitr) must not split describe() or correlation matrices.
+  skip_if_not_installed("knitr")
+  withr::local_options(width = 50)
+  res <- describe(survey_data, age, income, show = "all")
+  n_headers <- function(out) sum(grepl("Variable", out, fixed = TRUE))
+  expect_gt(n_headers(capture.output(print(res))), 1)   # console: blocks
+
+  withr::local_options(knitr.in.progress = TRUE)
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "html")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  expect_equal(n_headers(capture.output(print(res))), 1)  # HTML: one block
+  cm <- capture.output(print(summary(pearson_cor(survey_data, age, income,
+    life_satisfaction, trust_government, trust_media, trust_science))))
+  expect_true(any(grepl(
+    "age\\s+income\\s+life_satisfaction\\s+trust_government\\s+trust_media\\s+trust_science",
+    cm)))
+})

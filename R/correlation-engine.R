@@ -601,7 +601,7 @@
   row_w <- max(nchar(vars, type = "width"))
 
   # Greedy column blocks that fit the console width
-  avail <- max(getOption("width", 80L) - row_w, 1L)
+  avail <- max(.output_width() - row_w, 1L)
   blocks <- list()
   current <- integer(0)
   used <- 0

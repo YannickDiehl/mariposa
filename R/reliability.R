@@ -700,7 +700,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   if (all(is.na(lab))) return(var_names)
   lab[is.na(lab)] <- ""
   wn <- max(nchar(var_names, type = "width"))
-  avail <- getOption("width", 80) - other_width - wn - 4
+  avail <- .output_width() - other_width - wn - 4
   # A label cut to a few characters tells nothing; the item list above the
   # tables has the full labels
   if (avail < 20) return(var_names)
@@ -1050,7 +1050,7 @@ print.summary.reliability <- function(x, ...) {
   w0 <- max(nchar(row_lab, type = "width"))
   cells <- matrix(fmt_num(as.numeric(mat), digits), k)
   wc <- max(nchar(cells), nchar(idx))
-  per_block <- max(1L, floor((getOption("width", 80) - 2 - w0) / (wc + 2)))
+  per_block <- max(1L, floor((.output_width() - 2 - w0) / (wc + 2)))
   blocks <- split(seq_len(k), ceiling(seq_len(k) / per_block))
   for (b in blocks) {
     border <- paste0("  ", strrep("-", w0 + length(b) * (wc + 2)))

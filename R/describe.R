@@ -551,7 +551,7 @@ print.summary.describe <- function(x, ...) {
 #' @param align Named character vector ("left"/"right") overriding the
 #'   default alignment (text left, numbers right) per column
 #' @noRd
-.print_desc_table <- function(df, digits = 3, width = getOption("width", 80),
+.print_desc_table <- function(df, digits = 3, width = .output_width(),
                               col_digits = NULL,
                               count_cols = c("N", "Missing"),
                               footer_rows = 0L, align = NULL) {

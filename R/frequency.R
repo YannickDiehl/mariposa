@@ -1002,7 +1002,7 @@ print.summary.frequency <- function(x, ...) {
 #' @param width Console width
 #' @noRd
 .print_fre_table <- function(results, options, digits = 2, is_text = FALSE,
-                             width = getOption("width", 80)) {
+                             width = .output_width()) {
   pct <- function(v) ifelse(is.na(v), "", formatC(v, format = "f", digits = digits))
   cnt <- function(v) ifelse(is.na(v), "", sprintf("%.0f", round(v)))
 

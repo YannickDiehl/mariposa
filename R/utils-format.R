@@ -38,6 +38,24 @@ fmt_num <- function(x, digits = 3) {
   as.character(out)
 }
 
+#' Width available for a printed table
+#'
+#' Tables print as one block like SPSS wherever that can be displayed. A
+#' knitted HTML page scrolls a wide block, so there is no limit there; in the
+#' console (and in PDF/Word output) a line wider than getOption("width")
+#' breaks, so the printers split columns into blocks or shorten labels.
+#'
+#' @return Number of characters (Inf in knitted HTML)
+#' @noRd
+.output_width <- function() {
+  if (isTRUE(getOption("knitr.in.progress")) &&
+      requireNamespace("knitr", quietly = TRUE) &&
+      isTRUE(tryCatch(knitr::is_html_output(), error = function(e) FALSE))) {
+    return(Inf)
+  }
+  getOption("width", 80L)
+}
+
 #' Format p-values for display
 #'
 #' @param p Numeric vector of p-values
