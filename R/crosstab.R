@@ -204,6 +204,12 @@ crosstab.data.frame <- function(data, row, col,
   # Convert to matrix for easier calculations
   tab_matrix <- as.matrix(tab)
 
+  # Like SPSS CROSSTABS, show observed categories only: table()/xtabs()
+  # keep unused factor levels, which printed "0 0 0" rows with a row
+  # percentage of 100% (0 of 0) in the Total column
+  tab_matrix <- tab_matrix[rowSums(tab_matrix) > 0, colSums(tab_matrix) > 0,
+                           drop = FALSE]
+
   # Calculate marginals
   row_totals <- rowSums(tab_matrix)
   col_totals <- colSums(tab_matrix)

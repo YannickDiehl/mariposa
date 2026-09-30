@@ -116,3 +116,6 @@
   `summary(x, percentages = FALSE)` says "Counts only" instead of "Row
   percentages", and `crosstab(data, gender)` without a column variable
   gives a clear error (was the base error 'argument "x" is missing').
+* `crosstab()` shows observed categories only, as SPSS CROSSTABS does: an
+  empty factor level (e.g. after `filter(employment != "Student")`) used
+  to print a "0 0 0" row with a row percentage of "100.0%" of zero cases.

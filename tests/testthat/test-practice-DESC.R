@@ -604,3 +604,21 @@ test_that("DESC-07: crosstab na.rm = FALSE, header without percentages, missing 
   expect_error(crosstab(dplyr::group_by(survey_data, region), gender), "col")
   expect_error(crosstab(survey_data), "row")
 })
+
+
+# --- DESC-08 (crosstab part): empty categories ---------------------------------
+
+test_that("DESC-08: crosstab drops empty categories instead of showing 100% of 0", {
+  # table() keeps unused factor levels: after filter(employment !=
+  # "Student") the table had a "Student 0 0 0" row whose Total column read
+  # "100.0%" (0 of 0). SPSS CROSSTABS shows observed categories only.
+  d <- dplyr::filter(survey_data, employment != "Student")
+  r <- crosstab(d, employment, gender)
+  expect_false("Student" %in% r$row_levels)
+  expect_false(any(grepl("Student", capture.output(print(r)))))
+  r2 <- crosstab(d, gender, employment, percentages = "all")
+  expect_false("Student" %in% r2$col_levels)
+  expect_false(any(is.nan(r2$col_pct)))
+  rw <- crosstab(d, employment, gender, weights = sampling_weight)
+  expect_false("Student" %in% rw$row_levels)
+})
