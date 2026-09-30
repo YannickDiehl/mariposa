@@ -636,15 +636,22 @@ print.summary.crosstab <- function(x, ...) {
   )
   ct_row("Total", total_vals)
 
-  # Total row's column percentage sub-row
+  # Total row's percentage sub-rows: every requested type, as SPSS prints
+  # them for its Total row - % within the row variable and % of total are
+  # the column shares, % within the column variable is 100% per column
+  # (the old code printed the column shares labelled "col %" and nothing
+  # for row/total percentages)
+  col_share <- vapply(seq_len(n_cols), function(j) {
+    fmt_pct((x$col_totals[j] / x$total) * 100)
+  }, character(1))
+  if (show_percentages && !is.null(x$row_pct)) {
+    ct_row("  row %", c(col_share, fmt_pct(100)))
+  }
   if (show_percentages && !is.null(x$col_pct)) {
-    pct_vals <- c(
-      vapply(seq_len(n_cols), function(j) {
-        fmt_pct((x$col_totals[j] / x$total) * 100)
-      }, character(1)),
-      fmt_pct(100)
-    )
-    ct_row("  col %", pct_vals)
+    ct_row("  col %", c(rep(fmt_pct(100), n_cols), fmt_pct(100)))
+  }
+  if (show_percentages && !is.null(x$total_pct)) {
+    ct_row("  total %", c(col_share, fmt_pct(100)))
   }
 
   ct_line()

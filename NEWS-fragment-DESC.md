@@ -104,3 +104,8 @@
   15 | 3 with a row percentage of 81.7). Weighted counts, margins and
   percentages now match the SPSS reference exactly (validated for the
   weighted ungrouped and grouped scenarios).
+* `crosstab()`: the Total row shows every requested percentage as SPSS
+  CROSSTABS does (row % = column shares, col % = 100 %, total % = column
+  shares). With `percentages = "col"` it showed the column shares
+  labelled "col %", with `"row"`/`"total"` it had no percentage line and
+  with `"all"` only that mislabelled line.

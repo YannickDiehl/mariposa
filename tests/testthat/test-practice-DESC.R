@@ -517,3 +517,43 @@ test_that("EDGE-11: weighted crosstab rounds cells first; margins add up", {
   out <- capture.output(print(r))
   expect_true(any(grepl("402.*447.*849", out)))
 })
+
+
+# --- DESC-04: crosstab Total row percentages -----------------------------------
+
+# Percentage sub-rows printed under the Total row of a crosstab
+.ct_total_block <- function(out) {
+  i <- max(grep("^\\|\\s*Total\\s*\\|", out))
+  block <- character(0)
+  for (l in out[-(1:i)]) {
+    if (!grepl("^\\|", l)) break
+    block <- c(block, l)
+  }
+  block
+}
+
+test_that("DESC-04: crosstab Total row shows the requested percentages like SPSS", {
+  # With percentages = "col" the Total row showed row percentages
+  # labelled "col %", with "row"/"total" it had no percentage line at all,
+  # and with "all" only the (mislabelled) col % line. SPSS CROSSTABS prints
+  # every requested percentage for the Total row: % within the row
+  # variable = column share, % within the column variable = 100%, % of
+  # Total = column share.
+  pr <- function(p) .ct_total_block(capture.output(print(
+    crosstab(survey_data, gender, region, percentages = p))))
+  col <- pr("col")
+  expect_length(col, 1L)
+  expect_true(grepl("col %", col) && lengths(regmatches(col, gregexpr("100\\.0%", col))) == 3)
+  row <- pr("row")
+  expect_length(row, 1L)
+  expect_true(grepl("row %", row) && grepl("19\\.4%.*80\\.6%.*100\\.0%", row))
+  tot <- pr("total")
+  expect_length(tot, 1L)
+  expect_true(grepl("total %", tot) && grepl("19\\.4%.*80\\.6%.*100\\.0%", tot))
+  all <- pr("all")
+  expect_length(all, 3L)
+  expect_true(grepl("row %", all[1]) && grepl("col %", all[2]) && grepl("total %", all[3]))
+  expect_true(grepl("19\\.4%.*80\\.6%.*100\\.0%", all[1]))
+  expect_equal(lengths(regmatches(all[2], gregexpr("100\\.0%", all[2]))), 3L)
+  expect_length(pr("none"), 0L)
+})
