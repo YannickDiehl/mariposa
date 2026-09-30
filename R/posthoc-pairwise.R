@@ -26,7 +26,7 @@
 #' @param diff Mean difference (group1 - group2)
 #' @param se Standard error of the difference
 #' @param n_groups Number of groups k
-#' @param df Error degrees of freedom (pooled weighted df)
+#' @param df Error degrees of freedom of the ANOVA (weighted: floor(sum(w)) - k)
 #' @param conf.level Confidence level
 #' @return List with stat (t), conf_low, conf_high, p_adjusted
 #' @noRd
@@ -64,7 +64,7 @@
 #' @param mse Pooled within-group mean square error
 #' @param eff_n1,eff_n2 Effective group sample sizes
 #' @param k Number of groups
-#' @param df2 Error degrees of freedom (pooled weighted df)
+#' @param df2 Error degrees of freedom of the ANOVA (weighted: floor(sum(w)) - k)
 #' @param conf.level Confidence level
 #' @return List with stat (F), conf_low, conf_high, p_adjusted
 #' @noRd
@@ -183,50 +183,37 @@
       )
     })
   } else {
-    # Weighted statistics (byte-identical between Tukey and Scheffe originals)
+    # Weighted statistics: sum of weights as group n (SPSS frequency
+    # weights), kernel mean/variance (Bessel denominator sum(w) - 1)
     group_stats <- lapply(group_levels, function(level) {
       group_indices <- g == level
       group_data <- y[group_indices]
       group_weights <- w[group_indices]
 
-      n <- length(group_data)
-      weighted_n <- sum(group_weights)
-
-      # For SPSS compatibility: Use sum of weights as sample size
-      # SPSS treats frequency weights as literal counts
-      eff_n <- sum(group_weights)
-
-      # Weighted mean and variance (SPSS formula)
-      weighted_mean <- sum(group_data * group_weights) / sum(group_weights)
-      # SPSS uses Bessel's correction: divide by (sum(weights) - 1)
-      weighted_var <- sum(group_weights * (group_data - weighted_mean)^2) / (sum(group_weights) - 1)
-
       list(
         level = level,
-        n = n,
-        eff_n = eff_n,
-        weighted_n = weighted_n,
-        mean = weighted_mean,
-        var = weighted_var
+        n = length(group_data),
+        eff_n = sum(group_weights),
+        weighted_n = sum(group_weights),
+        mean = .w_mean(group_data, group_weights),
+        var = .w_var(group_data, group_weights)
       )
     })
   }
   names(group_stats) <- group_levels
 
-  # Calculate MSE (Mean Square Error) using SPSS approach:
-  # pooled within-group variance from the weighted group statistics
-  total_weighted_ss <- 0
-  total_weighted_df <- 0
-
-  for (level in group_levels) {
-    stat <- group_stats[[level]]
-    # Weight the sum of squares by effective sample size
-    ss_within <- (stat$eff_n - 1) * stat$var
-    total_weighted_ss <- total_weighted_ss + ss_within
-    total_weighted_df <- total_weighted_df + (stat$eff_n - 1)
+  # Error mean square and df of the ANOVA table: within-group sum of squares
+  # over df = N - k. With weights SPSS ONEWAY uses N = floor(sum(w)), as
+  # oneway_anova() does; the pooled df of the group statistics (unrounded
+  # sum(w) - k) moved SE, CI and Sig. off SPSS in the 4th significant digit.
+  ss_within <- sum(vapply(group_stats, function(st) (st$eff_n - 1) * st$var,
+                          numeric(1)))
+  df_error <- if (is.null(weight_name)) {
+    length(y) - length(group_levels)
+  } else {
+    floor(sum(w)) - length(group_levels)
   }
-
-  mse <- total_weighted_ss / total_weighted_df
+  mse <- ss_within / df_error
 
   # Number of groups
   n_groups <- length(group_levels)
@@ -248,7 +235,7 @@
     se <- sqrt(mse * (1/stat1$eff_n + 1/stat2$eff_n))
 
     if (method == "tukey") {
-      core <- .tukey_stats(diff, se, n_groups, total_weighted_df, conf.level)
+      core <- .tukey_stats(diff, se, n_groups, df_error, conf.level)
 
       data.frame(
         Variable = var_name,
@@ -263,7 +250,7 @@
       )
     } else {
       core <- .scheffe_stats(diff, se, mse, stat1$eff_n, stat2$eff_n,
-                             n_groups, total_weighted_df, conf.level)
+                             n_groups, df_error, conf.level)
 
       data.frame(
         Variable = var_name,

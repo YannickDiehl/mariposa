@@ -1381,6 +1381,19 @@ reference output showed mariposa was wrong.
   residual-based unweighted test made the old cell-mean-based weighted
   test disagree with it).
 
+### SPSS parity audit: reference runs no test asserted
+
+A value-by-value comparison of every SPSS reference output with the
+current code found values that had been in the reference files all along
+but were never asserted. These are now fixed and asserted:
+
+* Weighted `tukey_test()`/`scheffe_test()`: the error mean square and its
+  df come from the weighted ANOVA table (df = floor(sum of weights) - k,
+  as SPSS ONEWAY and `oneway_anova()` use). The pooled df of the group
+  statistics moved SE, confidence limits and Sig. off SPSS (e.g. SE
+  62.521 instead of 62.534, Sig. .089 instead of .090); about 550 printed
+  values in the reference runs.
+
 ## Validation
 
 * New Tier-3 exceptions for `efa()` ML extraction: EXC-001 (±.002; SPSS stops its
