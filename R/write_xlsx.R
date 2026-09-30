@@ -158,6 +158,9 @@ write_xlsx.codebook <- function(x, file, frequencies = FALSE,
 
   # Optional: Per-variable frequency sheets
   if (isTRUE(frequencies) && !is.null(x$frequencies)) {
+    freq_sheets <- .unique_sheet_names(names(x$frequencies),
+                                       reserved = c("Overview", "Codebook"))
+    names(freq_sheets) <- names(x$frequencies)
     for (var_name in names(x$frequencies)) {
       freq_df <- x$frequencies[[var_name]]
       if (is.data.frame(freq_df) && nrow(freq_df) > 0L) {
@@ -167,7 +170,7 @@ write_xlsx.codebook <- function(x, file, frequencies = FALSE,
         for (col in round_cols) {
           freq_df[[col]] <- round(freq_df[[col]], 2)
         }
-        sheet_name <- .sanitize_sheet_name(var_name)
+        sheet_name <- freq_sheets[[var_name]]
         .write_sheet(wb, sheet_name, freq_df)
       }
     }
@@ -207,10 +210,16 @@ write_xlsx.list <- function(x, file, labels = TRUE, overwrite = TRUE, ...) {
 
   wb <- openxlsx2::wb_workbook()
 
+  # Unique sheet names (31-character limit, case-insensitive), including
+  # the combined Labels sheet
+  sheet_names <- .unique_sheet_names(c(names(x), "Labels"))
+  labels_sheet <- sheet_names[length(sheet_names)]
+  sheet_names <- stats::setNames(sheet_names[seq_along(x)], names(x))
+
   # Write each element to its own sheet, dispatching by type
-  for (nm in names(x)) {
-    el <- x[[nm]]
-    sheet_name <- .sanitize_sheet_name(nm)
+  for (k in seq_along(x)) {
+    el <- x[[k]]
+    sheet_name <- sheet_names[[k]]
 
     if (inherits(el, "frequency")) {
       # Frequency: create sheet, then write formatted frequency tables
@@ -232,15 +241,16 @@ write_xlsx.list <- function(x, file, labels = TRUE, overwrite = TRUE, ...) {
   if (isTRUE(labels)) {
     df_names <- names(x)[vapply(x, is.data.frame, logical(1))]
     if (length(df_names) > 0L) {
-      all_labels <- do.call(rbind, lapply(df_names, function(nm) {
-        lbl <- .build_labels_sheet(x[[nm]])
+      df_idx <- which(vapply(x, is.data.frame, logical(1)))
+      all_labels <- do.call(rbind, lapply(df_idx, function(k) {
+        lbl <- .build_labels_sheet(x[[k]])
         if (nrow(lbl) > 0L) {
-          lbl <- cbind(Sheet = nm, lbl, stringsAsFactors = FALSE)
+          lbl <- cbind(Sheet = sheet_names[[k]], lbl, stringsAsFactors = FALSE)
         }
         lbl
       }))
       if (!is.null(all_labels) && nrow(all_labels) > 0L) {
-        .write_sheet(wb, "Labels", all_labels)
+        .write_sheet(wb, labels_sheet, all_labels)
       }
     }
   }
@@ -769,12 +779,21 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 
 #' Validate xlsx file path
 #' @noRd
-.validate_xlsx_path <- function(file, overwrite) {
-  if (!grepl("\\.xlsx$", file, ignore.case = TRUE)) {
+.validate_xlsx_path <- function(file, overwrite, call = rlang::caller_env()) {
+  if (!is.character(file) || length(file) != 1L ||
+      !grepl("\\.xlsx$", file, ignore.case = TRUE)) {
     cli::cli_abort(c(
       "{.arg file} must end in {.val .xlsx}.",
       "x" = "Got: {.file {file}}"
-    ))
+    ), call = call)
+  }
+  file_dir <- dirname(file)
+  if (!dir.exists(file_dir)) {
+    cli::cli_abort(c(
+      "Cannot write the Excel file to {.path {file}}.",
+      "x" = "Directory {.path {file_dir}} does not exist.",
+      "i" = "Create the directory first or choose an existing one."
+    ), call = call)
   }
   if (!isTRUE(overwrite) && file.exists(file)) {
     cli::cli_abort(c(
@@ -795,6 +814,45 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
     name <- substr(name, 1L, 31L)
   }
   name
+}
+
+
+#' Unique, valid Excel sheet names
+#'
+#' Excel sheet names are case-insensitive and limited to 31 characters, so
+#' two long list names sharing their first 31 characters (or a data sheet
+#' called "Labels") collided and openxlsx2 aborted without writing a file.
+#' Collisions get a numeric suffix within the 31-character limit; renamed
+#' sheets are announced once.
+#'
+#' @param nms Requested names (in order)
+#' @param reserved Names already taken (e.g. "Overview")
+#' @return Character vector of final sheet names, same length as `nms`
+#' @noRd
+.unique_sheet_names <- function(nms, reserved = character(0)) {
+  out <- character(length(nms))
+  taken <- tolower(reserved)
+  for (k in seq_along(nms)) {
+    base <- .sanitize_sheet_name(nms[k])
+    cand <- base
+    j <- 1L
+    while (tolower(cand) %in% taken) {
+      j <- j + 1L
+      suffix <- paste0("_", j)
+      cand <- paste0(substr(base, 1L, 31L - nchar(suffix)), suffix)
+    }
+    out[k] <- cand
+    taken <- c(taken, tolower(cand))
+  }
+  changed <- out != nms
+  if (any(changed)) {
+    shown <- paste0(nms[changed], " -> ", out[changed])
+    cli::cli_inform(c(
+      "i" = "Excel sheet names are limited to 31 characters and must be unique; renamed {sum(changed)} sheet{?s}:",
+      stats::setNames(shown, rep("*", length(shown)))
+    ))
+  }
+  out
 }
 
 

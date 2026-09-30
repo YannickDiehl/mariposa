@@ -666,3 +666,31 @@ test_that("IO-13: write_xpt() warns about truncated names, refuses duplicates", 
   expect_no_warning(suppressMessages(write_xpt(d2, tf, version = 8)))
   expect_equal(names(read_xpt(tf)), c("trust_government", "trust_goals"))
 })
+
+# IO-26: write_xlsx(list) with two names identical in their first 31
+# characters (Excel's limit) crashed without writing a file; a missing
+# output directory gave openxlsx2's internal error.
+test_that("IO-26: write_xlsx() makes sheet names unique", {
+  skip_if_not_installed("openxlsx2")
+  tf <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tf))
+  d <- data.frame(x = 1:2)
+  attr(d$x, "label") <- "X"  # gives the combined Labels sheet content
+  lst <- list(d, d, d)
+  names(lst) <- c(paste0(strrep("a", 31), "_first"),
+                  paste0(strrep("a", 31), "_second"),
+                  "Labels")
+  expect_message(write_xlsx(lst, tf), "sheet")
+  sheets <- openxlsx2::wb_load(tf)$sheet_names
+  expect_equal(length(unique(tolower(sheets))), length(sheets))
+  expect_true(all(nchar(sheets) <= 31))
+  expect_equal(length(sheets), 4L)
+})
+
+test_that("IO-26: write_xlsx() reports a missing directory", {
+  skip_if_not_installed("openxlsx2")
+  bad <- file.path(tempdir(), "no-such-dir-io26", "out.xlsx")
+  expect_error(write_xlsx(data.frame(x = 1), bad), "does not exist")
+  expect_error(write_xlsx(frequency(survey_data, gender), bad),
+               "does not exist")
+})

@@ -148,3 +148,8 @@
   duplicate names. It now warns (listing old -> new names, suggesting
   `version = 8`) and refuses to write when truncation would produce
   duplicates.
+* `write_xlsx()` makes sheet names unique within Excel's 31-character,
+  case-insensitive limit (two list names sharing their first 31
+  characters, or an element called "Labels", crashed without writing a
+  file); renamed sheets are listed in one message. A missing output
+  directory is reported clearly, as in `codebook(file = )`.
