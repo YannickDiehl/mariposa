@@ -33,3 +33,8 @@
   same number of decimals (no `50` next to `50.550`), and a table wider
   than the console is split into column blocks that each repeat the
   Variable column (the continuation block used to lose it).
+* `w_mean()` and the other `w_*` functions (including `w_modus()`) print
+  every group combination when data are grouped by two or more variables.
+  The print iterated over the first grouping variable only: region x
+  gender showed two blocks labelled "region = East"/"West" that silently
+  contained the Male rows.

@@ -154,13 +154,9 @@ print.w_modus <- function(x, digits = 3, ...) {
   is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
 
   if (is_grouped_data) {
-    # Handle grouped results
-    for (group_val in unique(x$results[[x$groups[1]]])) {
-      group_results <- x$results[.group_match(x$results[[x$groups[1]]], group_val), ]
-
-      cat(sprintf("\nGroup: %s\n",
-                  .format_group_label(group_results[1, x$groups[1], drop = FALSE])))
-
+    # One block per combination of ALL grouping variables (the first
+    # grouping variable alone dropped/mislabelled groups)
+    for_each_group(x$results, x$groups, function(group_results, combo) {
       print_df <- group_results
       if (!is.null(x$weights)) {
         print_df <- print_df %>%
@@ -178,7 +174,7 @@ print.w_modus <- function(x, digits = 3, ...) {
       }
 
       print(print_df, row.names = FALSE)
-    }
+    })
   } else {
     # Handle ungrouped results
     print_df <- x$results

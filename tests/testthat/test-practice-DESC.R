@@ -192,3 +192,25 @@ test_that("DESC-16: describe() tables are sized to content and wrap with the Var
                        !grepl("^\\s*Variable\\s", out_w)]
   expect_true(all(grepl("^\\s*(age|income)\\s", data_rows)))
 })
+
+
+# --- DESC-01 / EDGE-01: w_* print with two grouping variables ------------------
+
+test_that("DESC-01: w_* print shows every combination of two group_by variables", {
+  # The print iterated over the first grouping variable only and took the
+  # first row per level: region x gender printed two blocks labelled
+  # "region = East"/"West" that silently showed the Male rows.
+  g <- survey_data |> group_by(region, gender)
+  res <- w_mean(g, age, weights = sampling_weight)
+  out <- capture.output(print(res))
+  grp <- grep("^Group:", out, value = TRUE)
+  expect_length(grp, 4L)
+  expect_true(any(grepl("region = East, gender = Female", grp)))
+  r <- res$results
+  v <- r$weighted_mean[r$region == "East" & r$gender == "Female"]
+  expect_true(any(grepl(sub("0+$", "", sprintf("%.3f", v)), out, fixed = TRUE)))
+
+  out_m <- capture.output(print(w_modus(g, education, weights = sampling_weight)))
+  expect_length(grep("^Group:", out_m), 4L)
+  expect_true(any(grepl("region = West, gender = Female", out_m)))
+})

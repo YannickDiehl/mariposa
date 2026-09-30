@@ -371,17 +371,16 @@
   }
 
   if (is_grouped_data) {
-    for (group_val in unique(x$results[[x$groups[1]]])) {
-      group_results <- x$results[.group_match(x$results[[x$groups[1]]], group_val), ]
-      cat(sprintf("\nGroup: %s\n",
-                  .format_group_label(group_results[1, x$groups[1], drop = FALSE])))
-
+    # One block per combination of ALL grouping variables (iterating over
+    # the first variable only dropped half the groups and mislabelled the
+    # rest)
+    for_each_group(x$results, x$groups, function(group_results, combo) {
       for (var_name in unique(group_results$Variable)) {
         var_data <- group_results[group_results$Variable == var_name, ]
         cat(sprintf("\n--- %s ---\n", var_name))
         print(.rename_stat(.make_output_df(var_name, var_data)), row.names = FALSE)
       }
-    }
+    })
   } else {
     variables <- if ("Variable" %in% names(x$results)) {
       unique(x$results$Variable)
