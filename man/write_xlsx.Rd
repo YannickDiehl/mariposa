@@ -3,15 +3,18 @@
 \name{write_xlsx}
 \alias{write_xlsx}
 \alias{write_xlsx.frequency}
+\alias{write_xlsx.default}
 \title{Export Data to Excel with Label Support}
 \usage{
 write_xlsx(x, file, ...)
 
 \method{write_xlsx}{frequency}(x, file, overwrite = TRUE, ...)
+
+\method{write_xlsx}{default}(x, file, overwrite = TRUE, ...)
 }
 \arguments{
-\item{x}{Object to export: a data frame, a \code{\link[=codebook]{codebook()}} result, or a
-named list of data frames.}
+\item{x}{Object to export: a data frame, a \code{\link[=codebook]{codebook()}} result, an
+analysis result, or a named list of these.}
 
 \item{file}{Path to the output \code{.xlsx} file. Must end in \code{.xlsx}.}
 
@@ -34,7 +37,7 @@ value labels, and tagged NA metadata. When exporting labelled survey data,
 a "Labels" reference sheet is automatically included so that reviewers
 can look up what each numeric code means -- even without R access.
 
-Three input types are supported:
+Four input types are supported:
 \enumerate{
 \item \strong{Data frame}: Exports the data plus a "Labels" reference sheet
 with variable labels, value labels, and missing value codes.
@@ -42,9 +45,13 @@ with variable labels, value labels, and missing value codes.
 HTML viewer -- with values, value labels, and frequencies stacked
 inside each cell, tagged NAs separated by a line, and an overview
 sheet with dataset metadata.
+\item \strong{Analysis results}: \code{\link[=frequency]{frequency()}} and \code{\link[=crosstab]{crosstab()}} tables in
+their printed layout; every other result (e.g. \code{\link[=describe]{describe()}},
+\code{\link[=t_test]{t_test()}}, \code{\link[=oneway_anova]{oneway_anova()}}, \code{\link[=reliability]{reliability()}},
+\code{\link[=linear_regression]{linear_regression()}}) as its result tables.
 \item \strong{Named list}: Each list element becomes a separate sheet.
-Elements can be data frames, \code{\link[=frequency]{frequency()}} results, or \code{\link[=codebook]{codebook()}}
-results -- types can be mixed freely. For data frame elements, a
+Elements can be data frames, \code{\link[=codebook]{codebook()}} results, or any analysis
+result -- types can be mixed freely. For data frame elements, a
 combined "Labels" sheet is appended.
 }
 }
@@ -77,6 +84,8 @@ Use \code{write_xlsx()} when you:
 \item Want to export a codebook for manual review or documentation
 \item Need to combine multiple tables (data, codebook, frequencies) in
 one Excel file
+\item Want to hand analysis results (descriptives, crosstabs, test
+results) to colleagues as Excel tables
 }
 }
 }
@@ -88,6 +97,17 @@ Exports one or more frequency tables to a single Excel sheet, mirroring
 the console print output. Each variable gets a header row, stats summary,
 column headers, data rows, and total rows. Multiple variables are separated
 by 3 blank rows.
+
+\item \code{write_xlsx(default)}: Export any other mariposa analysis result (e.g.
+\code{\link[=describe]{describe()}}, \code{\link[=crosstab]{crosstab()}}, \code{\link[=t_test]{t_test()}}, \code{\link[=reliability]{reliability()}},
+\code{\link[=linear_regression]{linear_regression()}}) to one sheet. \code{\link[=crosstab]{crosstab()}} results are written
+in the SPSS table layout (counts and the requested percentages per
+row category, with totals); all other results as the table
+\link[=as.data.frame.mariposa]{as.data.frame()} returns, followed by the
+secondary tables SPSS
+shows next to it (group descriptives, mean ranks, item statistics,
+model summary, ...). Grouped results keep the grouping variables as
+leading columns (crosstabs get one block per group).
 
 }}
 \examples{
@@ -135,10 +155,30 @@ if (requireNamespace("openxlsx2", quietly = TRUE)) {
 }
 }
 
+if (requireNamespace("openxlsx2", quietly = TRUE)) {
+  # Analysis results: one sheet each, or several in one workbook
+  tmp_res <- tempfile(fileext = ".xlsx")
+  t_test(survey_data, age, income, group = gender) |> write_xlsx(tmp_res)
+
+  tmp_list <- tempfile(fileext = ".xlsx")
+  write_xlsx(
+    list(
+      "Descriptives" = describe(survey_data, age, income),
+      "Crosstab"     = crosstab(survey_data, gender, region),
+      "ANOVA"        = oneway_anova(survey_data, age, group = education)
+    ),
+    tmp_list
+  )
+
+  unlink(c(tmp_res, tmp_list))
+}
+
 }
 \seealso{
 \code{\link[=codebook]{codebook()}} for generating codebook objects,
 \code{\link[=frequency]{frequency()}} for frequency tables,
+\link[=as.data.frame.mariposa]{as.data.frame()} for analysis results as data
+frames,
 \code{\link[=read_spss]{read_spss()}}, \code{\link[=read_por]{read_por()}}, \code{\link[=read_stata]{read_stata()}}, \code{\link[=read_sas]{read_sas()}},
 \code{\link[=read_xpt]{read_xpt()}}, \code{\link[=read_xlsx]{read_xlsx()}} for importing labelled data
 

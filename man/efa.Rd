@@ -28,12 +28,19 @@ Default \code{NULL} uses the Kaiser criterion (eigenvalue > 1). A single
 component cannot be rotated; it is shown unrotated with SPSS's note.}
 
 \item{rotation}{Rotation method: \code{"varimax"} (default, orthogonal),
-\code{"oblimin"} (oblique, allows correlated factors),
-\code{"promax"} (oblique, power-based), or \code{"none"}.}
+\code{"oblimin"} (oblique direct oblimin, delta = 0, allows correlated
+factors), \code{"promax"} (oblique, power 4), or \code{"none"}. All
+rotations use Kaiser normalization and SPSS FACTOR's own algorithms and
+stopping rules (at most 25 iterations, as SPSS \code{/CRITERIA
+  ITERATE(25)}), so they reproduce SPSS's rotated matrices; they differ
+slightly from \code{stats::varimax()}, \code{stats::promax()} and
+\code{GPArotation::oblimin()}.}
 
 \item{extraction}{Extraction method: \code{"pca"} (default, Principal
 Component Analysis) or \code{"ml"} (Maximum Likelihood, enables
-goodness-of-fit testing, assumes multivariate normality).}
+goodness-of-fit testing, assumes multivariate normality). ML uses
+SPSS's starting values, bounds a Heywood variable's communality at
+.999 as SPSS does and keeps SPSS's factor order.}
 
 \item{weights}{Optional survey weights for population-representative results.}
 
@@ -61,7 +68,9 @@ An \code{efa} result object containing:
 loadings of the extracted components/factors (SPSS "Extraction Sums
 of Squared Loadings"). For ML this is the variance the common factors
 explain - the figure the compact print reports.}
-\item{rotation_variance}{Tibble with rotation sums of squared loadings}
+\item{rotation_variance}{Tibble with rotation sums of squared loadings
+(for the oblique rotations the column sums of squares of the
+structure matrix, as SPSS reports them)}
 \item{communalities}{Extraction communalities for each variable}
 \item{kmo}{List with overall KMO and per-item MSA values}
 \item{bartlett}{List with chi_sq, df, and p_value}
@@ -75,6 +84,10 @@ explain - the figure the compact print reports.}
 \item{pattern_matrix}{Pattern matrix (oblimin/promax only, NULL otherwise)}
 \item{structure_matrix}{Structure matrix (oblimin/promax only, NULL otherwise)}
 \item{factor_correlations}{Factor correlation matrix (oblimin/promax only, NULL otherwise)}
+\item{rotation_iterations, rotation_converged}{Iterations of the
+rotation as SPSS counts them ("Rotation converged in 4 iterations";
+for promax those of its varimax step) and whether it converged;
+NULL without rotation}
 \item{variables}{Character vector of variable names}
 \item{variable_labels}{Named character vector with the variable labels
 (\code{NA} where a variable has none); \code{summary()} shows them
@@ -170,15 +183,11 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science)
 
-# With Oblimin rotation (requires GPArotation package)
-\donttest{
-if (requireNamespace("GPArotation", quietly = TRUE)) {
-  efa(survey_data,
-      political_orientation, environmental_concern, life_satisfaction,
-      trust_government, trust_media, trust_science,
-      rotation = "oblimin")
-}
-}
+# With Oblimin rotation
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    rotation = "oblimin")
 
 # Maximum Likelihood extraction
 efa(survey_data,

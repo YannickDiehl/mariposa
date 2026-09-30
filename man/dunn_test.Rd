@@ -26,6 +26,9 @@ Pairwise comparison results showing:
 \item Z-statistics based on rank differences
 \item Adjusted p-values (controlling for multiple comparisons)
 }
+
+The comparison table (one row per pair) is stored as \code{$results}
+(also available as \code{$comparisons}).
 }
 \description{
 \code{dunn_test()} tells you exactly which groups are different from each other

@@ -4,11 +4,14 @@
 \alias{print.linear_regression}
 \title{Print linear regression results (compact)}
 \usage{
-\method{print}{linear_regression}(x, ...)
+\method{print}{linear_regression}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"linear_regression"} returned by
 \code{\link{linear_regression}}.}
+
+\item{digits}{Number of decimal places for R-squared and the p-value
+(the F statistic keeps one decimal fewer). (Default: 3)}
 
 \item{...}{Additional arguments (not used).}
 }

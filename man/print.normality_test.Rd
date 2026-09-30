@@ -4,11 +4,13 @@
 \alias{print.normality_test}
 \title{Print normality test results (compact)}
 \usage{
-\method{print}{normality_test}(x, ...)
+\method{print}{normality_test}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"normality_test"} returned by
 \code{\link{normality_test}}.}
+
+\item{digits}{Number of decimal places. (Default: 3)}
 
 \item{...}{Additional arguments (not used).}
 }
@@ -17,9 +19,8 @@ Invisibly returns the input object \code{x}.
 }
 \description{
 Compact print method for objects of class \code{"normality_test"}.
-Shows one line per variable with both test results. For grouped
-analyses, only the dimensions are shown — use \code{summary()} for the
-per-group tables.
+Shows one line per variable with both test results; grouped analyses
+show these lines under a \code{[group]} line for every group.
 }
 \examples{
 result <- normality_test(survey_data, age, income)

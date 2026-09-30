@@ -4,11 +4,14 @@
 \alias{print.logistic_regression}
 \title{Print logistic regression results (compact)}
 \usage{
-\method{print}{logistic_regression}(x, ...)
+\method{print}{logistic_regression}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"logistic_regression"} returned by
 \code{\link{logistic_regression}}.}
+
+\item{digits}{Number of decimal places for the pseudo R-squared and the
+p-value (chi-square one decimal fewer). (Default: 3)}
 
 \item{...}{Additional arguments (not used).}
 }

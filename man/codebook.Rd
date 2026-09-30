@@ -65,11 +65,16 @@ file is used). The directory of \code{file} must already exist.}
 
 \item{view}{Open the HTML codebook in the RStudio Viewer (or browser)?
 Defaults to \code{\link[=interactive]{interactive()}}, so interactive sessions open the Viewer
-and scripts/tests do not. Set \code{view = FALSE} to suppress the Viewer
+and scripts/tests do not; while an R Markdown/Quarto document is
+knitted the default is \code{FALSE} (the codebook is embedded in the
+document instead). Set \code{view = FALSE} to suppress the Viewer
 side effect entirely; \verb{file =} writing is unaffected by this argument.}
 }
 \value{
-Invisibly returns a list of class \code{"codebook"} containing:
+A list of class \code{"codebook"}. Printing it shows a compact
+console overview; in a knitted HTML document (R Markdown, Quarto)
+the full HTML codebook is embedded, in other formats the overview is
+shown. The list contains:
 \describe{
 \item{codebook}{Tibble with one row per variable and all metadata}
 \item{data_info}{List with dataset-level information (name, nrow, ncol, etc.)}
@@ -113,6 +118,14 @@ Use \code{codebook()} when you:
 \item Want to document your dataset for colleagues or publications
 \item Need to quickly see value distributions across variables
 }
+}
+
+\subsection{In R Markdown and Quarto}{
+
+A chunk containing \code{codebook(data)} embeds the HTML codebook in HTML
+output (its styles only apply to the codebook, not to the rest of the
+document); PDF and Word output show the compact console overview. Use
+\code{\link[=write_xlsx]{write_xlsx()}} for an Excel version of the codebook.
 }
 }
 \examples{

@@ -27,6 +27,9 @@ Pairwise comparison results showing:
 \item Adjusted p-values (controlling for multiple comparisons)
 \item The number of cases of each pair (\code{n})
 }
+
+The comparison table (one row per pair) is stored as \code{$results}
+(also available as \code{$comparisons}).
 }
 \description{
 \code{pairwise_wilcoxon()} tells you exactly which pairs of measurements differ

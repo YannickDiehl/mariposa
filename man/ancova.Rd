@@ -37,7 +37,10 @@ redundant 0 (\code{redundant = TRUE})}
 \item{emm_main_effects}{For 2+ factors: named list of tibbles with the
 adjusted main-effect means (unweighted average of the cell means, as
 SPSS \code{/EMMEANS=TABLES(factor)}); NULL for one factor}
-\item{levene_test}{Tibble with Levene's test results}
+\item{levene_test}{Tibble with Levene's test of equality of error
+variances (f, df1, df2, p): as in SPSS UNIANOVA, a one-way ANOVA of
+the absolute residuals of the ANCOVA model across the cells of the
+design. Also available as \code{levene_test(result)}.}
 \item{r_squared}{R-squared and Adjusted R-squared}
 \item{model}{The underlying lm model object}
 \item{call_info}{List with metadata (dv, factors, covariates, weighted, etc.)}

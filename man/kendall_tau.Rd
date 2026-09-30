@@ -18,7 +18,8 @@ kendall_tau(
 
 \item{...}{The variables you want to correlate. List two for a single
 correlation or more for a correlation matrix. You can use helpers like
-\code{starts_with("trust")}.}
+\code{starts_with("trust")}. Numeric variables or ordered factors
+(ranked by their level order).}
 
 \item{weights}{Optional survey weights for population-representative results.}
 

@@ -6,6 +6,7 @@
 \alias{levene_test.data.frame}
 \alias{levene_test.oneway_anova}
 \alias{levene_test.t_test}
+\alias{levene_test.ancova}
 \alias{levene_test.mann_whitney}
 \alias{levene_test.grouped_df}
 \title{Test If Groups Vary Similarly}
@@ -20,6 +21,8 @@ levene_test(x, ...)
 
 \method{levene_test}{t_test}(x, center = c("mean", "median"), ...)
 
+\method{levene_test}{ancova}(x, center = c("mean", "median"), ...)
+
 \method{levene_test}{mann_whitney}(x, ...)
 
 \method{levene_test}{grouped_df}(x, ..., group, weights = NULL, center = c("mean", "median"))
@@ -27,7 +30,7 @@ levene_test(x, ...)
 \arguments{
 \item{x}{Either your data (a data frame, optionally grouped with
 \code{group_by()}) or test results from \code{t_test()},
-\code{oneway_anova()} or \code{factorial_anova()}}
+\code{oneway_anova()}, \code{factorial_anova()} or \code{ancova()}}
 
 \item{...}{Variables to test (when using a data frame). List several
 variables or use tidyselect helpers like \code{starts_with("trust")}.}
@@ -38,7 +41,11 @@ variables or use tidyselect helpers like \code{starts_with("trust")}.}
 results. Must be numeric and non-negative (the package-wide weights
 policy).}
 
-\item{center}{How to measure center: \code{"mean"} (default) or \code{"median"} (more robust)}
+\item{center}{How to measure center: \code{"mean"} (default) or
+\code{"median"} (more robust). For \code{ancova()} results only
+\code{"mean"} is available: as in SPSS UNIANOVA, the test is computed on
+the absolute residuals of the ANCOVA model (covariates and factors),
+compared across the cells of the design.}
 }
 \value{
 Test results showing:
