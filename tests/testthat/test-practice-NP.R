@@ -421,6 +421,66 @@ test_that("NP-12 grouped binomial_test skips a group with one category", {
                "2 categories")
 })
 
+# --- NP-13: degenerate cases print a reason, not broken text ------------------
+
+no_broken_text <- function(out) {
+  expect_false(any(grepl("= ,", out, fixed = TRUE)))
+  expect_false(any(grepl("(NA)", out, fixed = TRUE)))
+  expect_false(any(grepl("= NA", out, fixed = TRUE)))
+  expect_false(any(grepl("NaN", out, fixed = TRUE)))
+}
+
+test_that("NP-13 wilcoxon_test with identical variables: Z = 0, p = 1 (SPSS)", {
+  # Was: "Z = ," and NA statistics; SPSS reports Z = 0, p = 1.
+  d <- dplyr::mutate(survey_data, tg2 = trust_government)
+  r <- wilcoxon_test(d, x = trust_government, y = tg2)
+  expect_equal(r$results$Z, 0)
+  expect_equal(r$results$p_value, 1)
+  no_broken_text(c(capture.output(print(r)), capture.output(print(summary(r)))))
+})
+
+test_that("NP-13 grouped friedman_test: failing group named, no broken line", {
+  # Was: "chi2(NA) = ,  , W = , N = NA" and a warning without the group.
+  d <- survey_data
+  east <- which(d$region == "East")
+  d$trust_media[east[-1]] <- NA
+  expect_warning(
+    r <- friedman_test(dplyr::group_by(d, region), trust_government,
+                       trust_media, trust_science),
+    "East"
+  )
+  out <- c(capture.output(print(r)), capture.output(print(summary(r))))
+  no_broken_text(out)
+  expect_true(any(grepl("not computed", out, ignore.case = TRUE)))
+})
+
+test_that("NP-13 constant and all-NA variables in MW/KW: clear reasons", {
+  # Was: KW printed "(see warning)" without any warning (H = NaN); MW
+  # leaked German CI warnings and "Fehlender Wert"; an all-NA variable
+  # blamed the grouping variable ("Found 0 groups ... use Kruskal-Wallis").
+  d <- dplyr::mutate(survey_data, const = 3, allna = NA_real_)
+  expect_warning(kw <- kruskal_wallis(d, const, group = education), "identical")
+  expect_warning(mw <- mann_whitney(d, const, group = gender), "identical")
+  for (res in list(kw, mw)) {
+    out <- c(capture.output(print(res)), capture.output(print(summary(res))))
+    no_broken_text(out)
+    expect_true(any(grepl("not computed", out, ignore.case = TRUE)))
+    # no group_by(): no "for this group"
+    expect_false(any(grepl("for this group", out, fixed = TRUE)))
+  }
+  w <- character()
+  withCallingHandlers(
+    mann_whitney(d, allna, group = gender),
+    warning = function(cnd) {
+      w <<- c(w, conditionMessage(cnd))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(any(grepl("no valid values", w)))
+  expect_false(any(grepl("groups", w)))
+  expect_warning(kruskal_wallis(d, allna, group = education), "no valid values")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

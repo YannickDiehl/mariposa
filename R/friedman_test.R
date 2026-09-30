@@ -167,7 +167,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
     k <- ncol(mat)
 
     if (n < 2) {
-      cli_abort("Friedman test requires at least 2 complete cases.")
+      cli_abort("{n} complete case{?s}; the Friedman test needs at least 2")
     }
 
     if (is.null(weight_name)) {
@@ -244,7 +244,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
   }
 
   # Main computation function
-  compute_results <- function(data) {
+  compute_results <- function(data, key = NULL) {
     tryCatch({
       result <- perform_single_friedman(data, var_names, w_name)
 
@@ -255,18 +255,25 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
         kendall_w = result$kendall_w,
         n = result$n,
         k = result$k,
-        mean_ranks = list(result$mean_ranks)
+        mean_ranks = list(result$mean_ranks),
+        reason = NA_character_
       )
     }, error = function(e) {
-      cli_warn("Friedman test failed: {e$message}")
+      where <- .np_where(key)
+      reason <- .np_error_reason(e)
+      cli_warn(c(
+        "Friedman test not computed{where}.",
+        "x" = "{reason}."
+      ))
       tibble(
         chi_squared = NA_real_,
-        df = NA_integer_,
+        df = NA_real_,
         p_value = NA_real_,
         kendall_w = NA_real_,
-        n = NA_integer_,
-        k = NA_integer_,
-        mean_ranks = list(NULL)
+        n = NA_real_,
+        k = NA_real_,
+        mean_ranks = list(NULL),
+        reason = reason
       )
     })
   }
@@ -274,7 +281,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
   # Execute computation (with or without group_by)
   if (is_grouped) {
     results <- data %>%
-      group_modify(~ compute_results(.x))
+      group_modify(~ compute_results(.x, .y))
   } else {
     results <- compute_results(data)
   }
@@ -285,6 +292,7 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
     variables = var_names,
     weights = w_name,
     is_grouped = is_grouped,
+    groups = grp_vars,
     conf.level = conf.level,
     data = data[, unique(c(var_names, w_name, grp_vars)), drop = FALSE]
   )
@@ -296,7 +304,14 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 # Helper: print the rank table and test statistics for a Friedman test
 #' @noRd
 .print_friedman_block <- function(row_data, var_names, weights, digits,
-                                  show_ranks = TRUE, show_results = TRUE) {
+                                  show_ranks = TRUE, show_results = TRUE,
+                                  grouped = FALSE) {
+  if (is.na(row_data$chi_squared)) {
+    txt <- .np_not_computed(row_data, 1, grouped)
+    cat(sprintf("  %s%s.\n\n", toupper(substr(txt, 1, 1)), substring(txt, 2)))
+    return(invisible(NULL))
+  }
+
   # Print rank table (gated by ranks toggle)
   if (show_ranks) {
     cat("  Ranks:\n")
@@ -350,8 +365,13 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
 
 # Internal: compact one-line summary for a single Friedman test row
 #' @noRd
-.print_friedman_compact <- function(results, i, var_label, weighted_tag, digits) {
+.print_friedman_compact <- function(results, i, var_label, weighted_tag, digits,
+                                    grouped = FALSE) {
   cat(sprintf("Friedman Test: %s%s\n", var_label, weighted_tag))
+  if (is.na(results$chi_squared[i])) {
+    cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
+    return(invisible(NULL))
+  }
   cat(sprintf("  chi2(%s) = %s, %s %s, W = %s, N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
               fmt_num(results$chi_squared[i], digits),
@@ -391,9 +411,7 @@ print.friedman_test <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("chi_squared", "df",
-                                            "p_value", "kendall_w", "n", "k",
-                                            "mean_ranks"))
+    group_vars <- .np_group_cols(x, .fr_result_cols)
     groups <- unique(results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -406,7 +424,8 @@ print.friedman_test <- function(x, digits = 3, ...) {
         group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
       if (nrow(group_results) == 0) next
-      .print_friedman_compact(group_results, 1, var_label, weighted_tag, digits)
+      .print_friedman_compact(group_results, 1, var_label, weighted_tag, digits,
+                              grouped = TRUE)
     }
   } else {
     .print_friedman_compact(results, 1, var_label, weighted_tag, digits)
@@ -505,9 +524,7 @@ print.summary.friedman_test <- function(x, ...) {
 
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("chi_squared", "df",
-                                                "p_value", "kendall_w", "n",
-                                                "k", "mean_ranks", "sig"))
+    group_vars <- .np_group_cols(x, .fr_result_cols)
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -528,7 +545,8 @@ print.summary.friedman_test <- function(x, ...) {
         weights = x$weights,
         digits = digits,
         show_ranks = show_ranks,
-        show_results = show_results
+        show_results = show_results,
+        grouped = TRUE
       )
     }
   } else {
@@ -557,3 +575,7 @@ print.summary.friedman_test <- function(x, ...) {
 
   invisible(x)
 }
+
+# Non-group columns of friedman_test()$results
+.fr_result_cols <- c("chi_squared", "df", "p_value", "kendall_w", "n", "k",
+                     "mean_ranks")

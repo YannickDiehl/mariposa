@@ -86,6 +86,49 @@
   as.character(vals[match(levels, levels(f))])
 }
 
+#' Grouping columns of a test result
+#'
+#' Results store their group_by() columns in `$groups`; objects created
+#' before that field existed fall back to "all columns that are not result
+#' columns".
+#'
+#' @param x Result object
+#' @param result_cols Names of the non-group columns of `x$results`
+#' @return Character vector
+#' @noRd
+.np_group_cols <- function(x, result_cols) {
+  if (!is.null(x$groups)) return(x$groups)
+  setdiff(names(x$results), c(result_cols, "reason", "sig"))
+}
+
+#' "not computed" text for a skipped result row
+#'
+#' @param results Results data frame
+#' @param i Row index
+#' @param grouped Is the result grouped (group_by())?
+#' @return e.g. "not computed for this group (x has no valid values)"
+#' @noRd
+.np_not_computed <- function(results, i, grouped) {
+  sprintf("not computed%s (%s)", if (isTRUE(grouped)) " for this group" else "",
+          .np_reason(results, i))
+}
+
+#' Check the values of one variable before a rank test
+#'
+#' @param x Values after removing missing cases
+#' @param var_name Variable name
+#' @return invisible(TRUE); aborts with a reason otherwise
+#' @noRd
+.np_check_values <- function(x, var_name) {
+  if (length(x) == 0) {
+    cli_abort("{.var {var_name}} has no valid values")
+  }
+  if (length(unique(x)) < 2) {
+    cli_abort("all values of {.var {var_name}} are identical")
+  }
+  invisible(TRUE)
+}
+
 #' First line of an error message, unwrapped and without styling
 #'
 #' conditionMessage() of a cli error is wrapped at the console width and

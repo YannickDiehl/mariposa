@@ -220,7 +220,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     }
     x <- x[valid_indices]
     g <- g[valid_indices]
-    
+    .np_check_values(x, var_name)
+
     # Get unique levels preserving original order (SPSS convention)
     if (is.factor(g)) {
       all_levels <- levels(g)
@@ -415,15 +416,19 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
           p_value = result$p_value,
           r_effect = result$effect_size_r,
           rank_mean_diff = result$rank_mean_diff,
-          group_stats = list(result$group_stats)
+          group_stats = list(result$group_stats),
+          reason = NA_character_
         )
-        
+
       }, error = function(e) {
         # Keep an all-NA row (returned as the tryCatch value: assignments
         # inside this handler would be local and the row lost)
-        where <- if (is.null(key)) "" else
-          paste0(" in group ", .format_group_label(key))
-        cli_warn("Mann-Whitney test failed for variable {.var {var_name}}{where}: {conditionMessage(e)}")
+        where <- .np_where(key)
+        reason <- .np_error_reason(e)
+        cli_warn(c(
+          "Mann-Whitney test not computed for {.var {var_name}}{where}.",
+          "x" = "{reason}."
+        ))
         tibble(
           Variable = var_name,
           U = NA_real_,
@@ -432,7 +437,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
           p_value = NA_real_,
           r_effect = NA_real_,
           rank_mean_diff = NA_real_,
-          group_stats = list(NULL)
+          group_stats = list(NULL),
+          reason = reason
         )
       })
     }
@@ -469,6 +475,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     weights = w_name,
     group_levels = group_levels,
     is_grouped = is_grouped,
+    groups = grp_vars,
     mu = mu,
     alternative = alternative,
     conf.level = conf.level,
@@ -483,13 +490,15 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 #' @noRd
 .print_mw_variable_block <- function(var_name, row_data, stats, weights, digits,
                                      show_ranks = TRUE, show_results = TRUE,
-                                     show_effect_sizes = TRUE) {
+                                     show_effect_sizes = TRUE,
+                                     grouped = FALSE) {
   cat(sprintf("\n--- %s ---\n", var_name))
   cat("\n")
 
-  # Group skipped at computation time (warned there): no NA tables
-  if (is.na(row_data$U) && is.null(stats)) {
-    cat("  Not computed for this group (see warning).\n\n")
+  # Skipped at computation time (warned there): no NA tables
+  if (is.na(row_data$U)) {
+    txt <- .np_not_computed(row_data, 1, grouped)
+    cat(sprintf("  %s%s.\n\n", toupper(substr(txt, 1, 1)), substring(txt, 2)))
     return(invisible(NULL))
   }
 
@@ -547,7 +556,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
 # Internal: compact one-line summary for a single Mann-Whitney variable
 #' @noRd
-.print_mw_compact <- function(results, i, group_tag, weighted_tag, digits) {
+.print_mw_compact <- function(results, i, group_tag, weighted_tag, digits,
+                              grouped = FALSE) {
   var_name <- results$Variable[i]
   U_val    <- results$U[i]
   Z_val    <- results$Z[i]
@@ -557,7 +567,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   cat(sprintf("Mann-Whitney U Test: %s%s%s\n", var_name, group_tag, weighted_tag))
 
   if (is.na(U_val)) {
-    cat("  not computed for this group (see warning)\n")
+    cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
   } else if (!is.na(r_val)) {
     r_interp <- if (abs(r_val) < 0.1) "negligible"
                 else if (abs(r_val) < 0.3) "small"
@@ -614,9 +624,7 @@ print.mann_whitney <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("Variable", "U", "W", "Z", "p_value",
-                                             "r_effect",
-                                             "rank_mean_diff", "group_stats"))
+    group_vars <- .np_group_cols(x, .mw_result_cols)
     groups <- unique(results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -630,7 +638,8 @@ print.mann_whitney <- function(x, digits = 3, ...) {
       }
       group_results <- group_results[!is.na(group_results$Variable), ]
       for (j in seq_len(nrow(group_results))) {
-        .print_mw_compact(group_results, j, group_tag, weighted_tag, digits)
+        .print_mw_compact(group_results, j, group_tag, weighted_tag, digits,
+                          grouped = TRUE)
       }
     }
   } else {
@@ -745,10 +754,7 @@ print.summary.mann_whitney <- function(x, ...) {
 
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("Variable", "U", "W", "Z", "p_value",
-                                               "r_effect",
-                                               "rank_mean_diff", "group_stats",
-                                               "sig"))
+    group_vars <- .np_group_cols(x, .mw_result_cols)
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -772,7 +778,8 @@ print.summary.mann_whitney <- function(x, ...) {
           digits           = digits,
           show_ranks       = show_ranks,
           show_results     = show_results,
-          show_effect_sizes = show_effect_sizes
+          show_effect_sizes = show_effect_sizes,
+          grouped          = TRUE
         )
       }
     }
@@ -815,3 +822,7 @@ print.summary.mann_whitney <- function(x, ...) {
 
   invisible(x)
 }
+
+# Non-group columns of mann_whitney()$results
+.mw_result_cols <- c("Variable", "U", "W", "Z", "p_value", "r_effect",
+                     "rank_mean_diff", "group_stats")

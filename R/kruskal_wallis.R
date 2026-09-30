@@ -182,6 +182,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     }
     x <- x[valid_indices]
     g <- g[valid_indices]
+    .np_check_values(x, var_name)
 
     # Ensure grouping variable is a factor
     if (!is.factor(g)) {
@@ -315,23 +316,28 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
           p_value = result$p_value,
           epsilon_squared = result$epsilon_squared,
           n_total = result$n_total,
-          group_stats = list(result$group_stats)
+          group_stats = list(result$group_stats),
+          reason = NA_character_
         )
 
       }, error = function(e) {
         # Keep an all-NA row (returned as the tryCatch value: assignments
         # inside this handler would be local and the row lost)
-        where <- if (is.null(key)) "" else
-          paste0(" in group ", .format_group_label(key))
-        cli_warn("Kruskal-Wallis test failed for variable {.var {var_name}}{where}: {conditionMessage(e)}")
+        where <- .np_where(key)
+        reason <- .np_error_reason(e)
+        cli_warn(c(
+          "Kruskal-Wallis test not computed for {.var {var_name}}{where}.",
+          "x" = "{reason}."
+        ))
         tibble(
           Variable = var_name,
           H = NA_real_,
-          df = NA_integer_,
+          df = NA_real_,
           p_value = NA_real_,
           epsilon_squared = NA_real_,
-          n_total = NA_integer_,
-          group_stats = list(NULL)
+          n_total = NA_real_,
+          group_stats = list(NULL),
+          reason = reason
         )
       })
     }
@@ -378,6 +384,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     weights = w_name,
     group_levels = group_levels,
     is_grouped = is_grouped,
+    groups = grp_vars,
     conf.level = conf.level,
     data = data[, unique(c(var_names, g_name, w_name, grp_vars)), drop = FALSE]
   )
@@ -389,12 +396,14 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 # Helper: print a single variable block (rank table + test statistics)
 #' @noRd
 .print_kw_variable_block <- function(var_name, row_data, stats, weights, digits,
-                                     show_ranks = TRUE, show_results = TRUE) {
+                                     show_ranks = TRUE, show_results = TRUE,
+                                     grouped = FALSE) {
   print_header(var_name, newline_before = FALSE)
 
-  # Group skipped at computation time (warned there): no NA tables
-  if (is.na(row_data$H) && is.null(stats)) {
-    cat("  Not computed for this group (see warning).\n\n")
+  # Skipped at computation time (warned there): no NA tables
+  if (is.na(row_data$H)) {
+    txt <- .np_not_computed(row_data, 1, grouped)
+    cat(sprintf("  %s%s.\n\n", toupper(substr(txt, 1, 1)), substring(txt, 2)))
     return(invisible(NULL))
   }
 
@@ -460,11 +469,12 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
 # Internal: compact one-line summary for a single Kruskal-Wallis variable
 #' @noRd
-.print_kw_compact <- function(results, i, group_tag, weighted_tag, digits) {
+.print_kw_compact <- function(results, i, group_tag, weighted_tag, digits,
+                              grouped = FALSE) {
   cat(sprintf("Kruskal-Wallis Test: %s%s%s\n",
               results$Variable[i], group_tag, weighted_tag))
   if (is.na(results$H[i])) {
-    cat("  not computed for this group (see warning)\n")
+    cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
     return(invisible(NULL))
   }
   cat(sprintf("  H(%s) = %s, %s %s, eps2 = %s, N = %s\n",
@@ -505,9 +515,7 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("Variable", "H", "df", "p_value",
-                                            "epsilon_squared", "n_total",
-                                            "group_stats"))
+    group_vars <- .np_group_cols(x, .kw_result_cols)
     groups <- unique(results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -521,7 +529,8 @@ print.kruskal_wallis <- function(x, digits = 3, ...) {
       }
       group_results <- group_results[!is.na(group_results$Variable), ]
       for (j in seq_len(nrow(group_results))) {
-        .print_kw_compact(group_results, j, group_tag, weighted_tag, digits)
+        .print_kw_compact(group_results, j, group_tag, weighted_tag, digits,
+                          grouped = TRUE)
       }
     }
   } else {
@@ -622,9 +631,7 @@ print.summary.kruskal_wallis <- function(x, ...) {
 
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("Variable", "H", "df", "p_value",
-                                               "epsilon_squared", "n_total",
-                                               "group_stats", "sig"))
+    group_vars <- .np_group_cols(x, .kw_result_cols)
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -648,7 +655,8 @@ print.summary.kruskal_wallis <- function(x, ...) {
           weights  = x$weights,
           digits   = digits,
           show_ranks   = show_ranks,
-          show_results = show_results
+          show_results = show_results,
+          grouped      = TRUE
         )
       }
     }
@@ -683,3 +691,7 @@ print.summary.kruskal_wallis <- function(x, ...) {
 
   invisible(x)
 }
+
+# Non-group columns of kruskal_wallis()$results
+.kw_result_cols <- c("Variable", "H", "df", "p_value", "epsilon_squared",
+                     "n_total", "group_stats")

@@ -103,3 +103,15 @@
   warning naming the group and the reason, and the output says "not
   computed (gender has 1 observed category; ...)". An ungrouped single
   variable still stops with a clear error.
+* Degenerate cases in the rank tests print a reason instead of broken
+  text. `wilcoxon_test()` with identical variables reports Z = 0 and
+  p = 1 as SPSS does (was "Z = ," and `NA`); a grouped `friedman_test()`
+  whose group cannot be tested no longer prints "chi2(NA) = ,  , W = ,
+  N = NA" and its warning names the group; a constant variable in
+  `kruskal_wallis()`/`mann_whitney()` is reported ("all values of x are
+  identical") instead of "(see warning)" without a warning or German
+  "cannot compute confidence interval" warnings; an all-missing variable
+  says "x has no valid values" instead of blaming the grouping variable
+  ("Found 0 groups ... use a Kruskal-Wallis test"). "not computed for
+  this group" appears only under `group_by()`; otherwise the output says
+  "not computed (reason)".

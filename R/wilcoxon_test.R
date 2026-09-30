@@ -175,17 +175,27 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
     n_ties <- sum(tie_idx)
     n_total <- length(d)
 
+    if (n_total == 0) {
+      cli_abort("no valid pairs of {.var {x_name}} and {.var {y_name}}")
+    }
+
     # Remove ties for rank computation
     d_no_ties <- d[!tie_idx]
     n_ranked <- length(d_no_ties)
 
     if (n_ranked == 0) {
+      # Every pair tied (e.g. identical variables): no evidence of a
+      # difference. SPSS reports Z = 0 and p = 1 with empty rank rows.
+      if (!is.null(weight_name)) {
+        n_ties <- round(sum(w))
+        n_total <- n_ties
+      }
       return(list(
-        Z = NA_real_, p_value = NA_real_, r_effect = NA_real_,
-        n_neg = n_neg, n_pos = n_pos, n_ties = n_ties, n_total = n_total,
+        Z = 0, p_value = 1, r_effect = 0,
+        n_neg = 0, n_pos = 0, n_ties = n_ties, n_total = n_total,
         mean_rank_neg = NA_real_, mean_rank_pos = NA_real_,
-        sum_rank_neg = NA_real_, sum_rank_pos = NA_real_,
-        V = NA_real_
+        sum_rank_neg = 0, sum_rank_pos = 0,
+        V = 0
       ))
     }
 
@@ -291,7 +301,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
   }
 
   # Main computation function
-  compute_results <- function(data) {
+  compute_results <- function(data, key = NULL) {
     tryCatch({
       result <- perform_single_wilcoxon(data, x_name, y_name, w_name)
 
@@ -308,18 +318,25 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
         mean_rank_pos = result$mean_rank_pos,
         sum_rank_neg = result$sum_rank_neg,
         sum_rank_pos = result$sum_rank_pos,
-        V = result$V
+        V = result$V,
+        reason = NA_character_
       )
     }, error = function(e) {
-      cli_warn("Wilcoxon test failed: {e$message}")
+      where <- .np_where(key)
+      reason <- .np_error_reason(e)
+      cli_warn(c(
+        "Wilcoxon signed-rank test not computed for {.var {y_name}} - {.var {x_name}}{where}.",
+        "x" = "{reason}."
+      ))
       tibble(
         pair = paste(y_name, "-", x_name),
         Z = NA_real_, p_value = NA_real_, r_effect = NA_real_,
-        n_neg = NA_integer_, n_pos = NA_integer_,
-        n_ties = NA_integer_, n_total = NA_integer_,
+        n_neg = NA_real_, n_pos = NA_real_,
+        n_ties = NA_real_, n_total = NA_real_,
         mean_rank_neg = NA_real_, mean_rank_pos = NA_real_,
         sum_rank_neg = NA_real_, sum_rank_pos = NA_real_,
-        V = NA_real_
+        V = NA_real_,
+        reason = reason
       )
     })
   }
@@ -327,7 +344,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
   # Execute computation (with or without group_by)
   if (is_grouped) {
     results <- data %>%
-      group_modify(~ compute_results(.x))
+      group_modify(~ compute_results(.x, .y))
   } else {
     results <- compute_results(data)
   }
@@ -339,6 +356,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
     y_name = y_name,
     weights = w_name,
     is_grouped = is_grouped,
+    groups = grp_vars,
     conf.level = conf.level
   )
 
@@ -349,8 +367,15 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 # Helper: print the rank table and test statistics for one comparison
 #' @noRd
 .print_wt_block <- function(row_data, x_name, y_name, weights, digits,
-                            show_ranks = TRUE, show_results = TRUE) {
+                            show_ranks = TRUE, show_results = TRUE,
+                            grouped = FALSE) {
   print_header(paste(y_name, "-", x_name), newline_before = FALSE)
+
+  if (is.na(row_data$Z)) {
+    txt <- .np_not_computed(row_data, 1, grouped)
+    cat(sprintf("  %s%s.\n\n", toupper(substr(txt, 1, 1)), substring(txt, 2)))
+    return(invisible(NULL))
+  }
 
   # Rank table (gated by ranks toggle)
   if (show_ranks) {
@@ -412,12 +437,17 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
 
 # Internal: compact one-line summary for a single Wilcoxon comparison
 #' @noRd
-.print_wt_compact <- function(results, i, pair_label, weighted_tag, digits) {
+.print_wt_compact <- function(results, i, pair_label, weighted_tag, digits,
+                              grouped = FALSE) {
   Z_val <- results$Z[i]
   p_val <- as.numeric(results$p_value[i])
   r_val <- results$r_effect[i]
 
   cat(sprintf("Wilcoxon Signed-Rank Test: %s%s\n", pair_label, weighted_tag))
+  if (is.na(Z_val)) {
+    cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
+    return(invisible(NULL))
+  }
 
   if (!is.na(r_val)) {
     r_interp <- if (abs(r_val) < 0.1) "negligible"
@@ -467,11 +497,7 @@ print.wilcoxon_test <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("pair", "Z", "p_value", "r_effect",
-                                            "n_neg", "n_pos", "n_ties",
-                                            "n_total", "mean_rank_neg",
-                                            "mean_rank_pos", "sum_rank_neg",
-                                            "sum_rank_pos", "V"))
+    group_vars <- .np_group_cols(x, .wt_result_cols)
     groups <- unique(results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -484,7 +510,8 @@ print.wilcoxon_test <- function(x, digits = 3, ...) {
         group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
       if (nrow(group_results) == 0) next
-      .print_wt_compact(group_results, 1, pair_label, weighted_tag, digits)
+      .print_wt_compact(group_results, 1, pair_label, weighted_tag, digits,
+                        grouped = TRUE)
     }
   } else {
     .print_wt_compact(results, 1, pair_label, weighted_tag, digits)
@@ -579,11 +606,7 @@ print.summary.wilcoxon_test <- function(x, ...) {
   cat("\n")
 
   if (is_grouped_data) {
-    group_vars <- setdiff(names(x$results), c("pair", "Z", "p_value", "r_effect",
-                                                "n_neg", "n_pos", "n_ties",
-                                                "n_total", "mean_rank_neg",
-                                                "mean_rank_pos", "sum_rank_neg",
-                                                "sum_rank_pos", "V", "sig"))
+    group_vars <- .np_group_cols(x, .wt_result_cols)
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -605,7 +628,8 @@ print.summary.wilcoxon_test <- function(x, ...) {
         weights = x$weights,
         digits = digits,
         show_ranks = show_ranks,
-        show_results = show_results
+        show_results = show_results,
+        grouped = TRUE
       )
     }
   } else {
@@ -635,3 +659,8 @@ print.summary.wilcoxon_test <- function(x, ...) {
 
   invisible(x)
 }
+
+# Non-group columns of wilcoxon_test()$results
+.wt_result_cols <- c("pair", "Z", "p_value", "r_effect", "n_neg", "n_pos",
+                     "n_ties", "n_total", "mean_rank_neg", "mean_rank_pos",
+                     "sum_rank_neg", "sum_rank_pos", "V")
