@@ -131,8 +131,8 @@ test_that("SCALE note: weighted formulas are defined only in kernels-weighted.R"
   # (also used by efa()), against the rule that every weighted formula
   # lives in R/kernels-weighted.R (the weighted variance once drifted in
   # six files).
-  r_dir <- testthat::test_path("..", "..", "R")
-  skip_if(!dir.exists(r_dir), "R/ sources not available (installed package)")
+  r_dir <- r_source_dir()
+  skip_if(is.null(r_dir), "R/ sources not available (installed package)")
   expect_identical(.weighted_defs_outside_kernels(r_dir), character(0))
   # behaviour unchanged: w == 1 reproduces the unweighted matrices
   m <- as.matrix(stats::na.omit(survey_data[c("trust_government",

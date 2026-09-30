@@ -265,7 +265,7 @@ test_that("haven-not-loaded: labelled data from readRDS() work without haven loa
   skip_on_cran()
   skip_if_not_installed("haven")
   pkg_root <- normalizePath(testthat::test_path("..", ".."), mustWork = FALSE)
-  dev <- file.exists(file.path(pkg_root, "DESCRIPTION"))
+  dev <- !is.null(r_source_dir())
   if (dev) skip_if_not_installed("pkgload")
   load_line <- if (dev) {
     sprintf("suppressMessages(pkgload::load_all(%s, quiet = TRUE, helpers = FALSE))",

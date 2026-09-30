@@ -21,6 +21,20 @@ skip_without_spss_ref <- function(file_name) {
   }
 }
 
+#' Path to the package's R/ sources, or NULL outside a source checkout
+#'
+#' Tests that read the R/ source files must skip when only an installed
+#' package is available. Checking that R/ exists is not enough: under covr
+#' the tests run inside the installed package, whose R/ holds only the
+#' lazy-load database (mariposa.rdb/.rdx) and no .R files.
+#'
+#' @return The R/ directory if it contains .R files, otherwise NULL
+r_source_dir <- function() {
+  r_dir <- testthat::test_path("..", "..", "R")
+  if (length(list.files(r_dir, pattern = "\\.R$")) == 0) return(NULL)
+  r_dir
+}
+
 #' Extract a single group from grouped results
 #'
 #' @param result A mariposa result object with grouped results

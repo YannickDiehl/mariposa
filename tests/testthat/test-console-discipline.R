@@ -33,9 +33,10 @@ library(testthat)
 
 test_that("cat()/print() calls appear only in print-layer functions", {
   # R/ sources are only present in the development tree (devtools::test(),
-  # CI checkout), not in an installed package or on CRAN's test runner.
-  r_dir <- testthat::test_path("..", "..", "R")
-  skip_if(!dir.exists(r_dir), "R/ sources not available (installed package)")
+  # CI checkout), not in an installed package, on CRAN's test runner or
+  # under covr (see r_source_dir() in helper-mariposa.R).
+  r_dir <- r_source_dir()
+  skip_if(is.null(r_dir), "R/ sources not available (installed package)")
 
   console_fns <- c("cat", "print", "writeLines")
   silent_wrappers <- "capture.output" # print() inside these writes nowhere
