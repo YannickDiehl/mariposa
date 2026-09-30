@@ -55,7 +55,8 @@ namespace_path <- file.path(repo_root, "NAMESPACE")
 exports <- character()
 if (file.exists(namespace_path)) {
   ns <- readLines(namespace_path, warn = FALSE)
-  exports <- sub("^export\\(([A-Za-z_][A-Za-z0-9_.]*)\\).*$", "\\1",
+  # Non-syntactic names are quoted: export("%>%"), export("var_label<-")
+  exports <- sub('^export\\("?([^")]+)"?\\).*$', "\\1",
                  grep("^export\\(", ns, value = TRUE))
 }
 
@@ -177,7 +178,7 @@ not_in_scope <- c(
   # tests/testthat/test-marginal-effects.R
   "marginal_effects",
   # Label management
-  "var_label", "val_labels", "copy_labels", "drop_labels",
+  "var_label", "var_label<-", "val_labels", "copy_labels", "drop_labels",
   "to_label", "to_character", "to_numeric", "to_labelled",
   "set_na", "unlabel",
   # Type/exploration
@@ -186,7 +187,9 @@ not_in_scope <- c(
   "na_frequencies", "untag_na", "strip_tags", "fre",
   # I/O
   "read_spss", "read_por", "read_stata", "read_sas", "read_xpt", "read_xlsx",
-  "write_spss", "write_stata", "write_xpt", "write_xlsx"
+  "write_spss", "write_stata", "write_xpt", "write_xlsx",
+  # Re-exported from dplyr
+  "%>%"
 )
 
 # Functions in SPSS-validation scope but missing a test file (gap)
@@ -312,17 +315,20 @@ if (n_exceptions == 0L) {
                  "")
 } else {
   rmd_lines <- c(rmd_lines,
-                 "| ID | Function | Statistic | Tolerance |",
-                 "|---|---|---|---:|")
+                 "| ID | Function | Statistic | Tolerance | Reason |",
+                 "|---|---|---|---:|---|")
   for (id in sort(names(exception_registry))) {
     e <- exception_registry[[id]]
     rmd_lines <- c(rmd_lines,
-                   sprintf("| %s | `%s` | %s | %g |",
-                           id, e$function_name, e$statistic, e$tolerance))
+                   sprintf("| %s | `%s` | %s | %g | %s |",
+                           id, e$function_name, e$statistic, e$tolerance,
+                           e$reason %||% "\u2014"))
   }
   rmd_lines <- c(rmd_lines, "",
-                 "Full provenance for each exception lives in",
-                 "[VALIDATION_EXCEPTIONS.md](https://github.com/YannickDiehl/mariposa/blob/main/.claude/VALIDATION_EXCEPTIONS.md).",
+                 "An exception covers an identified algorithmic difference to SPSS,",
+                 "not a bug: its tolerance is what the two algorithms agree to.",
+                 "Statistics outside an exception are asserted at Spec or Display",
+                 "tier, or are listed as Internal (Tier 4) in the table above.",
                  "")
 }
 

@@ -1378,6 +1378,10 @@ reference output showed mariposa was wrong.
   correlation matrices, rotation sums, iteration counts); the ML initial
   communalities of all 6 ML reference runs; `ancova()` Levene tests of the
   6 unweighted reference runs.
+* `vignette("spss-compatibility")` is regenerated: it lists EXC-001/EXC-002
+  with their reason (it still said "No active Tier-3 exceptions") and the
+  updated assertion counts of `ancova()`, `crosstab()`, `describe()`,
+  `efa()` and `t_test()`.
 
 # mariposa 0.7.3
 

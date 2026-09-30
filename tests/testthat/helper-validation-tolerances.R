@@ -50,8 +50,9 @@ spec_tolerances <- list(
 #   "EXC-NNN" = list(
 #     tolerance     = <numeric>,
 #     statistic     = "<short label>",
-#     function_name = "<R function>"
-#   )
+#     function_name = "<R function>",
+#     reason        = "<one user-facing sentence>"  # optional; shown in the
+#   )                                               # compatibility vignette
 
 exception_registry <- list(
   # SPSS FACTOR /EXTRACTION ML stops its Newton-Raphson iteration once no
@@ -61,14 +62,20 @@ exception_registry <- list(
   # loading).
   "EXC-001" = list(tolerance = 0.002,
                    statistic = "ML loadings, sums of squares, % of variance",
-                   function_name = "efa"),
+                   function_name = "efa",
+                   reason = paste(
+                     "SPSS stops the ML iteration at its convergence",
+                     "criterion (.001); mariposa iterates to the optimum.")),
   # SPSS reference runs that end without convergence ("More than 25
   # iterations required", Tests 5a/6a; df = 0, Heywood cases): the SPSS
   # values are an unfinished iteration state on an almost flat likelihood.
   # Observed maximum .044 (5a life_satisfaction communality).
   "EXC-002" = list(tolerance = 0.05,
                    statistic = "ML communalities / SS where SPSS did not converge",
-                   function_name = "efa")
+                   function_name = "efa",
+                   reason = paste(
+                     "The SPSS reference runs end without convergence",
+                     "(3 factors from 6 items, df = 0, Heywood cases)."))
 )
 
 
