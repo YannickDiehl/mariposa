@@ -27,7 +27,8 @@
 #'   recoded variables (e.g., \code{"_r"}). If \code{NULL} (default), the
 #'   original columns are overwritten in-place.
 #' @param var_label A new variable label. If \code{NULL}, the existing label
-#'   is kept with \code{" (recoded)"} appended.
+#'   is kept with \code{" (recoded)"} appended (once: recoding a recoded
+#'   variable does not stack the suffix).
 #' @param val_labels A named character vector of value labels for the new
 #'   values (e.g., \code{c("1" = "Low", "2" = "Medium", "3" = "High")}).
 #'   If \code{NULL}, labels are taken from inline \code{[Label]} syntax in
@@ -58,6 +59,7 @@
 #'   \strong{Syntax}       \tab \strong{Meaning}        \tab \strong{Example} \cr
 #'   \code{"old=new"}      \tab Single value             \tab \code{"1=0; 2=1"} \cr
 #'   \code{"lo:hi=new"}    \tab Range of values          \tab \code{"1:3=1; 4:6=2"} \cr
+#'   \code{"a,b=new"}      \tab List of values/ranges    \tab \code{"1,2=1; 3,4:5=2"} \cr
 #'   \code{"old=new [Label]"} \tab Inline value label    \tab \code{"1:2=1 [Low]; 3:5=2 [High]"} \cr
 #'   \code{"else=new"}     \tab Catch-all for unmatched  \tab \code{"1=1; else=NA"} \cr
 #'   \code{"copy"}         \tab Keep original value      \tab \code{"1:3=copy; else=NA"} \cr
@@ -72,7 +74,16 @@
 #'   \code{"val=NA"}       \tab Set values to NA          \tab \code{"-9=NA; -8=NA"} \cr
 #' }
 #'
-#' Rules are evaluated in order — the first matching rule wins.
+#' Rules are evaluated in order — the first matching rule wins. Keywords
+#' (\code{else}, \code{copy}, \code{NA}, \code{min}, \code{max},
+#' \code{rev}, \code{dicho}, \code{mean}, \code{quart}) are
+#' case-insensitive. A range must be written low to high (\code{"1:5"}, not
+#' \code{"5:1"}). Inline labels may contain semicolons
+#' (\code{"1:2=1 [low; poor]"}).
+#'
+#' Valid values that match no rule become \code{NA}, with a warning listing
+#' them: add \code{"else=copy"} to keep them (what SPSS's in-place
+#' \code{RECODE} does) or \code{"else=NA"} to confirm.
 #'
 #' ## Missing Values of Imported Data
 #'
@@ -181,6 +192,13 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   if (!is.null(var.label)) .stop_removed_arg("var.label", "var_label")
   if (!is.null(val.labels)) .stop_removed_arg("val.labels", "val_labels")
 
+  if (missing(rules)) {
+    cli::cli_abort(c(
+      "{.arg rules} is required.",
+      "i" = "For example {.code rules = \"1:2=1; 3:5=2\"} or {.code rules = \"rev\"}."
+    ))
+  }
+
   # ============================================================================
   # VECTOR INPUT
   # ============================================================================
@@ -197,10 +215,6 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   # ============================================================================
   # DATA FRAME INPUT
   # ============================================================================
-
-  if (missing(rules)) {
-    cli::cli_abort("{.arg rules} is required.")
-  }
 
   vars <- .process_variables(data, ...)
 
@@ -239,15 +253,18 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
     x <- .tag_spss_missing_values(tibble::tibble(x = x), verbose = FALSE)$x
   }
 
-  # Preserve variable label
+  # Preserve variable label (the suffix is added once, not per call)
   orig_label <- attr(x, "label", exact = TRUE)
   new_label <- var_label %||% {
-    if (!is.null(orig_label)) paste0(orig_label, " (recoded)") else NULL
+    if (is.null(orig_label)) NULL
+    else if (endsWith(orig_label, " (recoded)")) orig_label
+    else paste0(orig_label, " (recoded)")
   }
 
   # ---- Special modes --------------------------------------------------------
 
-  rules_trimmed <- trimws(rules)
+  # Keywords (rev, dicho, mean, quart) are case-insensitive
+  rules_trimmed <- tolower(trimws(rules))
 
   # Every mode ends here: the result keeps the missing types of x (tagged
   # NAs + na_tag_map + labelled missing codes) and is haven_labelled when it
@@ -283,11 +300,18 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
   if (grepl("^dicho(\\(|$)", rules_trimmed)) {
     cut_point <- NULL
-    m <- regmatches(rules_trimmed, regexec("^dicho\\(([^)]+)\\)$", rules_trimmed))
-    if (length(m[[1]]) == 2L) {
-      cut_point <- as.numeric(m[[1]][2])
+    m <- regmatches(rules_trimmed, regexec("^dicho\\(([^)]*)\\)$", rules_trimmed))
+    if (rules_trimmed != "dicho") {
+      cut_point <- if (length(m[[1]]) == 2L) {
+        suppressWarnings(as.numeric(trimws(m[[1]][2])))
+      } else {
+        NA_real_
+      }
       if (is.na(cut_point)) {
-        cli::cli_abort("Invalid cut-point in {.val {rules}}.")
+        cli::cli_abort(c(
+          "Invalid cut-point in {.val {rules}}.",
+          "i" = "Use a number, e.g. {.code rules = \"dicho(3)\"}, or {.code \"dicho\"} for a median split."
+        ))
       }
     }
     result <- .apply_dicho(x, cut_point = cut_point)
@@ -309,6 +333,16 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
   parsed <- .parse_rec_rules(rules, x)
   result <- .apply_rec_rules(x, parsed)
+  unmatched <- attr(result, "unmatched")
+  attr(result, "unmatched") <- NULL
+  if (length(unmatched) > 0L) {
+    n_unmatched <- length(unmatched)
+    shown <- if (n_unmatched > 10L) c(utils::head(unmatched, 10L), "...") else unmatched
+    cli::cli_warn(c(
+      "{n_unmatched} value{?s} of {.var {var_name}} matched no rule and became {.val NA}: {shown}.",
+      "i" = "Add {.code else=copy} to keep them (as SPSS's in-place {.code RECODE} does) or {.code else=NA} to confirm."
+    ))
+  }
 
   # Apply value labels: explicit val_labels > inline + preserved originals > none
   effective_labels <- NULL
@@ -387,18 +421,19 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
 #' @noRd
 .parse_rec_rules <- function(rules, x) {
-  # Split by semicolons
-  parts <- trimws(strsplit(rules, ";")[[1]])
+  # Split by semicolons that are not inside an inline [label]
+  parts <- trimws(strsplit(rules, ";(?![^\\[]*\\])", perl = TRUE)[[1]])
   parts <- parts[nzchar(parts)]
 
   if (length(parts) == 0L) {
     cli::cli_abort("No valid rules found in {.arg rules}.")
   }
 
-  x_min <- suppressWarnings(min(as.numeric(x), na.rm = TRUE))
-  x_max <- suppressWarnings(max(as.numeric(x), na.rm = TRUE))
+  x_num <- .rec_numeric(x)
+  x_min <- suppressWarnings(min(x_num, na.rm = TRUE))
+  x_max <- suppressWarnings(max(x_num, na.rm = TRUE))
 
-  parsed <- vector("list", length(parts))
+  parsed <- list()
 
   for (i in seq_along(parts)) {
     part <- parts[i]
@@ -434,48 +469,67 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
     }
 
     # ---- Parse the OLD (left-hand) specification ----------------------------
-
-    if (toupper(lhs) == "ELSE") {
-      parsed[[i]] <- list(type = "else", new = new_val, label = inline_label)
-      next
+    # A comma-separated list ("1,2=1", "1, 4:5=2") is shorthand for one rule
+    # per element with the same new value, like SPSS's RECODE (1,2=1).
+    elements <- trimws(strsplit(lhs, ",", fixed = TRUE)[[1]])
+    if (length(elements) == 0L || any(!nzchar(elements))) {
+      cli::cli_abort("Invalid old value list {.val {lhs}} in rule {.val {part}}.")
     }
 
-    if (toupper(lhs) == "NA") {
-      parsed[[i]] <- list(type = "na", new = new_val, label = inline_label)
-      next
-    }
+    for (el in elements) {
+      rule <- list(new = new_val, label = inline_label)
 
-    # Check for range "lo:hi"
-    if (grepl(":", lhs)) {
-      range_parts <- strsplit(lhs, ":", fixed = TRUE)[[1]]
-      if (length(range_parts) != 2L) {
-        cli::cli_abort("Invalid range: {.val {lhs}} in rule {.val {part}}.")
-      }
-      lo_str <- trimws(range_parts[1])
-      hi_str <- trimws(range_parts[2])
-
-      lo <- if (toupper(lo_str) == "MIN") x_min
-            else suppressWarnings(as.numeric(lo_str))
-      hi <- if (toupper(hi_str) == "MAX") x_max
-            else suppressWarnings(as.numeric(hi_str))
-
-      if (is.na(lo) || is.na(hi)) {
-        cli::cli_abort("Invalid range values in {.val {part}}.")
+      if (toupper(el) == "ELSE") {
+        if (length(elements) > 1L) {
+          cli::cli_abort("{.val else} cannot be part of a value list in rule {.val {part}}.")
+        }
+        parsed[[length(parsed) + 1L]] <- c(list(type = "else"), rule)
+        next
       }
 
-      parsed[[i]] <- list(type = "range", from = lo, to = hi, new = new_val,
-                          label = inline_label)
-      next
-    }
+      if (toupper(el) == "NA") {
+        parsed[[length(parsed) + 1L]] <- c(list(type = "na"), rule)
+        next
+      }
 
-    # Single value
-    old_val <- suppressWarnings(as.numeric(lhs))
-    if (is.na(old_val)) {
-      cli::cli_abort("Invalid old value: {.val {lhs}} in rule {.val {part}}.")
-    }
+      # Range "lo:hi"
+      if (grepl(":", el, fixed = TRUE)) {
+        range_parts <- strsplit(el, ":", fixed = TRUE)[[1]]
+        if (length(range_parts) != 2L) {
+          cli::cli_abort("Invalid range: {.val {el}} in rule {.val {part}}.")
+        }
+        lo_str <- trimws(range_parts[1])
+        hi_str <- trimws(range_parts[2])
 
-    parsed[[i]] <- list(type = "value", from = old_val, new = new_val,
-                        label = inline_label)
+        lo <- if (toupper(lo_str) == "MIN") x_min
+              else suppressWarnings(as.numeric(lo_str))
+        hi <- if (toupper(hi_str) == "MAX") x_max
+              else suppressWarnings(as.numeric(hi_str))
+
+        if (is.na(lo) || is.na(hi)) {
+          cli::cli_abort("Invalid range values in {.val {part}}.")
+        }
+        literal <- toupper(lo_str) != "MIN" && toupper(hi_str) != "MAX"
+        if (literal && lo > hi) {
+          cli::cli_abort(c(
+            "Invalid range {.val {el}} in rule {.val {part}}: the lower bound comes first.",
+            "i" = "Did you mean {.val {paste0(hi_str, ':', lo_str)}}?"
+          ))
+        }
+
+        parsed[[length(parsed) + 1L]] <- c(list(type = "range", from = lo,
+                                                to = hi), rule)
+        next
+      }
+
+      # Single value
+      old_val <- suppressWarnings(as.numeric(el))
+      if (is.na(old_val)) {
+        cli::cli_abort("Invalid old value: {.val {el}} in rule {.val {part}}.")
+      }
+      parsed[[length(parsed) + 1L]] <- c(list(type = "value", from = old_val),
+                                         rule)
+    }
   }
 
   parsed
@@ -563,6 +617,8 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   keep_na <- !matched & is.na(x_num)
   result[keep_na] <- x_num[keep_na]
 
+  # Valid values no rule matched (set to NA): reported by .rec_vec()
+  attr(result, "unmatched") <- sort(unique(x_num[!matched & !is.na(x_num)]))
   result
 }
 

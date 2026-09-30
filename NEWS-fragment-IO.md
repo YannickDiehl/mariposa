@@ -47,3 +47,13 @@
   recoded like valid values and lost their codes and labels. The input is
   converted to the tagged-NA form of `read_spss()` first. `val_labels` is
   honoured with `rules = "rev"` (it was silently ignored).
+* `rec()` syntax is more forgiving and never loses values silently:
+  valid values that match no rule still become `NA` but now with a warning
+  that lists them and suggests `else=copy` (SPSS's in-place `RECODE`
+  keeps them) or `else=NA`; value lists work (`"1,2=1; 3,4:5=2"`, as
+  SPSS's `RECODE (1,2=1)`); keywords are case-insensitive (`"REV"`,
+  `"Dicho(3)"`); a reversed range such as `"5:1=1"` is an error instead of
+  silently matching nothing; inline labels may contain semicolons
+  (`"[niedrig; gering]"`); `"dicho(x)"` and a missing `rules` argument give
+  clear English errors instead of leaked base-R (German) messages; the
+  `" (recoded)"` label suffix is no longer appended again on every call.

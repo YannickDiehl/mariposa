@@ -242,3 +242,45 @@ test_that("SCALE-09: val_labels are honoured with rules = 'rev'", {
   r <- rec(x, rules = "rev", val_labels = c("1" = "viel", "5" = "wenig"))
   expect_equal(attr(r, "labels"), c(viel = 1, wenig = 5))
 })
+
+# IO-18: rec() syntax problems: unmatched values silently NA, "1,2=1" list
+# syntax unsupported, "REV" rejected, "5:1=1" silently all NA, labels with
+# ";" broke the parser, "dicho(x)" leaked a German base warning, missing
+# rules gave a German base error, " (recoded)" stacked on every call.
+test_that("IO-18: unmatched valid values warn with the fix", {
+  expect_warning(r <- rec(c(1, 2, 3, 4, 5), rules = "1:3=1"),
+                 "else=copy")
+  expect_equal(r, c(1, 1, 1, NA, NA))
+  expect_no_warning(rec(c(1, 2, 3, 4, 5), rules = "1:3=1; else=NA"))
+  expect_no_warning(rec(c(1, 2, 3, 4, 5), rules = "1:3=1; else=copy"))
+  expect_no_warning(rec(c(1, 2, NA), rules = "1:2=1"))
+  expect_warning(rec(data.frame(q = 1:5), q, rules = "1:3=1"), "q")
+})
+
+test_that("IO-18: value lists, case-insensitive keywords, reversed ranges", {
+  expect_equal(rec(c(1, 2, 3, 4), rules = "1,2=1; 3,4=2"), c(1, 1, 2, 2))
+  expect_equal(rec(c(1, 2, 3, 4, 5), rules = "1, 2:3=1; else=0"),
+               c(1, 1, 1, 0, 0))
+  expect_message(r <- rec(c(1, 2, 3), rules = "REV"), "observed")
+  expect_equal(as.numeric(r), c(3, 2, 1))
+  expect_equal(rec(c(1, 5), rules = "DICHO(3)"), c(0, 1))
+  expect_error(rec(c(1, 5), rules = "5:1=1"), "1:5")
+})
+
+test_that("IO-18: labels may contain semicolons; clear errors in English", {
+  skip_if_not_installed("haven")
+  r <- rec(c(1, 2, 3), rules = "1:2=1 [niedrig; gering]; 3=2 [hoch]")
+  expect_equal(names(attr(r, "labels")), c("niedrig; gering", "hoch"))
+  expect_error(rec(c(1, 2), rules = "dicho(x)"), "cut-point")
+  expect_no_warning(try(rec(c(1, 2), rules = "dicho(x)"), silent = TRUE))
+  expect_error(rec(c(1, 2)), "rules")
+  expect_error(rec(c(1, 2)), class = "rlang_error")
+})
+
+test_that("IO-18: the ' (recoded)' label suffix does not stack", {
+  x <- c(1, 2, 3)
+  attr(x, "label") <- "Trust"
+  r1 <- rec(x, rules = "1:3=copy")
+  r2 <- rec(r1, rules = "1:3=copy")
+  expect_equal(attr(r2, "label"), "Trust (recoded)")
+})
