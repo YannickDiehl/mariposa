@@ -20,15 +20,20 @@
 #' mirroring SPSS's \code{MEAN.n()} syntax: \code{min_valid = 2} corresponds
 #' to \code{MEAN.2(a, b, c)}.
 #'
-#' @param data Your survey data (a data frame or tibble). When used inside
-#'   \code{mutate()}, pass \code{.} or use \code{pick()}.
+#' @param data Your survey data (a data frame or tibble). Inside
+#'   \code{mutate()}, the recommended form is \code{pick()}:
+#'   \code{mutate(score = row_means(pick(item1, item2, item3)))}. It also
+#'   works in a grouped \code{mutate()}; \code{.} (the magrittr placeholder)
+#'   is the whole data set and therefore only works without groups.
 #' @param ... The variables to average. Use bare column names separated by
 #'   commas, or tidyselect helpers like \code{starts_with("trust")}. If no
 #'   variables are specified, all numeric columns in \code{data} are used
-#'   (useful with \code{pick()}).
+#'   (useful with \code{pick()}; non-numeric columns are ignored with a
+#'   warning).
 #' @param min_valid Minimum number of non-missing values required to compute
-#'   a mean. If a row has fewer valid values, \code{NA} is returned. Default
-#'   is \code{NULL} (compute mean if at least 1 value is valid).
+#'   a mean (a whole number). If a row has fewer valid values, \code{NA} is
+#'   returned. Default is \code{NULL} (compute mean if at least 1 value is
+#'   valid).
 #' @param na.rm Remove missing values before calculating? Default: \code{TRUE}.
 #'
 #' @return A numeric vector with one value per row — the mean across the
@@ -69,13 +74,20 @@
 #' library(dplyr)
 #' data(survey_data)
 #'
-#' # Create a trust scale from 3 items
+#' # Create a trust scale from 3 items (recommended: pick())
+#' survey_data <- survey_data %>%
+#'   mutate(m_trust = row_means(pick(trust_government, trust_media,
+#'                                   trust_science)))
+#'
+#' # tidyselect helpers inside pick(); also works after group_by()
+#' survey_data <- survey_data %>%
+#'   group_by(region) %>%
+#'   mutate(m_trust = row_means(pick(starts_with("trust")))) %>%
+#'   ungroup()
+#'
+#' # Alternative without groups: the data placeholder `.`
 #' survey_data <- survey_data %>%
 #'   mutate(m_trust = row_means(., trust_government, trust_media, trust_science))
-#'
-#' # Using pick()
-#' survey_data <- survey_data %>%
-#'   mutate(m_trust = row_means(pick(starts_with("trust"))))
 #'
 #' # Require at least 2 valid items (like SPSS MEAN.2)
 #' survey_data <- survey_data %>%
@@ -246,14 +258,35 @@ row_count <- function(data, ..., count, na.rm = TRUE) {
 
 #' Build a numeric matrix from data + tidyselect
 #' @noRd
-.row_op_matrix <- function(data, ...) {
+.row_op_matrix <- function(data, ..., call = rlang::caller_env()) {
   dots <- rlang::enquos(...)
+  fn <- rlang::call_name(rlang::frame_call(call)) %||% "row_means"
+
+  # Inside a grouped mutate(), `.` is the whole data set while the result
+  # must have one value per row of the current group: dplyr then aborts
+  # with a size-mismatch error that does not say what to do.
+  n_group <- tryCatch(length(dplyr::cur_group_rows()),
+                      error = function(e) NULL)
+  if (!is.null(n_group) && nrow(data) != n_group) {
+    cli::cli_abort(c(
+      "{.fn {fn}} received {nrow(data)} rows, but the current group of {.fn mutate} has {n_group}.",
+      "i" = "In a grouped {.fn mutate}, {.code .} is the whole data set. Use {.code pick()} instead, e.g. {.code mutate(score = {fn}(pick(item1, item2, item3)))}."
+    ), call = call)
+  }
 
   if (length(dots) == 0L) {
     # No variables specified — use all numeric columns (for pick() pattern)
-    numeric_cols <- names(data)[vapply(data, is.numeric, logical(1))]
+    is_num <- vapply(data, is.numeric, logical(1))
+    numeric_cols <- names(data)[is_num]
     if (length(numeric_cols) == 0L) {
-      cli::cli_abort("No numeric variables found in {.arg data}.")
+      cli::cli_abort("No numeric variables found in {.arg data}.", call = call)
+    }
+    if (any(!is_num)) {
+      dropped <- names(data)[!is_num]
+      cli::cli_warn(c(
+        "{.fn {fn}} ignored non-numeric column{?s} {.var {dropped}}.",
+        "i" = "Only numeric columns are aggregated; leave {cli::qty(length(dropped))}{?it/them} out of {.code pick()} to silence this."
+      ), call = call)
     }
     as.matrix(data[, numeric_cols, drop = FALSE])
   } else {
@@ -297,8 +330,12 @@ row_count <- function(data, ..., count, na.rm = TRUE) {
 
   # Validate min_valid
   if (!is.null(min_valid)) {
-    if (!is.numeric(min_valid) || length(min_valid) != 1L || min_valid < 1L) {
-      cli::cli_abort("{.arg min_valid} must be a positive integer.")
+    if (!is.numeric(min_valid) || length(min_valid) != 1L ||
+        is.na(min_valid) || min_valid < 1L || min_valid != round(min_valid)) {
+      cli::cli_abort(c(
+        "{.arg min_valid} must be a positive whole number of items.",
+        "x" = "Got {.val {min_valid}}."
+      ))
     }
     if (min_valid > n_items) {
       cli::cli_warn(

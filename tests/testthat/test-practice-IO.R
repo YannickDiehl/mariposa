@@ -460,3 +460,32 @@ test_that("SCALE-11: row_count() counts SPSS missing codes of imported data", {
   expect_equal(row_count(d, q1, q2, count = c(-9, -8)), c(1L, 2L, 0L, 1L))
   expect_equal(row_count(d, q1, q2, count = NA), c(1L, 2L, 0L, 1L))
 })
+
+# SCALE-19: row_means(., ...) inside a grouped mutate() failed with dplyr's
+# size-mismatch error; pick() silently dropped non-numeric columns;
+# min_valid = 2.5 was accepted.
+test_that("SCALE-19: row_means() in grouped mutate: clear error, pick() works", {
+  g <- dplyr::group_by(survey_data, region)
+  expect_error(
+    g %>% dplyr::mutate(m = row_means(., trust_government, trust_media)),
+    "pick"
+  )
+  r <- dplyr::mutate(g, m = row_means(pick(trust_government, trust_media)))
+  expect_equal(r$m, row_means(survey_data, trust_government, trust_media))
+  # ungrouped `.` keeps working
+  r2 <- survey_data %>% dplyr::mutate(m = row_means(., trust_government,
+                                                 trust_media))
+  expect_equal(r2$m, r$m)
+})
+
+test_that("SCALE-19: pick() with non-numeric columns warns; min_valid integer", {
+  expect_warning(
+    r <- dplyr::mutate(survey_data,
+                       m = row_means(pick(gender, trust_government,
+                                          trust_media))),
+    "gender"
+  )
+  expect_equal(r$m, row_means(survey_data, trust_government, trust_media))
+  expect_error(row_means(survey_data, trust_government, trust_media,
+                         min_valid = 2.5), "whole number")
+})

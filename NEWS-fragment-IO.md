@@ -101,3 +101,9 @@
   (SPSS `MISSING`), and SPSS missing codes of imported data (e.g. -9, a
   tagged NA after `read_spss()`) are counted when listed - they were
   always 0.
+* `row_means()`, `row_sums()` and `row_count()` inside a grouped
+  `mutate()` with the `.` placeholder now stop with an explanation and the
+  `pick()` form instead of dplyr's bare size-mismatch error; `pick()` is
+  the documented, recommended form. Non-numeric columns handed over by
+  `pick()` are ignored with a warning naming them (they were dropped
+  silently), and a fractional `min_valid` (e.g. 2.5) is rejected.
