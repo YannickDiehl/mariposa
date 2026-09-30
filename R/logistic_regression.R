@@ -251,7 +251,11 @@ logistic_regression <- function(data, formula = NULL,
   if (n_in == 0 || (!is_grouped && n_in < length(pred_names) + 2)) {
     .abort_insufficient_cases(data, all_vars, n_in, length(pred_names))
   }
-  dv_encoding <- .logistic_dv_encoding(data[[dep_name]][in_analysis], dep_name)
+  # Value labels taken from the full column: subsetting a plain numeric
+  # vector with a "labels" attribute (e.g. rec() output) drops them
+  dv_col <- data[[dep_name]]
+  dv_encoding <- .logistic_dv_encoding(dv_col[in_analysis], dep_name,
+                                       labels = attr(dv_col, "labels", exact = TRUE))
 
   # ============================================================================
   # GROUPED ANALYSIS
@@ -369,10 +373,15 @@ logistic_regression <- function(data, formula = NULL,
   }
 
   # Character predictors are categorical: enter them as factors (as glm()
-  # would), so the numeric mode and the AMEs treat them like factors
+  # would), so the numeric mode and the AMEs treat them like factors.
+  # Labelled (SPSS) predictors enter with their numeric codes: fit on the
+  # bare numbers so glm() does not depend on haven's vctrs arithmetic
+  # methods being registered (see .plain_numeric).
   for (v in pred_names) {
     if (is.character(data_complete[[v]])) {
       data_complete[[v]] <- factor(data_complete[[v]])
+    } else if (inherits(data_complete[[v]], "haven_labelled")) {
+      data_complete[[v]] <- .plain_numeric(data_complete[[v]])
     }
   }
 
@@ -602,7 +611,8 @@ logistic_regression <- function(data, formula = NULL,
 #' @return list(type, values, original, short): original = display text
 #'   "value (label)", short = label if any, else value
 #' @noRd
-.logistic_dv_encoding <- function(x, dep_name) {
+.logistic_dv_encoding <- function(x, dep_name,
+                                  labels = attr(x, "labels", exact = TRUE)) {
   if (is.logical(x)) {
     type <- "logical"
     vals <- sort(unique(x[!is.na(x)]))
@@ -620,7 +630,7 @@ logistic_regression <- function(data, formula = NULL,
     xv <- .plain_numeric(x)
     vals <- sort(unique(xv[!is.na(xv)]))
     original <- short <- as.character(vals)
-    labs <- attr(x, "labels", exact = TRUE)
+    labs <- labels
     if (!is.null(labs) && length(vals) > 0) {
       hit <- match(vals, .plain_numeric(labs))
       has <- !is.na(hit)

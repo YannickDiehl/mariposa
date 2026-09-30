@@ -134,3 +134,9 @@
     crashes with "missing value where TRUE/FALSE needed".
   - Aligned pair labels and a pairwise table that no longer wraps; a very
     large weighted N (above 2^31) no longer breaks the output.
+* `logistic_regression()` also finds the value labels of an outcome that
+  carries them as a plain `labels` attribute (e.g. `rec()` output) for the
+  encoding table and the `[P(y = category)]` tag, and both regression
+  functions fit labelled (SPSS) variables on their bare numeric codes, so
+  a fit no longer depends on haven's arithmetic methods being loaded
+  ("<haven_labelled> - <haven_labelled> is not permitted").

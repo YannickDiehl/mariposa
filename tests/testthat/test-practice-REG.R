@@ -248,6 +248,26 @@ test_that("REG-07/08: any two-valued outcome is accepted and its encoding shown"
   expect_true(any(grepl("2 (zufrieden)", out_l, fixed = TRUE)))
 })
 
+# REG-08 / REG-19 follow-up: value labels stored as a plain "labels"
+# attribute (rec() output) were lost when the outcome was subset; labelled
+# variables are fitted on their bare numeric codes.
+test_that("REG-08/19: plain value-label attributes and labelled variables", {
+  d <- .reg_sd2()
+  d$sat_rec <- structure(d$high_sat, labels = c(no = 0, yes = 1))
+  m <- logistic_regression(d, sat_rec ~ age)
+  expect_equal(m$dv_encoding$Original, c("0 (no)", "1 (yes)"))
+  expect_true(any(grepl("P(sat_rec = yes)", capture.output(print(m)),
+                        fixed = TRUE)))
+
+  skip_if_not_installed("haven")
+  d$ls_lab <- haven::labelled(d$life_satisfaction, c(low = 1, high = 5))
+  d$age_lab <- haven::labelled(d$age, c(young = 18))
+  ml <- linear_regression(d, ls_lab ~ age_lab + income)
+  ref <- stats::lm(life_satisfaction ~ age + income, data = d)
+  expect_equal(unname(coef(ml)), unname(coef(ref)))
+  expect_equal(ml$labelled_predictors, "age_lab")
+})
+
 # REG-21 (logistic part): a constant outcome gave "Nagelkerke R2 = -Inf ...
 # Accuracy = 100%"; outcomes with more than two values or a character
 # outcome gave cryptic messages.

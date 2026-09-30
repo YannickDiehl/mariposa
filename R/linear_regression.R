@@ -375,10 +375,15 @@ linear_regression <- function(data, formula = NULL,
   }
 
   # Character predictors are categorical: enter them as factors (as lm()
-  # would), so descriptives and the numeric mode treat them like factors
-  for (v in pred_names) {
-    if (is.character(data_complete[[v]])) {
+  # would), so descriptives and the numeric mode treat them like factors.
+  # Labelled (SPSS) variables enter with their numeric codes: fit on the
+  # bare numbers so lm() does not depend on haven's vctrs arithmetic
+  # methods being registered (see .plain_numeric).
+  for (v in all_vars) {
+    if (is.character(data_complete[[v]]) && v %in% pred_names) {
       data_complete[[v]] <- factor(data_complete[[v]])
+    } else if (inherits(data_complete[[v]], "haven_labelled")) {
+      data_complete[[v]] <- .plain_numeric(data_complete[[v]])
     }
   }
 
@@ -2058,7 +2063,9 @@ df.residual.linear_regression <- function(object, ...) {
 #' @noRd
 .labelled_predictors <- function(data, pred_names) {
   pred_names[vapply(pred_names, function(v) {
-    inherits(data[[v]], "haven_labelled")
+    x <- data[[v]]
+    inherits(x, "haven_labelled") ||
+      (is.numeric(x) && !is.null(attr(x, "labels", exact = TRUE)))
   }, logical(1))]
 }
 
