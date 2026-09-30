@@ -29,8 +29,13 @@
 #'
 #' **Z-Statistics**: Based on the Wilcoxon signed-rank test for each pair
 #' - Large absolute Z values indicate big differences between two measurements
-#' - Positive Z: Values in var1 tend to be higher than var2
-#' - Negative Z: Values in var2 tend to be higher than var1
+#' - Z is computed from the differences \code{var2 - var1}, like
+#'   \code{wilcoxon_test(x = var1, y = var2)} and the SPSS pair
+#'   "var2 - var1"
+#' - Positive Z: Values in var2 (Var 2) tend to be higher than var1
+#' - Negative Z: Values in var1 (Var 1) tend to be higher than var2
+#' - SPSS prints the same |Z| always with a negative sign and a footnote
+#'   ("Based on positive/negative ranks") telling the direction
 #'
 #' **Adjusted P-values**: Control for multiple comparisons
 #' - p < 0.05: Measurements are significantly different
@@ -521,8 +526,9 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
 
   if (show_interpretation) {
     cat("\nInterpretation:\n")
-    cat("- Positive Z: First variable tends to have higher values\n")
-    cat("- Negative Z: Second variable tends to have higher values\n")
+    cat("- Z is based on second minus first variable (SPSS prints |Z| with a negative sign)\n")
+    cat("- Positive Z: Second variable tends to have higher values\n")
+    cat("- Negative Z: First variable tends to have higher values\n")
     cat("- p-values are adjusted for multiple comparisons\n")
   }
 

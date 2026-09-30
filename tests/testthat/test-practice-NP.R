@@ -304,6 +304,24 @@ test_that("NP-21 no confidence level is advertised for rank tests", {
   expect_false(grepl("conf.int = TRUE", src, fixed = TRUE))
 })
 
+# --- NP-04 / NP-14: pairwise_wilcoxon ----------------------------------------
+
+test_that("NP-04 pairwise_wilcoxon legend matches the sign of Z", {
+  # Was: Z is based on Var 2 - Var 1 (positive: Var 2 higher, as
+  # wilcoxon_test and SPSS "Var 2 - Var 1"), but the legend said
+  # "Positive Z: First variable tends to have higher values".
+  set.seed(4)
+  d <- data.frame(t1 = sample(1:5, 60, TRUE))
+  d$t2 <- pmin(d$t1 + sample(0:2, 60, TRUE), 7)
+  d$t3 <- d$t1
+  pw <- pairwise_wilcoxon(friedman_test(d, t1, t2, t3))
+  row <- pw$comparisons[pw$comparisons$var1 == "t1" & pw$comparisons$var2 == "t2", ]
+  expect_gt(row$z, 0)                       # t2 is higher
+  out <- capture.output(print(summary(pw)))
+  expect_true(any(grepl("Positive Z: Second variable", out, fixed = TRUE)))
+  expect_false(any(grepl("Positive Z: First", out, fixed = TRUE)))
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

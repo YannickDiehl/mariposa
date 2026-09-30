@@ -70,3 +70,9 @@
   advertises a "Confidence level: 95.0%" for which no interval exists.
   `conf.level` of `mann_whitney()`, `kruskal_wallis()`,
   `wilcoxon_test()` and `friedman_test()` is documented as not used.
+* `pairwise_wilcoxon()`: the interpretation legend and help page now match
+  the sign of Z. Z is computed from the differences second minus first
+  variable (like `wilcoxon_test(x, y)` and the SPSS pair "var2 - var1"),
+  so a positive Z means the *second* variable tends to be higher; the
+  legend said the opposite (score_T1 vs score_T2: Z = +5.43 while T2 is
+  higher).
