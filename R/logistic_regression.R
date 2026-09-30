@@ -655,7 +655,7 @@ logistic_regression <- function(data, formula = NULL,
 #' @method print logistic_regression
 print.logistic_regression <- function(x, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
-  formula_str <- deparse(x$formula)
+  formula_str <- .formula_label(x$formula)
 
   if (isTRUE(x$is_grouped)) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
@@ -784,7 +784,7 @@ print.summary.logistic_regression <- function(x, ...) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
 
-  formula_str <- deparse(x$formula)
+  formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
     "Method" = "ENTER",
@@ -839,7 +839,7 @@ print.summary.logistic_regression <- function(x, ...) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
 
-  formula_str <- deparse(x$formula)
+  formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
     "Method" = "ENTER",

@@ -279,7 +279,7 @@ marginal_effects.logistic_regression <- function(model, conf.level = 0.95, ...) 
 #' @method print marginal_effects
 print.marginal_effects <- function(x, digits = 3, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
-  cat(sprintf("Average Marginal Effects: %s%s\n", deparse(x$formula), weighted_tag))
+  cat(sprintf("Average Marginal Effects: %s%s\n", .formula_label(x$formula), weighted_tag))
 
   print_rows <- function(rows, indent = "  ") {
     for (i in seq_len(nrow(rows))) {
@@ -371,7 +371,7 @@ print.summary.marginal_effects <- function(x, ...) {
   print_header(title)
 
   info <- list(
-    "Formula" = deparse(x$formula),
+    "Formula" = .formula_label(x$formula),
     "Scale" = "Predicted probability",
     "Std. errors" = "Delta method"
   )

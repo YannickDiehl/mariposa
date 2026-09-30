@@ -1014,7 +1014,7 @@ linear_regression <- function(data, formula = NULL,
 #' @method print linear_regression
 print.linear_regression <- function(x, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
-  formula_str <- deparse(x$formula)
+  formula_str <- .formula_label(x$formula)
 
   if (isTRUE(x$is_grouped)) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
@@ -1151,7 +1151,7 @@ print.summary.linear_regression <- function(x, ...) {
   print_header(title)
 
   # Formula info
-  formula_str <- deparse(x$formula)
+  formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
     "Method" = "ENTER (all predictors)",
@@ -1209,7 +1209,7 @@ print.summary.linear_regression <- function(x, ...) {
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
   print_header(title)
 
-  formula_str <- deparse(x$formula)
+  formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
     "Method" = "ENTER (all predictors)",
@@ -1518,4 +1518,20 @@ predict.linear_regression <- function(object, ...) {
 anova.linear_regression <- function(object, ...) {
   .lr_require_lm(object, "anova")
   NextMethod()
+}
+
+
+# ============================================================================
+# SHARED REGRESSION HELPERS (linear, logistic, marginal effects)
+# ============================================================================
+
+#' One-line text form of a model formula
+#'
+#' deparse() splits formulas longer than ~60 characters into several
+#' strings; pasted into sprintf()/cat() that printed the title twice and
+#' made print_info_section() abort on a length-2 value.
+#' @noRd
+.formula_label <- function(f) {
+  if (is.null(f)) return("")
+  paste(trimws(deparse(f, width.cutoff = 500L)), collapse = " ")
 }
