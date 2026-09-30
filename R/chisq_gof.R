@@ -19,9 +19,16 @@
 #'
 #' @param data Your survey data (data frame or tibble)
 #' @param ... One or more categorical variables to test (tidyselect supported)
-#' @param expected Optional numeric vector of expected proportions (must sum to 1).
-#'   Only used when a single variable is tested. If NULL (default), equal
-#'   proportions are assumed.
+#' @param expected Optional numeric vector of expected proportions, one per
+#'   category. If NULL (default), equal proportions are assumed (SPSS
+#'   \code{/EXPECTED=EQUAL}). Applied to every selected variable, so each
+#'   variable must have that many categories. A named vector is matched to
+#'   the categories by name (category label, or the code of a labelled
+#'   variable); an unnamed vector is used in category order. As in SPSS
+#'   \code{/EXPECTED=50 30 20}, values may also be counts or any relative
+#'   frequencies: they are divided by their sum. Proportions (all values
+#'   below 1) must sum to 1; a sum within 0.01 of 1 (e.g. 0.995 from
+#'   rounding) is rescaled with a message.
 #' @param weights Optional survey weights for population-representative results
 #'
 #' @return Test results showing whether observed frequencies match expected,
@@ -127,18 +134,8 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
 
-  # Validate expected proportions
-  if (!is.null(expected)) {
-    if (!is.numeric(expected) || any(expected < 0)) {
-      cli_abort("{.arg expected} must be a numeric vector of non-negative proportions.")
-    }
-    if (abs(sum(expected) - 1) > 0.01) {
-      cli_abort(c(
-        "{.arg expected} proportions must sum to 1.",
-        "x" = "Current sum: {round(sum(expected), 4)}"
-      ))
-    }
-  }
+  # Validate and normalise expected proportions (SPSS /EXPECTED semantics)
+  expected <- .gof_normalize_expected(expected)
 
   # Process weights
   weights_info <- .process_weights(data, rlang::enquo(weights))
@@ -160,19 +157,8 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     }
   }
 
-  # Validate expected proportions length against categories (before computation)
-  if (!is.null(expected) && length(var_names) == 1) {
-    k_check <- length(unique(na.omit(data[[var_names[1]]])))
-    if (length(expected) != k_check) {
-      cli_abort(c(
-        "Length of {.arg expected} does not match number of categories.",
-        "x" = "Expected {k_check} proportions, got {length(expected)}."
-      ))
-    }
-  }
-
-  # Helper to perform GoF test on a single variable in a single data slice
-  perform_single_gof <- function(data_slice, var_name, expected_props = NULL) {
+  # Build the observed frequency table of one variable in one data slice
+  gof_table <- function(data_slice, var_name) {
     vals <- data_slice[[var_name]]
 
     # Remove NAs
@@ -184,29 +170,50 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     }
     vals <- vals[valid]
 
-    # Build frequency table
     if (!is.null(w_name)) {
       freq_tbl <- xtabs(w ~ vals)
       freq_tbl <- round(freq_tbl)
     } else {
       freq_tbl <- table(vals)
     }
+    freq_tbl
+  }
+
+  # Check `expected` against every variable's categories up front, so a
+  # mismatch is a clear error instead of a silently skipped variable
+  if (!is.null(expected)) {
+    for (vn in var_names) {
+      .gof_align_expected(expected, gof_table(data, vn), vn)
+    }
+  }
+
+  # Helper to perform GoF test on a single variable in a single data slice
+  perform_single_gof <- function(data_slice, var_name, expected_props = NULL,
+                                 key = NULL) {
+    freq_tbl <- gof_table(data_slice, var_name)
 
     n <- sum(freq_tbl)
     k <- length(freq_tbl)
 
     # Determine expected frequencies
     if (!is.null(expected_props)) {
-      if (length(expected_props) != k) {
-        cli_abort(c(
-          "Length of {.arg expected} does not match number of categories.",
-          "x" = "Expected {k} proportions, got {length(expected_props)}."
-        ))
-      }
-      expected_freq <- n * expected_props
+      expected_freq <- n * .gof_align_expected(expected_props, freq_tbl,
+                                               var_name)
     } else {
       # Equal proportions (SPSS default)
       expected_freq <- rep(n / k, k)
+    }
+    expected_freq <- unname(expected_freq)
+
+    # SPSS footnotes cells with an expected frequency below 5
+    n_low <- sum(expected_freq < 5)
+    if (n_low > 0) {
+      where <- .np_where(key)
+      pct_low <- round(100 * n_low / k, 1)
+      cli_warn(c(
+        "{.var {var_name}}{where}: {n_low} categor{?y/ies} ({pct_low}%) ha{?s/ve} an expected count below 5.",
+        "i" = "The chi-square approximation may be unreliable (minimum expected count {round(min(expected_freq), 1)})."
+      ))
     }
 
     # Chi-square statistic
@@ -232,18 +239,29 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     )
   }
 
+  na_row <- function(vn) {
+    data.frame(
+      Variable = vn,
+      chi_squared = NA_real_,
+      df = NA_integer_,
+      p_value = NA_real_,
+      n = NA_integer_,
+      stringsAsFactors = FALSE
+    )
+  }
+
   # Main execution
   if (is_grouped) {
     data_list <- dplyr::group_split(data)
     group_keys_df <- dplyr::group_keys(data)
 
     results_list <- lapply(seq_along(data_list), function(i) {
+      key <- group_keys_df[i, , drop = FALSE]
       var_results <- lapply(var_names, function(vn) {
         tryCatch({
-          res <- perform_single_gof(data_list[[i]], vn,
-                                    if (length(var_names) == 1) expected else NULL)
+          res <- perform_single_gof(data_list[[i]], vn, expected, key)
           cbind(
-            group_keys_df[i, , drop = FALSE],
+            key,
             data.frame(
               Variable = vn,
               chi_squared = res$chi_sq,
@@ -254,17 +272,11 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
             )
           )
         }, error = function(e) {
-          cbind(
-            group_keys_df[i, , drop = FALSE],
-            data.frame(
-              Variable = vn,
-              chi_squared = NA_real_,
-              df = NA_integer_,
-              p_value = NA_real_,
-              n = NA_integer_,
-              stringsAsFactors = FALSE
-            )
-          )
+          cli_warn(c(
+            "Chi-square goodness-of-fit test skipped for {.var {vn}}{.np_where(key)}.",
+            "x" = "{conditionMessage(e)}"
+          ))
+          cbind(key, na_row(vn))
         })
       })
       do.call(rbind, var_results)
@@ -286,8 +298,7 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
   } else {
     var_results <- lapply(var_names, function(vn) {
       tryCatch({
-        res <- perform_single_gof(data, vn,
-                                  if (length(var_names) == 1) expected else NULL)
+        res <- perform_single_gof(data, vn, expected)
         list(
           row = data.frame(
             Variable = vn,
@@ -300,17 +311,11 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
           freq = res$freq_table
         )
       }, error = function(e) {
-        list(
-          row = data.frame(
-            Variable = vn,
-            chi_squared = NA_real_,
-            df = NA_integer_,
-            p_value = NA_real_,
-            n = NA_integer_,
-            stringsAsFactors = FALSE
-          ),
-          freq = NULL
-        )
+        cli_warn(c(
+          "Chi-square goodness-of-fit test skipped for {.var {vn}}.",
+          "x" = "{conditionMessage(e)}"
+        ))
+        list(row = na_row(vn), freq = NULL)
       })
     })
 
@@ -471,8 +476,13 @@ print.summary.chisq_gof <- function(x, ...) {
   cat("\n")
   test_info <- list(
     "Variables" = paste(x$variables, collapse = ", "),
-    "Expected" = if (is.null(x$expected)) "Equal proportions" else
-      paste(x$expected, collapse = ", "),
+    "Expected" = if (is.null(x$expected)) "Equal proportions" else {
+      shown <- fmt_num(x$expected, digits)
+      if (!is.null(names(x$expected))) {
+        shown <- paste(names(x$expected), "=", shown)
+      }
+      paste(shown, collapse = ", ")
+    },
     "Weights variable" = x$weights
   )
   print_info_section(test_info)
@@ -553,4 +563,96 @@ print.summary.chisq_gof <- function(x, ...) {
   cat(border, "\n")
   for (line in output) cat(line, "\n")
   cat(border, "\n\n")
+}
+
+#' Validate and normalise `expected` of chisq_gof() (SPSS /EXPECTED)
+#'
+#' SPSS treats the /EXPECTED values as relative frequencies and divides them
+#' by their sum, so counts (50 30 20) or equal weights (1 1) are valid.
+#' Values that are all below 1 are read as proportions: they must sum to 1,
+#' and a sum within 0.01 of 1 (rounded proportions such as 0.995) is
+#' rescaled with a message.
+#'
+#' @param expected NULL or numeric vector (optionally named)
+#' @return NULL or the proportions (names kept)
+#' @noRd
+.gof_normalize_expected <- function(expected, call = rlang::caller_env()) {
+  if (is.null(expected)) return(NULL)
+  if (!is.numeric(expected) || anyNA(expected) || any(expected <= 0)) {
+    cli_abort(
+      "{.arg expected} must be a numeric vector of positive proportions (or relative frequencies).",
+      call = call
+    )
+  }
+  nm <- names(expected)
+  if (!is.null(nm) && (anyNA(nm) || any(!nzchar(nm)) || anyDuplicated(nm))) {
+    cli_abort(
+      "{.arg expected} must be either unnamed or have a unique name for every category.",
+      call = call
+    )
+  }
+  total <- sum(expected)
+  if (all(expected < 1)) {
+    if (abs(total - 1) > 0.01) {
+      cli_abort(c(
+        "{.arg expected} proportions must sum to 1.",
+        "x" = "Current sum: {round(total, 4)}.",
+        "i" = "Counts or other relative frequencies (as in SPSS {.code /EXPECTED=50 30 20}) are also accepted; they are divided by their sum."
+      ), call = call)
+    }
+    if (abs(total - 1) > sqrt(.Machine$double.eps)) {
+      cli_inform(
+        "{.arg expected} proportions sum to {round(total, 4)}; rescaled to sum to 1."
+      )
+    }
+  }
+  out <- expected / total
+  names(out) <- nm
+  out
+}
+
+#' Align normalised `expected` proportions with a variable's categories
+#'
+#' Named vectors are matched by category name (or by the code of a labelled
+#' variable, stored in attr(freq_tbl, "codes")); unnamed vectors are used in
+#' category order.
+#'
+#' @param expected Output of .gof_normalize_expected()
+#' @param freq_tbl Observed frequency table (names = category labels)
+#' @param var_name Variable name for error messages
+#' @return Unnamed numeric vector aligned with freq_tbl
+#' @noRd
+.gof_align_expected <- function(expected, freq_tbl, var_name,
+                                call = rlang::caller_env()) {
+  cats <- names(freq_tbl)
+  codes <- attr(freq_tbl, "codes", exact = TRUE)
+  k <- length(cats)
+  nm <- names(expected)
+
+  if (!is.null(nm)) {
+    idx <- match(cats, nm)
+    if (!is.null(codes)) {
+      by_code <- match(codes, nm)
+      idx[is.na(idx)] <- by_code[is.na(idx)]
+    }
+    unknown <- setdiff(nm, c(cats, codes))
+    if (length(unknown) > 0 || anyNA(idx) || length(expected) != k) {
+      missing_cats <- cats[is.na(idx)]
+      cli_abort(c(
+        "The names of {.arg expected} do not match the categories of {.var {var_name}}.",
+        "x" = if (length(unknown) > 0) "Unknown name{?s}: {.val {unknown}}.",
+        "x" = if (length(missing_cats) > 0) "No value for: {.val {missing_cats}}.",
+        "i" = "Categories of {.var {var_name}}: {.val {cats}}."
+      ), call = call)
+    }
+    return(unname(expected[idx]))
+  }
+
+  if (length(expected) != k) {
+    cli_abort(c(
+      "Length of {.arg expected} does not match the number of categories of {.var {var_name}}.",
+      "x" = "{.var {var_name}} has {k} categor{?y/ies} ({.val {cats}}); {.arg expected} has {length(expected)} value{?s}."
+    ), call = call)
+  }
+  unname(expected)
 }
