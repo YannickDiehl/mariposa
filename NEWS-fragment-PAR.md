@@ -32,3 +32,10 @@
   "Robust Tests of Equality of Means" (SPSS) instead of "Assumption
   Tests", with df2 shown with decimals (1229.456, not 1229). (PAR-07,
   PAR-17)
+* Grouped `oneway_anova()`, `tukey_test()`, `scheffe_test()` and
+  `levene_test()`: a group that cannot be tested (e.g. only one level of
+  `group` present in that group) is reported with a warning that names the
+  group label and the reason. `oneway_anova()` printed a silent "Results
+  not available", the post-hoc tests dropped the group without a word,
+  and `levene_test()` warned "in group 1" (the factor code). (PAR-18,
+  EDGE-13)

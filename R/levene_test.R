@@ -262,7 +262,8 @@ levene_test.oneway_anova <- function(x, center = c("mean", "median"), ...) {
           results_list <- append(results_list, list(result_row))
           
         }, error = function(e) {
-          cli_warn("Levene test failed for variable {.var {var_name}} in group {paste(group_info, collapse = ', ')}: {e$message}")
+          .warn_not_computed("levene_test", var_name, conditionMessage(e),
+                             group_info)
         })
       }
     }

@@ -194,3 +194,27 @@ test_that("PAR-17: zero-variance groups: no NaN Welch rows, no infinite Glass' D
   expect_true(is.na(tt$results$glass_delta))
   expect_false(any(grepl("Inf", capture.output(print(summary(tt))))))
 })
+
+# --- PAR-18 / EDGE-13: grouped runs name the group that cannot be tested ------
+
+test_that("PAR-18: grouped oneway/tukey/levene warn with the group label", {
+  # oneway_anova() printed a silent "Results not available", tukey_test()
+  # dropped the group without a word, levene_test() warned "in group 1".
+  d <- dplyr::filter(survey_data, region == "West" | education == "University")
+  g <- dplyr::group_by(d, region)
+  expect_warning(r <- oneway_anova(g, life_satisfaction, group = education),
+                 "region = East")
+  east <- r$results[r$results$region == "East", ]
+  expect_true(is.na(east$F_statistic))
+  expect_match(east$note, "groups? with")
+  out <- capture.output(print(r))
+  expect_false(any(grepl("Results not available", out, fixed = TRUE)))
+  expect_true(any(grepl("not computed (", out, fixed = TRUE)))
+  out_s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("not computed", out_s, fixed = TRUE)))
+
+  expect_warning(tk <- tukey_test(r), "region = East")
+  expect_warning(scheffe_test(r), "region = East")
+  expect_warning(lv <- levene_test(r), "region = East")
+  expect_false(any(grepl("in group 1", tryCatch(levene_test(r), warning = conditionMessage))))
+})

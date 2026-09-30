@@ -137,7 +137,10 @@
   group_levels <- levels(g)
 
   if (length(group_levels) < 2) {
-    return(NULL)
+    .not_computed(sprintf(
+      "only %d group with valid data; at least 2 are needed",
+      length(group_levels)
+    ))
   }
 
   # A constant DV has MSE = 0 up to floating-point noise: no comparisons
@@ -299,7 +302,6 @@
 .pairwise_posthoc <- function(x, method = c("tukey", "scheffe"),
                               conf.level = 0.95) {
   method <- match.arg(method)
-  method_label <- switch(method, tukey = "Tukey", scheffe = "Scheffe")
 
   # Input validation
   if (conf.level <= 0 || conf.level >= 1) {
@@ -338,7 +340,8 @@
           .warn_not_computed(paste0(method, "_test"), var_name,
                              conditionMessage(e), group_info)
         }, error = function(e) {
-          cli_warn("{method_label} test failed for variable {.var {var_name}} in group {paste(unlist(group_info), collapse = ', ')}: {e$message}")
+          .warn_not_computed(paste0(method, "_test"), var_name,
+                             conditionMessage(e), group_info)
         })
       }
     }
@@ -358,7 +361,8 @@
         .warn_not_computed(paste0(method, "_test"), var_name,
                            conditionMessage(e))
       }, error = function(e) {
-        cli_warn("{method_label} test failed for variable {.var {var_name}}: {e$message}")
+        .warn_not_computed(paste0(method, "_test"), var_name,
+                           conditionMessage(e))
       })
     }
   }

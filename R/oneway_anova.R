@@ -236,6 +236,10 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
           }
           .anova_result_row(anova_result, var_name, group_info)
         }, error = function(e) {
+          # Unexpected failure in this group: say which group and why, and
+          # keep an NA row so the other groups still report
+          .warn_not_computed("oneway_anova", var_name, conditionMessage(e),
+                             group_info)
           # Ensure var_name is scalar
           var_name_safe <- if(length(var_name) == 0) "unknown" else as.character(var_name[1])
           
@@ -550,7 +554,12 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   }
 
   if (length(unique(g)) < 2) {
-    cli_abort("Variable {.var {var_name}}: After removing NAs, grouping variable must have at least 2 levels.")
+    present <- unique(as.character(g))
+    return(.anova_not_computed(
+      sprintf("only 1 group with valid data (%s); at least 2 are needed",
+              present[1]),
+      is_weighted = !is.null(weight_name)
+    ))
   }
 
   # Get group levels (factor order; oneway_anova() converted `group`)
