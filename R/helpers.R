@@ -110,6 +110,9 @@ NULL
 #' Handles the ... expressions passed to statistical functions and returns a named
 #' vector of column positions.
 #'
+#' Labelled columns load haven's namespace (.ensure_haven()): without it,
+#' comparisons on haven_labelled vectors fail (data restored by readRDS()).
+#'
 #' A named argument in `...` is refused (.check_dot_names()): a misspelled
 #' argument (`weight =`, `na_rm =`, `groups =`) used to become a tidyselect
 #' rename and produced an unweighted result, a garbage row, or an unrelated
@@ -133,6 +136,7 @@ NULL
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.", call = call)
   }
+  .ensure_haven(data, call = call)
   .check_dot_names(names(rlang::enquos(...)), call = call)
 
   vars <- tidyselect::eval_select(rlang::expr(c(...)), data)
@@ -167,6 +171,9 @@ NULL
 #'   or NULL) and data (the data with the stripped weights column)
 #' @noRd
 .process_weights <- function(data, weights_quo, call = rlang::caller_env()) {
+  # Also the entry of the functions without .process_variables() (crosstab,
+  # the regressions, codebook, ...): labelled data need haven's methods
+  .ensure_haven(data, call = call)
   if (rlang::quo_is_null(weights_quo)) {
     return(list(vector = NULL, name = NULL, data = data))
   }
@@ -620,4 +627,32 @@ get_value_labels <- function(x, freq_names) {
     paste0("Unknown argument {.arg {nm}}", where, "."),
     "i" = "Did you mean {.arg {full}}? Argument names must be written in full."
   ), call = env)
+}
+
+#' Load haven when labelled data meet an unloaded haven namespace
+#'
+#' haven is only suggested. A data set restored with readRDS() keeps its
+#' haven_labelled columns, but without haven's namespace their vctrs
+#' methods are not registered: comparisons, `%in%`, as.character() and
+#' arithmetic on them fail ("Can't convert <haven_labelled> to
+#' <character>", "<haven_labelled_spss> * <double> is not permitted").
+#' Loading the namespace registers the methods. Called by the entry helpers
+#' (.process_variables(), .process_weights()) and the w_* vector mode.
+#'
+#' @param x A data frame or a vector
+#' @noRd
+.ensure_haven <- function(x, call = rlang::caller_env()) {
+  if (isNamespaceLoaded("haven")) return(invisible(TRUE))
+  labelled <- if (is.data.frame(x)) {
+    any(vapply(x, inherits, logical(1), what = "haven_labelled"))
+  } else {
+    inherits(x, "haven_labelled")
+  }
+  if (labelled && !requireNamespace("haven", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Package {.pkg haven} is required for labelled (SPSS, Stata, SAS) variables.",
+      "i" = "Install it with: {.code install.packages(\"haven\")}"
+    ), call = call)
+  }
+  invisible(TRUE)
 }

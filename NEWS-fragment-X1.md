@@ -40,3 +40,13 @@
   silently), and in `summarise()` a non-numeric `weights` is an error
   instead of a silent unweighted result. `std()` and `center()` return the
   weights column unchanged (it lost its attributes).
+* Labelled data (`haven_labelled`) work when the haven package is not
+  loaded, e.g. data restored with `readRDS()` in a fresh session.
+  haven is only suggested, and without its namespace the labelled vectors
+  have no methods for comparison and arithmetic: `frequency()` failed with
+  "Can't convert `x` <haven_labelled> to <character>", `describe()` and
+  `w_mean()` with "<haven_labelled_spss> * <double> is not permitted",
+  `crosstab()`, `codebook()`, `unlabel()`, `drop_labels()`, `rec()` and
+  `write_xlsx()` likewise. The entry helpers now load haven's namespace
+  when a selected data set or vector is labelled (and say that haven is
+  needed when it is not installed).

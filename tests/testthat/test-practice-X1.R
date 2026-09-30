@@ -251,3 +251,66 @@ test_that("UX-WEIGHTS: std()/center() return the data without a weights column",
   expect_identical(attributes(std(d, age, weights = sampling_weight)$sampling_weight),
                    attributes(d$sampling_weight))
 })
+
+
+# --- haven not loaded ---------------------------------------------------------
+
+test_that("haven-not-loaded: labelled data from readRDS() work without haven loaded", {
+  # haven is only suggested. Labelled data restored with readRDS() in a
+  # session where haven was never loaded have no registered vctrs methods:
+  # frequency() failed with "Can't convert `x` <haven_labelled> to
+  # <character>", describe()/w_mean() with "<haven_labelled_spss> *
+  # <double> is not permitted", codebook() and crosstab() likewise. Each
+  # call runs in a fresh R process (the methods cannot be unregistered).
+  skip_on_cran()
+  skip_if_not_installed("haven")
+  pkg_root <- normalizePath(testthat::test_path("..", ".."), mustWork = FALSE)
+  dev <- file.exists(file.path(pkg_root, "DESCRIPTION"))
+  if (dev) skip_if_not_installed("pkgload")
+  load_line <- if (dev) {
+    sprintf("suppressMessages(pkgload::load_all(%s, quiet = TRUE, helpers = FALSE))",
+            deparse(pkg_root))
+  } else {
+    "suppressMessages(library(mariposa))"
+  }
+
+  rds <- tempfile(fileext = ".rds")
+  set.seed(7)
+  n <- 40
+  saveRDS(data.frame(
+    x = haven::labelled(rep(1:2, n / 2), c(low = 1, high = 2), label = "X"),
+    y = haven::labelled_spss(rep(1:4, n / 4), c(a = 1, d = 4), na_values = 9),
+    g = haven::labelled(rep(1:2, each = n / 2), c(East = 1, West = 2)),
+    w = haven::labelled(runif(n, 0.5, 1.5), c(none = 0))
+  ), rds)
+  on.exit(unlink(rds), add = TRUE)
+
+  run_fresh <- function(call_text) {
+    script <- tempfile(fileext = ".R")
+    on.exit(unlink(script))
+    writeLines(c(
+      sprintf(".libPaths(%s)", paste(deparse(.libPaths()), collapse = "")),
+      load_line,
+      sprintf("d <- readRDS(%s)", deparse(rds)),
+      "if (isNamespaceLoaded('haven')) stop('precondition: haven is loaded')",
+      sprintf(
+        "r <- tryCatch({invisible(capture.output(suppressMessages(%s))); 'OK'}, error = function(e) conditionMessage(e))",
+        call_text
+      ),
+      "cat('RESULT:', r, '\\n')"
+    ), script)
+    out <- suppressWarnings(system2(file.path(R.home("bin"), "Rscript"),
+                                    c("--vanilla", shQuote(script)),
+                                    stdout = TRUE, stderr = TRUE))
+    paste(out, collapse = "\n")
+  }
+
+  for (cl in c("frequency(d, x)",
+               "describe(d, y, weights = w)",
+               "crosstab(d, x, g)",
+               "dplyr::summarise(d, m = w_mean(y, weights = w))",
+               "codebook(d, view = FALSE)",
+               "unlabel(d)")) {
+    expect_match(run_fresh(cl), "RESULT: OK", fixed = TRUE, info = cl)
+  }
+})

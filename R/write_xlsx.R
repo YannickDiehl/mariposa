@@ -114,6 +114,7 @@
 #'
 #' @export
 write_xlsx <- function(x, file, ...) {
+  if (is.data.frame(x)) .ensure_haven(x)
   UseMethod("write_xlsx")
 }
 

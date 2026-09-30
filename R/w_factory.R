@@ -80,6 +80,8 @@
     .check_dots_unused(..., call = call)
     x <- data
     weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
+    .ensure_haven(x, call = call)
+    .ensure_haven(weights_vec, call = call)
     weighted <- !is.null(weights_vec)
     if (weighted) {
       # Type check before stripping: a factor must not pass as its codes,

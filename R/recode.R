@@ -207,6 +207,7 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
   if (!is.data.frame(data)) {
     .check_dots_unused(...)
+    .ensure_haven(data)
     if (!is.atomic(data)) {
       cli::cli_abort("{.arg data} must be a data frame, vector, or factor.")
     }

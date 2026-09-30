@@ -585,6 +585,7 @@ copy_labels <- function(data, source) {
 #'
 #' @export
 drop_labels <- function(data, ..., drop_na = FALSE) {
+  .ensure_haven(data)
   if (!is.data.frame(data)) {
     # Single vector
     return(.drop_labels_vec(data, drop_na))

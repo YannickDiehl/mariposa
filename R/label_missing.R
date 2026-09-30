@@ -323,6 +323,7 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
 #'
 #' @export
 unlabel <- function(data, ...) {
+  .ensure_haven(data)
   if (!is.data.frame(data)) {
     return(.unlabel_vec(data))
   }
