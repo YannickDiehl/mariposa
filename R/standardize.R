@@ -123,7 +123,12 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
       cli::cli_abort("{.arg data} must be numeric.")
     }
     w <- if (!rlang::quo_is_null(weights_quo)) rlang::eval_tidy(weights_quo) else NULL
-    return(.std_vec(data, method = method, w = w, na.rm = na.rm))
+    x_name <- sub(".*\\$", "", deparse(substitute(data))[1])
+    out <- .std_vec(data, method = method, w = w, na.rm = na.rm,
+                    where = paste0("{.var ", x_name, "}"))
+    lbl <- attr(data, "label", exact = TRUE)
+    if (!is.null(lbl)) attr(out, "label") <- paste0(lbl, " (standardized)")
+    return(out)
   }
 
   # ============================================================================
@@ -143,7 +148,6 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
   }
 
   vars <- .process_variables(data, ...)
-  is_grouped <- inherits(data, "grouped_df")
 
   for (i in vars) {
     col_name <- names(data)[i]
@@ -154,32 +158,48 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
       next
     }
 
-    if (is_grouped) {
-      group_indices <- dplyr::group_indices(data)
-      result <- data[[col_name]]
-      for (g in unique(group_indices)) {
-        mask <- group_indices == g
-        w_g <- if (!is.null(w)) w[mask] else NULL
-        result[mask] <- .std_vec(result[mask], method = method, w = w_g,
-                                 na.rm = na.rm)
+    data[[out_name]] <- .transform_by_group(
+      data, col_name, w, suffix_label = " (standardized)",
+      fun = function(x, w, where) {
+        .std_vec(x, method = method, w = w, na.rm = na.rm, where = where)
       }
-      data[[out_name]] <- result
-    } else {
-      data[[out_name]] <- .std_vec(data[[col_name]], method = method, w = w,
-                                   na.rm = na.rm)
-    }
-
-    # Update variable label
-    orig_label <- attr(data[[col_name]], "label", exact = TRUE)
-    if (!is.null(orig_label)) {
-      attr(data[[out_name]], "label") <- paste0(orig_label, " (standardized)")
-    }
-
-    # Remove value labels (z-scores are not categorical)
-    attr(data[[out_name]], "labels") <- NULL
+    )
   }
 
   invisible(data)
+}
+
+
+#' Apply a per-group transformation (std/center) to one column
+#'
+#' Returns a plain double (value labels and the labelled class dropped, the
+#' variable label read BEFORE the column is overwritten and extended by
+#' `suffix_label`). Grouped data are transformed within each group; the
+#' result vector is built fresh, so an in-place grouped call no longer
+#' leaves a haven_labelled (dbl+lbl) column behind.
+#' @noRd
+.transform_by_group <- function(data, col_name, w, suffix_label, fun) {
+  x <- data[[col_name]]
+  orig_label <- attr(x, "label", exact = TRUE)
+
+  if (inherits(data, "grouped_df")) {
+    group_indices <- dplyr::group_indices(data)
+    keys <- dplyr::group_keys(data)
+    result <- rep(NA_real_, length(x))
+    for (g in unique(group_indices)) {
+      mask <- group_indices == g
+      w_g <- if (!is.null(w)) w[mask] else NULL
+      where <- paste0("{.var ", col_name, "} (",
+                      .format_group_label(keys[g, , drop = FALSE]), ")")
+      result[mask] <- fun(x[mask], w_g, where)
+    }
+  } else {
+    result <- fun(x, w, paste0("{.var ", col_name, "}"))
+  }
+
+  result <- as.double(result)
+  if (!is.null(orig_label)) attr(result, "label") <- paste0(orig_label, suffix_label)
+  result
 }
 
 
@@ -188,7 +208,8 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.std_vec <- function(x, method = "sd", w = NULL, na.rm = TRUE) {
+.std_vec <- function(x, method = "sd", w = NULL, na.rm = TRUE,
+                     where = "{.var x}") {
   # Bare numbers; missing values of imported variables (tagged NAs) become
   # plain NA in the result, like SPSS DESCRIPTIVES /SAVE (system-missing
   # z-scores). Tagged payloads without their code map would otherwise break
@@ -196,9 +217,9 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
   x <- as.double(.plain_numeric(x))
   x[is.na(x)] <- NA_real_
 
-  # Weighted path
-  if (!is.null(w)) .check_weights(w)
+  # Weighted path (SPSS frequency-weight mean/SD from kernels-weighted.R)
   if (!is.null(w)) {
+    .check_weights(w)
 
     if (method %in% c("mad", "gmd")) {
       cli::cli_abort(
@@ -206,46 +227,31 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
       )
     }
 
-    # Align NA removal for x and w
-    if (isTRUE(na.rm)) {
-      valid <- !is.na(x) & !is.na(w)
-      xv <- x[valid]
-      wv <- w[valid]
-    } else {
-      xv <- x
-      wv <- w
-    }
-
-    w_mean <- sum(xv * wv) / sum(wv)
-    V1 <- sum(wv)
-    w_var <- sum(wv * (xv - w_mean)^2) / (V1 - 1)
-    w_sd <- sqrt(w_var)
+    w <- .plain_numeric(w)
+    center <- .w_mean(x, w, na.rm = na.rm)
+    w_sd <- .w_sd(x, w, na.rm = na.rm)
     spread <- if (method == "2sd") 2 * w_sd else w_sd
-
-    if (is.na(spread) || spread == 0) {
-      cli::cli_warn("Standard deviation is zero or NA. Returning {.val NA}.")
-      return(rep(NA_real_, length(x)))
+  } else {
+    # Unweighted path
+    center <- if (method == "mad") {
+      stats::median(x, na.rm = na.rm)
+    } else {
+      mean(x, na.rm = na.rm)
     }
-
-    return((x - w_mean) / spread)
+    spread <- switch(method,
+      sd   = stats::sd(x, na.rm = na.rm),
+      `2sd` = 2 * stats::sd(x, na.rm = na.rm),
+      mad  = stats::mad(x, na.rm = na.rm),
+      gmd  = .gmd(x, na.rm = na.rm)
+    )
   }
-
-  # Unweighted path
-  center <- mean(x, na.rm = na.rm)
-  spread <- switch(method,
-    sd   = stats::sd(x, na.rm = na.rm),
-    `2sd` = 2 * stats::sd(x, na.rm = na.rm),
-    mad  = stats::mad(x, na.rm = na.rm),
-    gmd  = .gmd(x, na.rm = na.rm)
-  )
 
   if (is.na(spread) || spread == 0) {
-    cli::cli_warn("Standard deviation is zero or NA. Returning {.val NA}.")
+    cli::cli_warn(c(
+      paste0(where, ": the spread (", method, ") is zero or not computable."),
+      "i" = "The standardized values are {.val NA}."
+    ))
     return(rep(NA_real_, length(x)))
-  }
-
-  if (method == "mad") {
-    center <- stats::median(x, na.rm = na.rm)
   }
 
   (x - center) / spread
@@ -347,7 +353,10 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
       cli::cli_abort("{.arg data} must be numeric.")
     }
     w <- if (!rlang::quo_is_null(weights_quo)) rlang::eval_tidy(weights_quo) else NULL
-    return(.center_vec(data, w = w, na.rm = na.rm))
+    out <- .center_vec(data, w = w, na.rm = na.rm)
+    lbl <- attr(data, "label", exact = TRUE)
+    if (!is.null(lbl)) attr(out, "label") <- paste0(lbl, " (centered)")
+    return(out)
   }
 
   # ============================================================================
@@ -360,7 +369,6 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
   w <- weights_info$vector
 
   vars <- .process_variables(data, ...)
-  is_grouped <- inherits(data, "grouped_df")
 
   for (i in vars) {
     col_name <- names(data)[i]
@@ -371,27 +379,10 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
       next
     }
 
-    if (is_grouped) {
-      group_indices <- dplyr::group_indices(data)
-      result <- data[[col_name]]
-      for (g in unique(group_indices)) {
-        mask <- group_indices == g
-        w_g <- if (!is.null(w)) w[mask] else NULL
-        result[mask] <- .center_vec(result[mask], w = w_g, na.rm = na.rm)
-      }
-      data[[out_name]] <- result
-    } else {
-      data[[out_name]] <- .center_vec(data[[col_name]], w = w, na.rm = na.rm)
-    }
-
-    # Update variable label
-    orig_label <- attr(data[[col_name]], "label", exact = TRUE)
-    if (!is.null(orig_label)) {
-      attr(data[[out_name]], "label") <- paste0(orig_label, " (centered)")
-    }
-
-    # Remove value labels (centered values are not categorical)
-    attr(data[[out_name]], "labels") <- NULL
+    data[[out_name]] <- .transform_by_group(
+      data, col_name, w, suffix_label = " (centered)",
+      fun = function(x, w, where) .center_vec(x, w = w, na.rm = na.rm)
+    )
   }
 
   invisible(data)
@@ -407,18 +398,10 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
   # Bare numbers, missing types become plain NA (see .std_vec)
   x <- as.double(.plain_numeric(x))
   x[is.na(x)] <- NA_real_
-  if (!is.null(w)) .check_weights(w)
   if (!is.null(w)) {
-    if (isTRUE(na.rm)) {
-      valid <- !is.na(x) & !is.na(w)
-      xv <- x[valid]
-      wv <- w[valid]
-    } else {
-      xv <- x
-      wv <- w
-    }
-    w_mean <- sum(xv * wv) / sum(wv)
-    return(x - w_mean)
+    .check_weights(w)
+    # SPSS frequency-weight mean from kernels-weighted.R
+    return(x - .w_mean(x, .plain_numeric(w), na.rm = na.rm))
   }
   x - mean(x, na.rm = na.rm)
 }

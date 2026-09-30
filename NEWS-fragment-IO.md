@@ -112,3 +112,12 @@
   that `scale_min`/`scale_max` are single finite numbers (a vector gave
   the German base error "Bedingung hat Länge > 1", `NA` a cryptic one),
   and says clearly when an all-`NA` input leaves no range to derive.
+* `std()` and `center()` keep the variable label of imported (SPSS)
+  variables when overwriting them in place: the label was read after the
+  column had already been replaced, so it was lost. Grouped
+  standardization/centering returns a plain numeric column instead of
+  leaving a `dbl+lbl` vector behind, vector input keeps its label (with
+  " (standardized)"/" (centered)"), and the zero-spread warning names the
+  variable and the group (e.g. "`x` (g = a): the spread (sd) is zero").
+  The weighted mean/SD now come from the shared SPSS kernels (results
+  unchanged).

@@ -509,3 +509,36 @@ test_that("SCALE-15: pomps() validates the scale range and all-NA input", {
   expect_no_warning(r <- pomps(c(NA_real_, NA_real_), 1, 5))
   expect_true(all(is.na(r)))
 })
+
+# IO-24: std()/center() in place dropped the variable label of SPSS
+# variables (label read after the column was overwritten); grouped std()
+# left a dbl+lbl column; the zero-SD warning named neither variable nor
+# group.
+test_that("IO-24: std()/center() keep the variable label, return plain doubles", {
+  skip_if_not_installed("haven")
+  d <- tibble::tibble(
+    g = c(1, 1, 1, 2, 2, 2),
+    x = haven::labelled(c(1, 2, 3, 2, 4, 6), labels = c(low = 1),
+                        label = "Trust")
+  )
+  s <- std(d, x)
+  expect_equal(attr(s$x, "label"), "Trust (standardized)")
+  expect_false(inherits(s$x, "haven_labelled"))
+  expect_null(attr(s$x, "labels"))
+  cen <- center(d, x)
+  expect_equal(attr(cen$x, "label"), "Trust (centered)")
+  gs <- std(dplyr::group_by(d, g), x)
+  expect_false(inherits(gs$x, "haven_labelled"))
+  expect_type(unclass(gs$x), "double")
+  expect_equal(as.numeric(gs$x), c(-1, 0, 1, -1, 0, 1))
+  expect_equal(attr(gs$x, "label"), "Trust (standardized)")
+  gc <- center(dplyr::group_by(d, g), x, suffix = "_c")
+  expect_false(inherits(gc$x_c, "haven_labelled"))
+  expect_equal(as.numeric(gc$x_c), c(-1, 0, 1, -2, 0, 2))
+})
+
+test_that("IO-24: the zero-SD warning names variable and group", {
+  d <- data.frame(g = c("a", "a", "b", "b"), x = c(1, 1, 2, 3))
+  expect_warning(std(d[1:2, ], x), "`x`")
+  expect_warning(std(dplyr::group_by(d, g), x), "g = a")
+})
