@@ -122,3 +122,9 @@
   already did. Grouping variables are ordered by code, as in SPSS: a
   numeric 0/1 group was ordered by first appearance ("1 vs. 0" while the
   ranks listed 0 first).
+* `fisher_test()` output: the contingency table is labelled with the
+  variable names and value labels (was "r"/"cc" and codes), empty factor
+  levels are dropped, grouped `summary()` shows each group's table (it
+  was dropped), the compact line uses 3 decimals like the rest of the
+  family (was "p = 0.5435") and reports the odds ratio with its 95% CI for
+  2x2 tables (SPSS "Risk Estimate": sample odds ratio, Woolf interval).

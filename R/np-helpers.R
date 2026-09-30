@@ -159,3 +159,31 @@
   if (is.null(reason) || length(reason) == 0 || is.na(reason) ||
       !nzchar(reason)) "see warning" else reason
 }
+
+#' Contingency table of the observed categories (SPSS CROSSTABS style)
+#'
+#' Categories come from .np_factor() (value labels, code order, empty
+#' levels dropped). With weights the cell counts are rounded as SPSS does
+#' and rows/columns whose rounded total is 0 are dropped.
+#'
+#' @param v1,v2 Row and column variable
+#' @param w Weights or NULL
+#' @param dnn Names of the two dimensions
+#' @return A table
+#' @noRd
+.np_crosstab <- function(v1, v2, w = NULL, dnn) {
+  f1 <- .np_factor(v1)
+  f2 <- .np_factor(v2)
+  ok <- !is.na(f1) & !is.na(f2)
+  if (!is.null(w)) {
+    ok <- ok & !is.na(w)
+    tbl <- round(tapply(w[ok], list(f1[ok], f2[ok]), sum))
+    tbl[is.na(tbl)] <- 0
+    tbl <- as.table(tbl)
+  } else {
+    tbl <- table(f1[ok], f2[ok])
+  }
+  tbl <- tbl[rowSums(tbl) > 0, colSums(tbl) > 0, drop = FALSE]
+  names(dimnames(tbl)) <- dnn
+  tbl
+}

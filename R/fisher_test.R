@@ -153,37 +153,32 @@ fisher_test <- function(data, row, col, weights = NULL,
 
   # Helper to perform Fisher test on a single data slice
   perform_single_fisher <- function(data_slice, key = NULL) {
-    r <- data_slice[[row_name]]
-    cc <- data_slice[[col_name]]
-
-    # Remove NAs
-    valid <- !is.na(r) & !is.na(cc)
-    if (!is.null(w_name)) {
-      w <- data_slice[[w_name]]
-      valid <- valid & !is.na(w)
-      w <- w[valid]
-    }
-    r <- r[valid]
-    cc <- cc[valid]
-
-    # Build contingency table
-    if (!is.null(w_name)) {
-      tbl <- xtabs(w ~ r + cc)
-      tbl <- round(tbl)
-    } else {
-      tbl <- table(r, cc)
+    w <- if (!is.null(w_name)) data_slice[[w_name]] else NULL
+    tbl <- .np_crosstab(data_slice[[row_name]], data_slice[[col_name]], w,
+                        c(row_name, col_name))
+    if (nrow(tbl) < 2 || ncol(tbl) < 2) {
+      one <- c(row_name, col_name)[c(nrow(tbl) < 2, ncol(tbl) < 2)]
+      cli_abort("{.var {one}} ha{?s/ve} fewer than 2 observed categories")
     }
 
-    n <- sum(tbl)
-
-    # Perform Fisher's exact test
+    # Perform Fisher's exact test (Monte Carlo fallback for large tables)
     ft <- .fisher_exact_or_mc(tbl, simulate.p.value, B, key)
 
-    list(
-      p_value = ft$p.value,
-      n = n,
-      table = tbl,
-      method = ft$method
+    c(list(p_value = ft$p.value, n = sum(tbl), table = tbl,
+           method = gsub("\\s+", " ", ft$method)),
+      .odds_ratio_2x2(tbl))
+  }
+
+  result_row <- function(res) {
+    data.frame(
+      p_value = res$p_value,
+      n = res$n,
+      method = res$method,
+      odds_ratio = res$odds_ratio,
+      or_ci_lower = res$or_ci_lower,
+      or_ci_upper = res$or_ci_upper,
+      reason = NA_character_,
+      stringsAsFactors = FALSE
     )
   }
 
@@ -191,34 +186,27 @@ fisher_test <- function(data, row, col, weights = NULL,
   if (is_grouped) {
     data_list <- dplyr::group_split(data)
     group_keys_df <- dplyr::group_keys(data)
+    tables <- vector("list", length(data_list))
 
     results_list <- lapply(seq_along(data_list), function(i) {
+      key <- group_keys_df[i, , drop = FALSE]
       tryCatch({
-        res <- perform_single_fisher(data_list[[i]], group_keys_df[i, , drop = FALSE])
-        cbind(
-          group_keys_df[i, , drop = FALSE],
-          data.frame(
-            p_value = res$p_value,
-            n = res$n,
-            method = res$method,
-            stringsAsFactors = FALSE
-          )
-        )
+        res <- perform_single_fisher(data_list[[i]], key)
+        tables[[i]] <<- res$table
+        cbind(key, result_row(res))
       }, error = function(e) {
-        where <- .np_where(group_keys_df[i, , drop = FALSE])
+        where <- .np_where(key)
+        reason <- .np_error_reason(e)
         cli_warn(c(
           "Fisher's exact test skipped{where}.",
-          "x" = "{conditionMessage(e)}"
+          "x" = "{reason}."
         ))
-        cbind(
-          group_keys_df[i, , drop = FALSE],
-          data.frame(
-            p_value = NA_real_,
-            n = NA_integer_,
-            method = NA_character_,
-            stringsAsFactors = FALSE
-          )
-        )
+        cbind(key, data.frame(
+          p_value = NA_real_, n = NA_real_, method = NA_character_,
+          odds_ratio = NA_real_, or_ci_lower = NA_real_,
+          or_ci_upper = NA_real_, reason = reason,
+          stringsAsFactors = FALSE
+        ))
       })
     })
 
@@ -230,6 +218,7 @@ fisher_test <- function(data, row, col, weights = NULL,
       p_value = results_df$p_value[1],
       n = results_df$n[1],
       table = NULL,
+      tables = tables,
       method = results_df$method[1],
       row_var = row_name,
       col_var = col_name,
@@ -240,19 +229,14 @@ fisher_test <- function(data, row, col, weights = NULL,
 
   } else {
     res <- perform_single_fisher(data)
-
-    results_df <- data.frame(
-      p_value = res$p_value,
-      n = res$n,
-      method = res$method,
-      stringsAsFactors = FALSE
-    )
+    results_df <- result_row(res)
 
     result <- list(
       results = results_df,
       p_value = res$p_value,
       n = res$n,
       table = res$table,
+      tables = list(res$table),
       method = res$method,
       row_var = row_name,
       col_var = col_name,
@@ -271,13 +255,13 @@ fisher_test <- function(data, row, col, weights = NULL,
 #' @description
 #' Compact print method for objects of class \code{"fisher_test"}.
 #' Shows a one-line summary with the exact p-value, significance stars,
-#' and sample size.
+#' the odds ratio for 2x2 tables, and sample size.
 #'
 #' For the full detailed output (contingency table, test results), use
 #' \code{summary()}.
 #'
 #' @param x An object of class \code{"fisher_test"}
-#' @param digits Number of decimal places (default: 4)
+#' @param digits Number of decimal places (default: 3)
 #' @param ... Additional arguments (currently unused)
 #' @return Invisibly returns the input object \code{x}.
 #'
@@ -287,41 +271,41 @@ fisher_test <- function(data, row, col, weights = NULL,
 #' summary(result)     # full detailed output
 #'
 #' @export
-print.fisher_test <- function(x, digits = 4, ...) {
+print.fisher_test <- function(x, digits = 3, ...) {
   weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-  pair_label <- paste(x$row_var, "x", x$col_var)
+  pair_label <- paste(x$row_var, "\u00d7", x$col_var)
 
-  print_row <- function(p_val, n_val) {
-    cat(sprintf("  %s %s, N = %s\n",
-                fmt_p(p_val, digits, style = "compact"),
-                add_significance_stars(p_val),
-                formatC(as.integer(n_val), format = "d")))
-  }
-
-  if (isTRUE(x$is_grouped)) {
-    groups <- unique(x$results[x$groups])
-
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-      group_label <- .format_group_label(group_values)
-      cat(sprintf("[%s]\n", group_label))
-
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
-      }
-      if (nrow(group_results) == 0) next
-
-      cat(sprintf("Fisher's Exact Test: %s%s\n", pair_label, weighted_tag))
-      print_row(group_results$p_value[1], group_results$n[1])
-    }
-  } else {
+  for_each_group(x$results, if (isTRUE(x$is_grouped)) x$groups, function(rows, key) {
+    if (!is.null(key)) cat(sprintf("[%s]\n", .format_group_label(key)))
     cat(sprintf("Fisher's Exact Test: %s%s\n", pair_label, weighted_tag))
-    print_row(x$p_value, x$n)
-  }
+    .print_fisher_compact(rows, 1, digits, grouped = isTRUE(x$is_grouped))
+  }, header = FALSE)
 
   cat("Use summary() for detailed output.\n")
   invisible(x)
+}
+
+#' One compact Fisher line
+#' @noRd
+.print_fisher_compact <- function(results, i, digits, grouped = FALSE) {
+  p_val <- results$p_value[i]
+  if (is.na(p_val)) {
+    cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
+    return(invisible(NULL))
+  }
+  mc <- if (!is.na(results$method[i]) && grepl("simulated", results$method[i]))
+    " (Monte Carlo)" else ""
+  or_part <- ""
+  if (!is.null(results$odds_ratio) && !is.na(results$odds_ratio[i])) {
+    or_part <- sprintf(", OR = %s", fmt_num(results$odds_ratio[i], digits))
+    if (!is.na(results$or_ci_lower[i])) {
+      or_part <- sprintf("%s [%s, %s]", or_part,
+                         fmt_num(results$or_ci_lower[i], digits),
+                         fmt_num(results$or_ci_upper[i], digits))
+    }
+  }
+  cat(sprintf("  %s%s%s, N = %s\n", format_p_stars(p_val, digits), mc, or_part,
+              format(round(results$n[i]), big.mark = "")))
 }
 
 #' Summary method for Fisher's exact test results
@@ -329,7 +313,8 @@ print.fisher_test <- function(x, digits = 4, ...) {
 #' @description
 #' Creates a summary object that produces detailed output when printed,
 #' including the contingency table of observed frequencies and the test
-#' results table with method, exact p-value, and sample size.
+#' results table with method, exact p-value, sample size, and (for 2x2
+#' tables) the odds ratio with its 95\% confidence interval.
 #'
 #' @param object A \code{fisher_test} result object.
 #' @param contingency_table Logical. Show the contingency table?
@@ -398,77 +383,62 @@ print.summary.fisher_test <- function(x, ...) {
     "Weights variable" = x$weights
   )
   print_info_section(test_info)
-  cat("\n")
 
-  if (isTRUE(x$is_grouped)) {
-    groups <- unique(x$results[x$groups])
+  tables <- x$tables
+  if (is.null(tables)) tables <- list(x$table)
 
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-      print_group_header(group_values)
-
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
-      }
-
-      if (nrow(group_results) > 0 && show_results) {
-        p_val <- group_results$p_value[1]
-        sig <- add_significance_stars(p_val)
-
-        display <- data.frame(
-          `p-value` = ifelse(p_val < 0.001, "<.001",
-                             format(round(p_val, digits), nsmall = digits)),
-          N = group_results$n[1],
-          Sig = as.character(sig),
-          check.names = FALSE,
-          stringsAsFactors = FALSE
-        )
-
-        output <- capture.output(print(display, row.names = FALSE))
-        border <- paste(rep("-", max(nchar(output))), collapse = "")
-        cat(border, "\n")
-        for (line in output) cat(line, "\n")
-        cat(border, "\n\n")
-      }
+  for (i in seq_len(nrow(x$results))) {
+    if (isTRUE(x$is_grouped)) {
+      print_group_header(x$results[i, x$groups, drop = FALSE])
     }
-  } else {
-    # Print contingency table if available (gated by contingency_table toggle)
-    if (show_table && !is.null(x$table)) {
-      cat("Contingency Table:\n")
-      border <- paste(rep("-", 40), collapse = "")
-      cat(border, "\n")
-      print(x$table)
-      cat(border, "\n\n")
-    }
-
-    if (show_results) {
-      p_val <- x$p_value
-      sig <- add_significance_stars(p_val)
-
-      cat("Test Results:\n")
-      display <- data.frame(
-        Method = x$method,
-        `p-value` = ifelse(p_val < 0.001, "<.001",
-                           format(round(p_val, digits), nsmall = digits)),
-        N = x$n,
-        Sig = as.character(sig),
-        check.names = FALSE,
-        stringsAsFactors = FALSE
-      )
-
-      output <- capture.output(print(display, row.names = FALSE))
-      border <- paste(rep("-", max(nchar(output))), collapse = "")
-      cat(border, "\n")
-      for (line in output) cat(line, "\n")
-      cat(border, "\n")
-    }
+    .print_fisher_block(x$results, i, tables[[i]], digits, show_table,
+                        show_results, grouped = isTRUE(x$is_grouped))
   }
 
   if (show_results) {
     print_significance_legend()
   }
   invisible(x)
+}
+
+#' Contingency table and results of one Fisher test
+#' @noRd
+.print_fisher_block <- function(results, i, tbl, digits, show_table,
+                                show_results, grouped = FALSE) {
+  if (is.na(results$p_value[i])) {
+    txt <- .np_not_computed(results, i, grouped)
+    cat(sprintf("\n%s%s.\n", toupper(substr(txt, 1, 1)), substring(txt, 2)))
+    return(invisible(NULL))
+  }
+
+  if (show_table && !is.null(tbl)) {
+    cat("\nContingency Table:\n")
+    .print_chi_matrix(tbl, digits = 0)
+  }
+
+  if (show_results) {
+    cat("\nTest Results:\n")
+    display <- data.frame(
+      Method = results$method[i],
+      p = results$p_value[i],
+      stars = add_significance_stars(results$p_value[i]),
+      N = round(results$n[i]),
+      stringsAsFactors = FALSE
+    )
+    labels <- c(p = "p value", stars = "")
+    if (!is.null(results$odds_ratio) && !is.na(results$odds_ratio[i])) {
+      display$OR <- results$odds_ratio[i]
+      if (!is.na(results$or_ci_lower[i])) {
+        display$CI <- sprintf("[%s, %s]", fmt_num(results$or_ci_lower[i], digits),
+                              fmt_num(results$or_ci_upper[i], digits))
+        labels <- c(labels, CI = "95% CI (OR)")
+      }
+    }
+    print_stat_table(display, digits = digits, indent = 0,
+                     col_types = c(N = "int", OR = "num"),
+                     col_labels = labels)
+  }
+  invisible(NULL)
 }
 
 #' Fisher's exact test with a Monte Carlo fallback
@@ -501,4 +471,27 @@ print.summary.fisher_test <- function(x, ...) {
       stats::fisher.test(tbl, simulate.p.value = TRUE, B = B)
     }
   )
+}
+
+#' Sample odds ratio of a 2x2 table with Woolf 95% CI (SPSS Risk Estimate)
+#'
+#' @param tbl Contingency table
+#' @return list(odds_ratio, or_ci_lower, or_ci_upper); NA unless 2x2 (CI
+#'   also NA when a cell is 0)
+#' @noRd
+.odds_ratio_2x2 <- function(tbl) {
+  out <- list(odds_ratio = NA_real_, or_ci_lower = NA_real_,
+              or_ci_upper = NA_real_)
+  if (!identical(dim(tbl), c(2L, 2L))) return(out)
+  n <- as.numeric(tbl)
+  a <- n[1]; c <- n[2]; b <- n[3]; d <- n[4]
+  if (b * c == 0) return(out)
+  or <- (a * d) / (b * c)
+  out$odds_ratio <- or
+  if (all(n > 0)) {
+    se <- sqrt(1 / a + 1 / b + 1 / c + 1 / d)
+    out$or_ci_lower <- exp(log(or) - stats::qnorm(0.975) * se)
+    out$or_ci_upper <- exp(log(or) + stats::qnorm(0.975) * se)
+  }
+  out
 }

@@ -197,20 +197,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 #' @noRd
 .chi_square_one <- function(v1, v2, w, correct, var_names, key = NULL) {
   where <- .np_where(key)
-  f1 <- .np_factor(v1)
-  f2 <- .np_factor(v2)
-  ok <- !is.na(f1) & !is.na(f2)
-  if (!is.null(w)) {
-    ok <- ok & !is.na(w)  # missing weight: case excluded
-    w_ok <- w[ok]
-    g1 <- f1[ok]
-    g2 <- f2[ok]
-    tbl <- round(stats::xtabs(w_ok ~ g1 + g2))  # SPSS rounds cell counts
-  } else {
-    tbl <- table(f1[ok], f2[ok])
-  }
-  tbl <- tbl[rowSums(tbl) > 0, colSums(tbl) > 0, drop = FALSE]
-  names(dimnames(tbl)) <- var_names
+  # observed categories, SPSS-rounded weighted cell counts
+  tbl <- .np_crosstab(v1, v2, w, var_names)
   n <- sum(tbl)
   r <- nrow(tbl)
   c <- ncol(tbl)

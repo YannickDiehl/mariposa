@@ -541,6 +541,49 @@ test_that("NP-07 numeric 0/1 group is ordered by value (was '1 vs. 0')", {
   expect_equal(mw$results$group_stats[[1]]$group1$name, "0")
 })
 
+# --- fisher_test output (NP-07, NP-18, NP-20, NP-06) ---------------------------
+
+test_that("NP-18 fisher_test tables carry variable names and labels", {
+  # Was: dimnames "r"/"cc", codes for labelled variables, grouped
+  # summaries without the table.
+  r <- fisher_test(survey_data, row = gender, col = region)
+  expect_equal(names(dimnames(r$table)), c("gender", "region"))
+  out <- capture.output(print(summary(r)))
+  expect_false(any(grepl("^\\s*r\\s", out)))
+  expect_true(any(grepl("gender", out, fixed = TRUE)))
+
+  g <- fisher_test(dplyr::group_by(survey_data, education), row = gender,
+                   col = region)
+  out_g <- capture.output(print(summary(g)))
+  expect_equal(sum(grepl("Contingency Table", out_g, fixed = TRUE)), 4L)
+
+  skip_if_not_installed("haven")
+  d <- make_labelled_np()
+  l <- fisher_test(d, row = bin, col = g2)
+  expect_equal(dimnames(l$table), list(bin = c("No", "Yes"), g2 = c("East", "West")))
+})
+
+test_that("NP-20 fisher_test compact line: 3 decimals and the odds ratio", {
+  # Was: "p = 0.5435" (4 decimals, unlike the family) and no effect size.
+  r <- fisher_test(survey_data, row = gender, col = region)
+  out <- capture.output(print(r))
+  expect_true(any(grepl("p = 0\\.[0-9]{3}(,| |$)", out)))
+  expect_true(any(grepl("OR = ", out, fixed = TRUE)))
+  tb <- r$table
+  expect_equal(r$results$odds_ratio,
+               (tb[1, 1] * tb[2, 2]) / (tb[1, 2] * tb[2, 1]))
+})
+
+test_that("NP-06 fisher_test ignores empty factor levels", {
+  # Was: a phantom all-zero row entered the table.
+  d <- dplyr::mutate(survey_data,
+                     gender3 = factor(gender, levels = c("Male", "Female", "Diverse")))
+  r3 <- fisher_test(d, row = gender3, col = region)
+  r2 <- fisher_test(survey_data, row = gender, col = region)
+  expect_equal(dim(r3$table), c(2L, 2L))
+  expect_equal(r3$p_value, r2$p_value)
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()
