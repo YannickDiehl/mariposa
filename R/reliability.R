@@ -31,6 +31,12 @@
 #'     Deleted, and Omega if Item Deleted}
 #'   \item{inter_item_cor}{Inter-item correlation matrix}
 #'   \item{n}{Sample size (listwise)}
+#'   \item{variable_labels}{Named character vector with the items' variable
+#'     labels (\code{NA} where an item has none); \code{summary()} lists
+#'     them next to the item names}
+#'   \item{removed_items}{Items removed for zero variance, or \code{NULL}}
+#'   \item{negative_items}{When alpha is negative: the items with a negative
+#'     corrected item-total correlation (candidates for reverse-coding)}
 #' }
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
@@ -192,6 +198,9 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   weights_info <- .process_weights(data, rlang::enquo(weights))
   data <- weights_info$data
 
+  # Variable labels (shown in summary(), as SPSS does)
+  variable_labels <- .scale_item_labels(data, var_names)
+
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
 
@@ -219,6 +228,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     result <- list(
       groups = results_list,
       variables = var_names,
+      variable_labels = variable_labels,
       weights = weights_info$name,
       is_grouped = TRUE,
       group_vars = group_vars,
@@ -231,6 +241,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
     result <- c(core_result, list(
       variables = var_names,
+      variable_labels = variable_labels,
       weights = weights_info$name,
       is_grouped = FALSE,
       group_vars = NULL
@@ -701,6 +712,70 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 # HELPERS
 # ============================================================================
 
+#' Variable labels of scale items (reliability(), efa())
+#'
+#' @param data Data frame (before group splitting)
+#' @param var_names Item names
+#' @return Named character vector, NA where an item has no label
+#' @noRd
+.scale_item_labels <- function(data, var_names) {
+  vapply(var_names, function(v) {
+    l <- attr(data[[v]], "label", exact = TRUE)
+    if (is.null(l) || length(l) == 0 || is.na(l[1]) || !nzchar(l[1])) {
+      NA_character_
+    } else {
+      as.character(l[1])
+    }
+  }, character(1))
+}
+
+#' Row labels "name  label" that fit the console
+#'
+#' Labels are shortened with "..." so that a table row of `other_width`
+#' further characters fits getOption("width"); the full labels are listed
+#' in the summary's item list. Returns the bare names when no item has a
+#' label or too little room is left.
+#' @param var_names Item names
+#' @param labels Named label vector (from .scale_item_labels) or NULL
+#' @param other_width Width of the rest of the row (numbers, separators)
+#' @noRd
+.scale_row_labels <- function(var_names, labels, other_width) {
+  if (is.null(labels)) return(var_names)
+  lab <- unname(labels[var_names])
+  if (all(is.na(lab))) return(var_names)
+  lab[is.na(lab)] <- ""
+  wn <- max(nchar(var_names, type = "width"))
+  avail <- getOption("width", 80) - other_width - wn - 4
+  # A label cut to a few characters tells nothing; the item list above the
+  # tables has the full labels
+  if (avail < 20) return(var_names)
+  too_long <- nchar(lab, type = "width") > avail
+  lab[too_long] <- paste0(substr(lab[too_long], 1, avail - 3), "...")
+  out <- paste0(vapply(var_names, pad_utf8, character(1), wn), "  ", lab)
+  # Pad to one display width: table helpers that pad with sprintf() count
+  # bytes, so umlauts in labels would otherwise shift the columns
+  w <- max(nchar(out, type = "width"))
+  unname(vapply(out, pad_utf8, character(1), w))
+}
+
+#' Print the item list of a scale summary, with labels when available
+#' @noRd
+.print_scale_item_list <- function(title, var_names, labels) {
+  lab <- if (is.null(labels)) rep(NA_character_, length(var_names)) else
+    unname(labels[var_names])
+  if (all(is.na(lab))) {
+    cat("- ", title, ": ", paste(var_names, collapse = ", "), "\n", sep = "")
+    return(invisible(NULL))
+  }
+  cat("- ", title, ":\n", sep = "")
+  wn <- max(nchar(var_names, type = "width"))
+  for (i in seq_along(var_names)) {
+    cat(sub(" +$", "", paste0("    ", pad_utf8(var_names[i], wn), "  ",
+                              if (is.na(lab[i])) "" else lab[i])), "\n", sep = "")
+  }
+  invisible(NULL)
+}
+
 #' Interpret Cronbach's Alpha value
 #' @noRd
 .alpha_interpretation <- function(alpha) {
@@ -876,9 +951,9 @@ print.summary.reliability <- function(x, ...) {
   show_inter_item <- if (!is.null(x$show)) isTRUE(x$show$inter_item_correlations) else TRUE
   show_item_total <- if (!is.null(x$show)) isTRUE(x$show$item_total_statistics) else TRUE
 
-  # Info section
+  # Info section (items with their variable labels, as SPSS shows them)
+  .print_scale_item_list("Items", x$variables, x$variable_labels)
   print_info_section(list(
-    "Items" = paste(x$variables, collapse = ", "),
     "N of Items" = x$n_items,
     "Removed (zero variance)" = if (length(x$removed_items)) {
       paste(x$removed_items, collapse = ", ")
@@ -927,6 +1002,10 @@ print.summary.reliability <- function(x, ...) {
     } else {
       formatC(round(item_df$n), format = "d")
     }
+    # name + (shortened) label; indent, Mean, SD, N and separators take
+    # about 34 + digits columns
+    item_df$item <- .scale_row_labels(item_df$item, x$variable_labels,
+                                      other_width = 34 + digits)
     print_stat_table(item_df, digits = digits,
                      col_types = c(mean = "num", sd = "num", n = "char"),
                      col_labels = c(item = "Item", mean = "Mean",
@@ -1059,6 +1138,7 @@ print.summary.reliability <- function(x, ...) {
     # Create a temporary ungrouped-like structure for printing
     temp <- c(group_result, list(
       variables = x$variables,
+      variable_labels = x$variable_labels,
       weights = x$weights,
       n_items = x$n_items
     ))

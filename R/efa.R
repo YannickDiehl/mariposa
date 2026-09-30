@@ -58,6 +58,9 @@
 #'   \item{structure_matrix}{Structure matrix (oblimin/promax only, NULL otherwise)}
 #'   \item{factor_correlations}{Factor correlation matrix (oblimin/promax only, NULL otherwise)}
 #'   \item{variables}{Character vector of variable names}
+#'   \item{variable_labels}{Named character vector with the variable labels
+#'     (\code{NA} where a variable has none); \code{summary()} shows them
+#'     next to the names, shortened to the console width in the tables}
 #'   \item{weights}{Weights variable name or NULL}
 #'   \item{item_statistics}{Tibble with mean, SD, analysis N and missing N
 #'     per item. With \code{use = "pairwise"} each item uses its own valid
@@ -278,6 +281,9 @@ efa <- function(data, ...,
   weights_info <- .process_weights(data, rlang::enquo(weights))
   data <- weights_info$data
 
+  # Variable labels (shown in summary(), as SPSS does)
+  variable_labels <- .scale_item_labels(data, var_names)
+
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
 
@@ -317,6 +323,7 @@ efa <- function(data, ...,
     result <- list(
       groups = results_list,
       variables = var_names,
+      variable_labels = variable_labels,
       weights = weights_info$name,
       is_grouped = TRUE,
       group_vars = group_vars,
@@ -334,6 +341,7 @@ efa <- function(data, ...,
 
     result <- c(core_result, list(
       variables = var_names,
+      variable_labels = variable_labels,
       weights = weights_info$name,
       is_grouped = FALSE,
       group_vars = NULL,
@@ -1500,9 +1508,10 @@ print.summary.efa <- function(x, ...) {
 
   rotation_note <- .efa_rotation_note(x)
 
-  # Info section
+  # Info section (items with their variable labels, as SPSS shows them)
+  labels <- x$variable_labels
+  .print_scale_item_list("Variables", x$variables, labels)
   info <- list(
-    "Variables" = paste(x$variables, collapse = ", "),
     "Extraction" = extraction_full,
     "Rotation" = switch(x$rotation,
       "varimax" = "Varimax with Kaiser Normalization",
@@ -1523,6 +1532,8 @@ print.summary.efa <- function(x, ...) {
   if (show_desc && !is.null(x$item_statistics)) {
     cat("\nDescriptive Statistics\n")
     desc <- as.data.frame(x$item_statistics)
+    desc$variable <- .scale_row_labels(desc$variable, labels,
+                                       other_width = 47 + digits)
     print_stat_table(
       desc, digits = digits,
       col_types = c(analysis_n = "int", missing_n = "int"),
@@ -1573,7 +1584,8 @@ print.summary.efa <- function(x, ...) {
     }
 
     comm_df <- data.frame(
-      variable = names(x$communalities),
+      variable = .scale_row_labels(names(x$communalities), labels,
+                                   other_width = 24 + 2 * digits),
       initial = initial_vals,
       extraction = as.numeric(x$communalities),
       stringsAsFactors = FALSE
@@ -1597,7 +1609,7 @@ print.summary.efa <- function(x, ...) {
   if (show_unrotated) {
     cat(sprintf("\n%s Matrix (unrotated)\n", matrix_label))
     cat(paste(rep("-", 40), collapse = ""), "\n")
-    .print_loading_matrix(x$unrotated_loadings, blank, sort_loadings, digits)
+    .print_loading_matrix(x$unrotated_loadings, blank, sort_loadings, digits, labels)
     cat(sprintf("Extraction Method: %s.\n", extraction_full))
   }
   if (!is.null(rotation_note) && show_rotated) {
@@ -1611,7 +1623,7 @@ print.summary.efa <- function(x, ...) {
     if (show_rotated) {
       cat(sprintf("\nRotated %s Matrix\n", matrix_label))
       cat(paste(rep("-", 40), collapse = ""), "\n")
-      .print_loading_matrix(x$loadings, blank, sort_loadings, digits)
+      .print_loading_matrix(x$loadings, blank, sort_loadings, digits, labels)
       cat(sprintf("Extraction Method: %s.\n", extraction_full))
       cat("Rotation Method: Varimax with Kaiser Normalization.\n")
     }
@@ -1622,7 +1634,7 @@ print.summary.efa <- function(x, ...) {
     if (show_pattern) {
       cat("\nPattern Matrix\n")
       cat(paste(rep("-", 40), collapse = ""), "\n")
-      .print_loading_matrix(x$pattern_matrix, blank, sort_loadings, digits)
+      .print_loading_matrix(x$pattern_matrix, blank, sort_loadings, digits, labels)
       cat(sprintf("Extraction Method: %s.\n", extraction_full))
       cat(sprintf("Rotation Method: %s with Kaiser Normalization.\n", rot_label))
     }
@@ -1630,7 +1642,7 @@ print.summary.efa <- function(x, ...) {
     if (show_structure) {
       cat("\nStructure Matrix\n")
       cat(paste(rep("-", 40), collapse = ""), "\n")
-      .print_loading_matrix(x$structure_matrix, blank, sort_loadings, digits)
+      .print_loading_matrix(x$structure_matrix, blank, sort_loadings, digits, labels)
     }
 
     if (show_factor_cor) {
@@ -1660,6 +1672,7 @@ print.summary.efa <- function(x, ...) {
     # Create a temporary ungrouped-like structure for printing
     temp <- c(group_result, list(
       variables = x$variables,
+      variable_labels = x$variable_labels,
       weights = x$weights,
       sort = x$sort,
       blank = x$blank
@@ -1750,17 +1763,20 @@ print.summary.efa <- function(x, ...) {
   cat("Sums = sums of squared loadings.\n")
   cat(sprintf("Extraction Method: %s.\n", extraction_full))
   if (oblique) {
-    cat(sprintf("When %ss are correlated, sums of squared loadings cannot be added to obtain a total variance.\n",
+    cat(sprintf("When %ss are correlated, sums of squared loadings cannot be added\n",
                 tolower(unit_label)))
+    cat("to obtain a total variance.\n")
   }
   invisible(NULL)
 }
 
 #' Print a loading matrix with blank suppression and optional sorting
 #' @noRd
-.print_loading_matrix <- function(mat, blank = 0.40, sort_loadings = TRUE, digits = 3) {
+.print_loading_matrix <- function(mat, blank = 0.40, sort_loadings = TRUE, digits = 3,
+                                  labels = NULL) {
   k <- nrow(mat)
   n_f <- ncol(mat)
+  cell_width <- max(7L, digits + 4L)
 
   # Determine display order
   if (sort_loadings && n_f > 1) {
@@ -1777,17 +1793,16 @@ print.summary.efa <- function(x, ...) {
 
   # Format the matrix
   display_mat <- matrix("", nrow = k, ncol = n_f)
-  rownames(display_mat) <- rownames(mat)
+  # Variable name plus its (console-fitted) label, as SPSS labels the rows
+  rownames(display_mat) <- .scale_row_labels(rownames(mat), labels,
+                                             other_width = n_f * (cell_width + 1L))
   colnames(display_mat) <- colnames(mat)
 
   for (i in seq_len(k)) {
     for (j in seq_len(n_f)) {
       val <- mat[i, j]
-      if (abs(val) >= blank) {
-        display_mat[i, j] <- format(round(val, digits), nsmall = digits, width = 7)
-      } else {
-        display_mat[i, j] <- format("", width = 7)
-      }
+      display_mat[i, j] <- pad_utf8(if (abs(val) >= blank) fmt_num(val, digits) else "",
+                                    cell_width, "right")
     }
   }
 

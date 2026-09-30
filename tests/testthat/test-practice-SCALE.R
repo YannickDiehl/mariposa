@@ -511,3 +511,42 @@ test_that("SCALE-16: compact and item statistics formatting", {
   nums <- unlist(regmatches(rows, gregexpr("[0-9]+\\.[0-9]+", rows)))
   expect_true(all(grepl("\\.[0-9]{3}$", nums)))
 })
+
+# --- SCALE-14: variable labels ---------------------------------------------------
+
+test_that("SCALE-14: reliability() summary shows the item labels", {
+  # Only variable names were shown; SPSS shows the variable labels.
+  r <- reliability(survey_data, trust_government, trust_media, trust_science)
+  expect_equal(r$variable_labels[["trust_media"]],
+               "Trust in media (1=none, 5=complete)")
+  s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("Trust in government (1=none, 5=complete)", s,
+                        fixed = TRUE)))
+  it <- section(s, "Item Statistics")
+  expect_true(any(grepl("trust_media +Trust in media", it)))
+})
+
+test_that("SCALE-14: efa() summary shows labels next to the loadings", {
+  e <- efa(survey_data, political_orientation, environmental_concern,
+           life_satisfaction, trust_government, trust_media, trust_science)
+  at_width_80 <- function(f) {
+    op <- options(width = 80)
+    on.exit(options(op))
+    f()
+  }
+  s <- at_width_80(function() capture.output(print(summary(e))))
+  expect_true(any(grepl(
+    "Life satisfaction (1=dissatisfied, 5=satisfied)", s, fixed = TRUE)))
+  rot <- section(s, "Rotated Component Matrix")
+  expect_true(any(grepl("trust_science +Trust in science.* 0\\.[0-9]{3}", rot)))
+  # labels are shortened to the console width, never wrapped
+  expect_true(all(nchar(s, type = "width") <= 80))
+})
+
+test_that("SCALE-14: unlabelled items keep the compact name list", {
+  d <- data.frame(a = c(1, 2, 3, 4, 5, 2), b = c(2, 2, 4, 5, 4, 1),
+                  c = c(1, 3, 3, 5, 5, 2))
+  r <- reliability(d, a, b, c)
+  s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("- Items: a, b, c", s, fixed = TRUE)))
+})

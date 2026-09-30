@@ -88,3 +88,9 @@
   narrow. Item statistics print with fixed decimals (no more "1.16" next
   to "2.615"), and a missing omega reads "not computed" with the reason
   instead of "NA".
+* `reliability()` and `efa()` show variable labels, as SPSS does.
+  `summary()` lists every item with its full label, and the per-item
+  tables (item statistics, communalities, loading matrices) add the
+  label next to the name, shortened with "..." so that rows fit the
+  console width; wide tables keep the names only. Labels with umlauts
+  stay aligned. The labels are stored in `$variable_labels`.
