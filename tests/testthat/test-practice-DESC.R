@@ -402,7 +402,7 @@ test_that("DESC-11: frequency() table has SPSS-like total rows and no NA cells",
   expect_equal(first[length(first)], "Total")
   last <- rows[[length(rows)]]
   expect_true("2500" %in% last && "100.00" %in% last)
-  expect_equal(sum(first == "NA"), 1L)                   # system missing row
+  expect_equal(sum(first == "System"), 1L)               # system missing row (SPSS)
   expect_false(any(first == "Total missing"))           # only one missing row
 
   for (x in list(c(1, 2, 2, 3, NA), c(TRUE, FALSE, NA), c("a", "b", NA))) {
@@ -427,7 +427,7 @@ test_that("DESC-11: frequency() table has SPSS-like total rows and no NA cells",
   o <- capture.output(print(frequency(tibble::tibble(x = x), x)))
   expect_false(any(grepl("NA(total)", o, fixed = TRUE)))
   f <- vapply(.fre_rows(o), `[`, "", 1)
-  expect_true(all(c("Total valid", "-9", "-8", "NA", "Total missing", "Total") %in% f))
+  expect_true(all(c("Total valid", "-9", "-8", "System", "Total missing", "Total") %in% f))
   expect_false(any(unlist(lapply(.fre_rows(o), `[`, -1)) == "NA"))
 })
 
@@ -831,4 +831,13 @@ test_that("crosstab: a group without positive weights is left out with a warning
   )
   expect_length(r$results, 1)
   expect_output(print(r), "region = West")
+})
+
+test_that("frequency labels system-missing values 'System' like SPSS, also in Excel", {
+  # Was: the system-missing row read "NA" (SPSS FREQUENCIES: "Missing System").
+  f <- tempfile(fileext = ".xlsx")
+  write_xlsx(frequency(survey_data, life_satisfaction), f)
+  cells <- unlist(openxlsx2::read_xlsx(f, col_names = FALSE, skip_empty_rows = TRUE))
+  expect_true("System" %in% cells)
+  expect_false("NA" %in% cells)
 })

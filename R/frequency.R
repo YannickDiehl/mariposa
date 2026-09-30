@@ -1021,6 +1021,8 @@ print.summary.frequency <- function(x, ...) {
     miss_rows <- results[is.na(results$value), , drop = FALSE]
     miss_values <- rep("NA", nrow(miss_rows))
   }
+  # SPSS FREQUENCIES lists system-missing values as "System"
+  miss_values[miss_values == "NA"] <- "System"
   if (!isTRUE(options$show_na)) {
     miss_rows <- miss_rows[0, , drop = FALSE]
     miss_values <- character(0)

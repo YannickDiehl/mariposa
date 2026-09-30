@@ -302,6 +302,9 @@ reference output showed mariposa was wrong.
   GENERIERBAR"); the automatic mode only looked at the labels of valid
   values, so metric variables printed their missing codes without the
   explaining label.
+* `frequency()` (console and `write_xlsx()`) labels system-missing values
+  "System" as SPSS FREQUENCIES does ("Missing System 79"); the row read
+  "NA".
 * `frequency()` tables follow the SPSS FREQUENCIES layout: valid
   categories, "Total valid", the missing categories, "Total missing" (only
   with two or more missing categories) and a grand "Total" row (N and

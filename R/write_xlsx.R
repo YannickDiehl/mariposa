@@ -730,6 +730,8 @@ write_xlsx.default <- function(x, file, overwrite = TRUE, ...) {
   } else {
     val <- as.character(data_row$value)
   }
+  # System-missing values as SPSS FREQUENCIES labels them
+  if (identical(val, "NA")) val <- "System"
   .write_cell(wb, sheet, row, col_idx, val)
 
   # Label

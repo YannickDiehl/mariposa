@@ -686,9 +686,9 @@ test_that("write_xlsx.frequency handles NAs with Total Valid/Missing", {
   expect_true("Total Valid" %in% all_labels)
   expect_true("Total Missing" %in% all_labels)
 
-  # Find "NA" in value column for the NA data row
+  # The system-missing row is labelled "System" (SPSS FREQUENCIES)
   all_values <- as.character(data[[1]])
-  expect_true("NA" %in% all_values)
+  expect_true("System" %in% all_values)
 
   # Total rows should have "Total" in value column
   expect_true(sum(all_values == "Total", na.rm = TRUE) >= 2L)
