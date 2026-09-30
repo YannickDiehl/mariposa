@@ -252,7 +252,7 @@ describe <- function(data, ..., weights = NULL,
   if ("quantiles" %in% show) {
     quantiles <- .w_quantile(xs, ws, probs = probs, na.rm = na.rm)
     for (i in seq_along(probs)) {
-      prob_name <- paste0("Q", probs[i] * 100)
+      prob_name <- .desc_quantile_name(probs[i])
       stats_list[[prob_name]] <- quantiles[i]
     }
   }
@@ -400,7 +400,8 @@ print.summary.describe <- function(x, ...) {
 #' Print results for ungrouped data
 #' @noRd
 .print_ungrouped_results <- function(x, is_weighted, digits = 3) {
-  output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted, digits = digits)
+  output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted,
+                                 digits = digits, probs = x$probs)
   print(output_df, row.names = FALSE)
 
   # Print footer border
@@ -431,7 +432,8 @@ print.summary.describe <- function(x, ...) {
     print_group_header(group_filter)
 
     # Create and print output
-    temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted, digits = digits)
+    temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted,
+                                     digits = digits, probs = x$probs)
     print_separator(get_table_width(temp_output))
     print(temp_output, row.names = FALSE)
     print_separator(get_table_width(temp_output))
@@ -440,7 +442,8 @@ print.summary.describe <- function(x, ...) {
 
 #' Create formatted output data frame for printing
 #' @noRd
-.create_output_df <- function(results_df, variables, show, is_weighted, digits = 3) {
+.create_output_df <- function(results_df, variables, show, is_weighted, digits = 3,
+                              probs = c(0.25, 0.5, 0.75)) {
   output_rows <- list()
   
   for (var_name in variables) {
@@ -456,10 +459,11 @@ print.summary.describe <- function(x, ...) {
                                "mode" = "Mode", "quantiles" = "Q25"))
       
       if (stat == "quantiles") {
-        # Handle quantiles specially - can be multiple columns
-        q_cols <- grep(paste0("^", var_name, "_Q"), names(results_df), value = TRUE)
-        for (q_col in q_cols) {
-          q_name <- gsub(paste0("^", var_name, "_"), "", q_col)
+        # Quantile columns by their exact names: a regex prefix match
+        # (grep("^var_Q")) also caught variables such as income_Quintile
+        # and failed on names with metacharacters (`Einkommen (EUR)`)
+        for (q_name in .desc_quantile_name(probs)) {
+          q_col <- paste0(var_name, "_", q_name)
           if (q_col %in% names(results_df)) {
             row_data[[q_name]] <- round(results_df[[q_col]], digits)
           }
@@ -511,3 +515,12 @@ print.summary.describe <- function(x, ...) {
 
 # Note: .get_border function removed - using standardized get_table_width from print_helpers.R
  
+
+
+#' Result/display name of a quantile column ("Q25" for probs = 0.25)
+#' @param p Probabilities
+#' @return Character vector
+#' @noRd
+.desc_quantile_name <- function(p) {
+  paste0("Q", p * 100)
+}
