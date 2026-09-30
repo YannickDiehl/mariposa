@@ -102,6 +102,7 @@ read_xlsx <- function(path, sheet = NULL, labels = TRUE,
                       verbose = FALSE, ...) {
   .check_openxlsx2()
   .validate_xlsx_read_path(path)
+  .check_file_type(path, c("xlsx", "zip"), "read_xlsx")
 
   wb <- openxlsx2::wb_load(path)
   sheet_names <- wb$sheet_names

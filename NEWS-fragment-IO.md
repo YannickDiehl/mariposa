@@ -137,3 +137,9 @@
   discrete value" form when that avoids valid values (e.g. codes 0, 7, 8,
   9 around valid 1-6, which used to be an error), reported in one message
   with readable ranges ("-11 to -8 and -42").
+* `read_spss()`, `read_por()`, `read_stata()`, `read_sas()`, `read_xpt()`
+  and `read_xlsx()` recognise a file of the wrong type from its first bytes
+  and say what it looks like and which reader to use (e.g. "read_spss()
+  cannot read x.dta: it looks like a Stata file (.dta). Use read_stata()
+  instead."), instead of readstat's cryptic errors; a missing file is
+  reported as such.

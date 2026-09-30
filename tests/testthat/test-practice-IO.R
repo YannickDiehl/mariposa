@@ -622,3 +622,32 @@ test_that("IO-15: >3 codes use range + one discrete value, one message", {
   expect_equal(attr(back$a, "na_range"), c(-11, -8))
   expect_equal(attr(back$a, "na_values"), -42)
 })
+
+# IO-25: read_spss() on a .dta/.xlsx file and read_stata() on a .sav file
+# failed with raw readstat errors ("Unable to convert string to the
+# requested encoding", "Failed to parse ... : This version of the file
+# format is not supported.").
+test_that("IO-25: readers say which file type they were given", {
+  skip_if_not_installed("haven")
+  sav <- tempfile(fileext = ".sav")
+  dta <- tempfile(fileext = ".dta")
+  on.exit(unlink(c(sav, dta)))
+  haven::write_sav(data.frame(x = 1:3), sav)
+  haven::write_dta(data.frame(x = 1:3), dta)
+  expect_error(read_spss(dta), "Stata")
+  expect_error(read_spss(dta), "read_stata")
+  expect_error(read_stata(sav), "SPSS")
+  expect_error(read_stata(sav), "read_spss")
+  expect_error(read_sas(sav), "SPSS")
+  expect_error(read_spss(file.path(tempdir(), "does-not-exist.sav")),
+               "does not exist")
+  if (requireNamespace("openxlsx2", quietly = TRUE)) {
+    xl <- tempfile(fileext = ".xlsx")
+    on.exit(unlink(xl), add = TRUE)
+    write_xlsx(data.frame(x = 1:3), xl)
+    expect_error(read_spss(xl), "Excel")
+  }
+  # correct types still read
+  expect_equal(nrow(read_spss(sav)), 3L)
+  expect_equal(nrow(read_stata(dta)), 3L)
+})

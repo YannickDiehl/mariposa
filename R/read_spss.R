@@ -24,8 +24,12 @@
 #'     \item The original SPSS missing codes can be recovered via
 #'       [na_frequencies()], [untag_na()], or [haven::na_tag()]
 #'     \item Each tagged variable has an `"na_tag_map"` attribute mapping
-#'       tag characters to original SPSS codes
+#'       tag characters to original SPSS codes, and an `"spss_missing"`
+#'       attribute with the original missing-value definition (used by
+#'       [write_spss()] for an exact round trip)
 #'   }
+#'   A file that is not an SPSS `.sav` file (e.g. a Stata or Excel file)
+#'   is reported with its apparent type and the matching reader.
 #'
 #' @details
 #' SPSS allows defining specific values as "user-defined missing values"
@@ -72,6 +76,7 @@
 #' @export
 read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE) {
   .check_haven("SPSS import")
+  .check_file_type(path, "sav", "read_spss")
 
   # Read with user_na = TRUE to preserve missing value metadata as attributes
   # (haven_labelled_spss class keeps values but marks them via na_range/na_values)
@@ -124,6 +129,7 @@ read_spss <- function(path, tag_na = TRUE, encoding = NULL, verbose = FALSE) {
 #' @export
 read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
   .check_haven("SPSS portable import")
+  .check_file_type(path, "por", "read_por")
 
   data <- haven::read_por(file = path, user_na = tag_na)
 
@@ -134,6 +140,84 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 
 
 # ---- Internal Helpers -------------------------------------------------------
+
+#' Guess a data file's format from its first bytes
+#'
+#' @return One of "sav", "por", "dta", "sas7bdat", "xpt", "xlsx", "zip",
+#'   "gzip", "text", or NA when unknown
+#' @noRd
+.sniff_file_type <- function(path) {
+  con <- file(path, "rb")
+  on.exit(close(con))
+  b <- readBin(con, "raw", n = 512L)
+  if (length(b) == 0L) return(NA_character_)
+  txt <- rawToChar(b[b != as.raw(0)])
+  has <- function(s) grepl(s, txt, fixed = TRUE, useBytes = TRUE)
+  starts <- function(s) {
+    n <- nchar(s, type = "bytes")
+    length(b) >= n && identical(b[seq_len(n)], charToRaw(s))
+  }
+  sas_magic <- as.raw(c(0xc2, 0xea, 0x81, 0x60, 0xb3, 0x14, 0x11, 0xcf,
+                        0xbd, 0x92, 0x08, 0x00, 0x09, 0xc7, 0x31, 0x8c))
+  if (starts("$FL2") || starts("$FL3")) return("sav")
+  if (starts("<stata_dta>")) return("dta")
+  if (length(b) >= 2L && as.integer(b[1]) %in% 102:115 &&
+      as.integer(b[2]) %in% 1:2) return("dta")
+  if (length(b) >= 28L && identical(b[13:28], sas_magic)) return("sas7bdat")
+  if (starts("HEADER RECORD")) return("xpt")
+  if (has("SPSS PORT FILE")) return("por")
+  if (starts("PK\003\004")) {
+    return(if (has("[Content_Types].xml") || has("xl/")) "xlsx" else "zip")
+  }
+  if (length(b) >= 2L && identical(b[1:2], as.raw(c(0x1f, 0x8b)))) {
+    return("gzip")
+  }
+  if (all(as.integer(b) %in% c(9L, 10L, 13L, 32:126, 128:255))) return("text")
+  NA_character_
+}
+
+
+#' Stop early, and say why, when a reader gets the wrong kind of file
+#'
+#' readstat's own errors for a mismatched format are cryptic ("Unable to
+#' convert string to the requested encoding", "This version of the file
+#' format is not supported"). Unknown formats are left to haven.
+#'
+#' @param path File path
+#' @param expected Accepted types (see .sniff_file_type())
+#' @param fn Name of the calling reader, for the message
+#' @noRd
+.check_file_type <- function(path, expected, fn, call = rlang::caller_env()) {
+  if (!is.character(path) || length(path) != 1L) return(invisible(TRUE))
+  if (grepl("^(https?|ftp)://", path)) return(invisible(TRUE))
+  if (!file.exists(path)) {
+    cli::cli_abort("File {.file {path}} does not exist.", call = call)
+  }
+  found <- .sniff_file_type(path)
+  if (is.na(found) || found %in% expected) return(invisible(TRUE))
+
+  what <- c(sav = "an SPSS data file (.sav)", por = "an SPSS portable file (.por)",
+            dta = "a Stata file (.dta)", sas7bdat = "a SAS data file (.sas7bdat)",
+            xpt = "a SAS transport file (.xpt)", xlsx = "an Excel workbook (.xlsx)",
+            zip = "a zip archive", gzip = "a gzip-compressed file (e.g. .rds)",
+            text = "a text file (e.g. .csv)")
+  reader <- c(sav = "read_spss", por = "read_por", dta = "read_stata",
+              sas7bdat = "read_sas", xpt = "read_xpt", xlsx = "read_xlsx")
+  hint <- if (found %in% names(reader)) {
+    paste0("Use {.fn ", reader[[found]], "} instead.")
+  } else if (found == "text") {
+    "Read it with e.g. {.fn utils::read.csv} or {.fn readr::read_csv}."
+  } else if (found == "gzip") {
+    "An R data file is read with {.fn readRDS}."
+  } else {
+    NULL
+  }
+  cli::cli_abort(c(
+    "{.fn {fn}} cannot read {.file {basename(path)}}: it looks like {what[[found]]}.",
+    if (!is.null(hint)) c("i" = hint)
+  ), call = call)
+}
+
 
 #' Convert SPSS user-defined missing values to tagged NAs
 #'

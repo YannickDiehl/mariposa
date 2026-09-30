@@ -90,6 +90,7 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
   if (!is.null(tag_na) && !is.numeric(tag_na)) {
     cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")
   }
+  .check_file_type(path, "sas7bdat", "read_sas")
 
   # haven rejects an explicit NULL catalog_encoding ("Expected string vector
   # of length 1"); its own default is the data file's encoding, where NULL
@@ -163,6 +164,7 @@ read_sas <- function(path, catalog_file = NULL, encoding = NULL,
 #' @export
 read_xpt <- function(path, tag_na = NULL, verbose = FALSE) {
   .check_haven("SAS transport import")
+  .check_file_type(path, "xpt", "read_xpt")
 
   if (!is.null(tag_na) && !is.numeric(tag_na)) {
     cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")

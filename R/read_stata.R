@@ -77,6 +77,7 @@
 #' @export
 read_stata <- function(path, encoding = NULL, tag_na = NULL, verbose = FALSE) {
   .check_haven("Stata import")
+  .check_file_type(path, "dta", "read_stata")
 
   if (!is.null(tag_na) && !is.numeric(tag_na)) {
     cli::cli_abort("{.arg tag_na} must be a numeric vector of missing value codes.")
