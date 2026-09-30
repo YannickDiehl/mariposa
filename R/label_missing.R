@@ -25,6 +25,8 @@
 #'     \item **Named pairs**: Applied to specific variables
 #'       (e.g., `set_na(data, income = c(-9, -8), age = -1)`)
 #'   }
+#'   Factors are left unchanged (with a warning when named explicitly):
+#'   `set_na()` works on numeric codes.
 #' @param tag If `TRUE` (default), uses tagged NAs to preserve distinct
 #'   missing types. The resulting tagged NAs integrate with
 #'   [na_frequencies()], [frequency()], and [codebook()].
@@ -92,7 +94,8 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
     if (!is.numeric(na_values)) {
       cli::cli_abort("Missing values must be numeric.")
     }
-    return(.set_na_vec(data, na_values, tag, verbose))
+    return(.set_na_vec(data, na_values, tag, verbose,
+                       var_name = sub(".*\\$", "", deparse(substitute(data))[1])))
   }
 
   # Data frame mode
@@ -130,7 +133,8 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
       if (!is.numeric(na_values)) {
         cli::cli_abort("Missing values for {.var {nm}} must be numeric.")
       }
-      data[[nm]] <- .set_na_vec(data[[nm]], na_values, tag, verbose)
+      data[[nm]] <- .set_na_vec(data[[nm]], na_values, tag, verbose,
+                                var_name = nm)
     }
   }
 
@@ -140,7 +144,15 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
 
 #' Internal: set values to NA in a single vector
 #' @noRd
-.set_na_vec <- function(x, na_values, tag = TRUE, verbose = FALSE) {
+.set_na_vec <- function(x, na_values, tag = TRUE, verbose = FALSE,
+                        var_name = "x") {
+  if (is.factor(x)) {
+    cli::cli_warn(c(
+      "{.var {var_name}} is a factor and was left unchanged: {.fn set_na} works on numeric codes.",
+      "i" = "Drop levels with {.code factor(x, exclude = ...)}, or convert it with {.fn to_labelled} first."
+    ))
+    return(x)
+  }
   if (!is.numeric(x)) return(x)
 
   na_values <- sort(unique(na_values))

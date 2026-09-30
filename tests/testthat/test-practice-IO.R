@@ -392,3 +392,21 @@ test_that("IO-08: set_na(tag = FALSE) keeps variable and value labels", {
   expect_equal(attr(set_na(d, q = -9, tag = FALSE)$q, "label"), "Question")
   expect_s3_class(set_na(d$q, -9, tag = FALSE), "haven_labelled")
 })
+
+# IO-22: val_labels() SET on a factor/character column was silently
+# accepted (meaningless labels attribute); set_na() silently skipped
+# factors.
+test_that("IO-22: val_labels() refuses factor and character columns", {
+  expect_error(val_labels(survey_data, gender = c(Male = 1)), "factor")
+  d <- data.frame(s = c("a", "b"))
+  expect_error(val_labels(d, s = c(A = 1)), "character")
+  # numeric still works
+  r <- val_labels(survey_data, political_orientation = c(left = 1, right = 5))
+  expect_equal(attr(r$political_orientation, "labels"), c(left = 1, right = 5))
+})
+
+test_that("IO-22: set_na() on a factor warns instead of silently skipping", {
+  expect_warning(r <- set_na(survey_data, gender = 1), "factor")
+  expect_identical(r$gender, survey_data$gender)
+  expect_warning(set_na(survey_data$gender, 1), "factor")
+})

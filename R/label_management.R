@@ -202,6 +202,9 @@ var_label <- function(data, ...) {
 #' to keep existing labels and only add new ones. If a value already has a
 #' label, the new label overwrites it.
 #'
+#' Value labels belong to numeric codes: setting them on a factor or a
+#' character column is an error (convert it with [to_labelled()] first).
+#'
 #' @seealso [var_label()] for variable labels, [to_label()] for converting
 #'   labelled vectors to factors, [drop_labels()] for removing unused labels
 #'
@@ -291,6 +294,16 @@ val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
 
     if (!is.numeric(new_labels) || is.null(names(new_labels))) {
       cli::cli_abort("Labels for {.var {nm}} must be a named numeric vector (e.g., {.code c(\"Male\" = 1, \"Female\" = 2)}).")
+    }
+
+    # Value labels map numeric codes to text; on a factor or character
+    # column they were stored but never used by anything.
+    if (is.factor(data[[nm]]) || is.character(data[[nm]])) {
+      type <- if (is.factor(data[[nm]])) "a factor" else "a character variable"
+      cli::cli_abort(c(
+        "Cannot set value labels on {.var {nm}}: it is {type}.",
+        "i" = "Value labels need numeric codes. Convert it first with {.fn to_labelled} (its levels/values become labelled codes){if (is.factor(data[[nm]])) ', or rename the levels with levels()' else ''}."
+      ))
     }
 
     if (isTRUE(.add)) {

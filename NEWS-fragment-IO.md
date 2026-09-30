@@ -82,3 +82,7 @@
   labels -> 6). Variable labels, the value labels of the remaining codes,
   the `haven_labelled` class and existing missing-value types are kept;
   integer columns stay integer.
+* `val_labels()` refuses to set value labels on a factor or character
+  column (they were stored but never used) and points to `to_labelled()`;
+  `set_na()` warns when a named variable or a vector is a factor instead of
+  silently returning it unchanged.
