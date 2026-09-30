@@ -569,6 +569,7 @@ na_frequencies <- function(x, ...) {
 
   if (is.data.frame(x)) {
     dots <- rlang::enexprs(...)
+    .check_dot_names(names(dots))
     cols <- if (length(dots) == 0L) {
       which(vapply(x, function(v) {
         is.numeric(v) && !is.factor(v) && anyNA(v)
@@ -816,6 +817,7 @@ strip_tags <- function(x, ...) {
 #' @noRd
 .tag_fun_df <- function(data, fun, dots, select_expr,
                         call = rlang::caller_env()) {
+  .check_dot_names(names(dots), call = call)
   cols <- if (length(dots) == 0L) {
     which(vapply(data, function(v) is.numeric(v) && !is.factor(v), logical(1)))
   } else {

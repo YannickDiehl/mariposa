@@ -147,6 +147,7 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
   # INPUT VALIDATION
   # ============================================================================
 
+  .reject_partial_args()
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }

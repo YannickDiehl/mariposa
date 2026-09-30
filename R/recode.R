@@ -191,6 +191,8 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   if (!is.null(as.factor)) .stop_removed_arg("as.factor", "as_factor")
   if (!is.null(var.label)) .stop_removed_arg("var.label", "var_label")
   if (!is.null(val.labels)) .stop_removed_arg("val.labels", "val_labels")
+  # `rule = ...` would otherwise be reported as "`rules` is required"
+  .check_dot_names(names(rlang::enquos(...)))
 
   if (missing(rules)) {
     cli::cli_abort(c(
@@ -204,6 +206,7 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   # ============================================================================
 
   if (!is.data.frame(data)) {
+    .check_dots_unused(...)
     if (!is.atomic(data)) {
       cli::cli_abort("{.arg data} must be a data frame, vector, or factor.")
     }
@@ -862,6 +865,7 @@ to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
   # ============================================================================
 
   if (!is.data.frame(data)) {
+    .check_dots_unused(...)
     var_name <- deparse(substitute(data))
     # Clean up deparse artifacts
     if (grepl("\\$", var_name)) var_name <- sub(".*\\$", "", var_name)

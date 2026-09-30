@@ -75,6 +75,9 @@
 
   # --- Summarise context: data is a vector, not a data frame -----------------
   if (!is.data.frame(data) && vector_ok(data)) {
+    # `...` selects variables of a data frame; with a vector it is unused
+    # (`w_mean(x, weight = w)` silently computed an unweighted mean)
+    .check_dots_unused(..., call = call)
     x <- data
     weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
     if (!is.null(weights_vec)) weights_vec <- .plain_numeric(weights_vec)

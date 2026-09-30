@@ -122,6 +122,7 @@
 #' @family posthoc
 #' @export
 scheffe_test <- function(x, conf.level = 0.95, ...) {
+  .reject_partial_args()
   UseMethod("scheffe_test")
 }
 

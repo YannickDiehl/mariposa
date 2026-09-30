@@ -115,6 +115,8 @@
 #' @export
 fisher_test <- function(data, row, col, weights = NULL,
                         simulate.p.value = FALSE, B = 10000, ...) {
+  .reject_partial_args()
+  .check_dots_unused(...)
 
   # Input validation
   if (!is.data.frame(data)) {

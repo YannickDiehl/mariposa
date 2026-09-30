@@ -210,6 +210,7 @@ logistic_regression <- function(data, formula = NULL,
   # INPUT VALIDATION & FORMULA CONSTRUCTION
   # ============================================================================
 
+  .reject_partial_args()
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame or tibble.")
   }

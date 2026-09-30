@@ -119,6 +119,7 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
   weights_quo <- rlang::enquo(weights)
 
   if (!is.data.frame(data)) {
+    .check_dots_unused(...)
     if (!is.numeric(data)) {
       cli::cli_abort("{.arg data} must be numeric.")
     }
@@ -349,6 +350,7 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
   weights_quo <- rlang::enquo(weights)
 
   if (!is.data.frame(data)) {
+    .check_dots_unused(...)
     if (!is.numeric(data)) {
       cli::cli_abort("{.arg data} must be numeric.")
     }

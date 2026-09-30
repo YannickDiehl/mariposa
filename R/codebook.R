@@ -431,6 +431,7 @@ codebook <- function(data, ..., weights = NULL,
 
   # Select variables (all if ... is empty)
   dots <- rlang::enquos(...)
+  .check_dot_names(names(dots))
   if (length(dots) == 0) {
     var_names <- names(data)
   } else {

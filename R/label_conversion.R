@@ -230,6 +230,7 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
 #' @noRd
 .label_conversion_cols <- function(data, dots, select_expr, add_non_labelled,
                                    fn, call = rlang::caller_env()) {
+  .check_dot_names(names(dots), call = call)
   if (length(dots) > 0L) {
     # evaluated in the caller's frame, where `...` lives
     cols <- tidyselect::eval_select(select_expr, data, env = call)
@@ -469,6 +470,7 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
   }
 
   dots <- rlang::enexprs(...)
+  .check_dot_names(names(dots))
   if (length(dots) == 0L) {
     cols <- which(vapply(data, function(x) {
       is.factor(x) || inherits(x, "haven_labelled")
@@ -624,6 +626,7 @@ to_labelled <- function(data, ..., labels = NULL, label = NULL) {
   }
 
   dots <- rlang::enexprs(...)
+  .check_dot_names(names(dots))
   if (length(dots) == 0L) {
     cols <- which(vapply(data, is.factor, logical(1)))
   } else {

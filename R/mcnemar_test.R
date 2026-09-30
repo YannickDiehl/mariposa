@@ -109,6 +109,8 @@
 #' @export
 mcnemar_test <- function(data, var1, var2, weights = NULL,
                          correct = TRUE, ...) {
+  .reject_partial_args()
+  .check_dots_unused(...)
 
   # Input validation
   if (!is.data.frame(data)) {

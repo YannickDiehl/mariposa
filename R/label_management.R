@@ -591,6 +591,7 @@ drop_labels <- function(data, ..., drop_na = FALSE) {
   }
 
   dots <- rlang::enexprs(...)
+  .check_dot_names(names(dots))
   if (length(dots) == 0L) {
     cols <- seq_len(ncol(data))
   } else {

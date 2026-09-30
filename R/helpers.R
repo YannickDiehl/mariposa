@@ -110,6 +110,11 @@ NULL
 #' Handles the ... expressions passed to statistical functions and returns a named
 #' vector of column positions.
 #'
+#' A named argument in `...` is refused (.check_dot_names()): a misspelled
+#' argument (`weight =`, `na_rm =`, `groups =`) used to become a tidyselect
+#' rename and produced an unweighted result, a garbage row, or an unrelated
+#' error.
+#'
 #' Grouping columns of grouped data are dropped from the selection
 #' (.drop_grouping_vars(), as dplyr::across() does) unless
 #' `drop_groups = FALSE` (transformations such as rec() may recode a
@@ -119,7 +124,8 @@ NULL
 #' @param ... Variable selection expressions (tidyselect compatible)
 #' @param drop_groups Drop the grouping columns of grouped data from the
 #'   selection (with a message)?
-#' @param call Environment of the user-facing function
+#' @param call Environment of the user-facing function (its formals are used
+#'   for the "Did you mean" suggestions of misspelled arguments)
 #' @return Named integer vector of column positions
 #' @noRd
 .process_variables <- function(data, ..., drop_groups = TRUE,
@@ -127,6 +133,7 @@ NULL
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.", call = call)
   }
+  .check_dot_names(names(rlang::enquos(...)), call = call)
 
   vars <- tidyselect::eval_select(rlang::expr(c(...)), data)
 
@@ -381,4 +388,154 @@ get_value_labels <- function(x, freq_names) {
     "Grouping variable{?s} {.var {grp}} {?is/are} not analyzed ({?it defines/they define} the groups)."
   )
   vars
+}
+
+#' Name of the function running in a frame (for messages)
+#' @return The name, or NA when it cannot be determined
+#' @noRd
+.frame_fn_name <- function(env) {
+  cl <- tryCatch(rlang::frame_call(env), error = function(e) NULL)
+  nm <- if (is.call(cl)) tryCatch(rlang::call_name(cl), error = function(e) NULL)
+  if (is.null(nm)) NA_character_ else nm
+}
+
+#' Closest formal argument name for a misspelled argument
+#'
+#' Same name up to case and `.`/`_` (na_rm -> na.rm), an abbreviation
+#' (weight -> weights, conf -> conf.level) or a small typo (groups -> group,
+#' weigths -> weights; utils::adist() <= 2 and shorter than the names).
+#'
+#' @param nm The name as typed
+#' @param candidates Formal argument names
+#' @return Character vector of suggestions (empty when nothing is close)
+#' @noRd
+.closest_arg <- function(nm, candidates) {
+  candidates <- setdiff(candidates, "...")
+  if (length(candidates) == 0 || !nzchar(nm)) return(character(0))
+  norm <- function(s) gsub("[._]", "", tolower(s))
+  hit <- candidates[norm(candidates) == norm(nm)]
+  if (length(hit) > 0) return(hit[1])
+  if (nchar(nm) >= 2) {
+    hit <- candidates[startsWith(candidates, nm)]
+    if (length(hit) > 0) return(hit)
+  }
+  d <- utils::adist(nm, candidates)[1, ]
+  ok <- d <= 2 & d < nchar(nm) & d < nchar(candidates)
+  if (any(ok)) return(candidates[ok][which.min(d[ok])])
+  character(0)
+}
+
+#' Escape braces for cli/glue interpolation
+#' @noRd
+.cli_escape <- function(x) {
+  gsub("}", "}}", gsub("{", "{{", x, fixed = TRUE), fixed = TRUE)
+}
+
+#' Refuse named arguments in a variable-selection `...`
+#'
+#' In functions whose `...` selects variables, a named argument is either a
+#' misspelled argument (`weight = w` for `weights`, `na_rm = TRUE`,
+#' `groups = g`) or a tidyselect rename that the analyses do not support.
+#' Both used to be passed on to tidyselect: the analysis ran unweighted with
+#' a bogus extra "variable" row, or failed with an unrelated error
+#' ("Variable weight is not numeric", "Exactly two variables must be
+#' specified"). The error names the closest formal argument of the
+#' user-facing function (found from `call`).
+#'
+#' @param dot_names Names of the `...` arguments ("" for unnamed)
+#' @param call Environment of the user-facing function
+#' @param selection Is `...` a variable selection (explain renames)?
+#' @noRd
+.check_dot_names <- function(dot_names, call = rlang::caller_env(),
+                             selection = TRUE) {
+  dot_names <- dot_names[!is.na(dot_names) & nzchar(dot_names)]
+  if (length(dot_names) == 0) return(invisible(TRUE))
+
+  fn <- tryCatch(rlang::frame_fn(call), error = function(e) NULL)
+  candidates <- if (is.function(fn)) names(formals(fn)) else character(0)
+  # Removed dot-case arguments kept as error sentinels (show.na next to
+  # show_na) are no suggestion
+  dotted <- grepl(".", candidates, fixed = TRUE) &
+    gsub(".", "_", candidates, fixed = TRUE) %in% candidates
+  candidates <- candidates[!dotted]
+  fn_name <- .frame_fn_name(call)
+  where <- if (is.na(fn_name)) "" else paste0(" of {.fn ", .cli_escape(fn_name), "}")
+
+  bullets <- character(0)
+  for (nm in dot_names) {
+    sug <- .closest_arg(nm, candidates)
+    if (length(sug) > 0) {
+      sug_txt <- paste0("{.arg ", .cli_escape(sug), "}", collapse = ", ")
+      bullets <- c(bullets, i = paste0("Did you mean ", sug_txt, " instead of {.arg ",
+                                       .cli_escape(nm), "}?"))
+    }
+  }
+  if (length(bullets) == 0 && selection) {
+    bullets <- c(
+      i = "Variables in {.arg ...} are selected without names; a name would rename the variable, which is not supported here.",
+      i = "Rename the variable beforehand if needed, e.g. with {.fn dplyr::rename}."
+    )
+  } else if (length(bullets) == 0 && !is.na(fn_name)) {
+    bullets <- c(i = paste0("See {.code ?", .cli_escape(fn_name), "} for the arguments."))
+  }
+  cli_abort(c(
+    paste0("Unknown argument{?s} {.arg {dot_names}}", where, "."),
+    bullets
+  ), call = call)
+}
+
+#' Refuse any argument in an unused `...`
+#'
+#' For functions whose `...` is not used (fisher_test(), mcnemar_test()) or
+#' not used in a mode (the vector input of the w_* functions and std()):
+#' arguments there were silently ignored, e.g. `w_mean(x, weight = w)` inside
+#' summarise() computed an unweighted mean.
+#'
+#' @param ... The function's `...`
+#' @param call Environment of the user-facing function
+#' @noRd
+.check_dots_unused <- function(..., call = rlang::caller_env()) {
+  n <- ...length()
+  if (n == 0) return(invisible(TRUE))
+  .check_dot_names(names(rlang::enquos(...)), call = call, selection = FALSE)
+  fn_name <- .frame_fn_name(call)
+  cli_abort(c(
+    "{n} unused argument{?s} in {.arg ...}.",
+    "i" = if (!is.na(fn_name)) paste0("See {.code ?", .cli_escape(fn_name), "} for the arguments.")
+  ), call = call)
+}
+
+#' Refuse partially matched argument names
+#'
+#' R matches abbreviated argument names (`weight =` for `weights`,
+#' `percent =` for `percentages`) for formals before `...`, but not for
+#' formals after it. mariposa's analysis functions accept full argument
+#' names only, so that `weight =` behaves the same everywhere: an error with
+#' the full name instead of silently working in some functions and being
+#' taken as a variable in others. Call at the top of functions whose formals
+#' can be partially matched.
+#'
+#' @param env The function's environment
+#' @noRd
+.reject_partial_args <- function(env = rlang::caller_env()) {
+  cl <- tryCatch(rlang::frame_call(env), error = function(e) NULL)
+  fn <- tryCatch(rlang::frame_fn(env), error = function(e) NULL)
+  if (!is.call(cl) || !is.function(fn)) return(invisible(TRUE))
+  given <- rlang::names2(as.list(cl)[-1])
+  given <- given[nzchar(given)]
+  if (length(given) == 0) return(invisible(TRUE))
+  fmls <- names(formals(fn))
+  dots_at <- match("...", fmls)
+  matchable <- if (is.na(dots_at)) fmls else fmls[seq_len(dots_at - 1L)]
+  partial <- given[!given %in% fmls &
+                     vapply(given, function(g) any(startsWith(matchable, g)), logical(1))]
+  if (length(partial) == 0) return(invisible(TRUE))
+  nm <- partial[1]
+  full <- matchable[startsWith(matchable, nm)][1]
+  fn_name <- .frame_fn_name(env)
+  where <- if (is.na(fn_name)) "" else paste0(" of {.fn ", .cli_escape(fn_name), "}")
+  cli_abort(c(
+    paste0("Unknown argument {.arg {nm}}", where, "."),
+    "i" = "Did you mean {.arg {full}}? Argument names must be written in full."
+  ), call = env)
 }
