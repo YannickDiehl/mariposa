@@ -23,3 +23,12 @@
   group), and the output says "not computed (x has only one observed
   category)". The `summary()` tables show full value labels (no longer
   cut at 20 characters) and fixed decimals.
+* `goodman_gamma()` and the gamma row of `chi_square()` are dramatically
+  faster and their p-value now matches SPSS. The concordant/discordant
+  counts came from a quadruple R loop over the table (`cramers_v(survey_data,
+  age, income)` took ~50 s, because `chi_square()` always computes gamma);
+  they now come from 2-D cumulative sums (0.03 s). The loop also counted
+  only the pairs below each cell, which mis-stated the null-hypothesis
+  standard error (ASE0): the approximate significance of gamma was wrong
+  (education x employment: p = .122 where SPSS prints .027). The gamma
+  value itself is unchanged.

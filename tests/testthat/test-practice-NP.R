@@ -147,3 +147,34 @@ test_that("NP-09 chi_square and effect sizes handle a constant variable", {
   expect_warning(g <- goodman_gamma(d, const, region), "const")
   expect_true(is.na(g))
 })
+
+# --- NP-23: gamma speed (+ SPSS ASE0 p-value) ---------------------------------
+
+test_that("NP-23 gamma p-value uses the SPSS ASE0 (both pair directions)", {
+  # Was: C_ij/D_ij counted only the cells below the current cell, which
+  # halves P and Q and mis-states ASE0: p = .122 where SPSS prints .027.
+  ref <- list(  # chi_squared_output.txt, Symmetric Measures (Tests 2a-2c)
+    list(v = c("gender", "region"), gamma = 0.037, p = 0.460),
+    list(v = c("education", "employment"), gamma = -0.062, p = 0.027),
+    list(v = c("gender", "education"), gamma = -0.011, p = 0.708)
+  )
+  for (r in ref) {
+    res <- chi_square(survey_data, dplyr::all_of(r$v),
+                      weights = sampling_weight)$results
+    lab <- paste(r$v, collapse = " x ")
+    assert_spss(res$gamma, r$gamma, tier = "display", precision = 3,
+                label = paste(lab, "gamma"))
+    assert_spss(res$gamma_p_value, r$p, tier = "display", precision = 3,
+                what = "p_value", label = paste(lab, "gamma p"))
+  }
+})
+
+test_that("NP-23 cramers_v on a large table is fast", {
+  # Was: ~50 s for age x income (quadruple R loop over `[.table`).
+  skip_on_cran()
+  elapsed <- system.time(
+    suppressWarnings(v <- cramers_v(survey_data, age, income))
+  )[["elapsed"]]
+  expect_lt(elapsed, 10)
+  expect_true(is.finite(v))
+})

@@ -268,52 +268,56 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 
 #' Goodman and Kruskal's gamma with its ASE0-based p-value (SPSS)
 #'
+#' SPSS CROSSTABS algorithm: for every cell (i, j)
+#'   C_ij = cases above-left + cases below-right (concordant with the cell)
+#'   D_ij = cases above-right + cases below-left (discordant with the cell)
+#'   P = sum n_ij C_ij, Q = sum n_ij D_ij  (each pair counted twice)
+#'   gamma = (P - Q) / (P + Q)
+#'   ASE0 = 2 / (P + Q) * sqrt(sum n_ij (C_ij - D_ij)^2 - (P - Q)^2 / N)
+#' and the approximate significance is 2 * pnorm(-|gamma / ASE0|). The four
+#' quadrant sums come from 2-D cumulative sums (O(r * c); the former
+#' element-wise loop over `[.table` took ~50 s on age x income).
+#'
 #' @param obs_table Contingency table (rows and columns in category order)
 #' @return list(gamma, p_value)
 #' @noRd
 .goodman_gamma_stats <- function(obs_table) {
-  r <- nrow(obs_table)
-  c <- ncol(obs_table)
-  n <- sum(obs_table)
-  # For each cell (i,j):
-  #   C_ij = sum of all cells below-right (concordant with this cell)
-  #   D_ij = sum of all cells below-left (discordant with this cell)
-  C_mat <- matrix(0, nrow = r, ncol = c)
-  D_mat <- matrix(0, nrow = r, ncol = c)
+  n <- matrix(as.numeric(obs_table), nrow = nrow(obs_table))
+  r <- nrow(n)
+  k <- ncol(n)
+  rr <- r:1
+  kk <- k:1
 
-  for (row1 in 1:r) {
-    for (col1 in 1:c) {
-      if (row1 < r && col1 < c) {
-        for (row2 in (row1 + 1):r) {
-          for (col2 in (col1 + 1):c) {
-            C_mat[row1, col1] <- C_mat[row1, col1] + obs_table[row2, col2]
-          }
-        }
-      }
-      if (row1 < r && col1 > 1) {
-        for (row2 in (row1 + 1):r) {
-          for (col2 in 1:(col1 - 1)) {
-            D_mat[row1, col1] <- D_mat[row1, col1] + obs_table[row2, col2]
-          }
-        }
-      }
+  # inclusive 2-D cumulative sum from the top-left corner
+  cum2 <- function(m) {
+    if (nrow(m) > 1) for (i in 2:nrow(m)) m[i, ] <- m[i, ] + m[i - 1, ]
+    if (ncol(m) > 1) for (j in 2:ncol(m)) m[, j] <- m[, j] + m[, j - 1]
+    m
+  }
+  # strictly above-left of each cell: the cumulative sum shifted by (1, 1)
+  above_left <- function(m) {
+    s <- cum2(m)
+    out <- matrix(0, nrow(m), ncol(m))
+    if (nrow(m) > 1 && ncol(m) > 1) {
+      out[-1, -1] <- s[-nrow(m), -ncol(m), drop = FALSE]
     }
+    out
   }
 
-  # P = total concordant pairs, Q = total discordant pairs
-  P <- as.numeric(sum(obs_table * C_mat))
-  Q <- as.numeric(sum(obs_table * D_mat))
+  C_mat <- above_left(n) +
+    above_left(n[rr, kk, drop = FALSE])[rr, kk, drop = FALSE]  # below-right
+  D_mat <- above_left(n[, kk, drop = FALSE])[, kk, drop = FALSE] +  # above-right
+    above_left(n[rr, , drop = FALSE])[rr, , drop = FALSE]           # below-left
 
+  P <- sum(n * C_mat)
+  Q <- sum(n * D_mat)
   if ((P + Q) == 0) return(list(gamma = 0, p_value = NA_real_))
 
   gamma <- (P - Q) / (P + Q)
-  # ASE0 under the null hypothesis (SPSS method):
-  #   ASE0 = (2 / (P + Q)) * sqrt(sum(n_ij * (C_ij - D_ij)^2) - (P - Q)^2 / n)
-  # Reference: Goodman & Kruskal (1963); Agresti (2002)
-  inner <- sum(as.numeric(obs_table) * (C_mat - D_mat)^2) - (P - Q)^2 / n
+  inner <- sum(n * (C_mat - D_mat)^2) - (P - Q)^2 / sum(n)
   p_value <- if (inner > 0) {
     ase0 <- (2 / (P + Q)) * sqrt(inner)
-    2 * (1 - stats::pnorm(abs(gamma / ase0)))
+    2 * stats::pnorm(-abs(gamma / ase0))
   } else {
     NA_real_
   }
