@@ -359,12 +359,15 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
 .print_gof_compact <- function(results, i, weighted_tag, digits) {
   cat(sprintf("Chi-Square Goodness-of-Fit Test: %s%s\n",
               results$Variable[i], weighted_tag))
-  cat(sprintf("  chi2(%s) = %s, %s %s, N = %s\n",
+  if (is.na(results$chi_squared[i])) {
+    cat("  not computed (see warning)\n")
+    return(invisible(NULL))
+  }
+  cat(sprintf("  chi2(%s) = %s, %s, N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
               fmt_num(results$chi_squared[i], digits),
-              fmt_p(results$p_value[i], digits, style = "compact"),
-              add_significance_stars(results$p_value[i]),
-              formatC(as.integer(results$n[i]), format = "d")))
+              format_p_stars(results$p_value[i], digits),
+              .np_count(results$n[i])))
 }
 
 #' Print chi-square goodness-of-fit test results (compact)
@@ -512,32 +515,23 @@ print.summary.chisq_gof <- function(x, ...) {
       }
 
       if (nrow(group_results) > 0 && show_results) {
+        cat("\n")
         .print_gof_table(group_results, digits)
       }
     }
   } else {
     # Print frequency tables if available (gated by frequency_table toggle)
     if (show_freq && !is.null(x$frequencies)) {
-      if (is.data.frame(x$frequencies)) {
-        # Single variable case
-        cat(sprintf("  %s - Frequency Table:\n", x$variables[1]))
-        output <- capture.output(print(x$frequencies, row.names = FALSE))
-        border <- paste(rep("-", max(nchar(output))), collapse = "")
-        cat("  ", border, "\n", sep = "")
-        for (line in output) cat("  ", line, "\n", sep = "")
-        cat("  ", border, "\n\n", sep = "")
+      freqs <- if (is.data.frame(x$frequencies)) {
+        stats::setNames(list(x$frequencies), x$variables[1])
       } else {
-        # Multi-variable case (named list)
-        for (vn in x$variables) {
-          freq <- x$frequencies[[vn]]
-          if (!is.null(freq)) {
-            cat(sprintf("  %s - Frequency Table:\n", vn))
-            output <- capture.output(print(freq, row.names = FALSE))
-            border <- paste(rep("-", max(nchar(output))), collapse = "")
-            cat("  ", border, "\n", sep = "")
-            for (line in output) cat("  ", line, "\n", sep = "")
-            cat("  ", border, "\n\n", sep = "")
-          }
+        x$frequencies
+      }
+      for (vn in x$variables) {
+        freq <- freqs[[vn]]
+        if (!is.null(freq)) {
+          cat(sprintf("  %s - Frequency Table:\n", vn))
+          .print_gof_frequencies(freq)
         }
       }
     }
@@ -555,25 +549,37 @@ print.summary.chisq_gof <- function(x, ...) {
 }
 
 #' @noRd
-.print_gof_table <- function(results_df, digits = 4) {
+.print_gof_table <- function(results_df, digits = 3) {
   display <- data.frame(
     Variable = results_df$Variable,
-    `Chi-Square` = round(results_df$chi_squared, 3),
-    df = as.integer(results_df$df),
-    `p-value` = ifelse(results_df$p_value < 0.001, "<.001",
-                       format(round(results_df$p_value, digits),
-                              nsmall = digits)),
-    N = results_df$n,
-    Sig = sapply(results_df$p_value, add_significance_stars),
-    check.names = FALSE,
+    chi = results_df$chi_squared,
+    df = results_df$df,
+    p = results_df$p_value,
+    N = .np_count(results_df$n),
+    stars = add_significance_stars(results_df$p_value),
     stringsAsFactors = FALSE
   )
+  print_stat_table(display, digits = digits, indent = 0,
+                   col_types = c(chi = "num", df = "int", N = "char"),
+                   col_labels = c(chi = "Chi-Square", p = "p-value",
+                                  stars = ""))
+  cat("\n")
+}
 
-  output <- capture.output(print(display, row.names = FALSE))
-  border <- paste(rep("-", max(nchar(output))), collapse = "")
-  cat(border, "\n")
-  for (line in output) cat(line, "\n")
-  cat(border, "\n\n")
+#' Observed/expected/residual table of one variable (SPSS: 1 decimal)
+#' @noRd
+.print_gof_frequencies <- function(freq) {
+  display <- data.frame(
+    category = freq$category,
+    observed = .np_count(freq$observed),
+    expected = fmt_num(freq$expected, 1),
+    residual = fmt_num(freq$residual, 1),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(display, indent = 2,
+                   col_types = c(observed = "char", expected = "char",
+                                 residual = "char"))
+  cat("\n")
 }
 
 #' Validate and normalise `expected` of chisq_gof() (SPSS /EXPECTED)

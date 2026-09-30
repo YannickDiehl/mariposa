@@ -307,56 +307,43 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     return(invisible(NULL))
   }
 
-  # Category table (gated by categories toggle)
+  # Category table (gated by categories toggle): integer N, proportions
+  # with a fixed number of decimals
   if (show_categories) {
     cat("  Categories:\n")
     cat_df <- data.frame(
-      ` ` = c(paste("Group 1:", row_data$cat1_name),
-              paste("Group 2:", row_data$cat2_name),
-              "Total"),
-      N = c(as.integer(row_data$n1), as.integer(row_data$n2),
-            as.integer(row_data$n_total)),
-      `Observed Prop.` = c(round(row_data$obs_prop1, 3),
-                            round(row_data$obs_prop2, 3),
-                            1.000),
-      check.names = FALSE,
+      category = c(paste("Group 1:", row_data$cat1_name),
+                   paste("Group 2:", row_data$cat2_name),
+                   "Total"),
+      N = .np_count(c(row_data$n1, row_data$n2, row_data$n_total)),
+      prop = c(row_data$obs_prop1, row_data$obs_prop2, 1),
       stringsAsFactors = FALSE
     )
-
-    output <- capture.output(print(cat_df, row.names = FALSE))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(cat_df, digits = digits, indent = 2,
+                     col_types = c(N = "char", prop = "num"),
+                     col_labels = c(category = "", prop = "Observed Prop."))
+    cat("\n")
   }
 
   # Test statistics (gated by results toggle)
   if (show_results) {
     test_df <- data.frame(
-      `Test Prop.` = row_data$test_prop,
-      `p value` = round(row_data$p_value, digits),
-      `CI lower` = round(row_data$ci_lower, digits),
-      `CI upper` = round(row_data$ci_upper, digits),
-      sig = row_data$sig,
-      check.names = FALSE,
+      test_prop = row_data$test_prop,
+      p = row_data$p_value,
+      ci_lower = row_data$ci_lower,
+      ci_upper = row_data$ci_upper,
+      stars = add_significance_stars(row_data$p_value),
       stringsAsFactors = FALSE
     )
-
     label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
     cat(sprintf("  %s\n", label))
-    output <- capture.output(print(test_df, row.names = FALSE))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(test_df, digits = digits, indent = 2,
+                     col_types = c(test_prop = "num", ci_lower = "num",
+                                   ci_upper = "num"),
+                     col_labels = c(test_prop = "Test Prop.", p = "p value",
+                                    ci_lower = "CI lower", ci_upper = "CI upper",
+                                    stars = ""))
+    cat("\n")
   }
 }
 
@@ -368,13 +355,12 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     cat(sprintf("  not computed (%s)\n", .np_reason(results, i)))
     return(invisible(NULL))
   }
-  cat(sprintf("  Group 1 (%s): prop = %s vs %s, %s %s, N = %s\n",
+  cat(sprintf("  Group 1 (%s): prop = %s vs %s, %s, N = %s\n",
               results$cat1_name[i],
               fmt_num(results$obs_prop1[i], digits),
               fmt_num(results$test_prop[i], digits),
-              fmt_p(results$p_value[i], digits, style = "compact"),
-              add_significance_stars(results$p_value[i]),
-              formatC(as.integer(results$n_total[i]), format = "d")))
+              format_p_stars(results$p_value[i], digits),
+              .np_count(results$n_total[i])))
 }
 
 #' Print binomial test results (compact)

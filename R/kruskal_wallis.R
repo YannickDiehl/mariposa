@@ -395,63 +395,40 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     return(invisible(NULL))
   }
 
-  # Print group rank table (gated by ranks toggle)
+  # Print group rank table (gated by ranks toggle): integer N, mean
+  # ranks with 2 decimals (SPSS), no mean rank for the Total row
   if (show_ranks && !is.null(stats)) {
     cat("  Ranks:\n")
+    n_vals <- vapply(stats, function(s) as.numeric(s$n), numeric(1))
     rank_df <- data.frame(
-      Group = sapply(stats, function(s) s$name),
-      N = sapply(stats, function(s) {
-        if (is.null(weights)) as.integer(s$n) else round(s$n, 1)
-      }),
-      `Mean Rank` = sapply(stats, function(s) round(s$rank_mean, 2)),
-      check.names = FALSE,
+      Group = c(vapply(stats, function(s) as.character(s$name), ""), "Total"),
+      N = .np_count(c(n_vals, sum(n_vals))),
+      mean_rank = c(vapply(stats, function(s) s$rank_mean, numeric(1)), NA),
       stringsAsFactors = FALSE
     )
-    # Add total row
-    total_n <- sum(rank_df$N)
-    rank_df <- rbind(rank_df, data.frame(
-      Group = "Total",
-      N = if (is.null(weights)) as.integer(total_n) else round(total_n, 1),
-      `Mean Rank` = NA,
-      check.names = FALSE,
-      stringsAsFactors = FALSE
-    ))
-
-    # Dynamic border
-    output <- capture.output(print(rank_df, row.names = FALSE, na.print = ""))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(rank_df, digits = 2, indent = 2,
+                     col_types = c(N = "char", mean_rank = "num"),
+                     col_labels = c(mean_rank = "Mean Rank"))
+    cat("\n")
   }
 
   # Print test statistics table (gated by results toggle)
   if (show_results) {
     test_df <- data.frame(
-      `Kruskal-Wallis H` = round(row_data$H, digits),
-      df = as.integer(row_data$df),
-      `p value` = round(row_data$p_value, digits),
-      `Epsilon-squared` = round(row_data$epsilon_squared, digits),
-      sig = row_data$sig,
-      check.names = FALSE,
+      H = row_data$H,
+      df = row_data$df,
+      p = row_data$p_value,
+      eps2 = row_data$epsilon_squared,
+      stars = add_significance_stars(row_data$p_value),
       stringsAsFactors = FALSE
     )
-
     label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
     cat(sprintf("  %s\n", label))
-    output <- capture.output(print(test_df, row.names = FALSE))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(test_df, digits = digits, indent = 2,
+                     col_types = c(H = "num", df = "int", eps2 = "num"),
+                     col_labels = c(H = "Kruskal-Wallis H", p = "p value",
+                                    eps2 = "Epsilon-squared", stars = ""))
+    cat("\n")
   }
 }
 
@@ -465,13 +442,13 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
     return(invisible(NULL))
   }
-  cat(sprintf("  H(%s) = %s, %s %s, eps2 = %s, N = %s\n",
+  cat(sprintf("  H(%s) = %s, %s, eps2 = %s (%s), N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
               fmt_num(results$H[i], digits),
-              fmt_p(results$p_value[i], digits, style = "compact"),
-              add_significance_stars(results$p_value[i]),
+              format_p_stars(results$p_value[i], digits),
               fmt_num(results$epsilon_squared[i], digits),
-              formatC(as.integer(results$n_total[i]), format = "d")))
+              .interpret_epsilon2(results$epsilon_squared[i]),
+              .np_count(results$n_total[i])))
 }
 
 #' Print Kruskal-Wallis test results (compact)
@@ -672,9 +649,10 @@ print.summary.kruskal_wallis <- function(x, ...) {
     print_significance_legend()
 
     cat("\nEffect Size Interpretation (Epsilon-squared):\n")
-    cat("- Small effect: 0.01 - 0.06\n")
-    cat("- Medium effect: 0.06 - 0.14\n")
-    cat("- Large effect: > 0.14\n")
+    cat("- Negligible: < 0.01\n")
+    cat("- Small: 0.01 - 0.06\n")
+    cat("- Medium: 0.06 - 0.14\n")
+    cat("- Large: >= 0.14\n")
   }
 
   invisible(x)

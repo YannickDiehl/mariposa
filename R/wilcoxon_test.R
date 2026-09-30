@@ -377,32 +377,23 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
     return(invisible(NULL))
   }
 
-  # Rank table (gated by ranks toggle)
+  # Rank table (gated by ranks toggle): SPSS layout, empty cells blank
   if (show_ranks) {
     cat("  Ranks:\n")
     rank_df <- data.frame(
-      ` ` = c("Negative Ranks", "Positive Ranks", "Ties", "Total"),
-      N = c(as.integer(row_data$n_neg), as.integer(row_data$n_pos),
-            as.integer(row_data$n_ties), as.integer(row_data$n_total)),
-      `Mean Rank` = c(round(row_data$mean_rank_neg, 2),
-                      round(row_data$mean_rank_pos, 2),
-                      NA, NA),
-      `Sum of Ranks` = c(round(row_data$sum_rank_neg, 2),
-                         round(row_data$sum_rank_pos, 2),
-                         NA, NA),
-      check.names = FALSE,
+      Ranks = c("Negative Ranks", "Positive Ranks", "Ties", "Total"),
+      N = .np_count(c(row_data$n_neg, row_data$n_pos, row_data$n_ties,
+                      row_data$n_total)),
+      mean_rank = c(row_data$mean_rank_neg, row_data$mean_rank_pos, NA, NA),
+      sum_rank = c(row_data$sum_rank_neg, row_data$sum_rank_pos, NA, NA),
       stringsAsFactors = FALSE
     )
-
-    output <- capture.output(print(rank_df, row.names = FALSE, na.print = ""))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(rank_df, digits = 2, indent = 2,
+                     col_types = c(N = "char", mean_rank = "num",
+                                   sum_rank = "num"),
+                     col_labels = c(Ranks = "", mean_rank = "Mean Rank",
+                                    sum_rank = "Sum of Ranks"))
+    cat("\n")
 
     # Direction note
     cat(sprintf("  a %s < %s\n", y_name, x_name))
@@ -413,25 +404,18 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
   # Test statistics table (gated by results toggle)
   if (show_results) {
     test_df <- data.frame(
-      Z = round(row_data$Z, digits),
-      `p value` = round(row_data$p_value, digits),
-      `Effect r` = round(row_data$r_effect, digits),
-      sig = row_data$sig,
-      check.names = FALSE,
+      Z = row_data$Z,
+      p = row_data$p_value,
+      r = row_data$r_effect,
+      stars = add_significance_stars(row_data$p_value),
       stringsAsFactors = FALSE
     )
-
     label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
     cat(sprintf("  %s\n", label))
-    output <- capture.output(print(test_df, row.names = FALSE))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(test_df, digits = digits, indent = 2,
+                     col_types = c(Z = "num", r = "num"),
+                     col_labels = c(p = "p value", r = "Effect r", stars = ""))
+    cat("\n")
   }
 }
 
@@ -449,23 +433,11 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
     return(invisible(NULL))
   }
 
-  if (!is.na(r_val)) {
-    r_interp <- if (abs(r_val) < 0.1) "negligible"
-                else if (abs(r_val) < 0.3) "small"
-                else if (abs(r_val) < 0.5) "medium"
-                else "large"
-    cat(sprintf("  Z = %s, %s %s, r = %s (%s), N = %s\n",
-                fmt_num(Z_val, digits),
-                fmt_p(p_val, digits, style = "compact"),
-                add_significance_stars(p_val),
-                fmt_num(r_val, digits), r_interp,
-                formatC(as.integer(results$n_total[i]), format = "d")))
-  } else {
-    cat(sprintf("  Z = %s, %s %s\n",
-                fmt_num(Z_val, digits),
-                fmt_p(p_val, digits, style = "compact"),
-                add_significance_stars(p_val)))
-  }
+  cat(sprintf("  Z = %s, %s, r = %s (%s), N = %s\n",
+              fmt_num(Z_val, digits),
+              format_p_stars(p_val, digits),
+              fmt_num(r_val, digits), .interpret_r_effect(r_val),
+              .np_count(results$n_total[i])))
 }
 
 #' Print Wilcoxon signed-rank test results (compact)
@@ -651,10 +623,7 @@ print.summary.wilcoxon_test <- function(x, ...) {
   if (show_results) {
     print_significance_legend()
 
-    cat("\nEffect Size Interpretation (r):\n")
-    cat("- Small effect: 0.1 - 0.3\n")
-    cat("- Medium effect: 0.3 - 0.5\n")
-    cat("- Large effect: > 0.5\n")
+    .print_r_effect_legend()
   }
 
   invisible(x)

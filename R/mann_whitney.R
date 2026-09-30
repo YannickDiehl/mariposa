@@ -57,10 +57,9 @@
 #'
 #' **Effect Size r** (How big is the difference?):
 #' - |r| < 0.1: Negligible difference
-#' - |r| ~ 0.1: Small difference
-#' - |r| ~ 0.3: Medium difference
-#' - |r| ~ 0.5: Large difference
-#' - |r| > 0.5: Very large difference
+#' - 0.1 to < 0.3: Small difference
+#' - 0.3 to < 0.5: Medium difference
+#' - 0.5 or higher: Large difference
 #'
 #' **Rank Mean Difference**:
 #' - Positive: Group 1 tends to have higher values
@@ -494,12 +493,17 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     return(invisible(NULL))
   }
 
-  # Print group rank means (gated by ranks toggle)
+  # Print group rank means (gated by ranks toggle); mean ranks with 2
+  # decimals and integer N, as SPSS prints them
   if (show_ranks && !is.null(stats) && !is.null(stats$group1)) {
-    cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n",
-                stats$group1$name, stats$group1$rank_mean, stats$group1$n))
-    cat(sprintf("  %s: rank mean = %.1f, n = %.1f\n",
-                stats$group2$name, stats$group2$rank_mean, stats$group2$n))
+    grp <- list(stats$group1, stats$group2)
+    names_w <- max(nchar(vapply(grp, function(s) as.character(s$name), ""),
+                         type = "width"))
+    for (gs in grp) {
+      cat(sprintf("  %s  rank mean = %s, n = %s\n",
+                  pad_utf8(paste0(gs$name, ":"), names_w + 1),
+                  fmt_num(gs$rank_mean, 2), .np_count(gs$n)))
+    }
     cat("\n")
   }
 
@@ -507,29 +511,22 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   if (show_results) {
     results_df <- data.frame(
       Test = "Mann-Whitney U",
-      U = ifelse(is.na(row_data$U), "NA",
-                 format(round(row_data$U, 0), big.mark = ",")),
-      W = ifelse(is.na(row_data$W), "NA",
-                 format(round(row_data$W, 0), big.mark = ",")),
-      Z = round(row_data$Z, digits),
-      p_value = round(row_data$p_value, digits),
-      effect_r = round(row_data$r_effect, digits),
-      sig = row_data$sig,
+      U = row_data$U,
+      W = row_data$W,
+      Z = row_data$Z,
+      p = row_data$p_value,
+      r = row_data$r_effect,
+      stars = add_significance_stars(row_data$p_value),
       stringsAsFactors = FALSE
     )
 
-    # Dynamic border width from actual table content
-    col_widths <- sapply(names(results_df), function(col) {
-      max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
-    })
-    total_width <- sum(col_widths) + length(col_widths) - 1
-    border <- paste(rep("-", total_width), collapse = "")
-
     label <- if (!is.null(weights)) "Weighted Mann-Whitney U Test Results" else "Mann-Whitney U Test Results"
-    cat(sprintf("\n%s:\n", label))
-    cat(border, "\n")
-    print(results_df, row.names = FALSE)
-    cat(border, "\n\n")
+    cat(sprintf("%s:\n", label))
+    print_stat_table(results_df, digits = digits, indent = 0,
+                     col_types = c(Z = "num", r = "num"),
+                     col_labels = c(Test = "", p = "p value", r = "Effect r",
+                                    stars = ""))
+    cat("\n")
   }
 
   # Effect size detail (gated by effect_sizes toggle, only in summary output)
@@ -537,11 +534,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     # Stand-alone effect size when results table is hidden
     r_val <- row_data$r_effect
     if (!is.na(r_val)) {
-      r_interp <- if (abs(r_val) < 0.1) "negligible"
-                  else if (abs(r_val) < 0.3) "small"
-                  else if (abs(r_val) < 0.5) "medium"
-                  else "large"
-      cat(sprintf("  Effect size: r = %.*f (%s)\n", digits, r_val, r_interp))
+      cat(sprintf("  Effect size: r = %s (%s)\n", fmt_num(r_val, digits),
+                  .interpret_r_effect(r_val)))
     }
   }
 }
@@ -560,30 +554,21 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
   if (is.na(U_val)) {
     cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
-  } else if (!is.na(r_val)) {
-    r_interp <- if (abs(r_val) < 0.1) "negligible"
-                else if (abs(r_val) < 0.3) "small"
-                else if (abs(r_val) < 0.5) "medium"
-                else "large"
-
-    stats <- results$group_stats[[i]]
-    n_total <- if (!is.null(stats) && !is.null(stats$group1)) {
-      round(stats$group1$n + stats$group2$n)
-    } else NA_real_
-
-    cat(sprintf("  U = %s, Z = %.*f, %s %s, r = %.*f (%s), N = %d\n",
-                format(round(U_val, 0), big.mark = ","),
-                digits, Z_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val),
-                digits, r_val, r_interp, n_total))
-  } else {
-    cat(sprintf("  U = %s, Z = %.*f, %s %s\n",
-                format(round(U_val, 0), big.mark = ","),
-                digits, Z_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val)))
+    return(invisible(NULL))
   }
+
+  stats <- results$group_stats[[i]]
+  n_part <- if (!is.null(stats) && !is.null(stats$group1)) {
+    sprintf(", N = %s", .np_count(stats$group1$n + stats$group2$n))
+  } else ""
+  r_part <- if (!is.na(r_val)) {
+    sprintf(", r = %s (%s)", fmt_num(r_val, digits), .interpret_r_effect(r_val))
+  } else ""
+
+  cat(sprintf("  U = %s, Z = %s, %s%s%s\n",
+              format(round(U_val, 1), big.mark = ","),
+              fmt_num(Z_val, digits),
+              format_p_stars(p_val, digits), r_part, n_part))
 }
 
 #' Print Mann-Whitney test results (compact)
@@ -641,6 +626,7 @@ print.mann_whitney <- function(x, digits = 3, ...) {
     }
   }
 
+  cat("Use summary() for detailed output.\n")
   invisible(x)
 }
 
@@ -805,11 +791,7 @@ print.summary.mann_whitney <- function(x, ...) {
 
   # Effect size interpretation footer (gated by effect_sizes toggle)
   if (show_effect_sizes) {
-    cat("\nEffect Size Interpretation (r):\n")
-    cat("- Negligible effect: |r| < 0.1\n")
-    cat("- Small effect: |r| ~ 0.1\n")
-    cat("- Medium effect: |r| ~ 0.3\n")
-    cat("- Large effect: |r| ~ 0.5\n")
+    .print_r_effect_legend()
   }
 
   invisible(x)

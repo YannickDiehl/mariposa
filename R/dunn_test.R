@@ -176,7 +176,7 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
     group_levels <- levels(droplevels(g))
 
     if (length(group_levels) < 2) {
-      return(NULL)
+      cli_abort("{length(group_levels)} group{?s} with valid values; pairwise comparisons need at least 2")
     }
 
     g <- as.character(g)
@@ -305,7 +305,11 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
             all_results <- append(all_results, list(result_with_groups))
           }
         }, error = function(e) {
-          cli_warn("Dunn test failed for variable {.var {var_name}} in group {paste(unlist(group_info), collapse = ', ')}: {e$message}")
+          where <- .np_where(group_info)
+          cli_warn(c(
+            "Dunn test skipped for {.var {var_name}}{where}.",
+            "x" = "{(.np_error_reason(e))}."
+          ))
         })
       }
     }
@@ -322,7 +326,10 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
           all_results <- append(all_results, list(dunn_result))
         }
       }, error = function(e) {
-        cli_warn("Dunn test failed for variable {.var {var_name}}: {e$message}")
+        cli_warn(c(
+          "Dunn test skipped for {.var {var_name}}.",
+          "x" = "{(.np_error_reason(e))}."
+        ))
       })
     }
   }
@@ -599,28 +606,19 @@ print.summary.dunn_test <- function(x, ...) {
 #' @noRd
 .print_dunn_table <- function(var_results, digits = 3) {
   display_table <- data.frame(
-    `Group 1` = var_results$group1,
-    `Group 2` = var_results$group2,
-    Z = round(var_results$z, digits),
-    `p (unadj)` = ifelse(var_results$p < 0.001,
-                          "<.001",
-                          format(round(var_results$p, digits), nsmall = digits)),
-    `p (adj)` = ifelse(var_results$p_adj < 0.001,
-                        "<.001",
-                        format(round(var_results$p_adj, digits), nsmall = digits)),
-    Sig = var_results$sig,
-    check.names = FALSE,
+    group1 = var_results$group1,
+    group2 = var_results$group2,
+    z = var_results$z,
+    p = var_results$p,
+    p_adj = var_results$p_adj,
+    stars = var_results$sig,
     stringsAsFactors = FALSE
   )
-
-  # Calculate border width based on table content
-  output <- capture.output(print(display_table, row.names = FALSE))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
-
-  cat(border, "\n")
-  for (line in output) {
-    cat(line, "\n")
-  }
-  cat(border, "\n\n")
+  # cat()-based table: never wrapped at the console width
+  print_stat_table(display_table, digits = digits, indent = 0,
+                   col_types = c(group2 = "char", z = "num"),
+                   col_labels = c(group1 = "Group 1", group2 = "Group 2",
+                                  z = "Z", p = "p (unadj)", p_adj = "p (adj)",
+                                  stars = ""))
+  cat("\n")
 }

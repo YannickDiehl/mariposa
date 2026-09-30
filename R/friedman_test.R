@@ -312,54 +312,42 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
     return(invisible(NULL))
   }
 
-  # Print rank table (gated by ranks toggle)
+  # Print rank table (gated by ranks toggle): mean ranks with 2 decimals
   if (show_ranks) {
     cat("  Ranks:\n")
     mean_ranks <- row_data$mean_ranks[[1]]
-
     rank_df <- data.frame(
       Variable = var_names,
-      `Mean Rank` = sapply(var_names, function(v) round(mean_ranks[[v]], 2)),
-      check.names = FALSE,
+      mean_rank = vapply(var_names, function(v) as.numeric(mean_ranks[[v]]),
+                         numeric(1)),
       stringsAsFactors = FALSE,
       row.names = NULL
     )
-
-    output <- capture.output(print(rank_df, row.names = FALSE))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(rank_df, digits = 2, indent = 2,
+                     col_types = c(mean_rank = "num"),
+                     col_labels = c(mean_rank = "Mean Rank"))
+    cat("\n")
   }
 
   # Print test statistics table (gated by results toggle)
   if (show_results) {
     test_df <- data.frame(
-      N = as.integer(row_data$n),
-      `Chi-Square` = round(row_data$chi_squared, digits),
-      df = as.integer(row_data$df),
-      `p value` = round(row_data$p_value, digits),
-      `Kendall's W` = round(row_data$kendall_w, digits),
-      sig = row_data$sig,
-      check.names = FALSE,
+      N = .np_count(row_data$n),
+      chi = row_data$chi_squared,
+      df = row_data$df,
+      p = row_data$p_value,
+      W = row_data$kendall_w,
+      stars = add_significance_stars(row_data$p_value),
       stringsAsFactors = FALSE
     )
-
     label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
     cat(sprintf("  %s\n", label))
-    output <- capture.output(print(test_df, row.names = FALSE))
-    border_width <- max(nchar(output), na.rm = TRUE)
-    border <- paste(rep("-", border_width), collapse = "")
-
-    cat("  ", border, "\n", sep = "")
-    for (line in output) {
-      cat("  ", line, "\n", sep = "")
-    }
-    cat("  ", border, "\n\n", sep = "")
+    print_stat_table(test_df, digits = digits, indent = 2,
+                     col_types = c(N = "char", chi = "num", df = "int",
+                                   W = "num"),
+                     col_labels = c(chi = "Chi-Square", p = "p value",
+                                    W = "Kendall's W", stars = ""))
+    cat("\n")
   }
 }
 
@@ -372,13 +360,13 @@ friedman_test <- function(data, ..., weights = NULL, conf.level = 0.95) {
     cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
     return(invisible(NULL))
   }
-  cat(sprintf("  chi2(%s) = %s, %s %s, W = %s, N = %s\n",
+  cat(sprintf("  chi2(%s) = %s, %s, Kendall's W = %s (%s), N = %s\n",
               formatC(as.integer(results$df[i]), format = "d"),
               fmt_num(results$chi_squared[i], digits),
-              fmt_p(results$p_value[i], digits, style = "compact"),
-              add_significance_stars(results$p_value[i]),
+              format_p_stars(results$p_value[i], digits),
               fmt_num(results$kendall_w[i], digits),
-              formatC(as.integer(results$n[i]), format = "d")))
+              .interpret_kendall_w(results$kendall_w[i]),
+              .np_count(results$n[i])))
 }
 
 #' Print Friedman test results (compact)
@@ -568,9 +556,10 @@ print.summary.friedman_test <- function(x, ...) {
     print_significance_legend()
 
     cat("\nEffect Size Interpretation (Kendall's W):\n")
+    cat("- Negligible: < 0.1\n")
     cat("- Weak agreement: 0.1 - 0.3\n")
     cat("- Moderate agreement: 0.3 - 0.5\n")
-    cat("- Strong agreement: > 0.5\n")
+    cat("- Strong agreement: >= 0.5\n")
   }
 
   invisible(x)

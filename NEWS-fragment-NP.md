@@ -140,3 +140,17 @@
 * `mann_whitney()` without `group` stops with "`group` is required" (as
   `kruskal_wallis()` does) instead of the internal "Can't extract column
   with `g_name`".
+* Output of the rank and exact tests is formatted consistently.
+  `summary()` tables print p-values in SPSS style ("<.001", ".026")
+  instead of a bare "p value 0" (Kruskal-Wallis, Wilcoxon, Friedman,
+  binomial, Mann-Whitney), leave empty cells blank instead of "NA"
+  ("Total 2500 NA", "Ties 502 NA NA"), show counts as integers (Mann-
+  Whitney "n = 1149.0") and give every column a fixed number of decimals
+  (0.52 next to 0.537, Mean Rank 19 next to 40.19, expected 538.24 next
+  to 26.239). Compact lines label Kruskal-Wallis epsilon-squared and
+  Kendall's W with an interpretation, `mann_whitney()` ends with the
+  "Use summary()" hint, and Mann-Whitney and Wilcoxon share one set of
+  r thresholds. The `dunn_test()` comparison table no longer wraps at 80
+  characters with long group labels, and a group or variable that
+  `dunn_test()` cannot compare is reported with a warning naming the
+  group.

@@ -129,6 +129,53 @@
   invisible(TRUE)
 }
 
+#' Verbal labels for the effect sizes of the rank tests
+#'
+#' One set of thresholds per measure, shared by the compact print and the
+#' summary legends (mann_whitney and wilcoxon_test used different ones).
+#'
+#' @param x Effect size
+#' @return Lower-case label ("-" for NA)
+#' @noRd
+.interpret_r_effect <- function(x) {
+  if (is.na(x)) return("-")
+  x <- abs(x)
+  if (x < 0.1) "negligible" else if (x < 0.3) "small" else
+    if (x < 0.5) "medium" else "large"
+}
+
+#' Verbal label for epsilon-squared (Kruskal-Wallis)
+#' @noRd
+.interpret_epsilon2 <- function(x) {
+  if (is.na(x)) return("-")
+  if (x < 0.01) "negligible" else if (x < 0.06) "small" else
+    if (x < 0.14) "medium" else "large"
+}
+
+#' Verbal label for Kendall's W (Friedman)
+#' @noRd
+.interpret_kendall_w <- function(x) {
+  if (is.na(x)) return("-")
+  if (x < 0.1) "negligible" else if (x < 0.3) "weak" else
+    if (x < 0.5) "moderate" else "strong"
+}
+
+#' Legend of the r effect-size labels (mann_whitney, wilcoxon_test)
+#' @noRd
+.print_r_effect_legend <- function() {
+  cat("\nEffect Size Interpretation (r):\n")
+  cat("- Negligible: |r| < 0.1\n")
+  cat("- Small: 0.1 <= |r| < 0.3\n")
+  cat("- Medium: 0.3 <= |r| < 0.5\n")
+  cat("- Large: |r| >= 0.5\n")
+}
+
+#' Format a (possibly weighted) count for display: integer, no decimals
+#' @noRd
+.np_count <- function(n) {
+  ifelse(is.na(n), "", formatC(round(as.numeric(n)), format = "d", big.mark = ""))
+}
+
 #' First line of an error message, unwrapped and without styling
 #'
 #' conditionMessage() of a cli error is wrapped at the console width and

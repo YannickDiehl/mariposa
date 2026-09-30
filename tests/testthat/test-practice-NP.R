@@ -642,6 +642,80 @@ test_that("NP-24 mann_whitney without `group` gives a clear error", {
   expect_error(mann_whitney(survey_data, age), "group.*required")
 })
 
+# --- NP-16 / NP-17 / NP-19 / NP-20: output formatting -------------------------
+
+test_that("NP-16/NP-17 summaries: SPSS p-values, no NA cells, fixed decimals", {
+  # Was: "p value 0" in the KW/Wilcoxon/Friedman/binomial/MW summaries,
+  # "Total 2500 NA", "Ties 0 NA NA", MW "n = 1149.0", and columns mixing
+  # decimals (0.52 vs 0.537, Mean Rank 19 vs 40.19).
+  outs <- list(
+    kw = capture.output(print(summary(
+      kruskal_wallis(survey_data, income, group = education)))),
+    wt = capture.output(print(summary(
+      wilcoxon_test(survey_data, x = trust_government, y = trust_science)))),
+    fr = capture.output(print(summary(
+      friedman_test(survey_data, trust_government, trust_media, trust_science)))),
+    mw = capture.output(print(summary(
+      mann_whitney(dplyr::mutate(survey_data, retired = employment == "Retired"),
+                   age, group = retired)))),
+    bt = capture.output(print(summary(binomial_test(survey_data, gender, p = 0.4))))
+  )
+  for (nm in names(outs)) {
+    out <- outs[[nm]]
+    expect_true(any(grepl("<.001", out, fixed = TRUE)), label = nm)
+    expect_false(any(grepl("\\bNA\\b", out)), label = nm)
+  }
+  mw <- capture.output(print(summary(
+    mann_whitney(survey_data, life_satisfaction, group = gender))))
+  expect_true(any(grepl("n = 1149$", mw)))
+  expect_false(any(grepl("1149.0", mw, fixed = TRUE)))
+
+  bt <- outs$bt
+  prop_rows <- grep("Group [12]:|Total", bt, value = TRUE)
+  expect_true(all(grepl("[0-9]\\.[0-9]{3}\\s*$", prop_rows)))
+})
+
+test_that("NP-20 compact lines: labelled effect sizes, summary hint", {
+  # Was: KW "eps2 = 0.044" and Friedman "W = 0.236" without interpretation,
+  # no "Use summary()" hint for mann_whitney.
+  kw <- capture.output(print(kruskal_wallis(survey_data, income, group = education)))
+  expect_true(any(grepl("eps2 = [0-9.]+ \\((negligible|small|medium|large)\\)", kw)))
+  fr <- capture.output(print(friedman_test(survey_data, trust_government,
+                                           trust_media, trust_science)))
+  expect_true(any(grepl("Kendall's W = [0-9.]+ \\((negligible|weak|moderate|strong)\\)", fr)))
+  mw <- capture.output(print(mann_whitney(survey_data, life_satisfaction,
+                                          group = gender)))
+  expect_true(any(grepl("Use summary()", mw, fixed = TRUE)))
+  expect_false(any(grepl(" ,", c(kw, fr, mw), fixed = TRUE)))
+})
+
+test_that("NP-20 Mann-Whitney and Wilcoxon share one r interpretation", {
+  # Was: different thresholds/wording in the two summaries.
+  mw <- capture.output(print(summary(mann_whitney(survey_data, life_satisfaction,
+                                                  group = gender))))
+  wt <- capture.output(print(summary(wilcoxon_test(survey_data, x = trust_government,
+                                                   y = trust_media))))
+  block <- function(out) {
+    i <- grep("Effect Size Interpretation (r)", out, fixed = TRUE)
+    out[i:(i + 4)]
+  }
+  expect_equal(block(mw), block(wt))
+})
+
+test_that("NP-19 dunn_test summary does not wrap long labels", {
+  # Was: print(data.frame) wrapped the comparison table at 80 characters.
+  set.seed(9)
+  labs <- paste("A rather long education category name", 1:5)
+  d <- data.frame(y = rnorm(200), g = factor(sample(labs, 200, TRUE), levels = labs))
+  dn <- dunn_test(kruskal_wallis(d, y, group = g))
+  out <- capture.output(print(summary(dn)))
+  for (i in seq_len(nrow(dn$comparisons))) {
+    hit <- grepl(dn$comparisons$group1[i], out, fixed = TRUE) &
+      grepl(dn$comparisons$group2[i], out, fixed = TRUE)
+    expect_true(any(hit))
+  }
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()
