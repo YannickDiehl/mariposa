@@ -350,7 +350,8 @@ crosstab.grouped_df <- function(data, row, col,
 #' test of independence.
 #'
 #' @param x A crosstab result object
-#' @param digits Number of decimal places for percentages (default: 1)
+#' @param digits Number of decimal places for percentages (default: the
+#'   \code{digits} given to \code{\link{crosstab}}, i.e. 1 unless set)
 #' @param ... Additional arguments (currently unused)
 #' @return Invisibly returns the input object \code{x}.
 #'
@@ -361,7 +362,7 @@ crosstab.grouped_df <- function(data, row, col,
 #'
 #' @export
 #' @method print crosstab
-print.crosstab <- function(x, digits = 1, ...) {
+print.crosstab <- function(x, digits = x$digits %||% 1, ...) {
   print(summary(x, digits = digits))
   invisible(x)
 }
@@ -384,7 +385,8 @@ print.crosstab <- function(x, digits = 1, ...) {
 #'   significant \code{\link{chi_square}} test, cells with an absolute
 #'   adjusted residual above roughly 2 are the ones deviating from
 #'   independence. (Default: FALSE, matching SPSS's opt-in cell display)
-#' @param digits Number of decimal places for percentages (Default: 1).
+#' @param digits Number of decimal places for percentages (Default: the
+#'   \code{digits} given to \code{\link{crosstab}}, i.e. 1 unless set).
 #' @param ... Additional arguments (not used).
 #' @return A \code{summary.crosstab} object.
 #'
@@ -399,7 +401,7 @@ print.crosstab <- function(x, digits = 1, ...) {
 #' @method summary crosstab
 summary.crosstab <- function(object, crosstab_table = TRUE,
                              percentages = TRUE, residuals = FALSE,
-                             digits = 1, ...) {
+                             digits = object$digits %||% 1, ...) {
   build_summary_object(
     object     = object,
     show       = list(crosstab_table = crosstab_table,

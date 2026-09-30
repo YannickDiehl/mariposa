@@ -109,3 +109,5 @@
   shares). With `percentages = "col"` it showed the column shares
   labelled "col %", with `"row"`/`"total"` it had no percentage line and
   with `"all"` only that mislabelled line.
+* `crosstab(digits = 2)` is honoured by `print()` and `summary()`; their
+  own default of 1 decimal overrode the value stored by `crosstab()`.

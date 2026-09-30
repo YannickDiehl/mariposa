@@ -557,3 +557,19 @@ test_that("DESC-04: crosstab Total row shows the requested percentages like SPSS
   expect_equal(lengths(regmatches(all[2], gregexpr("100\\.0%", all[2]))), 3L)
   expect_length(pr("none"), 0L)
 })
+
+
+# --- DESC-06: crosstab digits ---------------------------------------------------
+
+test_that("DESC-06: crosstab(digits = 2) is honoured by print() and summary()", {
+  # print.crosstab() had its own default digits = 1 that overrode the
+  # digits stored by crosstab().
+  r <- crosstab(survey_data, gender, region, digits = 2)
+  expect_true(any(grepl("19.93%", capture.output(print(r)), fixed = TRUE)))
+  expect_true(any(grepl("19.93%", capture.output(print(summary(r))), fixed = TRUE)))
+  out1 <- capture.output(print(r, digits = 1))
+  expect_true(any(grepl("19.9%", out1, fixed = TRUE)))
+  expect_false(any(grepl("19.93%", out1, fixed = TRUE)))
+  rg <- survey_data |> group_by(region) |> crosstab(gender, education, digits = 2)
+  expect_true(any(grepl("\\d+\\.\\d{2}%", capture.output(print(rg)))))
+})
