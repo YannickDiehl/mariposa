@@ -119,3 +119,12 @@
   factors, `ancova()` also reports the main-effect marginal means (SPSS
   `/EMMEANS=TABLES(factor)`, new element `emm_main_effects`) besides the
   cell means. (PAR-16, EDGE-25)
+* `factorial_anova()` and `ancova()` with an empty design cell (e.g. no
+  women with a university degree after filtering): `ancova()` no longer
+  crashes with "Tibble columns must have compatible sizes", and effects
+  whose Type III hypothesis has no degrees of freedom are reported as
+  "not computed (not testable: the design has empty cells)" with a
+  warning that lists the empty cells, instead of "F(0, 2208) = NaN, p =
+  NA" (factorial) or F = -Inf (ANCOVA). The Corrected Model df is the
+  rank of the design minus 1, as in SPSS (unchanged for complete designs).
+  (PAR-08, PAR-09)

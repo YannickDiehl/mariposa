@@ -233,6 +233,7 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
       "x" = "{reason}"
     ))
   }
+  .warn_empty_cells("ancova", data_complete, between_names)
 
   # ============================================================================
   # MODEL FITTING WITH TYPE III SS
@@ -397,10 +398,12 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   }
 
   ms_error <- ss_error / df_error
-  term_ms <- term_ss / term_df
-  term_f <- term_ms / ms_error
-  term_p <- stats::pf(term_f, term_df, df_error, lower.tail = FALSE)
-  term_eta <- term_ss / (term_ss + ss_error)
+  tested <- .type3_testable_terms(term_ss, term_df, ms_error, ss_error, df_error)
+  term_ss <- tested$ss
+  term_ms <- tested$ms
+  term_f <- tested$f
+  term_p <- tested$p
+  term_eta <- tested$eta
 
   # Corrected Total and Corrected Model
   if (!is.null(w_name)) {
@@ -417,7 +420,9 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   }
 
   ss_corrected_model <- ss_corrected_total - ss_error
-  df_corrected_model <- sum(term_df)
+  # Model degrees of freedom = rank - 1 (equals the sum of the Type III df
+  # in a full-rank design; with empty cells some terms have df 0)
+  df_corrected_model <- model$rank - 1L
   ms_corrected_model <- ss_corrected_model / df_corrected_model
   f_corrected_model <- ms_corrected_model / ms_error
   p_corrected_model <- stats::pf(f_corrected_model, df_corrected_model,
@@ -465,7 +470,9 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
     ms = ms_vals,
     f = f_vals,
     p = p_vals,
-    partial_eta_sq = eta_vals
+    partial_eta_sq = eta_vals,
+    note = c(NA_character_, NA_character_, tested$note,
+             NA_character_, NA_character_, NA_character_)
   )
 }
 
@@ -819,6 +826,10 @@ print.summary.ancova <- function(x, ...) {
     cat("\nEstimated Marginal Means\n")
     cat("(Evaluated at covariate means)\n")
     emm_table <- function(emm, factors) {
+      if (all(is.na(emm$mean))) {
+        cat("  not estimable (the design has empty cells)\n")
+        return(invisible(NULL))
+      }
       tbl <- as.data.frame(lapply(emm[factors], as.character),
                            stringsAsFactors = FALSE, check.names = FALSE)
       tbl$Mean <- fmt_num(emm$mean, digits)

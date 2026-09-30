@@ -234,6 +234,7 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
       "x" = "{reason}"
     ))
   }
+  .warn_empty_cells("factorial_anova", data_complete, between_names)
 
   # ============================================================================
   # MODEL FITTING WITH TYPE III SS
@@ -415,18 +416,13 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     }
   }
 
-  # Mean squares
   ms_error <- ss_error / df_error
-  term_ms <- term_ss / term_df
-
-  # F statistics
-  term_f <- term_ms / ms_error
-
-  # P values
-  term_p <- stats::pf(term_f, term_df, df_error, lower.tail = FALSE)
-
-  # Partial eta squared: SS_effect / (SS_effect + SS_error)
-  term_eta <- term_ss / (term_ss + ss_error)
+  tested <- .type3_testable_terms(term_ss, term_df, ms_error, ss_error, df_error)
+  term_ss <- tested$ss
+  term_ms <- tested$ms
+  term_f <- tested$f
+  term_p <- tested$p
+  term_eta <- tested$eta
 
   # Corrected Total and Corrected Model
   # Corrected Total = total SS corrected for the mean (data property, model-independent)
@@ -446,7 +442,9 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
   }
 
   ss_corrected_model <- ss_corrected_total - ss_error
-  df_corrected_model <- sum(term_df)
+  # Model degrees of freedom = rank - 1 (equals the sum of the Type III df
+  # in a full-rank design; with empty cells some terms have df 0)
+  df_corrected_model <- model$rank - 1L
   ms_corrected_model <- ss_corrected_model / df_corrected_model
   f_corrected_model <- ms_corrected_model / ms_error
   p_corrected_model <- stats::pf(f_corrected_model, df_corrected_model,
@@ -498,7 +496,9 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     ms = ms_vals,
     f = f_vals,
     p = p_vals,
-    partial_eta_sq = eta_vals
+    partial_eta_sq = eta_vals,
+    note = c(NA_character_, NA_character_, tested$note,
+             NA_character_, NA_character_, NA_character_)
   )
 }
 
@@ -714,6 +714,11 @@ print.factorial_anova <- function(x, digits = 3, ...) {
   cat(sprintf("R Squared = %s (Adjusted R Squared = %s)\n",
               fmt_num(x$r_squared[["r_squared"]], digits),
               fmt_num(x$r_squared[["adj_r_squared"]], digits)))
+  if ("note" %in% names(at) && any(!is.na(at$note))) {
+    untested <- at$source[!is.na(at$note)]
+    cat(sprintf("Not computed: %s (%s)\n", paste(untested, collapse = ", "),
+                at$note[!is.na(at$note)][1]))
+  }
   invisible(NULL)
 }
 

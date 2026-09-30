@@ -169,3 +169,60 @@
   out[tiny] <- formatC(x[tiny], format = "e", digits = max(digits - 1, 1))
   out
 }
+
+#' Type III terms that can be tested
+#'
+#' A term whose Type III hypothesis has no degrees of freedom (the design
+#' has empty cells, so the term is aliased) cannot be tested: SPSS prints
+#' it with df 0 and no F. mariposa printed "F(0, 2208) = NaN" (factorial)
+#' or F = -Inf from a -0.000 sum of squares (ANCOVA).
+#'
+#' @return list(ss, ms, f, p, eta, note) for the terms
+#' @noRd
+.type3_testable_terms <- function(term_ss, term_df, ms_error, ss_error,
+                                  df_error) {
+  testable <- !is.na(term_df) & term_df > 0
+  ss <- ifelse(testable, term_ss, 0)
+  ms <- ifelse(testable, ss / pmax(term_df, 1), NA_real_)
+  f <- ms / ms_error
+  p <- rep(NA_real_, length(f))
+  p[testable] <- stats::pf(f[testable], term_df[testable], df_error,
+                           lower.tail = FALSE)
+  eta <- ifelse(testable, ss / (ss + ss_error), NA_real_)
+  note <- ifelse(testable, NA_character_,
+                 "not testable: the design has empty cells")
+  list(ss = ss, ms = ms, f = f, p = p, eta = eta, note = note)
+}
+
+#' Warn about empty cells of a factorial design
+#'
+#' @param fn Function name for the message
+#' @param data Complete-case data with the factors (factors, unused levels
+#'   dropped)
+#' @param between_names Factor names
+#' @param group_info Optional group keys (grouped analyses)
+#' @noRd
+.warn_empty_cells <- function(fn, data, between_names, group_info = NULL) {
+  if (length(between_names) < 2) return(invisible(character(0)))
+  tab <- table(data[between_names])
+  idx <- which(tab == 0, arr.ind = TRUE)
+  if (length(idx) == 0) return(invisible(character(0)))
+  idx <- matrix(idx, ncol = length(between_names))
+  dn <- dimnames(tab)
+  cells <- apply(idx, 1, function(r) {
+    paste(vapply(seq_along(r), function(k) {
+      paste(between_names[k], "=", dn[[k]][r[k]])
+    }, character(1)), collapse = " x ")
+  })
+  shown <- if (length(cells) > 3) {
+    c(cells[1:3], sprintf("and %d more", length(cells) - 3))
+  } else cells
+  where <- .where_group(group_info)
+  n_cells <- length(cells)
+  cell_list <- paste(shown, collapse = "; ")
+  cli_warn(c(
+    "{.fn {fn}}: the design has {n_cells} empty cell{?s}{where}: {cell_list}.",
+    "i" = "Effects that cannot be tested with Type III sums of squares are reported as not computed."
+  ), call = NULL)
+  invisible(cells)
+}

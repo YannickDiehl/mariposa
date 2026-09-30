@@ -595,6 +595,40 @@ test_that("PAR-16: multi-factor ANCOVA reports main-effect marginal means", {
   expect_true(any(grepl("^ +Male +[0-9]", out)))
 })
 
+test_that("PAR-08/PAR-09: empty design cells: warning, untestable effects marked", {
+  # ancova() crashed ("Tibble columns must have compatible sizes (4 vs 5,
+  # ci_lower)"), factorial_anova() printed "F(0, 2208) = NaN, p = NA" without
+  # a word about the empty cell; the ancova rows showed F = -Inf.
+  d <- dplyr::filter(survey_data, !(gender == "Female" & region == "East"))
+  expect_warning(
+    an <- ancova(d, dv = life_satisfaction, between = c(gender, region),
+                 covariate = age),
+    "empty.*Female"
+  )
+  at <- an$anova_table
+  bad <- at$df == 0
+  expect_true(any(bad))
+  expect_true(all(is.na(at$f[bad])))
+  expect_false(any(is.infinite(at$f)))
+  out <- c(capture.output(print(an)), capture.output(print(summary(an))))
+  expect_false(any(grepl("Inf|NaN|F\\(0,", out)))
+  expect_true(any(grepl("not computed (not testable", out, fixed = TRUE)))
+
+  d2 <- dplyr::filter(survey_data, !(gender == "Female" & education == "University"))
+  expect_warning(
+    fa <- factorial_anova(d2, dv = life_satisfaction, between = c(gender, education)),
+    "empty.*University"
+  )
+  g_row <- fa$anova_table[fa$anova_table$source == "gender", ]
+  expect_true(is.na(g_row$f))
+  expect_match(g_row$note, "empty")
+  expect_false(any(grepl("F\\(0,|NaN", capture.output(print(fa)))))
+  # SPSS: Corrected Model df = rank of the design - 1 (7 observed cells)
+  expect_equal(fa$anova_table$df[fa$anova_table$source == "Corrected Model"], 6L)
+  expect_no_warning(factorial_anova(survey_data, dv = life_satisfaction,
+                                    between = c(gender, education)))
+})
+
 test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
   # The example called summary(result, marginal_means = FALSE), a toggle
   # factorial_anova's summary() does not have (silently ignored).
