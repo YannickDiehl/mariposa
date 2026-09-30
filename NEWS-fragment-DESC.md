@@ -95,3 +95,12 @@
     a "Valid % 100.00" of zero cases or an R warning.
   - `print(x, digits = 0)` rounds the percentages only; the summary line
     keeps two decimals.
+* Weighted `crosstab()` reproduces SPSS CROSSTABS' default
+  `/COUNT ROUND CELL`: every weighted cell count is rounded first, the
+  margins are sums of the rounded cells and percentages, expected counts
+  and adjusted residuals come from the rounded table. Cells used to be
+  rounded only for display while margins and percentages came from the
+  unrounded sums (402 + 447 shown with a margin of 848; ALLBUS DIVERS
+  15 | 3 with a row percentage of 81.7). Weighted counts, margins and
+  percentages now match the SPSS reference exactly (validated for the
+  weighted ungrouped and grouped scenarios).

@@ -4,8 +4,11 @@
 # Purpose: Validate mariposa::crosstab() against SPSS v29 CROSSTABS.
 # Reference output: tests/spss_reference/outputs/crosstab_output.txt
 #
-# CROSSTABS family honors WEIGHT BY. Tests focus on Count and margin totals;
-# expected counts and residuals are computed inside chi_square pilot.
+# CROSSTABS family honors WEIGHT BY. The reference syntax runs every table
+# with SPSS's default /COUNT ROUND CELL: each weighted cell count is rounded
+# first, margins are sums of the rounded cells and percentages come from the
+# rounded counts. crosstab() reproduces that exactly, so weighted counts are
+# integers and asserted at the Spec tier, percentages at Display(1).
 # =============================================================================
 
 library(testthat)
@@ -25,8 +28,45 @@ spss_values <- list(
   ),
 
   # ---- Test 2.1: Gender × Region 2×2 weighted -------------------------
-  # SPSS Test 2.1 line 155 — weighted counts differ slightly from unweighted
-  test_2_1_weighted = NULL,  # captured below
+  # crosstab_output.txt:162-178 (/COUNT ROUND CELL)
+  test_2_1_weighted = list(
+    table = matrix(c(249, 945, 260, 1062), nrow = 2, byrow = TRUE,
+                   dimnames = list(c("Male", "Female"), c("East", "West"))),
+    row_totals = c(Male = 1194, Female = 1322),
+    col_totals = c(East = 509, West = 2007),
+    total = 2516,
+    row_pct = matrix(c(20.9, 79.1, 19.7, 80.3), nrow = 2, byrow = TRUE),
+    col_pct = matrix(c(48.9, 47.1, 51.1, 52.9), nrow = 2, byrow = TRUE),
+    total_pct = matrix(c(9.9, 37.6, 10.3, 42.2), nrow = 2, byrow = TRUE)
+  ),
+
+  # ---- Test 2.2: Education × Employment 4×5 weighted ------------------
+  # crosstab_output.txt:187-211. The grand total 2518 exceeds the rounded
+  # sum of weights (2516): margins are sums of rounded cells.
+  test_2_2_weighted = list(
+    table = matrix(c(0, 573, 66, 175, 34,
+                     0, 420, 52, 139, 29,
+                     46, 370, 45, 149, 33,
+                     34, 240, 21, 72, 20), nrow = 4, byrow = TRUE),
+    row_totals = c(848, 640, 643, 387),
+    col_totals = c(80, 1603, 184, 535, 116),
+    total = 2518
+  ),
+
+  # ---- Test 4.1: Gender × Education by region, weighted (SPLIT FILE) ----
+  # crosstab_output.txt:465-491
+  test_4_1_weighted = list(
+    East = list(table = matrix(c(83, 63, 64, 39, 92, 66, 59, 43), nrow = 2, byrow = TRUE),
+                row_totals = c(249, 260), col_totals = c(175, 129, 123, 82),
+                total = 509,
+                row_pct = matrix(c(33.3, 25.3, 25.7, 15.7, 35.4, 25.4, 22.7, 16.5),
+                                 nrow = 2, byrow = TRUE)),
+    West = list(table = matrix(c(318, 228, 262, 137, 355, 284, 257, 166), nrow = 2, byrow = TRUE),
+                row_totals = c(945, 1062), col_totals = c(673, 512, 519, 303),
+                total = 2007,
+                row_pct = matrix(c(33.7, 24.1, 27.7, 14.5, 33.4, 26.7, 24.2, 15.6),
+                                 nrow = 2, byrow = TRUE))
+  ),
 
   # ---- Test 3.1: Gender × Education grouped by region (unweighted) ----
   test_3_1_grouped = NULL  # see test
@@ -60,29 +100,56 @@ test_that("Test 1.1: crosstab gender × region 2x2 unweighted — matches SPSS",
   assert_spss_count(r$total, spss$total, label = "[1.1] grand total")
 })
 
-test_that("Test 2.1: crosstab gender × region weighted — matches SPSS", {
-  r <- survey_data |> crosstab(gender, region, weights = sampling_weight)
-  # SPSS Test 2.1 reference (line 155-178)
-  # Gender Male:  East=246 West=961 → row 1207
-  # Gender Female:East=243 West=1054 → row 1297
-  # Actually let me get values directly from SPSS reference
-  # Reading at lines 159-178 from output
-  expected_male_east   <- 246  # approximate; mariposa weighted is non-integer
-  expected_female_east <- 243
-  expected_total       <- 2500  # NB: SPSS shows N before rounding sum(w)
+# Counts, margins and (optionally) percentages of one weighted table
+compare_weighted_table <- function(r, spss, scenario, pct = c("row", "col", "total")) {
+  for (i in seq_len(nrow(spss$table))) {
+    for (j in seq_len(ncol(spss$table))) {
+      assert_spss_count(unname(r$table[i, j]), spss$table[i, j],
+                        label = sprintf("[%s] cell %d,%d", scenario, i, j))
+    }
+  }
+  for (i in seq_along(spss$row_totals)) {
+    assert_spss_count(unname(r$row_totals[i]), unname(spss$row_totals[i]),
+                      label = sprintf("[%s] row total %d", scenario, i))
+  }
+  for (j in seq_along(spss$col_totals)) {
+    assert_spss_count(unname(r$col_totals[j]), unname(spss$col_totals[j]),
+                      label = sprintf("[%s] col total %d", scenario, j))
+  }
+  assert_spss_count(unname(r$total), spss$total,
+                    label = sprintf("[%s] grand total", scenario))
+  for (type in pct) {
+    ref <- spss[[paste0(type, "_pct")]]
+    if (is.null(ref)) next
+    got <- r[[paste0(type, "_pct")]]
+    for (i in seq_len(nrow(ref))) {
+      for (j in seq_len(ncol(ref))) {
+        assert_spss(unname(got[i, j]), ref[i, j], tier = "display", precision = 1,
+                    label = sprintf("[%s] %s %% %d,%d", scenario, type, i, j))
+      }
+    }
+  }
+}
 
-  # mariposa weighted cells are non-integer (sum of fractional weights)
-  # Use Display(0) tier: half-integer tolerance
-  # SPSS Test 2.1 actual values (line 174): East=509, West=2007, Total=2516
-  m_east_total <- r$col_totals["East"]
-  assert_spss(m_east_total, 509,
-              tier = "display", precision = 0,
-              label = "[2.1] col total East (weighted)")
+test_that("Test 2.1: crosstab gender × region weighted — matches SPSS (ROUND CELL)", {
+  r <- survey_data |>
+    crosstab(gender, region, weights = sampling_weight, percentages = "all")
+  compare_weighted_table(r, spss_values$test_2_1_weighted, "2.1")
+})
 
-  m_total <- r$total
-  assert_spss(m_total, 2516,
-              tier = "display", precision = 0,
-              label = "[2.1] grand total (weighted)")
+test_that("Test 2.2: crosstab education × employment weighted — margins are sums of rounded cells", {
+  r <- survey_data |> crosstab(education, employment, weights = sampling_weight)
+  compare_weighted_table(r, spss_values$test_2_2_weighted, "2.2", pct = character(0))
+})
+
+test_that("Test 4.1: crosstab gender × education weighted, grouped by region — matches SPSS", {
+  r <- survey_data |> group_by(region) |>
+    crosstab(gender, education, weights = sampling_weight)
+  for (res in r$results) {
+    rg <- as.character(res$group_info$region)
+    compare_weighted_table(res, spss_values$test_4_1_weighted[[rg]],
+                           sprintf("4.1 %s", rg), pct = "row")
+  }
 })
 
 test_that("Test 3.1: crosstab gender × education grouped by region — matches SPSS", {
@@ -131,13 +198,14 @@ test_that("Adjusted residuals match chisq.test()$stdres (unweighted)", {
   }
 })
 
-test_that("Weighted adjusted residuals follow the Haberman formula on weighted counts", {
+test_that("Weighted adjusted residuals follow the Haberman formula on the rounded counts", {
   r <- crosstab(survey_data, gender, region, weights = sampling_weight)
 
-  # Independent recomputation from the weighted contingency table
+  # Independent recomputation from the weighted contingency table with
+  # SPSS's /COUNT ROUND CELL (cells rounded before any statistic)
   d <- survey_data[!is.na(survey_data$gender) & !is.na(survey_data$region) &
                      !is.na(survey_data$sampling_weight), ]
-  tab <- xtabs(sampling_weight ~ gender + region, data = d)
+  tab <- round(xtabs(sampling_weight ~ gender + region, data = d))
   rt <- rowSums(tab); ct <- colSums(tab); N <- sum(tab)
   E <- outer(rt, ct) / N
   expected_res <- (tab - E) / sqrt(E * outer(1 - rt / N, 1 - ct / N))

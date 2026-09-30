@@ -495,3 +495,25 @@ test_that("DESC-12: frequency() table formatting (factors, labels, width, header
   expect_true(any(grepl("mean=3.63", o3, fixed = TRUE)))
   expect_equal(.fre_rows(o3)[[2]], c("1", "118", "5", "5", "5"))  # rounded %
 })
+
+
+# --- EDGE-11: weighted crosstab with SPSS /COUNT ROUND CELL -------------------
+
+test_that("EDGE-11: weighted crosstab rounds cells first; margins add up", {
+  # Cells were rounded only for display while margins and percentages came
+  # from the unrounded sums: 402 + 447 was shown with a margin of 848, and
+  # DIVERS 15 | 3 had a row % of 81.7 (15/18 = 83.3). SPSS's default
+  # /COUNT ROUND CELL rounds each cell first (see
+  # test-crosstab-spss-validation.R for the SPSS reference values).
+  r <- crosstab(survey_data, education, gender, weights = sampling_weight,
+                percentages = "all")
+  expect_true(all(r$table == round(r$table)))
+  expect_equal(unname(r$row_totals), unname(rowSums(r$table)))
+  expect_equal(unname(r$col_totals), unname(colSums(r$table)))
+  expect_equal(r$total, sum(r$table))
+  expect_equal(unname(r$row_pct), unname(r$table / rowSums(r$table) * 100))
+  basic <- which(rownames(r$table) == "Basic Secondary")
+  expect_equal(unname(r$row_totals[basic]), 849)       # 402 + 447
+  out <- capture.output(print(r))
+  expect_true(any(grepl("402.*447.*849", out)))
+})

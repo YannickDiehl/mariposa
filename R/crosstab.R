@@ -43,10 +43,19 @@
 #'   SPSS \code{/CELLS=ASRESID}): which cells deviate from independence.
 #'   After a significant \code{\link{chi_square}} test, cells with
 #'   |adj. residual| > 2 are the ones driving the association.
-#'   For weighted tables the residuals are computed on the unrounded
-#'   weighted cell counts; an SPSS v29 reference run for the residuals is
-#'   pending, so they are currently verified against the Haberman formula
-#'   (\code{chisq.test()$stdres}) rather than SPSS output.
+#'   For weighted tables the residuals are computed on the rounded
+#'   weighted cell counts (see below); an SPSS v29 reference run for the
+#'   residuals is pending, so they are currently verified against the
+#'   Haberman formula (\code{chisq.test()$stdres}) rather than SPSS output.
+#'
+#' ## Weighted Tables
+#'
+#' As SPSS CROSSTABS does by default (\code{/COUNT ROUND CELL}), each
+#' weighted cell count is rounded to a whole number first; the row and
+#' column totals are sums of the rounded cells and all percentages come
+#' from the rounded counts. The table total can therefore differ by a few
+#' cases from the rounded sum of weights shown as "N (valid)" (SPSS: 2518
+#' vs. 2516 for education x employment in \code{survey_data}).
 #'
 #' ## When to Use This
 #'
@@ -175,13 +184,13 @@ crosstab.data.frame <- function(data, row, col,
 
   # Create contingency table
   if (is_weighted) {
-    # Documented deviation from SPSS: SPSS CROSSTABS' default is
-    # /COUNT ROUND CELL (cell counts are rounded BEFORE percentages are
-    # computed), which is what chi_square() reproduces. crosstab() keeps
-    # the unrounded decimal cell counts, so weighted counts/percentages can
-    # differ from SPSS within the rounding margin. Validated within the
-    # Display-tier tolerances; revisit if a /COUNT option is ever added.
-    tab <- xtabs(weights_vec ~ row_data + col_data)
+    # SPSS CROSSTABS default /COUNT ROUND CELL: every weighted cell count
+    # is rounded first; margins are sums of the rounded cells and all
+    # percentages, expected counts and residuals come from the rounded
+    # table (as chi_square() does). Keeping the unrounded cells showed
+    # e.g. 402 + 447 with a margin of 848 and percentages off by up to
+    # 0.1 point from SPSS.
+    tab <- round(xtabs(weights_vec ~ row_data + col_data))
   } else {
     # Create unweighted table
     tab <- table(row_data, col_data)
@@ -218,9 +227,9 @@ crosstab.data.frame <- function(data, row, col,
 
   # Expected counts and adjusted standardized residuals
   # (SPSS CROSSTABS /CELLS=EXPECTED ASRESID; Haberman 1973). Weighted
-  # tables use the unrounded weighted cell counts, consistent with the
-  # /COUNT note above; with weights == 1 this reduces exactly to the
-  # unweighted result. Cells in empty rows/columns yield NA.
+  # tables use the rounded cell counts (/COUNT ROUND CELL above); with
+  # weights == 1 this reduces exactly to the unweighted result. Cells in
+  # empty rows/columns yield NA.
   expected <- outer(row_totals, col_totals) / grand_total
   adj_correction <- outer(1 - row_totals / grand_total,
                           1 - col_totals / grand_total)
@@ -246,7 +255,10 @@ crosstab.data.frame <- function(data, row, col,
     col_label_map = col_label_map,
     weights_var = weights_var,
     percentages = percentages,
-    n_valid = grand_total,
+    # Valid cases as SPSS's Case Processing Summary reports them: with
+    # weights the (unrounded) sum of weights, which can differ from the
+    # total of the rounded cells
+    n_valid = if (is_weighted) sum(weights_vec) else grand_total,
     n_missing = n_missing,
     is_weighted = is_weighted,
     is_grouped = FALSE,
