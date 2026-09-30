@@ -346,3 +346,19 @@ test_that("EDGE-23: section titles without a suffix end without a blank", {
     expect_false(any(grepl("[^ ] $", out)))
   }
 })
+
+# --- 0.7.4 audit: rounding of exact halves ---------------------------------------
+
+test_that("fmt_num rounds halves up like SPSS, not to the even digit", {
+  # Was: formatC() rounds an exact .xx5 to the even digit: a mean rank of
+  # 306/16 = 19.125 printed as 19.12 where SPSS shows 19.13
+  # (pairwise_wilcoxon_output.txt:744).
+  expect_identical(mariposa:::fmt_num(19.125, 2), "19.13")
+  expect_identical(mariposa:::fmt_num(-19.125, 2), "-19.13")
+  expect_identical(mariposa:::fmt_num(0.5, 0), "1")
+  expect_identical(mariposa:::fmt_num(2.5, 0), "3")
+  expect_identical(mariposa:::fmt_num(2.675, 2), "2.68")   # binary 2.67499999...
+  expect_identical(mariposa:::fmt_num(1.23449, 3), "1.234")
+  expect_identical(mariposa:::fmt_num(c(NA, 1), 1), c("", "1.0"))
+  expect_identical(mariposa:::fmt_num(-0.0004, 3), "0.000")
+})

@@ -14,13 +14,22 @@
 #' Format numeric values with a fixed number of decimals
 #'
 #' Single number-display policy: fixed decimals (so columns align), "" for
-#' NA, integers without decimals when `digits = 0`.
+#' NA, integers without decimals when `digits = 0`. Halves round up (away
+#' from zero) as in SPSS; formatC() alone rounds an exact .xx5 to the even
+#' digit (a mean rank of 19.125 printed as 19.12, SPSS 19.13). The small
+#' fuzz treats binary near-halves such as 2.675 (2.67499999...) as halves,
+#' and a value that rounds to zero never prints as "-0.000".
 #'
 #' @param x Numeric vector
 #' @param digits Decimal places
 #' @return Character vector
 #' @noRd
 fmt_num <- function(x, digits = 3) {
+  x <- as.numeric(x)
+  scaled <- abs(x) * 10^digits
+  exact <- !is.na(x) & is.finite(scaled) & scaled < 1e15
+  x[exact] <- sign(x[exact]) *
+    trunc(scaled[exact] + 0.5 + sqrt(.Machine$double.eps)) / 10^digits + 0
   out <- ifelse(
     is.na(x),
     "",

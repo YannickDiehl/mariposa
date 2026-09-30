@@ -1412,6 +1412,9 @@ but were never asserted. These are now fixed and asserted:
 * Weighted `factorial_anova()`/`ancova()` cell standard deviations match
   SPSS's /REGWGT Descriptive Statistics (weighted sum of squares over
   n - 1): they divided by the sum of weights (1.207 instead of 1.238).
+* Printed numbers round halves up as SPSS does: a mean rank of 306/16 =
+  19.125 printed as 19.12 (round half to even) where SPSS shows 19.13,
+  and a value that rounds to zero no longer prints as "-0.000".
 
 ## Validation
 
