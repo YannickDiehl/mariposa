@@ -388,8 +388,8 @@ test_that("SCALE-18: a singular item set gives an English omega warning", {
 test_that("SCALE-18: the k = 2 omega warning appears once per call", {
   g <- group_by(survey_data, education)
   cnd <- conditions_of(reliability(g, trust_government, trust_media))
-  expect_length(cnd$msgs, 1)
-  expect_match(cnd$msgs, "at least 3 items", fixed = TRUE)
+  # (one group also has a negative alpha - a separate, legitimate warning)
+  expect_length(grep("at least 3 items", cnd$msgs, fixed = TRUE), 1)
 })
 
 test_that("SCALE-18: too few cases name the group and the empty item", {
@@ -424,4 +424,36 @@ test_that("SCALE-05: omega from a Heywood solution is not reported", {
   expect_match(east$omega_note, "Heywood", fixed = TRUE)
   out <- capture.output(print(r))
   expect_false(any(grepl("0.349", out, fixed = TRUE)))
+})
+
+# --- SCALE-06: negative alpha --------------------------------------------------
+
+test_that("SCALE-06: negative alpha gets SPSS's note and names the items", {
+  # alpha -0.929 was labelled "(Poor)" without any hint at unreversed
+  # items; SPSS adds "The value is negative due to a negative average
+  # covariance among items ... check item codings."
+  cnd <- conditions_of(reliability(survey_data, political_orientation,
+                                   environmental_concern, life_satisfaction))
+  r <- cnd$result
+  expect_true(r$alpha < 0)
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "negative average covariance", fixed = TRUE)
+  expect_match(cnd$msgs, "political_orientation", fixed = TRUE)
+  expect_match(cnd$msgs, "environmental_concern", fixed = TRUE)
+  expect_false(grepl("life_satisfaction", cnd$msgs, fixed = TRUE))
+  expect_setequal(r$negative_items,
+                  c("political_orientation", "environmental_concern"))
+
+  out <- capture.output(print(r))
+  expect_false(any(grepl("Poor", out, fixed = TRUE)))
+  expect_true(any(grepl("check item coding", out, fixed = TRUE)))
+  s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("negative average covariance", s, fixed = TRUE)))
+})
+
+test_that("SCALE-06: a positive alpha gets no negative-alpha note", {
+  cnd <- conditions_of(reliability(survey_data, trust_government, trust_media,
+                                   trust_science))
+  expect_length(cnd$msgs, 0)
+  expect_null(cnd$result$negative_items)
 })

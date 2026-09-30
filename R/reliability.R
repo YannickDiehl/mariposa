@@ -514,6 +514,27 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   )
 
   # ============================================================================
+  # NEGATIVE ALPHA (SPSS footnote)
+  # ============================================================================
+  # alpha < 0 exactly when the average inter-item covariance is negative -
+  # nearly always an item worded in the opposite direction that was not
+  # reverse-coded. SPSS footnotes the value; mariposa also names the items
+  # whose corrected item-total correlation is negative.
+  negative_items <- NULL
+  if (isTRUE(alpha < 0) || isTRUE(alpha_standardized < 0)) {
+    negative_items <- var_names[!is.na(corrected_item_total_r) &
+                                  corrected_item_total_r < 0]
+    alpha_txt <- fmt_num(alpha, 3)
+    cli_warn(c(
+      "Cronbach's alpha is negative ({alpha_txt}){in_group} due to a negative average covariance among items.",
+      "i" = "This violates reliability model assumptions; check the item codings.",
+      if (length(negative_items)) c(
+        "i" = "Negative corrected item-total correlation: {.var {negative_items}}. Reverse-code items worded in the opposite direction."
+      )
+    ))
+  }
+
+  # ============================================================================
   # RETURN RESULT
   # ============================================================================
 
@@ -529,7 +550,9 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     n = n,
     weighted_n = if (!is.null(weights_vec)) w_n else NULL,
     removed_items = if (length(removed_items)) removed_items else NULL,
-    omega_note = omega_note
+    omega_note = omega_note,
+    negative_alpha = isTRUE(alpha < 0) || isTRUE(alpha_standardized < 0),
+    negative_items = negative_items
   )
 }
 
@@ -682,6 +705,9 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @noRd
 .alpha_interpretation <- function(alpha) {
   if (is.na(alpha)) return("")
+  # A negative alpha is not "poor reliability" but a violated model
+  # (negative average covariance, usually an unreversed item)
+  if (alpha < 0) return("negative; check item coding")
   if (alpha >= 0.90) return("Excellent")
   if (alpha >= 0.80) return("Good")
   if (alpha >= 0.70) return("Acceptable")
@@ -888,6 +914,7 @@ print.summary.reliability <- function(x, ...) {
       as.character(x$n)
     }
     cat(sprintf("  N (listwise):                  %s\n", n_label))
+    if (isTRUE(x$negative_alpha)) .print_negative_alpha_note(x$negative_items)
   }
 
   # Item Statistics
@@ -938,6 +965,19 @@ print.summary.reliability <- function(x, ...) {
       cat("(a one-factor model on the remaining 2 items is not identified).\n")
     }
   }
+}
+
+#' SPSS's footnote for a negative alpha, plus the items to check
+#' @noRd
+.print_negative_alpha_note <- function(negative_items) {
+  cat("Note: The value is negative due to a negative average covariance among\n")
+  cat("items. This violates reliability model assumptions. You may want to\n")
+  cat("check item codings.\n")
+  if (length(negative_items)) {
+    cat(sprintf("Negative corrected item-total correlation: %s\n",
+                paste(negative_items, collapse = ", ")))
+  }
+  invisible(NULL)
 }
 
 #' Print reliability results for grouped data

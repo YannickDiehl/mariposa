@@ -72,3 +72,10 @@
   put one uniqueness at its lower bound (loading of about 1), and omega
   0.349 was printed next to alpha 0.037 without comment. Omega is now
   `NA` in such cases, with a warning that names the item and the group.
+* `reliability()` flags a negative Cronbach's alpha like SPSS: "The value
+  is negative due to a negative average covariance among items ... check
+  item codings." A warning and the `summary()` footnote name the items
+  with a negative corrected item-total correlation (usually items that
+  need reverse-coding; new `$negative_items`), and the compact print says
+  "negative; check item coding" instead of classifying alpha -0.929 as
+  "Poor".
