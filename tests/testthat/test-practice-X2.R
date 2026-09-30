@@ -387,3 +387,58 @@ test_that("IO-26 write_xlsx() names unsupported objects instead of dispatch erro
                "not its")
   expect_false(file.exists(tmp))
 })
+
+# --- UX-RMD (EDGE-21): codebook() in R Markdown ---------------------------------
+
+test_that("EDGE-21 codebook() returns visibly", {
+  # Was: invisible(), so a knitted chunk `codebook(data)` showed nothing
+  # (view = interactive() is FALSE while knitting).
+  expect_true(withVisible(codebook(survey_data, age, gender,
+                                   view = FALSE))$visible)
+})
+
+test_that("EDGE-21 knit_print() embeds the HTML codebook in HTML documents", {
+  # Was: no knit_print method; the knitted document got neither the HTML
+  # codebook nor (because of the invisible return) the console overview.
+  skip_if_not_installed("knitr")
+  cb <- codebook(survey_data, age, gender, view = FALSE)
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  on.exit(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "html")
+  out <- knitr::knit_print(cb)
+  expect_s3_class(out, "knit_asis")
+  html <- paste(as.character(out), collapse = "\n")
+  expect_match(html, "<table", fixed = TRUE)
+  expect_match(html, "Age in years", fixed = TRUE)
+  expect_match(html, "mariposa-codebook", fixed = TRUE)
+  # A fragment, not a nested page, and CSS scoped to the codebook: the
+  # standalone page's `body {...}`/`table {...}` rules must not restyle
+  # the whole document
+  expect_no_match(html, "<html|<body|<head")
+  expect_no_match(html, "(^|[\n}])\\s*(body|table|h2)\\s*\\{")
+
+  # Other output formats (PDF, Word) get the console overview
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "latex")
+  txt <- utils::capture.output(res <- knitr::knit_print(cb))
+  expect_match(paste(c(txt, as.character(res)), collapse = "\n"),
+               "Codebook: survey_data", fixed = TRUE)
+})
+
+test_that("EDGE-21 a knitted chunk shows the codebook without opening a viewer", {
+  # Was: the chunk output was empty.
+  skip_if_not_installed("knitr")
+  skip_if_not_installed("withr")
+  rmd <- tempfile(fileext = ".Rmd")
+  md <- tempfile(fileext = ".md")
+  on.exit(unlink(c(rmd, md)))
+  writeLines(c("```{r}", "codebook(survey_data, age, gender)", "```"), rmd)
+  viewed <- FALSE
+  withr::local_options(viewer = function(...) viewed <<- TRUE)
+  suppressMessages(knitr::knit(rmd, output = md, quiet = TRUE,
+                               envir = environment()))
+  out <- paste(readLines(md), collapse = "\n")
+  expect_match(out, "Age in years", fixed = TRUE)
+  expect_match(out, "<table", fixed = TRUE)
+  expect_false(viewed)
+})

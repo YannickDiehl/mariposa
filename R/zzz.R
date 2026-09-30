@@ -32,6 +32,10 @@
   for (cls in .xp_tidy_classes) {
     s3_register("broom::tidy", cls, method = .xp_tidy)
   }
+
+  # knitr: embed the HTML codebook in R Markdown / Quarto documents
+  # (R/codebook.R); knitr is only suggested
+  s3_register("knitr::knit_print", "codebook")
 }
 
 

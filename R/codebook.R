@@ -310,10 +310,15 @@
 #'   file is used). The directory of `file` must already exist.
 #' @param view Open the HTML codebook in the RStudio Viewer (or browser)?
 #'   Defaults to [interactive()], so interactive sessions open the Viewer
-#'   and scripts/tests do not. Set `view = FALSE` to suppress the Viewer
+#'   and scripts/tests do not; while an R Markdown/Quarto document is
+#'   knitted the default is `FALSE` (the codebook is embedded in the
+#'   document instead). Set `view = FALSE` to suppress the Viewer
 #'   side effect entirely; `file =` writing is unaffected by this argument.
 #'
-#' @return Invisibly returns a list of class `"codebook"` containing:
+#' @return A list of class `"codebook"`. Printing it shows a compact
+#'   console overview; in a knitted HTML document (R Markdown, Quarto)
+#'   the full HTML codebook is embedded, in other formats the overview is
+#'   shown. The list contains:
 #'   \describe{
 #'     \item{codebook}{Tibble with one row per variable and all metadata}
 #'     \item{data_info}{List with dataset-level information (name, nrow, ncol, etc.)}
@@ -342,6 +347,13 @@
 #' - Work with labelled data (SPSS, Stata, SAS) and need to see all value labels
 #' - Want to document your dataset for colleagues or publications
 #' - Need to quickly see value distributions across variables
+#'
+#' ## In R Markdown and Quarto
+#'
+#' A chunk containing `codebook(data)` embeds the HTML codebook in HTML
+#' output (its styles only apply to the codebook, not to the rest of the
+#' document); PDF and Word output show the compact console overview. Use
+#' [write_xlsx()] for an Excel version of the codebook.
 #'
 #' @examples
 #' data(survey_data)
@@ -537,7 +549,10 @@ codebook <- function(data, ..., weights = NULL,
   }
 
   # Open in the Viewer (opt-out via view = FALSE; default only in
-  # interactive sessions)
+  # interactive sessions, and not while knitting - rmarkdown::render()
+  # called from the console is interactive, but there knit_print()
+  # embeds the codebook in the document)
+  if (missing(view) && isTRUE(getOption("knitr.in.progress"))) view <- FALSE
   if (isTRUE(view)) {
     html_file <- if (!is.null(file)) file else tempfile(fileext = ".html")
     if (is.null(file)) htmltools::save_html(result$html, file = html_file)
@@ -546,7 +561,9 @@ codebook <- function(data, ..., weights = NULL,
     result$viewed <- TRUE
   }
 
-  invisible(result)
+  # Visible like every other result: an invisible return left a knitted
+  # chunk `codebook(data)` empty (no viewer, nothing printed)
+  result
 }
 
 
@@ -1022,6 +1039,89 @@ print.codebook <- function(x, ...) {
   }
 
   invisible(x)
+}
+
+
+# =============================================================================
+# knitr: embed the HTML codebook in R Markdown / Quarto documents
+# =============================================================================
+
+#' knit_print method for codebook objects
+#'
+#' Registered for knitr::knit_print on knitr load (R/zzz.R; knitr is only
+#' suggested). In HTML output the codebook table is embedded as a fragment
+#' - the standalone page's <html>/<head>/<body> wrapper is dropped, its
+#' stylesheet is scoped to a `.mariposa-codebook` container so it cannot
+#' restyle the rest of the document, and the page title becomes a styled
+#' div (an <h2> would enter a floating table of contents). Other formats
+#' (PDF, Word) get the compact console overview of print.codebook().
+#'
+#' @param x A codebook object
+#' @param ... Passed to knitr
+#' @noRd
+knit_print.codebook <- function(x, ...) {
+  if (!knitr::is_html_output() || is.null(x$html)) return(NextMethod())
+
+  page <- x$html
+  kids <- page$children
+  is_tag <- function(el, name) inherits(el, "shiny.tag") && el$name == name
+  head <- Find(function(el) is_tag(el, "head"), kids)
+  body <- Find(function(el) is_tag(el, "body"), kids)
+  if (is.null(body)) return(NextMethod())
+
+  css <- ""
+  if (!is.null(head)) {
+    style <- Find(function(el) is_tag(el, "style"), head$children)
+    if (!is.null(style)) css <- paste(unlist(style$children), collapse = "\n")
+  }
+  content <- lapply(body$children, function(el) {
+    if (is_tag(el, "h2")) {
+      el$name <- "div"
+      el$attribs$class <- "cb-title"
+    }
+    el
+  })
+  fragment <- htmltools::tags$div(
+    class = "mariposa-codebook",
+    htmltools::tags$style(htmltools::HTML(
+      .codebook_scoped_css(css, ".mariposa-codebook")
+    )),
+    content
+  )
+  htmltools::knit_print.shiny.tag(fragment, ...)
+}
+
+#' Scope a stylesheet to a container
+#'
+#' Prefixes every selector with `scope`; `body` becomes the container
+#' itself and `h2` the title div. Handles the flat rule list of the
+#' codebook stylesheet (no at-rules).
+#'
+#' @param css Stylesheet text
+#' @param scope Container selector, e.g. ".mariposa-codebook"
+#' @return Scoped stylesheet text
+#' @noRd
+.codebook_scoped_css <- function(css, scope) {
+  rules <- strsplit(css, "}", fixed = TRUE)[[1]]
+  rules <- rules[grepl("{", rules, fixed = TRUE)]
+  scoped <- vapply(rules, function(rule) {
+    parts <- strsplit(rule, "{", fixed = TRUE)[[1]]
+    selectors <- trimws(strsplit(parts[1], ",", fixed = TRUE)[[1]])
+    selectors <- selectors[nzchar(selectors)]
+    selectors <- ifelse(
+      selectors == "body", scope,
+      ifelse(selectors == "h2", paste(scope, ".cb-title"),
+             paste(scope, selectors))
+    )
+    paste0(paste(selectors, collapse = ", "), " {",
+           paste(parts[-1], collapse = "{"), "}")
+  }, character(1), USE.NAMES = FALSE)
+  # In a document the container needs no page margin, and wide codebooks
+  # scroll instead of overflowing the text column
+  paste(c(scoped,
+          paste0(scope, " { margin: 1em 0; overflow-x: auto; }"),
+          paste0(scope, " .cb-title { display: block; }")),
+        collapse = "\n")
 }
 
 

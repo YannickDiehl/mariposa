@@ -27,3 +27,12 @@
   frames with any result (`list(Descriptives = describe(...), Data = df)`
   was rejected), and unsupported objects get a clear error instead of
   "no applicable method for 'write_xlsx'".
+* `codebook()` works in R Markdown and Quarto. It returned invisibly and
+  (with `view = interactive()` being `FALSE` while knitting) a chunk
+  `codebook(data)` produced nothing. It now returns visibly, and a
+  `knit_print()` method embeds the HTML codebook in HTML output (styles
+  scoped to the codebook, so the rest of the document keeps its look);
+  PDF/Word output shows the console overview. While knitting, the viewer
+  is no longer opened by default (`rmarkdown::render()` from an
+  interactive session used to open it). In the console, the compact
+  overview is now printed after the viewer opens.
