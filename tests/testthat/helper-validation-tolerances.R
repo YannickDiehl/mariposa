@@ -54,10 +54,21 @@ spec_tolerances <- list(
 #   )
 
 exception_registry <- list(
-  # No active exceptions yet — populated during Phase 1 diagnosis.
-  # Likely entries:
-  # "EXC-001" = list(tolerance = 0.01, statistic = "chi-sq (ties)", function_name = "friedman_test"),
-  # "EXC-002" = list(tolerance = 0.01, statistic = "H (ties)",       function_name = "kruskal_wallis"),
+  # SPSS FACTOR /EXTRACTION ML stops its Newton-Raphson iteration once no
+  # log unique variance changes by ECONVERGE (.001) or more; mariposa
+  # (factanal) iterates to the optimum. Converged SPSS solutions (Tests 7a/8a
+  # West) differ by up to .00105 (a percentage of variance) / .00052 (a
+  # loading).
+  "EXC-001" = list(tolerance = 0.002,
+                   statistic = "ML loadings, sums of squares, % of variance",
+                   function_name = "efa"),
+  # SPSS reference runs that end without convergence ("More than 25
+  # iterations required", Tests 5a/6a; df = 0, Heywood cases): the SPSS
+  # values are an unfinished iteration state on an almost flat likelihood.
+  # Observed maximum .044 (5a life_satisfaction communality).
+  "EXC-002" = list(tolerance = 0.05,
+                   statistic = "ML communalities / SS where SPSS did not converge",
+                   function_name = "efa")
 )
 
 

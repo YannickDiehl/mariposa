@@ -33,3 +33,28 @@
   weighted, per region) now matches SPSS, including SPSS's iteration
   counts, which `summary()` prints as SPSS does ("Rotation converged in 4
   iterations."). Oblimin no longer needs the GPArotation package.
+* `efa(extraction = "ml")`: a Heywood variable is now bounded at a
+  communality of .999, as SPSS FACTOR does (it was .995, the default bound
+  of `stats::factanal()`), and the factors keep SPSS's order (by the
+  eigenvalues of the rescaled correlation matrix; `factanal()` re-sorted
+  them by sums of squares, so the unrotated factor matrix and the
+  extraction sums came in a different order). Where SPSS's ML iteration
+  converges (reference runs per region, West), the whole solution now
+  matches SPSS: communalities, factor and rotated factor matrices,
+  extraction and rotation sums, transformation matrix. The remaining
+  reference runs end without convergence in SPSS itself (a model with
+  0 degrees of freedom and Heywood cases); see Validation.
+
+## Validation (for the lead: NEWS "## Validation" subsection)
+
+* New Tier-3 exceptions for `efa()` ML extraction (to be added to
+  `.claude/VALIDATION_EXCEPTIONS.md`): EXC-001 (±.002; SPSS stops its
+  Newton-Raphson iteration at ECONVERGE(.001), so loadings, sums of
+  squares and percentages of variance of converged solutions agree to
+  about 1e-3) and EXC-002 (±.05; SPSS reference runs 5a/6a that end
+  without convergence, "More than 25 iterations required").
+* `efa()` rotations are now validated in full against SPSS: 8 varimax,
+  6 oblimin and 6 promax solutions (transformation, pattern, structure and
+  correlation matrices, rotation sums, iteration counts); the ML initial
+  communalities of all 6 ML reference runs; `ancova()` Levene tests of the
+  6 unweighted reference runs.

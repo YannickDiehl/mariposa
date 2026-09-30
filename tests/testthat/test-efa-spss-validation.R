@@ -506,3 +506,172 @@ test_that("Tests P1-P4: PCA + promax matrices match SPSS", {
   }
 })
 
+
+# =============================================================================
+# ML EXTRACTION (efa_ml_promax_output.txt, Tests 5a, 6a, 7a, 8a)
+# =============================================================================
+# All SPSS ML runs extract 3 factors from 6 items: df = 0 ("The number of
+# degrees of freedom (0) is not positive"), and every run hits Heywood
+# cases. Initial communalities (SMC) do not depend on the iterations and
+# are asserted for every run (Display tier).
+#
+# Where SPSS reaches the maximum of the likelihood (7a West, 8a West:
+# "3 factors extracted") mariposa reproduces the whole solution, including
+# SPSS's bound of .999 for a Heywood communality and SPSS's factor order.
+# The communalities match at Display tier. SPSS stops its Newton-Raphson
+# iteration once no log unique variance changes by .001 or more
+# (ECONVERGE), so loadings and sums of squares carry an error of that
+# order; the percentages of variance (5 significant digits) resolve it.
+# These are asserted with EXC-001.
+#
+# Where SPSS does not reach the maximum:
+# - 5a / 6a: SPSS stops without convergence ("More than 25 iterations
+#   required. (Convergence=.008 / .004)"): its communalities are those of
+#   an unfinished path on an almost flat likelihood -> EXC-002.
+# - 8a East: SPSS stops at a point with a larger discrepancy than
+#   mariposa's solution (F = .0049 vs .0034), a different Heywood
+#   solution that no tolerance can bridge: not asserted beyond the SMC.
+# - 7a East: SPSS reports no solution ("no local minimum was found").
+
+spss_ml_smc <- list(
+  # efa_ml_promax_output.txt:101-108 (Test 5a, unweighted)
+  `5a` = list(weighted = FALSE, region = NULL,
+              smc = c(.346, .345, .001, .005, .001, .003)),
+  # efa_ml_promax_output.txt:915-922 (Test 6a, weighted)
+  `6a` = list(weighted = TRUE, region = NULL,
+              smc = c(.343, .343, .001, .006, .001, .004)),
+  # efa_ml_promax_output.txt:1423-1430 (Test 7a, unweighted, region = East)
+  `7a_East` = list(weighted = FALSE, region = "East",
+                   smc = c(.376, .374, .006, .006, .028, .009)),
+  # efa_ml_promax_output.txt:1524-1531 (Test 7a, unweighted, region = West)
+  `7a_West` = list(weighted = FALSE, region = "West",
+                   smc = c(.344, .342, .002, .008, .002, .004)),
+  # efa_ml_promax_output.txt:2022-2029 (Test 8a, weighted, region = East)
+  `8a_East` = list(weighted = TRUE, region = "East",
+                   smc = c(.375, .373, .006, .008, .030, .012)),
+  # efa_ml_promax_output.txt:2157-2164 (Test 8a, weighted, region = West)
+  `8a_West` = list(weighted = TRUE, region = "West",
+                   smc = c(.340, .338, .002, .008, .002, .004))
+)
+
+item_names <- c("political_orientation", "environmental_concern",
+                "life_satisfaction", "trust_government", "trust_media",
+                "trust_science")
+
+test_that("ML 5a-8a: initial communalities (SMC) match SPSS", {
+  for (id in names(spss_ml_smc)) {
+    ref <- spss_ml_smc[[id]]
+    r <- suppressWarnings(fit_scenario(ref, extraction = "ml"))
+    for (k in seq_along(item_names)) {
+      assert_spss(r$initial_communalities[[item_names[k]]], ref$smc[k],
+                  tier = "display", precision = 3,
+                  label = sprintf("[%s] initial communality %s", id, item_names[k]))
+    }
+  }
+})
+
+spss_ml <- list(
+  # efa_ml_promax_output.txt:1524-1586 (Test 7a, unweighted, region = West;
+  # "3 factors extracted. 25 iterations required.")
+  `7a_West` = list(weighted = FALSE, region = "West",
+    comm = c(.638, .539, .023, .012, .072, .999),
+    ext_ss = c(1.002, 1.181, .100), ext_pct = c(16.708, 19.688, 1.665),
+    ext_cum = c(16.708, 36.396, 38.061),
+    factor = spss_cells(
+      "trust_science",         1,  0.999, "political_orientation", 2, -0.797,
+      "environmental_concern", 2,  0.733),
+    rotated = spss_cells(
+      "political_orientation", 1, -0.797, "environmental_concern", 1, 0.732,
+      "trust_science",         2,  0.999),
+    rot_ss = c(1.179, 1.004, .101), rot_pct = c(19.656, 16.727, 1.677),
+    rot_cum = c(19.656, 36.383, 38.061),
+    T = vm_T(.015, 1.000, -.007, 1.000, -.015, -.025, .025, .006, 1.000)),
+  # efa_ml_promax_output.txt:2157-2220 (Test 8a, weighted, region = West;
+  # "3 factors extracted. 8 iterations required.")
+  `8a_West` = list(weighted = TRUE, region = "West",
+    comm = c(.615, .555, .030, .016, .054, .999),
+    ext_ss = c(1.003, 1.174, .093), ext_pct = c(16.710, 19.560, 1.546),
+    ext_cum = c(16.710, 36.270, 37.816),
+    factor = spss_cells(
+      "trust_science",         1,  0.999, "political_orientation", 2, -0.782,
+      "environmental_concern", 2,  0.743),
+    rotated = spss_cells(
+      "political_orientation", 1, -0.782, "environmental_concern", 1, 0.743,
+      "trust_science",         2,  0.999),
+    rot_ss = c(1.174, 1.002, .093), rot_pct = c(19.563, 16.707, 1.547),
+    rot_cum = c(19.563, 36.270, 37.816),
+    T = vm_T(-.002, 1.000, .002, 1.000, .002, -.001, .001, -.002, 1.000))
+)
+
+test_that("ML 7a/8a West: converged ML + varimax solutions match SPSS", {
+  for (id in names(spss_ml)) {
+    ref <- spss_ml[[id]]
+    r <- fit_scenario(ref, extraction = "ml")
+    for (k in seq_along(item_names)) {
+      assert_spss(r$communalities[[item_names[k]]], ref$comm[k],
+                  tier = "display", precision = 3,
+                  label = sprintf("[%s] extraction communality %s", id, item_names[k]))
+    }
+    # EXC-001 — SPSS stops the ML iteration at ECONVERGE(.001)
+    exc1 <- function(actual, expected, label) {
+      assert_spss(actual, expected, tier = "exception", id = "EXC-001",
+                  label = sprintf("[%s] %s", id, label))
+    }
+    ev <- r$extraction_variance
+    for (j in seq_along(ref$ext_ss)) {
+      exc1(ev$ss_loading[j], ref$ext_ss[j], sprintf("extraction SS %d", j))
+      exc1(ev$prc_variance[j], ref$ext_pct[j], sprintf("extraction %% of variance %d", j))
+      exc1(ev$cumulative_prc[j], ref$ext_cum[j], sprintf("extraction cumulative %% %d", j))
+    }
+    for (cells in list(list(r$unrotated_loadings, ref$factor, "factor matrix"),
+                       list(r$loadings, ref$rotated, "rotated factor matrix"))) {
+      ref_cells <- cells[[2]]
+      for (i in seq_len(nrow(ref_cells))) {
+        exc1(cells[[1]][ref_cells$var[i], ref_cells$comp[i]], ref_cells$value[i],
+             sprintf("%s: %s on factor %d", cells[[3]], ref_cells$var[i], ref_cells$comp[i]))
+      }
+    }
+    rv <- r$rotation_variance
+    for (j in seq_along(ref$rot_ss)) {
+      exc1(rv$ss_loading[j], ref$rot_ss[j], sprintf("rotation SS %d", j))
+      exc1(rv$prc_variance[j], ref$rot_pct[j], sprintf("rotation %% of variance %d", j))
+      exc1(rv$cumulative_prc[j], ref$rot_cum[j], sprintf("rotation cumulative %% %d", j))
+    }
+    T_r <- qr.solve(r$unrotated_loadings, r$loadings)
+    for (i in 1:3) for (j in 1:3) {
+      exc1(T_r[i, j], ref$T[i, j], sprintf("factor transformation matrix [%d,%d]", i, j))
+    }
+  }
+})
+
+spss_ml_nonconverged <- list(
+  # efa_ml_promax_output.txt:101-122 (Test 5a, unweighted: "More than 25
+  # iterations required. (Convergence=.008)")
+  `5a` = list(weighted = FALSE, region = NULL,
+              comm = c(.608, .573, .100, .017, .010, .105),
+              ext_ss = c(1.184, .125, .104)),
+  # efa_ml_promax_output.txt:915-936 (Test 6a, weighted: "More than 25
+  # iterations required. (Convergence=.004)")
+  `6a` = list(weighted = TRUE, region = NULL,
+              comm = c(.611, .566, .172, .021, .010, .087),
+              ext_ss = c(1.181, .177, .109))
+)
+
+test_that("ML 5a/6a: SPSS runs without convergence agree within EXC-002", {
+  for (id in names(spss_ml_nonconverged)) {
+    ref <- spss_ml_nonconverged[[id]]
+    r <- fit_scenario(ref, extraction = "ml")
+    for (k in seq_along(item_names)) {
+      # EXC-002 — SPSS reports a non-converged ML solution (df = 0, Heywood)
+      assert_spss(r$communalities[[item_names[k]]], ref$comm[k],
+                  tier = "exception", id = "EXC-002",
+                  label = sprintf("[%s] extraction communality %s", id, item_names[k]))
+    }
+    for (j in seq_along(ref$ext_ss)) {
+      # EXC-002 — SPSS reports a non-converged ML solution (df = 0, Heywood)
+      assert_spss(r$extraction_variance$ss_loading[j], ref$ext_ss[j],
+                  tier = "exception", id = "EXC-002",
+                  label = sprintf("[%s] extraction SS %d", id, j))
+    }
+  }
+})

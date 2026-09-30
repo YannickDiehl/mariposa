@@ -26,7 +26,9 @@
 #'   \code{GPArotation::oblimin()}.
 #' @param extraction Extraction method: \code{"pca"} (default, Principal
 #'   Component Analysis) or \code{"ml"} (Maximum Likelihood, enables
-#'   goodness-of-fit testing, assumes multivariate normality).
+#'   goodness-of-fit testing, assumes multivariate normality). ML uses
+#'   SPSS's starting values, bounds a Heywood variable's communality at
+#'   .999 as SPSS does and keeps SPSS's factor order.
 #' @param weights Optional survey weights for population-representative results.
 #' @param use How to handle missing data for correlation computation:
 #'   \code{"pairwise"} (default, matches SPSS) or \code{"complete"} (listwise;
@@ -679,10 +681,23 @@ efa <- function(data, ...,
     n_factors_used <- ml_max
   }
 
-  # Call factanal with correlation matrix (supports weighted data via covmat)
+  # Call factanal with correlation matrix (supports weighted data via covmat).
+  # SPSS's starting values are factanal's: (1 - m / 2p) / diag(R^-1).
+  # Unique variances are bounded below by .001, where SPSS stops a Heywood
+  # variable (communality .999: efa_ml_promax_output.txt Tests 7a/8a West,
+  # 8a East); factanal's default bound .005 capped it at .995.
+  # NOTE EXC-001: SPSS stops its Newton-Raphson iteration once no log unique
+  # variance changes by .001 (ECONVERGE); factanal iterates to the optimum,
+  # so loadings / sums of squares agree to about 1e-3, not to the printed
+  # precision of the percentages.
+  # NOTE EXC-002: where SPSS itself stops without convergence (Tests 5a, 6a:
+  # "More than 25 iterations required") or at a different Heywood point
+  # (8a East), its solution is not the likelihood optimum found here. See
+  # VALIDATION_EXCEPTIONS.md.
   fa_result <- tryCatch(
     stats::factanal(factors = n_factors_used, covmat = cor_mat,
-                    n.obs = as.integer(round(n_obs)), rotation = "none"),
+                    n.obs = as.integer(round(n_obs)), rotation = "none",
+                    control = list(lower = 0.001)),
     error = function(e) {
       .efa_abort_undefined(
         paste0("ML extraction failed: ", conditionMessage(e)),
@@ -692,14 +707,18 @@ efa <- function(data, ...,
     }
   )
 
-  # Extract unrotated loadings (factanal already reflects to positive
-  # column sums; applied again so both extractions share one rule)
-  raw_loadings <- .efa_reflect(unclass(fa_result$loadings))
+  # Unrotated loadings from the ML unique variances, in SPSS's factor order
+  # (IBM SPSS Statistics Algorithms, FACTOR "Maximum Likelihood"):
+  # Lambda = Psi^1/2 Omega (Theta - I)^1/2 with the largest eigenvalues
+  # Theta of Psi^-1/2 R Psi^-1/2. factanal() re-sorts the factors by their
+  # sums of squared loadings, SPSS does not (7a West: SS 1.002 / 1.181 /
+  # .100 with the Heywood factor first).
+  uniquenesses <- fa_result$uniquenesses
+  raw_loadings <- .efa_ml_loadings(cor_mat, uniquenesses, n_factors_used)
   rownames(raw_loadings) <- var_names
   colnames(raw_loadings) <- paste0("Factor", seq_len(n_factors_used))
 
   # Communalities = 1 - uniquenesses
-  uniquenesses <- fa_result$uniquenesses
   communalities <- 1 - uniquenesses
   names(communalities) <- var_names
   names(uniquenesses) <- var_names
@@ -749,6 +768,25 @@ efa <- function(data, ...,
     uniquenesses = uniquenesses,
     col_prefix = "Factor"
   )
+}
+
+
+#' Unrotated ML loadings from the unique variances (SPSS factor order)
+#'
+#' Lambda = Psi^1/2 Omega_m (Theta_m - I)^1/2, where Theta_m / Omega_m are
+#' the m largest eigenvalues / eigenvectors of Psi^-1/2 R Psi^-1/2 (SPSS:
+#' the smallest eigenvalues gamma = 1/theta of Psi R^-1 Psi). The factors
+#' keep this eigenvalue order and are reflected to a positive loading sum.
+#' @param R Correlation matrix
+#' @param psi Unique variances
+#' @param m Number of factors
+#' @noRd
+.efa_ml_loadings <- function(R, psi, m) {
+  sc <- 1 / sqrt(psi)
+  e <- eigen(R * outer(sc, sc), symmetric = TRUE)
+  L <- sqrt(psi) * e$vectors[, seq_len(m), drop = FALSE] %*%
+    diag(sqrt(pmax(e$values[seq_len(m)] - 1, 0)), nrow = m)
+  .efa_reflect(unname(L))
 }
 
 

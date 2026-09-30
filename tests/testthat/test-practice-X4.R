@@ -157,6 +157,14 @@ test_that("X4-VARIMAX: SPSS's cyclic varimax, reflected and ordered", {
   best <- unclass(stats::varimax(r$unrotated_loadings, eps = 1e-14)$loadings)
   expect_lt(.varimax_criterion(best) - .varimax_criterion(r$loadings), 1e-5)
   expect_identical(r$rotation_iterations, 3L)
+
+  # ML (West): the Heywood factor comes first unrotated but not rotated
+  w <- .six_items(dplyr::filter(survey_data, region == "West"), extraction = "ml")
+  ss <- colSums(w$loadings^2)
+  expect_false(is.unsorted(rev(ss)))
+  expect_true(all(colSums(w$loadings) > 0))
+  expect_identical(unname(which.max(abs(w$unrotated_loadings["trust_science", ]))), 1L)
+  expect_identical(unname(which.max(abs(w$loadings["trust_science", ]))), 2L)
 })
 
 test_that("X4-VARIMAX: a rotation that hits the iteration limit warns", {
@@ -189,4 +197,25 @@ test_that("X4-OBLIMIN: SPSS's direct oblimin needs no GPArotation", {
   skip_if_not_installed("GPArotation")
   gpa <- GPArotation::oblimin(r$unrotated_loadings, normalize = TRUE)
   expect_lt(max(abs(unname(r$pattern_matrix) - unname(unclass(gpa$loadings)))), 0.005)
+})
+
+# --- X4-ML: ML extraction as SPSS FACTOR ---------------------------------------
+
+test_that("X4-ML: Heywood bound .001 and SPSS factor order", {
+  # factanal() bounds unique variances at .005 (communality .995); SPSS
+  # stops Heywood variables at .999 (efa_ml_promax_output.txt 7a/8a West,
+  # 8a East). factanal() also re-sorts factors by sums of squares; SPSS
+  # keeps the eigenvalue order (7a West: SS 1.002 / 1.181 / .100).
+  w <- .six_items(dplyr::filter(survey_data, region == "West"), extraction = "ml")
+  expect_equal(min(w$uniquenesses), 0.001, tolerance = 1e-6)
+  expect_equal(unname(w$communalities[["trust_science"]]), 0.999, tolerance = 1e-6)
+  ss <- w$extraction_variance$ss_loading
+  expect_gt(ss[2], ss[1])
+  # loadings follow Lambda = Psi^1/2 Omega (Theta - I)^1/2
+  R <- w$correlation_matrix
+  psi <- w$uniquenesses
+  e <- eigen(R / sqrt(outer(psi, psi)), symmetric = TRUE)
+  L <- sqrt(psi) * e$vectors[, 1:3] %*% diag(sqrt(e$values[1:3] - 1))
+  L <- sweep(L, 2, sign(colSums(L)), "*")
+  expect_equal(unname(w$unrotated_loadings), L, tolerance = 1e-8)
 })
