@@ -1185,3 +1185,19 @@ test_that("analysis functions on data without rows give one clear error", {
   # transformations keep working on empty data
   expect_equal(nrow(rec(d0, age, rules = "18:29=1; else=copy")), 0L)
 })
+
+test_that("read_spss() reports counts without thousands separators", {
+  # 0.7.4: counts are printed SPSS-style everywhere else ("1500", not
+  # "1,500"); read_spss()'s conversion message was the last exception.
+  skip_if_not_installed("haven")
+  x <- haven::labelled_spss(c(rep(1, 500), rep(-9, 1500)),
+                            labels = c(yes = 1, "no answer" = -9),
+                            na_values = -9)
+  f <- tempfile(fileext = ".sav")
+  on.exit(unlink(f), add = TRUE)
+  haven::write_sav(data.frame(x = x), f)
+  msg <- paste(capture.output(invisible(read_spss(f)), type = "message"),
+               collapse = " ")
+  expect_match(msg, "1500 values")
+  expect_false(grepl("1,500", msg, fixed = TRUE))
+})

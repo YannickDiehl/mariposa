@@ -333,7 +333,7 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 
   if (verbose) {
     cli::cli_inform(
-      "Converted {format(n_converted, big.mark = ',')} values in {n_vars_converted} variable{?s} to tagged NAs."
+      "Converted {fmt_int(n_converted)} values in {n_vars_converted} variable{?s} to tagged NAs."
     )
   }
 
@@ -447,7 +447,7 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 
   if (verbose && n_vars_converted > 0L) {
     cli::cli_inform(
-      "Converted {format(n_converted, big.mark = ',')} values in {n_vars_converted} variable{?s} to tagged NAs."
+      "Converted {fmt_int(n_converted)} values in {n_vars_converted} variable{?s} to tagged NAs."
     )
   }
 
