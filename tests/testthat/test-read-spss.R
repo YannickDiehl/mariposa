@@ -72,9 +72,9 @@ test_that("na_frequencies returns correct codes", {
   a_row <- result[result$tag == "a" & !is.na(result$tag), ]
   b_row <- result[result$tag == "b" & !is.na(result$tag), ]
 
-  # Codes are now character (as.character of numeric for SPSS)
-  expect_equal(a_row$code, "-9")
-  expect_equal(b_row$code, "-11")
+  # SPSS codes are numeric (0.7.4 practice test IO-21; were character)
+  expect_equal(a_row$code, -9)
+  expect_equal(b_row$code, -11)
 })
 
 test_that("na_frequencies has 'code' column, not 'spss_code'", {
@@ -112,12 +112,14 @@ test_that("na_frequencies rejects non-numeric input", {
   expect_error(na_frequencies("text"), "`x` must be a numeric vector")
 })
 
-test_that("na_frequencies results are sorted by count descending", {
+test_that("na_frequencies results are sorted by code, system missing last", {
+  # 0.7.4 practice test IO-21: ordered like the missing block of
+  # frequency() (by code), no longer by count
   x <- make_tagged_vector()
   result <- na_frequencies(x)
 
-  # First row should have highest count
-  expect_true(result$n[1] >= result$n[nrow(result)])
+  expect_equal(result$code, c(-11, -9, NA))
+  expect_equal(result$label[nrow(result)], "(System Missing)")
 })
 
 # ============================================================================

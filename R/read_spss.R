@@ -530,15 +530,23 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 #' that was read with [read_spss()], [read_stata()], [read_sas()], or
 #' [read_xpt()] and contains tagged NAs.
 #'
-#' @param x A numeric vector with tagged NAs.
+#' @param x A numeric vector with tagged NAs, or a data frame.
+#' @param ... For a data frame: the variables to tabulate (tidyselect). If
+#'   empty, every numeric variable with missing values is tabulated.
 #'
-#' @return A data frame with columns:
-#'   \item{tag}{The tag character (e.g., a-z for Stata, A-Z for SAS,
-#'     a-z/A-Z/0-9 for SPSS)}
-#'   \item{n}{Number of cases with this missing type}
-#'   \item{code}{The original missing value code: numeric SPSS codes (e.g.,
-#'     -9, -8) or native format codes (e.g., ".a" for Stata, ".A" for SAS)}
+#' @return A data frame with one row per missing type, ordered by code like
+#'   the missing block of [frequency()] (system missing last, listed only
+#'   when it occurs):
+#'   \item{code}{The original missing value code: numeric for SPSS codes
+#'     (e.g., -9, -8), character for native format codes (e.g., ".a" for
+#'     Stata, ".A" for SAS)}
 #'   \item{label}{The value label for this missing type (if available)}
+#'   \item{n}{Number of cases with this missing type}
+#'   \item{prc}{Percent of all cases}
+#'   \item{tag}{The internal tag character of the tagged NA}
+#'   For a data frame, a first column `variable` names the variable. Without
+#'   any missing values the (empty) result is returned invisibly with a
+#'   message.
 #'
 #' @examples
 #' \donttest{
@@ -546,9 +554,9 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 #'   # Declare -9/-8 as distinct tagged missing types, then inspect them
 #'   x <- set_na(c(1, 2, -9, 3, -8, -9), -9, -8)
 #'   na_frequencies(x)
-#'   #   tag n code label
-#'   # 1   a 2   -9  <NA>
-#'   # 2   b 1   -8  <NA>
+#'   #   code label n      prc tag
+#'   # 1   -9  <NA> 2 33.33333   a
+#'   # 2   -8  <NA> 1 16.66667   b
 #' }
 #' }
 #'
@@ -556,59 +564,100 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 #'   [untag_na()], [strip_tags()]
 #' @family data-import
 #' @export
-na_frequencies <- function(x) {
+na_frequencies <- function(x, ...) {
   .check_haven("tagged NA inspection")
+
+  if (is.data.frame(x)) {
+    dots <- rlang::enexprs(...)
+    cols <- if (length(dots) == 0L) {
+      which(vapply(x, function(v) {
+        is.numeric(v) && !is.factor(v) && anyNA(v)
+      }, logical(1)))
+    } else {
+      tidyselect::eval_select(rlang::expr(c(...)), x)
+    }
+    tables <- lapply(cols, function(i) {
+      tbl <- .na_frequency_table(x[[i]], names(x)[i])
+      if (nrow(tbl) == 0L) return(NULL)
+      cbind(variable = names(x)[i], tbl, stringsAsFactors = FALSE)
+    })
+    tables <- tables[!vapply(tables, is.null, logical(1))]
+    if (length(tables) == 0L) {
+      cli::cli_inform("No missing values in the selected variables.")
+      return(invisible(.na_frequency_table(numeric(0), "x")))
+    }
+    # codes may be numeric (SPSS) in one variable and ".a" in another
+    if (length(unique(vapply(tables, function(t) class(t$code)[1],
+                             character(1)))) > 1L) {
+      tables <- lapply(tables, function(t) {
+        t$code <- as.character(t$code)
+        t
+      })
+    }
+    out <- do.call(rbind, tables)
+    rownames(out) <- NULL
+    return(out)
+  }
+
   if (!is.numeric(x)) {
     cli::cli_abort("{.arg x} must be a numeric vector.")
   }
+  out <- .na_frequency_table(x)
+  if (nrow(out) == 0L) {
+    x_name <- sub(".*\\$", "", deparse(substitute(x))[1])
+    cli::cli_inform("No missing values in {.var {x_name}}.")
+    return(invisible(out))
+  }
+  out
+}
 
-  tag_map <- attr(x, "na_tag_map")
-  labels  <- attr(x, "labels")
+
+#' Missing-type table of one numeric vector (see na_frequencies())
+#' @noRd
+.na_frequency_table <- function(x, var_name = "x") {
+  tag_map <- attr(x, "na_tag_map", exact = TRUE)
+  labels  <- attr(x, "labels", exact = TRUE)
+  numeric_codes <- is.null(tag_map) || is.numeric(tag_map)
 
   raw <- .plain_numeric(x)
   na_mask <- is.na(raw)
+  empty_code <- if (numeric_codes) numeric(0) else character(0)
   if (!any(na_mask)) {
-    return(data.frame(
-      tag = character(0), n = integer(0),
-      code = character(0), label = character(0),
-      stringsAsFactors = FALSE
-    ))
+    return(data.frame(code = empty_code, label = character(0),
+                      n = integer(0), prc = numeric(0), tag = character(0),
+                      stringsAsFactors = FALSE))
   }
 
   tags <- .na_tags(raw[na_mask])
-  tag_tbl <- table(tags, useNA = "always")
+  tagged <- unique(tags[!is.na(tags)])
+  n_tag <- vapply(tagged, function(t) sum(tags == t, na.rm = TRUE), integer(1))
+  n_sys <- sum(is.na(tags))
 
-  result <- data.frame(
-    tag = names(tag_tbl),
-    n = as.integer(tag_tbl),
-    stringsAsFactors = FALSE
-  )
-
-  # Add original codes (numeric for SPSS, character for Stata/SAS)
-  if (!is.null(tag_map)) {
-    result$code <- as.character(tag_map[result$tag])
-  } else {
-    result$code <- NA_character_
-  }
-
-  # Add value labels
+  code <- if (!is.null(tag_map)) unname(tag_map)[match(tagged, names(tag_map))]
+          else rep(if (numeric_codes) NA_real_ else NA_character_, length(tagged))
+  label <- rep(NA_character_, length(tagged))
   if (!is.null(labels)) {
     na_labels <- labels[is.na(labels)]
-    label_tags <- .na_tags(na_labels)
-    label_lookup <- stats::setNames(names(na_labels), label_tags)
-    result$label <- label_lookup[result$tag]
-  } else {
-    result$label <- NA_character_
+    hit <- match(tagged, .na_tags(na_labels))
+    label[!is.na(hit)] <- names(na_labels)[hit[!is.na(hit)]]
   }
 
-  # Handle system NAs (tag = NA)
-  sys_na_rows <- is.na(result$tag)
-  result$label[sys_na_rows] <- "(System Missing)"
-  result$code[sys_na_rows]  <- NA_character_
-
-  result <- result[order(-result$n), , drop = FALSE]
-  rownames(result) <- NULL
-  result
+  out <- data.frame(code = code, label = label, n = unname(n_tag),
+                    tag = tagged, stringsAsFactors = FALSE)
+  # Order by code, like the missing block of frequency() (SPSS order);
+  # tags without a known code after them
+  out <- out[order(is.na(out$code), out$code, out$tag), , drop = FALSE]
+  if (n_sys > 0L) {
+    out <- rbind(out, data.frame(
+      code = if (numeric_codes) NA_real_ else NA_character_,
+      label = "(System Missing)", n = n_sys, tag = NA_character_,
+      stringsAsFactors = FALSE
+    ))
+  }
+  out$prc <- out$n / length(raw) * 100
+  out <- out[, c("code", "label", "n", "prc", "tag")]
+  rownames(out) <- NULL
+  out
 }
 
 

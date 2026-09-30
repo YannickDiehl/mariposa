@@ -72,7 +72,7 @@ test_that("IO-02: rec() keeps class, na_tag_map and missing labels", {
     expect_s3_class(r, "haven_labelled")
     expect_equal(attr(r, "na_tag_map"), attr(x, "na_tag_map"))
     nf <- na_frequencies(r)
-    expect_setequal(nf$code[!is.na(nf$tag)], c("-9", "-8"))
+    expect_setequal(nf$code[!is.na(nf$tag)], c(-9, -8))
     lab <- attr(r, "labels")
     expect_setequal(names(lab)[is.na(lab)], c("no answer", "don't know"))
   }
@@ -227,7 +227,7 @@ test_that("SCALE-09: rec() on haven_labelled_spss keeps the missing codes", {
   expect_equal(as.numeric(r)[c(1, 2, 3, 5)], c(5, 4, 3, 1))
   expect_true(is.na(r[4]))
   nf <- na_frequencies(r)
-  expect_equal(nf$code[!is.na(nf$tag)], "-9")
+  expect_equal(nf$code[!is.na(nf$tag)], -9)
   tf <- tempfile(fileext = ".sav")
   on.exit(unlink(tf))
   suppressMessages(write_spss(data.frame(r = r), tf))
@@ -790,4 +790,40 @@ test_that("IO-20: strip_tags()/untag_na() reject non-numeric vectors clearly", {
   expect_error(strip_tags(c("a", "b")), "numeric")
   expect_error(untag_na(c("a", "b")), "numeric")
   expect_error(strip_tags(list(1)), "numeric")
+})
+
+# IO-21: na_frequencies() sorted by n (frequency() sorts by code), put the
+# technical tag letter first, returned the code as character, had no
+# percentages, always added a "(System Missing) 0" row and printed an empty
+# result as "<0 Zeilen>".
+test_that("IO-21: na_frequencies() is ordered by code with numeric codes and %", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(1, -42, -9, -9, -11, -11, -11, 2, 3, 4),
+                       labels = c("no answer" = -9, "n.a." = -11,
+                                  "error" = -42))
+  x <- set_na(x, -42, -11, -9)
+  nf <- na_frequencies(x)
+  expect_equal(names(nf), c("code", "label", "n", "prc", "tag"))
+  expect_equal(nf$code, c(-42, -11, -9))
+  expect_type(nf$code, "double")
+  expect_equal(nf$n, c(1L, 3L, 2L))
+  expect_equal(nf$prc, c(10, 30, 20))
+  expect_false(any(nf$label == "(System Missing)"))
+  y <- x
+  y[1] <- NA
+  nf2 <- na_frequencies(y)
+  expect_equal(nf2$label[nrow(nf2)], "(System Missing)")
+  expect_true(is.na(nf2$code[nrow(nf2)]))
+})
+
+test_that("IO-21: na_frequencies() without missings is quiet; data frames work", {
+  skip_if_not_installed("haven")
+  expect_message(out <- withVisible(na_frequencies(c(1, 2, 3))), "No missing")
+  expect_false(out$visible)
+  d <- tibble::tibble(a = set_na(c(1, -9, -9), -9), b = set_na(c(-8, 1, 2), -8),
+                      s = c("x", "y", "z"))
+  nf <- na_frequencies(d)
+  expect_equal(nf$variable, c("a", "b"))
+  expect_equal(nf$code, c(-9, -8))
+  expect_equal(na_frequencies(d, b)$variable, "b")
 })

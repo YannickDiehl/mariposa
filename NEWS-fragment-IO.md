@@ -173,3 +173,12 @@
   variable labels: the labels of the missing types are attached to their
   restored codes (e.g. -9 = "KEINE ANGABE"), so the result is still
   `haven_labelled`.
+* `na_frequencies()` output is reorganised: rows are ordered by code like
+  the missing block of `frequency()` (they were sorted by count), columns
+  are `code`, `label`, `n`, `prc` (percent of all cases, new) and `tag`
+  (the technical tag letter moved last), SPSS codes are numeric (were
+  character), the "(System Missing)" row appears only when system-missing
+  values occur, and a variable without missing values gives a message
+  instead of printing `<0 rows>`. Data frames are accepted
+  (`na_frequencies(data, q1, q2)`, as the data-io vignette shows) and
+  return one table with a `variable` column.
