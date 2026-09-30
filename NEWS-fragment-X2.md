@@ -10,7 +10,8 @@
   for correlations and post-hoc tests, per term for ANOVA and regression
   tables, per cell for `crosstab()`, per item for `efa()` loadings); list
   columns are flattened (`t_test()` gets `group1`, `group2`, `mean1`,
-  `mean2`, `sd1`, `sd2`) or dropped (the observed/expected tables of
+  `mean2`, `sd1`, `sd2`), written out as text (the values and value
+  labels of a `codebook()`) or dropped (the observed/expected tables of
   `chi_square()`), so `write.csv()` works; grouping variables are the
   leading columns, labelled ones as their value labels. With broom
   loaded, `broom::tidy()` now works for all test and descriptive classes

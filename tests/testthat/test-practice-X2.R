@@ -247,6 +247,21 @@ test_that("UX-EXPORT frequency() with tagged missing values drops the summary ro
   expect_equal(sum(df$missing), 3L)
 })
 
+test_that("UX-EXPORT codebook() table lists values and labels as text", {
+  # Was: the codebook table had list-columns (values, value labels,
+  # missing codes) that no CSV/table writer could take.
+  skip_if_not_installed("haven")
+  d <- data.frame(
+    r = haven::labelled(c(1, 2, 2, 1), labels = c(Low = 1, High = 2),
+                        label = "Rating"),
+    g = factor(c("a", "b", "a", "b"))
+  )
+  cb <- as.data.frame(codebook(d, view = FALSE))
+  expect_equal(cb$name, c("r", "g"))
+  expect_equal(cb$value_labels, c("1 = Low; 2 = High", "a; b"))
+  expect_equal(cb$values[2], "a; b")
+})
+
 test_that("UX-EXPORT broom::tidy() works for the test classes with broom names", {
   # Was: tidy() worked only for the two regressions.
   skip_if_not_installed("broom")

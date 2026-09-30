@@ -442,8 +442,11 @@
   out$values <- vapply(cb$empirical_values, function(v) {
     paste(v[!is.na(v)], collapse = "; ")
   }, character(1))
+  # "1 = Low; 2 = High"; factor levels are their own labels ("Male; Female")
   out$value_labels <- vapply(cb$value_labels, function(v) {
-    if (is.null(v)) "" else pairs(unname(v), names(v))
+    if (is.null(v)) return("")
+    if (identical(names(v), unname(v))) pairs(unname(v), NULL)
+    else pairs(unname(v), names(v))
   }, character(1))
   out$missing_values <- vapply(seq_len(nrow(cb)), function(i) {
     nav <- cb$na_values[[i]]
