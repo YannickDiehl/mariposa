@@ -69,6 +69,11 @@ By default, SET mode replaces all existing value labels. Use
 `.add = TRUE` to keep existing labels and only add new ones. If a value
 already has a label, the new label overwrites it.
 
+Value labels belong to numeric codes: setting them on a factor or a
+character column is an error (convert it with
+[`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)
+first).
+
 ## See also
 
 [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md)
@@ -93,30 +98,32 @@ Other labels:
 ## Examples
 
 ``` r
+# SET: assign value labels to a numeric rating (1-5)
+data <- val_labels(survey_data,
+  life_satisfaction = c("Very dissatisfied" = 1, "Very satisfied" = 5)
+)
+
 # GET: retrieve value labels from a vector
-val_labels(survey_data$gender)
-#> NULL
+val_labels(data$life_satisfaction)
+#> Very dissatisfied    Very satisfied 
+#>                 1                 5 
 
 # GET: from specific variables (returns list)
-val_labels(survey_data, gender, region)
-#> $gender
+val_labels(data, life_satisfaction, trust_government)
+#> $life_satisfaction
+#> Very dissatisfied    Very satisfied 
+#>                 1                 5 
+#> 
+#> $trust_government
 #> NULL
 #> 
-#> $region
-#> NULL
-#> 
-
-# SET: assign value labels
-data <- val_labels(survey_data,
-  gender = c("Male" = 1, "Female" = 2, "Non-binary" = 3)
-)
 
 # ADD: add labels without removing existing ones
 data <- val_labels(data,
-  gender = c("Prefer not to say" = 4),
+  life_satisfaction = c("Neither" = 3),
   .add = TRUE
 )
 
 # REMOVE: set to NULL
-data <- val_labels(data, gender = NULL)
+data <- val_labels(data, life_satisfaction = NULL)
 ```

@@ -101,8 +101,12 @@ single vector input, returns a <code>haven_labelled</code> vector.</p>
 <h3 id="factor-conversion">Factor Conversion<a class="anchor" aria-label="anchor" href="#factor-conversion"></a></h3>
 
 
-<p>When converting a factor, the integer codes (1, 2, 3, ...) become the
-numeric values and the factor levels become the value labels.</p>
+<p>When converting a factor created by <code><a href="to_label.html">to_label()</a></code>, the original codes
+stored in its <code>"codes"</code> attribute are restored (the round trip
+<code>to_labelled(to_label(x))</code> returns the original values and labels).
+For other factors, or when <code>labels</code> is supplied, the integer codes
+(1, 2, 3, ...) become the numeric values and the factor levels become
+the value labels.</p>
 </div>
 
 <div class="section">

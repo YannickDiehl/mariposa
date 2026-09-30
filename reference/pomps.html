@@ -100,7 +100,9 @@ The transformation preserves all correlations between variables.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A numeric vector of the same length as <code>x</code>, with values
-rescaled to the 0-100 range.</p>
+rescaled to the 0-100 range. The variable label of <code>x</code> is kept;
+missing values (including the SPSS missing types of imported data)
+become plain <code>NA</code>, as in an SPSS <code>COMPUTE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -123,7 +125,9 @@ range:</p>
 <li><p>A 1-7 Likert scale: <code>scale_min = 1, scale_max = 7</code></p></li>
 <li><p>A 0-10 scale: <code>scale_min = 0, scale_max = 10</code></p></li>
 </ul><p>Using theoretical values ensures that the transformation is consistent
-across samples and time points.</p>
+across samples and time points. Values outside the range (e.g. an
+unrecoded "don't know" = 9 on a 1-5 scale) give scores below 0 or above
+100; <code>pomps()</code> warns about them, so recode missing codes first.</p>
 </div>
 
 <div class="section">

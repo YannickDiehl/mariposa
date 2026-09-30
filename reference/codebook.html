@@ -109,7 +109,9 @@ are shown. Supports tidyselect helpers like <code>starts_with("trust")</code>.</
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for weighted frequency calculations</p></dd>
+<dd><p>Optional survey weights for weighted frequency calculations.
+Give a column name (unquoted or as a string), an expression such as
+<code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-show-id">show_id<a class="anchor" aria-label="anchor" href="#arg-show-id"></a></dt>
@@ -170,13 +172,18 @@ file is used). The directory of <code>file</code> must already exist.</p></dd>
 <dt id="arg-view">view<a class="anchor" aria-label="anchor" href="#arg-view"></a></dt>
 <dd><p>Open the HTML codebook in the RStudio Viewer (or browser)?
 Defaults to <code><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive()</a></code>, so interactive sessions open the Viewer
-and scripts/tests do not. Set <code>view = FALSE</code> to suppress the Viewer
+and scripts/tests do not; while an R Markdown/Quarto document is
+knitted the default is <code>FALSE</code> (the codebook is embedded in the
+document instead). Set <code>view = FALSE</code> to suppress the Viewer
 side effect entirely; <code>file =</code> writing is unaffected by this argument.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Invisibly returns a list of class <code>"codebook"</code> containing:</p><dl><dt>codebook</dt>
+    <p>A list of class <code>"codebook"</code>. Printing it shows a compact
+console overview; in a knitted HTML document (R Markdown, Quarto)
+the full HTML codebook is embedded, in other formats the overview is
+shown. The list contains:</p><dl><dt>codebook</dt>
 <dd><p>Tibble with one row per variable and all metadata</p></dd>
 
 <dt>data_info</dt>
@@ -222,6 +229,16 @@ side effect entirely; <code>file =</code> writing is unaffected by this argument
 <li><p>Need to quickly see value distributions across variables</p></li>
 </ul></div>
 
+<div class="section">
+<h3 id="in-r-markdown-and-quarto">In R Markdown and Quarto<a class="anchor" aria-label="anchor" href="#in-r-markdown-and-quarto"></a></h3>
+
+
+<p>A chunk containing <code>codebook(data)</code> embeds the HTML codebook in HTML
+output (its styles only apply to the codebook, not to the rest of the
+document); PDF and Word output show the compact console overview. Use
+<code><a href="write_xlsx.html">write_xlsx()</a></code> for an Excel version of the codebook.</p>
+</div>
+
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -239,7 +256,7 @@ detailed frequency tables, <code><a href="read_spss.html">read_spss()</a></code>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cb</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Codebook: survey_data</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 variables | 2,500 observations | 15 labelled</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 variables | 2500 observations | 15 labelled</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer</span>
 <span class="r-in"><span></span></span>
@@ -249,7 +266,7 @@ detailed frequency tables, <code><a href="read_spss.html">read_spss()</a></code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Codebook</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Dataset: survey_data</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Observations: 2,500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Observations: 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Variables: 16 (10 numeric, 6 factor, 0 character)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Variables with labels: 15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Variables with missing data: 7</span>
@@ -351,12 +368,27 @@ detailed frequency tables, <code><a href="read_spss.html">read_spss()</a></code>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Full codebook (opens in RStudio Viewer when interactive)</span></span></span>
 <span class="r-in"><span><span class="fu">codebook</span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Codebook: survey_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 variables | 2500 observations | 15 labelled</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Only trust-related variables</span></span></span>
 <span class="r-in"><span><span class="fu">codebook</span><span class="op">(</span><span class="va">survey_data</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Codebook: survey_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 variables | 2500 observations | 3 labelled</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Types: 3 int</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Save to file for sharing</span></span></span>
 <span class="r-in"><span><span class="fu">codebook</span><span class="op">(</span><span class="va">survey_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".html"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Codebook: survey_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 variables | 2500 observations | 15 labelled</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

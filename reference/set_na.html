@@ -83,7 +83,8 @@ declared as missing after import.</p>
 (e.g., <code>set_na(data, -9, -8)</code>)</p></li>
 <li><p><strong>Named pairs</strong>: Applied to specific variables
 (e.g., <code>set_na(data, income = c(-9, -8), age = -1)</code>)</p></li>
-</ul></dd>
+</ul><p>Factors are left unchanged (with a warning when named explicitly):
+<code>set_na()</code> works on numeric codes.</p></dd>
 
 
 <dt id="arg-tag">tag<a class="anchor" aria-label="anchor" href="#arg-tag"></a></dt>
@@ -164,8 +165,8 @@ in <code><a href="frequency.html">frequency()</a></code> and <code><a href="code
 <span class="r-in"><span>  <span class="co"># Check the result</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="na_frequencies.html">na_frequencies</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">income</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    tag   n code            label</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;NA&gt; 314 &lt;NA&gt; (System Missing)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code            label   n   prc  tag</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   NA (System Missing) 314 12.56 &lt;NA&gt;</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

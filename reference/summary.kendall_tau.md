@@ -58,23 +58,23 @@ for the main analysis function.
 result <- kendall_tau(survey_data[1:300, ], trust_government, trust_media)
 summary(result)
 #> 
-#> Kendall's Tau-b Correlation 
-#> ----------------------------
+#> Kendall's Tau-b Correlation
+#> ---------------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Kendall's tau-b: tau-b = 0.083
-#>   p-value: p = 0.098 
+#>   p-value (2-tailed): p = 0.098
 #>   N = 270
 #>   z-score: 1.655
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)
 #> 
-#> Kendall's Tau-b Correlation 
-#> ----------------------------
+#> Kendall's Tau-b Correlation
+#> ---------------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Alternative hypothesis: two.sided

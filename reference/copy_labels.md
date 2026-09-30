@@ -1,13 +1,18 @@
 # Copy Labels from One Data Frame to Another
 
 Copies variable labels, value labels, and tagged NA metadata from a
-source data frame to a target data frame. This is essential after dplyr
-operations like
+source data frame to a target data frame. dplyr verbs such as
 [`dplyr::filter()`](https://dplyr.tidyverse.org/reference/filter.html),
-[`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html),
+[`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html)
 or
-[`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
-which can strip label attributes.
+[`dplyr::arrange()`](https://dplyr.tidyverse.org/reference/arrange.html)
+keep labels; they are lost by base-R conversions and computations (e.g.
+[`as.numeric()`](https://rdrr.io/r/base/numeric.html),
+[`ifelse()`](https://rdrr.io/r/base/ifelse.html), arithmetic on labelled
+vectors), by [`merge()`](https://rdrr.io/r/base/merge.html) /
+[`rbind()`](https://rdrr.io/r/base/cbind.html) of plain data frames, or
+by a detour through CSV. `copy_labels()` restores them from the original
+data.
 
 ## Usage
 
@@ -33,9 +38,10 @@ left unchanged.
 
 ## Details
 
-The following attributes are copied for each shared column:
-
-- `"label"` — variable label
+The variable label (`"label"`) is always copied. The following are
+copied only when the target column still holds the source's codes (a
+numeric column whose values are observed values or labelled codes of the
+source column):
 
 - `"labels"` — value labels
 
@@ -43,7 +49,14 @@ The following attributes are copied for each shared column:
 
 - `"na_tag_format"` — tagged NA format (spss/stata/sas)
 
+- `"na_values"`, `"na_range"` — SPSS missing-value definitions
+
 - `"class"` — vector class (e.g., `haven_labelled`)
+
+A converted column (e.g. a factor from
+[`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md))
+or a summarised one (e.g. group means) keeps its own type and gets the
+variable label only.
 
 ## See also
 
@@ -65,9 +78,13 @@ Other labels:
 ## Examples
 
 ``` r
-# Labels are lost after dplyr operations
-data_subset <- dplyr::filter(survey_data, age >= 18)
+# as.numeric() drops the variable label
+data_plain <- dplyr::mutate(survey_data, age = as.numeric(age))
+attr(data_plain$age, "label")
+#> NULL
 
-# Restore them
-data_subset <- copy_labels(data_subset, survey_data)
+# Restore it
+data_plain <- copy_labels(data_plain, survey_data)
+attr(data_plain$age, "label")
+#> [1] "Age in years"
 ```

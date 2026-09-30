@@ -152,10 +152,13 @@ for coding and structure. Generated with set.seed(2024) for reproducibility.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Descriptive Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable     Mean Median       SD Range  IQR Skewness Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age   50.514     50   17.084    77   25    0.159      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income 3743.099   3500 1423.966  7200 1900    0.725      2158.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     Mean   Median       SD    Range      IQR Skewness    N Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age        50.514   50.000   17.084   77.000   25.000    0.159 2516       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income   3743.099 3500.000 1423.966 7200.000 1900.000    0.725 2201     315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Frequency analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="frequency.html">frequency</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
@@ -164,43 +167,44 @@ for coding and structure. Generated with set.seed(2024) for reproducibility.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> education (Highest educational attainment)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                  Total |                        |   2516 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value                  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Basic Secondary        |  848 |  33.71 |   33.71 |  33.71 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Intermediate Secondary |  641 |  25.47 |   25.47 |  59.18 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Academic Secondary     |  642 |  25.51 |   25.51 |  84.69 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | University             |  385 |  15.31 |   15.31 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total                  | 2516 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> region (Region (East/West))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                   East |                   East |    509 |  20.23 |  20.23 |  20.23 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                   West |                   West |   2007 |  79.77 |  79.77 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                  Total |                        |   2516 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | East  |  509 |  20.23 |   20.23 |  20.23 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | West  | 2007 |  79.77 |   79.77 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total | 2516 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Group comparisons</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(484.7) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(484.7) = 0.641, p = 0.522, g = 0.058 (negligible), N = 488</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(1901.1) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(1901.1) = -1.548, p = 0.122, g = -0.070 (negligible), N = 1949</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -33,9 +33,11 @@ to_numeric(
 
 - use_labels:
 
-  If `TRUE` (default), attempts to use the numeric value of factor
-  levels (e.g., level `"3"` becomes `3`). If `FALSE`, uses sequential
-  integers (1, 2, 3, ...).
+  If `TRUE` (default), restores the original codes of a factor created
+  by
+  [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md),
+  otherwise uses the numeric value of factor levels (e.g., level `"3"`
+  becomes `3`). If `FALSE`, uses sequential integers (1, 2, 3, ...).
 
 - start_at:
 
@@ -44,8 +46,11 @@ to_numeric(
 
 - keep_labels:
 
-  If `TRUE`, the former factor levels are stored as value labels on the
-  result. Default: `FALSE`.
+  If `TRUE`, the result is a `haven_labelled` vector: the former factor
+  levels (or the existing value labels and missing-value types of a
+  labelled input) are kept, so they survive
+  [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md).
+  Default: `FALSE` (plain numeric; missing-value types become `NA`).
 
 - use.labels, start.at, keep.labels:
 
@@ -61,17 +66,25 @@ returns a numeric vector.
 
 ## Details
 
-This function handles three input types:
+This function handles four input types:
 
-1.  **Numeric factors** (levels like `"1"`, `"2"`, `"3"`): Extracts the
+1.  **Factors from
+    [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)**:
+    Restores the original codes stored in the `"codes"` attribute, so a
+    [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
+    / `to_numeric()` round trip returns the original values (6, 42, 90,
+    ...) instead of 1, 2, 3.
+
+2.  **Numeric factors** (levels like `"1"`, `"2"`, `"3"`): Extracts the
     numeric values from the level names.
 
-2.  **Text factors** (levels like `"Male"`, `"Female"`): Converts to
-    sequential integers by default; use `use_labels = FALSE` to force
-    this behavior even for numeric-looking levels.
+3.  **Other text factors** (levels like `"Male"`, `"Female"`): Converts
+    to sequential integers (1, 2, 3, ... in level order). Use
+    `use_labels = FALSE` to force this behavior for any factor.
 
-3.  **haven_labelled**: Extracts the underlying numeric vector,
-    stripping the labelled class.
+4.  **haven_labelled**: Extracts the underlying numeric vector,
+    stripping the labelled class. Missing-value types of imported data
+    (tagged NAs) become plain `NA`.
 
 ## See also
 

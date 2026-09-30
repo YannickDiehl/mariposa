@@ -56,28 +56,31 @@ summary(result)
 #> life_satisfaction
 #> -----------------
 #>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  809    974.29
-#>    Intermediate Secondary  618   1250.73
-#>        Academic Secondary  607   1329.56
-#>                University  387   1456.42
-#>                     Total 2421        NA
-#>   --------------------------------------
+#>   ---------------------------------------
+#>   Group                      N  Mean Rank
+#>   ---------------------------------------
+#>   Basic Secondary          809     974.29
+#>   Intermediate Secondary   618    1250.73
+#>   Academic Secondary       607    1329.56
+#>   University               387    1456.42
+#>   Total                   2421           
+#>   ---------------------------------------
 #> 
 #>   Test Statistics:
-#>   ------------------------------------------------
-#>    Kruskal-Wallis H df p value Epsilon-squared sig
-#>             171.178  3       0           0.071 ***
-#>   ------------------------------------------------
+#>   ---------------------------------------------------
+#>   Kruskal-Wallis H  df  p value  Epsilon-squared     
+#>   ---------------------------------------------------
+#>            171.178   3    <.001            0.071  ***
+#>   ---------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (Epsilon-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> - Negligible: < 0.01
+#> - Small: 0.01 - 0.06
+#> - Medium: 0.06 - 0.14
+#> - Large: >= 0.14
 summary(result, ranks = FALSE)
 #> Kruskal-Wallis Test Results
 #> ---------------------------
@@ -88,16 +91,18 @@ summary(result, ranks = FALSE)
 #> life_satisfaction
 #> -----------------
 #>   Test Statistics:
-#>   ------------------------------------------------
-#>    Kruskal-Wallis H df p value Epsilon-squared sig
-#>             171.178  3       0           0.071 ***
-#>   ------------------------------------------------
+#>   ---------------------------------------------------
+#>   Kruskal-Wallis H  df  p value  Epsilon-squared     
+#>   ---------------------------------------------------
+#>            171.178   3    <.001            0.071  ***
+#>   ---------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (Epsilon-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> - Negligible: < 0.01
+#> - Small: 0.01 - 0.06
+#> - Medium: 0.06 - 0.14
+#> - Large: >= 0.14
 ```

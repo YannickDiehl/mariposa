@@ -119,8 +119,9 @@ between-subjects factors (2-3 factors). These must be categorical variables
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results
-(unquoted variable name)</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-ss-type">ss_type<a class="anchor" aria-label="anchor" href="#arg-ss-type"></a></dt>
@@ -149,7 +150,13 @@ implemented. Passing 2 issues a warning and computes Type III.</p></dd>
 <dd><p>List with metadata (dv, factors, weighted, n_total, n_missing)</p></dd>
 
 
-</dl><p>Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p>
+</dl><p>Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.
+For data grouped with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>, one ANOVA is computed per group:
+the tables carry the group keys as leading columns, <code>group_results</code>
+holds the complete result of each group (<code>NULL</code>, with a warning, for
+a group that cannot be analysed), and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>,
+<code><a href="tukey_test.html">tukey_test()</a></code>, <code><a href="scheffe_test.html">scheffe_test()</a></code> and <code><a href="levene_test.html">levene_test()</a></code> report
+per group.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -237,31 +244,49 @@ Analyzing Data (2nd ed.). Lawrence Erlbaum Associates.</p>
 <span class="r-in"><span><span class="co"># Two-way ANOVA: income by gender and education</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">factorial_anova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): income by gender, education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 2178) = 0.098, p = 0.755 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): income by gender, education, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 2178) = 0.098, p = 0.755, eta2p = 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   education:        F(3, 2178) = 463.521, p &lt; 0.001 ***, eta2p = 0.390</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 2178) = 0.399, p = 0.754 , eta2p = 0.001, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 2178) = 0.399, p = 0.754, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Two-way ANOVA with weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">factorial_anova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">life_satisfaction</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): life_satisfaction by gender, region [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:        F(1, 2417) = 0.008, p = 0.930 , eta2p = 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   region:        F(1, 2417) = 0.001, p = 0.979 , eta2p = 0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:region: F(1, 2417) = 1.642, p = 0.200 , eta2p = 0.001, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): life_satisfaction by gender, region [Weighted], N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:        F(1, 2417) = 0.008, p = 0.930, eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   region:        F(1, 2417) = 0.001, p = 0.979, eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:region: F(1, 2417) = 1.642, p = 0.200, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Separate ANOVA for each region</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">factorial_anova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">life_satisfaction</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): life_satisfaction by gender, education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East] N = 465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 457) = 0.340, p = 0.560, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education:        F(3, 457) = 6.877, p &lt; 0.001 ***, eta2p = 0.043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 457) = 0.060, p = 0.981, eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West] N = 1956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 1948) = 3.631, p = 0.057, eta2p = 0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education:        F(3, 1948) = 61.144, p &lt; 0.001 ***, eta2p = 0.086</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 1948) = 1.107, p = 0.345, eta2p = 0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Three-way ANOVA</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">factorial_anova</span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, <span class="va">education</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (3-Way): income by gender, region, education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:                  F(1, 2170) = 2.976, p = 0.085 , eta2p = 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   region:                  F(1, 2170) = 0.056, p = 0.812 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (3-Way): income by gender, region, education, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:                  F(1, 2170) = 2.976, p = 0.085, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   region:                  F(1, 2170) = 0.056, p = 0.812, eta2p = 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   education:               F(3, 2170) = 279.309, p &lt; 0.001 ***, eta2p = 0.279</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   gender:region:           F(1, 2170) = 5.769, p = 0.016 *, eta2p = 0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education:        F(3, 2170) = 0.597, p = 0.617 , eta2p = 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   region:education:        F(3, 2170) = 0.990, p = 0.396 , eta2p = 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:region:education: F(3, 2170) = 3.889, p = 0.009 **, eta2p = 0.005, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education:        F(3, 2170) = 0.597, p = 0.617, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   region:education:        F(3, 2170) = 0.990, p = 0.396, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:region:education: F(3, 2170) = 3.889, p = 0.009 **, eta2p = 0.005</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Follow up with post-hoc tests</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -278,108 +303,81 @@ Analyzing Data (2nd ed.). Lawrence Erlbaum Associates.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact overview</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): income by gender, education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 2178) = 0.098, p = 0.755 , eta2p = 0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way): income by gender, education, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:           F(1, 2178) = 0.098, p = 0.755, eta2p = 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   education:        F(3, 2178) = 463.521, p &lt; 0.001 ***, eta2p = 0.390</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 2178) = 0.399, p = 0.754 , eta2p = 0.001, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender:education: F(3, 2178) = 0.399, p = 0.754, eta2p = 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way ANOVA) Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Factors: gender x education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Type III Sum of Squares: Type 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Sum of squares: Type III</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N (complete cases): 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: 314</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tests of Between-Subjects Effects</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Source             Type III SS  df   Mean Square  F         Sig. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Model    1.754652e+09    7 2.506646e+08   199.909 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intercept          3.221261e+10    1 3.221261e+10 25690.075 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender             1.226376e+05    1 1.226376e+05     0.098 0.755</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education          1.743618e+09    3 5.812059e+08   463.521 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender * education 1.499441e+06    3 4.998136e+05     0.399 0.754</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Error              2.730979e+09 2178 1.253893e+06                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Total              3.529079e+10 2186                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Total    4.485631e+09 2185                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Partial Eta Sq    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.391          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.922          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.390          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.001             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Source              Type III Sum of Squares    df      Mean Square          F    Sig  Partial Eta Squared     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Corrected Model              1754652069.847     7    250664581.407    199.909  &lt;.001                0.391  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Intercept                   32212607064.510     1  32212607064.510  25690.075  &lt;.001                0.922  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender                           122637.601     1       122637.601      0.098   .755                0.000     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education                    1743617622.524     3    581205874.175    463.521  &lt;.001                0.390  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender * education              1499440.759     3       499813.586      0.399   .754                0.001     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Error                        2730979096.667  2178      1253893.066                                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                       35290790000.000  2186                                                             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Corrected Total              4485631166.514  2185                                                             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> R Squared = 0.391 (Adjusted R Squared = 0.389)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender education              Mean    Std. Deviation N  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Basic Secondary        2803.43  774.959       350</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Intermediate Secondary 3574.09  996.649       247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Academic Secondary     4246.45 1180.779       282</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   University             5318.56 1718.805       167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Basic Secondary        2718.70  795.831       385</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Intermediate Secondary 3607.64  996.214       301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Academic Secondary     4200.38 1178.118       266</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female University             5353.72 1612.265       188</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender  education                   Mean  Std. Deviation    N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    Basic Secondary         2803.429         774.959  350</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    Intermediate Secondary  3574.089         996.649  247</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    Academic Secondary      4246.454        1180.779  282</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    University              5318.563        1718.805  167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  Basic Secondary         2718.701         795.831  385</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  Intermediate Secondary  3607.641         996.214  301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  Academic Secondary      4200.376        1178.118  266</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  University              5353.723        1612.265  188</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test of Equality of Error Variances</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(7, 2178) = 44.988, p = &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(7, 2178) = 44.988, p &lt; 0.001 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, marginal_means <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide estimated marginal means</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, descriptives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide the cell descriptives</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Factorial ANOVA (2-Way ANOVA) Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Dependent variable: income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Factors: gender x education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Type III Sum of Squares: Type 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Sum of squares: Type III</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N (complete cases): 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: 314</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tests of Between-Subjects Effects</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Source             Type III SS  df   Mean Square  F         Sig. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Model    1.754652e+09    7 2.506646e+08   199.909 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Intercept          3.221261e+10    1 3.221261e+10 25690.075 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender             1.226376e+05    1 1.226376e+05     0.098 0.755</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  education          1.743618e+09    3 5.812059e+08   463.521 &lt;.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender * education 1.499441e+06    3 4.998136e+05     0.399 0.754</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Error              2.730979e+09 2178 1.253893e+06                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Total              3.529079e+10 2186                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Corrected Total    4.485631e+09 2185                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Partial Eta Sq    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.391          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.922          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.390          ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.001             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Source              Type III Sum of Squares    df      Mean Square          F    Sig  Partial Eta Squared     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Corrected Model              1754652069.847     7    250664581.407    199.909  &lt;.001                0.391  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Intercept                   32212607064.510     1  32212607064.510  25690.075  &lt;.001                0.922  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender                           122637.601     1       122637.601      0.098   .755                0.000     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education                    1743617622.524     3    581205874.175    463.521  &lt;.001                0.390  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender * education              1499440.759     3       499813.586      0.399   .754                0.001     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Error                        2730979096.667  2178      1253893.066                                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                       35290790000.000  2186                                                             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Corrected Total              4485631166.514  2185                                                             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> R Squared = 0.391 (Adjusted R Squared = 0.389)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  gender education              Mean    Std. Deviation N  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Basic Secondary        2803.43  774.959       350</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Intermediate Secondary 3574.09  996.649       247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   Academic Secondary     4246.45 1180.779       282</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Male   University             5318.56 1718.805       167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Basic Secondary        2718.70  795.831       385</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Intermediate Secondary 3607.64  996.214       301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female Academic Secondary     4200.38 1178.118       266</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Female University             5353.72 1612.265       188</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test of Equality of Error Variances</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(7, 2178) = 44.988, p = &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(7, 2178) = 44.988, p &lt; 0.001 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

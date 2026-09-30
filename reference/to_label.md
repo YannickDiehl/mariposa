@@ -29,7 +29,10 @@ to_label(
 - ...:
 
   Optional: unquoted variable names (tidyselect supported). If empty,
-  converts all `haven_labelled` columns.
+  converts every `haven_labelled` column whose values are all
+  value-labelled; metric variables (e.g. age with labels only for its
+  missing codes), weights and partially labelled variables are left
+  unchanged with a message. Selected variables are always converted.
 
 - ordered:
 
@@ -50,7 +53,7 @@ to_label(
 
   If `TRUE`, values without labels are included as factor levels using
   their numeric value as the level name. Default: `FALSE` (unlabelled
-  values become `NA`).
+  values become `NA`, with a warning naming the variables).
 
 - drop.na, drop.unused, add.non.labelled:
 
@@ -68,7 +71,22 @@ vector input, returns a factor.
 
 For each labelled variable, the numeric codes are replaced by their
 associated value labels. The resulting factor levels are ordered by the
-original numeric values (not alphabetically).
+original numeric values (not alphabetically). Distinct codes that share
+a label text (e.g. ".." for the unlabelled points of a scale) stay
+distinct levels with their code appended: `".. (2)"`, `".. (3)"`.
+
+The original code of every level is kept in the factor's `"codes"`
+attribute (a named numeric vector, names = levels), so
+[`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md)
+and
+[`to_labelled()`](https://YannickDiehl.github.io/mariposa/reference/to_labelled.md)
+can restore the original values (e.g. 6, 42, 90) instead of renumbering
+the levels 1, 2, 3. The attribute survives dplyr verbs
+([`filter()`](https://dplyr.tidyverse.org/reference/filter.html),
+[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html),
+[`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html), ...)
+but, like the variable label, is dropped by base subsetting (`x[i]`) and
+no longer applies once the levels are renamed or extended.
 
 ### When to Use This
 

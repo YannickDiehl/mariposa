@@ -171,8 +171,13 @@ correction and Shapiro-Wilk:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/normality_test.html">normality_test</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Normality Tests: age, income</span></span>
-<span><span class="co">#&gt;   2 group combination(s) x 2 variable(s) [Grouped: gender]</span></span>
+<span><span class="co">#&gt; Normality Tests: age, income [Grouped: gender]</span></span>
+<span><span class="co">#&gt; [gender = Male]</span></span>
+<span><span class="co">#&gt;   age: KS = 0.029, p = 0.018; Shapiro-Wilk W = 0.989, p &lt; 0.001 (n = 1194)</span></span>
+<span><span class="co">#&gt;   income: KS = 0.080, p &lt; 0.001; Shapiro-Wilk W = 0.960, p &lt; 0.001 (n = 1046)</span></span>
+<span><span class="co">#&gt; [gender = Female]</span></span>
+<span><span class="co">#&gt;   age: KS = 0.030, p = 0.007; Shapiro-Wilk W = 0.990, p &lt; 0.001 (n = 1306)</span></span>
+<span><span class="co">#&gt;   income: KS = 0.081, p &lt; 0.001; Shapiro-Wilk W = 0.965, p &lt; 0.001 (n = 1140)</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>Run it grouped (as above) when you are about to compare groups: the
 assumption that matters is normality <em>within</em> each group. With
@@ -192,7 +197,8 @@ switching to a non-parametric alternative.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: life_satisfaction by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>The output includes both Student’s t-test (equal variances assumed)
 and Welch’s t-test (not assumed). When in doubt, use Welch — it is more
 robust.</p>
@@ -212,24 +218,30 @@ confidence intervals:</p>
 <span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
 <span><span class="co">#&gt; - Null hypothesis (mu): 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- life_satisfaction ---</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Male: mean = 3.598, n = 1149.0</span></span>
-<span><span class="co">#&gt;   Female: mean = 3.648, n = 1287.0</span></span>
+<span><span class="co">#&gt; Weighted Group Statistics:</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------</span></span>
+<span><span class="co">#&gt;   gender     N   Mean  Std. Deviation  Std. Error Mean</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Male    1149  3.598           1.165            0.034</span></span>
+<span><span class="co">#&gt;   Female  1287  3.648           1.141            0.032</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted t-test Results:</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;         Assumption t_stat       df p_value mean_diff        conf_int sig</span></span>
-<span><span class="co">#&gt;    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    </span></span>
-<span><span class="co">#&gt;  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    </span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt; Weighted Independent Samples Test:</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Equal variances assumed      -1.070      2435  .285      -0.050     0.047        -0.142         0.042   </span></span>
+<span><span class="co">#&gt;   Equal variances not assumed  -1.069  2391.291  .285      -0.050     0.047        -0.142         0.042   </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect Sizes:</span></span>
-<span><span class="co">#&gt; ------------ </span></span>
-<span><span class="co">#&gt;           Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span></span>
-<span><span class="co">#&gt;  life_satisfaction   -0.043   -0.043      -0.043  negligible</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction     -0.043     -0.043        -0.043  negligible</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -249,11 +261,12 @@ confidence intervals:</p>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>         group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: trust_government by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371</span></span>
+<span><span class="co">#&gt;   t(2322.8) = -0.682, p = 0.496, g = -0.028 (negligible), N = 2371</span></span>
 <span><span class="co">#&gt; t-Test: trust_media by gender [Weighted]</span></span>
 <span><span class="co">#&gt;   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382</span></span>
 <span><span class="co">#&gt; t-Test: trust_science by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2360.9) = -1.421, p = 0.156, g = -0.058 (negligible), N = 2414</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="one-sample-t-test">One-Sample t-Test<a class="anchor" aria-label="anchor" href="#one-sample-t-test"></a>
@@ -264,7 +277,8 @@ confidence intervals:</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, mu <span class="op">=</span> <span class="fl">3</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: life_satisfaction [Weighted]</span></span>
-<span><span class="co">#&gt;   t(2435.6) = 26.771, p &lt; 0.001 ***</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(2435.6) = 26.771, p &lt; 0.001 ***, N = 2437</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="grouped-analysis">Grouped Analysis<a class="anchor" aria-label="anchor" href="#grouped-analysis"></a>
@@ -274,12 +288,13 @@ confidence intervals:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [region = 1]</span></span>
+<span><span class="co">#&gt; [region = East]</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450</span></span>
-<span><span class="co">#&gt; [region = 2]</span></span>
+<span><span class="co">#&gt;   t(431.2) = 1.674, p = 0.095, g = 0.158 (negligible), N = 450</span></span>
+<span><span class="co">#&gt; [region = West]</span></span>
 <span><span class="co">#&gt; t-Test: income by gender [Weighted]</span></span>
-<span><span class="co">#&gt;   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751</span></span></code></pre></div>
+<span><span class="co">#&gt;   t(1740.2) = 0.009, p = 0.993, g = 0.000 (negligible), N = 1751</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -291,7 +306,8 @@ confidence intervals:</p>
 <span>  <span class="fu"><a href="../reference/oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="va">result</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
-<span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span></code></pre></div>
+<span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>The effect size <span class="math inline">\eta^2</span> (eta-squared)
 indicates how much variance is explained by group membership:</p>
 <ul>
@@ -348,10 +364,11 @@ the ANOVA output.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/factorial_anova.html">factorial_anova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span><span class="op">)</span>,</span>
 <span>                  weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Factorial ANOVA (2-Way): income by gender, education [Weighted]</span></span>
-<span><span class="co">#&gt;   gender:           F(1, 2178) = 0.115, p = 0.735 , eta2p = 0.000</span></span>
+<span><span class="co">#&gt; Factorial ANOVA (2-Way): income by gender, education [Weighted], N = 2186</span></span>
+<span><span class="co">#&gt;   gender:           F(1, 2178) = 0.115, p = 0.735, eta2p = 0.000</span></span>
 <span><span class="co">#&gt;   education:        F(3, 2178) = 455.835, p &lt; 0.001 ***, eta2p = 0.386</span></span>
-<span><span class="co">#&gt;   gender:education: F(3, 2178) = 0.300, p = 0.825 , eta2p = 0.000, N = 2186</span></span></code></pre></div>
+<span><span class="co">#&gt;   gender:education: F(3, 2178) = 0.300, p = 0.825, eta2p = 0.000</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>The output uses Type III sums of squares and reports partial <span class="math inline">\eta^2</span> for each effect. Weighted analysis
 uses WLS estimation, matching SPSS UNIANOVA.</p>
 <p>For the full output with descriptive statistics per cell:</p>
@@ -365,42 +382,35 @@ uses WLS estimation, matching SPSS UNIANOVA.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Dependent variable: life_satisfaction</span></span>
 <span><span class="co">#&gt; - Factors: gender x region</span></span>
-<span><span class="co">#&gt; - Type III Sum of Squares: Type 3</span></span>
+<span><span class="co">#&gt; - Sum of squares: Type III</span></span>
 <span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
 <span><span class="co">#&gt; - N (complete cases): 2421</span></span>
 <span><span class="co">#&gt; - Missing: 79</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Tests of Between-Subjects Effects</span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;  Source          Type III SS df   Mean Square F         Sig.  Partial Eta Sq</span></span>
-<span><span class="co">#&gt;  Corrected Model     3.714      3     1.238       0.927 0.427 0.001         </span></span>
-<span><span class="co">#&gt;  Intercept       20468.612      1 20468.612   15319.285 &lt;.001 0.864         </span></span>
-<span><span class="co">#&gt;  gender              0.010      1     0.010       0.008 0.930 0.000         </span></span>
-<span><span class="co">#&gt;  region              0.001      1     0.001       0.001 0.979 0.000         </span></span>
-<span><span class="co">#&gt;  gender * region     2.194      1     2.194       1.642 0.200 0.001         </span></span>
-<span><span class="co">#&gt;  Error            3229.435   2417     1.336                                 </span></span>
-<span><span class="co">#&gt;  Total           35249.294   2421                                           </span></span>
-<span><span class="co">#&gt;  Corrected Total  3233.149   2420                                           </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;  ***</span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt; ---------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Source           Type III Sum of Squares    df  Mean Square          F    Sig  Partial Eta Squared     </span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Corrected Model                    3.714     3        1.238      0.927   .427                0.001     </span></span>
+<span><span class="co">#&gt;   Intercept                      20468.612     1    20468.612  15319.285  &lt;.001                0.864  ***</span></span>
+<span><span class="co">#&gt;   gender                             0.010     1        0.010      0.008   .930                0.000     </span></span>
+<span><span class="co">#&gt;   region                             0.001     1        0.001      0.001   .979                0.000     </span></span>
+<span><span class="co">#&gt;   gender * region                    2.194     1        2.194      1.642   .200                0.001     </span></span>
+<span><span class="co">#&gt;   Error                           3229.435  2417        1.336                                            </span></span>
+<span><span class="co">#&gt;   Total                          35249.294  2421                                                         </span></span>
+<span><span class="co">#&gt;   Corrected Total                 3233.149  2420                                                         </span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; R Squared = 0.001 (Adjusted R Squared = 0.000)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;  gender region Mean Std. Deviation N   </span></span>
-<span><span class="co">#&gt;  Male   East   3.66 1.207           228</span></span>
-<span><span class="co">#&gt;  Male   West   3.58 1.152           921</span></span>
-<span><span class="co">#&gt;  Female East   3.59 1.197           237</span></span>
-<span><span class="co">#&gt;  Female West   3.66 1.126          1035</span></span>
-<span><span class="co">#&gt; -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;   -------------------------------------------</span></span>
+<span><span class="co">#&gt;   gender  region   Mean  Std. Deviation     N</span></span>
+<span><span class="co">#&gt;   -------------------------------------------</span></span>
+<span><span class="co">#&gt;   Male    East    3.659           1.238   228</span></span>
+<span><span class="co">#&gt;   Male    West    3.583           1.147   921</span></span>
+<span><span class="co">#&gt;   Female  East    3.589           1.230   237</span></span>
+<span><span class="co">#&gt;   Female  West    3.663           1.128  1035</span></span>
+<span><span class="co">#&gt;   -------------------------------------------</span></span>
 <span><span class="co">#&gt; Note: Means and SDs are weighted (WLS)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Levene's Test of Equality of Error Variances</span></span>
@@ -416,9 +426,10 @@ uses WLS estimation, matching SPSS UNIANOVA.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/ancova.html">ancova</a></span><span class="op">(</span>dv <span class="op">=</span> <span class="va">income</span>, between <span class="op">=</span> <span class="va">education</span>, covariate <span class="op">=</span> <span class="va">age</span>,</span>
 <span>         weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ANCOVA: income by education, covariate: age [Weighted]</span></span>
-<span><span class="co">#&gt;   age (covariate): F(1, 2181) = 0.019, p = 0.889 , eta2p = 0.000</span></span>
-<span><span class="co">#&gt;   education:       F(3, 2181) = 458.943, p &lt; 0.001 ***, eta2p = 0.387, N = 2186</span></span></code></pre></div>
+<span><span class="co">#&gt; ANCOVA: income by education, covariate: age [Weighted], N = 2186</span></span>
+<span><span class="co">#&gt;   age (covariate): F(1, 2181) = 0.019, p = 0.889, eta2p = 0.000</span></span>
+<span><span class="co">#&gt;   education:       F(3, 2181) = 458.943, p &lt; 0.001 ***, eta2p = 0.387</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>The output includes the covariate effect, the adjusted factor effect,
 and estimated marginal means (group means adjusted for the
 covariate).</p>
@@ -437,7 +448,8 @@ small samples.</p>
 <span>  <span class="fu"><a href="../reference/mann_whitney.html">mann_whitney</a></span><span class="op">(</span><span class="va">political_orientation</span>, group <span class="op">=</span> <span class="va">region</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Mann-Whitney U Test: political_orientation by region [Weighted]</span></span>
-<span><span class="co">#&gt;   U = 426,033, Z = 0.207, p = 0.836 , r = 0.004 (negligible), N = 2312</span></span></code></pre></div>
+<span><span class="co">#&gt;   U = 426032.8, Z = -0.207, p = 0.836, r = 0.004 (negligible), N = 2312</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="kruskal-wallis-h-test">Kruskal-Wallis H Test<a class="anchor" aria-label="anchor" href="#kruskal-wallis-h-test"></a>
@@ -449,7 +461,7 @@ small samples.</p>
 <span></span>
 <span><span class="va">kw_result</span></span>
 <span><span class="co">#&gt; Kruskal-Wallis Test: life_satisfaction by education</span></span>
-<span><span class="co">#&gt;   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071, N = 2421</span></span>
+<span><span class="co">#&gt;   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071 (medium), N = 2421</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>When significant, use Dunn’s post-hoc test with Bonferroni
 correction:</p>
@@ -469,7 +481,7 @@ correction:</p>
 <span><span class="va">longitudinal_data_wide</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/wilcoxon_test.html">wilcoxon_test</a></span><span class="op">(</span><span class="va">score_T1</span>, <span class="va">score_T2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Wilcoxon Signed-Rank Test: score_T2 - score_T1</span></span>
-<span><span class="co">#&gt;   Z = 5.427, p &lt; 0.001 ***, r = 0.530 (large), N = 105</span></span>
+<span><span class="co">#&gt;   Z = -5.427, p &lt; 0.001 ***, r = 0.530 (large), N = 105</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -483,7 +495,7 @@ measurements):</p>
 <span></span>
 <span><span class="va">friedman_result</span></span>
 <span><span class="co">#&gt; Friedman Test: score_T1, score_T2, score_T3</span></span>
-<span><span class="co">#&gt;   chi2(2) = 47.255, p &lt; 0.001 ***, W = 0.251, N = 94</span></span>
+<span><span class="co">#&gt;   chi2(2) = 47.255, p &lt; 0.001 ***, Kendall's W = 0.251 (weak), N = 94</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>When significant, use pairwise Wilcoxon post-hoc tests:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -501,7 +513,7 @@ value:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/binomial_test.html">binomial_test</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Binomial Test: gender</span></span>
-<span><span class="co">#&gt;   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span></span>
+<span><span class="co">#&gt;   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
@@ -515,8 +527,9 @@ value:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/chi_square.html">chi_square</a></span><span class="op">(</span><span class="va">education</span>, <span class="va">employment</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chi-Squared Test: education × employment [Weighted]</span></span>
-<span><span class="co">#&gt;   chi2(12) = 130.696, p &lt; 0.001 ***, V = 0.132 (small), N = 2518</span></span></code></pre></div>
+<span><span class="co">#&gt; Chi-Squared Test: education x employment [Weighted]</span></span>
+<span><span class="co">#&gt;   chi2(12) = 130.696, p &lt; 0.001 ***, V = 0.132 (small), N = 2518</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>A significant result means the variables are not independent —
 knowing one tells you something about the other.</p>
 </div>
@@ -549,7 +562,7 @@ directly.</p>
 <span><span class="va">small_sample</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/fisher_test.html">fisher_test</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Fisher's Exact Test: gender x region</span></span>
-<span><span class="co">#&gt;   p = 1.0000 , N = 30</span></span>
+<span><span class="co">#&gt;   p = 1.000, OR = 1.167 [0.210, 6.484], N = 30</span></span>
 <span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -674,31 +687,39 @@ corrections.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = Basic Secondary</span></span>
 <span><span class="co">#&gt; ----------------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction  3.208   3.000  1.243  4.000  2.000    -0.056  816       32</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = Intermediate Secondary</span></span>
 <span><span class="co">#&gt; -----------------------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median   SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.698      4 1.11     4   2   -0.592       611.8</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction  3.698   4.000  1.110  4.000  2.000    -0.592  630       11</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = Academic Secondary</span></span>
 <span><span class="co">#&gt; -------------------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable  Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 3.851      4 0.997     4   2   -0.581       600.6</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction  3.851   4.000  0.997  4.000  2.000    -0.581  618       24</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: education = University</span></span>
 <span><span class="co">#&gt; -----------------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;           Variable Mean Median    SD Range IQR Skewness Effective_N</span></span>
-<span><span class="co">#&gt;  life_satisfaction 4.04      4 0.962     4   1   -0.967       377.8</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction  4.040   4.000  0.962  4.000  1.000    -0.967  373       12</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
 <span></span>
 <span><span class="co"># 2. Test for overall differences</span></span>
 <span><span class="va">anova_result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -707,6 +728,7 @@ corrections.</p>
 <span><span class="va">anova_result</span></span>
 <span><span class="co">#&gt; One-Way ANOVA: life_satisfaction by education [Weighted]</span></span>
 <span><span class="co">#&gt;   F(3, 2432) = 65.333, p &lt; 0.001 ***, eta2 = 0.075 (medium), N = 2437</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span>
 <span></span>
 <span><span class="co"># 3. Check assumptions</span></span>
 <span><span class="fu"><a href="../reference/levene_test.html">levene_test</a></span><span class="op">(</span><span class="va">anova_result</span><span class="op">)</span></span>

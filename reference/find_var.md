@@ -8,7 +8,12 @@ SPSS datasets where variable names are often cryptic codes (e.g.,
 ## Usage
 
 ``` r
-find_var(data, pattern, search = c("name_label", "name", "label"))
+find_var(
+  data,
+  pattern,
+  search = c("name_label", "name", "label"),
+  fixed = FALSE
+)
 ```
 
 ## Arguments
@@ -29,6 +34,15 @@ find_var(data, pattern, search = c("name_label", "name", "label"))
   and labels, `"name"` searches only names, `"label"` searches only
   labels.
 
+- fixed:
+
+  If `TRUE`, `pattern` is searched as literal text (case-insensitive),
+  e.g. `find_var(data, "BEFRAGTE(R)", fixed = TRUE)` for label text with
+  parentheses. Default `FALSE`: regular expression. A pattern that is
+  not a valid regular expression (e.g. `"("`) is searched as literal
+  text automatically, and a message points to `fixed = TRUE` when the
+  literal text would give other matches.
+
 ## Value
 
 A data frame with columns:
@@ -44,6 +58,9 @@ A data frame with columns:
 - label:
 
   Variable label (or `""` if none)
+
+Without matches, an empty data frame is returned invisibly (with a
+message).
 
 ## Details
 
@@ -68,6 +85,11 @@ case-insensitive. Some examples:
 - `"^q[0-9]+"` — matches variable names like q1, q23, q104
 
 - `"zufried"` — finds German labels containing "Zufriedenheit"
+
+Label text often contains characters with a special meaning in regular
+expressions, such as parentheses: `"BEFRAGTE(R)"` as a regular
+expression matches "BEFRAGTER". Use `fixed = TRUE` to search for the
+text exactly as written.
 
 ## See also
 
@@ -109,6 +131,9 @@ find_var(survey_data, "satisfaction", search = "label")
 # Use regex to find numbered items
 find_var(survey_data, "^q[0-9]+", search = "name")
 #> No variables found matching "^q[0-9]+".
-#> [1] col   name  label
-#> <0 rows> (or 0-length row.names)
+
+# Literal text with regex characters, e.g. parentheses in a label
+find_var(survey_data, "(1=left", fixed = TRUE)
+#>   col                  name                                   label
+#> 1   8 political_orientation Political orientation (1=left, 5=right)
 ```

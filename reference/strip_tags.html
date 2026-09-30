@@ -67,7 +67,7 @@ format: <code><a href="read_spss.html">read_spss()</a></code>, <code><a href="re
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">strip_tags</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">strip_tags</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,14 +75,22 @@ format: <code><a href="read_spss.html">read_spss()</a></code>, <code><a href="re
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A numeric vector with tagged NAs.</p></dd>
+<dd><p>A numeric vector with tagged NAs, or a data frame.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>For a data frame: the columns to convert (tidyselect). If
+empty, every numeric column is converted. Ignored for vectors.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A numeric vector where all tagged NAs have been replaced with
-regular <code>NA</code>. Value labels for missing types are removed; labels for
-valid values are preserved.</p>
+    <p>The input with all tagged NAs replaced by regular <code>NA</code>. Value
+labels for missing types are removed; labels for valid values and the
+variable label are preserved. A <code>haven_labelled</code> input stays
+<code>haven_labelled</code>, so the labels survive <code><a href="write_spss.html">write_spss()</a></code> and
+<code><a href="write_stata.html">write_stata()</a></code>. A data frame is returned with the selected columns
+converted.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -107,6 +115,7 @@ valid values are preserved.</p>
 <span class="r-in"><span>  <span class="co"># Remove tag information: all missings become plain NA</span></span></span>
 <span class="r-in"><span>  <span class="fu">strip_tags</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;labelled&lt;double&gt;[5]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]  1  2 NA  3 NA</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

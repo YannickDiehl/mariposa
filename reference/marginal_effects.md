@@ -86,10 +86,16 @@ reporting style in much of the social sciences.
 ### Technical Details
 
 Continuous predictors use a centered numerical derivative of the
-predicted probability; factor predictors use the average discrete change
-against the reference level. Standard errors come from the delta method
-with the analytic gradient of the AME with respect to the coefficients
-and the model's Wald covariance matrix, matching the default in Stata's
+predicted probability; factor, character and logical predictors use the
+average discrete change against the reference level (the first level;
+`FALSE` for logicals). Effects are computed per *variable* from the
+original data: a variable that enters through several terms
+(`x + I(x^2)`, `poly(x, 2)`, `log(x)`, interactions) gets one AME that
+moves all of those terms together. A numeric variable that enters only
+as a categorical term (e.g. `factor(x)`) cannot be differentiated; it is
+skipped with a warning. Standard errors come from the delta method with
+the analytic gradient of the AME with respect to the coefficients and
+the model's Wald covariance matrix, matching the default in Stata's
 `margins` and R's margins package. Weighted models average with their
 frequency weights (unrounded, Charter §5.1); at `weights == 1` the
 weighted AME reduces exactly to the unweighted one.
@@ -128,11 +134,11 @@ model <- logistic_regression(survey_data,
                              high_satisfaction ~ age + income + education)
 marginal_effects(model)
 #> Average Marginal Effects: high_satisfaction ~ age + income + education
-#>   age: AME = 0.000, p = 0.730 
-#>   income: AME = 0.000, p < 0.001 ***
+#>   age: AME = 1.99e-04, p = 0.730
+#>   income: AME = 1.43e-04, p < 0.001 ***
 #>   education: Intermediate Secondary vs. Basic Secondary: AME = 0.059, p = 0.023 *
-#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600 
-#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715 
+#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600
+#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715
 #> AME = average change in predicted probability. Use summary() for detailed output.
 
 # Weighted model
@@ -140,19 +146,19 @@ model_w <- logistic_regression(survey_data, high_satisfaction ~ age + income,
                                weights = sampling_weight)
 marginal_effects(model_w)
 #> Average Marginal Effects: high_satisfaction ~ age + income [Weighted]
-#>   age: AME = 0.000, p = 0.639 
-#>   income: AME = 0.000, p < 0.001 ***
+#>   age: AME = 2.69e-04, p = 0.639
+#>   income: AME = 1.45e-04, p < 0.001 ***
 #> AME = average change in predicted probability. Use summary() for detailed output.
 
 # --- Three-layer output ---
 ame <- marginal_effects(model)
 ame                 # compact overview
 #> Average Marginal Effects: high_satisfaction ~ age + income + education
-#>   age: AME = 0.000, p = 0.730 
-#>   income: AME = 0.000, p < 0.001 ***
+#>   age: AME = 1.99e-04, p = 0.730
+#>   income: AME = 1.43e-04, p < 0.001 ***
 #>   education: Intermediate Secondary vs. Basic Secondary: AME = 0.059, p = 0.023 *
-#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600 
-#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715 
+#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600
+#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715
 #> AME = average change in predicted probability. Use summary() for detailed output.
 summary(ame)        # full detailed output
 #> 
@@ -163,15 +169,15 @@ summary(ame)        # full detailed output
 #> - Std. errors: Delta method
 #> - N: 2115
 #> 
-#>   ------------------------------------------------------------------------------------------------------------ 
-#>   Term                                                      AME     SE       z      p  CI Lower  CI Upper  sig 
-#>   ------------------------------------------------------------------------------------------------------------ 
-#>   age                                                     0.000  0.001   0.344   .730    -0.001     0.001      
-#>   income                                                  0.000  0.000  16.833  <.001     0.000     0.000  *** 
-#>   education: Intermediate Secondary vs. Basic Secondary   0.059  0.026   2.268   .023     0.008     0.110    * 
-#>   education: Academic Secondary vs. Basic Secondary       0.015  0.029   0.525   .600    -0.041     0.071      
-#>   education: University vs. Basic Secondary              -0.014  0.038  -0.365   .715    -0.088     0.061      
-#>   ------------------------------------------------------------------------------------------------------------ 
+#>   -------------------------------------------------------------------------------------------------------------------------
+#>   Term                                                        AME        SE       z      p  95% CI Lower  95% CI Upper     
+#>   -------------------------------------------------------------------------------------------------------------------------
+#>   age                                                    1.99e-04     0.001   0.344   .730        -0.001         0.001     
+#>   income                                                 1.43e-04  8.48e-06  16.833  <.001      1.26e-04      1.59e-04  ***
+#>   education: Intermediate Secondary vs. Basic Secondary     0.059     0.026   2.268   .023         0.008         0.110    *
+#>   education: Academic Secondary vs. Basic Secondary         0.015     0.029   0.525   .600        -0.041         0.071     
+#>   education: University vs. Basic Secondary                -0.014     0.038  -0.365   .715        -0.088         0.061     
+#>   -------------------------------------------------------------------------------------------------------------------------
 #> 
 #> Factor rows show the average discrete change vs. the reference level.
 #> 

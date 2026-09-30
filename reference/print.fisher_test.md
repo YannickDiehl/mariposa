@@ -1,8 +1,8 @@
 # Print Fisher's exact test results (compact)
 
 Compact print method for objects of class `"fisher_test"`. Shows a
-one-line summary with the exact p-value, significance stars, and sample
-size.
+one-line summary with the exact p-value, significance stars, the odds
+ratio for 2x2 tables, and sample size.
 
 For the full detailed output (contingency table, test results), use
 [`summary()`](https://rdrr.io/r/base/summary.html).
@@ -11,7 +11,7 @@ For the full detailed output (contingency table, test results), use
 
 ``` r
 # S3 method for class 'fisher_test'
-print(x, digits = 4, ...)
+print(x, digits = 3, ...)
 ```
 
 ## Arguments
@@ -22,7 +22,7 @@ print(x, digits = 4, ...)
 
 - digits:
 
-  Number of decimal places (default: 4)
+  Number of decimal places (default: 3)
 
 - ...:
 
@@ -38,7 +38,7 @@ Invisibly returns the input object `x`.
 result <- fisher_test(survey_data, row = gender, col = region)
 result              # compact one-line overview
 #> Fisher's Exact Test: gender x region
-#>   p = 0.5435 , N = 2500
+#>   p = 0.544, OR = 1.067 [0.875, 1.302], N = 2500
 #> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> Fisher's Exact Test Results
@@ -48,18 +48,17 @@ summary(result)     # full detailed output
 #> - Column variable: region
 #> 
 #> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        East West
+#>         region
+#> gender   East West
 #>   Male    238  956
 #>   Female  247 1059
-#> ---------------------------------------- 
 #> 
 #> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data   0.544 2500     
-#> ---------------------------------------------------- 
+#> ---------------------------------------------------------------------------
+#> Method                              p value        N     OR     95% CI (OR)
+#> ---------------------------------------------------------------------------
+#> Fisher's Exact Test for Count Data     .544     2500  1.067  [0.875, 1.302]
+#> ---------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

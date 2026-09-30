@@ -118,20 +118,18 @@ available)? (Default: TRUE)</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="levene_test.html">levene_test</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable F_statistic df1  df2 p_value sig        Conclusion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction      31.634   3 2417       0 *** Variances unequal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable           Levene Statistic  df1   df2    Sig              Conclusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction            31.634    3  2417  &lt;.001  ***  Variances unequal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -139,20 +137,18 @@ available)? (Default: TRUE)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &gt; 0.05: Variances are homogeneous (equal variances assumed)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p &lt;= 0.05: Variances are heterogeneous (equal variances NOT assumed)</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, interpretation <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test for Homogeneity of Variance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Center: mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable F_statistic df1  df2 p_value sig        Conclusion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction      31.634   3 2417       0 *** Variances unequal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable           Levene Statistic  df1   df2    Sig              Conclusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction            31.634    3  2417  &lt;.001  ***  Variances unequal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

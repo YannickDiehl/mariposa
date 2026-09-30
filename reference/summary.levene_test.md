@@ -59,20 +59,18 @@ for the main analysis function.
 ``` r
 result <- levene_test(survey_data, life_satisfaction, group = education)
 summary(result)
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> Levene's Test for Homogeneity of Variance
+#> -----------------------------------------
 #> 
 #> - Grouping variable: education
 #> - Center: mean
 #> 
-#> 
-#> --- life_satisfaction ---
-#> 
 #> Levene's Test Results:
-#> -------------------------------------------------------------------- 
-#>           Variable F_statistic df1  df2 p_value sig        Conclusion
-#>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
+#>   -----------------------------------------------------------------------------
+#>   Variable           Levene Statistic  df1   df2    Sig              Conclusion
+#>   -----------------------------------------------------------------------------
+#>   life_satisfaction            31.634    3  2417  <.001  ***  Variances unequal
+#>   -----------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
@@ -80,20 +78,18 @@ summary(result)
 #> - p > 0.05: Variances are homogeneous (equal variances assumed)
 #> - p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)
 summary(result, interpretation = FALSE)
-#> Levene's Test for Homogeneity of Variance 
-#> ------------------------------------------
+#> Levene's Test for Homogeneity of Variance
+#> -----------------------------------------
 #> 
 #> - Grouping variable: education
 #> - Center: mean
 #> 
-#> 
-#> --- life_satisfaction ---
-#> 
 #> Levene's Test Results:
-#> -------------------------------------------------------------------- 
-#>           Variable F_statistic df1  df2 p_value sig        Conclusion
-#>  life_satisfaction      31.634   3 2417       0 *** Variances unequal
-#> -------------------------------------------------------------------- 
+#>   -----------------------------------------------------------------------------
+#>   Variable           Levene Statistic  df1   df2    Sig              Conclusion
+#>   -----------------------------------------------------------------------------
+#>   life_satisfaction            31.634    3  2417  <.001  ***  Variances unequal
+#>   -----------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

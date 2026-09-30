@@ -49,12 +49,14 @@ multiple_response(d, gov, media)
 #> - Counted value: 1
 #> 
 #> Frequencies
-#>   -------------------------------------------- 
-#>   Option  Responses n  Responses %  % of Cases 
-#>   -------------------------------------------- 
-#>   gov           583.0         55.4        23.4 
-#>   media         470.0         44.6        18.8 
-#>   -------------------------------------------- 
+#>   --------------------------------------------
+#>   Option  Responses n  Responses %  % of Cases
+#>   --------------------------------------------
+#>   gov             583         55.4        23.4
+#>   media           470         44.6        18.8
+#>   --------------------------------------------
+#>   Total          1053        100.0        42.2
+#>   --------------------------------------------
 #>   Valid cases: 2494 | Total responses: 1053 | Excluded (all missing): 6
 #>   % of Cases can sum above 100% (multiple mentions per case).
 ```

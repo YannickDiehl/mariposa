@@ -31,11 +31,15 @@ w_modus(data, ..., weights = NULL, na.rm = TRUE)
 
   Survey weights to make results representative of your population.
   Without weights, the mode is simply the most frequent value in your
-  sample.
+  sample. Give a column name (unquoted or as a string), an expression
+  such as `sampling_weight * 2`, or a numeric vector with one weight per
+  row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -54,10 +58,15 @@ most common value (by weighted frequency), effective sample size
 - **Effective N**: How many independent observations your weighted data
   represents.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
-If multiple values share the highest weighted frequency (ties), the
-first value encountered is returned.
+If multiple values share the highest (weighted) frequency, the smallest
+value (for factors: the first level) is returned, as in SPSS; the print
+flags such results ("Multiple modes exist") and `$results$n_modes` holds
+the number of tied values.
 
 ### When to Use This
 
@@ -124,42 +133,52 @@ survey_data %>% w_modus(gender, weights = sampling_weight)
 #> 
 #> Weighted Mode Statistics
 #> ------------------------
-#> # A tibble: 1 × 3
-#>   Variable weighted_mode effective_n
-#>   <chr>    <fct>               <dbl>
-#> 1 gender   Female              2469.
+#> Weights: sampling_weight
 #> 
+#>   -------------------------------
+#>   Variable  Mode       N  Missing
+#>   -------------------------------
+#>   gender    Female  2516        0
+#>   -------------------------------
 
 # Multiple variables (works best with categorical/discrete data)
 survey_data %>% w_modus(gender, region, weights = sampling_weight)
 #> 
 #> Weighted Mode Statistics
 #> ------------------------
-#> # A tibble: 2 × 3
-#>   Variable weighted_mode effective_n
-#>   <chr>    <chr>               <dbl>
-#> 1 gender   Female              2469.
-#> 2 region   West                2469.
+#> Weights: sampling_weight
 #> 
+#>   -------------------------------
+#>   Variable  Mode       N  Missing
+#>   -------------------------------
+#>   gender    Female  2516        0
+#>   region    West    2516        0
+#>   -------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_modus(gender, weights = sampling_weight)
 #> 
 #> Weighted Mode Statistics
 #> ------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
-#> # A tibble: 1 × 2
-#>   weighted_mode effective_n
-#>   <fct>               <dbl>
-#> 1 Female                477
+#> --------------------
+#> 
+#>   ------------------------------
+#>   Variable  Mode      N  Missing
+#>   ------------------------------
+#>   gender    Female  509        0
+#>   ------------------------------
 #> 
 #> Group: region = West
-#> # A tibble: 1 × 2
-#>   weighted_mode effective_n
-#>   <fct>               <dbl>
-#> 1 Female              1993.
+#> --------------------
 #> 
+#>   -------------------------------
+#>   Variable  Mode       N  Missing
+#>   -------------------------------
+#>   gender    Female  2007        0
+#>   -------------------------------
 
 # In summarise context
 survey_data %>% summarise(mode_gender = w_modus(gender, weights = sampling_weight))
@@ -173,9 +192,10 @@ survey_data %>% w_modus(gender)
 #> 
 #> Mode Statistics
 #> ---------------
-#> # A tibble: 1 × 3
-#>   Variable mode       n
-#>   <chr>    <chr>  <dbl>
-#> 1 gender   Female  2500
 #> 
+#>   -------------------------------
+#>   Variable  Mode       N  Missing
+#>   -------------------------------
+#>   gender    Female  2500        0
+#>   -------------------------------
 ```

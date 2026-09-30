@@ -46,18 +46,17 @@ summary(result)                            # all sections
 #> - Column variable: region
 #> 
 #> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        East West
+#>         region
+#> gender   East West
 #>   Male    238  956
 #>   Female  247 1059
-#> ---------------------------------------- 
 #> 
 #> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data   0.544 2500     
-#> ---------------------------------------------------- 
+#> ---------------------------------------------------------------------------
+#> Method                              p value        N     OR     95% CI (OR)
+#> ---------------------------------------------------------------------------
+#> Fisher's Exact Test for Count Data     .544     2500  1.067  [0.875, 1.302]
+#> ---------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, contingency_table = FALSE) # hide contingency table
@@ -68,10 +67,11 @@ summary(result, contingency_table = FALSE) # hide contingency table
 #> - Column variable: region
 #> 
 #> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data   0.544 2500     
-#> ---------------------------------------------------- 
+#> ---------------------------------------------------------------------------
+#> Method                              p value        N     OR     95% CI (OR)
+#> ---------------------------------------------------------------------------
+#> Fisher's Exact Test for Count Data     .544     2500  1.067  [0.875, 1.302]
+#> ---------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

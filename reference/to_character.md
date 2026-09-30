@@ -27,7 +27,10 @@ to_character(
 - ...:
 
   Optional: unquoted variable names (tidyselect supported). If empty,
-  converts all `haven_labelled` columns.
+  converts every `haven_labelled` column whose values are all
+  value-labelled (metric variables are left unchanged with a message, as
+  in
+  [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)).
 
 - drop_na:
 

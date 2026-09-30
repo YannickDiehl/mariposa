@@ -44,11 +44,14 @@ kruskal_wallis(data, ..., group, weights = NULL, conf.level = 0.95)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - conf.level:
 
-  Confidence level for intervals (Default: 0.95 = 95%)
+  Not used. Rank tests report no confidence interval (SPSS `NPAR TESTS`
+  neither); kept for backward compatibility.
 
 ## Value
 
@@ -191,7 +194,7 @@ data(survey_data)
 survey_data %>%
   kruskal_wallis(life_satisfaction, group = education)
 #> Kruskal-Wallis Test: life_satisfaction by education
-#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071 (medium), N = 2421
 #> Use summary() for detailed output.
 
 # Multiple variables
@@ -199,22 +202,22 @@ survey_data %>%
   kruskal_wallis(life_satisfaction, income, trust_government,
                  group = education)
 #> Kruskal-Wallis Test: life_satisfaction by education
-#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071 (medium), N = 2421
 #> Kruskal-Wallis Test: income by education
-#>   H(3) = 814.174, p < 0.001 ***, eps2 = 0.373, N = 2186
+#>   H(3) = 814.174, p < 0.001 ***, eps2 = 0.373 (large), N = 2186
 #> Kruskal-Wallis Test: trust_government by education
-#>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354
+#>   H(3) = 1.235, p = 0.745, eps2 = 0.001 (negligible), N = 2354
 #> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   kruskal_wallis(starts_with("trust_"), group = education)
 #> Kruskal-Wallis Test: trust_government by education
-#>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354
+#>   H(3) = 1.235, p = 0.745, eps2 = 0.001 (negligible), N = 2354
 #> Kruskal-Wallis Test: trust_media by education
-#>   H(3) = 2.709, p = 0.439 , eps2 = 0.001, N = 2367
+#>   H(3) = 2.709, p = 0.439, eps2 = 0.001 (negligible), N = 2367
 #> Kruskal-Wallis Test: trust_science by education
-#>   H(3) = 3.047, p = 0.384 , eps2 = 0.001, N = 2398
+#>   H(3) = 3.047, p = 0.384, eps2 = 0.001 (negligible), N = 2398
 #> Use summary() for detailed output.
 
 # Weighted analysis
@@ -222,25 +225,25 @@ survey_data %>%
   kruskal_wallis(life_satisfaction, group = education,
                  weights = sampling_weight)
 #> Kruskal-Wallis Test: life_satisfaction by education [Weighted]
-#>   H(3) = 167.075, p < 0.001 ***, eps2 = 0.069, N = 2437
+#>   H(3) = 167.075, p < 0.001 ***, eps2 = 0.069 (medium), N = 2437
 #> Use summary() for detailed output.
 
 # Grouped analysis (separate test for each region)
 survey_data %>%
   group_by(region) %>%
   kruskal_wallis(life_satisfaction, group = education)
-#> [region = 1]
+#> [region = East]
 #> Kruskal-Wallis Test: life_satisfaction by education
-#>   H(3) = 17.105, p < 0.001 ***, eps2 = 0.037, N = 465
-#> [region = 2]
+#>   H(3) = 17.105, p < 0.001 ***, eps2 = 0.037 (small), N = 465
+#> [region = West]
 #> Kruskal-Wallis Test: life_satisfaction by education
-#>   H(3) = 158.807, p < 0.001 ***, eps2 = 0.081, N = 1956
+#>   H(3) = 158.807, p < 0.001 ***, eps2 = 0.081 (medium), N = 1956
 #> Use summary() for detailed output.
 
 # Compare across employment status (5 groups)
 survey_data %>%
   kruskal_wallis(income, group = employment)
 #> Kruskal-Wallis Test: income by employment
-#>   H(4) = 28.026, p < 0.001 ***, eps2 = 0.013, N = 2186
+#>   H(4) = 28.026, p < 0.001 ***, eps2 = 0.013 (small), N = 2186
 #> Use summary() for detailed output.
 ```

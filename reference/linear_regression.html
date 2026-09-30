@@ -103,7 +103,9 @@ SPSS REGRESSION output.</p>
 
 <dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
 <dd><p>A formula specifying the model (e.g., <code>y ~ x1 + x2</code>).
-If provided, <code>dependent</code> and <code>predictors</code> are ignored.</p></dd>
+If provided, <code>dependent</code> and <code>predictors</code> are ignored. The
+outcome may be transformed (<code>log(income) ~ age</code>); <code>y ~ .</code>
+uses all other columns except the weights and grouping variables.</p></dd>
 
 
 <dt id="arg-dependent">dependent<a class="anchor" aria-label="anchor" href="#arg-dependent"></a></dt>
@@ -113,12 +115,17 @@ when no formula is given.</p></dd>
 
 <dt id="arg-predictors">predictors<a class="anchor" aria-label="anchor" href="#arg-predictors"></a></dt>
 <dd><p>Predictor variable(s) (unquoted, supports tidyselect).
-Used with <code>dependent</code> when no formula is given.</p></dd>
+Used with <code>dependent</code> when no formula is given. The dependent,
+weights and grouping variables are never used as predictors (a
+selection such as <code>where(is.numeric)</code> drops them with a message).
+Character predictors are entered as factors.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights (unquoted variable name). When
-specified, weighted least squares (WLS) is used, matching SPSS WEIGHT BY.</p></dd>
+<dd><p>Optional survey weights. When specified, weighted least
+squares (WLS) is used, matching SPSS WEIGHT BY. Give a column name
+(unquoted or as a string), an expression such as
+<code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-use">use<a class="anchor" aria-label="anchor" href="#arg-use"></a></dt>
@@ -150,7 +157,11 @@ when factor predictors carry ordered meaning (e.g., 4-level education).
 Note that for <em>ordered</em> factors, "dummy" applies R's default
 polynomial contrasts (terms suffixed <code>.L</code>, <code>.Q</code>, <code>.C</code>),
 not treatment dummies; convert with
-<code>factor(x, ordered = FALSE)</code> first if you want dummy coding.</p></dd>
+<code>factor(x, ordered = FALSE)</code> first if you want dummy coding.
+<code>factors</code> applies to factors only: labelled predictors from SPSS
+files (<code>haven_labelled</code>) are numeric and enter with their numeric
+codes, exactly as in SPSS REGRESSION; <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> notes them.
+Convert them with <code><a href="to_label.html">to_label</a></code> first to get dummy coding.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -236,7 +247,17 @@ covariance matrix. Pairwise deletion retains more cases and produces
 results closer to SPSS output when data has varying patterns of missingness.</p>
 <p><strong>Weights</strong>: When weights are specified, they are treated as frequency
 weights (matching SPSS WEIGHT BY behavior). The model is fitted using weighted
-least squares via <code>lm(weights = ...)</code>.</p>
+least squares via <code>lm(weights = ...)</code>; the coefficients are those of
+<code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>, but N is <code>sum(w)</code> and the residual df are
+<code>sum(w) - rank</code> (unrounded), as in SPSS. <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> itself treats
+weights as analytic (precision) weights with df = cases - rank, so the
+inherited generics are adjusted to the SPSS convention:
+<code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>, <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code>, <code><a href="https://rdrr.io/r/stats/nobs.html" class="external-link">nobs()</a></code> (unrounded <code>sum(w)</code>),
+<code><a href="https://rdrr.io/r/stats/df.residual.html" class="external-link">df.residual()</a></code>, <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> (single model), <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
+(standard errors and intervals), <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code> and
+<code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">broom::glance()</a></code> all agree with <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.
+<code><a href="https://rdrr.io/r/stats/summary.lm.html" class="external-link">stats::summary.lm()</a></code>, <code><a href="https://rdrr.io/r/stats/logLik.html" class="external-link">logLik()</a></code>, <code><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC()</a></code> and
+<code><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">BIC()</a></code> keep lm's analytic-weight definitions.</p>
 <p><strong>Standardized Coefficients</strong>: Beta = B * (SD_x / SD_y). This matches
 the SPSS standardized coefficient output. Not available for the intercept.
 For dummy-coded factor terms (<code>factors = "dummy"</code>), the SD of the
@@ -276,37 +297,45 @@ education or Likert scales that SPSS treats as continuous.</p>
 <span class="r-in"><span><span class="co"># Bivariate regression</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ age</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple regression</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">life_satisfaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: income ~ age + education + life_satisfaction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.477, adj.R2 = 0.476, F(5, 2109) = 385.29, p &lt; 0.001 ***, N = 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># SPSS-style interface</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
 <span class="r-in"><span>                  dependent <span class="op">=</span> <span class="va">life_satisfaction</span>,</span></span>
 <span class="r-in"><span>                  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ trust_government + trust_media + trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.002, adj.R2 = 0.000, F(3, 2062) = 1.16, p = 0.322 , N = 2066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.002, adj.R2 = 0.000, F(3, 2062) = 1.16, p = 0.322, N = 2066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted regression</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ age [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.001, adj.R2 = 0.000, F(1, 2435) = 2.08, p = 0.150 , N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.001, adj.R2 = 0.000, F(1, 2435) = 2.08, p = 0.150, N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped by region</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">linear_regression</span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ age [Grouped: region]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   region = East: R2 = 0.002, adj.R2 = -0.000, F(1, 463) = 0.88, p = 0.350 , N = 465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   region = West: R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274 , N = 1956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.002, adj.R2 = 0.000, F(1, 463) = 0.88, p = 0.350, N = 465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274, N = 1956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Factor predictors: dummy-coding (default, matches base R lm())</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: income ~ age + education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.391, adj.R2 = 0.390, F(4, 2181) = 349.72, p &lt; 0.001 ***, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Factor predictors: SPSS-style ordinal-as-scale</span></span></span>
 <span class="r-in"><span><span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">income</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span>,</span></span>
@@ -315,12 +344,14 @@ education or Likert scales that SPSS treats as continuous.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `education`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: income ~ age + education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.386, adj.R2 = 0.386, F(2, 2183) = 686.59, p &lt; 0.001 ***, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">linear_regression</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">income</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>                                  <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ age + income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.201, adj.R2 = 0.200, F(2, 2112) = 265.60, p &lt; 0.001 ***, N = 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>                         <span class="co"># full detailed SPSS-style output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression Results</span>
@@ -330,47 +361,47 @@ education or Likert scales that SPSS treats as continuous.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2115</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable                                    Mean     Std.Dev.      N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction                          3.638        1.148   2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                                       50.827       16.995   2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                                  3757.683     1430.923   2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable               Mean  Std. Deviation     N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction     3.638           1.148  2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                  50.827          16.995  2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income             3757.683        1430.923  2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R                              0.448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R Square                       0.201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Adjusted R Square              0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Std. Error of Estimate         1.026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R                            0.448</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R Square                     0.201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Adjusted R Square            0.200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Std. Error of the Estimate   1.026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ANOVA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Source           Sum of Squares    df      Mean Square          F     Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Regression              559.609     2          279.804    265.598    0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Residual               2224.965  2112            1.053                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                  2784.574  2114                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Source      Sum of Squares    df  Mean Square        F   Sig.     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Regression         559.609     2      279.804  265.598  &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Residual          2224.965  2112        1.053                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total             2784.574  2114                                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)     2.321       0.092          25.237  &lt;.001         2.141         2.502  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age            -0.001       0.001  -0.010  -0.508   .611        -0.003         0.002     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income       3.59e-04    1.56e-05   0.448  23.037  &lt;.001      3.29e-04      3.90e-04  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Collinearity Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                       Tolerance        VIF</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                            1.000      1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                         1.000      1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term    Tolerance    VIF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         1.000  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income      1.000  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   VIF &gt; 10 (Tolerance &lt; 0.1) indicates problematic collinearity.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
@@ -383,38 +414,38 @@ education or Likert scales that SPSS treats as continuous.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2115</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R                              0.448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R Square                       0.201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Adjusted R Square              0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Std. Error of Estimate         1.026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R                            0.448</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R Square                     0.201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Adjusted R Square            0.200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Std. Error of the Estimate   1.026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ANOVA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Source           Sum of Squares    df      Mean Square          F     Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Regression              559.609     2          279.804    265.598    0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Residual               2224.965  2112            1.053                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                  2784.574  2114                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Source      Sum of Squares    df  Mean Square        F   Sig.     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Regression         559.609     2      279.804  265.598  &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Residual          2224.965  2112        1.053                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total             2784.574  2114                                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)     2.321       0.092          25.237  &lt;.001         2.141         2.502  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age            -0.001       0.001  -0.010  -0.508   .611        -0.003         0.002     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income       3.59e-04    1.56e-05   0.448  23.037  &lt;.001      3.29e-04      3.90e-04  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Collinearity Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                       Tolerance        VIF</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                            1.000      1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                         1.000      1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term    Tolerance    VIF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         1.000  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income      1.000  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   VIF &gt; 10 (Tolerance &lt; 0.1) indicates problematic collinearity.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>

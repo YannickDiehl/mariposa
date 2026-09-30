@@ -32,11 +32,15 @@ w_skew(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample skewness.
+  Without weights, you get the simple sample skewness. Give a column
+  name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -61,7 +65,10 @@ and the number of valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 High skewness suggests you might want to use the median instead of the
 mean as a measure of center, and non-parametric tests instead of
@@ -134,49 +141,53 @@ survey_data %>% w_skew(age, weights = sampling_weight)
 #> 
 #> Weighted Skewness Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_skew Effective_N
-#>       age         0.159      2468.8
-#> 
+#>   ---------------------------------
+#>   Variable  Skewness     N  Missing
+#>   ---------------------------------
+#>   age          0.159  2516        0
+#>   ---------------------------------
 
 # Multiple variables
 survey_data %>% w_skew(age, income, life_satisfaction, weights = sampling_weight)
 #> 
 #> Weighted Skewness Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_skew Effective_N
-#>       age         0.159      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_skew Effective_N
-#>    income         0.725      2158.9
-#> 
-#> --- life_satisfaction ---
-#>           Variable weighted_skew Effective_N
-#>  life_satisfaction        -0.499      2390.9
-#> 
+#>   ------------------------------------------
+#>   Variable           Skewness     N  Missing
+#>   ------------------------------------------
+#>   age                   0.159  2516        0
+#>   income                0.725  2201      315
+#>   life_satisfaction    -0.499  2437       79
+#>   ------------------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_skew(age, weights = sampling_weight)
 #> 
 #> Weighted Skewness Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_skew Effective_N
-#>       age         0.098         477
+#>   --------------------------------
+#>   Variable  Skewness    N  Missing
+#>   --------------------------------
+#>   age          0.098  509        0
+#>   --------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_skew Effective_N
-#>       age          0.17      1993.1
-#> 
+#>   ---------------------------------
+#>   Variable  Skewness     N  Missing
+#>   ---------------------------------
+#>   age          0.170  2007        0
+#>   ---------------------------------
 
 # In summarise context
 survey_data %>% summarise(skew_age = w_skew(age, weights = sampling_weight))
@@ -191,8 +202,9 @@ survey_data %>% w_skew(age)
 #> Skewness Statistics
 #> -------------------
 #> 
-#> --- age ---
-#>  Variable  skew    N
-#>       age 0.172 2500
-#> 
+#>   ---------------------------------
+#>   Variable  Skewness     N  Missing
+#>   ---------------------------------
+#>   age          0.172  2500        0
+#>   ---------------------------------
 ```

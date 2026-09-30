@@ -38,8 +38,13 @@ Kolmogorov-Smirnov with Lilliefors correction and Shapiro-Wilk:
 survey_data %>%
   group_by(gender) %>%
   normality_test(age, income)
-#> Normality Tests: age, income
-#>   2 group combination(s) x 2 variable(s) [Grouped: gender]
+#> Normality Tests: age, income [Grouped: gender]
+#> [gender = Male]
+#>   age: KS = 0.029, p = 0.018; Shapiro-Wilk W = 0.989, p < 0.001 (n = 1194)
+#>   income: KS = 0.080, p < 0.001; Shapiro-Wilk W = 0.960, p < 0.001 (n = 1046)
+#> [gender = Female]
+#>   age: KS = 0.030, p = 0.007; Shapiro-Wilk W = 0.990, p < 0.001 (n = 1306)
+#>   income: KS = 0.081, p < 0.001; Shapiro-Wilk W = 0.965, p < 0.001 (n = 1140)
 #> Use summary() for detailed output.
 ```
 
@@ -61,7 +66,8 @@ Compare two groups on a continuous variable:
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436
+#> Use summary() for detailed output.
 ```
 
 The output includes both Student’s t-test (equal variances assumed) and
@@ -86,24 +92,30 @@ survey_data %>%
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: mean = 3.598, n = 1149.0
-#>   Female: mean = 3.648, n = 1287.0
+#> Weighted Group Statistics:
+#>   ----------------------------------------------------
+#>   gender     N   Mean  Std. Deviation  Std. Error Mean
+#>   ----------------------------------------------------
+#>   Male    1149  3.598           1.165            0.034
+#>   Female  1287  3.648           1.141            0.032
+#>   ----------------------------------------------------
 #> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    
-#> -------------------------------------------------------------------------------- 
+#> Weighted Independent Samples Test:
+#>   --------------------------------------------------------------------------------------------------------
+#>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   
+#>   --------------------------------------------------------------------------------------------------------
+#>   Equal variances assumed      -1.070      2435  .285      -0.050     0.047        -0.142         0.042   
+#>   Equal variances not assumed  -1.069  2391.291  .285      -0.050     0.047        -0.142         0.042   
+#>   --------------------------------------------------------------------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction   -0.043   -0.043      -0.043  negligible
-#> 
+#>   -----------------------------------------------------------------
+#>   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude
+#>   -----------------------------------------------------------------
+#>   life_satisfaction     -0.043     -0.043        -0.043  negligible
+#>   -----------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
@@ -124,11 +136,12 @@ survey_data %>%
   t_test(trust_government, trust_media, trust_science,
          group = gender, weights = sampling_weight)
 #> t-Test: trust_government by gender [Weighted]
-#>   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371
+#>   t(2322.8) = -0.682, p = 0.496, g = -0.028 (negligible), N = 2371
 #> t-Test: trust_media by gender [Weighted]
 #>   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
 #> t-Test: trust_science by gender [Weighted]
-#>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414
+#>   t(2360.9) = -1.421, p = 0.156, g = -0.058 (negligible), N = 2414
+#> Use summary() for detailed output.
 ```
 
 ### One-Sample t-Test
@@ -141,7 +154,8 @@ Test whether a mean differs from a specific value:
 survey_data %>%
   t_test(life_satisfaction, mu = 3, weights = sampling_weight)
 #> t-Test: life_satisfaction [Weighted]
-#>   t(2435.6) = 26.771, p < 0.001 ***
+#>   t(2435.6) = 26.771, p < 0.001 ***, N = 2437
+#> Use summary() for detailed output.
 ```
 
 ### Grouped Analysis
@@ -153,12 +167,13 @@ Run separate tests per subgroup:
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
-#> [region = 1]
+#> [region = East]
 #> t-Test: income by gender [Weighted]
-#>   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450
-#> [region = 2]
+#>   t(431.2) = 1.674, p = 0.095, g = 0.158 (negligible), N = 450
+#> [region = West]
 #> t-Test: income by gender [Weighted]
-#>   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+#>   t(1740.2) = 0.009, p = 0.993, g = 0.000 (negligible), N = 1751
+#> Use summary() for detailed output.
 ```
 
 ## One-Way ANOVA
@@ -172,6 +187,7 @@ result <- survey_data %>%
 result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
 #>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#> Use summary() for detailed output.
 ```
 
 The effect size \eta^2 (eta-squared) indicates how much variance is
@@ -228,10 +244,11 @@ Test the effects of two or more factors and their interactions:
 survey_data %>%
   factorial_anova(dv = income, between = c(gender, education),
                   weights = sampling_weight)
-#> Factorial ANOVA (2-Way): income by gender, education [Weighted]
-#>   gender:           F(1, 2178) = 0.115, p = 0.735 , eta2p = 0.000
+#> Factorial ANOVA (2-Way): income by gender, education [Weighted], N = 2186
+#>   gender:           F(1, 2178) = 0.115, p = 0.735, eta2p = 0.000
 #>   education:        F(3, 2178) = 455.835, p < 0.001 ***, eta2p = 0.386
-#>   gender:education: F(3, 2178) = 0.300, p = 0.825 , eta2p = 0.000, N = 2186
+#>   gender:education: F(3, 2178) = 0.300, p = 0.825, eta2p = 0.000
+#> Use summary() for detailed output.
 ```
 
 The output uses Type III sums of squares and reports partial \eta^2 for
@@ -251,42 +268,35 @@ survey_data %>%
 #> 
 #> - Dependent variable: life_satisfaction
 #> - Factors: gender x region
-#> - Type III Sum of Squares: Type 3
+#> - Sum of squares: Type III
 #> - Weights variable: sampling_weight
 #> - N (complete cases): 2421
 #> - Missing: 79
 #> 
 #> Tests of Between-Subjects Effects
-#> ---------------------------------------------------------------------------- 
-#>  Source          Type III SS df   Mean Square F         Sig.  Partial Eta Sq
-#>  Corrected Model     3.714      3     1.238       0.927 0.427 0.001         
-#>  Intercept       20468.612      1 20468.612   15319.285 <.001 0.864         
-#>  gender              0.010      1     0.010       0.008 0.930 0.000         
-#>  region              0.001      1     0.001       0.001 0.979 0.000         
-#>  gender * region     2.194      1     2.194       1.642 0.200 0.001         
-#>  Error            3229.435   2417     1.336                                 
-#>  Total           35249.294   2421                                           
-#>  Corrected Total  3233.149   2420                                           
-#>     
-#>     
-#>  ***
-#>     
-#>     
-#>     
-#>     
-#>     
-#>     
-#> ---------------------------------------------------------------------------- 
+#>   -------------------------------------------------------------------------------------------------------
+#>   Source           Type III Sum of Squares    df  Mean Square          F    Sig  Partial Eta Squared     
+#>   -------------------------------------------------------------------------------------------------------
+#>   Corrected Model                    3.714     3        1.238      0.927   .427                0.001     
+#>   Intercept                      20468.612     1    20468.612  15319.285  <.001                0.864  ***
+#>   gender                             0.010     1        0.010      0.008   .930                0.000     
+#>   region                             0.001     1        0.001      0.001   .979                0.000     
+#>   gender * region                    2.194     1        2.194      1.642   .200                0.001     
+#>   Error                           3229.435  2417        1.336                                            
+#>   Total                          35249.294  2421                                                         
+#>   Corrected Total                 3233.149  2420                                                         
+#>   -------------------------------------------------------------------------------------------------------
 #> R Squared = 0.001 (Adjusted R Squared = 0.000)
 #> 
 #> Descriptive Statistics
-#> -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#>  gender region Mean Std. Deviation N   
-#>  Male   East   3.66 1.207           228
-#>  Male   West   3.58 1.152           921
-#>  Female East   3.59 1.197           237
-#>  Female West   3.66 1.126          1035
-#> -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+#>   -------------------------------------------
+#>   gender  region   Mean  Std. Deviation     N
+#>   -------------------------------------------
+#>   Male    East    3.659           1.238   228
+#>   Male    West    3.583           1.147   921
+#>   Female  East    3.589           1.230   237
+#>   Female  West    3.663           1.128  1035
+#>   -------------------------------------------
 #> Note: Means and SDs are weighted (WLS)
 #> 
 #> Levene's Test of Equality of Error Variances
@@ -304,9 +314,10 @@ Compare groups while controlling for a covariate:
 survey_data %>%
   ancova(dv = income, between = education, covariate = age,
          weights = sampling_weight)
-#> ANCOVA: income by education, covariate: age [Weighted]
-#>   age (covariate): F(1, 2181) = 0.019, p = 0.889 , eta2p = 0.000
-#>   education:       F(3, 2181) = 458.943, p < 0.001 ***, eta2p = 0.387, N = 2186
+#> ANCOVA: income by education, covariate: age [Weighted], N = 2186
+#>   age (covariate): F(1, 2181) = 0.019, p = 0.889, eta2p = 0.000
+#>   education:       F(3, 2181) = 458.943, p < 0.001 ***, eta2p = 0.387
+#> Use summary() for detailed output.
 ```
 
 The output includes the covariate effect, the adjusted factor effect,
@@ -327,7 +338,8 @@ survey_data %>%
   mann_whitney(political_orientation, group = region,
                weights = sampling_weight)
 #> Mann-Whitney U Test: political_orientation by region [Weighted]
-#>   U = 426,033, Z = 0.207, p = 0.836 , r = 0.004 (negligible), N = 2312
+#>   U = 426032.8, Z = -0.207, p = 0.836, r = 0.004 (negligible), N = 2312
+#> Use summary() for detailed output.
 ```
 
 ### Kruskal-Wallis H Test
@@ -341,7 +353,7 @@ kw_result <- survey_data %>%
 
 kw_result
 #> Kruskal-Wallis Test: life_satisfaction by education
-#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071 (medium), N = 2421
 #> Use summary() for detailed output.
 ```
 
@@ -366,7 +378,7 @@ data(longitudinal_data_wide)
 longitudinal_data_wide %>%
   wilcoxon_test(score_T1, score_T2)
 #> Wilcoxon Signed-Rank Test: score_T2 - score_T1
-#>   Z = 5.427, p < 0.001 ***, r = 0.530 (large), N = 105
+#>   Z = -5.427, p < 0.001 ***, r = 0.530 (large), N = 105
 #> Use summary() for detailed output.
 ```
 
@@ -382,7 +394,7 @@ friedman_result <- longitudinal_data_wide %>%
 
 friedman_result
 #> Friedman Test: score_T1, score_T2, score_T3
-#>   chi2(2) = 47.255, p < 0.001 ***, W = 0.251, N = 94
+#>   chi2(2) = 47.255, p < 0.001 ***, Kendall's W = 0.251 (weak), N = 94
 #> Use summary() for detailed output.
 ```
 
@@ -405,7 +417,7 @@ Test whether an observed proportion differs from an expected value:
 survey_data %>%
   binomial_test(gender)
 #> Binomial Test: gender
-#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500
 #> Use summary() for detailed output.
 ```
 
@@ -419,8 +431,9 @@ Test whether two categorical variables are related:
 
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
-#> Chi-Squared Test: education × employment [Weighted]
+#> Chi-Squared Test: education x employment [Weighted]
 #>   chi2(12) = 130.696, p < 0.001 ***, V = 0.132 (small), N = 2518
+#> Use summary() for detailed output.
 ```
 
 A significant result means the variables are not independent — knowing
@@ -466,7 +479,7 @@ small_sample <- survey_data %>% slice_sample(n = 30)
 small_sample %>%
   fisher_test(gender, region)
 #> Fisher's Exact Test: gender x region
-#>   p = 1.0000 , N = 30
+#>   p = 1.000, OR = 1.167 [0.210, 6.484], N = 30
 #> Use summary() for detailed output.
 ```
 
@@ -556,31 +569,39 @@ survey_data %>%
 #> 
 #> Group: education = Basic Secondary
 #> ----------------------------------
-#> ----------------------------------------
-#>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.208      3 1.243     4   2   -0.056       801.2
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------
+#>   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing
+#>   -----------------------------------------------------------------------------
+#>   life_satisfaction  3.208   3.000  1.243  4.000  2.000    -0.056  816       32
+#>   -----------------------------------------------------------------------------
 #> 
 #> Group: education = Intermediate Secondary
 #> -----------------------------------------
-#> ----------------------------------------
-#>           Variable  Mean Median   SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.698      4 1.11     4   2   -0.592       611.8
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------
+#>   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing
+#>   -----------------------------------------------------------------------------
+#>   life_satisfaction  3.698   4.000  1.110  4.000  2.000    -0.592  630       11
+#>   -----------------------------------------------------------------------------
 #> 
 #> Group: education = Academic Secondary
 #> -------------------------------------
-#> ----------------------------------------
-#>           Variable  Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 3.851      4 0.997     4   2   -0.581       600.6
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------
+#>   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing
+#>   -----------------------------------------------------------------------------
+#>   life_satisfaction  3.851   4.000  0.997  4.000  2.000    -0.581  618       24
+#>   -----------------------------------------------------------------------------
 #> 
 #> Group: education = University
 #> -----------------------------
-#> ----------------------------------------
-#>           Variable Mean Median    SD Range IQR Skewness Effective_N
-#>  life_satisfaction 4.04      4 0.962     4   1   -0.967       377.8
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------
+#>   Variable            Mean  Median     SD  Range    IQR  Skewness    N  Missing
+#>   -----------------------------------------------------------------------------
+#>   life_satisfaction  4.040   4.000  0.962  4.000  1.000    -0.967  373       12
+#>   -----------------------------------------------------------------------------
 
 # 2. Test for overall differences
 anova_result <- survey_data %>%
@@ -589,6 +610,7 @@ anova_result <- survey_data %>%
 anova_result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
 #>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#> Use summary() for detailed output.
 
 # 3. Check assumptions
 levene_test(anova_result)

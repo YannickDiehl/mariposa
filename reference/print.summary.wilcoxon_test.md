@@ -48,31 +48,35 @@ summary(result)                # all sections
 #> trust_media - trust_government
 #> ------------------------------
 #>   Ranks:
-#>   -------------------------------------------
-#>                      N Mean Rank Sum of Ranks
-#>    Negative Ranks  955    887.53     847592.5
-#>    Positive Ranks  770    832.57     641082.5
-#>              Ties  502        NA           NA
-#>             Total 2227        NA           NA
-#>   -------------------------------------------
+#>   ---------------------------------------------
+#>                      N  Mean Rank  Sum of Ranks
+#>   ---------------------------------------------
+#>   Negative Ranks   955     887.53     847592.50
+#>   Positive Ranks   770     832.57     641082.50
+#>   Ties             502                         
+#>   Total           2227                         
+#>   ---------------------------------------------
 #> 
 #>   a trust_media < trust_government
 #>   b trust_media > trust_government
 #>   c trust_media = trust_government
 #> 
 #>   Test Statistics:
-#>   ----------------------------
-#>         Z p value Effect r sig
-#>    -5.097       0    0.123 ***
-#>   ----------------------------
+#>   ------------------------------
+#>        Z  p value  Effect r     
+#>   ------------------------------
+#>   -5.097    <.001     0.123  ***
+#>   ------------------------------
+#>   Z is based on positive ranks (the smaller rank sum), as in SPSS.
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: 0.1 - 0.3
-#> - Medium effect: 0.3 - 0.5
-#> - Large effect: > 0.5
+#> - Negligible: |r| < 0.1
+#> - Small: 0.1 <= |r| < 0.3
+#> - Medium: 0.3 <= |r| < 0.5
+#> - Large: |r| >= 0.5
 summary(result, ranks = FALSE) # hide rank table
 #> Wilcoxon Signed-Rank Test Results
 #> ---------------------------------
@@ -82,16 +86,19 @@ summary(result, ranks = FALSE) # hide rank table
 #> trust_media - trust_government
 #> ------------------------------
 #>   Test Statistics:
-#>   ----------------------------
-#>         Z p value Effect r sig
-#>    -5.097       0    0.123 ***
-#>   ----------------------------
+#>   ------------------------------
+#>        Z  p value  Effect r     
+#>   ------------------------------
+#>   -5.097    <.001     0.123  ***
+#>   ------------------------------
+#>   Z is based on positive ranks (the smaller rank sum), as in SPSS.
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Small effect: 0.1 - 0.3
-#> - Medium effect: 0.3 - 0.5
-#> - Large effect: > 0.5
+#> - Negligible: |r| < 0.1
+#> - Small: 0.1 <= |r| < 0.3
+#> - Medium: 0.3 <= |r| < 0.5
+#> - Large: |r| >= 0.5
 ```

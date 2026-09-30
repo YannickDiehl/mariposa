@@ -65,7 +65,7 @@ Shows R-squared, adjusted R-squared, F statistic, and p-value.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'linear_regression'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,6 +75,11 @@ Shows R-squared, adjusted R-squared, F statistic, and p-value.</p>
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>An object of class <code>"linear_regression"</code> returned by
 <code><a href="linear_regression.html">linear_regression</a></code>.</p></dd>
+
+
+<dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
+<dd><p>Number of decimal places for R-squared and the p-value
+(the F statistic keeps one decimal fewer). (Default: 3)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -92,6 +97,7 @@ Shows R-squared, adjusted R-squared, F statistic, and p-value.</p>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression: life_satisfaction ~ age + income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   R2 = 0.201, adj.R2 = 0.200, F(2, 2112) = 265.60, p &lt; 0.001 ***, N = 2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Linear Regression Results</span>
@@ -101,47 +107,47 @@ Shows R-squared, adjusted R-squared, F statistic, and p-value.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N: 2115</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Descriptive Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable                                    Mean     Std.Dev.      N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction                          3.638        1.148   2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                                       50.827       16.995   2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                                  3757.683     1430.923   2115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable               Mean  Std. Deviation     N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction     3.638           1.148  2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                  50.827          16.995  2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income             3757.683        1430.923  2115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Model Summary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R                              0.448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   R Square                       0.201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Adjusted R Square              0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Std. Error of Estimate         1.026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R                            0.448</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   R Square                     0.201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Adjusted R Square            0.200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Std. Error of the Estimate   1.026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ANOVA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Source           Sum of Squares    df      Mean Square          F     Sig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Regression              559.609     2          279.804    265.598    0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Residual               2224.965  2112            1.053                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                  2784.574  2114                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Source      Sum of Squares    df  Mean Square        F   Sig.     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Regression         559.609     2      279.804  265.598  &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Residual          2224.965  2112        1.053                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total             2784.574  2114                                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)     2.321       0.092          25.237  &lt;.001         2.141         2.502  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age            -0.001       0.001  -0.010  -0.508   .611        -0.003         0.002     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income       3.59e-04    1.56e-05   0.448  23.037  &lt;.001      3.29e-04      3.90e-04  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Collinearity Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Term                       Tolerance        VIF</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age                            1.000      1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income                         1.000      1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Term    Tolerance    VIF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         1.000  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income      1.000  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   VIF &gt; 10 (Tolerance &lt; 0.1) indicates problematic collinearity.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>

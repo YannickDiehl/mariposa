@@ -34,7 +34,7 @@ cb <- codebook(survey_data)
 print(cb)
 #> 
 #> Codebook: survey_data
-#> 16 variables | 2,500 observations | 15 labelled
+#> 16 variables | 2500 observations | 15 labelled
 #> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)
 #> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer
 ```

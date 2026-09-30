@@ -104,7 +104,7 @@ survey_data %>%
 # Grouped weighted analysis
 survey_data %>%
   group_by(region) %>%
-  describe(satisfaction, weights = sampling_weight)
+  describe(life_satisfaction, weights = sampling_weight)
 ```
 
 ### Tidyverse Integration
@@ -209,7 +209,7 @@ workflows translate directly:
 ``` spss
 WEIGHT BY sampling_weight.
 T-TEST GROUPS=gender(1 2)
-  /VARIABLES=satisfaction.
+  /VARIABLES=life_satisfaction.
 ```
 
 **mariposa:**
@@ -217,7 +217,7 @@ T-TEST GROUPS=gender(1 2)
 ``` r
 
 survey_data %>%
-  t_test(satisfaction, group = gender, weights = sampling_weight)
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
 ```
 
 ## Documentation
@@ -295,12 +295,58 @@ values
   : Export Data to SAS Transport Format
 - [`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)
   : Export Data to Excel with Label Support
+- [`as.data.frame(`*`<ancova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<binomial_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<chi_square>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<chisq_gof>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<codebook>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<crosstab>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<describe>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<dunn_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<efa>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<factorial_anova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<fisher_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<frequency>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<friedman_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<kendall_tau>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<kruskal_wallis>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<levene_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<mann_whitney>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<marginal_effects>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<mcnemar_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<multiple_response>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<normality_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<oneway_anova>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<pairwise_wilcoxon>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<partial_cor>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<pearson_cor>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<reliability>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<scheffe_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<spearman_rho>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<t_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<tukey_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_iqr>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_kurtosis>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_mean>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_median>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_modus>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_quantile>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_range>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_sd>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_se>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_skew>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<w_var>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  [`as.data.frame(`*`<wilcoxon_test>`*`)`](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  : Convert Analysis Results to Data Frames
 
 ## Label Management
 
 Inspect, modify, and convert labelled survey data
 
 - [`var_label()`](https://YannickDiehl.github.io/mariposa/reference/var_label.md)
+  [`` `var_label<-`() ``](https://YannickDiehl.github.io/mariposa/reference/var_label.md)
   : Get or Set Variable Labels
 - [`val_labels()`](https://YannickDiehl.github.io/mariposa/reference/val_labels.md)
   : Get or Set Value Labels
@@ -463,6 +509,34 @@ Linear and logistic regression with SPSS-compatible output
   : Predict from a linear_regression model
 - [`predict(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/predict.logistic_regression.md)
   : Predict from a logistic_regression model
+- [`confint(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/confint.linear_regression.md)
+  : Confidence intervals for linear_regression coefficients
+- [`confint(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/confint.logistic_regression.md)
+  : Confidence intervals for logistic regression coefficients
+- [`profile(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/profile.logistic_regression.md)
+  : Profile likelihood for a logistic_regression model
+- [`vcov(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/vcov.linear_regression.md)
+  : Variance-covariance matrix of a linear_regression model
+- [`nobs(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/nobs.linear_regression.md)
+  : Number of observations of a linear_regression model
+- [`df.residual(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/df.residual.linear_regression.md)
+  : Residual degrees of freedom of a linear_regression model
+- [`coef(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/coef.linear_regression.md)
+  : Coefficients of a linear_regression model
+- [`residuals(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/residuals.linear_regression.md)
+  : Residuals of a linear_regression model
+- [`fitted(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/fitted.linear_regression.md)
+  : Fitted values of a linear_regression model
+- [`update(`*`<linear_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/update.linear_regression.md)
+  : Update and re-fit a linear_regression model
+- [`update(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/update.logistic_regression.md)
+  : Update and re-fit a logistic_regression model
+- [`coef(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression-accessors.md)
+  [`residuals(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression-accessors.md)
+  [`fitted(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression-accessors.md)
+  [`vcov(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression-accessors.md)
+  [`nobs(`*`<logistic_regression>`*`)`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression-accessors.md)
+  : Standard glm accessors for logistic_regression results
 
 ## Weighted Statistics
 

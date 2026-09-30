@@ -161,17 +161,17 @@ reverse-coding, and inline value labels.</p>
 <span><span class="co">#&gt; --------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; age_group (Age in years (recoded))</span></span>
-<span><span class="co">#&gt; # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span></span>
+<span><span class="co">#&gt; # total N=2500 valid N=2500</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Young |  Young |    292 |  11.68 |  11.68 |  11.68 |</span></span>
-<span><span class="co">#&gt; | Middle | Middle |    935 |  37.40 |  37.40 |  49.08 |</span></span>
-<span><span class="co">#&gt; |  Older |  Older |   1273 |  50.92 |  50.92 | 100.00 |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Total |        |   2500 | 100.00 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Value  |    N |  Raw % | Valid % | Cum. % |</span></span>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Young  |  292 |  11.68 |   11.68 |  11.68 |</span></span>
+<span><span class="co">#&gt; | Middle |  935 |  37.40 |   37.40 |  49.08 |</span></span>
+<span><span class="co">#&gt; | Older  | 1273 |  50.92 |   50.92 | 100.00 |</span></span>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Total  | 2500 | 100.00 |  100.00 |        |</span></span>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span></code></pre></div>
 <p>The bracket notation (<code>[Young]</code>) automatically creates
 value labels on the recoded variable. The <code>suffix</code> argument
 creates a new column (here <code>age_group</code>) instead of
@@ -181,10 +181,15 @@ overwriting the original.</p>
 <h3 id="reverse-coding">Reverse-Coding<a class="anchor" aria-label="anchor" href="#reverse-coding"></a>
 </h3>
 <p>Reverse the direction of a Likert scale. Useful when some items in a
-scale are negatively worded:</p>
+scale are negatively worded. Give the scale range explicitly with
+<code>"rev(min, max)"</code>: reversing is <code>min + max - x</code> on
+the <em>scale</em>, which differs from the observed range whenever
+nobody chose an end point (common in subgroups). With plain
+<code>"rev"</code>, the range comes from the value labels, or from the
+observed values with a message saying so:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>,</span>
-<span>  rules <span class="op">=</span> <span class="st">"rev"</span>, suffix <span class="op">=</span> <span class="st">"_rev"</span></span>
+<span>  rules <span class="op">=</span> <span class="st">"rev(1, 5)"</span>, suffix <span class="op">=</span> <span class="st">"_rev"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Original: 1=low trust ... 5=high trust</span></span>
@@ -218,18 +223,18 @@ scale are negatively worded:</p>
 <span><span class="co">#&gt; income_dicho (Monthly household income (EUR) (recoded))</span></span>
 <span><span class="co">#&gt; # total N=2500 valid N=2186 mean=0.49 sd=0.50 skewness=0.03</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Value |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |    0 |   1108 |  44.32 |  50.69 |  50.69 |</span></span>
-<span><span class="co">#&gt; |    1 |   1078 |  43.12 |  49.31 | 100.00 |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Total |   2186 |  87.44 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |   NA |    314 |  12.56 |     NA |     NA |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Total |    314 |  12.56 |     NA |        |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; +-------------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; |       Value |    N |  Raw % | Valid % | Cum. % |</span></span>
+<span><span class="co">#&gt; +-------------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; |           0 | 1108 |  44.32 |   50.69 |  50.69 |</span></span>
+<span><span class="co">#&gt; |           1 | 1078 |  43.12 |   49.31 | 100.00 |</span></span>
+<span><span class="co">#&gt; +-------------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Total valid | 2186 |  87.44 |  100.00 |        |</span></span>
+<span><span class="co">#&gt; +-------------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; |      System |  314 |  12.56 |         |        |</span></span>
+<span><span class="co">#&gt; +-------------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Total       | 2500 | 100.00 |         |        |</span></span>
+<span><span class="co">#&gt; +-------------+------+--------+---------+--------+</span></span></code></pre></div>
 <p>Other split options:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Split at the mean</span></span>
@@ -259,16 +264,16 @@ and <code>else</code> for a catch-all:</p>
 <span><span class="co">#&gt; --------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; education_binary (Highest educational attainment (recoded))</span></span>
-<span><span class="co">#&gt; # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span></span>
+<span><span class="co">#&gt; # total N=2500 valid N=2500</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Lower |  Lower |   1470 |  58.80 |  58.80 |  58.80 |</span></span>
-<span><span class="co">#&gt; | Higher | Higher |   1030 |  41.20 |  41.20 | 100.00 |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |  Total |        |   2500 | 100.00 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +--------+--------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Value  |    N |  Raw % | Valid % | Cum. % |</span></span>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Lower  | 1470 |  58.80 |   58.80 |  58.80 |</span></span>
+<span><span class="co">#&gt; | Higher | 1030 |  41.20 |   41.20 | 100.00 |</span></span>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Total  | 2500 | 100.00 |  100.00 |        |</span></span>
+<span><span class="co">#&gt; +--------+------+--------+---------+--------+</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -319,18 +324,16 @@ omitted as reference):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dummies</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/to_dummy.html">to_dummy</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">education</span>, ref <span class="op">=</span> <span class="fl">1</span>, append <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dummies</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
-<span><span class="co">#&gt;   `education_Basic Secondary` education_Intermediate Se…¹ education_Academic S…²</span></span>
-<span><span class="co">#&gt;                         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                           0                           1                      0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                           0                           0                      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                           0                           0                      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                           1                           0                      0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>                           1                           0                      0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>                           0                           1                      0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated names: ¹​`education_Intermediate Secondary`,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ²​`education_Academic Secondary`</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: education_University &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
+<span><span class="co">#&gt;   `education_Intermediate Secondary` education_Academic S…¹ education_University</span></span>
+<span><span class="co">#&gt;                                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                                  1                      0                    0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                                  0                      1                    0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                                  0                      1                    0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                                  0                      0                    0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>                                  0                      0                    0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>                                  1                      0                    0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`education_Academic Secondary`</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="adding-to-existing-data">Adding to Existing Data<a class="anchor" aria-label="anchor" href="#adding-to-existing-data"></a>
@@ -360,10 +363,13 @@ different scales.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;  Variable Mean SD    N Missing</span></span>
-<span><span class="co">#&gt;       age    0  1 2500       0</span></span>
-<span><span class="co">#&gt;    income    0  1 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable   Mean     SD     N  Missing</span></span>
+<span><span class="co">#&gt;   -------------------------------------</span></span>
+<span><span class="co">#&gt;   age       0.000  1.000  2500        0</span></span>
+<span><span class="co">#&gt;   income    0.000  1.000  2186      314</span></span>
+<span><span class="co">#&gt;   -------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="standardization-methods">Standardization Methods<a class="anchor" aria-label="anchor" href="#standardization-methods"></a>
@@ -382,11 +388,14 @@ different scales.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;               Variable   Mean    SD    N Missing</span></span>
-<span><span class="co">#&gt;   life_satisfaction_sd  0.000 1.000 2421      79</span></span>
-<span><span class="co">#&gt;  life_satisfaction_2sd  0.000 0.500 2421      79</span></span>
-<span><span class="co">#&gt;  life_satisfaction_mad -0.251 0.778 2421      79</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ---------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable                 Mean     SD     N  Missing</span></span>
+<span><span class="co">#&gt;   ---------------------------------------------------</span></span>
+<span><span class="co">#&gt;   life_satisfaction_sd    0.000  1.000  2421       79</span></span>
+<span><span class="co">#&gt;   life_satisfaction_2sd   0.000  0.500  2421       79</span></span>
+<span><span class="co">#&gt;   life_satisfaction_mad  -0.251  0.778  2421       79</span></span>
+<span><span class="co">#&gt;   ---------------------------------------------------</span></span></code></pre></div>
 <ul>
 <li>
 <strong><code>"sd"</code></strong> (default): Classic
@@ -416,9 +425,12 @@ Mean Difference</li>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;     Variable  Mean    SD    N Missing</span></span>
-<span><span class="co">#&gt;  income_wstd 0.008 1.006 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ----------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable      Mean     SD     N  Missing</span></span>
+<span><span class="co">#&gt;   ----------------------------------------</span></span>
+<span><span class="co">#&gt;   income_wstd  0.008  1.006  2186      314</span></span>
+<span><span class="co">#&gt;   ----------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="group-wise-standardization">Group-Wise Standardization<a class="anchor" aria-label="anchor" href="#group-wise-standardization"></a>
@@ -449,10 +461,13 @@ scale.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;  Variable Mean SD    N Missing</span></span>
-<span><span class="co">#&gt;     age_c    0  1 2500       0</span></span>
-<span><span class="co">#&gt;  income_c    0  1 2186     314</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable   Mean     SD     Min    Max     N  Missing</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------</span></span>
+<span><span class="co">#&gt;   age_c     0.000  1.000  -1.917  2.618  2500        0</span></span>
+<span><span class="co">#&gt;   income_c  0.000  1.000  -2.062  2.963  2186      314</span></span>
+<span><span class="co">#&gt;   ----------------------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="group-mean-centering">Group-Mean Centering<a class="anchor" aria-label="anchor" href="#group-mean-centering"></a>
@@ -475,17 +490,21 @@ from its group mean:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = East</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;   Variable Mean    SD   N Missing</span></span>
-<span><span class="co">#&gt;  income_gc    0 0.968 429      56</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable    Mean     SD    N  Missing</span></span>
+<span><span class="co">#&gt;   -------------------------------------</span></span>
+<span><span class="co">#&gt;   income_gc  0.000  0.968  429       56</span></span>
+<span><span class="co">#&gt;   -------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: region = West</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span>
-<span><span class="co">#&gt;   Variable Mean    SD    N Missing</span></span>
-<span><span class="co">#&gt;  income_gc    0 1.008 1757     258</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   --------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable    Mean     SD     N  Missing</span></span>
+<span><span class="co">#&gt;   --------------------------------------</span></span>
+<span><span class="co">#&gt;   income_gc  0.000  1.008  1757      258</span></span>
+<span><span class="co">#&gt;   --------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="weighted-centering">Weighted Centering<a class="anchor" aria-label="anchor" href="#weighted-centering"></a>
@@ -515,9 +534,12 @@ variables for each row:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;  Variable  Mean Median  SD Range IQR Skewness    N Missing</span></span>
-<span><span class="co">#&gt;   m_trust 2.915      3 0.7     4   1    0.015 2500       0</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ---------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable   Mean  Median     SD  Range    IQR  Skewness     N  Missing</span></span>
+<span><span class="co">#&gt;   ---------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   m_trust   2.915   3.000  0.700  4.000  1.000     0.015  2500        0</span></span>
+<span><span class="co">#&gt;   ---------------------------------------------------------------------</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="using-tidyselect">Using tidyselect<a class="anchor" aria-label="anchor" href="#using-tidyselect"></a>
 </h4>
@@ -565,9 +587,12 @@ returns the total:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;     Variable  Mean Median   SD Range IQR Skewness    N Missing</span></span>
-<span><span class="co">#&gt;  trust_total 8.282      8 2.17    13   3   -0.164 2500       0</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable      Mean  Median     SD   Range    IQR  Skewness     N  Missing</span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   trust_total  8.282   8.000  2.170  13.000  3.000    -0.164  2500        0</span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------------</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="row-count">Row Count<a class="anchor" aria-label="anchor" href="#row-count"></a>
@@ -590,15 +615,15 @@ appears in each row:</p>
 <span><span class="co">#&gt; n_high_trust</span></span>
 <span><span class="co">#&gt; # total N=2500 valid N=2500 mean=0.29 sd=0.49 skewness=1.39</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Value |      N |  Raw % |Valid % | Cum. % |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |    0 |   1829 |  73.16 |  73.16 |  73.16 |</span></span>
-<span><span class="co">#&gt; |    1 |    628 |  25.12 |  25.12 |  98.28 |</span></span>
-<span><span class="co">#&gt; |    2 |     43 |   1.72 |   1.72 | 100.00 |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span>
-<span><span class="co">#&gt; |Total |   2500 | 100.00 | 100.00 |        |</span></span>
-<span><span class="co">#&gt; +------+--------+--------+--------+--------+</span></span></code></pre></div>
+<span><span class="co">#&gt; +-------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Value |    N |  Raw % | Valid % | Cum. % |</span></span>
+<span><span class="co">#&gt; +-------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; |     0 | 1829 |  73.16 |   73.16 |  73.16 |</span></span>
+<span><span class="co">#&gt; |     1 |  628 |  25.12 |   25.12 |  98.28 |</span></span>
+<span><span class="co">#&gt; |     2 |   43 |   1.72 |    1.72 | 100.00 |</span></span>
+<span><span class="co">#&gt; +-------+------+--------+---------+--------+</span></span>
+<span><span class="co">#&gt; | Total | 2500 | 100.00 |  100.00 |        |</span></span>
+<span><span class="co">#&gt; +-------+------+--------+---------+--------+</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -616,9 +641,12 @@ directly comparable:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Descriptive Statistics</span></span>
 <span><span class="co">#&gt; ----------------------</span></span>
-<span><span class="co">#&gt;     Variable   Mean Median   SD Range IQR Skewness    N Missing</span></span>
-<span><span class="co">#&gt;  trust_pomps 47.885     50 17.5   100  25    0.015 2500       0</span></span>
-<span><span class="co">#&gt; ----------------------------------------</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable       Mean  Median      SD    Range     IQR  Skewness     N  Missing</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   trust_pomps  47.885  50.000  17.500  100.000  25.000     0.015  2500        0</span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------------------------------</span></span></code></pre></div>
 <p>A score of 0 means the respondent chose the minimum on every item;
 100 means the maximum on every item.</p>
 <p>Always specify <code>scale_min</code> and <code>scale_max</code>
@@ -645,7 +673,7 @@ ensures scores are comparable across samples.</p>
 <span>  rules <span class="op">=</span> <span class="st">"18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]"</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="st">"_group"</span>, as_factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rec.html">rec</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>,</span>
-<span>  rules <span class="op">=</span> <span class="st">"rev"</span>, suffix <span class="op">=</span> <span class="st">"_rev"</span><span class="op">)</span></span>
+<span>  rules <span class="op">=</span> <span class="st">"rev(1, 5)"</span>, suffix <span class="op">=</span> <span class="st">"_rev"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 2. Create scale score</span></span>
 <span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -661,12 +689,14 @@ ensures scores are comparable across samples.</p>
 <span>  <span class="fu"><a href="../reference/t_test.html">t_test</a></span><span class="op">(</span><span class="va">m_trust</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; t-Test: m_trust by gender [Weighted]</span></span>
 <span><span class="co">#&gt;   t(2457.6) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span>
 <span></span>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/linear_regression.html">linear_regression</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">age_z</span> <span class="op">+</span> <span class="va">income_z</span> <span class="op">+</span> <span class="va">m_trust</span>,</span>
 <span>                    weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear Regression: life_satisfaction ~ age_z + income_z + m_trust [Weighted]</span></span>
-<span><span class="co">#&gt;   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.02, p &lt; 0.001 ***, N = 2113</span></span></code></pre></div>
+<span><span class="co">#&gt;   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.02, p &lt; 0.001 ***, N = 2113</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="practical-tips">Practical Tips<a class="anchor" aria-label="anchor" href="#practical-tips"></a>

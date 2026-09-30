@@ -36,7 +36,7 @@ survey_data$high_satisfaction <- as.integer(survey_data$life_satisfaction >= 4)
 model <- logistic_regression(survey_data, high_satisfaction ~ age + income)
 marginal_effects(model)
 #> Average Marginal Effects: high_satisfaction ~ age + income
-#>   age: AME = 0.000, p = 0.677 
-#>   income: AME = 0.000, p < 0.001 ***
+#>   age: AME = 2.41e-04, p = 0.677
+#>   income: AME = 1.43e-04, p < 0.001 ***
 #> AME = average change in predicted probability. Use summary() for detailed output.
 ```

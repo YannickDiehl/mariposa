@@ -110,7 +110,9 @@ Must have exactly two categories. Leave empty for one-sample tests.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-var-equal">var.equal<a class="anchor" aria-label="anchor" href="#arg-var-equal"></a></dt>
@@ -138,9 +140,13 @@ For one-sample tests, your benchmark value.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Test results showing whether groups differ, including:</p><ul><li><p>t-statistic and p-value for statistical significance</p></li>
-<li><p>Mean difference and confidence interval</p></li>
+<li><p>Mean difference and confidence interval (one-sample tests: mean minus
+<code>mu</code> and the interval of that difference, as in the SPSS
+One-Sample Test)</p></li>
 <li><p>Effect sizes (Cohen's d, Hedges' g, Glass' Delta)</p></li>
-<li><p>Group statistics (mean, SD, sample size)
+<li><p>Group statistics (mean, SD, standard error of the mean, sample size)</p></li>
+<li><p>A <code>note</code> column that explains why a variable (or group) was not
+computed, e.g. no variance or only one group with valid data
 Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the full SPSS-style output with toggleable sections.</p></li>
 </ul></div>
     <div class="section level2">
@@ -243,13 +249,15 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2384.1) = -1.018, p = 0.309 , g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2384.1) = -1.018, p = 0.309, g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With survey weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -257,61 +265,69 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: age by region [Weighted]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t(763.8) = 2.551, p = 0.011 *, g = 0.130 (negligible), N = 2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: income by region [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(713.7) = 0.299, p = 0.765 , g = 0.016 (negligible), N = 2200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(713.7) = 0.299, p = 0.765, g = 0.016 (negligible), N = 2200</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by region [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(721.0) = -0.031, p = 0.975 , g = -0.002 (negligible), N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(721.0) = -0.031, p = 0.975, g = -0.002 (negligible), N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One-sample test against a benchmark</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, mu <span class="op">=</span> <span class="fl">5</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2435.6) = -58.916, p &lt; 0.001 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2435.6) = -58.916, p &lt; 0.001 ***, N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(484.7) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(484.7) = 0.641, p = 0.522, g = 0.058 (negligible), N = 488</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(1901.1) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(1901.1) = -1.548, p = 0.122, g = -0.070 (negligible), N = 1949</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Equal variance assumption</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, var.equal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2419.0) = -1.019, p = 0.308 , g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2419) = -1.019, p = 0.308, g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One-sided test</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: income by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2169.3) = 0.690, p = 0.245 , g = 0.030 (negligible), N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2169.3) = 0.690, p = 0.245, g = 0.030 (negligible), N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: trust_government by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2322.8) = -0.682, p = 0.496, g = -0.028 (negligible), N = 2371</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: trust_media by gender [Weighted]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: trust_science by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2360.9) = -1.421, p = 0.156, g = -0.058 (negligible), N = 2414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Store results for further analysis</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">t_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">t_test</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line summary</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2384.1) = -1.018, p = 0.309 , g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2384.1) = -1.018, p = 0.309, g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------</span>
@@ -322,24 +338,30 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: mean = 3.603, n = 1149.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: mean = 3.651, n = 1272.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Group Statistics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender     N   Mean  Std. Deviation  Std. Error Mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    1149  3.603           1.165            0.034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  1272  3.651           1.142            0.032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> t-test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Assumption t_stat       df p_value mean_diff        conf_int sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Independent Samples Test:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Equal variances assumed      -1.019      2419  .308      -0.048     0.047        -0.140         0.044   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Equal variances not assumed  -1.018  2384.147  .309      -0.048     0.047        -0.140         0.044   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Sizes:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction   -0.041   -0.041      -0.041  negligible</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction     -0.041     -0.041        -0.041  negligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -360,19 +382,23 @@ different population variances are involved. Biometrika, 34(1-2), 28-35.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: mean = 3.603, n = 1149.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: mean = 3.651, n = 1272.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Group Statistics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender     N   Mean  Std. Deviation  Std. Error Mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    1149  3.603           1.165            0.034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  1272  3.651           1.142            0.032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> t-test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Assumption t_stat       df p_value mean_diff        conf_int sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Independent Samples Test:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Equal variances assumed      -1.019      2419  .308      -0.048     0.047        -0.140         0.044   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Equal variances not assumed  -1.018  2384.147  .309      -0.048     0.047        -0.140         0.044   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

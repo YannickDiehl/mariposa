@@ -13,20 +13,30 @@ or
 ## Usage
 
 ``` r
-strip_tags(x)
+strip_tags(x, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  A numeric vector with tagged NAs.
+  A numeric vector with tagged NAs, or a data frame.
+
+- ...:
+
+  For a data frame: the columns to convert (tidyselect). If empty, every
+  numeric column is converted. Ignored for vectors.
 
 ## Value
 
-A numeric vector where all tagged NAs have been replaced with regular
-`NA`. Value labels for missing types are removed; labels for valid
-values are preserved.
+The input with all tagged NAs replaced by regular `NA`. Value labels for
+missing types are removed; labels for valid values and the variable
+label are preserved. A `haven_labelled` input stays `haven_labelled`, so
+the labels survive
+[`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+and
+[`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md).
+A data frame is returned with the selected columns converted.
 
 ## See also
 
@@ -56,6 +66,7 @@ if (requireNamespace("haven", quietly = TRUE)) {
   # Remove tag information: all missings become plain NA
   strip_tags(x)
 }
+#> <labelled<double>[5]>
 #> [1]  1  2 NA  3 NA
 # }
 ```

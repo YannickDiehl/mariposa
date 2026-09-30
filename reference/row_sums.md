@@ -16,23 +16,29 @@ row_sums(data, ..., min_valid = NULL, na.rm = TRUE)
 
 - data:
 
-  Your survey data (a data frame or tibble). When used inside
-  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html), pass
-  `.` or use
-  [`pick()`](https://dplyr.tidyverse.org/reference/pick.html).
+  Your survey data (a data frame or tibble). Inside
+  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html), the
+  recommended form is
+  [`pick()`](https://dplyr.tidyverse.org/reference/pick.html):
+  `mutate(score = row_means(pick(item1, item2, item3)))`. It also works
+  in a grouped
+  [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html); `.`
+  (the magrittr placeholder) is the whole data set and therefore only
+  works without groups.
 
 - ...:
 
   The variables to average. Use bare column names separated by commas,
   or tidyselect helpers like `starts_with("trust")`. If no variables are
   specified, all numeric columns in `data` are used (useful with
-  [`pick()`](https://dplyr.tidyverse.org/reference/pick.html)).
+  [`pick()`](https://dplyr.tidyverse.org/reference/pick.html);
+  non-numeric columns are ignored with a warning).
 
 - min_valid:
 
-  Minimum number of non-missing values required to compute a mean. If a
-  row has fewer valid values, `NA` is returned. Default is `NULL`
-  (compute mean if at least 1 value is valid).
+  Minimum number of non-missing values required to compute a mean (a
+  whole number). If a row has fewer valid values, `NA` is returned.
+  Default is `NULL` (compute mean if at least 1 value is valid).
 
 - na.rm:
 

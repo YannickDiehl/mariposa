@@ -29,11 +29,15 @@ w_sd(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample standard deviation.
+  Without weights, you get the simple sample standard deviation. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -52,7 +56,10 @@ number of valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents. Always less than or equal to the actual sample size.
 
-- **N**: The actual number of observations used in the calculation.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 A large difference between weighted and unweighted SD suggests that the
 variability in your sample does not accurately reflect the population.
@@ -122,49 +129,53 @@ survey_data %>% w_sd(age, weights = sampling_weight)
 #> 
 #> Weighted Standard Deviation Statistics
 #> --------------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_sd Effective_N
-#>       age      17.084      2468.8
-#> 
+#>   -------------------------------
+#>   Variable      SD     N  Missing
+#>   -------------------------------
+#>   age       17.084  2516        0
+#>   -------------------------------
 
 # Multiple variables
 survey_data %>% w_sd(age, income, life_satisfaction, weights = sampling_weight)
 #> 
 #> Weighted Standard Deviation Statistics
 #> --------------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_sd Effective_N
-#>       age      17.084      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_sd Effective_N
-#>    income    1423.966      2158.9
-#> 
-#> --- life_satisfaction ---
-#>           Variable weighted_sd Effective_N
-#>  life_satisfaction       1.152      2390.9
-#> 
+#>   ------------------------------------------
+#>   Variable                 SD     N  Missing
+#>   ------------------------------------------
+#>   age                  17.084  2516        0
+#>   income             1423.966  2201      315
+#>   life_satisfaction     1.152  2437       79
+#>   ------------------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_sd(age, weights = sampling_weight)
 #> 
 #> Weighted Standard Deviation Statistics
 #> --------------------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_sd Effective_N
-#>       age      17.595         477
+#>   ------------------------------
+#>   Variable      SD    N  Missing
+#>   ------------------------------
+#>   age       17.595  509        0
+#>   ------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_sd Effective_N
-#>       age      16.927      1993.1
-#> 
+#>   -------------------------------
+#>   Variable      SD     N  Missing
+#>   -------------------------------
+#>   age       16.927  2007        0
+#>   -------------------------------
 
 # In summarise context
 survey_data %>% summarise(sd_age = w_sd(age, weights = sampling_weight))
@@ -179,8 +190,9 @@ survey_data %>% w_sd(age)
 #> Standard Deviation Statistics
 #> -----------------------------
 #> 
-#> --- age ---
-#>  Variable     sd    N
-#>       age 16.976 2500
-#> 
+#>   -------------------------------
+#>   Variable      SD     N  Missing
+#>   -------------------------------
+#>   age       16.976  2500        0
+#>   -------------------------------
 ```

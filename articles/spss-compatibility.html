@@ -90,7 +90,7 @@
 <p>This vignette reports the SPSS-compatibility status of every
 statistical function in <strong>mariposa</strong>. It is auto-generated
 from the test suite and the validation exception registry.</p>
-<p><strong>Generated:</strong> 2026-09-09</p>
+<p><strong>Generated:</strong> 2026-09-30</p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
@@ -101,7 +101,7 @@ from the test suite and the validation exception registry.</p>
 </li>
 <li>Validation gaps (no test file yet): <strong>11</strong>
 </li>
-<li>Active Tier-3 algorithmic exceptions: <strong>0</strong>
+<li>Active Tier-3 algorithmic exceptions: <strong>2</strong>
 </li>
 </ul>
 </div>
@@ -129,9 +129,10 @@ verified via snapshot tests only</li>
 <div class="section level2">
 <h2 id="per-function-status">Per-Function Status<a class="anchor" aria-label="anchor" href="#per-function-status"></a>
 </h2>
-<p>The columns show how many <code>assert_spss()</code> calls per tier
-the validation file contains. “Total” is the total number of
-charter-compliant assertions.</p>
+<p>The columns show how many SPSS reference values per tier the
+validation file checks when it runs. “Total” is the total number of
+charter-compliant comparisons. The <code>w_*</code> functions share one
+validation file, whose total each of them shows.</p>
 <p>The “Internal (Tier 4)” column flags statistics that have no SPSS
 reference and are therefore R-only: for the rank-based family the
 <em>weighted variant</em> (SPSS <code>NPAR TESTS</code> and
@@ -167,19 +168,19 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <tr class="odd">
 <td><code>ancova</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">147</td>
+<td align="right">653</td>
 <td align="right">0</td>
-<td align="right">6</td>
+<td align="right">800</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>binomial_test</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">3</td>
+<td align="right">24</td>
+<td align="right">34</td>
 <td align="right">0</td>
-<td align="right">5</td>
+<td align="right">58</td>
 <td>weighted variant</td>
 </tr>
 <tr class="odd">
@@ -194,19 +195,19 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <tr class="even">
 <td><code>chi_square</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">6</td>
+<td align="right">53</td>
+<td align="right">182</td>
 <td align="right">0</td>
-<td align="right">8</td>
+<td align="right">235</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>chisq_gof</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">2</td>
+<td align="right">51</td>
+<td align="right">82</td>
 <td align="right">0</td>
-<td align="right">4</td>
+<td align="right">133</td>
 <td>—</td>
 </tr>
 <tr class="even">
@@ -230,74 +231,74 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <tr class="even">
 <td><code>crosstab</code></td>
 <td>compliant</td>
-<td align="right">4</td>
-<td align="right">5</td>
+<td align="right">1419</td>
+<td align="right">1950</td>
 <td align="right">0</td>
-<td align="right">9</td>
+<td align="right">3369</td>
 <td>adjusted standardized residuals (Haberman-formula oracle; SPSS
 /CELLS=ASRESID reference run pending)</td>
 </tr>
 <tr class="odd">
 <td><code>describe</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">3</td>
+<td align="right">18</td>
+<td align="right">270</td>
 <td align="right">0</td>
-<td align="right">5</td>
+<td align="right">288</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>dunn_test</code></td>
 <td>compliant</td>
 <td align="right">0</td>
-<td align="right">1</td>
+<td align="right">6</td>
 <td align="right">0</td>
-<td align="right">1</td>
+<td align="right">6</td>
 <td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>efa</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">7</td>
-<td align="right">0</td>
-<td align="right">8</td>
+<td align="right">21</td>
+<td align="right">473</td>
+<td align="right">84</td>
+<td align="right">578</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>factorial_anova</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">200</td>
+<td align="right">409</td>
 <td align="right">0</td>
-<td align="right">6</td>
+<td align="right">609</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>fisher_test</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">3</td>
+<td align="right">100</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">4</td>
+<td align="right">412</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>frequency</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">5</td>
+<td align="right">24</td>
+<td align="right">126</td>
 <td align="right">0</td>
-<td align="right">7</td>
+<td align="right">150</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>friedman_test</code></td>
 <td>compliant</td>
-<td align="right">3</td>
-<td align="right">3</td>
+<td align="right">18</td>
+<td align="right">38</td>
 <td align="right">0</td>
-<td align="right">6</td>
+<td align="right">56</td>
 <td>weighted variant</td>
 </tr>
 <tr class="even">
@@ -312,122 +313,122 @@ functions are SPSS-validated as shown in the tier columns.</p>
 <tr class="odd">
 <td><code>kendall_tau</code></td>
 <td>compliant</td>
-<td align="right">4</td>
-<td align="right">6</td>
+<td align="right">100</td>
+<td align="right">102</td>
 <td align="right">0</td>
-<td align="right">10</td>
+<td align="right">202</td>
 <td>weighted variant</td>
 </tr>
 <tr class="even">
 <td><code>kruskal_wallis</code></td>
 <td>compliant</td>
-<td align="right">5</td>
-<td align="right">3</td>
+<td align="right">52</td>
+<td align="right">45</td>
 <td align="right">0</td>
-<td align="right">8</td>
+<td align="right">97</td>
 <td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>levene_test</code></td>
 <td>compliant</td>
 <td align="right">0</td>
-<td align="right">2</td>
+<td align="right">144</td>
 <td align="right">0</td>
-<td align="right">2</td>
+<td align="right">144</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>linear_regression</code></td>
 <td>compliant</td>
-<td align="right">4</td>
-<td align="right">23</td>
+<td align="right">35</td>
+<td align="right">567</td>
 <td align="right">0</td>
-<td align="right">27</td>
+<td align="right">602</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>logistic_regression</code></td>
 <td>compliant</td>
-<td align="right">7</td>
-<td align="right">13</td>
+<td align="right">12</td>
+<td align="right">17</td>
 <td align="right">0</td>
-<td align="right">20</td>
+<td align="right">29</td>
 <td>all statistics (textbook-formula oracle; no SPSS v29 reference run
 yet)</td>
 </tr>
 <tr class="even">
 <td><code>mann_whitney</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">8</td>
+<td align="right">19</td>
+<td align="right">74</td>
 <td align="right">0</td>
-<td align="right">10</td>
+<td align="right">93</td>
 <td>weighted variant</td>
 </tr>
 <tr class="odd">
 <td><code>mcnemar_test</code></td>
 <td>compliant</td>
-<td align="right">3</td>
-<td align="right">1</td>
+<td align="right">84</td>
+<td align="right">59</td>
 <td align="right">0</td>
-<td align="right">4</td>
+<td align="right">143</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>multiple_response</code></td>
 <td>compliant</td>
-<td align="right">11</td>
-<td align="right">10</td>
+<td align="right">19</td>
+<td align="right">33</td>
 <td align="right">0</td>
-<td align="right">21</td>
+<td align="right">52</td>
 <td>all statistics (hand-computation oracle; SPSS MULT RESPONSE
 reference run pending)</td>
 </tr>
 <tr class="odd">
 <td><code>normality_test</code></td>
 <td>compliant</td>
-<td align="right">4</td>
-<td align="right">8</td>
+<td align="right">6</td>
+<td align="right">15</td>
 <td align="right">0</td>
-<td align="right">12</td>
+<td align="right">21</td>
 <td>all statistics (independent-implementation oracles; SPSS EXAMINE
 reference run pending)</td>
 </tr>
 <tr class="even">
 <td><code>oneway_anova</code></td>
 <td>compliant</td>
-<td align="right">6</td>
-<td align="right">16</td>
+<td align="right">234</td>
+<td align="right">1209</td>
 <td align="right">0</td>
-<td align="right">22</td>
+<td align="right">1443</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>pairwise_wilcoxon</code></td>
 <td>compliant</td>
+<td align="right">106</td>
+<td align="right">136</td>
 <td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
+<td align="right">242</td>
 <td>weighted variant</td>
 </tr>
 <tr class="even">
 <td><code>partial_cor</code></td>
 <td>compliant</td>
-<td align="right">3</td>
-<td align="right">9</td>
+<td align="right">4</td>
+<td align="right">16</td>
 <td align="right">0</td>
-<td align="right">12</td>
+<td align="right">20</td>
 <td>all statistics (residual-regression oracle; SPSS PARTIAL CORR
 reference run pending)</td>
 </tr>
 <tr class="odd">
 <td><code>pearson_cor</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">5</td>
+<td align="right">18</td>
+<td align="right">55</td>
 <td align="right">0</td>
-<td align="right">7</td>
+<td align="right">73</td>
 <td>—</td>
 </tr>
 <tr class="even">
@@ -460,10 +461,10 @@ reference run pending)</td>
 <tr class="odd">
 <td><code>reliability</code></td>
 <td>compliant</td>
-<td align="right">1</td>
-<td align="right">5</td>
+<td align="right">45</td>
+<td align="right">413</td>
 <td align="right">0</td>
-<td align="right">6</td>
+<td align="right">458</td>
 <td>McDonald’s omega (all paths)</td>
 </tr>
 <tr class="even">
@@ -497,18 +498,18 @@ reference run pending)</td>
 <td><code>scheffe_test</code></td>
 <td>compliant</td>
 <td align="right">0</td>
-<td align="right">2</td>
+<td align="right">1422</td>
 <td align="right">0</td>
-<td align="right">2</td>
+<td align="right">1422</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>spearman_rho</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">2</td>
+<td align="right">118</td>
+<td align="right">120</td>
 <td align="right">0</td>
-<td align="right">4</td>
+<td align="right">238</td>
 <td>—</td>
 </tr>
 <tr class="odd">
@@ -523,127 +524,127 @@ reference run pending)</td>
 <tr class="even">
 <td><code>t_test</code></td>
 <td>compliant</td>
-<td align="right">2</td>
-<td align="right">30</td>
+<td align="right">9</td>
+<td align="right">664</td>
 <td align="right">0</td>
-<td align="right">32</td>
+<td align="right">673</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>tukey_test</code></td>
 <td>compliant</td>
 <td align="right">0</td>
-<td align="right">4</td>
+<td align="right">1418</td>
 <td align="right">0</td>
-<td align="right">4</td>
+<td align="right">1418</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_iqr</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_kurtosis</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_mean</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_median</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_modus</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_quantile</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_range</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_sd</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_se</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>w_skew</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
 <td><code>w_var</code></td>
 <td>compliant</td>
+<td align="right">132</td>
+<td align="right">312</td>
 <td align="right">0</td>
-<td align="right">19</td>
-<td align="right">0</td>
-<td align="right">19</td>
+<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td><code>wilcoxon_test</code></td>
 <td>compliant</td>
-<td align="right">6</td>
-<td align="right">6</td>
+<td align="right">48</td>
+<td align="right">66</td>
 <td align="right">0</td>
-<td align="right">12</td>
+<td align="right">114</td>
 <td>weighted variant</td>
 </tr>
 </tbody>
@@ -652,8 +653,44 @@ reference run pending)</td>
 <div class="section level2">
 <h2 id="active-exceptions">Active Exceptions<a class="anchor" aria-label="anchor" href="#active-exceptions"></a>
 </h2>
-<p>No active Tier-3 exceptions. All validated statistics agree with SPSS
-within Spec or Display tolerances.</p>
+<table class="table">
+<colgroup>
+<col width="18%">
+<col width="18%">
+<col width="18%">
+<col width="25%">
+<col width="18%">
+</colgroup>
+<thead><tr class="header">
+<th>ID</th>
+<th>Function</th>
+<th>Statistic</th>
+<th align="right">Tolerance</th>
+<th>Reason</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>EXC-001</td>
+<td><code>efa</code></td>
+<td>ML loadings, sums of squares, % of variance</td>
+<td align="right">0.002</td>
+<td>SPSS stops the ML iteration at its convergence criterion (.001);
+mariposa iterates to the optimum.</td>
+</tr>
+<tr class="even">
+<td>EXC-002</td>
+<td><code>efa</code></td>
+<td>ML communalities / SS where SPSS did not converge</td>
+<td align="right">0.05</td>
+<td>The SPSS reference runs end without convergence (3 factors from 6
+items, df = 0, Heywood cases).</td>
+</tr>
+</tbody>
+</table>
+<p>An exception covers an identified algorithmic difference to SPSS, not
+a bug: its tolerance is what the two algorithms agree to. Statistics
+outside an exception are asserted at Spec or Display tier, or are listed
+as Internal (Tier 4) in the table above.</p>
 </div>
 <div class="section level2">
 <h2 id="validation-gaps">Validation Gaps<a class="anchor" aria-label="anchor" href="#validation-gaps"></a>

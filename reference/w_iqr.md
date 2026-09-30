@@ -26,11 +26,15 @@ w_iqr(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample IQR.
+  Without weights, you get the simple sample IQR. Give a column name
+  (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -49,7 +53,10 @@ valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 The IQR is especially useful when your data is skewed. For example, with
 income data, the IQR gives a better sense of "typical spread" than the
@@ -126,45 +133,52 @@ survey_data %>% w_iqr(age, weights = sampling_weight)
 #> 
 #> Weighted Interquartile Range Statistics
 #> ---------------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_iqr Effective_N
-#>       age           25      2468.8
-#> 
+#>   -------------------------------
+#>   Variable     IQR     N  Missing
+#>   -------------------------------
+#>   age       25.000  2516        0
+#>   -------------------------------
 
 # Multiple variables
 survey_data %>% w_iqr(age, income, weights = sampling_weight)
 #> 
 #> Weighted Interquartile Range Statistics
 #> ---------------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_iqr Effective_N
-#>       age           25      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_iqr Effective_N
-#>    income         1900      2158.9
-#> 
+#>   ---------------------------------
+#>   Variable       IQR     N  Missing
+#>   ---------------------------------
+#>   age         25.000  2516        0
+#>   income    1900.000  2201      315
+#>   ---------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_iqr(age, weights = sampling_weight)
 #> 
 #> Weighted Interquartile Range Statistics
 #> ---------------------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_iqr Effective_N
-#>       age           24         477
+#>   ------------------------------
+#>   Variable     IQR    N  Missing
+#>   ------------------------------
+#>   age       24.000  509        0
+#>   ------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_iqr Effective_N
-#>       age           24      1993.1
-#> 
+#>   -------------------------------
+#>   Variable     IQR     N  Missing
+#>   -------------------------------
+#>   age       24.000  2007        0
+#>   -------------------------------
 
 # In summarise context
 survey_data %>% summarise(iqr_age = w_iqr(age, weights = sampling_weight))
@@ -179,8 +193,9 @@ survey_data %>% w_iqr(age)
 #> Interquartile Range Statistics
 #> ------------------------------
 #> 
-#> --- age ---
-#>  Variable iqr    N
-#>       age  24 2500
-#> 
+#>   -------------------------------
+#>   Variable     IQR     N  Missing
+#>   -------------------------------
+#>   age       24.000  2500        0
+#>   -------------------------------
 ```

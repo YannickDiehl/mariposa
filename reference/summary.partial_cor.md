@@ -58,21 +58,21 @@ summary(result)
 #> - Missing: Listwise deletion
 #> 
 #> Partial Correlation Matrix:
-#> --------------------------- 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> --------------------------- 
+#> ---------------------------
+#>                   trust_government  trust_media  trust_science
+#> trust_government                 1        0.014          0.020
+#> trust_media                  0.014            1          0.015
+#> trust_science                0.020        0.015              1
+#> ---------------------------
 #> 
 #> Pairwise Results:
-#>   -------------------------------------------------------------------------------------- 
-#>   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig 
-#>   -------------------------------------------------------------------------------------- 
-#>   trust_government    trust_media      0.014         0.014  2132  0.645  .519  2135      
-#>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135      
-#>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135      
-#>   -------------------------------------------------------------------------------------- 
+#>   --------------------------------------------------------------------------------------
+#>   Variable 1        Variable 2     Partial r  Zero-order r    df      t     p     n  sig
+#>   --------------------------------------------------------------------------------------
+#>   trust_government  trust_media        0.014         0.014  2132  0.645  .519  2135     
+#>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135     
+#>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135     
+#>   --------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, matrix = FALSE)
@@ -84,13 +84,13 @@ summary(result, matrix = FALSE)
 #> - Missing: Listwise deletion
 #> 
 #> Pairwise Results:
-#>   -------------------------------------------------------------------------------------- 
-#>   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig 
-#>   -------------------------------------------------------------------------------------- 
-#>   trust_government    trust_media      0.014         0.014  2132  0.645  .519  2135      
-#>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135      
-#>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135      
-#>   -------------------------------------------------------------------------------------- 
+#>   --------------------------------------------------------------------------------------
+#>   Variable 1        Variable 2     Partial r  Zero-order r    df      t     p     n  sig
+#>   --------------------------------------------------------------------------------------
+#>   trust_government  trust_media        0.014         0.014  2132  0.645  .519  2135     
+#>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135     
+#>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135     
+#>   --------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

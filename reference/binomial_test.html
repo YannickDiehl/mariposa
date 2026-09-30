@@ -112,12 +112,16 @@ categories (e.g., Yes/No, Male/Female, 0/1, TRUE/FALSE)</p></dd>
 
 <dt id="arg-p">p<a class="anchor" aria-label="anchor" href="#arg-p"></a></dt>
 <dd><p>The hypothesized proportion to test against (Default: 0.50 = 50 percent).
-This refers to the proportion of the first category (first factor level,
-or the lower numeric value).</p></dd>
+It refers to Group 1, the category of the first valid case in the data
+(as in SPSS). With 0.5 the test is two-tailed; with any other value it
+is one-tailed in the direction of the observed proportion, as SPSS
+reports it.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -129,8 +133,9 @@ or the lower numeric value).</p></dd>
     <p>Test results showing whether the proportion differs from expected,
 including:</p><ul><li><p>Category counts and observed proportions</p></li>
 <li><p>Test proportion (null hypothesis)</p></li>
-<li><p>Exact p-value (two-sided)</p></li>
-<li><p>Confidence interval for the true proportion</p></li>
+<li><p>Exact p-value (two-tailed for <code>p = 0.5</code>, otherwise one-tailed;
+column <code>alternative</code>: "two.sided", "less" or "greater")</p></li>
+<li><p>Confidence interval for the true proportion of Group 1 (Clopper-Pearson)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -169,8 +174,22 @@ the result is significant.</p>
 Use <code><a href="chi_square.html">chi_square()</a></code> instead</p></li>
 <li><p>For comparing proportions between groups:
 Use chi-square or z-test for proportions</p></li>
-<li><p>For larger samples with normal approximation:</p></li>
+<li><p>For larger samples with normal approximation: results will be very
+similar to a one-sample z-test for proportions</p></li>
 </ul></div>
+
+<div class="section">
+<h3 id="group-and-one-tailed-tests">Group 1 and one-tailed tests<a class="anchor" aria-label="anchor" href="#group-and-one-tailed-tests"></a></h3>
+
+
+<p>As in SPSS <code>NPAR TESTS /BINOMIAL</code>, Group 1 is the category of the
+first valid case in the data (per group with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>), and
+<code>p</code> is its hypothesized proportion. For <code>p = 0.5</code> the p-value
+is two-tailed. For any other <code>p</code> SPSS reports a one-tailed p-value
+in the direction of the observed proportion ("the proportion of cases in
+the first group &lt; p"); <code>binomial_test()</code> does the same. To test the
+other category, put a case of it first or use <code>1 - p</code>.</p>
+</div>
 
 <div class="section">
 <h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
@@ -181,7 +200,6 @@ no SPSS reference. The weighted variant is an R-only frequency-weight
 extension that reduces exactly to the unweighted test when all weights
 equal 1 (enforced by an internal invariance suite); see
 <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p>
-<p>Results will be very similar to a one-sample z-test for proportions</p>
 </div>
 
     </div>
@@ -220,7 +238,7 @@ variables.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test whether East region proportion is 50%</span></span></span>
@@ -234,7 +252,7 @@ variables.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (East): prop = 0.194 vs 0.500, p &lt; 0.001 ***, N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
@@ -243,17 +261,17 @@ variables.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate test per region)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">binomial_test</span><span class="op">(</span><span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.491 vs 0.500, p = 0.716 , N = 485</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Female): prop = 0.509 vs 0.500, p = 0.716, N = 485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.474 vs 0.500, p = 0.023 *, N = 2015</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>

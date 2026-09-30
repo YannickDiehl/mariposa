@@ -61,30 +61,39 @@ w_mean(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Mean Statistics
 #> ------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_mean Effective_N
-#>    income      3743.099      2158.9
+#>   ---------------------------------
+#>   Variable      Mean     N  Missing
+#>   ---------------------------------
+#>   income    3743.099  2201      315
+#>   ---------------------------------
 
 # Weighted median
 w_median(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Median Statistics
 #> --------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_median Effective_N
-#>    income            3500      2158.9
+#>   ---------------------------------
+#>   Variable    Median     N  Missing
+#>   ---------------------------------
+#>   income    3500.000  2201      315
+#>   ---------------------------------
 
 # Weighted mode
 w_modus(survey_data, education, weights = sampling_weight)
 #> 
 #> Weighted Mode Statistics
 #> ------------------------
-#> # A tibble: 1 × 3
-#>   Variable  weighted_mode   effective_n
-#>   <chr>     <ord>                 <dbl>
-#> 1 education Basic Secondary       2469.
+#> Weights: sampling_weight
+#> 
+#>   -----------------------------------------
+#>   Variable   Mode                N  Missing
+#>   -----------------------------------------
+#>   education  Basic Secondary  2516        0
+#>   -----------------------------------------
 ```
 
 ### Dispersion
@@ -96,30 +105,39 @@ w_sd(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Standard Deviation Statistics
 #> --------------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_sd Effective_N
-#>    income    1423.966      2158.9
+#>   ---------------------------------
+#>   Variable        SD     N  Missing
+#>   ---------------------------------
+#>   income    1423.966  2201      315
+#>   ---------------------------------
 
 # Weighted variance
 w_var(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Variance Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_var Effective_N
-#>    income      2027678      2158.9
+#>   ------------------------------------
+#>   Variable     Variance     N  Missing
+#>   ------------------------------------
+#>   income    2027677.966  2201      315
+#>   ------------------------------------
 
 # Weighted interquartile range
 w_iqr(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Interquartile Range Statistics
 #> ---------------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_iqr Effective_N
-#>    income         1900      2158.9
+#>   ---------------------------------
+#>   Variable       IQR     N  Missing
+#>   ---------------------------------
+#>   income    1900.000  2201      315
+#>   ---------------------------------
 ```
 
 ### Distribution Shape
@@ -131,20 +149,26 @@ w_skew(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Skewness Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_skew Effective_N
-#>    income         0.725      2158.9
+#>   ---------------------------------
+#>   Variable  Skewness     N  Missing
+#>   ---------------------------------
+#>   income       0.725  2201      315
+#>   ---------------------------------
 
 # Weighted kurtosis
 w_kurtosis(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Excess Kurtosis Statistics
 #> -----------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_kurtosis Effective_N
-#>    income             0.388      2158.9
+#>   ---------------------------------
+#>   Variable  Kurtosis     N  Missing
+#>   ---------------------------------
+#>   income       0.388  2201      315
+#>   ---------------------------------
 ```
 
 ### Precision and Range
@@ -156,10 +180,13 @@ w_se(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Standard Error Statistics
 #> ----------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_se Effective_N
-#>    income      30.353      2158.9
+#>   -------------------------------
+#>   Variable      SE     N  Missing
+#>   -------------------------------
+#>   income    30.353  2201      315
+#>   -------------------------------
 
 # Weighted quantiles
 w_quantile(survey_data, income,
@@ -168,21 +195,26 @@ w_quantile(survey_data, income,
 #> 
 #> Weighted Quantile Statistics
 #> ----------------------------
-#>  Variable Quantile Value    N Effective_N         Weights
-#>    income      25%  2700 2186      2158.9 sampling_weight
-#>    income      50%  3500 2186      2158.9 sampling_weight
-#>    income      75%  4600 2186      2158.9 sampling_weight
-#> ----------------------------------------
+#> Weights: sampling_weight
+#> 
+#>   -----------------------------------------------------
+#>   Variable       25%       50%       75%     N  Missing
+#>   -----------------------------------------------------
+#>   income    2700.000  3500.000  4600.000  2201      315
+#>   -----------------------------------------------------
 
 # Weighted range
 w_range(survey_data, income, weights = sampling_weight)
 #> 
 #> Weighted Range Statistics
 #> -------------------------
+#> Weights: sampling_weight
 #> 
-#> --- income ---
-#>  Variable weighted_range Effective_N
-#>    income           7200      2158.9
+#>   ---------------------------------
+#>   Variable     Range     N  Missing
+#>   ---------------------------------
+#>   income    7200.000  2201      315
+#>   ---------------------------------
 ```
 
 ### Multiple Variables
@@ -196,18 +228,15 @@ w_mean(survey_data, age, income, life_satisfaction,
 #> 
 #> Weighted Mean Statistics
 #> ------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_mean Effective_N
-#>       age        50.514      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_mean Effective_N
-#>    income      3743.099      2158.9
-#> 
-#> --- life_satisfaction ---
-#>           Variable weighted_mean Effective_N
-#>  life_satisfaction         3.625      2390.9
+#>   ------------------------------------------
+#>   Variable               Mean     N  Missing
+#>   ------------------------------------------
+#>   age                  50.514  2516        0
+#>   income             3743.099  2201      315
+#>   life_satisfaction     3.625  2437       79
+#>   ------------------------------------------
 ```
 
 ## Effective Sample Size
@@ -248,10 +277,13 @@ survey_data %>%
 #> 
 #> Weighted Descriptive Statistics
 #> -------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
-#>  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9
-#> ----------------------------------------
+#> 
+#>   --------------------------------------------------------------------------------------------
+#>   Variable               Mean    Median        SD     Range       IQR  Skewness     N  Missing
+#>   --------------------------------------------------------------------------------------------
+#>   income             3743.099  3500.000  1423.966  7200.000  1900.000     0.725  2201      315
+#>   life_satisfaction     3.625     4.000     1.152     4.000     2.000    -0.499  2437       79
+#>   --------------------------------------------------------------------------------------------
 ```
 
 ``` r
@@ -264,18 +296,18 @@ survey_data %>%
 #> -----------------------------------
 #> 
 #> education (Highest educational attainment)
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> # total N=2516 valid N=2516
 #> 
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |
-#> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |
-#> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |
-#> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
-#> +------------------------+------------------------+--------+--------+--------+--------+
+#> +------------------------+------+--------+---------+--------+
+#> | Value                  |    N |  Raw % | Valid % | Cum. % |
+#> +------------------------+------+--------+---------+--------+
+#> | Basic Secondary        |  848 |  33.71 |   33.71 |  33.71 |
+#> | Intermediate Secondary |  641 |  25.47 |   25.47 |  59.18 |
+#> | Academic Secondary     |  642 |  25.51 |   25.51 |  84.69 |
+#> | University             |  385 |  15.31 |   15.31 | 100.00 |
+#> +------------------------+------+--------+---------+--------+
+#> | Total                  | 2516 | 100.00 |  100.00 |        |
+#> +------------------------+------+--------+---------+--------+
 ```
 
 ``` r
@@ -284,7 +316,8 @@ survey_data %>%
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> t-Test: income by gender [Weighted]
-#>   t(2178.7) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
+#>   t(2178.7) = 0.751, p = 0.453, g = 0.032 (negligible), N = 2201
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -295,6 +328,7 @@ survey_data %>%
                weights = sampling_weight)
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
 #>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -302,8 +336,9 @@ survey_data %>%
 # Chi-square
 survey_data %>%
   chi_square(education, employment, weights = sampling_weight)
-#> Chi-Squared Test: education × employment [Weighted]
+#> Chi-Squared Test: education x employment [Weighted]
 #>   chi2(12) = 130.696, p < 0.001 ***, V = 0.132 (small), N = 2518
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -312,7 +347,8 @@ survey_data %>%
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> Pearson Correlation: age x income [Weighted]
-#>   r = -0.005, p = 0.828 , N = 2201
+#>   r = -0.005, p = 0.828, N = 2201
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -323,6 +359,7 @@ survey_data %>%
                     weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age + income [Weighted]
 #>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.42, p < 0.001 ***, N = 2130
+#> Use summary() for detailed output.
 ```
 
 ## Grouped Weighted Analysis
@@ -342,21 +379,25 @@ survey_data %>%
 #> 
 #> Group: region = East
 #> --------------------
-#> ----------------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>                age   52.278     53   17.595    77   24    0.098       477.0
-#>             income 3760.687   3600 1388.321  7200 1700    0.721       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4
-#> ----------------------------------------
+#> 
+#>   -------------------------------------------------------------------------------------------
+#>   Variable               Mean    Median        SD     Range       IQR  Skewness    N  Missing
+#>   -------------------------------------------------------------------------------------------
+#>   age                  52.278    53.000    17.595    77.000    24.000     0.098  509        0
+#>   income             3760.687  3600.000  1388.321  7200.000  1700.000     0.721  449       60
+#>   life_satisfaction     3.623     4.000     1.203     4.000     2.000    -0.558  488       21
+#>   -------------------------------------------------------------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
-#> ----------------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>                age   50.067     49   16.927    77   24    0.170      1993.1
-#>             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
-#>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
-#> ----------------------------------------
+#> 
+#>   --------------------------------------------------------------------------------------------
+#>   Variable               Mean    Median        SD     Range       IQR  Skewness     N  Missing
+#>   --------------------------------------------------------------------------------------------
+#>   age                  50.067    49.000    16.927    77.000    24.000     0.170  2007        0
+#>   income             3738.586  3500.000  1433.325  7200.000  1900.000     0.727  1751      256
+#>   life_satisfaction     3.625     4.000     1.139     4.000     2.000    -0.481  1949       58
+#>   --------------------------------------------------------------------------------------------
 ```
 
 ``` r
@@ -364,12 +405,13 @@ survey_data %>%
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
-#> [region = 1]
+#> [region = East]
 #> t-Test: income by gender [Weighted]
-#>   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450
-#> [region = 2]
+#>   t(431.2) = 1.674, p = 0.095, g = 0.158 (negligible), N = 450
+#> [region = West]
 #> t-Test: income by gender [Weighted]
-#>   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+#>   t(1740.2) = 0.009, p = 0.993, g = 0.000 (negligible), N = 1751
+#> Use summary() for detailed output.
 ```
 
 ## Diagnosing Weight Issues
@@ -473,23 +515,28 @@ survey_data %>%
 #> 
 #> Group: region = East
 #> --------------------
-#> ----------------------------------------
-#>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>    income 3760.687   3600 1388.321  7200 1700    0.721       421.9
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------------------------------------------------
+#>   Variable      Mean    Median        SD     Range       IQR  Skewness    N  Missing
+#>   ----------------------------------------------------------------------------------
+#>   income    3760.687  3600.000  1388.321  7200.000  1700.000     0.721  449       60
+#>   ----------------------------------------------------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
-#> ----------------------------------------
-#>  Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>    income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------------
+#>   Variable      Mean    Median        SD     Range       IQR  Skewness     N  Missing
+#>   -----------------------------------------------------------------------------------
+#>   income    3738.586  3500.000  1433.325  7200.000  1900.000     0.727  1751      256
+#>   -----------------------------------------------------------------------------------
 
 # 4. Weighted hypothesis test
 survey_data %>%
   t_test(income, group = gender, weights = sampling_weight)
 #> t-Test: income by gender [Weighted]
-#>   t(2178.7) = 0.751, p = 0.453 , g = 0.032 (negligible), N = 2201
+#>   t(2178.7) = 0.751, p = 0.453, g = 0.032 (negligible), N = 2201
+#> Use summary() for detailed output.
 ```
 
 ## Best Practices

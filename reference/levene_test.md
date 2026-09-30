@@ -29,45 +29,53 @@ levene_test(x, center = c("mean", "median"), ...)
 # S3 method for class 't_test'
 levene_test(x, center = c("mean", "median"), ...)
 
+# S3 method for class 'ancova'
+levene_test(x, center = c("mean", "median"), ...)
+
 # S3 method for class 'mann_whitney'
 levene_test(x, ...)
 
 # S3 method for class 'grouped_df'
-levene_test(x, variable, group = NULL, weights = NULL, center = "mean", ...)
+levene_test(x, ..., group, weights = NULL, center = c("mean", "median"))
 ```
 
 ## Arguments
 
 - x:
 
-  Either your data or test results from
-  [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md)
+  Either your data (a data frame, optionally grouped with
+  [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html))
+  or test results from
+  [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
+  [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
+  [`factorial_anova()`](https://YannickDiehl.github.io/mariposa/reference/factorial_anova.md)
   or
-  [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md)
+  [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)
 
 - ...:
 
-  Variables to test (when using data frame)
+  Variables to test (when using a data frame). List several variables or
+  use tidyselect helpers like `starts_with("trust")`.
 
 - group:
 
-  The grouping variable for comparison
+  The grouping variable for comparison (unquoted or a string)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Must be
+  numeric and non-negative (the package-wide weights policy). Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - center:
 
-  How to measure center: `"mean"` (default) or `"median"` (more robust)
-
-- variable:
-
-  Variable to test (when using grouped data frame)
-
-- data:
-
-  Your survey data (when x is not a test result)
+  How to measure center: `"mean"` (default) or `"median"` (more robust).
+  For
+  [`ancova()`](https://YannickDiehl.github.io/mariposa/reference/ancova.md)
+  results only `"mean"` is available: as in SPSS UNIANOVA, the test is
+  computed on the absolute residuals of the ANCOVA model (covariates and
+  factors), compared across the cells of the design.
 
 ## Value
 
@@ -181,15 +189,15 @@ data(survey_data)
 # Standalone Levene test (test homogeneity of variances)
 survey_data %>% levene_test(life_satisfaction, group = region)
 #> Levene's Test: life_satisfaction by region
-#>   F(1, 2419) = 3.164, p = 0.075 , variances equal
+#>   F(1, 2419) = 3.164, p = 0.075, variances equal
 #> Use summary() for detailed output.
 
 # Multiple variables
 survey_data %>% levene_test(life_satisfaction, trust_government, group = region)
 #> Levene's Test: life_satisfaction by region
-#>   F(1, 2419) = 3.164, p = 0.075 , variances equal
+#>   F(1, 2419) = 3.164, p = 0.075, variances equal
 #> Levene's Test: trust_government by region
-#>   F(1, 2352) = 0.145, p = 0.703 , variances equal
+#>   F(1, 2352) = 0.145, p = 0.703, variances equal
 #> Use summary() for detailed output.
 
 # Weighted analysis
@@ -211,12 +219,12 @@ survey_data %>%
   t_test(age, group = gender) %>%
   levene_test()
 #> Levene's Test: age by gender
-#>   F(1, 2498) = 0.534, p = 0.465 , variances equal
+#>   F(1, 2498) = 0.534, p = 0.465, variances equal
 #> Use summary() for detailed output.
 
 # Using mean instead of median as center
 survey_data %>% levene_test(income, group = region, center = "mean")
 #> Levene's Test: income by region
-#>   F(1, 2184) = 1.631, p = 0.202 , variances equal
+#>   F(1, 2184) = 1.631, p = 0.202, variances equal
 #> Use summary() for detailed output.
 ```

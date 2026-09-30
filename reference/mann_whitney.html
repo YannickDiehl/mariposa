@@ -124,22 +124,31 @@ treatment/control). Must have exactly two groups.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-mu">mu<a class="anchor" aria-label="anchor" href="#arg-mu"></a></dt>
-<dd><p>The hypothesized difference (Default: 0, meaning no difference)</p></dd>
+<dd><p>The hypothesized location shift of group 1 against group 2
+(Default: 0, meaning no difference; this is the SPSS test). As in
+<code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test()</a></code>, group-1 values are shifted by <code>mu</code> before
+ranking, so U, W, Z, r and p all refer to the same hypothesis. Only
+<code>mu = 0</code> is available with <code>weights</code>.</p></dd>
 
 
 <dt id="arg-alternative">alternative<a class="anchor" aria-label="anchor" href="#arg-alternative"></a></dt>
-<dd><p>Direction of the test:</p><ul><li><p><code>"two.sided"</code> (default): Test if groups are different</p></li>
+<dd><p>Direction of the test:</p><ul><li><p><code>"two.sided"</code> (default): Test if groups are different.
+Z is reported as SPSS does, from the smaller U (never positive).</p></li>
 <li><p><code>"greater"</code>: Test if group 1 &gt; group 2</p></li>
 <li><p><code>"less"</code>: Test if group 1 &lt; group 2</p></li>
-</ul></dd>
+</ul><p>For a one-sided test Z is directional (positive when group 1 tends to
+have higher values), so its sign matches the p-value.</p></dd>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
-<dd><p>Confidence level for intervals (Default: 0.95 = 95%)</p></dd>
+<dd><p>Not used. Rank tests report no confidence interval
+(SPSS <code>NPAR TESTS</code> neither); kept for backward compatibility.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -162,10 +171,9 @@ Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">su
 <li><p>p &lt; 0.05: Moderate evidence of difference</p></li>
 <li><p>p &gt;= 0.05: No significant difference found</p></li>
 </ul><p><strong>Effect Size r</strong> (How big is the difference?):</p><ul><li><p>|r| &lt; 0.1: Negligible difference</p></li>
-<li><p>|r| ~ 0.1: Small difference</p></li>
-<li><p>|r| ~ 0.3: Medium difference</p></li>
-<li><p>|r| ~ 0.5: Large difference</p></li>
-<li><p>|r| &gt; 0.5: Very large difference</p></li>
+<li><p>0.1 to &lt; 0.3: Small difference</p></li>
+<li><p>0.3 to &lt; 0.5: Medium difference</p></li>
+<li><p>0.5 or higher: Large difference</p></li>
 </ul><p><strong>Rank Mean Difference</strong>:</p><ul><li><p>Positive: Group 1 tends to have higher values</p></li>
 <li><p>Negative: Group 2 tends to have higher values</p></li>
 <li><p>Zero: Groups have similar distributions</p></li>
@@ -256,63 +264,70 @@ Biometrika, 100(4), 831-842.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">age</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: age by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 776,732, Z = -0.164, p = 0.870 , r = 0.003 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 776732, Z = -0.164, p = 0.870, r = 0.003 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: age by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 462,234, Z = -1.850, p = 0.064 , r = 0.037 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 462234.5, Z = -1.850, p = 0.064, r = 0.037 (negligible), N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: income by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 374,226, Z = -0.226, p = 0.821 , r = 0.005 (negligible), N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 374226.5, Z = -0.226, p = 0.821, r = 0.005 (negligible), N = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 452,568, Z = -0.168, p = 0.867 , r = 0.003 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 452568.5, Z = -0.168, p = 0.867, r = 0.003 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: trust_government by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 678,806, Z = -0.775, p = 0.438 , r = 0.016 (negligible), N = 2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 678805.5, Z = -0.775, p = 0.438, r = 0.016 (negligible), N = 2354</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: trust_media by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 661,523, Z = -2.320, p = 0.020 *, r = 0.048 (negligible), N = 2367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 661523, Z = -2.320, p = 0.020 *, r = 0.048 (negligible), N = 2367</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: trust_science by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 697,309, Z = -1.234, p = 0.217 , r = 0.025 (negligible), N = 2398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 697309, Z = -1.234, p = 0.217, r = 0.025 (negligible), N = 2398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: income by region [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 386,321, Z = -0.536, p = 0.592 , r = 0.011 (negligible), N = 2201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 386321.2, Z = -0.536, p = 0.592, r = 0.011 (negligible), N = 2201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate tests for each education level)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = Basic Secondary]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 81,439, Z = -0.036, p = 0.971 , r = 0.001 (negligible), N = 809</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 81439, Z = -0.036, p = 0.971, r = 0.001 (negligible), N = 809</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = Intermediate Secondary]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 45,218, Z = -1.001, p = 0.317 , r = 0.040 (negligible), N = 618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 45218, Z = -1.001, p = 0.317, r = 0.040 (negligible), N = 618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = Academic Secondary]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 45,788, Z = -0.130, p = 0.897 , r = 0.005 (negligible), N = 607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 45787.5, Z = -0.130, p = 0.897, r = 0.005 (negligible), N = 607</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = University]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 17,319, Z = -1.281, p = 0.200 , r = 0.065 (negligible), N = 387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 17319, Z = -1.281, p = 0.200, r = 0.065 (negligible), N = 387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One-sided test</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: life_satisfaction by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 452,568, Z = -0.168, p = 0.433 , r = 0.003 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 452568.5, Z = 0.168, p = 0.433, r = 0.003 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">mann_whitney</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U Test: income by gender [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 592,273, Z = -0.755, p = 0.450 , r = 0.016 (negligible), N = 2201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   U = 592273.4, Z = -0.755, p = 0.450, r = 0.016 (negligible), N = 2201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
@@ -320,22 +335,20 @@ Biometrika, 100(4), 831-842.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: Male vs. Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1111.3, n = 1047.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1090.7, n = 1153.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male:    rank mean = 1111.32, n = 1048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female:  rank mean = 1090.68, n = 1153</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          U            W       Z  p value  Effect r   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U  592273.432  1257619.327  -0.755     .450     0.016   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span>
@@ -344,10 +357,10 @@ Biometrika, 100(4), 831-842.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (r):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negligible effect: |r| &lt; 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: |r| ~ 0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: |r| ~ 0.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: |r| ~ 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Negligible: |r| &lt; 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Small: 0.1 &lt;= |r| &lt; 0.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium: 0.3 &lt;= |r| &lt; 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Large: |r| &gt;= 0.5</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, effect_sizes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide effect sizes</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------</span>
@@ -355,22 +368,20 @@ Biometrika, 100(4), 831-842.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Grouping variable: gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Groups compared: Male vs. Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Weights variable: sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Confidence level: 95.0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: rank mean = 1111.3, n = 1047.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: rank mean = 1090.7, n = 1153.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male:    rank mean = 1111.32, n = 1048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female:  rank mean = 1090.68, n = 1153</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mann-Whitney U Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Test       U         W      Z p_value effect_r sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          U            W       Z  p value  Effect r   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mann-Whitney U  592273.432  1257619.327  -0.755     .450     0.016   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Weighted analysis uses design-based rank test (Lumley &amp; Scott, 2013).</span>

@@ -40,8 +40,13 @@ vector input, returns a `haven_labelled` vector.
 
 ### Factor Conversion
 
-When converting a factor, the integer codes (1, 2, 3, ...) become the
-numeric values and the factor levels become the value labels.
+When converting a factor created by
+[`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md),
+the original codes stored in its `"codes"` attribute are restored (the
+round trip `to_labelled(to_label(x))` returns the original values and
+labels). For other factors, or when `labels` is supplied, the integer
+codes (1, 2, 3, ...) become the numeric values and the factor levels
+become the value labels.
 
 ### Character Conversion
 

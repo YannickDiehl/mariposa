@@ -33,11 +33,15 @@ w_kurtosis(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample kurtosis.
+  Without weights, you get the simple sample kurtosis. Give a column
+  name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 - excess:
 
@@ -69,7 +73,10 @@ and the number of valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 Kurtosis is often checked together with skewness to assess normality.
 Both should be close to zero for normally distributed data.
@@ -141,60 +148,66 @@ survey_data %>% w_kurtosis(age, weights = sampling_weight)
 #> 
 #> Weighted Excess Kurtosis Statistics
 #> -----------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_kurtosis Effective_N
-#>       age            -0.396      2468.8
-#> 
+#>   ---------------------------------
+#>   Variable  Kurtosis     N  Missing
+#>   ---------------------------------
+#>   age         -0.396  2516        0
+#>   ---------------------------------
 
 # Multiple variables
 survey_data %>% w_kurtosis(age, income, life_satisfaction, weights = sampling_weight)
 #> 
 #> Weighted Excess Kurtosis Statistics
 #> -----------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_kurtosis Effective_N
-#>       age            -0.396      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_kurtosis Effective_N
-#>    income             0.388      2158.9
-#> 
-#> --- life_satisfaction ---
-#>           Variable weighted_kurtosis Effective_N
-#>  life_satisfaction            -0.598      2390.9
-#> 
+#>   ------------------------------------------
+#>   Variable           Kurtosis     N  Missing
+#>   ------------------------------------------
+#>   age                  -0.396  2516        0
+#>   income                0.388  2201      315
+#>   life_satisfaction    -0.598  2437       79
+#>   ------------------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_kurtosis(age, weights = sampling_weight)
 #> 
 #> Weighted Excess Kurtosis Statistics
 #> -----------------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_kurtosis Effective_N
-#>       age            -0.389         477
+#>   --------------------------------
+#>   Variable  Kurtosis    N  Missing
+#>   --------------------------------
+#>   age         -0.389  509        0
+#>   --------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_kurtosis Effective_N
-#>       age            -0.396      1993.1
-#> 
+#>   ---------------------------------
+#>   Variable  Kurtosis     N  Missing
+#>   ---------------------------------
+#>   age         -0.396  2007        0
+#>   ---------------------------------
 
 # Raw kurtosis (not excess)
 survey_data %>% w_kurtosis(age, weights = sampling_weight, excess = FALSE)
 #> 
 #> Weighted Kurtosis Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_kurtosis Effective_N
-#>       age             2.604      2468.8
-#> 
+#>   ---------------------------------
+#>   Variable  Kurtosis     N  Missing
+#>   ---------------------------------
+#>   age          2.604  2516        0
+#>   ---------------------------------
 
 # In summarise context
 survey_data %>% summarise(kurt_age = w_kurtosis(age, weights = sampling_weight))
@@ -209,8 +222,9 @@ survey_data %>% w_kurtosis(age)
 #> Excess Kurtosis Statistics
 #> --------------------------
 #> 
-#> --- age ---
-#>  Variable kurtosis    N
-#>       age   -0.364 2500
-#> 
+#>   ---------------------------------
+#>   Variable  Kurtosis     N  Missing
+#>   ---------------------------------
+#>   age         -0.364  2500        0
+#>   ---------------------------------
 ```

@@ -47,6 +47,9 @@ Pairwise comparison results showing:
 
 - Adjusted p-values (controlling for multiple comparisons)
 
+The comparison table (one row per pair) is stored as `$results` (also
+available as `$comparisons`).
+
 ## Details
 
 ### Understanding the Results

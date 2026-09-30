@@ -48,9 +48,11 @@ std(data, ..., method = "sd", weights = NULL, suffix = NULL, na.rm = TRUE)
 
 - weights:
 
-  Optional survey weights (unquoted column name or numeric vector). When
-  provided, weighted mean and weighted SD are used for standardization.
-  Only supported for methods `"sd"` and `"2sd"`.
+  Optional survey weights. When provided, weighted mean and weighted SD
+  are used for standardization. Only supported for methods `"sd"` and
+  `"2sd"`. Give a column name (unquoted or as a string), an expression
+  such as `sampling_weight * 2`, or a numeric vector with one weight per
+  row.
 
 - suffix:
 
@@ -96,6 +98,13 @@ When `data` is grouped (via
 standardization is performed separately within each group. This is
 useful for within-group comparisons. Weights are also subsetted per
 group.
+
+### Missing Values
+
+The result is a plain numeric variable (value labels are dropped, the
+variable label is kept with " (standardized)" appended). Missing values
+of imported data, including their SPSS missing types, become plain `NA`
+– as SPSS's `DESCRIPTIVES /SAVE` gives system-missing z-scores.
 
 ## See also
 

@@ -24,11 +24,15 @@ w_mean(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make the average representative of your population.
-  Without weights, you get the simple sample average.
+  Without weights, you get the simple sample average. Give a column name
+  (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -56,7 +60,10 @@ population-representative averages. Weights correct for:
 - **Effective N**: How many independent observations your weighted data
   represents
 
-- **N**: Actual number of observations used
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 ### Formula
 
@@ -106,49 +113,53 @@ survey_data %>% w_mean(age, weights = sampling_weight)
 #> 
 #> Weighted Mean Statistics
 #> ------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_mean Effective_N
-#>       age        50.514      2468.8
-#> 
+#>   -------------------------------
+#>   Variable    Mean     N  Missing
+#>   -------------------------------
+#>   age       50.514  2516        0
+#>   -------------------------------
 
 # Multiple variables
 survey_data %>% w_mean(age, income, life_satisfaction, weights = sampling_weight)
 #> 
 #> Weighted Mean Statistics
 #> ------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_mean Effective_N
-#>       age        50.514      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_mean Effective_N
-#>    income      3743.099      2158.9
-#> 
-#> --- life_satisfaction ---
-#>           Variable weighted_mean Effective_N
-#>  life_satisfaction         3.625      2390.9
-#> 
+#>   ------------------------------------------
+#>   Variable               Mean     N  Missing
+#>   ------------------------------------------
+#>   age                  50.514  2516        0
+#>   income             3743.099  2201      315
+#>   life_satisfaction     3.625  2437       79
+#>   ------------------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_mean(age, weights = sampling_weight)
 #> 
 #> Weighted Mean Statistics
 #> ------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_mean Effective_N
-#>       age        52.278         477
+#>   ------------------------------
+#>   Variable    Mean    N  Missing
+#>   ------------------------------
+#>   age       52.278  509        0
+#>   ------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_mean Effective_N
-#>       age        50.067      1993.1
-#> 
+#>   -------------------------------
+#>   Variable    Mean     N  Missing
+#>   -------------------------------
+#>   age       50.067  2007        0
+#>   -------------------------------
 
 # In summarise context
 survey_data %>% summarise(mean_age = w_mean(age, weights = sampling_weight))
@@ -163,8 +174,9 @@ survey_data %>% w_mean(age)
 #> Mean Statistics
 #> ---------------
 #> 
-#> --- age ---
-#>  Variable  mean    N
-#>       age 50.55 2500
-#> 
+#>   -------------------------------
+#>   Variable    Mean     N  Missing
+#>   -------------------------------
+#>   age       50.550  2500        0
+#>   -------------------------------
 ```

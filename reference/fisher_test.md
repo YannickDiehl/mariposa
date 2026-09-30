@@ -25,7 +25,15 @@ The test tells you:
 ## Usage
 
 ``` r
-fisher_test(data, row, col, weights = NULL, ...)
+fisher_test(
+  data,
+  row,
+  col,
+  weights = NULL,
+  simulate.p.value = FALSE,
+  B = 10000,
+  ...
+)
 ```
 
 ## Arguments
@@ -44,7 +52,25 @@ fisher_test(data, row, col, weights = NULL, ...)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
+
+- simulate.p.value:
+
+  Compute the p-value by Monte Carlo simulation instead of exactly?
+  (Default: FALSE). For large tables (many rows and columns, large N)
+  the exact network algorithm can run out of memory ("FEXACT error");
+  `fisher_test()` then switches to the Monte Carlo p-value automatically
+  with a warning. SPSS offers the same choice (Exact Tests: "Exact" or
+  "Monte Carlo"). Call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) first for
+  reproducible Monte Carlo results.
+
+- B:
+
+  Number of Monte Carlo replicates (Default: 10000, the SPSS default
+  number of samples).
 
 - ...:
 
@@ -157,38 +183,38 @@ data(survey_data)
 survey_data %>%
   fisher_test(row = gender, col = region)
 #> Fisher's Exact Test: gender x region
-#>   p = 0.5435 , N = 2500
+#>   p = 0.544, OR = 1.067 [0.875, 1.302], N = 2500
 #> Use summary() for detailed output.
 
 # Fisher test for larger table
 survey_data %>%
   fisher_test(row = gender, col = interview_mode)
 #> Fisher's Exact Test: gender x interview_mode
-#>   p = 0.6782 , N = 2500
+#>   p = 0.678, N = 2500
 #> Use summary() for detailed output.
 
 # With weights
 survey_data %>%
   fisher_test(row = gender, col = region, weights = sampling_weight)
 #> Fisher's Exact Test: gender x region [Weighted]
-#>   p = 0.4867 , N = 2516
+#>   p = 0.487, OR = 1.076 [0.886, 1.308], N = 2516
 #> Use summary() for detailed output.
 
 # Grouped analysis
 survey_data %>%
   group_by(education) %>%
   fisher_test(row = gender, col = region)
-#> [education = 1]
+#> [education = Basic Secondary]
 #> Fisher's Exact Test: gender x region
-#>   p = 0.9315 , N = 841
-#> [education = 2]
+#>   p = 0.932, OR = 1.028 [0.734, 1.440], N = 841
+#> [education = Intermediate Secondary]
 #> Fisher's Exact Test: gender x region
-#>   p = 0.4170 , N = 629
-#> [education = 3]
+#>   p = 0.417, OR = 1.198 [0.806, 1.782], N = 629
+#> [education = Academic Secondary]
 #> Fisher's Exact Test: gender x region
-#>   p = 0.9181 , N = 631
-#> [education = 4]
+#>   p = 0.918, OR = 1.029 [0.687, 1.542], N = 631
+#> [education = University]
 #> Fisher's Exact Test: gender x region
-#>   p = 0.9003 , N = 399
+#>   p = 0.900, OR = 1.037 [0.633, 1.698], N = 399
 #> Use summary() for detailed output.
 ```

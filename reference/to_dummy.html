@@ -96,7 +96,11 @@ raw value (e.g., <code>gender_1</code>), <code>"label"</code> uses the value lab
 <dt id="arg-ref">ref<a class="anchor" aria-label="anchor" href="#arg-ref"></a></dt>
 <dd><p>A value to use as reference category (omitted from output).
 If <code>NULL</code> (default), all categories get a dummy variable.
-Set to a specific value for n-1 coding (e.g., for regression).</p></dd>
+Set to a specific value for n-1 coding (e.g., for regression). For a
+factor, give a level name (<code>ref = "Male"</code>) or a number: the
+original code of a <code><a href="to_label.html">to_label()</a></code> factor, otherwise the level
+position (<code>ref = 1</code> = first level). A <code>ref</code> that matches no
+category is an error.</p></dd>
 
 
 <dt id="arg-append">append<a class="anchor" aria-label="anchor" href="#arg-append"></a></dt>
@@ -120,8 +124,11 @@ dummy columns. For vector input, always a tibble of dummy columns.</p>
 
 <p>With <code>suffix = "val"</code>: <code>{varname}_{value}</code> (e.g., <code>gender_1</code>,
 <code>gender_2</code>). With <code>suffix = "label"</code>: <code>{varname}_{label}</code>
-where labels are cleaned (spaces replaced with <code>_</code>, special characters
-removed).</p>
+where labels are cleaned (umlauts transliterated, e.g. "männlich" -&gt;
+<code>maennlich</code>; spaces replaced with <code>_</code>; other special
+characters removed). Values without a usable label (e.g. "..") use their
+value; labels shared by several values get the value appended, so every
+category keeps its own column.</p>
 </div>
 
 <div class="section">

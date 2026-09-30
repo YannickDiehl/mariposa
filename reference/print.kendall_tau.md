@@ -38,18 +38,19 @@ Invisibly returns the input object `x`.
 result <- kendall_tau(survey_data[1:300, ], age, life_satisfaction)
 result              # compact one-line overview
 #> Kendall's Tau: age x life_satisfaction
-#>   tau = -0.011, p = 0.806 , N = 287
+#>   tau = -0.011, p = 0.806, N = 287
+#> Use summary() for detailed output.
 summary(result)     # full correlation matrices
 #> 
-#> Kendall's Tau-b Correlation 
-#> ----------------------------
+#> Kendall's Tau-b Correlation
+#> ---------------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Kendall's tau-b: tau-b = -0.011
-#>   p-value: p = 0.806 
+#>   p-value (2-tailed): p = 0.806
 #>   N = 287
 #>   z-score: -0.245
 #> 

@@ -42,7 +42,9 @@ mcnemar_test(data, var1, var2, weights = NULL, correct = TRUE, ...)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - correct:
 
@@ -168,18 +170,18 @@ test_data <- survey_data %>%
 test_data %>%
   mcnemar_test(var1 = trust_gov_high, var2 = trust_media_high)
 #> McNemar Test: trust_gov_high x trust_media_high
-#>   chi2 = 15.116, p < 0.001 (asymp), p < 0.001 (exact) ***, N = 2227
+#>   chi2(1) = 15.116 (cc), p < 0.001 (asymptotic), p < 0.001 *** (exact), N = 2227
 #> Use summary() for detailed output.
 
 # Grouped analysis
 test_data %>%
   group_by(region) %>%
   mcnemar_test(var1 = trust_gov_high, var2 = trust_media_high)
-#> [region = 1]
+#> [region = East]
 #> McNemar Test: trust_gov_high x trust_media_high
-#>   chi2 = 8.255, p = 0.004 (asymp), p = 0.004 (exact) **, N = 435
-#> [region = 2]
+#>   chi2(1) = 8.255 (cc), p = 0.004 (asymptotic), p = 0.004 ** (exact), N = 435
+#> [region = West]
 #> McNemar Test: trust_gov_high x trust_media_high
-#>   chi2 = 8.242, p = 0.004 (asymp), p = 0.004 (exact) **, N = 1792
+#>   chi2(1) = 8.242 (cc), p = 0.004 (asymptotic), p = 0.004 ** (exact), N = 1792
 #> Use summary() for detailed output.
 ```

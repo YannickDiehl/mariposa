@@ -41,11 +41,14 @@ friedman_test(data, ..., weights = NULL, conf.level = 0.95)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - conf.level:
 
-  Confidence level for intervals (Default: 0.95 = 95 percent)
+  Not used. Rank tests report no confidence interval (SPSS `NPAR TESTS`
+  neither); kept for backward compatibility.
 
 ## Value
 
@@ -175,14 +178,14 @@ data(survey_data)
 survey_data %>%
   friedman_test(trust_government, trust_media, trust_science)
 #> Friedman Test: trust_government, trust_media, trust_science
-#>   chi2(2) = 1009.035, p < 0.001 ***, W = 0.236, N = 2135
+#>   chi2(2) = 1009.035, p < 0.001 ***, Kendall's W = 0.236 (weak), N = 2135
 #> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   friedman_test(starts_with("trust_"))
 #> Friedman Test: trust_government, trust_media, trust_science
-#>   chi2(2) = 1009.035, p < 0.001 ***, W = 0.236, N = 2135
+#>   chi2(2) = 1009.035, p < 0.001 ***, Kendall's W = 0.236 (weak), N = 2135
 #> Use summary() for detailed output.
 
 # Weighted analysis
@@ -190,18 +193,18 @@ survey_data %>%
   friedman_test(trust_government, trust_media, trust_science,
                 weights = sampling_weight)
 #> Friedman Test: trust_government, trust_media, trust_science [Weighted]
-#>   chi2(2) = 1012.084, p < 0.001 ***, W = 0.235, N = 2150
+#>   chi2(2) = 1012.084, p < 0.001 ***, Kendall's W = 0.235 (weak), N = 2150
 #> Use summary() for detailed output.
 
 # Grouped analysis (separate test per region)
 survey_data %>%
   group_by(region) %>%
   friedman_test(trust_government, trust_media, trust_science)
-#> [region = 1]
+#> [region = East]
 #> Friedman Test: trust_government, trust_media, trust_science
-#>   chi2(2) = 217.100, p < 0.001 ***, W = 0.257, N = 422
-#> [region = 2]
+#>   chi2(2) = 217.100, p < 0.001 ***, Kendall's W = 0.257 (weak), N = 422
+#> [region = West]
 #> Friedman Test: trust_government, trust_media, trust_science
-#>   chi2(2) = 792.344, p < 0.001 ***, W = 0.231, N = 1713
+#>   chi2(2) = 792.344, p < 0.001 ***, Kendall's W = 0.231 (weak), N = 1713
 #> Use summary() for detailed output.
 ```

@@ -26,11 +26,15 @@ w_se(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample standard error.
+  Without weights, you get the simple sample standard error. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -50,7 +54,10 @@ number of valid observations used.
   represents. Weights that vary a lot reduce effective N, increasing the
   SE.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 ### When to Use This
 
@@ -115,45 +122,52 @@ survey_data %>% w_se(age, weights = sampling_weight)
 #> 
 #> Weighted Standard Error Statistics
 #> ----------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_se Effective_N
-#>       age       0.341      2468.8
-#> 
+#>   ------------------------------
+#>   Variable     SE     N  Missing
+#>   ------------------------------
+#>   age       0.341  2516        0
+#>   ------------------------------
 
 # Multiple variables
 survey_data %>% w_se(age, income, weights = sampling_weight)
 #> 
 #> Weighted Standard Error Statistics
 #> ----------------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_se Effective_N
-#>       age       0.341      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_se Effective_N
-#>    income      30.353      2158.9
-#> 
+#>   -------------------------------
+#>   Variable      SE     N  Missing
+#>   -------------------------------
+#>   age        0.341  2516        0
+#>   income    30.353  2201      315
+#>   -------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_se(age, weights = sampling_weight)
 #> 
 #> Weighted Standard Error Statistics
 #> ----------------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_se Effective_N
-#>       age        0.78         477
+#>   -----------------------------
+#>   Variable     SE    N  Missing
+#>   -----------------------------
+#>   age       0.780  509        0
+#>   -----------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_se Effective_N
-#>       age       0.378      1993.1
-#> 
+#>   ------------------------------
+#>   Variable     SE     N  Missing
+#>   ------------------------------
+#>   age       0.378  2007        0
+#>   ------------------------------
 
 # In summarise context
 survey_data %>% summarise(se_age = w_se(age, weights = sampling_weight))
@@ -168,8 +182,9 @@ survey_data %>% w_se(age)
 #> Standard Error Statistics
 #> -------------------------
 #> 
-#> --- age ---
-#>  Variable   se    N
-#>       age 0.34 2500
-#> 
+#>   ------------------------------
+#>   Variable     SE     N  Missing
+#>   ------------------------------
+#>   age       0.340  2500        0
+#>   ------------------------------
 ```

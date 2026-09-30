@@ -46,6 +46,7 @@ media, and science).
 reliability(survey_data, trust_government, trust_media, trust_science)
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 ```
 
 ### Detailed Output
@@ -57,7 +58,10 @@ summary(rel)
 #> 
 #> Reliability Analysis Results
 #> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
+#> - Items:
+#>     trust_government  Trust in government (1=none, 5=complete)
+#>     trust_media       Trust in media (1=none, 5=complete)
+#>     trust_science     Trust in science (1=none, 5=complete)
 #> - N of Items: 3
 #> 
 #> Reliability Statistics
@@ -70,30 +74,32 @@ summary(rel)
 #>   N (listwise):                  2135
 #> 
 #> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
+#>   ---------------------------------------------------------------------------------------
+#>   Item                                                         Mean  Std. Deviation     N
+#>   ---------------------------------------------------------------------------------------
+#>   trust_government  Trust in government (1=none, 5=complete)  2.621           1.162  2135
+#>   trust_media       Trust in media (1=none, 5=complete)       2.430           1.156  2135
+#>   trust_science     Trust in science (1=none, 5=complete)     3.624           1.034  2135
+#>   ---------------------------------------------------------------------------------------
 #> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> ------------------------------ 
+#> Inter-Item Correlation Matrix
+#>   -----------------------------------------
+#>                           (1)    (2)    (3)
+#>   -----------------------------------------
+#>   (1) trust_government  1.000  0.014  0.020
+#>   (2) trust_media       0.014  1.000  0.015
+#>   (3) trust_science     0.020  0.015  1.000
+#>   -----------------------------------------
 #> 
 #> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted omega_deleted
-#>          0.029            NA
-#>          0.040            NA
-#>          0.027            NA
+#>   ------------------------------------------------------------------------
+#>                     Scale Mean  Scale Var.   Corrected  Alpha if  Omega if
+#>   Item              if Deleted  if Deleted  Item-Total   Deleted   Deleted
+#>   ------------------------------------------------------------------------
+#>   trust_government       6.054       2.440       0.024     0.029          
+#>   trust_media            6.245       2.467       0.020     0.040          
+#>   trust_science          5.051       2.723       0.025     0.027          
+#>   ------------------------------------------------------------------------
 #> Note: Omega if item deleted requires at least 4 items
 #> (a one-factor model on the remaining 2 items is not identified).
 ```
@@ -143,6 +149,7 @@ reliability(survey_data, trust_government, trust_media, trust_science,
             weights = sampling_weight)
 #> Reliability Analysis: 3 items [Weighted]
 #>   Cronbach's Alpha = 0.052 (Poor), McDonald's Omega = 0.053, N = 2150
+#> Use summary() for detailed output.
 ```
 
 ### Using tidyselect
@@ -152,6 +159,7 @@ reliability(survey_data, trust_government, trust_media, trust_science,
 reliability(survey_data, starts_with("trust"))
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 ```
 
 ### Grouped Analysis
@@ -163,12 +171,13 @@ Check whether reliability holds across subgroups:
 survey_data %>%
   group_by(region) %>%
   reliability(trust_government, trust_media, trust_science)
-#> [region = 1]
+#> [region = East]
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.037 (Poor), McDonald's Omega = 0.349, N = 422
-#> [region = 2]
+#>   Cronbach's Alpha = 0.037 (Poor), McDonald's Omega = not computed, N = 422
+#> [region = West]
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.050 (Poor), McDonald's Omega = 0.071, N = 1713
+#> Use summary() for detailed output.
 ```
 
 A scale that works well overall might be unreliable in specific
@@ -188,7 +197,8 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science)
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 ### Detailed Output
@@ -203,66 +213,116 @@ summary(efa_result)
 #> 
 #> Exploratory Factor Analysis (PCA, Varimax) Results
 #> --------------------------------------------------
-#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
+#> - Variables:
+#>     political_orientation  Political orientation (1=left, 5=right)
+#>     environmental_concern  Environmental concern (1=low, 5=high)
+#>     life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)
+#>     trust_government       Trust in government (1=none, 5=complete)
+#>     trust_media            Trust in media (1=none, 5=complete)
+#>     trust_science          Trust in science (1=none, 5=complete)
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
-#> - N of Factors: 3
+#> - N of Components: 3
+#> - N (smallest pairwise): 2168
+#> 
+#> Descriptive Statistics
+#>   --------------------------------------------------------------------------------------------------------------------
+#>   Variable                                                                 Mean  Std. Deviation  Analysis N  Missing N
+#>   --------------------------------------------------------------------------------------------------------------------
+#>   political_orientation  Political orientation (1=left, 5=right)          2.722           1.086        2299        201
+#>   environmental_concern  Environmental concern (1=low, 5=high)            3.573           1.194        2400        100
+#>   life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)  3.628           1.153        2421         79
+#>   trust_government       Trust in government (1=none, 5=complete)         2.621           1.163        2354        146
+#>   trust_media            Trust in media (1=none, 5=complete)              2.452           1.163        2367        133
+#>   trust_science          Trust in science (1=none, 5=complete)            3.641           1.028        2398        102
+#>   --------------------------------------------------------------------------------------------------------------------
 #> 
 #> KMO and Bartlett's Test
 #> ---------------------------------------- 
 #>   Kaiser-Meyer-Olkin Measure:     0.505
 #>   Bartlett's Chi-Square:          932.068
 #>   df:                             15
-#>   Sig.:                           0.000
+#>   Sig.:                           <.001
 #> 
 #> Communalities
-#> ---------------------------------------- 
-#>               variable initial extraction
-#>  political_orientation       1      0.786
-#>  environmental_concern       1      0.783
-#>      life_satisfaction       1      0.668
-#>       trust_government       1      0.347
-#>            trust_media       1      0.475
-#>          trust_science       1      0.598
+#>   -------------------------------------------------------------------------------------------
+#>   Variable                                                                Initial  Extraction
+#>   -------------------------------------------------------------------------------------------
+#>   political_orientation  Political orientation (1=left, 5=right)            1.000       0.786
+#>   environmental_concern  Environmental concern (1=low, 5=high)              1.000       0.783
+#>   life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)    1.000       0.668
+#>   trust_government       Trust in government (1=none, 5=complete)           1.000       0.347
+#>   trust_media            Trust in media (1=none, 5=complete)                1.000       0.475
+#>   trust_science          Trust in science (1=none, 5=complete)              1.000       0.598
+#>   -------------------------------------------------------------------------------------------
 #> Extraction Method: Principal Component Analysis.
 #> 
 #> Total Variance Explained
-#> ---------------------------------------- 
-#>   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%
-#>   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%
-#>   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%
-#>   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%
-#>   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%
-#>   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%
-#> 
-#> Rotation Sums of Squared Loadings
-#> ---------------------------------------- 
-#>   PC1  SS Loading: 1.598  Variance: 26.634%  Cumulative: 26.634%
-#>   PC2  SS Loading: 1.039  Variance: 17.325%  Cumulative: 43.959%
-#>   PC3  SS Loading: 1.021  Variance: 17.020%  Cumulative: 60.979%
+#>   -------------------------------------------------------------------------
+#>              Initial Eigenvalues   Extraction Sums      Rotation Sums
+#>   Component  Total % Var.  Cum. %  Total % Var. Cum. %  Total % Var. Cum. %
+#>   -------------------------------------------------------------------------
+#>           1  1.600 26.666  26.666  1.600 26.666 26.666  1.598 26.635 26.635
+#>           2  1.041 17.358  44.024  1.041 17.358 44.024  1.039 17.324 43.959
+#>           3  1.017 16.955  60.979  1.017 16.955 60.979  1.021 17.020 60.979
+#>           4  0.980 16.334  77.313
+#>           5  0.949 15.814  93.127
+#>           6  0.412  6.873 100.000
+#>   -------------------------------------------------------------------------
+#> Sums = sums of squared loadings.
+#> Extraction Method: Principal Component Analysis.
 #> 
 #> Component Matrix (unrotated)
-#> ---------------------------------------- 
-#>                           PC1     PC2     PC3
-#> political_orientation   0.885                
-#> environmental_concern  -0.885                
-#> trust_science                  -0.672        
-#> trust_government               -0.547        
-#> trust_media                    -0.524  -0.448
-#> life_satisfaction                      -0.809
+#> ----------------------------------------
+#>                                                                            PC1
+#> political_orientation  Political orientation (1=left, 5=right)          -0.885
+#> environmental_concern  Environmental concern (1=low, 5=high)             0.885
+#> trust_science          Trust in science (1=none, 5=complete)                  
+#> trust_government       Trust in government (1=none, 5=complete)               
+#> trust_media            Trust in media (1=none, 5=complete)                    
+#> life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)        
+#>                                                                            PC2
+#> political_orientation  Political orientation (1=left, 5=right)                
+#> environmental_concern  Environmental concern (1=low, 5=high)                  
+#> trust_science          Trust in science (1=none, 5=complete)             0.672
+#> trust_government       Trust in government (1=none, 5=complete)          0.547
+#> trust_media            Trust in media (1=none, 5=complete)               0.524
+#> life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)        
+#>                                                                            PC3
+#> political_orientation  Political orientation (1=left, 5=right)                
+#> environmental_concern  Environmental concern (1=low, 5=high)                  
+#> trust_science          Trust in science (1=none, 5=complete)                  
+#> trust_government       Trust in government (1=none, 5=complete)               
+#> trust_media            Trust in media (1=none, 5=complete)               0.448
+#> life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)   0.809
 #> Extraction Method: Principal Component Analysis.
 #> 
 #> Rotated Component Matrix
-#> ---------------------------------------- 
-#>                           PC1     PC2     PC3
-#> political_orientation   0.887                
-#> environmental_concern  -0.884                
-#> trust_science                  -0.762        
-#> trust_government               -0.566        
-#> life_satisfaction                      -0.789
-#> trust_media                            -0.620
+#> ----------------------------------------
+#>                                                                            PC1
+#> political_orientation  Political orientation (1=left, 5=right)          -0.887
+#> environmental_concern  Environmental concern (1=low, 5=high)             0.884
+#> trust_science          Trust in science (1=none, 5=complete)                  
+#> trust_government       Trust in government (1=none, 5=complete)               
+#> life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)        
+#> trust_media            Trust in media (1=none, 5=complete)                    
+#>                                                                            PC2
+#> political_orientation  Political orientation (1=left, 5=right)                
+#> environmental_concern  Environmental concern (1=low, 5=high)                  
+#> trust_science          Trust in science (1=none, 5=complete)             0.762
+#> trust_government       Trust in government (1=none, 5=complete)          0.566
+#> life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)        
+#> trust_media            Trust in media (1=none, 5=complete)                    
+#>                                                                            PC3
+#> political_orientation  Political orientation (1=left, 5=right)                
+#> environmental_concern  Environmental concern (1=low, 5=high)                  
+#> trust_science          Trust in science (1=none, 5=complete)                  
+#> trust_government       Trust in government (1=none, 5=complete)               
+#> life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)   0.789
+#> trust_media            Trust in media (1=none, 5=complete)               0.620
 #> Extraction Method: Principal Component Analysis.
 #> Rotation Method: Varimax with Kaiser Normalization.
+#> Rotation converged in 4 iterations.
 ```
 
 ### Understanding the Output
@@ -297,7 +357,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     rotation = "varimax")
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 **Promax** — allows correlated factors, produces Pattern and Structure
@@ -310,18 +371,21 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     rotation = "promax")
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Promax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 **Oblimin** — another oblique rotation, common in psychology:
 
 ``` r
 
-# Requires GPArotation package
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
     rotation = "oblimin")
+#> Exploratory Factor Analysis: 6 items, 3 components (PCA/Oblimin)
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 ### Extraction Methods
@@ -337,8 +401,9 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
     extraction = "ml")
-#> Exploratory Factor Analysis: 6 items, 3 components (ML/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#> Exploratory Factor Analysis: 6 items, 3 factors (ML/Varimax)
+#>   KMO = 0.505 (Miserable), Variance explained: 24.1%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 ML extraction provides a goodness-of-fit test and uses SMC (squared
@@ -351,8 +416,9 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
     extraction = "ml", rotation = "promax")
-#> Exploratory Factor Analysis: 6 items, 3 components (ML/Promax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#> Exploratory Factor Analysis: 6 items, 3 factors (ML/Promax)
+#>   KMO = 0.505 (Miserable), Variance explained: 24.1%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 ### Fixing the Number of Factors
@@ -364,7 +430,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     n_factors = 2)
 #> Exploratory Factor Analysis: 6 items, 2 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 44.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 44.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 ### With Survey Weights
@@ -376,7 +443,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     weights = sampling_weight)
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax) [Weighted]
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2182 (smallest pairwise)
+#> Use summary() for detailed output.
 ```
 
 ## Creating Scale Scores
@@ -410,10 +478,13 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>     Variable   Mean Median     SD Range IQR Skewness    N Missing
-#>      m_trust  2.916      3  0.691     4   1     0.02 2484      16
-#>  trust_pomps 47.892     50 17.283   100  25     0.02 2484      16
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------
+#>   Variable       Mean  Median      SD    Range     IQR  Skewness     N  Missing
+#>   -----------------------------------------------------------------------------
+#>   m_trust       2.916   3.000   0.691    4.000   1.000     0.020  2484       16
+#>   trust_pomps  47.892  50.000  17.283  100.000  25.000     0.020  2484       16
+#>   -----------------------------------------------------------------------------
 ```
 
 ### Using the Scale in Analysis
@@ -425,6 +496,7 @@ survey_data %>%
   t_test(m_trust, group = gender, weights = sampling_weight)
 #> t-Test: m_trust by gender [Weighted]
 #>   t(2457.6) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -435,6 +507,7 @@ survey_data %>%
                     weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ m_trust + age + income [Weighted]
 #>   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.02, p < 0.001 ***, N = 2113
+#> Use summary() for detailed output.
 ```
 
 ## Complete Example
@@ -446,11 +519,15 @@ rel <- reliability(survey_data, trust_government, trust_media, trust_science)
 rel
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 summary(rel)
 #> 
 #> Reliability Analysis Results
 #> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
+#> - Items:
+#>     trust_government  Trust in government (1=none, 5=complete)
+#>     trust_media       Trust in media (1=none, 5=complete)
+#>     trust_science     Trust in science (1=none, 5=complete)
 #> - N of Items: 3
 #> 
 #> Reliability Statistics
@@ -463,30 +540,32 @@ summary(rel)
 #>   N (listwise):                  2135
 #> 
 #> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
+#>   ---------------------------------------------------------------------------------------
+#>   Item                                                         Mean  Std. Deviation     N
+#>   ---------------------------------------------------------------------------------------
+#>   trust_government  Trust in government (1=none, 5=complete)  2.621           1.162  2135
+#>   trust_media       Trust in media (1=none, 5=complete)       2.430           1.156  2135
+#>   trust_science     Trust in science (1=none, 5=complete)     3.624           1.034  2135
+#>   ---------------------------------------------------------------------------------------
 #> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> ------------------------------ 
+#> Inter-Item Correlation Matrix
+#>   -----------------------------------------
+#>                           (1)    (2)    (3)
+#>   -----------------------------------------
+#>   (1) trust_government  1.000  0.014  0.020
+#>   (2) trust_media       0.014  1.000  0.015
+#>   (3) trust_science     0.020  0.015  1.000
+#>   -----------------------------------------
 #> 
 #> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted omega_deleted
-#>          0.029            NA
-#>          0.040            NA
-#>          0.027            NA
+#>   ------------------------------------------------------------------------
+#>                     Scale Mean  Scale Var.   Corrected  Alpha if  Omega if
+#>   Item              if Deleted  if Deleted  Item-Total   Deleted   Deleted
+#>   ------------------------------------------------------------------------
+#>   trust_government       6.054       2.440       0.024     0.029          
+#>   trust_media            6.245       2.467       0.020     0.040          
+#>   trust_science          5.051       2.723       0.025     0.027          
+#>   ------------------------------------------------------------------------
 #> Note: Omega if item deleted requires at least 4 items
 #> (a one-factor model on the remaining 2 items is not identified).
 
@@ -494,7 +573,9 @@ summary(rel)
 efa_result <- efa(survey_data, trust_government, trust_media, trust_science)
 efa_result
 #> Exploratory Factor Analysis: 3 items, 1 component (PCA/Unrotated)
-#>   KMO = 0.506 (Miserable), Variance explained: 34.7%
+#>   KMO = 0.506 (Miserable), Variance explained: 34.7%, N = 2227 (smallest pairwise)
+#>   Only one component was extracted. The solution cannot be rotated.
+#> Use summary() for detailed output.
 
 # 3. Create mean index (Alpha was acceptable)
 survey_data <- survey_data %>%
@@ -515,35 +596,43 @@ survey_data %>%
 #> 
 #> Group: education = Basic Secondary
 #> ----------------------------------
-#> ----------------------------------------
-#>     Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>      m_trust  2.924      3  0.696     4   1    0.024       829.7
-#>  trust_pomps 48.093     50 17.390   100  25    0.024       829.7
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------------------------------------------
+#>   Variable       Mean  Median      SD    Range     IQR  Skewness    N  Missing
+#>   ----------------------------------------------------------------------------
+#>   m_trust       2.924   3.000   0.696    4.000   1.000     0.024  845        3
+#>   trust_pomps  48.093  50.000  17.390  100.000  25.000     0.024  845        3
+#>   ----------------------------------------------------------------------------
 #> 
 #> Group: education = Intermediate Secondary
 #> -----------------------------------------
-#> ----------------------------------------
-#>     Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>      m_trust  2.920      3  0.697     4   1    0.035       617.7
-#>  trust_pomps 48.002     50 17.421   100  25    0.035       617.7
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------------------------------------------
+#>   Variable       Mean  Median      SD    Range     IQR  Skewness    N  Missing
+#>   ----------------------------------------------------------------------------
+#>   m_trust       2.920   3.000   0.697    4.000   1.000     0.035  636        5
+#>   trust_pomps  48.002  50.000  17.421  100.000  25.000     0.035  636        5
+#>   ----------------------------------------------------------------------------
 #> 
 #> Group: education = Academic Secondary
 #> -------------------------------------
-#> ----------------------------------------
-#>     Variable   Mean Median     SD Range    IQR Skewness Effective_N
-#>      m_trust  2.922      3  0.691     4  0.833   -0.006       616.4
-#>  trust_pomps 48.053     50 17.267   100 20.833   -0.006       616.4
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------------------------------------------
+#>   Variable       Mean  Median      SD    Range     IQR  Skewness    N  Missing
+#>   ----------------------------------------------------------------------------
+#>   m_trust       2.922   3.000   0.691    4.000   0.833    -0.006  634        8
+#>   trust_pomps  48.053  50.000  17.267  100.000  20.833    -0.006  634        8
+#>   ----------------------------------------------------------------------------
 #> 
 #> Group: education = University
 #> -----------------------------
-#> ----------------------------------------
-#>     Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>      m_trust  2.885      3  0.686     4   1    0.063       389.6
-#>  trust_pomps 47.132     50 17.157   100  25    0.063       389.6
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------------------------------------------
+#>   Variable       Mean  Median      SD    Range     IQR  Skewness    N  Missing
+#>   ----------------------------------------------------------------------------
+#>   m_trust       2.885   3.000   0.686    4.000   1.000     0.063  385        0
+#>   trust_pomps  47.132  50.000  17.157  100.000  25.000     0.063  385        0
+#>   ----------------------------------------------------------------------------
 ```
 
 ## Practical Tips

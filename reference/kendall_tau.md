@@ -33,11 +33,14 @@ kendall_tau(
 
   The variables you want to correlate. List two for a single correlation
   or more for a correlation matrix. You can use helpers like
-  `starts_with("trust")`.
+  `starts_with("trust")`. Numeric variables or ordered factors (ranked
+  by their level order).
 
 - weights:
 
-  Optional survey weights for population-representative results.
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - alternative:
 
@@ -174,61 +177,68 @@ mini_survey <- survey_data[1:300, ]
 mini_survey %>%
   kendall_tau(life_satisfaction, political_orientation)
 #> Kendall's Tau: life_satisfaction x political_orientation
-#>   tau = -0.028, p = 0.582 , N = 260
+#>   tau = -0.028, p = 0.582, N = 260
+#> Use summary() for detailed output.
 
 # Correlation matrix for multiple variables
 mini_survey %>%
   kendall_tau(life_satisfaction, political_orientation, trust_media)
 #> Kendall's Tau: 3 variables
-#>   life_satisfaction x political_orientation: tau = -0.028, p = 0.582  
-#>   life_satisfaction x trust_media: tau = 0.026, p = 0.608  
-#>   political_orientation x trust_media: tau = -0.037, p = 0.471  
-#>   0/3 pairs significant (p < .05), N = 260
+#>   life_satisfaction x political_orientation: tau = -0.028, p = 0.582
+#>   life_satisfaction x trust_media:           tau = 0.026, p = 0.608
+#>   political_orientation x trust_media:       tau = -0.037, p = 0.471
+#>   0/3 pairs significant (p < .05), N = 257-274
+#> Use summary() for detailed output.
 
 # Weighted correlations
 mini_survey %>%
   kendall_tau(age, income, weights = sampling_weight)
 #> Kendall's Tau: age x income [Weighted]
-#>   tau = -0.036, p = 0.374 , N = 271
+#>   tau = -0.036, p = 0.374, N = 271
+#> Use summary() for detailed output.
 
 # Listwise deletion for missing data
 mini_survey %>%
   kendall_tau(age, income, use = "listwise")
 #> Kendall's Tau: age x income
-#>   tau = -0.038, p = 0.370 , N = 267
+#>   tau = -0.038, p = 0.370, N = 267
+#> Use summary() for detailed output.
 
 # One-tailed test
 mini_survey %>%
   kendall_tau(age, income, alternative = "greater")
-#> Kendall's Tau: age x income
-#>   tau = -0.038, p = 0.815 , N = 267
+#> Kendall's Tau: age x income [one-sided: greater]
+#>   tau = -0.038, p = 0.815, N = 267
+#> Use summary() for detailed output.
 
 # \donttest{
 # Grouped correlations
 mini_survey %>%
   group_by(region) %>%
   kendall_tau(age, income, life_satisfaction)
-#> [region = 1]
+#> [region = East]
 #> Kendall's Tau: 3 variables
-#>   age x income:                  tau = 0.102, p = 0.265  
-#>   age x life_satisfaction:       tau = 0.061, p = 0.532  
-#>   income x life_satisfaction:    tau = 0.315, p = 0.002 ** 
-#>   1/3 pairs significant (p < .05), N = 58
-#> [region = 2]
+#>   age x income:               tau = 0.102, p = 0.265
+#>   age x life_satisfaction:    tau = 0.061, p = 0.532
+#>   income x life_satisfaction: tau = 0.315, p = 0.002 **
+#>   1/3 pairs significant (p < .05), N = 56-61
+#> [region = West]
 #> Kendall's Tau: 3 variables
-#>   age x income:                  tau = -0.068, p = 0.149  
-#>   age x life_satisfaction:       tau = -0.034, p = 0.491  
-#>   income x life_satisfaction:    tau = 0.361, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 209
+#>   age x income:               tau = -0.068, p = 0.149
+#>   age x life_satisfaction:    tau = -0.034, p = 0.491
+#>   income x life_satisfaction: tau = 0.361, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 199-226
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers for ordinal variables
 mini_survey %>%
   kendall_tau(starts_with("trust"), weights = sampling_weight)
 #> Kendall's Tau: 3 variables [Weighted]
-#>   trust_government x trust_media: tau = 0.084, p = 0.037 * 
-#>   trust_government x trust_science: tau = -0.028, p = 0.493  
-#>   trust_media x trust_science:   tau = 0.007, p = 0.870  
-#>   1/3 pairs significant (p < .05), N = 274
+#>   trust_government x trust_media:   tau = 0.084, p = 0.037 *
+#>   trust_government x trust_science: tau = -0.028, p = 0.493
+#>   trust_media x trust_science:      tau = 0.007, p = 0.870
+#>   1/3 pairs significant (p < .05), N = 267-274
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- mini_survey %>%
@@ -236,14 +246,15 @@ result <- mini_survey %>%
               weights = sampling_weight)
 result              # compact one-line overview
 #> Kendall's Tau: 3 variables [Weighted]
-#>   life_satisfaction x political_orientation: tau = -0.026, p = 0.535  
-#>   life_satisfaction x trust_media: tau = 0.025, p = 0.534  
-#>   political_orientation x trust_media: tau = -0.039, p = 0.350  
-#>   0/3 pairs significant (p < .05), N = 262
+#>   life_satisfaction x political_orientation: tau = -0.026, p = 0.535
+#>   life_satisfaction x trust_media:           tau = 0.025, p = 0.534
+#>   political_orientation x trust_media:       tau = -0.039, p = 0.350
+#>   0/3 pairs significant (p < .05), N = 259-277
+#> Use summary() for detailed output.
 summary(result)     # full correlation, p-value, and N matrices
 #> 
-#> Weighted Kendall's Tau-b Correlation 
-#> -------------------------------------
+#> Weighted Kendall's Tau-b Correlation
+#> ------------------------------------
 #> 
 #> - Weights variable: sampling_weight
 #> - Missing data handling: pairwise deletion
@@ -251,42 +262,43 @@ summary(result)     # full correlation, p-value, and N matrices
 #> 
 #> 
 #> Kendall's Tau-b Matrix:
-#> ----------------------- 
-#>                       life_satisfaction political_orientation trust_media
-#> life_satisfaction                 1.000                -0.026       0.025
-#> political_orientation            -0.026                 1.000      -0.039
-#> trust_media                       0.025                -0.039       1.000
-#> ----------------------- 
+#> -----------------------
+#>                        life_satisfaction  political_orientation  trust_media
+#> life_satisfaction                      1                 -0.026        0.025
+#> political_orientation             -0.026                      1       -0.039
+#> trust_media                        0.025                 -0.039            1
+#> -----------------------
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ----------------------------------------- 
-#>                       life_satisfaction political_orientation trust_media
-#> life_satisfaction                0.0000                0.5346      0.5345
-#> political_orientation            0.5346                0.0000      0.3497
-#> trust_media                      0.5345                0.3497      0.0000
-#> ----------------------------------------- 
+#> -----------------------------------------
+#>                        life_satisfaction  political_orientation  trust_media
+#> life_satisfaction                                          .535         .534
+#> political_orientation               .535                                .350
+#> trust_media                         .534                   .350             
+#> -----------------------------------------
 #> 
 #> Sample Size Matrix:
-#> ------------------- 
-#>                       life_satisfaction political_orientation trust_media
-#> life_satisfaction                   290                   262         277
-#> political_orientation               262                   272         259
-#> trust_media                         277                   259         289
-#> ------------------- 
+#> -------------------
+#>                        life_satisfaction  political_orientation  trust_media
+#> life_satisfaction                    290                    262          277
+#> political_orientation                262                    272          259
+#> trust_media                          277                    259          289
+#> -------------------
 #> 
 #> Pairwise Results:
-#> ---------------- 
-#>                                       Pair  tau_b      z      p   n sig
-#>  life_satisfaction × political_orientation -0.026 -0.621 0.5346 262    
-#>            life_satisfaction × trust_media  0.025  0.621 0.5345 277    
-#>        political_orientation × trust_media -0.039 -0.935 0.3497 259    
-#> ---------------- 
+#>   -----------------------------------------------------------------------
+#>   Pair                                        tau-b       z     p    N   
+#>   -----------------------------------------------------------------------
+#>   life_satisfaction x political_orientation  -0.026  -0.621  .535  262   
+#>   life_satisfaction x trust_media             0.025   0.621  .534  277   
+#>   political_orientation x trust_media        -0.039  -0.935  .350  259   
+#>   -----------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> 
-#> Weighted Kendall's Tau-b Correlation 
-#> -------------------------------------
+#> Weighted Kendall's Tau-b Correlation
+#> ------------------------------------
 #> 
 #> - Weights variable: sampling_weight
 #> - Missing data handling: pairwise deletion
@@ -294,28 +306,29 @@ summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> 
 #> 
 #> Kendall's Tau-b Matrix:
-#> ----------------------- 
-#>                       life_satisfaction political_orientation trust_media
-#> life_satisfaction                 1.000                -0.026       0.025
-#> political_orientation            -0.026                 1.000      -0.039
-#> trust_media                       0.025                -0.039       1.000
-#> ----------------------- 
+#> -----------------------
+#>                        life_satisfaction  political_orientation  trust_media
+#> life_satisfaction                      1                 -0.026        0.025
+#> political_orientation             -0.026                      1       -0.039
+#> trust_media                        0.025                 -0.039            1
+#> -----------------------
 #> 
 #> Sample Size Matrix:
-#> ------------------- 
-#>                       life_satisfaction political_orientation trust_media
-#> life_satisfaction                   290                   262         277
-#> political_orientation               262                   272         259
-#> trust_media                         277                   259         289
-#> ------------------- 
+#> -------------------
+#>                        life_satisfaction  political_orientation  trust_media
+#> life_satisfaction                    290                    262          277
+#> political_orientation                262                    272          259
+#> trust_media                          277                    259          289
+#> -------------------
 #> 
 #> Pairwise Results:
-#> ---------------- 
-#>                                       Pair  tau_b      z      p   n sig
-#>  life_satisfaction × political_orientation -0.026 -0.621 0.5346 262    
-#>            life_satisfaction × trust_media  0.025  0.621 0.5345 277    
-#>        political_orientation × trust_media -0.039 -0.935 0.3497 259    
-#> ---------------- 
+#>   -----------------------------------------------------------------------
+#>   Pair                                        tau-b       z     p    N   
+#>   -----------------------------------------------------------------------
+#>   life_satisfaction x political_orientation  -0.026  -0.621  .535  262   
+#>   life_satisfaction x trust_media             0.025   0.621  .534  277   
+#>   political_orientation x trust_media        -0.039  -0.935  .350  259   
+#>   -----------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 # }

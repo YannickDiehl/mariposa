@@ -93,8 +93,10 @@ variables or use helpers like <code>starts_with("income")</code></p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Survey weights to make results representative of your population.
-Without weights, you get the simple sample quantiles.</p></dd>
+<dd><p>Survey weights to make results representative of your
+population. Without weights, you get the simple sample quantiles. Give a
+column name (unquoted or as a string), an expression such as
+<code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-probs">probs<a class="anchor" aria-label="anchor" href="#arg-probs"></a></dt>
@@ -105,7 +107,9 @@ deciles, or <code>c(0.25, 0.5, 0.75)</code> for quartiles only.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Remove missing values before calculating? (Default: TRUE)</p></dd>
+<dd><p>Remove missing values before calculating? (Default: TRUE).
+With <code>FALSE</code>, the result for a variable that contains missing
+values is <code>NA</code> (as in base R).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -125,7 +129,9 @@ in the weighted population. For example, if the weighted 25th percentile
 of income is 35,000, then 25% of the population earns less than that.</p></li>
 <li><p><strong>Effective N</strong>: How many independent observations your weighted data
 represents.</p></li>
-<li><p><strong>N</strong>: The actual number of observations used.</p></li>
+<li><p><strong>N / Missing</strong>: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+<code>WEIGHT BY</code>; Kish's effective N is shown by <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</p></li>
 </ul><p>Common percentiles and their meaning:</p><ul><li><p><strong>0% (minimum)</strong>: The smallest observed value</p></li>
 <li><p><strong>25% (Q1)</strong>: One quarter of the population falls below this value</p></li>
 <li><p><strong>50% (median)</strong>: Half the population falls below this value</p></li>
@@ -198,81 +204,77 @@ pending.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Quantile Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Quantile Value    N Effective_N         Weights</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Min    18 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      25%    38 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      50%    50 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      75%    63 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Max    95 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     Min     25%     50%     75%     Max     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       18.000  38.000  50.000  63.000  95.000  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom quantiles</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_quantile</span><span class="op">(</span><span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Quantile Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Quantile Value    N Effective_N         Weights</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      10%  2100 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      50%  3500 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      90%  5700 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable       10%       50%       90%     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income    2100.000  3500.000  5700.000  2201      315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_quantile</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Quantile Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Quantile Value    N Effective_N         Weights</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Min    18 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      25%    38 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      50%    50 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      75%    63 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Max    95 2500      2468.8 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      Min   800 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      25%  2700 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      50%  3500 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      75%  4600 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income      Max  8000 2186      2158.9 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable      Min       25%       50%       75%       Max     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age        18.000    38.000    50.000    63.000    95.000  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income    800.000  2700.000  3500.000  4600.000  8000.000  2201      315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_quantile</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Quantile Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Quantile Value   N Effective_N         Weights</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Min    18 485         477 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      25%    40 485         477 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      50%    53 485         477 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      75%    64 485         477 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Max    95 485         477 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     Min     25%     50%     75%     Max    N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       18.000  40.000  53.000  64.000  95.000  509        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Quantile Value    N Effective_N         Weights</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Min    18 2015      1993.1 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      25%    38 2015      1993.1 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      50%    49 2015      1993.1 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      75%    62 2015      1993.1 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Max    95 2015      1993.1 sampling_weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     Min     25%     50%     75%     Max     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       18.000  38.000  49.000  62.000  95.000  2007        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Unweighted (for comparison)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_quantile</span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantile Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable Quantile Value    N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Min    18 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      25%    38 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      50%    50 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      75%    62 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      Max    95 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     Min     25%     50%     75%     Max     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       18.000  38.000  50.000  62.000  95.000  2500        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

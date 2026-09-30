@@ -2,7 +2,8 @@
 
 Creates a summary object that produces detailed output when printed,
 including the contingency table of observed frequencies and the test
-results table with method, exact p-value, and sample size.
+results table with method, exact p-value, sample size, and (for 2x2
+tables) the odds ratio with its 95\\
 
 ## Usage
 
@@ -54,18 +55,17 @@ summary(result)
 #> - Column variable: region
 #> 
 #> Contingency Table:
-#> ---------------------------------------- 
-#>         cc
-#> r        East West
+#>         region
+#> gender   East West
 #>   Male    238  956
 #>   Female  247 1059
-#> ---------------------------------------- 
 #> 
 #> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data   0.544 2500     
-#> ---------------------------------------------------- 
+#> ---------------------------------------------------------------------------
+#> Method                              p value        N     OR     95% CI (OR)
+#> ---------------------------------------------------------------------------
+#> Fisher's Exact Test for Count Data     .544     2500  1.067  [0.875, 1.302]
+#> ---------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, contingency_table = FALSE)
@@ -76,10 +76,11 @@ summary(result, contingency_table = FALSE)
 #> - Column variable: region
 #> 
 #> Test Results:
-#> ---------------------------------------------------- 
-#>                              Method p-value    N Sig 
-#>  Fisher's Exact Test for Count Data   0.544 2500     
-#> ---------------------------------------------------- 
+#> ---------------------------------------------------------------------------
+#> Method                              p value        N     OR     95% CI (OR)
+#> ---------------------------------------------------------------------------
+#> Fisher's Exact Test for Count Data     .544     2500  1.067  [0.875, 1.302]
+#> ---------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

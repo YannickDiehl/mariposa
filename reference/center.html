@@ -81,9 +81,10 @@ is a data frame.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights (unquoted column name or numeric
-vector). When provided, the weighted mean is subtracted instead of the
-unweighted mean.</p></dd>
+<dd><p>Optional survey weights. When provided, the weighted mean is
+subtracted instead of the unweighted mean. Give a column name (unquoted or
+as a string), an expression such as <code>sampling_weight * 2</code>, or a
+numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-suffix">suffix<a class="anchor" aria-label="anchor" href="#arg-suffix"></a></dt>
@@ -122,6 +123,16 @@ effects. This replaces sjmisc's separate <code>de_mean()</code> function.</p></l
 
 <p>When <code>weights</code> is provided, the weighted mean is used for centering.
 This accounts for survey design in the centering computation.</p>
+</div>
+
+<div class="section">
+<h3 id="missing-values">Missing Values<a class="anchor" aria-label="anchor" href="#missing-values"></a></h3>
+
+
+<p>The result is a plain numeric variable (value labels are dropped, the
+variable label is kept with " (centered)" appended). Missing values of
+imported data, including their SPSS missing types, become plain
+<code>NA</code>, as in an SPSS <code>COMPUTE</code>.</p>
 </div>
 
     </div>

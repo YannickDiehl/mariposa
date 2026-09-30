@@ -17,6 +17,8 @@ The function operates in two modes:
 
 ``` r
 var_label(data, ...)
+
+var_label(x) <- value
 ```
 
 ## Arguments
@@ -31,6 +33,17 @@ var_label(data, ...)
   returns labels for all variables. In SET mode: named pairs where the
   name is a variable and the value is the label string. Use `NULL` to
   remove a label.
+
+- x:
+
+  For the replacement form: a vector or a data frame.
+
+- value:
+
+  For the replacement form: a single character string (or `NULL` to
+  remove the label) for a vector; for a data frame a named list or named
+  character vector, names = columns (a `NULL` entry removes that label).
+  Columns not named keep their labels.
 
 ## Value
 
@@ -74,7 +87,7 @@ for value labels,
 [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
 for viewing all metadata,
 [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md)
-for preserving labels after dplyr operations
+for restoring labels lost by base-R operations
 
 Other labels:
 [`copy_labels()`](https://YannickDiehl.github.io/mariposa/reference/copy_labels.md),
@@ -143,4 +156,10 @@ data <- var_label(survey_data,
 
 # REMOVE: set to NULL
 data <- var_label(data, age = NULL)
+
+# Replacement form
+x <- c(1, 2, 3)
+var_label(x) <- "Score"
+d <- survey_data
+var_label(d) <- list(age = "Age of respondent", gender = "Gender identity")
 ```

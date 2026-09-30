@@ -29,11 +29,15 @@ w_var(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample variance.
+  Without weights, you get the simple sample variance. Give a column
+  name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -54,7 +58,10 @@ number of valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents. Always less than or equal to the actual sample size.
 
-- **N**: The actual number of observations used in the calculation.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 ### When to Use This
 
@@ -128,45 +135,52 @@ survey_data %>% w_var(age, weights = sampling_weight)
 #> 
 #> Weighted Variance Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_var Effective_N
-#>       age      291.857      2468.8
-#> 
+#>   ---------------------------------
+#>   Variable  Variance     N  Missing
+#>   ---------------------------------
+#>   age        291.857  2516        0
+#>   ---------------------------------
 
 # Multiple variables
 survey_data %>% w_var(age, income, weights = sampling_weight)
 #> 
 #> Weighted Variance Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_var Effective_N
-#>       age      291.857      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_var Effective_N
-#>    income      2027678      2158.9
-#> 
+#>   ------------------------------------
+#>   Variable     Variance     N  Missing
+#>   ------------------------------------
+#>   age           291.857  2516        0
+#>   income    2027677.966  2201      315
+#>   ------------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_var(age, weights = sampling_weight)
 #> 
 #> Weighted Variance Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_var Effective_N
-#>       age      309.601         477
+#>   --------------------------------
+#>   Variable  Variance    N  Missing
+#>   --------------------------------
+#>   age        309.601  509        0
+#>   --------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_var Effective_N
-#>       age       286.52      1993.1
-#> 
+#>   ---------------------------------
+#>   Variable  Variance     N  Missing
+#>   ---------------------------------
+#>   age        286.520  2007        0
+#>   ---------------------------------
 
 # In summarise context
 survey_data %>% summarise(var_age = w_var(age, weights = sampling_weight))
@@ -181,8 +195,9 @@ survey_data %>% w_var(age)
 #> Variance Statistics
 #> -------------------
 #> 
-#> --- age ---
-#>  Variable     var    N
-#>       age 288.185 2500
-#> 
+#>   ---------------------------------
+#>   Variable  Variance     N  Missing
+#>   ---------------------------------
+#>   age        288.185  2500        0
+#>   ---------------------------------
 ```

@@ -32,7 +32,8 @@ Both functions support two interface styles:
 
 linear_regression(survey_data, life_satisfaction ~ age)
 #> Linear Regression: life_satisfaction ~ age
-#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421
+#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158, N = 2421
+#> Use summary() for detailed output.
 ```
 
 ### Detailed Output
@@ -49,44 +50,44 @@ summary(result)
 #> - N: 2421
 #> 
 #>   Descriptive Statistics
-#>   ----------------------------------------------------------------------
-#>   Variable                                    Mean     Std.Dev.      N
-#>   ----------------------------------------------------------------------
-#>   life_satisfaction                          3.628        1.153   2421
-#>   age                                       50.583       17.000   2421
-#>   ----------------------------------------------------------------------
+#>   -----------------------------------------------
+#>   Variable             Mean  Std. Deviation     N
+#>   -----------------------------------------------
+#>   life_satisfaction   3.628           1.153  2421
+#>   age                50.583          17.000  2421
+#>   -----------------------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.029
-#>   R Square                       0.001
-#>   Adjusted R Square              0.000
-#>   Std. Error of Estimate         1.153
-#>   ------------------------------------------------------------
+#>   ----------------------------------
+#>   R                            0.029
+#>   R Square                     0.001
+#>   Adjusted R Square            0.000
+#>   Std. Error of the Estimate   1.153
+#>   ----------------------------------
 #> 
 #>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression                2.653     1            2.653      1.996    0.158 
-#>   Residual               3214.775  2419            1.329                     
-#>   Total                  3217.428  2420                                      
-#>   ------------------------------------------------------------------------------
+#>   -------------------------------------------------------------
+#>   Source      Sum of Squares    df  Mean Square      F  Sig.   
+#>   -------------------------------------------------------------
+#>   Regression           2.653     1        2.653  1.996  .158   
+#>   Residual          3214.775  2419        1.329                
+#>   Total             3217.428  2420                             
+#>   -------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   --------------------------------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
-#>   --------------------------------------------------------------------------------------------------------------
-#>   (Intercept)                    3.727      0.074              50.663    0.000      3.583      3.871 ***
-#>   age                           -0.002      0.001   -0.029     -1.413    0.158     -0.005      0.001 
-#>   --------------------------------------------------------------------------------------------------------------
+#>   ---------------------------------------------------------------------------------------
+#>   Term              B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     
+#>   ---------------------------------------------------------------------------------------
+#>   (Intercept)   3.727       0.074          50.663  <.001         3.583         3.871  ***
+#>   age          -0.002       0.001  -0.029  -1.413   .158        -0.005         0.001     
+#>   ---------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
-#>   --------------------------------------------------
-#>   Term                       Tolerance        VIF
-#>   --------------------------------------------------
-#>   age                            1.000      1.000
-#>   --------------------------------------------------
+#>   ----------------------
+#>   Term  Tolerance    VIF
+#>   ----------------------
+#>   age       1.000  1.000
+#>   ----------------------
 #>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
@@ -117,6 +118,7 @@ linear_regression(survey_data,
                   life_satisfaction ~ age + income + trust_government)
 #> Linear Regression: life_satisfaction ~ age + income + trust_government
 #>   R2 = 0.198, adj.R2 = 0.197, F(3, 1991) = 163.89, p < 0.001 ***, N = 1995
+#> Use summary() for detailed output.
 ```
 
 Compare Beta values to identify the strongest predictor.
@@ -130,6 +132,7 @@ linear_regression(survey_data,
                   predictors = c(age, income, trust_government))
 #> Linear Regression: life_satisfaction ~ age + income + trust_government
 #>   R2 = 0.198, adj.R2 = 0.197, F(3, 1991) = 163.89, p < 0.001 ***, N = 1995
+#> Use summary() for detailed output.
 ```
 
 ### With Survey Weights
@@ -141,6 +144,7 @@ linear_regression(survey_data,
                   weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age + income [Weighted]
 #>   R2 = 0.203, adj.R2 = 0.202, F(2, 2127) = 270.42, p < 0.001 ***, N = 2130
+#> Use summary() for detailed output.
 ```
 
 Weights are treated as frequency weights, matching SPSS `WEIGHT BY`
@@ -156,8 +160,11 @@ survey_data %>%
   group_by(region) %>%
   linear_regression(life_satisfaction ~ age + income)
 #> Linear Regression: life_satisfaction ~ age + income [Grouped: region]
-#>   region = East: R2 = 0.203, adj.R2 = 0.199, F(2, 407) = 51.95, p < 0.001 ***, N = 410
-#>   region = West: R2 = 0.201, adj.R2 = 0.200, F(2, 1702) = 214.58, p < 0.001 ***, N = 1705
+#> [region = East]
+#>   R2 = 0.203, adj.R2 = 0.199, F(2, 407) = 51.95, p < 0.001 ***, N = 410
+#> [region = West]
+#>   R2 = 0.201, adj.R2 = 0.200, F(2, 1702) = 214.58, p < 0.001 ***, N = 1705
+#> Use summary() for detailed output.
 ```
 
 ### Interpreting R-squared
@@ -186,6 +193,7 @@ linear_regression(survey_data_z,
                   weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age_z + income_z + trust_government [Weighted]
 #>   R2 = 0.200, adj.R2 = 0.199, F(3, 2005) = 167.49, p < 0.001 ***, N = 2009
+#> Use summary() for detailed output.
 ```
 
 ## Logistic Regression
@@ -207,8 +215,9 @@ survey_data <- survey_data %>%
 ``` r
 
 logistic_regression(survey_data, high_satisfaction ~ age + income)
-#> Logistic Regression: high_satisfaction ~ age + income
+#> Logistic Regression: high_satisfaction ~ age + income [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p < 0.001 ***, Accuracy = 68.4%, N = 2115
+#> Use summary() for detailed output.
 ```
 
 ### Detailed Output
@@ -224,47 +233,53 @@ summary(log_result)
 #> - Method: ENTER
 #> - N: 2115
 #> 
+#>   Dependent Variable Encoding
+#>   ------------------------------
+#>   Original Value  Internal Value
+#>   ------------------------------
+#>   0                            0
+#>   1                            1
+#>   ------------------------------
+#> 
 #>   Omnibus Tests of Model Coefficients
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>   Model                     357.432     2      0.000 ***
-#>   --------------------------------------------------
+#>   ---------------------------------
+#>          Chi-square  df   Sig.     
+#>   ---------------------------------
+#>   Model     357.432   2  <.001  ***
+#>   ---------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   -2 Log Likelihood                  2520.010
-#>   Cox & Snell R Square                  0.155
-#>   Nagelkerke R Square                   0.209
-#>   McFadden R Square                     0.124
-#>   ------------------------------------------------------------
+#>   -------------------------------
+#>   -2 Log Likelihood      2520.010
+#>   Cox & Snell R Square      0.155
+#>   Nagelkerke R Square       0.209
+#>   McFadden R Square         0.124
+#>   -------------------------------
 #> 
 #>   Hosmer and Lemeshow Test
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>                             150.764     8      0.000
-#>   --------------------------------------------------
+#>   ------------------------
+#>      Chi-square  df   Sig.
+#>   ------------------------
+#>         150.764   8  <.001
+#>   ------------------------
 #> 
-#>   Classification Table (cutoff = 0.50)
-#>   -----------------------------------------------------------------
-#>                                   Predicted                     
-#>   Observed                      0          1       % Correct
-#>   -----------------------------------------------------------------
-#>   0                           508        380           57.2
-#>   1                           289        938           76.4
-#>   -----------------------------------------------------------------
-#>   Overall Percentage                                   68.4
-#>   -----------------------------------------------------------------
+#>   Classification Table (cutoff = 0.50; rows: observed, columns: predicted)
+#>   ---------------------------------------
+#>   Observed              0    1  % Correct
+#>   ---------------------------------------
+#>   0                   508  380       57.2
+#>   1                   289  938       76.4
+#>   Overall Percentage                 68.4
+#>   ---------------------------------------
 #> 
 #>   Variables in the Equation
-#>   -----------------------------------------------------------------------------------------------
-#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
-#>   -----------------------------------------------------------------------------------------------
-#>   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***
-#>   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 
-#>   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***
-#>   -----------------------------------------------------------------------------------------------
+#>   ------------------------------------------------------------------------------------------
+#>   Term              B      S.E.     Wald  df   Sig.  Exp(B)  95% CI Lower  95% CI Upper     
+#>   ------------------------------------------------------------------------------------------
+#>   (Intercept)  -2.252     0.212  112.868   1  <.001   0.105                              ***
+#>   age           0.001     0.003    0.174   1   .677   1.001         0.996         1.007     
+#>   income        0.001  4.26e-05  268.118   1  <.001  1.0007        1.0006        1.0008  ***
+#>   ------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
@@ -294,8 +309,9 @@ Exp(B) is the odds ratio — the key statistic in logistic regression:
 
 logistic_regression(survey_data,
                     high_satisfaction ~ age + income + trust_government + education)
-#> Logistic Regression: high_satisfaction ~ age + income + trust_government + education
+#> Logistic Regression: high_satisfaction ~ age + income + trust_government + education [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.212, chi2(6) = 341.28, p < 0.001 ***, Accuracy = 68.1%, N = 1995
+#> Use summary() for detailed output.
 ```
 
 ### SPSS-Style Interface
@@ -305,8 +321,9 @@ logistic_regression(survey_data,
 logistic_regression(survey_data,
                     dependent = high_satisfaction,
                     predictors = c(age, income, trust_government))
-#> Logistic Regression: high_satisfaction ~ age + income + trust_government
+#> Logistic Regression: high_satisfaction ~ age + income + trust_government [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.207, chi2(3) = 333.76, p < 0.001 ***, Accuracy = 68.4%, N = 1995
+#> Use summary() for detailed output.
 ```
 
 ### With Survey Weights
@@ -316,8 +333,9 @@ logistic_regression(survey_data,
 logistic_regression(survey_data,
                     high_satisfaction ~ age + income,
                     weights = sampling_weight)
-#> Logistic Regression: high_satisfaction ~ age + income [Weighted]
+#> Logistic Regression: high_satisfaction ~ age + income [P(high_satisfaction = 1)] [Weighted]
 #>   Nagelkerke R2 = 0.211, chi2(2) = 362.91, p < 0.001 ***, Accuracy = 68.3%, N = 2130
+#> Use summary() for detailed output.
 ```
 
 ### Grouped Analysis
@@ -327,9 +345,12 @@ logistic_regression(survey_data,
 survey_data %>%
   group_by(region) %>%
   logistic_regression(high_satisfaction ~ age + income)
-#> Logistic Regression: high_satisfaction ~ age + income [Grouped: region]
-#>   region = East: Nagelkerke R2 = 0.178, chi2(2) = 57.88, p < 0.001 ***, Accuracy = 66.8%, N = 410
-#>   region = West: Nagelkerke R2 = 0.218, chi2(2) = 301.11, p < 0.001 ***, Accuracy = 68.8%, N = 1705
+#> Logistic Regression: high_satisfaction ~ age + income [P(high_satisfaction = 1)] [Grouped: region]
+#> [region = East]
+#>   Nagelkerke R2 = 0.178, chi2(2) = 57.88, p < 0.001 ***, Accuracy = 66.8%, N = 410
+#> [region = West]
+#>   Nagelkerke R2 = 0.218, chi2(2) = 301.11, p < 0.001 ***, Accuracy = 68.8%, N = 1705
+#> Use summary() for detailed output.
 ```
 
 ### Interpreting Model Fit
@@ -364,11 +385,11 @@ model <- survey_data %>%
 
 marginal_effects(model)
 #> Average Marginal Effects: high_satisfaction ~ age + income + education
-#>   age: AME = 0.000, p = 0.730 
-#>   income: AME = 0.000, p < 0.001 ***
+#>   age: AME = 1.99e-04, p = 0.730
+#>   income: AME = 1.43e-04, p < 0.001 ***
 #>   education: Intermediate Secondary vs. Basic Secondary: AME = 0.059, p = 0.023 *
-#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600 
-#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715 
+#>   education: Academic Secondary vs. Basic Secondary: AME = 0.015, p = 0.600
+#>   education: University vs. Basic Secondary: AME = -0.014, p = 0.715
 #> AME = average change in predicted probability. Use summary() for detailed output.
 summary(marginal_effects(model))
 #> 
@@ -379,15 +400,15 @@ summary(marginal_effects(model))
 #> - Std. errors: Delta method
 #> - N: 2115
 #> 
-#>   ------------------------------------------------------------------------------------------------------------ 
-#>   Term                                                      AME     SE       z      p  CI Lower  CI Upper  sig 
-#>   ------------------------------------------------------------------------------------------------------------ 
-#>   age                                                     0.000  0.001   0.344   .730    -0.001     0.001      
-#>   income                                                  0.000  0.000  16.833  <.001     0.000     0.000  *** 
-#>   education: Intermediate Secondary vs. Basic Secondary   0.059  0.026   2.268   .023     0.008     0.110    * 
-#>   education: Academic Secondary vs. Basic Secondary       0.015  0.029   0.525   .600    -0.041     0.071      
-#>   education: University vs. Basic Secondary              -0.014  0.038  -0.365   .715    -0.088     0.061      
-#>   ------------------------------------------------------------------------------------------------------------ 
+#>   -------------------------------------------------------------------------------------------------------------------------
+#>   Term                                                        AME        SE       z      p  95% CI Lower  95% CI Upper     
+#>   -------------------------------------------------------------------------------------------------------------------------
+#>   age                                                    1.99e-04     0.001   0.344   .730        -0.001         0.001     
+#>   income                                                 1.43e-04  8.48e-06  16.833  <.001      1.26e-04      1.59e-04  ***
+#>   education: Intermediate Secondary vs. Basic Secondary     0.059     0.026   2.268   .023         0.008         0.110    *
+#>   education: Academic Secondary vs. Basic Secondary         0.015     0.029   0.525   .600        -0.041         0.071     
+#>   education: University vs. Basic Secondary                -0.014     0.038  -0.365   .715        -0.088         0.061     
+#>   -------------------------------------------------------------------------------------------------------------------------
 #> 
 #> Factor rows show the average discrete change vs. the reference level.
 #> 
@@ -406,13 +427,14 @@ sentence your readers actually need.
 survey_data %>%
   pearson_cor(life_satisfaction, age, income, trust_government)
 #> Pearson Correlation: 4 variables
-#>   life_satisfaction x age:       r = -0.029, p = 0.158  
-#>   life_satisfaction x income:    r = 0.448, p < 0.001 *** 
-#>   life_satisfaction x trust_government: r = 0.006, p = 0.761  
-#>   age x income:                  r = -0.007, p = 0.761  
-#>   age x trust_government:        r = 0.002, p = 0.904  
-#>   income x trust_government:     r = 0.000, p = 0.991  
-#>   1/6 pairs significant (p < .05), N = 2421
+#>   life_satisfaction x age:              r = -0.029, p = 0.158
+#>   life_satisfaction x income:           r = 0.448, p < 0.001 ***
+#>   life_satisfaction x trust_government: r = 0.006, p = 0.761
+#>   age x income:                         r = -0.007, p = 0.761
+#>   age x trust_government:               r = 0.002, p = 0.904
+#>   income x trust_government:            r = 0.000, p = 0.991
+#>   1/6 pairs significant (p < .05), N = 2061-2421
+#> Use summary() for detailed output.
 
 # 2. Run linear regression
 lm_result <- linear_regression(survey_data,
@@ -421,6 +443,7 @@ lm_result <- linear_regression(survey_data,
 lm_result
 #> Linear Regression: life_satisfaction ~ age + income + trust_government [Weighted]
 #>   R2 = 0.200, adj.R2 = 0.199, F(3, 2005) = 167.49, p < 0.001 ***, N = 2009
+#> Use summary() for detailed output.
 summary(lm_result)
 #> 
 #> Weighted Linear Regression Results
@@ -431,50 +454,50 @@ summary(lm_result)
 #> - Weights: sampling_weight
 #> 
 #>   Descriptive Statistics
-#>   ----------------------------------------------------------------------
-#>   Variable                                    Mean     Std.Dev.      N
-#>   ----------------------------------------------------------------------
-#>   life_satisfaction                          3.647        1.147   2009
-#>   age                                       50.923       17.121   2009
-#>   income                                  3752.258     1424.703   2009
-#>   trust_government                           2.632        1.157   2009
-#>   ----------------------------------------------------------------------
+#>   -------------------------------------------------
+#>   Variable               Mean  Std. Deviation     N
+#>   -------------------------------------------------
+#>   life_satisfaction     3.647           1.147  2009
+#>   age                  50.923          17.121  2009
+#>   income             3752.258        1424.703  2009
+#>   trust_government      2.632           1.157  2009
+#>   -------------------------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.448
-#>   R Square                       0.200
-#>   Adjusted R Square              0.199
-#>   Std. Error of Estimate         1.026
-#>   ------------------------------------------------------------
+#>   ----------------------------------
+#>   R                            0.448
+#>   R Square                     0.200
+#>   Adjusted R Square            0.199
+#>   Std. Error of the Estimate   1.026
+#>   ----------------------------------
 #> 
 #>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression              529.253     3          176.418    167.491    0.000 ***
-#>   Residual               2111.871  2005            1.053                     
-#>   Total                  2641.124  2008                                      
-#>   ------------------------------------------------------------------------------
+#>   ------------------------------------------------------------------
+#>   Source      Sum of Squares    df  Mean Square        F   Sig.     
+#>   ------------------------------------------------------------------
+#>   Regression         529.253     3      176.418  167.491  <.001  ***
+#>   Residual          2111.871  2005        1.053                     
+#>   Total             2641.124  2008                                  
+#>   ------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   --------------------------------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
-#>   --------------------------------------------------------------------------------------------------------------
-#>   (Intercept)                    2.320      0.108              21.559    0.000      2.109      2.531 ***
-#>   age                           -0.001      0.001   -0.009     -0.441    0.660     -0.003      0.002 
-#>   income                         0.000      0.000    0.448     22.409    0.000      0.000      0.000 ***
-#>   trust_government               0.002      0.020    0.002      0.113    0.910     -0.037      0.041 
-#>   --------------------------------------------------------------------------------------------------------------
+#>   ----------------------------------------------------------------------------------------------
+#>   Term                     B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     
+#>   ----------------------------------------------------------------------------------------------
+#>   (Intercept)          2.320       0.108          21.559  <.001         2.109         2.531  ***
+#>   age                 -0.001       0.001  -0.009  -0.441   .660        -0.003         0.002     
+#>   income            3.60e-04    1.61e-05   0.448  22.409  <.001      3.29e-04      3.92e-04  ***
+#>   trust_government     0.002       0.020   0.002   0.113   .910        -0.037         0.041     
+#>   ----------------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
-#>   --------------------------------------------------
-#>   Term                       Tolerance        VIF
-#>   --------------------------------------------------
-#>   age                            1.000      1.000
-#>   income                         1.000      1.000
-#>   trust_government               1.000      1.000
-#>   --------------------------------------------------
+#>   ----------------------------------
+#>   Term              Tolerance    VIF
+#>   ----------------------------------
+#>   age                   1.000  1.000
+#>   income                1.000  1.000
+#>   trust_government      1.000  1.000
+#>   ----------------------------------
 #>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
@@ -488,8 +511,9 @@ log_result <- logistic_regression(survey_data,
                                   high_satisfaction ~ age + income + trust_government,
                                   weights = sampling_weight)
 log_result
-#> Logistic Regression: high_satisfaction ~ age + income + trust_government [Weighted]
+#> Logistic Regression: high_satisfaction ~ age + income + trust_government [P(high_satisfaction = 1)] [Weighted]
 #>   Nagelkerke R2 = 0.210, chi2(3) = 340.22, p < 0.001 ***, Accuracy = 68.5%, N = 2009
+#> Use summary() for detailed output.
 summary(log_result)
 #> 
 #> Weighted Logistic Regression Results
@@ -499,47 +523,53 @@ summary(log_result)
 #> - N: 2009
 #> - Weights: sampling_weight
 #> 
+#>   Dependent Variable Encoding
+#>   ------------------------------
+#>   Original Value  Internal Value
+#>   ------------------------------
+#>   0                            0
+#>   1                            1
+#>   ------------------------------
+#> 
 #>   Omnibus Tests of Model Coefficients
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>   Model                     340.224     3      0.000 ***
-#>   --------------------------------------------------
+#>   ---------------------------------
+#>          Chi-square  df   Sig.     
+#>   ---------------------------------
+#>   Model     340.224   3  <.001  ***
+#>   ---------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   -2 Log Likelihood                  2392.588
-#>   Cox & Snell R Square                  0.156
-#>   Nagelkerke R Square                   0.210
-#>   McFadden R Square                     0.124
-#>   ------------------------------------------------------------
+#>   -------------------------------
+#>   -2 Log Likelihood      2392.588
+#>   Cox & Snell R Square      0.156
+#>   Nagelkerke R Square       0.210
+#>   McFadden R Square         0.124
+#>   -------------------------------
 #> 
 #>   Hosmer and Lemeshow Test
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>                             129.020     8      0.000
-#>   --------------------------------------------------
+#>   ------------------------
+#>      Chi-square  df   Sig.
+#>   ------------------------
+#>         129.020   8  <.001
+#>   ------------------------
 #> 
-#>   Classification Table (cutoff = 0.50)
-#>   -----------------------------------------------------------------
-#>                                   Predicted                     
-#>   Observed                      0          1       % Correct
-#>   -----------------------------------------------------------------
-#>   0                           481        362           57.1
-#>   1                           271        895           76.7
-#>   -----------------------------------------------------------------
-#>   Overall Percentage                                   68.5
-#>   -----------------------------------------------------------------
+#>   Classification Table (cutoff = 0.50; rows: observed, columns: predicted)
+#>   ---------------------------------------
+#>   Observed              0    1  % Correct
+#>   ---------------------------------------
+#>   0                   481  362       57.1
+#>   1                   271  895       76.7
+#>   Overall Percentage                 68.5
+#>   ---------------------------------------
 #> 
 #>   Variables in the Equation
 #>   -----------------------------------------------------------------------------------------------
-#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
+#>   Term                   B      S.E.     Wald  df   Sig.  Exp(B)  95% CI Lower  95% CI Upper     
 #>   -----------------------------------------------------------------------------------------------
-#>   (Intercept)             -2.289     0.245    87.436    1    0.000      0.101                     ***
-#>   age                      0.002     0.003     0.524    1    0.469      1.002     0.996     1.008 
-#>   income                   0.001     0.000   254.712    1    0.000      1.001     1.001     1.001 ***
-#>   trust_government        -0.007     0.043     0.029    1    0.864      0.993     0.913     1.079 
+#>   (Intercept)       -2.289     0.245   87.448   1  <.001   0.101                              ***
+#>   age                0.002     0.003    0.524   1   .469   1.002         0.996         1.008     
+#>   income             0.001  4.39e-05  254.777   1  <.001  1.0007        1.0006        1.0008  ***
+#>   trust_government  -0.007     0.043    0.029   1   .864   0.993         0.913         1.079     
 #>   -----------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05

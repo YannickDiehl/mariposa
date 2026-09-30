@@ -1,16 +1,14 @@
 # Print normality test results (compact)
 
 Compact print method for objects of class `"normality_test"`. Shows one
-line per variable with both test results. For grouped analyses, only the
-dimensions are shown — use
-[`summary()`](https://rdrr.io/r/base/summary.html) for the per-group
-tables.
+line per variable with both test results; grouped analyses show these
+lines under a `[group]` line for every group.
 
 ## Usage
 
 ``` r
 # S3 method for class 'normality_test'
-print(x, ...)
+print(x, digits = 3, ...)
 ```
 
 ## Arguments
@@ -19,6 +17,10 @@ print(x, ...)
 
   An object of class `"normality_test"` returned by
   [`normality_test`](https://YannickDiehl.github.io/mariposa/reference/normality_test.md).
+
+- digits:
+
+  Number of decimal places. (Default: 3)
 
 - ...:
 
@@ -44,12 +46,12 @@ summary(result)     # full detailed output
 #> - Variables: age, income
 #> 
 #> Tests of Normality
-#>   ------------------------------------------ 
-#>   Variable     KS    df   KS p      W    W p 
-#>   ------------------------------------------ 
-#>   age       0.028  2500  <.001  0.990  <.001 
-#>   income    0.079  2186  <.001  0.963  <.001 
-#>   ------------------------------------------ 
+#>   ------------------------------------------
+#>   Variable     KS    df   KS p      W    W p
+#>   ------------------------------------------
+#>   age       0.028  2500  <.001  0.990  <.001
+#>   income    0.079  2186  <.001  0.963  <.001
+#>   ------------------------------------------
 #> 
 #> KS = Kolmogorov-Smirnov statistic with Lilliefors significance correction.
 #> W = Shapiro-Wilk statistic (computed for 3 <= n <= 5000, as in SPSS).

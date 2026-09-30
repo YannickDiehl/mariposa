@@ -86,11 +86,14 @@ survey_data %>%
 #> 
 #> Weighted Descriptive Statistics
 #> -------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>                age   50.514     50   17.084    77   25    0.159      2468.8
-#>             income 3743.099   3500 1423.966  7200 1900    0.725      2158.9
-#>  life_satisfaction    3.625      4    1.152     4    2   -0.499      2390.9
-#> ----------------------------------------
+#> 
+#>   --------------------------------------------------------------------------------------------
+#>   Variable               Mean    Median        SD     Range       IQR  Skewness     N  Missing
+#>   --------------------------------------------------------------------------------------------
+#>   age                  50.514    50.000    17.084    77.000    25.000     0.159  2516        0
+#>   income             3743.099  3500.000  1423.966  7200.000  1900.000     0.725  2201      315
+#>   life_satisfaction     3.625     4.000     1.152     4.000     2.000    -0.499  2437       79
+#>   --------------------------------------------------------------------------------------------
 ```
 
 ``` r
@@ -103,18 +106,18 @@ survey_data %>%
 #> -----------------------------------
 #> 
 #> education (Highest educational attainment)
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> # total N=2516 valid N=2516
 #> 
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |        Basic Secondary |        Basic Secondary |    848 |  33.71 |  33.71 |  33.71 |
-#> | Intermediate Secondary | Intermediate Secondary |    641 |  25.47 |  25.47 |  59.18 |
-#> |     Academic Secondary |     Academic Secondary |    642 |  25.51 |  25.51 |  84.69 |
-#> |             University |             University |    385 |  15.31 |  15.31 | 100.00 |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Total |                        |   2516 | 100.00 | 100.00 |        |
-#> +------------------------+------------------------+--------+--------+--------+--------+
+#> +------------------------+------+--------+---------+--------+
+#> | Value                  |    N |  Raw % | Valid % | Cum. % |
+#> +------------------------+------+--------+---------+--------+
+#> | Basic Secondary        |  848 |  33.71 |   33.71 |  33.71 |
+#> | Intermediate Secondary |  641 |  25.47 |   25.47 |  59.18 |
+#> | Academic Secondary     |  642 |  25.51 |   25.51 |  84.69 |
+#> | University             |  385 |  15.31 |   15.31 | 100.00 |
+#> +------------------------+------+--------+---------+--------+
+#> | Total                  | 2516 | 100.00 |  100.00 |        |
+#> +------------------------+------+--------+---------+--------+
 ```
 
 ### 2. Transform Variables
@@ -140,7 +143,8 @@ survey_data <- survey_data %>%
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436
+#> Use summary() for detailed output.
 ```
 
 ``` r
@@ -151,6 +155,7 @@ result <- survey_data %>%
 result
 #> One-Way ANOVA: life_satisfaction by education [Weighted]
 #>   F(3, 2432) = 65.333, p < 0.001 ***, eta2 = 0.075 (medium), N = 2437
+#> Use summary() for detailed output.
 ```
 
 Every result has a detailed view with
@@ -174,22 +179,27 @@ summary(result, descriptives = FALSE)
 #> 
 #> 
 #> Weighted ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     241.130    3      80.377 65.333   <.001 ***
-#>   Within Groups    2992.019 2432        1.23                   
-#>           Total    3233.149 2435                               
-#> -------------------------------------------------------------------------------- 
+#>   ---------------------------------------------------------------------
+#>                   Sum of Squares    df  Mean Square       F    Sig     
+#>   ---------------------------------------------------------------------
+#>   Between Groups         241.130     3       80.377  65.333  <.001  ***
+#>   Within Groups         2992.019  2432        1.230                    
+#>   Total                 3233.149  2435                                 
+#>   ---------------------------------------------------------------------
 #> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    62.636   3 1216   <.001 ***
+#> Robust Tests of Equality of Means:
+#>   -------------------------------------------
+#>          Statistic  df1       df2    Sig     
+#>   -------------------------------------------
+#>   Welch     62.636    3  1216.114  <.001  ***
+#>   -------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.075           0.073         0.073      medium
+#>   -------------------------------------------------------------------------
+#>   Variable           Eta Squared  Epsilon Squared  Omega Squared  Magnitude
+#>   -------------------------------------------------------------------------
+#>   life_satisfaction        0.075            0.073          0.073     medium
+#>   -------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
@@ -221,10 +231,11 @@ tukey_test(result)
 survey_data %>%
   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
 #> Pearson Correlation: 3 variables [Weighted]
-#>   age x income:                  r = -0.005, p = 0.828  
-#>   age x life_satisfaction:       r = -0.029, p = 0.150  
-#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 2201
+#>   age x income:               r = -0.005, p = 0.828
+#>   age x life_satisfaction:    r = -0.029, p = 0.150
+#>   income x life_satisfaction: r = 0.450, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 2130-2437
+#> Use summary() for detailed output.
 ```
 
 ### 6. Build Models
@@ -236,6 +247,7 @@ survey_data %>%
                     weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age + income + m_trust [Weighted]
 #>   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.02, p < 0.001 ***, N = 2113
+#> Use summary() for detailed output.
 ```
 
 ## Compact vs. Detailed Output
@@ -268,7 +280,8 @@ result <- survey_data %>%
 # Compact
 result
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436
+#> Use summary() for detailed output.
 
 # Detailed
 summary(result)
@@ -282,24 +295,30 @@ summary(result)
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: mean = 3.598, n = 1149.0
-#>   Female: mean = 3.648, n = 1287.0
+#> Weighted Group Statistics:
+#>   ----------------------------------------------------
+#>   gender     N   Mean  Std. Deviation  Std. Error Mean
+#>   ----------------------------------------------------
+#>   Male    1149  3.598           1.165            0.034
+#>   Female  1287  3.648           1.141            0.032
+#>   ----------------------------------------------------
 #> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    
-#> -------------------------------------------------------------------------------- 
+#> Weighted Independent Samples Test:
+#>   --------------------------------------------------------------------------------------------------------
+#>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   
+#>   --------------------------------------------------------------------------------------------------------
+#>   Equal variances assumed      -1.070      2435  .285      -0.050     0.047        -0.142         0.042   
+#>   Equal variances not assumed  -1.069  2391.291  .285      -0.050     0.047        -0.142         0.042   
+#>   --------------------------------------------------------------------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction   -0.043   -0.043      -0.043  negligible
-#> 
+#>   -----------------------------------------------------------------
+#>   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude
+#>   -----------------------------------------------------------------
+#>   life_satisfaction     -0.043     -0.043        -0.043  negligible
+#>   -----------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
@@ -323,19 +342,23 @@ summary(result, effect_sizes = FALSE)
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: mean = 3.598, n = 1149.0
-#>   Female: mean = 3.648, n = 1287.0
+#> Weighted Group Statistics:
+#>   ----------------------------------------------------
+#>   gender     N   Mean  Std. Deviation  Std. Error Mean
+#>   ----------------------------------------------------
+#>   Male    1149  3.598           1.165            0.034
+#>   Female  1287  3.648           1.141            0.032
+#>   ----------------------------------------------------
 #> 
-#> Weighted t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.070 2434.609   0.285     -0.05 [-0.142, 0.042]    
-#>  Unequal variances -1.069 2391.291   0.285     -0.05 [-0.142, 0.042]    
-#> -------------------------------------------------------------------------------- 
-#> 
+#> Weighted Independent Samples Test:
+#>   --------------------------------------------------------------------------------------------------------
+#>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   
+#>   --------------------------------------------------------------------------------------------------------
+#>   Equal variances assumed      -1.070      2435  .285      -0.050     0.047        -0.142         0.042   
+#>   Equal variances not assumed  -1.069  2391.291  .285      -0.050     0.047        -0.142         0.042   
+#>   --------------------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
@@ -357,19 +380,23 @@ survey_data %>%
 #> 
 #> Group: region = East
 #> --------------------
-#> ----------------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3760.687   3600 1388.321  7200 1700    0.721       421.9
-#>  life_satisfaction    3.623      4    1.203     4    2   -0.558       457.4
-#> ----------------------------------------
+#> 
+#>   -------------------------------------------------------------------------------------------
+#>   Variable               Mean    Median        SD     Range       IQR  Skewness    N  Missing
+#>   -------------------------------------------------------------------------------------------
+#>   income             3760.687  3600.000  1388.321  7200.000  1700.000     0.721  449       60
+#>   life_satisfaction     3.623     4.000     1.203     4.000     2.000    -0.558  488       21
+#>   -------------------------------------------------------------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
-#> ----------------------------------------
-#>           Variable     Mean Median       SD Range  IQR Skewness Effective_N
-#>             income 3738.586   3500 1433.325  7200 1900    0.727      1738.1
-#>  life_satisfaction    3.625      4    1.139     4    2   -0.481      1934.8
-#> ----------------------------------------
+#> 
+#>   --------------------------------------------------------------------------------------------
+#>   Variable               Mean    Median        SD     Range       IQR  Skewness     N  Missing
+#>   --------------------------------------------------------------------------------------------
+#>   income             3738.586  3500.000  1433.325  7200.000  1900.000     0.727  1751      256
+#>   life_satisfaction     3.625     4.000     1.139     4.000     2.000    -0.481  1949       58
+#>   --------------------------------------------------------------------------------------------
 ```
 
 ``` r
@@ -377,12 +404,13 @@ survey_data %>%
 survey_data %>%
   group_by(region) %>%
   t_test(income, group = gender, weights = sampling_weight)
-#> [region = 1]
+#> [region = East]
 #> t-Test: income by gender [Weighted]
-#>   t(431.2) = 1.674, p = 0.095 , g = 0.158 (negligible), N = 450
-#> [region = 2]
+#>   t(431.2) = 1.674, p = 0.095, g = 0.158 (negligible), N = 450
+#> [region = West]
 #> t-Test: income by gender [Weighted]
-#>   t(1740.2) = 0.009, p = 0.993 , g = 0.000 (negligible), N = 1751
+#>   t(1740.2) = 0.009, p = 0.993, g = 0.000 (negligible), N = 1751
+#> Use summary() for detailed output.
 ```
 
 ## Quick Reference

@@ -32,7 +32,9 @@ w_quantile(
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample quantiles.
+  Without weights, you get the simple sample quantiles. Give a column
+  name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - probs:
 
@@ -43,7 +45,9 @@ w_quantile(
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -62,7 +66,10 @@ the number of valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 Common percentiles and their meaning:
 
@@ -145,79 +152,75 @@ survey_data %>% w_quantile(age, weights = sampling_weight)
 #> 
 #> Weighted Quantile Statistics
 #> ----------------------------
-#>  Variable Quantile Value    N Effective_N         Weights
-#>       age      Min    18 2500      2468.8 sampling_weight
-#>       age      25%    38 2500      2468.8 sampling_weight
-#>       age      50%    50 2500      2468.8 sampling_weight
-#>       age      75%    63 2500      2468.8 sampling_weight
-#>       age      Max    95 2500      2468.8 sampling_weight
-#> ----------------------------------------
+#> Weights: sampling_weight
+#> 
+#>   ---------------------------------------------------------------
+#>   Variable     Min     25%     50%     75%     Max     N  Missing
+#>   ---------------------------------------------------------------
+#>   age       18.000  38.000  50.000  63.000  95.000  2516        0
+#>   ---------------------------------------------------------------
 
 # Custom quantiles
 survey_data %>% w_quantile(income, weights = sampling_weight, probs = c(0.1, 0.5, 0.9))
 #> 
 #> Weighted Quantile Statistics
 #> ----------------------------
-#>  Variable Quantile Value    N Effective_N         Weights
-#>    income      10%  2100 2186      2158.9 sampling_weight
-#>    income      50%  3500 2186      2158.9 sampling_weight
-#>    income      90%  5700 2186      2158.9 sampling_weight
-#> ----------------------------------------
+#> Weights: sampling_weight
+#> 
+#>   -----------------------------------------------------
+#>   Variable       10%       50%       90%     N  Missing
+#>   -----------------------------------------------------
+#>   income    2100.000  3500.000  5700.000  2201      315
+#>   -----------------------------------------------------
 
 # Multiple variables
 survey_data %>% w_quantile(age, income, weights = sampling_weight)
 #> 
 #> Weighted Quantile Statistics
 #> ----------------------------
-#>  Variable Quantile Value    N Effective_N         Weights
-#>       age      Min    18 2500      2468.8 sampling_weight
-#>       age      25%    38 2500      2468.8 sampling_weight
-#>       age      50%    50 2500      2468.8 sampling_weight
-#>       age      75%    63 2500      2468.8 sampling_weight
-#>       age      Max    95 2500      2468.8 sampling_weight
-#>    income      Min   800 2186      2158.9 sampling_weight
-#>    income      25%  2700 2186      2158.9 sampling_weight
-#>    income      50%  3500 2186      2158.9 sampling_weight
-#>    income      75%  4600 2186      2158.9 sampling_weight
-#>    income      Max  8000 2186      2158.9 sampling_weight
-#> ----------------------------------------
+#> Weights: sampling_weight
+#> 
+#>   ------------------------------------------------------------------------
+#>   Variable      Min       25%       50%       75%       Max     N  Missing
+#>   ------------------------------------------------------------------------
+#>   age        18.000    38.000    50.000    63.000    95.000  2516        0
+#>   income    800.000  2700.000  3500.000  4600.000  8000.000  2201      315
+#>   ------------------------------------------------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_quantile(age, weights = sampling_weight)
 #> 
 #> Weighted Quantile Statistics
 #> ----------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
-#> ----------------------------------------
-#>  Variable Quantile Value   N Effective_N         Weights
-#>       age      Min    18 485         477 sampling_weight
-#>       age      25%    40 485         477 sampling_weight
-#>       age      50%    53 485         477 sampling_weight
-#>       age      75%    64 485         477 sampling_weight
-#>       age      Max    95 485         477 sampling_weight
-#> ----------------------------------------
+#> --------------------
+#> 
+#>   --------------------------------------------------------------
+#>   Variable     Min     25%     50%     75%     Max    N  Missing
+#>   --------------------------------------------------------------
+#>   age       18.000  40.000  53.000  64.000  95.000  509        0
+#>   --------------------------------------------------------------
 #> 
 #> Group: region = West
-#> ----------------------------------------
-#>  Variable Quantile Value    N Effective_N         Weights
-#>       age      Min    18 2015      1993.1 sampling_weight
-#>       age      25%    38 2015      1993.1 sampling_weight
-#>       age      50%    49 2015      1993.1 sampling_weight
-#>       age      75%    62 2015      1993.1 sampling_weight
-#>       age      Max    95 2015      1993.1 sampling_weight
-#> ----------------------------------------
+#> --------------------
+#> 
+#>   ---------------------------------------------------------------
+#>   Variable     Min     25%     50%     75%     Max     N  Missing
+#>   ---------------------------------------------------------------
+#>   age       18.000  38.000  49.000  62.000  95.000  2007        0
+#>   ---------------------------------------------------------------
 
 # Unweighted (for comparison)
 survey_data %>% w_quantile(age)
 #> 
 #> Quantile Statistics
 #> -------------------
-#>  Variable Quantile Value    N
-#>       age      Min    18 2500
-#>       age      25%    38 2500
-#>       age      50%    50 2500
-#>       age      75%    62 2500
-#>       age      Max    95 2500
-#> ----------------------------------------
+#> 
+#>   ---------------------------------------------------------------
+#>   Variable     Min     25%     50%     75%     Max     N  Missing
+#>   ---------------------------------------------------------------
+#>   age       18.000  38.000  50.000  62.000  95.000  2500        0
+#>   ---------------------------------------------------------------
 ```

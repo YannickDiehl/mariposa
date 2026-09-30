@@ -118,19 +118,25 @@ sections controlled by the boolean parameters passed to
 <span class="r-out co"><span class="r-pr">#&gt;</span> - P-value adjustment: Bonferroni</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Number of comparisons: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Var 1         Var 2      Z p (unadj) p (adj) Sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government   trust_media -5.097     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government trust_science 25.945     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media trust_science 29.091     &lt;.001   &lt;.001 *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Var 1             Var 2             N        Z  Based on  p (unadj)  p (adj)     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government  trust_media    2227   -5.097  positive      &lt;.001    &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government  trust_science  2255  -25.945  negative      &lt;.001    &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media       trust_science  2272  -29.091  negative      &lt;.001    &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Each pair uses all cases with values on both variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (pairwise deletion, as SPSS NPAR TESTS /WILCOXON), so N can exceed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> the Friedman test's N = 2135 (cases complete on all variables).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Z is based on second minus first variable and, as in SPSS, on the</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   smaller rank sum (so it is never positive)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Based on negative ranks: the second variable tends to be higher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Based on positive ranks: the first variable tends to be higher</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, comparisons <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide comparison tables</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Wilcoxon Post-Hoc Test (Bonferroni) Results</span>
@@ -142,8 +148,10 @@ sections controlled by the boolean parameters passed to
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interpretation:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Positive Z: First variable tends to have higher values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Negative Z: Second variable tends to have higher values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Z is based on second minus first variable and, as in SPSS, on the</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   smaller rank sum (so it is never positive)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Based on negative ranks: the second variable tends to be higher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Based on positive ranks: the first variable tends to be higher</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - p-values are adjusted for multiple comparisons</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

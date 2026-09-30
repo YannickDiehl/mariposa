@@ -48,6 +48,11 @@ Pairwise comparison results showing:
 
 - Adjusted p-values (controlling for multiple comparisons)
 
+- The number of cases of each pair (`n`)
+
+The comparison table (one row per pair) is stored as `$results` (also
+available as `$comparisons`).
+
 ## Details
 
 ### Understanding the Results
@@ -57,9 +62,15 @@ Pairwise comparison results showing:
 - Large absolute Z values indicate big differences between two
   measurements
 
-- Positive Z: Values in var1 tend to be higher than var2
+- Z is computed from the differences `var2 - var1`, like
+  `wilcoxon_test(x = var1, y = var2)` and the SPSS pair "var2 - var1"
 
-- Negative Z: Values in var2 tend to be higher than var1
+- As in SPSS, Z comes from the smaller rank sum and is never positive;
+  `z_based_on` names that sum (SPSS's footnote)
+
+- Based on negative ranks: values in var2 (Var 2) tend to be higher
+
+- Based on positive ranks: values in var1 (Var 1) tend to be higher
 
 **Adjusted P-values**: Control for multiple comparisons
 
@@ -78,6 +89,15 @@ For each pair of measurements, the Wilcoxon signed-rank test:
 3.  Computes a Z-statistic based on the rank sums
 
 4.  Uses normal approximation with tie correction
+
+### Which Cases Are Used
+
+Each pair uses all cases with valid values on both of its variables
+(pairwise deletion), exactly like the individual SPSS
+`NPAR TESTS /WILCOXON` tests these results are validated against.
+[`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
+uses only cases complete on all variables (listwise, as SPSS
+`/FRIEDMAN`), so a pair's `n` can be larger than the Friedman N.
 
 ### P-Value Adjustment Methods
 

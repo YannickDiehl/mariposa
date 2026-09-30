@@ -108,7 +108,14 @@ tagged NAs with an <code>na_tag_map</code> attribute mapping tag characters to o
 codes (e.g., -9, -8). <code>write_spss()</code> reverses this process: tagged NAs are
 converted back to their original numeric codes, and the SPSS user-defined
 missing value specification is reconstructed so that the exported <code>.sav</code>
-file has the same missing value definitions as the original.</p>
+file has the same missing value definitions as the original:
+<code><a href="read_spss.html">read_spss()</a></code> remembers the original definition (e.g. <code>LOWEST THRU -1</code>),
+which is written back as long as it still covers every missing code and
+no valid value. Otherwise up to 3 codes are written as discrete values;
+more codes use SPSS's "range plus one discrete value" form (the tightest
+that contains no valid value), announced in one message. If no such
+range exists, the export stops with an error instead of declaring valid
+values missing.</p>
 </div>
 
 <div class="section">
@@ -119,6 +126,19 @@ file has the same missing value definitions as the original.</p>
 extended missing values like <code>.a</code>-<code>.z</code> or <code>.A</code>-<code>.Z</code>), these cannot be
 represented as SPSS user-defined missing values. In this case, they are
 written as system missing (regular <code>NA</code>) with a warning.</p>
+</div>
+
+<div class="section">
+<h3 id="derived-variables">Derived Variables<a class="anchor" aria-label="anchor" href="#derived-variables"></a></h3>
+
+
+<p>Arithmetic on an imported variable (e.g. <code>x + 1</code> inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>)
+keeps its tagged NAs but loses the code map, so the original codes are
+unknown. Such values are written as system missing with a warning
+naming the variables. <code><a href="rec.html">rec()</a></code> keeps the map; <code><a href="std.html">std()</a></code>, <code><a href="center.html">center()</a></code>,
+<code><a href="pomps.html">pomps()</a></code> and <code><a href="to_numeric.html">to_numeric()</a></code> return plain <code>NA</code> by design. Numeric
+columns that carry a bare <code>"labels"</code> attribute (without the
+<code>haven_labelled</code> class) are exported with their value labels.</p>
 </div>
 
 <div class="section">
@@ -159,8 +179,8 @@ written as system missing (regular <code>NA</code>) with a warning.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="va">tmp_z</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Wrote 16 variables (2500 obs.) to <span style="color: #0000BB;">file19bf444a83ce.sav</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Wrote 16 variables (2500 obs.) to <span style="color: #0000BB;">file19bf48ebaa0d.zsav</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Wrote 16 variables (2500 obs.) to <span style="color: #0000BB;">file1941c0a9ac5.sav</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Wrote 16 variables (2500 obs.) to <span style="color: #0000BB;">file19412a7e5e73.zsav</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

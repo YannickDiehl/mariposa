@@ -94,7 +94,11 @@ pinpoints where the differences lie.</p>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
-<dd><p>Confidence level for intervals (Default: 0.95 = 95%)</p></dd>
+<dd><p>Confidence level of the simultaneous intervals
+(Default: 0.95). As in SPSS it corresponds to the post-hoc
+<code>ALPHA</code> (1 - alpha) and does not follow the <code>conf.level</code> of
+<code><a href="oneway_anova.html">oneway_anova()</a></code>, which (like SPSS <code>CILEVEL</code>) only sets the
+intervals of the group means.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

@@ -44,7 +44,9 @@ codebook(
 
 - weights:
 
-  Optional survey weights for weighted frequency calculations
+  Optional survey weights for weighted frequency calculations. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - show_id:
 
@@ -108,13 +110,18 @@ codebook(
 
   Open the HTML codebook in the RStudio Viewer (or browser)? Defaults to
   [`interactive()`](https://rdrr.io/r/base/interactive.html), so
-  interactive sessions open the Viewer and scripts/tests do not. Set
-  `view = FALSE` to suppress the Viewer side effect entirely; `file =`
-  writing is unaffected by this argument.
+  interactive sessions open the Viewer and scripts/tests do not; while
+  an R Markdown/Quarto document is knitted the default is `FALSE` (the
+  codebook is embedded in the document instead). Set `view = FALSE` to
+  suppress the Viewer side effect entirely; `file =` writing is
+  unaffected by this argument.
 
 ## Value
 
-Invisibly returns a list of class `"codebook"` containing:
+A list of class `"codebook"`. Printing it shows a compact console
+overview; in a knitted HTML document (R Markdown, Quarto) the full HTML
+codebook is embedded, in other formats the overview is shown. The list
+contains:
 
 - codebook:
 
@@ -175,6 +182,14 @@ Use `codebook()` when you:
 
 - Need to quickly see value distributions across variables
 
+### In R Markdown and Quarto
+
+A chunk containing `codebook(data)` embeds the HTML codebook in HTML
+output (its styles only apply to the codebook, not to the rest of the
+document); PDF and Word output show the compact console overview. Use
+[`write_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/write_xlsx.md)
+for an Excel version of the codebook.
+
 ## See also
 
 [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
@@ -198,7 +213,7 @@ cb <- codebook(survey_data)
 print(cb)
 #> 
 #> Codebook: survey_data
-#> 16 variables | 2,500 observations | 15 labelled
+#> 16 variables | 2500 observations | 15 labelled
 #> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)
 #> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer
 
@@ -208,7 +223,7 @@ summary(cb)
 #> Codebook
 #> --------
 #>   Dataset: survey_data
-#>   Observations: 2,500
+#>   Observations: 2500
 #>   Variables: 16 (10 numeric, 6 factor, 0 character)
 #>   Variables with labels: 15
 #>   Variables with missing data: 7
@@ -310,11 +325,26 @@ summary(cb)
 # \donttest{
 # Full codebook (opens in RStudio Viewer when interactive)
 codebook(survey_data)
+#> 
+#> Codebook: survey_data
+#> 16 variables | 2500 observations | 15 labelled
+#> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)
+#> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer
 
 # Only trust-related variables
 codebook(survey_data, starts_with("trust"))
+#> 
+#> Codebook: survey_data
+#> 3 variables | 2500 observations | 3 labelled
+#> Types: 3 int
+#> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer
 
 # Save to file for sharing
 codebook(survey_data, file = tempfile(fileext = ".html"))
+#> 
+#> Codebook: survey_data
+#> 16 variables | 2500 observations | 15 labelled
+#> Types: 3 dbl, 2 fct(2), 1 fct(3), 1 fct(5), 1 fct(6), 7 int, 1 ord(4)
+#> -- Use summary() for details or codebook(..., view = TRUE) for the HTML viewer
 # }
 ```

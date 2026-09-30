@@ -90,12 +90,16 @@ variables or use helpers like <code>starts_with("trust")</code></p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Survey weights to make results representative of your population.
-Without weights, you get the simple sample standard deviation.</p></dd>
+<dd><p>Survey weights to make results representative of your
+population. Without weights, you get the simple sample standard deviation.
+Give a column name (unquoted or as a string), an expression such as
+<code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Remove missing values before calculating? (Default: TRUE)</p></dd>
+<dd><p>Remove missing values before calculating? (Default: TRUE).
+With <code>FALSE</code>, the result for a variable that contains missing
+values is <code>NA</code> (as in base R).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -114,7 +118,9 @@ number of valid observations used.</p>
 68% of your population falls within one SD of the weighted mean.</p></li>
 <li><p><strong>Effective N</strong>: How many independent observations your weighted data
 represents. Always less than or equal to the actual sample size.</p></li>
-<li><p><strong>N</strong>: The actual number of observations used in the calculation.</p></li>
+<li><p><strong>N / Missing</strong>: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+<code>WEIGHT BY</code>; Kish's effective N is shown by <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</p></li>
 </ul><p>A large difference between weighted and unweighted SD suggests that the
 variability in your sample does not accurately reflect the population.</p>
 </div>
@@ -175,49 +181,53 @@ variability in your sample does not accurately reflect the population.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Standard Deviation Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_sd Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      17.084      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable      SD     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       17.084  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_sd</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Standard Deviation Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_sd Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      17.084      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_sd Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income    1423.966      2158.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable weighted_sd Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       1.152      2390.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable                 SD     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                  17.084  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income             1423.966  2201      315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction     1.152  2437       79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_sd</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Standard Deviation Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_sd Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      17.595         477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable      SD    N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       17.595  509        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_sd Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age      16.927      1993.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable      SD     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       16.927  2007        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In summarise context</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>sd_age <span class="op">=</span> <span class="fu">w_sd</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -232,10 +242,11 @@ variability in your sample does not accurately reflect the population.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Standard Deviation Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable     sd    N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age 16.976 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable      SD     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       16.976  2500        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

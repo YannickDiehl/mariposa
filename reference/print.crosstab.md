@@ -18,7 +18,7 @@ for a test of independence.
 
 ``` r
 # S3 method for class 'crosstab'
-print(x, digits = 1, ...)
+print(x, digits = x$digits %||% 1, ...)
 ```
 
 ## Arguments
@@ -29,7 +29,10 @@ print(x, digits = 1, ...)
 
 - digits:
 
-  Number of decimal places for percentages (default: 1)
+  Number of decimal places for percentages (default: the `digits` given
+  to
+  [`crosstab`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
+  i.e. 1 unless set)
 
 - ...:
 
@@ -45,44 +48,46 @@ Invisibly returns the input object `x`.
 result <- crosstab(survey_data, gender, region)
 result              # full cross-tabulation table
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - N (valid): 2500
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    238 |    956 |   1194 |
-#> |   row %    |  19.9% |  80.1% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |    247 |   1059 |   1306 |
-#> |   row %    |  18.9% |  81.1% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |    485 |   2015 |   2500 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |   238 |   956 |   1194 |
+#> |   row % | 19.9% | 80.1% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |   247 |  1059 |   1306 |
+#> |   row % | 18.9% | 81.1% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |   485 |  2015 |   2500 |
+#> |   row % | 19.4% | 80.6% | 100.0% |
+#> +---------+-------+-------+--------+
 summary(result)     # same table, with section toggles
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - N (valid): 2500
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    238 |    956 |   1194 |
-#> |   row %    |  19.9% |  80.1% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |    247 |   1059 |   1306 |
-#> |   row %    |  18.9% |  81.1% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |    485 |   2015 |   2500 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |   238 |   956 |   1194 |
+#> |   row % | 19.9% | 80.1% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |   247 |  1059 |   1306 |
+#> |   row % | 18.9% | 81.1% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |   485 |  2015 |   2500 |
+#> |   row % | 19.4% | 80.6% | 100.0% |
+#> +---------+-------+-------+--------+
 ```

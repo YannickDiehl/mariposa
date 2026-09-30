@@ -42,7 +42,9 @@ crosstab(
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - percentages:
 
@@ -61,7 +63,9 @@ crosstab(
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, missing values of either variable form their own `"NA"` row
+  or column.
 
 - digits:
 
@@ -97,9 +101,18 @@ The crosstab table shows:
   [`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   test, cells with \|adj. residual\| \> 2 are the ones driving the
   association. For weighted tables the residuals are computed on the
-  unrounded weighted cell counts; an SPSS v29 reference run for the
-  residuals is pending, so they are currently verified against the
-  Haberman formula (`chisq.test()$stdres`) rather than SPSS output.
+  rounded weighted cell counts (see below); an SPSS v29 reference run
+  for the residuals is pending, so they are currently verified against
+  the Haberman formula (`chisq.test()$stdres`) rather than SPSS output.
+
+### Weighted Tables
+
+As SPSS CROSSTABS does by default (`/COUNT ROUND CELL`), each weighted
+cell count is rounded to a whole number first; the row and column totals
+are sums of the rounded cells and all percentages come from the rounded
+counts. The table total can therefore differ by a few cases from the
+rounded sum of weights shown as "N (valid)" (SPSS: 2518 vs. 2516 for
+education x employment in `survey_data`).
 
 ### When to Use This
 
@@ -161,218 +174,231 @@ data(survey_data)
 # Basic crosstab
 survey_data %>% crosstab(gender, region)
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - N (valid): 2500
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    238 |    956 |   1194 |
-#> |   row %    |  19.9% |  80.1% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |    247 |   1059 |   1306 |
-#> |   row %    |  18.9% |  81.1% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |    485 |   2015 |   2500 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |   238 |   956 |   1194 |
+#> |   row % | 19.9% | 80.1% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |   247 |  1059 |   1306 |
+#> |   row % | 18.9% | 81.1% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |   485 |  2015 |   2500 |
+#> |   row % | 19.4% | 80.6% | 100.0% |
+#> +---------+-------+-------+--------+
 
 # With weights and all percentages
 survey_data %>% crosstab(gender, education,
                          weights = sampling_weight,
                          percentages = "all")
 #> 
-#> Crosstabulation: gender × education
-#> ----------------------------------- 
+#> Crosstabulation: Gender x Highest educational attainment
+#> --------------------------------------------------------
 #> - Row variable: gender
 #> - Column variable: education
 #> - Percentages: All percentages (row, col, total)
 #> - Weights variable: sampling_weight
 #> - N (valid): 2516 (weighted)
 #> 
-#> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+
-#> |            |                                                    education                                                     |
-#> | gender     |      Basic Secondary | Intermediate Seco... |   Academic Secondary |           University |                Total |
-#> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+
-#> | Male       |                  402 |                  291 |                  326 |                  176 |                 1195 |
-#> |   row %    |                33.6% |                24.3% |                27.3% |                14.7% |               100.0% |
-#> |   col %    |                47.3% |                45.4% |                50.8% |                45.7% |                47.5% |
-#> |   total %  |                16.0% |                11.6% |                13.0% |                 7.0% |                47.5% |
-#> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+
-#> | Female     |                  447 |                  350 |                  316 |                  209 |                 1321 |
-#> |   row %    |                33.8% |                26.5% |                23.9% |                15.8% |               100.0% |
-#> |   col %    |                52.7% |                54.6% |                49.2% |                54.3% |                52.5% |
-#> |   total %  |                17.7% |                13.9% |                12.5% |                 8.3% |                52.5% |
-#> +============+======================+======================+======================+======================+======================+
-#> | Total      |                  848 |                  641 |                  642 |                  385 |                 2516 |
-#> |   col %    |                33.7% |                25.5% |                25.5% |                15.3% |               100.0% |
-#> +------------+----------------------+----------------------+----------------------+----------------------+----------------------+
+#> +-----------+-----------+--------------+-----------+------------+--------+
+#> |           |               Highest educational attainment               |
+#> |           |     Basic | Intermediate |  Academic |            |        |
+#> | Gender    | Secondary |    Secondary | Secondary | University |  Total |
+#> +-----------+-----------+--------------+-----------+------------+--------+
+#> | Male      |       402 |          291 |       326 |        176 |   1195 |
+#> |   row %   |     33.6% |        24.4% |     27.3% |      14.7% | 100.0% |
+#> |   col %   |     47.3% |        45.4% |     50.8% |      45.7% |  47.5% |
+#> |   total % |     16.0% |        11.6% |     13.0% |       7.0% |  47.5% |
+#> +-----------+-----------+--------------+-----------+------------+--------+
+#> | Female    |       447 |          350 |       316 |        209 |   1322 |
+#> |   row %   |     33.8% |        26.5% |     23.9% |      15.8% | 100.0% |
+#> |   col %   |     52.7% |        54.6% |     49.2% |      54.3% |  52.5% |
+#> |   total % |     17.8% |        13.9% |     12.6% |       8.3% |  52.5% |
+#> +===========+===========+==============+===========+============+========+
+#> | Total     |       849 |          641 |       642 |        385 |   2517 |
+#> |   row %   |     33.7% |        25.5% |     25.5% |      15.3% | 100.0% |
+#> |   col %   |    100.0% |       100.0% |    100.0% |     100.0% | 100.0% |
+#> |   total % |     33.7% |        25.5% |     25.5% |      15.3% | 100.0% |
+#> +-----------+-----------+--------------+-----------+------------+--------+
 
 # Grouped analysis
 survey_data %>%
   group_by(employment) %>%
   crosstab(gender, region, weights = sampling_weight)
 #> 
-#> Weighted Grouped Crosstabulation 
-#> ---------------------------------
+#> Weighted Grouped Crosstabulation
+#> --------------------------------
 #> 
 #> 
 #> Group: employment = Student
 #> ---------------------------
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - Weights variable: sampling_weight
 #> - N (valid): 80 (weighted)
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |      7 |     29 |     36 |
-#> |   row %    |  20.0% |  80.0% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |      4 |     40 |     44 |
-#> |   row %    |  10.2% |  89.8% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |     12 |     68 |     80 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |     7 |    29 |     36 |
+#> |   row % | 19.4% | 80.6% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |     4 |    40 |     44 |
+#> |   row % |  9.1% | 90.9% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |    11 |    69 |     80 |
+#> |   row % | 13.8% | 86.2% | 100.0% |
+#> +---------+-------+-------+--------+
 #> 
 #> 
 #> Group: employment = Employed
 #> ----------------------------
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - Weights variable: sampling_weight
 #> - N (valid): 1603 (weighted)
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    149 |    599 |    748 |
-#> |   row %    |  19.9% |  80.1% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |    172 |    683 |    855 |
-#> |   row %    |  20.1% |  79.9% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |    320 |   1282 |   1603 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |   149 |   599 |    748 |
+#> |   row % | 19.9% | 80.1% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |   172 |   683 |    855 |
+#> |   row % | 20.1% | 79.9% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |   321 |  1282 |   1603 |
+#> |   row % | 20.0% | 80.0% | 100.0% |
+#> +---------+-------+-------+--------+
 #> 
 #> 
 #> Group: employment = Unemployed
 #> ------------------------------
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - Weights variable: sampling_weight
 #> - N (valid): 184 (weighted)
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |     17 |     66 |     83 |
-#> |   row %    |  20.8% |  79.2% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |     16 |     85 |    101 |
-#> |   row %    |  15.5% |  84.5% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |     33 |    151 |    184 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |    17 |    66 |     83 |
+#> |   row % | 20.5% | 79.5% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |    16 |    85 |    101 |
+#> |   row % | 15.8% | 84.2% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |    33 |   151 |    184 |
+#> |   row % | 17.9% | 82.1% | 100.0% |
+#> +---------+-------+-------+--------+
 #> 
 #> 
 #> Group: employment = Retired
 #> ---------------------------
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - Weights variable: sampling_weight
 #> - N (valid): 534 (weighted)
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |     61 |    199 |    260 |
-#> |   row %    |  23.5% |  76.5% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |     61 |    212 |    273 |
-#> |   row %    |  22.5% |  77.5% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |    123 |    411 |    534 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |    61 |   199 |    260 |
+#> |   row % | 23.5% | 76.5% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |    61 |   212 |    273 |
+#> |   row % | 22.3% | 77.7% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |   122 |   411 |    533 |
+#> |   row % | 22.9% | 77.1% | 100.0% |
+#> +---------+-------+-------+--------+
 #> 
 #> 
 #> Group: employment = Other
 #> -------------------------
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - Weights variable: sampling_weight
 #> - N (valid): 115 (weighted)
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |     15 |     53 |     68 |
-#> |   row %    |  22.2% |  77.8% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |      6 |     41 |     47 |
-#> |   row %    |  13.1% |  86.9% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |     21 |     94 |    115 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |    15 |    53 |     68 |
+#> |   row % | 22.1% | 77.9% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |     6 |    41 |     47 |
+#> |   row % | 12.8% | 87.2% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |    21 |    94 |    115 |
+#> |   row % | 18.3% | 81.7% | 100.0% |
+#> +---------+-------+-------+--------+
 #> 
 
 # Column percentages only
 survey_data %>% crosstab(education, employment, percentages = "col")
 #> 
-#> Crosstabulation: education × employment
-#> --------------------------------------- 
+#> Crosstabulation: Highest educational attainment x Employment status
+#> -------------------------------------------------------------------
 #> - Row variable: education
 #> - Column variable: employment
 #> - Percentages: Column percentages
 #> - N (valid): 2500
 #> 
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> |                      |                                 employment                                  |
-#> | education            |    Student |   Employed | Unemployed |    Retired |      Other |      Total |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | Basic Secondary      |          0 |        571 |         65 |        171 |         34 |        841 |
-#> |   col %              |       0.0% |      35.7% |      35.7% |      32.6% |      29.6% |      33.6% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | Intermediate Seco... |          0 |        412 |         51 |        137 |         29 |        629 |
-#> |   col %              |       0.0% |      25.8% |      28.0% |      26.1% |      25.2% |      25.2% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | Academic Secondary   |         44 |        366 |         44 |        145 |         32 |        631 |
-#> |   col %              |      56.4% |      22.9% |      24.2% |      27.6% |      27.8% |      25.2% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
-#> | University           |         34 |        251 |         22 |         72 |         20 |        399 |
-#> |   col %              |      43.6% |      15.7% |      12.1% |      13.7% |      17.4% |      16.0% |
-#> +======================+============+============+============+============+============+============+
-#> | Total                |         78 |       1600 |        182 |        525 |        115 |       2500 |
-#> |   col %              |       3.1% |      64.0% |       7.3% |      21.0% |       4.6% |     100.0% |
-#> +----------------------+------------+------------+------------+------------+------------+------------+
+#> +----------------+---------+----------+------------+---------+--------+--------+
+#> | Highest        |                      Employment status                      |
+#> | educational    |                                                             |
+#> | attainment     | Student | Employed | Unemployed | Retired |  Other |  Total |
+#> +----------------+---------+----------+------------+---------+--------+--------+
+#> | Basic          |       0 |      571 |         65 |     171 |     34 |    841 |
+#> | Secondary      |         |          |            |         |        |        |
+#> |   col %        |    0.0% |    35.7% |      35.7% |   32.6% |  29.6% |  33.6% |
+#> +----------------+---------+----------+------------+---------+--------+--------+
+#> | Intermediate   |       0 |      412 |         51 |     137 |     29 |    629 |
+#> | Secondary      |         |          |            |         |        |        |
+#> |   col %        |    0.0% |    25.8% |      28.0% |   26.1% |  25.2% |  25.2% |
+#> +----------------+---------+----------+------------+---------+--------+--------+
+#> | Academic       |      44 |      366 |         44 |     145 |     32 |    631 |
+#> | Secondary      |         |          |            |         |        |        |
+#> |   col %        |   56.4% |    22.9% |      24.2% |   27.6% |  27.8% |  25.2% |
+#> +----------------+---------+----------+------------+---------+--------+--------+
+#> | University     |      34 |      251 |         22 |      72 |     20 |    399 |
+#> |   col %        |   43.6% |    15.7% |      12.1% |   13.7% |  17.4% |  16.0% |
+#> +================+=========+==========+============+=========+========+========+
+#> | Total          |      78 |     1600 |        182 |     525 |    115 |   2500 |
+#> |   col %        |  100.0% |   100.0% |     100.0% |  100.0% | 100.0% | 100.0% |
+#> +----------------+---------+----------+------------+---------+--------+--------+
 ```

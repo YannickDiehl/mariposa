@@ -57,7 +57,9 @@ fre(data, ..., weights = NULL, sort_frq = "none", show_na = TRUE,
 
   Optional survey weights for population-representative results. Without
   weights, you get sample frequencies. With weights, you get population
-  estimates.
+  estimates. Give a column name (unquoted or as a string), an expression
+  such as `sampling_weight * 2`, or a numeric vector with one weight per
+  row.
 
 - sort_frq:
 
@@ -79,11 +81,13 @@ fre(data, ..., weights = NULL, sort_frq = "none", show_na = TRUE,
 
 - show_valid:
 
-  Show percentages excluding missing values? (Default: TRUE)
+  Show percentages excluding missing values? (Default: TRUE). The
+  cumulative percentages are cumulative valid percentages, so
+  `show_valid = FALSE` hides them too.
 
 - show_sum:
 
-  Show cumulative totals? (Default: TRUE)
+  Show the cumulative (valid) percentages? (Default: TRUE)
 
 - show_labels:
 
@@ -96,8 +100,9 @@ fre(data, ..., weights = NULL, sort_frq = "none", show_na = TRUE,
   (Default: FALSE). When TRUE, values that have labels defined (e.g.,
   from statistical software files) but no cases in the data are included
   with frequency 0. This is useful for labelled datasets where unused
-  categories should still appear in the output. Automatically enables
-  label display.
+  categories should still appear in the output. The same applies to
+  empty factor levels, which are hidden by default (as SPSS lists only
+  observed values). Automatically enables label display.
 
 - sort.frq, show.na, show.prc, show.valid, show.sum, show.labels,
   show.unused:
@@ -115,16 +120,28 @@ A frequency table showing counts and percentages for each category
 
 ### Understanding the Results
 
-The frequency table shows:
+The frequency table follows the SPSS FREQUENCIES layout:
 
-- **Freq**: Number of responses in each category
+- **N**: Number of responses in each category (weighted: sum of weights,
+  displayed rounded)
 
-- **%**: Percentage including missing values (use for "response rate")
+- **Raw %**: Percentage including missing values (use for "response
+  rate")
 
 - **Valid %**: Percentage excluding missing values (use for "among those
   who answered")
 
-- **Cum %**: Running total percentage (helps identify cutoff points)
+- **Cum. %**: Running total of the valid percentages (helps identify
+  cutoff points)
+
+- **Total valid**, the missing categories, **Total missing** (with two
+  or more missing categories) and the grand **Total**; without missing
+  values a single **Total** row ends the table.
+
+Factors, character and logical variables show their categories in the
+Value column; labelled numeric variables show the code and its label.
+Long labels are never cut; they wrap when the table would be wider than
+the console.
 
 ### When to Use This
 
@@ -191,16 +208,16 @@ survey_data %>% frequency(gender)
 #> --------------------------
 #> 
 #> gender (Gender)
-#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> # total N=2500 valid N=2500
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |
-#> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2500 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +--------+------+--------+---------+--------+
+#> | Value  |    N |  Raw % | Valid % | Cum. % |
+#> +--------+------+--------+---------+--------+
+#> | Male   | 1194 |  47.76 |   47.76 |  47.76 |
+#> | Female | 1306 |  52.24 |   52.24 | 100.00 |
+#> +--------+------+--------+---------+--------+
+#> | Total  | 2500 | 100.00 |  100.00 |        |
+#> +--------+------+--------+---------+--------+
 #> 
 
 # Multiple variables with weights
@@ -210,29 +227,29 @@ survey_data %>% frequency(gender, region, weights = sampling_weight)
 #> -----------------------------------
 #> 
 #> gender (Gender)
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> # total N=2516 valid N=2516
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |   Male |   Male |   1195 |  47.48 |  47.48 |  47.48 |
-#> | Female | Female |   1321 |  52.52 |  52.52 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2516 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +--------+------+--------+---------+--------+
+#> | Value  |    N |  Raw % | Valid % | Cum. % |
+#> +--------+------+--------+---------+--------+
+#> | Male   | 1195 |  47.48 |   47.48 |  47.48 |
+#> | Female | 1321 |  52.52 |   52.52 | 100.00 |
+#> +--------+------+--------+---------+--------+
+#> | Total  | 2516 | 100.00 |  100.00 |        |
+#> +--------+------+--------+---------+--------+
 #> 
 #> 
 #> region (Region (East/West))
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> # total N=2516 valid N=2516
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |   East |   East |    509 |  20.23 |  20.23 |  20.23 |
-#> |   West |   West |   2007 |  79.77 |  79.77 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2516 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +-------+------+--------+---------+--------+
+#> | Value |    N |  Raw % | Valid % | Cum. % |
+#> +-------+------+--------+---------+--------+
+#> | East  |  509 |  20.23 |   20.23 |  20.23 |
+#> | West  | 2007 |  79.77 |   79.77 | 100.00 |
+#> +-------+------+--------+---------+--------+
+#> | Total | 2516 | 100.00 |  100.00 |        |
+#> +-------+------+--------+---------+--------+
 #> 
 
 # Grouped analysis by region
@@ -247,30 +264,30 @@ survey_data %>%
 #> 
 #> Group: region = East
 #> --------------------
-#> # total N=509 valid N=509 mean=NA sd=NA skewness=NA
+#> # total N=509 valid N=509
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |   Male |   Male |    249 |  49.01 |  49.01 |  49.01 |
-#> | Female | Female |    260 |  50.99 |  50.99 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |    509 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +--------+-----+--------+---------+--------+
+#> | Value  |   N |  Raw % | Valid % | Cum. % |
+#> +--------+-----+--------+---------+--------+
+#> | Male   | 249 |  49.01 |   49.01 |  49.01 |
+#> | Female | 260 |  50.99 |   50.99 | 100.00 |
+#> +--------+-----+--------+---------+--------+
+#> | Total  | 509 | 100.00 |  100.00 |        |
+#> +--------+-----+--------+---------+--------+
 #> 
 #> 
 #> Group: region = West
 #> --------------------
-#> # total N=2007 valid N=2007 mean=NA sd=NA skewness=NA
+#> # total N=2007 valid N=2007
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |   Male |   Male |    945 |  47.09 |  47.09 |  47.09 |
-#> | Female | Female |   1062 |  52.91 |  52.91 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2007 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +--------+------+--------+---------+--------+
+#> | Value  |    N |  Raw % | Valid % | Cum. % |
+#> +--------+------+--------+---------+--------+
+#> | Male   |  945 |  47.09 |   47.09 |  47.09 |
+#> | Female | 1062 |  52.91 |   52.91 | 100.00 |
+#> +--------+------+--------+---------+--------+
+#> | Total  | 2007 | 100.00 |  100.00 |        |
+#> +--------+------+--------+---------+--------+
 #> 
 
 # Education levels with sorting
@@ -280,18 +297,18 @@ survey_data %>% frequency(education, sort_frq = "desc")
 #> --------------------------
 #> 
 #> education (Highest educational attainment)
-#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> # total N=2500 valid N=2500
 #> 
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |        Basic Secondary |        Basic Secondary |    841 |  33.64 |  33.64 |  33.64 |
-#> |     Academic Secondary |     Academic Secondary |    631 |  25.24 |  25.24 |  58.88 |
-#> | Intermediate Secondary | Intermediate Secondary |    629 |  25.16 |  25.16 |  84.04 |
-#> |             University |             University |    399 |  15.96 |  15.96 | 100.00 |
-#> +------------------------+------------------------+--------+--------+--------+--------+
-#> |                  Total |                        |   2500 | 100.00 | 100.00 |        |
-#> +------------------------+------------------------+--------+--------+--------+--------+
+#> +------------------------+------+--------+---------+--------+
+#> | Value                  |    N |  Raw % | Valid % | Cum. % |
+#> +------------------------+------+--------+---------+--------+
+#> | Basic Secondary        |  841 |  33.64 |   33.64 |  33.64 |
+#> | Academic Secondary     |  631 |  25.24 |   25.24 |  58.88 |
+#> | Intermediate Secondary |  629 |  25.16 |   25.16 |  84.04 |
+#> | University             |  399 |  15.96 |   15.96 | 100.00 |
+#> +------------------------+------+--------+---------+--------+
+#> | Total                  | 2500 | 100.00 |  100.00 |        |
+#> +------------------------+------+--------+---------+--------+
 #> 
 
 # Employment status with custom display options
@@ -302,18 +319,18 @@ survey_data %>% frequency(employment, weights = sampling_weight,
 #> -----------------------------------
 #> 
 #> employment (Employment status)
-#> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA
+#> # total N=2516 valid N=2516
 #> 
-#> +------------+------------+--------+--------+--------+--------+
-#> |      Value |      Label |      N |  Raw % |Valid % | Cum. % |
-#> +------------+------------+--------+--------+--------+--------+
-#> |    Student |    Student |     80 |   3.18 |   3.18 |   3.18 |
-#> |   Employed |   Employed |   1603 |  63.71 |  63.71 |  66.89 |
-#> | Unemployed | Unemployed |    184 |   7.32 |   7.32 |  74.21 |
-#> |    Retired |    Retired |    534 |  21.21 |  21.21 |  95.41 |
-#> |      Other |      Other |    115 |   4.59 |   4.59 | 100.00 |
-#> +------------+------------+--------+--------+--------+--------+
-#> |      Total |            |   2516 | 100.00 | 100.00 |        |
-#> +------------+------------+--------+--------+--------+--------+
+#> +------------+------+--------+---------+--------+
+#> | Value      |    N |  Raw % | Valid % | Cum. % |
+#> +------------+------+--------+---------+--------+
+#> | Student    |   80 |   3.18 |    3.18 |   3.18 |
+#> | Employed   | 1603 |  63.71 |   63.71 |  66.89 |
+#> | Unemployed |  184 |   7.32 |    7.32 |  74.21 |
+#> | Retired    |  534 |  21.21 |   21.21 |  95.41 |
+#> | Other      |  115 |   4.59 |    4.59 | 100.00 |
+#> +------------+------+--------+---------+--------+
+#> | Total      | 2516 | 100.00 |  100.00 |        |
+#> +------------+------+--------+---------+--------+
 #> 
 ```

@@ -41,11 +41,15 @@ result <- reliability(survey_data, trust_government, trust_media, trust_science)
 result              # compact one-line overview
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> 
 #> Reliability Analysis Results
 #> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
+#> - Items:
+#>     trust_government  Trust in government (1=none, 5=complete)
+#>     trust_media       Trust in media (1=none, 5=complete)
+#>     trust_science     Trust in science (1=none, 5=complete)
 #> - N of Items: 3
 #> 
 #> Reliability Statistics
@@ -58,30 +62,32 @@ summary(result)     # full detailed output
 #>   N (listwise):                  2135
 #> 
 #> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
+#>   ----------------------------------------------------------------------
+#>   Item                                        Mean  Std. Deviation     N
+#>   ----------------------------------------------------------------------
+#>   trust_government  Trust in government ...  2.621           1.162  2135
+#>   trust_media       Trust in media (1=no...  2.430           1.156  2135
+#>   trust_science     Trust in science (1=...  3.624           1.034  2135
+#>   ----------------------------------------------------------------------
 #> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> ------------------------------ 
+#> Inter-Item Correlation Matrix
+#>   -----------------------------------------
+#>                           (1)    (2)    (3)
+#>   -----------------------------------------
+#>   (1) trust_government  1.000  0.014  0.020
+#>   (2) trust_media       0.014  1.000  0.015
+#>   (3) trust_science     0.020  0.015  1.000
+#>   -----------------------------------------
 #> 
 #> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted omega_deleted
-#>          0.029            NA
-#>          0.040            NA
-#>          0.027            NA
+#>   ------------------------------------------------------------------------
+#>                     Scale Mean  Scale Var.   Corrected  Alpha if  Omega if
+#>   Item              if Deleted  if Deleted  Item-Total   Deleted   Deleted
+#>   ------------------------------------------------------------------------
+#>   trust_government       6.054       2.440       0.024     0.029          
+#>   trust_media            6.245       2.467       0.020     0.040          
+#>   trust_science          5.051       2.723       0.025     0.027          
+#>   ------------------------------------------------------------------------
 #> Note: Omega if item deleted requires at least 4 items
 #> (a one-factor model on the remaining 2 items is not identified).
 ```

@@ -39,13 +39,22 @@ chisq_gof(data, ..., expected = NULL, weights = NULL)
 
 - expected:
 
-  Optional numeric vector of expected proportions (must sum to 1). Only
-  used when a single variable is tested. If NULL (default), equal
-  proportions are assumed.
+  Optional numeric vector of expected proportions, one per category. If
+  NULL (default), equal proportions are assumed (SPSS
+  `/EXPECTED=EQUAL`). Applied to every selected variable, so each
+  variable must have that many categories. A named vector is matched to
+  the categories by name (category label, or the code of a labelled
+  variable); an unnamed vector is used in category order. As in SPSS
+  `/EXPECTED=50 30 20`, values may also be counts or any relative
+  frequencies: they are divided by their sum. Proportions (all values
+  below 1) must sum to 1; a sum within 0.01 of 1 (e.g. 0.995 from
+  rounding) is rescaled with a message.
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 ## Value
 
@@ -57,6 +66,9 @@ including:
 - Degrees of freedom
 
 - Frequency table with observed, expected, and residual counts
+  (`frequencies`; expected counts and residuals unrounded, printed with
+  one decimal like SPSS; for grouped data one long table with the group
+  columns and `Variable`)
 
 - Sample size (N)
 
@@ -188,10 +200,10 @@ survey_data %>%
 survey_data %>%
   group_by(region) %>%
   chisq_gof(education)
-#> [region = 1]
+#> [region = East]
 #> Chi-Square Goodness-of-Fit Test: education
 #>   chi2(3) = 34.645, p < 0.001 ***, N = 485
-#> [region = 2]
+#> [region = West]
 #> Chi-Square Goodness-of-Fit Test: education
 #>   chi2(3) = 122.888, p < 0.001 ***, N = 2015
 #> Use summary() for detailed output.

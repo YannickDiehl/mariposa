@@ -95,11 +95,18 @@ preference? Or are they independent of each other?</p>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-correct">correct<a class="anchor" aria-label="anchor" href="#arg-correct"></a></dt>
-<dd><p>Apply continuity correction for small samples? (Default: FALSE)</p></dd>
+<dd><p>Apply Yates' continuity correction to a 2x2 table?
+(Default: FALSE). The corrected statistic is reported as
+<code>chi_squared</code>; as in SPSS (which prints "Pearson Chi-Square" and
+"Continuity Correction" side by side), the uncorrected Pearson value is
+kept in <code>pearson_chi_squared</code> and Phi / Cramer's V are always
+computed from it.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -125,8 +132,14 @@ Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">su
 <li><p>0.3-0.5: Medium relationship</p></li>
 <li><p>0.5 or higher: Large relationship</p></li>
 </ul></li>
-<li><p><strong>Phi</strong>: Only for 2x2 tables (similar interpretation as Cramer's V)</p></li>
-<li><p><strong>Gamma</strong>: For ordinal data (-1 to +1, shows direction of relationship)</p></li>
+<li><p><strong>Phi</strong>: sqrt(chi-squared / N). Reported for every table, as SPSS
+does; in a 2x2 table it equals Cramer's V, in larger tables it can
+exceed 1 (use Cramer's V there)</p></li>
+<li><p><strong>Gamma</strong>: For two ordinal variables (-1 to +1, shows the direction of
+the relationship). Shown by <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> only when both variables
+are ordered factors or numeric; for nominal variables its sign depends
+on the arbitrary category order. <code><a href="phi.html">goodman_gamma()</a></code> always
+computes it.</p></li>
 </ul></div>
 
 <div class="section">
@@ -195,103 +208,112 @@ University Press.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Basic chi-squared test for independence</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 0.415, p = 0.519 , V = 0.013 (neglig.), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender x region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 0.415, p = 0.519, V = 0.013 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">education</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender × education [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 4.403, p = 0.221 , V = 0.042 (neglig.), N = 2517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender x education [Weighted]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 4.403, p = 0.221, V = 0.042 (negligible), N = 2517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
 <span class="r-in"><span>  <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">employment</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender × employment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(4) = 5.970, p = 0.201 , V = 0.111 (small), N = 485</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender × employment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(4) = 4.166, p = 0.384 , V = 0.045 (neglig.), N = 2015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender x employment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(4) = 5.970, p = 0.201, V = 0.111 (small), N = 485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender x employment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(4) = 4.166, p = 0.384, V = 0.045 (negligible), N = 2015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With continuity correction</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, correct <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 0.353, p = 0.553 , V = 0.012 (neglig.), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender x region</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(1) = 0.353 (continuity-corrected), p = 0.553, V = 0.013 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">chi_square</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">gender</span>, <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender × education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 3.470, p = 0.325 , V = 0.037 (neglig.), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test: gender x education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   chi2(3) = 3.470, p = 0.325, V = 0.037 (negligible), N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output with all sections</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender × education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender x education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Seco... Academic Secondary University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male               401                  289                320        184</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female             440                  340                311        215</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Secondary Academic Secondary University</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male               401                    289                320        184</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female             440                    340                311        215</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Seco... Academic Secondary University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male           401.662               300.41            301.366    190.562</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female         439.338               328.59            329.634    208.438</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Secondary Academic Secondary University</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male           401.662                300.410            301.366    190.562</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female         439.338                328.590            329.634    208.438</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Chi_squared df p_value sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         3.47  3   0.325    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     Value  df  p value   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Chi-Square  3.470   3     .325   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Sizes:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Measure  Value p_value sig Interpretation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V  0.037   0.325            Neglig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.008   0.850               Weak</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×4 | N = 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Measure     Value  p value     Interpretation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Phi         0.037     .325                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cramer's V  0.037     .325         Negligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2 x 4 | N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Gamma is shown for two ordinal variables (ordered factor or numeric) only.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, cross_tabulation <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># hide cross-tabulation</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test of Independence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender × education</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: gender x education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observed Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Seco... Academic Secondary University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male               401                  289                320        184</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female             440                  340                311        215</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Secondary Academic Secondary University</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male               401                    289                320        184</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female             440                    340                311        215</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected Frequencies:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Seco... Academic Secondary University</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male           401.662               300.41            301.366    190.562</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female         439.338               328.59            329.634    208.438</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> gender   Basic Secondary Intermediate Secondary Academic Secondary University</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male           401.662                300.410            301.366    190.562</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female         439.338                328.590            329.634    208.438</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Chi-Squared Test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Chi_squared df p_value sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         3.47  3   0.325    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     Value  df  p value   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pearson Chi-Square  3.470   3     .325   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Sizes:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Measure  Value p_value sig Interpretation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Cramer's V  0.037   0.325            Neglig.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Gamma -0.008   0.850               Weak</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2×4 | N = 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Phi coefficient only shown for 2x2 tables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Measure     Value  p value     Interpretation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Phi         0.037     .325                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cramer's V  0.037     .325         Negligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Table size: 2 x 4 | N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Gamma is shown for two ordinal variables (ordered factor or numeric) only.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

@@ -24,8 +24,10 @@ write_xpt(data, path, version = 5, name = NULL)
 - version:
 
   SAS transport file version. Either `5` (default, SAS Transport v5,
-  most compatible) or `8` (SAS Transport v8, supports longer variable
-  names).
+  most compatible, variable names of up to 8 characters) or `8` (SAS
+  Transport v8, names of up to 32 characters). Longer names are
+  truncated with a warning; if truncation would create duplicate names,
+  the export stops.
 
 - name:
 
@@ -93,11 +95,11 @@ Other data-export:
 if (requireNamespace("haven", quietly = TRUE)) {
   # Roundtrip: write to a temporary .xpt transport file, read back
   tmp <- tempfile(fileext = ".xpt")
-  write_xpt(survey_data, tmp)
+  write_xpt(survey_data, tmp, version = 8)  # names longer than 8 chars
   data <- read_xpt(tmp)
 
   unlink(tmp)
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file19bf5d1858db.xpt
+#> ✔ Wrote 16 variables (2500 obs.) to file194178a9374f.xpt
 # }
 ```

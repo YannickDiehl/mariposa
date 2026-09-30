@@ -46,7 +46,9 @@ t_test(
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - var.equal:
 
@@ -81,11 +83,16 @@ Test results showing whether groups differ, including:
 
 - t-statistic and p-value for statistical significance
 
-- Mean difference and confidence interval
+- Mean difference and confidence interval (one-sample tests: mean minus
+  `mu` and the interval of that difference, as in the SPSS One-Sample
+  Test)
 
 - Effect sizes (Cohen's d, Hedges' g, Glass' Delta)
 
-- Group statistics (mean, SD, sample size) Use
+- Group statistics (mean, SD, standard error of the mean, sample size)
+
+- A `note` column that explains why a variable (or group) was not
+  computed, e.g. no variance or only one group with valid data Use
   [`summary()`](https://rdrr.io/r/base/summary.html) for the full
   SPSS-style output with toggleable sections.
 
@@ -232,13 +239,15 @@ data(survey_data)
 survey_data %>%
   t_test(life_satisfaction, group = gender)
 #> t-Test: life_satisfaction by gender
-#>   t(2384.1) = -1.018, p = 0.309 , g = -0.041 (negligible), N = 2421
+#>   t(2384.1) = -1.018, p = 0.309, g = -0.041 (negligible), N = 2421
+#> Use summary() for detailed output.
 
 # With survey weights
 survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436
+#> Use summary() for detailed output.
 
 # Multiple variables
 survey_data %>%
@@ -246,61 +255,69 @@ survey_data %>%
 #> t-Test: age by region [Weighted]
 #>   t(763.8) = 2.551, p = 0.011 *, g = 0.130 (negligible), N = 2516
 #> t-Test: income by region [Weighted]
-#>   t(713.7) = 0.299, p = 0.765 , g = 0.016 (negligible), N = 2200
+#>   t(713.7) = 0.299, p = 0.765, g = 0.016 (negligible), N = 2200
 #> t-Test: life_satisfaction by region [Weighted]
-#>   t(721.0) = -0.031, p = 0.975 , g = -0.002 (negligible), N = 2437
+#>   t(721.0) = -0.031, p = 0.975, g = -0.002 (negligible), N = 2437
+#> Use summary() for detailed output.
 
 # One-sample test against a benchmark
 survey_data %>%
   t_test(life_satisfaction, mu = 5, weights = sampling_weight)
 #> t-Test: life_satisfaction [Weighted]
-#>   t(2435.6) = -58.916, p < 0.001 ***
+#>   t(2435.6) = -58.916, p < 0.001 ***, N = 2437
+#> Use summary() for detailed output.
 
 # Grouped analysis
 survey_data %>%
   group_by(region) %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
-#> [region = 1]
+#> [region = East]
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(484.7) = 0.641, p = 0.522 , g = 0.058 (negligible), N = 488
-#> [region = 2]
+#>   t(484.7) = 0.641, p = 0.522, g = 0.058 (negligible), N = 488
+#> [region = West]
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(1901.1) = -1.548, p = 0.122 , g = -0.070 (negligible), N = 1949
+#>   t(1901.1) = -1.548, p = 0.122, g = -0.070 (negligible), N = 1949
+#> Use summary() for detailed output.
 
 # Equal variance assumption
 survey_data %>%
   t_test(life_satisfaction, group = gender, var.equal = TRUE)
 #> t-Test: life_satisfaction by gender
-#>   t(2419.0) = -1.019, p = 0.308 , g = -0.041 (negligible), N = 2421
+#>   t(2419) = -1.019, p = 0.308, g = -0.041 (negligible), N = 2421
+#> Use summary() for detailed output.
 
 # One-sided test
 survey_data %>%
   t_test(income, group = gender, alternative = "greater")
 #> t-Test: income by gender
-#>   t(2169.3) = 0.690, p = 0.245 , g = 0.030 (negligible), N = 2186
+#>   t(2169.3) = 0.690, p = 0.245, g = 0.030 (negligible), N = 2186
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   t_test(starts_with("trust"), group = gender, weights = sampling_weight)
 #> t-Test: trust_government by gender [Weighted]
-#>   t(2322.8) = -0.682, p = 0.496 , g = -0.028 (negligible), N = 2371
+#>   t(2322.8) = -0.682, p = 0.496, g = -0.028 (negligible), N = 2371
 #> t-Test: trust_media by gender [Weighted]
 #>   t(2350.1) = -2.196, p = 0.028 *, g = -0.090 (negligible), N = 2382
 #> t-Test: trust_science by gender [Weighted]
-#>   t(2360.9) = -1.421, p = 0.156 , g = -0.058 (negligible), N = 2414
+#>   t(2360.9) = -1.421, p = 0.156, g = -0.058 (negligible), N = 2414
+#> Use summary() for detailed output.
 
 # Store results for further analysis
 result <- survey_data %>%
   t_test(life_satisfaction, group = gender, weights = sampling_weight)
 print(result)
 #> t-Test: life_satisfaction by gender [Weighted]
-#>   t(2391.3) = -1.069, p = 0.285 , g = -0.043 (negligible), N = 2436
+#>   t(2391.3) = -1.069, p = 0.285, g = -0.043 (negligible), N = 2436
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- t_test(survey_data, life_satisfaction, group = gender)
 result              # compact one-line summary
 #> t-Test: life_satisfaction by gender
-#>   t(2384.1) = -1.018, p = 0.309 , g = -0.041 (negligible), N = 2421
+#>   t(2384.1) = -1.018, p = 0.309, g = -0.041 (negligible), N = 2421
+#> Use summary() for detailed output.
 summary(result)     # full detailed output with all sections
 #> t-Test Results
 #> --------------
@@ -311,24 +328,30 @@ summary(result)     # full detailed output with all sections
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: mean = 3.603, n = 1149.0
-#>   Female: mean = 3.651, n = 1272.0
+#> Group Statistics:
+#>   ----------------------------------------------------
+#>   gender     N   Mean  Std. Deviation  Std. Error Mean
+#>   ----------------------------------------------------
+#>   Male    1149  3.603           1.165            0.034
+#>   Female  1272  3.651           1.142            0.032
+#>   ----------------------------------------------------
 #> 
-#> t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    
-#>  Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    
-#> -------------------------------------------------------------------------------- 
+#> Independent Samples Test:
+#>   --------------------------------------------------------------------------------------------------------
+#>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   
+#>   --------------------------------------------------------------------------------------------------------
+#>   Equal variances assumed      -1.019      2419  .308      -0.048     0.047        -0.140         0.044   
+#>   Equal variances not assumed  -1.018  2384.147  .309      -0.048     0.047        -0.140         0.044   
+#>   --------------------------------------------------------------------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction   -0.041   -0.041      -0.041  negligible
-#> 
+#>   -----------------------------------------------------------------
+#>   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude
+#>   -----------------------------------------------------------------
+#>   life_satisfaction     -0.041     -0.041        -0.041  negligible
+#>   -----------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
@@ -349,19 +372,23 @@ summary(result, effect_sizes = FALSE)  # hide effect sizes
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: mean = 3.603, n = 1149.0
-#>   Female: mean = 3.651, n = 1272.0
+#> Group Statistics:
+#>   ----------------------------------------------------
+#>   gender     N   Mean  Std. Deviation  Std. Error Mean
+#>   ----------------------------------------------------
+#>   Male    1149  3.603           1.165            0.034
+#>   Female  1272  3.651           1.142            0.032
+#>   ----------------------------------------------------
 #> 
-#> t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    
-#>  Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    
-#> -------------------------------------------------------------------------------- 
-#> 
+#> Independent Samples Test:
+#>   --------------------------------------------------------------------------------------------------------
+#>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   
+#>   --------------------------------------------------------------------------------------------------------
+#>   Equal variances assumed      -1.019      2419  .308      -0.048     0.047        -0.140         0.044   
+#>   Equal variances not assumed  -1.018  2384.147  .309      -0.048     0.047        -0.140         0.044   
+#>   --------------------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

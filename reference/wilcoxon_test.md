@@ -45,11 +45,14 @@ wilcoxon_test(data, x, y, weights = NULL, conf.level = 0.95)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - conf.level:
 
-  Confidence level for intervals (Default: 0.95 = 95 percent)
+  Not used. Rank tests report no confidence interval (SPSS `NPAR TESTS`
+  neither); kept for backward compatibility.
 
 ## Value
 
@@ -95,6 +98,11 @@ different
 - Positive Ranks: subjects where y \> x (increased)
 
 - Ties: subjects where y = x (no change)
+
+**Z**: as in SPSS, computed from the smaller of the two rank sums, so it
+is never positive; `z_based_on` ("negative ranks" or "positive ranks")
+names that sum, like SPSS's footnote. "Based on negative ranks" means
+that increases (y \> x) dominate.
 
 ### When to Use This
 
@@ -188,10 +196,10 @@ survey_data %>%
 survey_data %>%
   group_by(region) %>%
   wilcoxon_test(x = trust_government, y = trust_media)
-#> [region = 1]
+#> [region = East]
 #> Wilcoxon Signed-Rank Test: trust_media - trust_government
 #>   Z = -2.727, p = 0.006 **, r = 0.147 (small), N = 435
-#> [region = 2]
+#> [region = West]
 #> Wilcoxon Signed-Rank Test: trust_media - trust_government
 #>   Z = -4.346, p < 0.001 ***, r = 0.117 (small), N = 1792
 #> Use summary() for detailed output.

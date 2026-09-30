@@ -45,7 +45,15 @@ stores SPSS user-defined missing values as tagged NAs with an
 -9, -8). `write_spss()` reverses this process: tagged NAs are converted
 back to their original numeric codes, and the SPSS user-defined missing
 value specification is reconstructed so that the exported `.sav` file
-has the same missing value definitions as the original.
+has the same missing value definitions as the original:
+[`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
+remembers the original definition (e.g. `LOWEST THRU -1`), which is
+written back as long as it still covers every missing code and no valid
+value. Otherwise up to 3 codes are written as discrete values; more
+codes use SPSS's "range plus one discrete value" form (the tightest that
+contains no valid value), announced in one message. If no such range
+exists, the export stops with an error instead of declaring valid values
+missing.
 
 ### Cross-Format Export
 
@@ -53,6 +61,24 @@ When exporting data originally imported from Stata or SAS (with native
 extended missing values like `.a`-`.z` or `.A`-`.Z`), these cannot be
 represented as SPSS user-defined missing values. In this case, they are
 written as system missing (regular `NA`) with a warning.
+
+### Derived Variables
+
+Arithmetic on an imported variable (e.g. `x + 1` inside
+[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)) keeps
+its tagged NAs but loses the code map, so the original codes are
+unknown. Such values are written as system missing with a warning naming
+the variables.
+[`rec()`](https://YannickDiehl.github.io/mariposa/reference/rec.md)
+keeps the map;
+[`std()`](https://YannickDiehl.github.io/mariposa/reference/std.md),
+[`center()`](https://YannickDiehl.github.io/mariposa/reference/center.md),
+[`pomps()`](https://YannickDiehl.github.io/mariposa/reference/pomps.md)
+and
+[`to_numeric()`](https://YannickDiehl.github.io/mariposa/reference/to_numeric.md)
+return plain `NA` by design. Numeric columns that carry a bare
+`"labels"` attribute (without the `haven_labelled` class) are exported
+with their value labels.
 
 ### When to Use This
 
@@ -100,7 +126,7 @@ if (requireNamespace("haven", quietly = TRUE)) {
 
   unlink(c(tmp, tmp_z))
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file19bf444a83ce.sav
-#> ✔ Wrote 16 variables (2500 obs.) to file19bf48ebaa0d.zsav
+#> ✔ Wrote 16 variables (2500 obs.) to file1941c0a9ac5.sav
+#> ✔ Wrote 16 variables (2500 obs.) to file19412a7e5e73.zsav
 # }
 ```

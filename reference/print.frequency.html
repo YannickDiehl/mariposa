@@ -83,7 +83,8 @@ additionally offers section toggles and a <code>digits</code> option.</p>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
-<dd><p>Number of decimal places to display (default: 2)</p></dd>
+<dd><p>Number of decimal places of the percentages (default: 2);
+the summary statistics line uses at least two decimals.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -104,16 +105,16 @@ additionally offers section toggles and a <code>digits</code> option.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> gender (Gender)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |   2500 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male   | 1194 |  47.76 |   47.76 |  47.76 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | 1306 |  52.24 |   52.24 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total  | 2500 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># same tables, with section toggles</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -121,16 +122,16 @@ additionally offers section toggles and a <code>digits</code> option.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> gender (Gender)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |   2500 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male   | 1194 |  47.76 |   47.76 |  47.76 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | 1306 |  52.24 |   52.24 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total  | 2500 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

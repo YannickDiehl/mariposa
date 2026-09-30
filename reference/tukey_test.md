@@ -30,7 +30,12 @@ tukey_test(x, conf.level = 0.95, ...)
 
 - conf.level:
 
-  Confidence level for intervals (Default: 0.95 = 95%)
+  Confidence level of the simultaneous intervals (Default: 0.95). As in
+  SPSS it corresponds to the post-hoc `ALPHA` (1 - alpha) and does not
+  follow the `conf.level` of
+  [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
+  which (like SPSS `CILEVEL`) only sets the intervals of the group
+  means.
 
 - ...:
 

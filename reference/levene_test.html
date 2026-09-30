@@ -93,11 +93,14 @@ out in similar ways.</p>
 <span><span class="co"># S3 method for class 't_test'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'ancova'</span></span>
+<span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'mann_whitney'</span></span>
 <span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'grouped_df'</span></span>
-<span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">variable</span>, group <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="st">"mean"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">levene_test</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, <span class="va">group</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -105,31 +108,33 @@ out in similar ways.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Either your data or test results from <code><a href="t_test.html">t_test()</a></code> or <code><a href="oneway_anova.html">oneway_anova()</a></code></p></dd>
+<dd><p>Either your data (a data frame, optionally grouped with
+<code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>) or test results from <code><a href="t_test.html">t_test()</a></code>,
+<code><a href="oneway_anova.html">oneway_anova()</a></code>, <code><a href="factorial_anova.html">factorial_anova()</a></code> or <code><a href="ancova.html">ancova()</a></code></p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Variables to test (when using data frame)</p></dd>
+<dd><p>Variables to test (when using a data frame). List several
+variables or use tidyselect helpers like <code>starts_with("trust")</code>.</p></dd>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
-<dd><p>The grouping variable for comparison</p></dd>
+<dd><p>The grouping variable for comparison (unquoted or a string)</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Must be numeric and non-negative (the package-wide weights
+policy). Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-center">center<a class="anchor" aria-label="anchor" href="#arg-center"></a></dt>
-<dd><p>How to measure center: <code>"mean"</code> (default) or <code>"median"</code> (more robust)</p></dd>
-
-
-<dt id="arg-variable">variable<a class="anchor" aria-label="anchor" href="#arg-variable"></a></dt>
-<dd><p>Variable to test (when using grouped data frame)</p></dd>
-
-
-<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>Your survey data (when x is not a test result)</p></dd>
+<dd><p>How to measure center: <code>"mean"</code> (default) or
+<code>"median"</code> (more robust). For <code><a href="ancova.html">ancova()</a></code> results only
+<code>"mean"</code> is available: as in SPSS UNIANOVA, the test is computed on
+the absolute residuals of the ANCOVA model (covariates and factors),
+compared across the cells of the design.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -222,15 +227,15 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span><span class="co"># Standalone Levene test (test homogeneity of variances)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: life_satisfaction by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2419) = 3.164, p = 0.075 , variances equal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2419) = 3.164, p = 0.075, variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">trust_government</span>, group <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: life_satisfaction by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2419) = 3.164, p = 0.075 , variances equal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2419) = 3.164, p = 0.075, variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: trust_government by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2352) = 0.145, p = 0.703 , variances equal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2352) = 0.145, p = 0.703, variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
@@ -252,13 +257,13 @@ variances. <em>Journal of the American Statistical Association</em>, 69(346),
 <span class="r-in"><span>  <span class="fu"><a href="t_test.html">t_test</a></span><span class="op">(</span><span class="va">age</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">levene_test</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: age by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2498) = 0.534, p = 0.465 , variances equal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2498) = 0.534, p = 0.465, variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using mean instead of median as center</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">levene_test</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">region</span>, center <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levene's Test: income by region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2184) = 1.631, p = 0.202 , variances equal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F(1, 2184) = 1.631, p = 0.202, variances equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -1,9 +1,10 @@
 # Spearman's Rank Correlation Analysis
 
 Calculates Spearman's rank correlation coefficients (rho) between
-variables with support for weighted correlations, grouped data, and
-multiple variable pairs. Provides significance testing and
-SPSS-compatible output formatting.
+variables with support for grouped data and multiple variable pairs.
+Provides significance testing and SPSS-compatible output formatting.
+Survey weights only select cases (see `weights`); the coefficient itself
+is unweighted, as in SPSS NONPAR CORR.
 
 Spearman's rho is a non-parametric measure of rank correlation that
 assesses monotonic relationships between variables. It is particularly
@@ -33,7 +34,8 @@ spearman_rho(
 
   The variables you want to correlate. List two for a single correlation
   or more for a correlation matrix. You can use helpers like
-  `starts_with("trust")`.
+  `starts_with("trust")`. Numeric variables or ordered factors (ranked
+  by their level order).
 
 - weights:
 
@@ -42,7 +44,9 @@ spearman_rho(
   are dropped); the rank correlation itself is computed unweighted on
   the remaining sample. For design-based weighted Spearman use
   [`survey::svyolr()`](https://rdrr.io/pkg/survey/man/svyolr.html) or
-  `wCorr::weightedCorr(method = "Spearman")`.
+  `wCorr::weightedCorr(method = "Spearman")`. Give a column name
+  (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - alternative:
 
@@ -176,73 +180,82 @@ data(survey_data)
 survey_data %>%
   spearman_rho(life_satisfaction, political_orientation)
 #> Spearman Correlation: life_satisfaction x political_orientation
-#>   rho = -0.004, p = 0.833 , N = 2228
+#>   rho = -0.004, p = 0.833, N = 2228
+#> Use summary() for detailed output.
 
 # Correlation matrix for multiple variables
 survey_data %>%
   spearman_rho(life_satisfaction, political_orientation, trust_media)
 #> Spearman Correlation: 3 variables
-#>   life_satisfaction x political_orientation: rho = -0.004, p = 0.833  
-#>   life_satisfaction x trust_media: rho = 0.028, p = 0.181  
-#>   political_orientation x trust_media: rho = 0.003, p = 0.885  
-#>   0/3 pairs significant (p < .05), N = 2228
+#>   life_satisfaction x political_orientation: rho = -0.004, p = 0.833
+#>   life_satisfaction x trust_media:           rho = 0.028, p = 0.181
+#>   political_orientation x trust_media:       rho = 0.003, p = 0.885
+#>   0/3 pairs significant (p < .05), N = 2177-2291
+#> Use summary() for detailed output.
 
-# Weighted correlations (mathematically correct, though SPSS may not apply weights)
+# Weights only filter cases (weight <= 0 or NA dropped); rho itself is
+# unweighted, matching SPSS NONPAR CORR
 survey_data %>%
   spearman_rho(age, income, weights = sampling_weight)
-#> Spearman Correlation: age x income [Weighted]
-#>   rho = 0.003, p = 0.870 , N = 2186
+#> Spearman Correlation: age x income
+#>   rho = 0.003, p = 0.870, N = 2186
+#> Use summary() for detailed output.
 
 # Grouped correlations
 survey_data %>%
   group_by(region) %>%
   spearman_rho(age, income, life_satisfaction)
-#> [region = 1]
+#> [region = East]
 #> Spearman Correlation: 3 variables
-#>   age x income:                  rho = 0.058, p = 0.234  
-#>   age x life_satisfaction:       rho = -0.040, p = 0.391  
-#>   income x life_satisfaction:    rho = 0.440, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 429
-#> [region = 2]
+#>   age x income:               rho = 0.058, p = 0.234
+#>   age x life_satisfaction:    rho = -0.040, p = 0.391
+#>   income x life_satisfaction: rho = 0.440, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 410-465
+#> [region = West]
 #> Spearman Correlation: 3 variables
-#>   age x income:                  rho = -0.008, p = 0.725  
-#>   age x life_satisfaction:       rho = -0.020, p = 0.382  
-#>   income x life_satisfaction:    rho = 0.470, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 1757
+#>   age x income:               rho = -0.008, p = 0.725
+#>   age x life_satisfaction:    rho = -0.020, p = 0.382
+#>   income x life_satisfaction: rho = 0.470, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 1705-1956
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   spearman_rho(starts_with("trust"), weights = sampling_weight)
-#> Spearman Correlation: 3 variables [Weighted]
-#>   trust_government x trust_media: rho = 0.008, p = 0.723  
-#>   trust_government x trust_science: rho = 0.027, p = 0.207  
-#>   trust_media x trust_science:   rho = 0.016, p = 0.453  
-#>   0/3 pairs significant (p < .05), N = 2227
+#> Spearman Correlation: 3 variables
+#>   trust_government x trust_media:   rho = 0.008, p = 0.723
+#>   trust_government x trust_science: rho = 0.027, p = 0.207
+#>   trust_media x trust_science:      rho = 0.016, p = 0.453
+#>   0/3 pairs significant (p < .05), N = 2227-2272
+#> Use summary() for detailed output.
 
 # Listwise deletion for missing data
 survey_data %>%
   spearman_rho(age, income, use = "listwise")
 #> Spearman Correlation: age x income
-#>   rho = 0.003, p = 0.870 , N = 2186
+#>   rho = 0.003, p = 0.870, N = 2186
+#> Use summary() for detailed output.
 
 # One-tailed test
 survey_data %>%
   spearman_rho(age, income, alternative = "greater")
-#> Spearman Correlation: age x income
-#>   rho = 0.003, p = 0.435 , N = 2186
+#> Spearman Correlation: age x income [one-sided: greater]
+#>   rho = 0.003, p = 0.435, N = 2186
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- spearman_rho(survey_data, age, income, life_satisfaction)
 result              # compact one-line overview
 #> Spearman Correlation: 3 variables
-#>   age x income:                  rho = 0.003, p = 0.870  
-#>   age x life_satisfaction:       rho = -0.024, p = 0.238  
-#>   income x life_satisfaction:    rho = 0.464, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 2186
+#>   age x income:               rho = 0.003, p = 0.870
+#>   age x life_satisfaction:    rho = -0.024, p = 0.238
+#>   income x life_satisfaction: rho = 0.464, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 2115-2421
+#> Use summary() for detailed output.
 summary(result)     # full correlation, p-value, and N matrices
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: age, income, life_satisfaction
@@ -251,42 +264,43 @@ summary(result)     # full correlation, p-value, and N matrices
 #> 
 #> 
 #> Spearman's Rho Matrix:
-#> ---------------------- 
-#>                       age  income life_satisfaction
-#> age                 1.000   0.003            -0.024
-#> income              0.003   1.000             0.464
-#> life_satisfaction  -0.024   0.464             1.000
-#> ---------------------- 
+#> ----------------------
+#>                       age     income     life_satisfaction   
+#> age                     1      0.003                -0.024   
+#> income              0.003          1                 0.464***
+#> life_satisfaction  -0.024      0.464***                  1   
+#> ----------------------
 #> 
 #> Significance Matrix (p-values, 2-tailed):
-#> ----------------------------------------- 
-#>                       age  income life_satisfaction
-#> age                0.0000  0.8703            0.2383
-#> income             0.8703  0.0000            0.0000
-#> life_satisfaction  0.2383  0.0000            0.0000
-#> ----------------------------------------- 
+#> -----------------------------------------
+#>                     age  income  life_satisfaction
+#> age                        .870               .238
+#> income             .870                      <.001
+#> life_satisfaction  .238   <.001                   
+#> -----------------------------------------
 #> 
 #> Sample Size Matrix:
-#> ------------------- 
-#>                     age income life_satisfaction
-#> age                2500   2186              2421
-#> income             2186   2186              2115
-#> life_satisfaction  2421   2115              2421
-#> ------------------- 
+#> -------------------
+#>                     age  income  life_satisfaction
+#> age                2500    2186               2421
+#> income             2186    2186               2115
+#> life_satisfaction  2421    2115               2421
+#> -------------------
 #> 
 #> Pairwise Results:
-#> ---------------- 
-#>                        Pair    rho      t      p    n sig
-#>                age × income  0.003  0.163 0.8703 2186    
-#>     age × life_satisfaction -0.024 -1.180 0.2383 2421    
-#>  income × life_satisfaction  0.464 24.073 0.0000 2115 ***
-#> ---------------- 
+#>   ------------------------------------------------------------
+#>   Pair                           rho       t      p     N     
+#>   ------------------------------------------------------------
+#>   age x income                 0.003   0.163   .870  2186     
+#>   age x life_satisfaction     -0.024  -1.180   .238  2421     
+#>   income x life_satisfaction   0.464  24.073  <.001  2115  ***
+#>   ------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: age, income, life_satisfaction
@@ -295,28 +309,29 @@ summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> 
 #> 
 #> Spearman's Rho Matrix:
-#> ---------------------- 
-#>                       age  income life_satisfaction
-#> age                 1.000   0.003            -0.024
-#> income              0.003   1.000             0.464
-#> life_satisfaction  -0.024   0.464             1.000
-#> ---------------------- 
+#> ----------------------
+#>                       age     income     life_satisfaction   
+#> age                     1      0.003                -0.024   
+#> income              0.003          1                 0.464***
+#> life_satisfaction  -0.024      0.464***                  1   
+#> ----------------------
 #> 
 #> Sample Size Matrix:
-#> ------------------- 
-#>                     age income life_satisfaction
-#> age                2500   2186              2421
-#> income             2186   2186              2115
-#> life_satisfaction  2421   2115              2421
-#> ------------------- 
+#> -------------------
+#>                     age  income  life_satisfaction
+#> age                2500    2186               2421
+#> income             2186    2186               2115
+#> life_satisfaction  2421    2115               2421
+#> -------------------
 #> 
 #> Pairwise Results:
-#> ---------------- 
-#>                        Pair    rho      t      p    n sig
-#>                age × income  0.003  0.163 0.8703 2186    
-#>     age × life_satisfaction -0.024 -1.180 0.2383 2421    
-#>  income × life_satisfaction  0.464 24.073 0.0000 2115 ***
-#> ---------------- 
+#>   ------------------------------------------------------------
+#>   Pair                           rho       t      p     N     
+#>   ------------------------------------------------------------
+#>   age x income                 0.003   0.163   .870  2186     
+#>   age x life_satisfaction     -0.024  -1.180   .238  2421     
+#>   income x life_satisfaction   0.464  24.073  <.001  2115  ***
+#>   ------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

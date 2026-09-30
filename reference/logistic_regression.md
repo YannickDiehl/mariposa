@@ -43,18 +43,23 @@ logistic_regression(
 - dependent:
 
   The dependent variable (unquoted). Used with `predictors` when no
-  formula is given. Must be binary (0/1 or two-level factor).
+  formula is given. Must have exactly two distinct values (e.g. 0/1,
+  1/2, a two-level factor); see Technical Details.
 
 - predictors:
 
   Predictor variable(s) (unquoted, supports tidyselect). Used with
-  `dependent` when no formula is given.
+  `dependent` when no formula is given. The dependent, weights and
+  grouping variables are never used as predictors (a selection such as
+  `where(is.numeric)` drops them with a message). Character predictors
+  are entered as factors.
 
 - weights:
 
-  Optional survey weights (unquoted variable name). When specified,
-  weighted maximum likelihood estimation is used, matching SPSS WEIGHT
-  BY behavior.
+  Optional survey weights. When specified, weighted maximum likelihood
+  estimation is used, matching SPSS WEIGHT BY behavior. Give a column
+  name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - conf.level:
 
@@ -72,7 +77,14 @@ logistic_regression(
   listing the coerced variables. Note that for *ordered* factors,
   "dummy" applies R's default polynomial contrasts (terms suffixed `.L`,
   `.Q`, `.C`), not treatment dummies; convert with
-  `factor(x, ordered = FALSE)` first if you want dummy coding.
+  `factor(x, ordered = FALSE)` first if you want dummy coding. `factors`
+  applies to factors only: labelled predictors from SPSS files
+  (`haven_labelled`) are numeric and enter with their numeric codes, as
+  in SPSS LOGISTIC REGRESSION without `/CATEGORICAL`;
+  [`summary()`](https://rdrr.io/r/base/summary.html) notes them. Convert
+  them with
+  [`to_label`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
+  first to get dummy coding.
 
 ## Value
 
@@ -100,6 +112,11 @@ with mariposa-specific slots attached:
 
   List with chi_sq, df, p (goodness-of-fit test)
 
+- dv_encoding:
+
+  Tibble Original -\> Internal (0/1) of the outcome categories (SPSS
+  "Dependent Variable Encoding")
+
 - n:
 
   Sample size (listwise complete cases; weighted N when weighted)
@@ -124,7 +141,12 @@ dispatch natively without unwrapping.
 [`summary()`](https://rdrr.io/r/base/summary.html) returns the
 SPSS-style mariposa summary; for the raw glm summary use
 [`stats::summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) on
-the same object.
+the same object. [`confint()`](https://rdrr.io/r/stats/confint.html)
+returns Wald intervals on the log-odds scale (the SPSS method;
+`exp(confint(model))` gives the "C.I. for EXP(B)" of the summary),
+profile-likelihood intervals via `confint(model, method = "profile")`;
+see
+[`confint.logistic_regression`](https://YannickDiehl.github.io/mariposa/reference/confint.logistic_regression.md).
 
 For grouped data, returns a list of class `"logistic_regression"` with
 `$groups` holding one fitted glm-inheriting result per group.
@@ -174,9 +196,17 @@ instead.
 
 ### Technical Details
 
-**Dependent Variable**: Must be binary. Factors with exactly 2 levels
-are automatically converted to 0/1 (first level = 0, second level = 1).
-Numeric variables must contain only 0 and 1 values.
+**Dependent Variable**: Any variable with exactly two distinct observed
+values, coded internally as 0/1 like SPSS LOGISTIC REGRESSION does: for
+numeric and labelled variables the lower value becomes 0 and the higher
+1 (so 1/2 and 0/1 codings give the same model); for factors unused
+levels are dropped and the first remaining level becomes 0; character
+values are ordered alphabetically; logicals code `FALSE` = 0, `TRUE`
+= 1. The model predicts the probability of the category coded 1 - the
+compact print names it (`[P(y = category)]`), and
+[`summary()`](https://rdrr.io/r/base/summary.html) shows the SPSS
+"Dependent Variable Encoding" table (also stored as `$dv_encoding`). A
+grouped analysis uses one encoding for all groups.
 
 **Missing Data**: Listwise deletion is used (matching SPSS LOGISTIC
 REGRESSION default behavior).
@@ -233,53 +263,63 @@ survey_data$high_satisfaction <- ifelse(survey_data$life_satisfaction >= 4, 1, 0
 
 # Bivariate logistic regression
 logistic_regression(survey_data, high_satisfaction ~ age)
-#> Logistic Regression: high_satisfaction ~ age
-#>   Nagelkerke R2 = 0.000, chi2(1) = 0.28, p = 0.595 , Accuracy = 57.7%, N = 2421
+#> Logistic Regression: high_satisfaction ~ age [P(high_satisfaction = 1)]
+#>   Nagelkerke R2 = 0.000, chi2(1) = 0.28, p = 0.595, Accuracy = 57.7%, N = 2421
+#> Use summary() for detailed output.
 
 # Multiple logistic regression
 logistic_regression(survey_data, high_satisfaction ~ age + income + education)
-#> Logistic Regression: high_satisfaction ~ age + income + education
+#> Logistic Regression: high_satisfaction ~ age + income + education [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.213, chi2(5) = 364.62, p < 0.001 ***, Accuracy = 68.3%, N = 2115
+#> Use summary() for detailed output.
 
 # SPSS-style interface
 logistic_regression(survey_data,
                     dependent = high_satisfaction,
                     predictors = c(age, income))
-#> Logistic Regression: high_satisfaction ~ age + income
+#> Logistic Regression: high_satisfaction ~ age + income [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p < 0.001 ***, Accuracy = 68.4%, N = 2115
+#> Use summary() for detailed output.
 
 # Weighted logistic regression
 logistic_regression(survey_data, high_satisfaction ~ age,
                     weights = sampling_weight)
-#> Logistic Regression: high_satisfaction ~ age [Weighted]
-#>   Nagelkerke R2 = 0.000, chi2(1) = 0.30, p = 0.586 , Accuracy = 57.6%, N = 2437
+#> Logistic Regression: high_satisfaction ~ age [P(high_satisfaction = 1)] [Weighted]
+#>   Nagelkerke R2 = 0.000, chi2(1) = 0.30, p = 0.586, Accuracy = 57.6%, N = 2437
+#> Use summary() for detailed output.
 
 # Grouped by region
 survey_data |>
   dplyr::group_by(region) |>
   logistic_regression(high_satisfaction ~ age)
-#> Logistic Regression: high_satisfaction ~ age [Grouped: region]
-#>   region = East: Nagelkerke R2 = 0.002, chi2(1) = 0.74, p = 0.390 , Accuracy = 58.3%, N = 465
-#>   region = West: Nagelkerke R2 = 0.000, chi2(1) = 0.03, p = 0.860 , Accuracy = 57.6%, N = 1956
+#> Logistic Regression: high_satisfaction ~ age [P(high_satisfaction = 1)] [Grouped: region]
+#> [region = East]
+#>   Nagelkerke R2 = 0.002, chi2(1) = 0.74, p = 0.390, Accuracy = 58.3%, N = 465
+#> [region = West]
+#>   Nagelkerke R2 = 0.000, chi2(1) = 0.03, p = 0.860, Accuracy = 57.6%, N = 1956
+#> Use summary() for detailed output.
 
 # Factor predictors: dummy-coding (default, matches base R glm())
 logistic_regression(survey_data, high_satisfaction ~ age + education)
-#> Logistic Regression: high_satisfaction ~ age + education
+#> Logistic Regression: high_satisfaction ~ age + education [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.084, chi2(4) = 156.25, p < 0.001 ***, Accuracy = 63.4%, N = 2421
+#> Use summary() for detailed output.
 
 # Factor predictors: SPSS-style ordinal-as-scale
 logistic_regression(survey_data, high_satisfaction ~ age + education,
                     factors = "numeric")
 #> ℹ Factor predictor(s) coerced to numeric (SPSS-style ordinal scaling):
 #> • `education`
-#> Logistic Regression: high_satisfaction ~ age + education
+#> Logistic Regression: high_satisfaction ~ age + education [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.078, chi2(2) = 144.84, p < 0.001 ***, Accuracy = 63.4%, N = 2421
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- logistic_regression(survey_data, high_satisfaction ~ age + income)
 result                                    # compact one-line overview
-#> Logistic Regression: high_satisfaction ~ age + income
+#> Logistic Regression: high_satisfaction ~ age + income [P(high_satisfaction = 1)]
 #>   Nagelkerke R2 = 0.209, chi2(2) = 357.43, p < 0.001 ***, Accuracy = 68.4%, N = 2115
+#> Use summary() for detailed output.
 summary(result)                           # full detailed SPSS-style output
 #> 
 #> Logistic Regression Results
@@ -288,47 +328,53 @@ summary(result)                           # full detailed SPSS-style output
 #> - Method: ENTER
 #> - N: 2115
 #> 
+#>   Dependent Variable Encoding
+#>   ------------------------------
+#>   Original Value  Internal Value
+#>   ------------------------------
+#>   0                            0
+#>   1                            1
+#>   ------------------------------
+#> 
 #>   Omnibus Tests of Model Coefficients
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>   Model                     357.432     2      0.000 ***
-#>   --------------------------------------------------
+#>   ---------------------------------
+#>          Chi-square  df   Sig.     
+#>   ---------------------------------
+#>   Model     357.432   2  <.001  ***
+#>   ---------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   -2 Log Likelihood                  2520.010
-#>   Cox & Snell R Square                  0.155
-#>   Nagelkerke R Square                   0.209
-#>   McFadden R Square                     0.124
-#>   ------------------------------------------------------------
+#>   -------------------------------
+#>   -2 Log Likelihood      2520.010
+#>   Cox & Snell R Square      0.155
+#>   Nagelkerke R Square       0.209
+#>   McFadden R Square         0.124
+#>   -------------------------------
 #> 
 #>   Hosmer and Lemeshow Test
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>                             150.764     8      0.000
-#>   --------------------------------------------------
+#>   ------------------------
+#>      Chi-square  df   Sig.
+#>   ------------------------
+#>         150.764   8  <.001
+#>   ------------------------
 #> 
-#>   Classification Table (cutoff = 0.50)
-#>   -----------------------------------------------------------------
-#>                                   Predicted                     
-#>   Observed                      0          1       % Correct
-#>   -----------------------------------------------------------------
-#>   0                           508        380           57.2
-#>   1                           289        938           76.4
-#>   -----------------------------------------------------------------
-#>   Overall Percentage                                   68.4
-#>   -----------------------------------------------------------------
+#>   Classification Table (cutoff = 0.50; rows: observed, columns: predicted)
+#>   ---------------------------------------
+#>   Observed              0    1  % Correct
+#>   ---------------------------------------
+#>   0                   508  380       57.2
+#>   1                   289  938       76.4
+#>   Overall Percentage                 68.4
+#>   ---------------------------------------
 #> 
 #>   Variables in the Equation
-#>   -----------------------------------------------------------------------------------------------
-#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
-#>   -----------------------------------------------------------------------------------------------
-#>   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***
-#>   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 
-#>   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***
-#>   -----------------------------------------------------------------------------------------------
+#>   ------------------------------------------------------------------------------------------
+#>   Term              B      S.E.     Wald  df   Sig.  Exp(B)  95% CI Lower  95% CI Upper     
+#>   ------------------------------------------------------------------------------------------
+#>   (Intercept)  -2.252     0.212  112.868   1  <.001   0.105                              ***
+#>   age           0.001     0.003    0.174   1   .677   1.001         0.996         1.007     
+#>   income        0.001  4.26e-05  268.118   1  <.001  1.0007        1.0006        1.0008  ***
+#>   ------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, classification = FALSE)   # hide classification table
@@ -339,36 +385,44 @@ summary(result, classification = FALSE)   # hide classification table
 #> - Method: ENTER
 #> - N: 2115
 #> 
+#>   Dependent Variable Encoding
+#>   ------------------------------
+#>   Original Value  Internal Value
+#>   ------------------------------
+#>   0                            0
+#>   1                            1
+#>   ------------------------------
+#> 
 #>   Omnibus Tests of Model Coefficients
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>   Model                     357.432     2      0.000 ***
-#>   --------------------------------------------------
+#>   ---------------------------------
+#>          Chi-square  df   Sig.     
+#>   ---------------------------------
+#>   Model     357.432   2  <.001  ***
+#>   ---------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   -2 Log Likelihood                  2520.010
-#>   Cox & Snell R Square                  0.155
-#>   Nagelkerke R Square                   0.209
-#>   McFadden R Square                     0.124
-#>   ------------------------------------------------------------
+#>   -------------------------------
+#>   -2 Log Likelihood      2520.010
+#>   Cox & Snell R Square      0.155
+#>   Nagelkerke R Square       0.209
+#>   McFadden R Square         0.124
+#>   -------------------------------
 #> 
 #>   Hosmer and Lemeshow Test
-#>   --------------------------------------------------
-#>                          Chi-square    df       Sig.
-#>   --------------------------------------------------
-#>                             150.764     8      0.000
-#>   --------------------------------------------------
+#>   ------------------------
+#>      Chi-square  df   Sig.
+#>   ------------------------
+#>         150.764   8  <.001
+#>   ------------------------
 #> 
 #>   Variables in the Equation
-#>   -----------------------------------------------------------------------------------------------
-#>   Term                         B      S.E.      Wald   df     Sig.     Exp(B)     Lower     Upper 
-#>   -----------------------------------------------------------------------------------------------
-#>   (Intercept)             -2.252     0.212   112.853    1    0.000      0.105                     ***
-#>   age                      0.001     0.003     0.174    1    0.677      1.001     0.996     1.007 
-#>   income                   0.001     0.000   268.051    1    0.000      1.001     1.001     1.001 ***
-#>   -----------------------------------------------------------------------------------------------
+#>   ------------------------------------------------------------------------------------------
+#>   Term              B      S.E.     Wald  df   Sig.  Exp(B)  95% CI Lower  95% CI Upper     
+#>   ------------------------------------------------------------------------------------------
+#>   (Intercept)  -2.252     0.212  112.868   1  <.001   0.105                              ***
+#>   age           0.001     0.003    0.174   1   .677   1.001         0.996         1.007     
+#>   income        0.001  4.26e-05  268.118   1  <.001  1.0007        1.0006        1.0008  ***
+#>   ------------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

@@ -27,7 +27,9 @@ reliability(data, ..., weights = NULL, na.rm = TRUE)
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
@@ -75,6 +77,21 @@ A reliability result object containing:
 - n:
 
   Sample size (listwise)
+
+- variable_labels:
+
+  Named character vector with the items' variable labels (`NA` where an
+  item has none); [`summary()`](https://rdrr.io/r/base/summary.html)
+  lists them next to the item names
+
+- removed_items:
+
+  Items removed for zero variance, or `NULL`
+
+- negative_items:
+
+  When alpha is negative: the items with a negative corrected item-total
+  correlation (candidates for reverse-coding)
 
 Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
 SPSS-style output with toggleable sections.
@@ -128,7 +145,13 @@ each item, mirroring Alpha if Item Deleted.
 A one-factor model needs at least 3 items to be identified: with fewer
 than 3 items the omega fields are `NA` (alpha is still computed), and
 Omega if Item Deleted is `NA` whenever the reduced scale would fall
-below 3 items.
+below 3 items. Omega is also `NA`, with a warning, when the items'
+correlation matrix is singular or the one-factor solution is a Heywood
+case (an item's uniqueness at the lower bound, i.e. a loading of about
+1: the "factor" is then that single item, not the scale).
+
+Items with zero variance are removed from the scale with a warning, as
+SPSS RELIABILITY does (`$removed_items`).
 
 ### Weighted variants and validation status
 
@@ -197,39 +220,53 @@ data(survey_data)
 reliability(survey_data, trust_government, trust_media, trust_science)
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 
 # With survey weights
 reliability(survey_data, trust_government, trust_media, trust_science,
             weights = sampling_weight)
 #> Reliability Analysis: 3 items [Weighted]
 #>   Cronbach's Alpha = 0.052 (Poor), McDonald's Omega = 0.053, N = 2150
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 reliability(survey_data, starts_with("trust"))
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 
 # Grouped by region
 survey_data %>%
   group_by(region) %>%
   reliability(trust_government, trust_media, trust_science)
-#> [region = 1]
+#> Warning: McDonald's omega is not computed (group region = East): the one-factor solution
+#> is a Heywood case.
+#> ℹ `trust_media` has a uniqueness at the lower bound (a loading of about 1), so
+#>   the factor reflects this item rather than the scale.
+#> ℹ This usually means the items share little common variance; Cronbach's alpha
+#>   is unaffected.
+#> [region = East]
 #> Reliability Analysis: 3 items
-#>   Cronbach's Alpha = 0.037 (Poor), McDonald's Omega = 0.349, N = 422
-#> [region = 2]
+#>   Cronbach's Alpha = 0.037 (Poor), McDonald's Omega = not computed, N = 422
+#> [region = West]
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.050 (Poor), McDonald's Omega = 0.071, N = 1713
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- reliability(survey_data, trust_government, trust_media, trust_science)
 result              # compact one-line overview
 #> Reliability Analysis: 3 items
 #>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135
+#> Use summary() for detailed output.
 summary(result)     # full detailed output with all sections
 #> 
 #> Reliability Analysis Results
 #> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
+#> - Items:
+#>     trust_government  Trust in government (1=none, 5=complete)
+#>     trust_media       Trust in media (1=none, 5=complete)
+#>     trust_science     Trust in science (1=none, 5=complete)
 #> - N of Items: 3
 #> 
 #> Reliability Statistics
@@ -242,37 +279,42 @@ summary(result)     # full detailed output with all sections
 #>   N (listwise):                  2135
 #> 
 #> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
+#>   ----------------------------------------------------------------------
+#>   Item                                        Mean  Std. Deviation     N
+#>   ----------------------------------------------------------------------
+#>   trust_government  Trust in government ...  2.621           1.162  2135
+#>   trust_media       Trust in media (1=no...  2.430           1.156  2135
+#>   trust_science     Trust in science (1=...  3.624           1.034  2135
+#>   ----------------------------------------------------------------------
 #> 
-#> Inter-Item Correlation Matrix:
-#> ------------------------------ 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.014         0.020
-#> trust_media                 0.014       1.000         0.015
-#> trust_science               0.020       0.015         1.000
-#> ------------------------------ 
+#> Inter-Item Correlation Matrix
+#>   -----------------------------------------
+#>                           (1)    (2)    (3)
+#>   -----------------------------------------
+#>   (1) trust_government  1.000  0.014  0.020
+#>   (2) trust_media       0.014  1.000  0.015
+#>   (3) trust_science     0.020  0.015  1.000
+#>   -----------------------------------------
 #> 
 #> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted omega_deleted
-#>          0.029            NA
-#>          0.040            NA
-#>          0.027            NA
+#>   ------------------------------------------------------------------------
+#>                     Scale Mean  Scale Var.   Corrected  Alpha if  Omega if
+#>   Item              if Deleted  if Deleted  Item-Total   Deleted   Deleted
+#>   ------------------------------------------------------------------------
+#>   trust_government       6.054       2.440       0.024     0.029          
+#>   trust_media            6.245       2.467       0.020     0.040          
+#>   trust_science          5.051       2.723       0.025     0.027          
+#>   ------------------------------------------------------------------------
 #> Note: Omega if item deleted requires at least 4 items
 #> (a one-factor model on the remaining 2 items is not identified).
 summary(result, inter_item_correlations = FALSE)  # hide correlations
 #> 
 #> Reliability Analysis Results
 #> ----------------------------
-#> - Items: trust_government, trust_media, trust_science
+#> - Items:
+#>     trust_government  Trust in government (1=none, 5=complete)
+#>     trust_media       Trust in media (1=none, 5=complete)
+#>     trust_science     Trust in science (1=none, 5=complete)
 #> - N of Items: 3
 #> 
 #> Reliability Statistics
@@ -285,22 +327,23 @@ summary(result, inter_item_correlations = FALSE)  # hide correlations
 #>   N (listwise):                  2135
 #> 
 #> Item Statistics
-#> ---------------------------------------- 
-#>              item  mean    sd    n
-#>  trust_government 2.621 1.162 2135
-#>       trust_media 2.430 1.156 2135
-#>     trust_science 3.624 1.034 2135
+#>   ----------------------------------------------------------------------
+#>   Item                                        Mean  Std. Deviation     N
+#>   ----------------------------------------------------------------------
+#>   trust_government  Trust in government ...  2.621           1.162  2135
+#>   trust_media       Trust in media (1=no...  2.430           1.156  2135
+#>   trust_science     Trust in science (1=...  3.624           1.034  2135
+#>   ----------------------------------------------------------------------
 #> 
 #> Item-Total Statistics
-#> ---------------------------------------- 
-#>              item scale_mean_deleted scale_var_deleted corrected_r
-#>  trust_government               6.05             2.440       0.024
-#>       trust_media               6.25             2.467       0.020
-#>     trust_science               5.05             2.723       0.025
-#>  alpha_deleted omega_deleted
-#>          0.029            NA
-#>          0.040            NA
-#>          0.027            NA
+#>   ------------------------------------------------------------------------
+#>                     Scale Mean  Scale Var.   Corrected  Alpha if  Omega if
+#>   Item              if Deleted  if Deleted  Item-Total   Deleted   Deleted
+#>   ------------------------------------------------------------------------
+#>   trust_government       6.054       2.440       0.024     0.029          
+#>   trust_media            6.245       2.467       0.020     0.040          
+#>   trust_science          5.051       2.723       0.025     0.027          
+#>   ------------------------------------------------------------------------
 #> Note: Omega if item deleted requires at least 4 items
 #> (a one-factor model on the remaining 2 items is not identified).
 ```

@@ -41,7 +41,9 @@ linear_regression(
 - formula:
 
   A formula specifying the model (e.g., `y ~ x1 + x2`). If provided,
-  `dependent` and `predictors` are ignored.
+  `dependent` and `predictors` are ignored. The outcome may be
+  transformed (`log(income) ~ age`); `y ~ .` uses all other columns
+  except the weights and grouping variables.
 
 - dependent:
 
@@ -51,12 +53,17 @@ linear_regression(
 - predictors:
 
   Predictor variable(s) (unquoted, supports tidyselect). Used with
-  `dependent` when no formula is given.
+  `dependent` when no formula is given. The dependent, weights and
+  grouping variables are never used as predictors (a selection such as
+  `where(is.numeric)` drops them with a message). Character predictors
+  are entered as factors.
 
 - weights:
 
-  Optional survey weights (unquoted variable name). When specified,
-  weighted least squares (WLS) is used, matching SPSS WEIGHT BY.
+  Optional survey weights. When specified, weighted least squares (WLS)
+  is used, matching SPSS WEIGHT BY. Give a column name (unquoted or as a
+  string), an expression such as `sampling_weight * 2`, or a numeric
+  vector with one weight per row.
 
 - use:
 
@@ -89,7 +96,14 @@ linear_regression(
   (e.g., 4-level education). Note that for *ordered* factors, "dummy"
   applies R's default polynomial contrasts (terms suffixed `.L`, `.Q`,
   `.C`), not treatment dummies; convert with
-  `factor(x, ordered = FALSE)` first if you want dummy coding.
+  `factor(x, ordered = FALSE)` first if you want dummy coding. `factors`
+  applies to factors only: labelled predictors from SPSS files
+  (`haven_labelled`) are numeric and enter with their numeric codes,
+  exactly as in SPSS REGRESSION;
+  [`summary()`](https://rdrr.io/r/base/summary.html) notes them. Convert
+  them with
+  [`to_label`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
+  first to get dummy coding.
 
 ## Value
 
@@ -203,7 +217,27 @@ missingness.
 
 **Weights**: When weights are specified, they are treated as frequency
 weights (matching SPSS WEIGHT BY behavior). The model is fitted using
-weighted least squares via `lm(weights = ...)`.
+weighted least squares via `lm(weights = ...)`; the coefficients are
+those of [`lm()`](https://rdrr.io/r/stats/lm.html), but N is `sum(w)`
+and the residual df are `sum(w) - rank` (unrounded), as in SPSS.
+[`lm()`](https://rdrr.io/r/stats/lm.html) itself treats weights as
+analytic (precision) weights with df = cases - rank, so the inherited
+generics are adjusted to the SPSS convention:
+[`vcov()`](https://rdrr.io/r/stats/vcov.html),
+[`confint()`](https://rdrr.io/r/stats/confint.html),
+[`nobs()`](https://rdrr.io/r/stats/nobs.html) (unrounded `sum(w)`),
+[`df.residual()`](https://rdrr.io/r/stats/df.residual.html),
+[`anova()`](https://rdrr.io/r/stats/anova.html) (single model),
+[`predict()`](https://rdrr.io/r/stats/predict.html) (standard errors and
+intervals),
+[`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+[`broom::glance()`](https://generics.r-lib.org/reference/glance.html)
+all agree with [`summary()`](https://rdrr.io/r/base/summary.html).
+[`stats::summary.lm()`](https://rdrr.io/r/stats/summary.lm.html),
+[`logLik()`](https://rdrr.io/r/stats/logLik.html),
+[`AIC()`](https://rdrr.io/r/stats/AIC.html) and
+[`BIC()`](https://rdrr.io/r/stats/AIC.html) keep lm's analytic-weight
+definitions.
 
 **Standardized Coefficients**: Beta = B \* (SD_x / SD_y). This matches
 the SPSS standardized coefficient output. Not available for the
@@ -253,37 +287,45 @@ data(survey_data)
 # Bivariate regression
 linear_regression(survey_data, life_satisfaction ~ age)
 #> Linear Regression: life_satisfaction ~ age
-#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158 , N = 2421
+#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2419) = 2.00, p = 0.158, N = 2421
+#> Use summary() for detailed output.
 
 # Multiple regression
 linear_regression(survey_data, income ~ age + education + life_satisfaction)
 #> Linear Regression: income ~ age + education + life_satisfaction
 #>   R2 = 0.477, adj.R2 = 0.476, F(5, 2109) = 385.29, p < 0.001 ***, N = 2115
+#> Use summary() for detailed output.
 
 # SPSS-style interface
 linear_regression(survey_data,
                   dependent = life_satisfaction,
                   predictors = c(trust_government, trust_media, trust_science))
 #> Linear Regression: life_satisfaction ~ trust_government + trust_media + trust_science
-#>   R2 = 0.002, adj.R2 = 0.000, F(3, 2062) = 1.16, p = 0.322 , N = 2066
+#>   R2 = 0.002, adj.R2 = 0.000, F(3, 2062) = 1.16, p = 0.322, N = 2066
+#> Use summary() for detailed output.
 
 # Weighted regression
 linear_regression(survey_data, life_satisfaction ~ age, weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age [Weighted]
-#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2435) = 2.08, p = 0.150 , N = 2437
+#>   R2 = 0.001, adj.R2 = 0.000, F(1, 2435) = 2.08, p = 0.150, N = 2437
+#> Use summary() for detailed output.
 
 # Grouped by region
 survey_data |>
   dplyr::group_by(region) |>
   linear_regression(life_satisfaction ~ age)
 #> Linear Regression: life_satisfaction ~ age [Grouped: region]
-#>   region = East: R2 = 0.002, adj.R2 = -0.000, F(1, 463) = 0.88, p = 0.350 , N = 465
-#>   region = West: R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274 , N = 1956
+#> [region = East]
+#>   R2 = 0.002, adj.R2 = 0.000, F(1, 463) = 0.88, p = 0.350, N = 465
+#> [region = West]
+#>   R2 = 0.001, adj.R2 = 0.000, F(1, 1954) = 1.20, p = 0.274, N = 1956
+#> Use summary() for detailed output.
 
 # Factor predictors: dummy-coding (default, matches base R lm())
 linear_regression(survey_data, income ~ age + education)
 #> Linear Regression: income ~ age + education
 #>   R2 = 0.391, adj.R2 = 0.390, F(4, 2181) = 349.72, p < 0.001 ***, N = 2186
+#> Use summary() for detailed output.
 
 # Factor predictors: SPSS-style ordinal-as-scale
 linear_regression(survey_data, income ~ age + education,
@@ -292,12 +334,14 @@ linear_regression(survey_data, income ~ age + education,
 #> • `education`
 #> Linear Regression: income ~ age + education
 #>   R2 = 0.386, adj.R2 = 0.386, F(2, 2183) = 686.59, p < 0.001 ***, N = 2186
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- linear_regression(survey_data, life_satisfaction ~ age + income)
 result                                  # compact one-line overview
 #> Linear Regression: life_satisfaction ~ age + income
 #>   R2 = 0.201, adj.R2 = 0.200, F(2, 2112) = 265.60, p < 0.001 ***, N = 2115
+#> Use summary() for detailed output.
 summary(result)                         # full detailed SPSS-style output
 #> 
 #> Linear Regression Results
@@ -307,47 +351,47 @@ summary(result)                         # full detailed SPSS-style output
 #> - N: 2115
 #> 
 #>   Descriptive Statistics
-#>   ----------------------------------------------------------------------
-#>   Variable                                    Mean     Std.Dev.      N
-#>   ----------------------------------------------------------------------
-#>   life_satisfaction                          3.638        1.148   2115
-#>   age                                       50.827       16.995   2115
-#>   income                                  3757.683     1430.923   2115
-#>   ----------------------------------------------------------------------
+#>   -------------------------------------------------
+#>   Variable               Mean  Std. Deviation     N
+#>   -------------------------------------------------
+#>   life_satisfaction     3.638           1.148  2115
+#>   age                  50.827          16.995  2115
+#>   income             3757.683        1430.923  2115
+#>   -------------------------------------------------
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.448
-#>   R Square                       0.201
-#>   Adjusted R Square              0.200
-#>   Std. Error of Estimate         1.026
-#>   ------------------------------------------------------------
+#>   ----------------------------------
+#>   R                            0.448
+#>   R Square                     0.201
+#>   Adjusted R Square            0.200
+#>   Std. Error of the Estimate   1.026
+#>   ----------------------------------
 #> 
 #>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression              559.609     2          279.804    265.598    0.000 ***
-#>   Residual               2224.965  2112            1.053                     
-#>   Total                  2784.574  2114                                      
-#>   ------------------------------------------------------------------------------
+#>   ------------------------------------------------------------------
+#>   Source      Sum of Squares    df  Mean Square        F   Sig.     
+#>   ------------------------------------------------------------------
+#>   Regression         559.609     2      279.804  265.598  <.001  ***
+#>   Residual          2224.965  2112        1.053                     
+#>   Total             2784.574  2114                                  
+#>   ------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   --------------------------------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
-#>   --------------------------------------------------------------------------------------------------------------
-#>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***
-#>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 
-#>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***
-#>   --------------------------------------------------------------------------------------------------------------
+#>   -----------------------------------------------------------------------------------------
+#>   Term                B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     
+#>   -----------------------------------------------------------------------------------------
+#>   (Intercept)     2.321       0.092          25.237  <.001         2.141         2.502  ***
+#>   age            -0.001       0.001  -0.010  -0.508   .611        -0.003         0.002     
+#>   income       3.59e-04    1.56e-05   0.448  23.037  <.001      3.29e-04      3.90e-04  ***
+#>   -----------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
-#>   --------------------------------------------------
-#>   Term                       Tolerance        VIF
-#>   --------------------------------------------------
-#>   age                            1.000      1.000
-#>   income                         1.000      1.000
-#>   --------------------------------------------------
+#>   ------------------------
+#>   Term    Tolerance    VIF
+#>   ------------------------
+#>   age         1.000  1.000
+#>   income      1.000  1.000
+#>   ------------------------
 #>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
@@ -360,38 +404,38 @@ summary(result, descriptives = FALSE)   # hide descriptives section
 #> - N: 2115
 #> 
 #>   Model Summary
-#>   ------------------------------------------------------------
-#>   R                              0.448
-#>   R Square                       0.201
-#>   Adjusted R Square              0.200
-#>   Std. Error of Estimate         1.026
-#>   ------------------------------------------------------------
+#>   ----------------------------------
+#>   R                            0.448
+#>   R Square                     0.201
+#>   Adjusted R Square            0.200
+#>   Std. Error of the Estimate   1.026
+#>   ----------------------------------
 #> 
 #>   ANOVA
-#>   ------------------------------------------------------------------------------
-#>   Source           Sum of Squares    df      Mean Square          F     Sig.
-#>   ------------------------------------------------------------------------------
-#>   Regression              559.609     2          279.804    265.598    0.000 ***
-#>   Residual               2224.965  2112            1.053                     
-#>   Total                  2784.574  2114                                      
-#>   ------------------------------------------------------------------------------
+#>   ------------------------------------------------------------------
+#>   Source      Sum of Squares    df  Mean Square        F   Sig.     
+#>   ------------------------------------------------------------------
+#>   Regression         559.609     2      279.804  265.598  <.001  ***
+#>   Residual          2224.965  2112        1.053                     
+#>   Total             2784.574  2114                                  
+#>   ------------------------------------------------------------------
 #> 
 #>   Coefficients
-#>   --------------------------------------------------------------------------------------------------------------
-#>   Term                               B  Std.Error     Beta          t     Sig.   CI Lower   CI Upper 
-#>   --------------------------------------------------------------------------------------------------------------
-#>   (Intercept)                    2.321      0.092              25.237    0.000      2.141      2.502 ***
-#>   age                           -0.001      0.001   -0.010     -0.508    0.611     -0.003      0.002 
-#>   income                         0.000      0.000    0.448     23.037    0.000      0.000      0.000 ***
-#>   --------------------------------------------------------------------------------------------------------------
+#>   -----------------------------------------------------------------------------------------
+#>   Term                B  Std. Error    Beta       t   Sig.  95% CI Lower  95% CI Upper     
+#>   -----------------------------------------------------------------------------------------
+#>   (Intercept)     2.321       0.092          25.237  <.001         2.141         2.502  ***
+#>   age            -0.001       0.001  -0.010  -0.508   .611        -0.003         0.002     
+#>   income       3.59e-04    1.56e-05   0.448  23.037  <.001      3.29e-04      3.90e-04  ***
+#>   -----------------------------------------------------------------------------------------
 #> 
 #>   Collinearity Statistics
-#>   --------------------------------------------------
-#>   Term                       Tolerance        VIF
-#>   --------------------------------------------------
-#>   age                            1.000      1.000
-#>   income                         1.000      1.000
-#>   --------------------------------------------------
+#>   ------------------------
+#>   Term    Tolerance    VIF
+#>   ------------------------
+#>   age         1.000  1.000
+#>   income      1.000  1.000
+#>   ------------------------
 #>   VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05

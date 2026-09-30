@@ -51,7 +51,8 @@ rec(
 - var_label:
 
   A new variable label. If `NULL`, the existing label is kept with
-  `" (recoded)"` appended.
+  `" (recoded)"` appended (once: recoding a recoded variable does not
+  stack the suffix).
 
 - val_labels:
 
@@ -70,7 +71,15 @@ rec(
 ## Value
 
 If `data` is a vector, a recoded vector is returned. If `data` is a data
-frame, the modified data frame is returned (invisibly).
+frame, the modified data frame is returned (invisibly). A recoded
+variable is `haven_labelled` whenever it carries value labels or the
+missing-value types of an imported variable, so the labels survive
+[`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+and
+[`write_stata()`](https://YannickDiehl.github.io/mariposa/reference/write_stata.md).
+With `as_factor = TRUE` the factor levels are ordered by code and named
+by the result's value labels (unlabelled values keep their code as level
+name).
 
 ## Details
 
@@ -84,11 +93,13 @@ pairs:
 | **Syntax** | **Meaning** | **Example** |
 | `"old=new"` | Single value | `"1=0; 2=1"` |
 | `"lo:hi=new"` | Range of values | `"1:3=1; 4:6=2"` |
+| `"a,b=new"` | List of values/ranges | `"1,2=1; 3,4:5=2"` |
 | `"old=new [Label]"` | Inline value label | `"1:2=1 [Low]; 3:5=2 [High]"` |
 | `"else=new"` | Catch-all for unmatched | `"1=1; else=NA"` |
 | `"copy"` | Keep original value | `"1:3=copy; else=NA"` |
 | `"min"/"max"` | Dynamic boundaries | `"min:3=1; 4:max=2"` |
 | `"rev"` | Reverse scale | `"rev"` |
+| `"rev(lo, hi)"` | Reverse a lo-hi scale | `"rev(1, 5)"` |
 | `"dicho"` | Median split | `"dicho"` |
 | `"dicho(x)"` | Fixed cut-point | `"dicho(3)"` |
 | `"mean"` | Mean split | `"mean"` |
@@ -96,7 +107,30 @@ pairs:
 | `"NA=new"` | Replace NA | `"NA=0; else=copy"` |
 | `"val=NA"` | Set values to NA | `"-9=NA; -8=NA"` |
 
-Rules are evaluated in order — the first matching rule wins.
+Rules are evaluated in order — the first matching rule wins. Keywords
+(`else`, `copy`, `NA`, `min`, `max`, `rev`, `dicho`, `mean`, `quart`)
+are case-insensitive. A range must be written low to high (`"1:5"`, not
+`"5:1"`). Inline labels may contain semicolons (`"1:2=1 [low; poor]"`).
+
+Valid values that match no rule become `NA`, with a warning listing
+them: add `"else=copy"` to keep them (what SPSS's in-place `RECODE`
+does) or `"else=NA"` to confirm.
+
+### Missing Values of Imported Data
+
+Missing values keep their type (the tagged NAs of
+[`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md),
+e.g. "no answer" vs. "not applicable") unless an `"NA=..."` or
+`"else=..."` rule recodes them, like SPSS's `RECODE` keeps user-missing
+codes.
+[`na_frequencies()`](https://YannickDiehl.github.io/mariposa/reference/na_frequencies.md),
+[`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
+and
+[`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+therefore still see them on the result. A `haven_labelled_spss` vector
+(from `haven::read_sav(user_na = TRUE)`) is first converted to this
+tagged-NA form, so its user-missing codes are neither reversed nor
+recoded as valid values.
 
 ### Decimal Values
 
@@ -119,8 +153,13 @@ provided, `val_labels` takes precedence.
 
 ### Special Modes
 
-`"rev"` reverses the scale by computing `max(x) + min(x) - x`. Value
-labels are mirrored accordingly.
+`"rev"` reverses the scale by computing `hi + lo - x`. The scale range
+`lo`-`hi` is taken from the value labels of the valid codes (together
+with the observed values), so an item answered only with 2-5 on a
+labelled 1-5 scale becomes 4-1, not 5-2. Without value labels the
+observed minimum and maximum are used and a message says so; set the
+range explicitly with `"rev(lo, hi)"`, e.g. `rules = "rev(1, 5)"`. Value
+labels are mirrored accordingly; missing values keep their type.
 
 `"dicho"` dichotomizes at the median: values \\\le\\ median become 0,
 values \\\>\\ median become 1.
@@ -160,7 +199,7 @@ data <- rec(survey_data, trust_government,
 
 # Reverse a scale (with suffix to keep original)
 data <- rec(survey_data, trust_government, trust_media,
-            rules = "rev", suffix = "_r")
+            rules = "rev(1, 5)", suffix = "_r")
 
 # Dichotomize at the median
 data <- rec(survey_data, age, rules = "dicho", suffix = "_d")

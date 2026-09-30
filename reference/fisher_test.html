@@ -94,7 +94,15 @@ sample is small or when expected cell frequencies are below 5.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fisher_test</span><span class="op">(</span><span class="va">data</span>, <span class="va">row</span>, <span class="va">col</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fisher_test</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">row</span>,</span>
+<span>  <span class="va">col</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  simulate.p.value <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  B <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -114,7 +122,24 @@ sample is small or when expected cell frequencies are below 5.</p>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
+
+
+<dt id="arg-simulate-p-value">simulate.p.value<a class="anchor" aria-label="anchor" href="#arg-simulate-p-value"></a></dt>
+<dd><p>Compute the p-value by Monte Carlo simulation
+instead of exactly? (Default: FALSE). For large tables (many rows and
+columns, large N) the exact network algorithm can run out of memory
+("FEXACT error"); <code>fisher_test()</code> then switches to the Monte Carlo
+p-value automatically with a warning. SPSS offers the same choice
+(Exact Tests: "Exact" or "Monte Carlo"). Call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> first
+for reproducible Monte Carlo results.</p></dd>
+
+
+<dt id="arg-b">B<a class="anchor" aria-label="anchor" href="#arg-b"></a></dt>
+<dd><p>Number of Monte Carlo replicates (Default: 10000, the SPSS
+default number of samples).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -214,39 +239,39 @@ contingency, goodness of fit and other problems of significance.
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">fisher_test</span><span class="op">(</span>row <span class="op">=</span> <span class="va">gender</span>, col <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.5435 , N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.544, OR = 1.067 [0.875, 1.302], N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Fisher test for larger table</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">fisher_test</span><span class="op">(</span>row <span class="op">=</span> <span class="va">gender</span>, col <span class="op">=</span> <span class="va">interview_mode</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x interview_mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.6782 , N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.678, N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With weights</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">fisher_test</span><span class="op">(</span>row <span class="op">=</span> <span class="va">gender</span>, col <span class="op">=</span> <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x region [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.4867 , N = 2516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.487, OR = 1.076 [0.886, 1.308], N = 2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">education</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">fisher_test</span><span class="op">(</span>row <span class="op">=</span> <span class="va">gender</span>, col <span class="op">=</span> <span class="va">region</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = Basic Secondary]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.9315 , N = 841</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.932, OR = 1.028 [0.734, 1.440], N = 841</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = Intermediate Secondary]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.4170 , N = 629</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.417, OR = 1.198 [0.806, 1.782], N = 629</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = Academic Secondary]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.9181 , N = 631</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [education = 4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.918, OR = 1.029 [0.687, 1.542], N = 631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [education = University]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fisher's Exact Test: gender x region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.9003 , N = 399</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   p = 0.900, OR = 1.037 [0.633, 1.698], N = 399</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

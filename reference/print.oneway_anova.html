@@ -99,6 +99,7 @@ effect size, and sample size.</p>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA: life_satisfaction by education</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   F(3, 2417) = 67.096, p &lt; 0.001 ***, eta2 = 0.077 (medium), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> One-Way ANOVA Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
@@ -112,29 +113,38 @@ effect size, and sample size.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Descriptive Statistics by Group:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Basic Secondary: mean = 3.204, sd = 1.243, n = 809</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Intermediate Secondary: mean = 3.701, sd = 1.112, n = 618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Academic Secondary: mean = 3.853, sd = 0.998, n = 607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   University: mean = 4.047, sd = 0.957, n = 387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Descriptive Statistics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   education                 N   Mean  Std. Deviation  Std. Error  95% CI Lower  95% CI Upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Basic Secondary         809  3.204           1.243       0.044         3.118         3.290</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Intermediate Secondary  618  3.701           1.112       0.045         3.613         3.789</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Academic Secondary      607  3.853           0.998       0.041         3.774         3.933</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   University              387  4.047           0.957       0.049         3.951         4.142</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ANOVA Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Source Sum_Squares   df Mean_Square      F p_value sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Between Groups     247.347    3      82.449 67.096   &lt;.001 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Within Groups    2970.080 2417       1.229                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Total    3217.428 2420                               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Sum of Squares    df  Mean Square       F    Sig     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Between Groups         247.347     3       82.449  67.096  &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Within Groups         2970.080  2417        1.229                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                 3217.428  2420                                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Assumption Tests:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Assumption Statistic df1  df2 p_value sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Welch    64.489   3 1229   &lt;.001 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Robust Tests of Equality of Means:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          Statistic  df1       df2    Sig     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Welch     64.489    3  1229.456  &lt;.001  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Sizes:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction       0.077           0.076         0.076      medium</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable           Eta Squared  Epsilon Squared  Omega Squared  Magnitude</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction        0.077            0.076          0.076     medium</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>

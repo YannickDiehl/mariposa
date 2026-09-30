@@ -60,7 +60,7 @@ summary(cb)
 #> Codebook
 #> --------
 #>   Dataset: survey_data
-#>   Observations: 2,500
+#>   Observations: 2500
 #>   Variables: 16 (10 numeric, 6 factor, 0 character)
 #>   Variables with labels: 15
 #>   Variables with missing data: 7
@@ -163,7 +163,7 @@ summary(cb, value_labels = FALSE)
 #> Codebook
 #> --------
 #>   Dataset: survey_data
-#>   Observations: 2,500
+#>   Observations: 2500
 #>   Variables: 16 (10 numeric, 6 factor, 0 character)
 #>   Variables with labels: 15
 #>   Variables with missing data: 7

@@ -39,36 +39,35 @@ Invisibly returns the input object `x`.
 result <- mann_whitney(survey_data, life_satisfaction, group = gender)
 result              # compact one-line overview
 #> Mann-Whitney U Test: life_satisfaction by gender
-#>   U = 714,347, Z = -0.989, p = 0.323 , r = 0.020 (negligible), N = 2421
+#>   U = 714347, Z = -0.989, p = 0.323, r = 0.020 (negligible), N = 2421
+#> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> Mann-Whitney U Test Results
 #> ---------------------------
 #> 
 #> - Grouping variable: gender
 #> - Groups compared: Male vs. Female
-#> - Confidence level: 95.0%
 #> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: rank mean = 1196.7, n = 1149.0
-#>   Female: rank mean = 1223.9, n = 1272.0
-#> 
+#>   Male:    rank mean = 1196.71, n = 1149
+#>   Female:  rank mean = 1223.91, n = 1272
 #> 
 #> Mann-Whitney U Test Results:
-#> ------------------------------------------------------------ 
-#>            Test       U         W      Z p_value effect_r sig
-#>  Mann-Whitney U 714,347 1,375,022 -0.989   0.323     0.02    
-#> ------------------------------------------------------------ 
+#> -------------------------------------------------------------
+#>                      U        W       Z  p value  Effect r   
+#> -------------------------------------------------------------
+#> Mann-Whitney U  714347  1375022  -0.989     .323     0.020   
+#> -------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Negligible effect: |r| < 0.1
-#> - Small effect: |r| ~ 0.1
-#> - Medium effect: |r| ~ 0.3
-#> - Large effect: |r| ~ 0.5
+#> - Negligible: |r| < 0.1
+#> - Small: 0.1 <= |r| < 0.3
+#> - Medium: 0.3 <= |r| < 0.5
+#> - Large: |r| >= 0.5
 ```

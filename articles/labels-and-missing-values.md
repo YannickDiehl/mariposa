@@ -173,28 +173,28 @@ var_label(labeled_data, age, income)
 
 ``` r
 
-# Set value labels
+# Set value labels on a numeric (1-5) rating
 labeled_data <- val_labels(survey_data,
-  gender = c("Male" = 1, "Female" = 2)
+  life_satisfaction = c("Very dissatisfied" = 1, "Very satisfied" = 5)
 )
 
 # Verify
-val_labels(labeled_data, gender)
-#>   Male Female 
-#>      1      2
+val_labels(labeled_data, life_satisfaction)
+#> Very dissatisfied    Very satisfied 
+#>                 1                 5
 ```
 
 ``` r
 
 # Add labels without replacing existing ones
-labeled_data <- val_labels(survey_data,
-  gender = c("Diverse" = 3),
+labeled_data <- val_labels(labeled_data,
+  life_satisfaction = c("Neither" = 3),
   .add = TRUE
 )
 
-val_labels(labeled_data, gender)
-#> Diverse 
-#>       3
+val_labels(labeled_data, life_satisfaction)
+#> Very dissatisfied    Very satisfied           Neither 
+#>                 1                 5                 3
 ```
 
 ## Converting Between Formats
@@ -210,7 +210,7 @@ when you need factors for plotting or statistical models:
 
 ``` r
 
-# Convert gender from labelled to factor
+# Labelled variables become factors (factors such as gender pass through)
 factor_data <- to_label(survey_data, gender, education)
 
 # Check the result

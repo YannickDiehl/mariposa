@@ -93,8 +93,9 @@ empty, converts all factor columns.</p></dd>
 
 
 <dt id="arg-use-labels">use_labels<a class="anchor" aria-label="anchor" href="#arg-use-labels"></a></dt>
-<dd><p>If <code>TRUE</code> (default), attempts to use the numeric value
-of factor levels (e.g., level <code>"3"</code> becomes <code>3</code>). If <code>FALSE</code>, uses
+<dd><p>If <code>TRUE</code> (default), restores the original codes of
+a factor created by <code><a href="to_label.html">to_label()</a></code>, otherwise uses the numeric value of
+factor levels (e.g., level <code>"3"</code> becomes <code>3</code>). If <code>FALSE</code>, uses
 sequential integers (1, 2, 3, ...).</p></dd>
 
 
@@ -104,8 +105,10 @@ starts at this number. Default: <code>NULL</code> (use original values).</p></dd
 
 
 <dt id="arg-keep-labels">keep_labels<a class="anchor" aria-label="anchor" href="#arg-keep-labels"></a></dt>
-<dd><p>If <code>TRUE</code>, the former factor levels are stored as
-value labels on the result. Default: <code>FALSE</code>.</p></dd>
+<dd><p>If <code>TRUE</code>, the result is a <code>haven_labelled</code> vector:
+the former factor levels (or the existing value labels and missing-value
+types of a labelled input) are kept, so they survive <code><a href="write_spss.html">write_spss()</a></code>.
+Default: <code>FALSE</code> (plain numeric; missing-value types become <code>NA</code>).</p></dd>
 
 
 <dt id="arg-use-labels-start-at-keep-labels">use.labels, start.at, keep.labels<a class="anchor" aria-label="anchor" href="#arg-use-labels-start-at-keep-labels"></a></dt>
@@ -123,13 +126,18 @@ input, returns a numeric vector.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function handles three input types:</p><ol><li><p><strong>Numeric factors</strong> (levels like <code>"1"</code>, <code>"2"</code>, <code>"3"</code>): Extracts
+    <p>This function handles four input types:</p><ol><li><p><strong>Factors from <code><a href="to_label.html">to_label()</a></code></strong>: Restores the original codes
+stored in the <code>"codes"</code> attribute, so a <code><a href="to_label.html">to_label()</a></code> /
+<code>to_numeric()</code> round trip returns the original values (6, 42, 90,
+...) instead of 1, 2, 3.</p></li>
+<li><p><strong>Numeric factors</strong> (levels like <code>"1"</code>, <code>"2"</code>, <code>"3"</code>): Extracts
 the numeric values from the level names.</p></li>
-<li><p><strong>Text factors</strong> (levels like <code>"Male"</code>, <code>"Female"</code>): Converts
-to sequential integers by default; use <code>use_labels = FALSE</code> to force
-this behavior even for numeric-looking levels.</p></li>
+<li><p><strong>Other text factors</strong> (levels like <code>"Male"</code>, <code>"Female"</code>):
+Converts to sequential integers (1, 2, 3, ... in level order). Use
+<code>use_labels = FALSE</code> to force this behavior for any factor.</p></li>
 <li><p><strong>haven_labelled</strong>: Extracts the underlying numeric vector,
-stripping the labelled class.</p></li>
+stripping the labelled class. Missing-value types of imported data
+(tagged NAs) become plain <code>NA</code>.</p></li>
 </ol></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

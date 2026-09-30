@@ -38,11 +38,12 @@ Invisibly returns the input object `x`.
 result <- spearman_rho(survey_data, age, life_satisfaction)
 result              # compact one-line overview
 #> Spearman Correlation: age x life_satisfaction
-#>   rho = -0.024, p = 0.238 , N = 2421
+#>   rho = -0.024, p = 0.238, N = 2421
+#> Use summary() for detailed output.
 summary(result)     # full correlation matrices
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: age, life_satisfaction
@@ -51,7 +52,7 @@ summary(result)     # full correlation matrices
 #> 
 #> 
 #>   Spearman's rho: rho = -0.024
-#>   p-value: p = 0.238 
+#>   p-value (2-tailed): p = 0.238
 #>   N = 2421
 #>   t-statistic: -1.180
 #> 

@@ -116,11 +116,14 @@ The difference is computed as <code>y - x</code></p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
-<dd><p>Confidence level for intervals (Default: 0.95 = 95 percent)</p></dd>
+<dd><p>Not used. Rank tests report no confidence interval (SPSS
+<code>NPAR TESTS</code> neither); kept for backward compatibility.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -148,7 +151,11 @@ The difference is computed as <code>y - x</code></p></dd>
 </ul><p><strong>Rank Categories</strong>:</p><ul><li><p>Negative Ranks: subjects where y &lt; x (decreased)</p></li>
 <li><p>Positive Ranks: subjects where y &gt; x (increased)</p></li>
 <li><p>Ties: subjects where y = x (no change)</p></li>
-</ul></div>
+</ul><p><strong>Z</strong>: as in SPSS, computed from the smaller of the two rank sums, so it
+is never positive; <code>z_based_on</code> ("negative ranks" or "positive
+ranks") names that sum, like SPSS's footnote. "Based on negative ranks"
+means that increases (y &gt; x) dominate.</p>
+</div>
 
 <div class="section">
 <h3 id="when-to-use-this">When to Use This<a class="anchor" aria-label="anchor" href="#when-to-use-this"></a></h3>
@@ -232,10 +239,10 @@ Psychology: General, 141(1), 2.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">wilcoxon_test</span><span class="op">(</span>x <span class="op">=</span> <span class="va">trust_government</span>, y <span class="op">=</span> <span class="va">trust_media</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test: trust_media - trust_government</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Z = -2.727, p = 0.006 **, r = 0.147 (small), N = 435</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Wilcoxon Signed-Rank Test: trust_media - trust_government</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Z = -4.346, p &lt; 0.001 ***, r = 0.117 (small), N = 1792</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>

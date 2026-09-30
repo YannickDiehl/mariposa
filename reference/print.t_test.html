@@ -97,7 +97,8 @@ effect size, and sample size.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="t_test.html">t_test</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test: life_satisfaction by gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2384.1) = -1.018, p = 0.309 , g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   t(2384.1) = -1.018, p = 0.309, g = -0.041 (negligible), N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t-Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------</span>
@@ -108,24 +109,30 @@ effect size, and sample size.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Alternative hypothesis: two.sided</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Null hypothesis (mu): 0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male: mean = 3.603, n = 1149.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female: mean = 3.651, n = 1272.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Group Statistics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender     N   Mean  Std. Deviation  Std. Error Mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male    1149  3.603           1.165            0.034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female  1272  3.651           1.142            0.032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> t-test Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Assumption t_stat       df p_value mean_diff        conf_int sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Independent Samples Test:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Equal variances assumed      -1.019      2419  .308      -0.048     0.047        -0.140         0.044   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Equal variances not assumed  -1.018  2384.147  .309      -0.048     0.047        -0.140         0.044   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Sizes:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction   -0.041   -0.041      -0.041  negligible</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction     -0.041     -0.041        -0.041  negligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

@@ -91,12 +91,17 @@ like <code>starts_with("trust")</code></p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Survey weights to make results representative of your population.
-Without weights, the mode is simply the most frequent value in your sample.</p></dd>
+<dd><p>Survey weights to make results representative of your
+population. Without weights, the mode is simply the most frequent value in
+your sample. Give a column name (unquoted or as a string), an expression
+such as <code>sampling_weight * 2</code>, or a numeric vector with one weight per
+row.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Remove missing values before calculating? (Default: TRUE)</p></dd>
+<dd><p>Remove missing values before calculating? (Default: TRUE).
+With <code>FALSE</code>, the result for a variable that contains missing
+values is <code>NA</code> (as in base R).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -116,9 +121,13 @@ population. For weighted data, the mode is the value whose observations
 have the largest total weight.</p></li>
 <li><p><strong>Effective N</strong>: How many independent observations your weighted data
 represents.</p></li>
-<li><p><strong>N</strong>: The actual number of observations used.</p></li>
-</ul><p>If multiple values share the highest weighted frequency (ties), the first
-value encountered is returned.</p>
+<li><p><strong>N / Missing</strong>: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+<code>WEIGHT BY</code>; Kish's effective N is shown by <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</p></li>
+</ul><p>If multiple values share the highest (weighted) frequency, the smallest
+value (for factors: the first level) is returned, as in SPSS; the print
+flags such results ("Multiple modes exist") and <code>$results$n_modes</code>
+holds the number of tied values.</p>
 </div>
 
 <div class="section">
@@ -176,42 +185,52 @@ with the largest total weight.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mode Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable weighted_mode effective_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> gender   Female              <span style="text-decoration: underline;">2</span>469.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Mode       N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender    Female  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables (works best with categorical/discrete data)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_modus</span><span class="op">(</span><span class="va">gender</span>, <span class="va">region</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mode Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable weighted_mode effective_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> gender   Female              <span style="text-decoration: underline;">2</span>469.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> region   West                <span style="text-decoration: underline;">2</span>469.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Mode       N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender    Female  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   region    West    2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_modus</span><span class="op">(</span><span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mode Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 2</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   weighted_mode effective_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female                477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Mode      N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender    Female  509        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 2</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   weighted_mode effective_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female              <span style="text-decoration: underline;">1</span>993.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Mode       N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender    Female  2007        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In summarise context</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mode_gender <span class="op">=</span> <span class="fu">w_modus</span><span class="op">(</span><span class="va">gender</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -225,11 +244,12 @@ with the largest total weight.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Mode Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable mode       n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> gender   Female  <span style="text-decoration: underline;">2</span>500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Mode       N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   gender    Female  2500        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

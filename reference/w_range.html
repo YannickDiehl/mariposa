@@ -93,7 +93,9 @@ minimum and maximum values.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Remove missing values before calculating? (Default: TRUE)</p></dd>
+<dd><p>Remove missing values before calculating? (Default: TRUE).
+With <code>FALSE</code>, the result for a variable that contains missing
+values is <code>NA</code> (as in base R).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -112,7 +114,9 @@ and the number of valid observations used.</p>
 range indicates that at least some values are far apart.</p></li>
 <li><p><strong>Effective N</strong>: Reported when weights are provided, for consistency with
 other weighted statistics.</p></li>
-<li><p><strong>N</strong>: The actual number of observations used.</p></li>
+<li><p><strong>N / Missing</strong>: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+<code>WEIGHT BY</code>; Kish's effective N is shown by <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</p></li>
 </ul><p>Note: The range is sensitive to outliers. A single extreme value can
 dramatically increase the range. Consider using <code><a href="w_iqr.html">w_iqr</a></code> for a
 more robust measure of spread.</p>
@@ -171,45 +175,52 @@ values do not change when weights are applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Range Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_range Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age             77      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable   Range     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       77.000  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_range</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Range Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_range Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age             77      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_range Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income           7200      2158.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     Range     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         77.000  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income    7200.000  2201      315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_range</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Range Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_range Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age             77         477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable   Range    N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       77.000  509        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_range Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age             77      1993.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable   Range     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       77.000  2007        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In summarise context</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>range_age <span class="op">=</span> <span class="fu">w_range</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -224,10 +235,11 @@ values do not change when weights are applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Range Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable range    N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age    77 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable   Range     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       77.000  2500        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -215,8 +215,13 @@ distribution of Lilliefors's test statistic for normality.
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">normality_test</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Normality Tests: age, income</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2 group combination(s) x 2 variable(s) [Grouped: gender]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Normality Tests: age, income [Grouped: gender]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [gender = Male]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age: KS = 0.029, p = 0.018; Shapiro-Wilk W = 0.989, p &lt; 0.001 (n = 1194)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income: KS = 0.080, p &lt; 0.001; Shapiro-Wilk W = 0.960, p &lt; 0.001 (n = 1046)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [gender = Female]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age: KS = 0.030, p = 0.007; Shapiro-Wilk W = 0.990, p &lt; 0.001 (n = 1306)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income: KS = 0.081, p &lt; 0.001; Shapiro-Wilk W = 0.965, p &lt; 0.001 (n = 1140)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Three-layer output ---</span></span></span>
@@ -233,12 +238,12 @@ distribution of Lilliefors's test statistic for normality.
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Variables: age, income</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tests of Normality</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     KS    df   KS p      W    W p </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   age       0.028  2500  &lt;.001  0.990  &lt;.001 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   income    0.079  2186  &lt;.001  0.963  &lt;.001 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable     KS    df   KS p      W    W p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age       0.028  2500  &lt;.001  0.990  &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income    0.079  2186  &lt;.001  0.963  &lt;.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> KS = Kolmogorov-Smirnov statistic with Lilliefors significance correction.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> W = Shapiro-Wilk statistic (computed for 3 &lt;= n &lt;= 5000, as in SPSS).</span>

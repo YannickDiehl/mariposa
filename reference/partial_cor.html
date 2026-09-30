@@ -95,8 +95,10 @@ with the analysis variables.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights (unquoted variable name),
-treated as frequency weights matching SPSS <code>WEIGHT BY</code>.</p></dd>
+<dd><p>Optional survey weights, treated as frequency weights
+matching SPSS <code>WEIGHT BY</code>. Give a column name (unquoted or as a
+string), an expression such as <code>sampling_weight * 2</code>, or a numeric
+vector with one weight per row.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -201,9 +203,9 @@ vignette).</p>
 <span class="r-in"><span><span class="fu">partial_cor</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span></span>
 <span class="r-in"><span>            controls <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">political_orientation</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Partial Correlation: trust_government, trust_media, trust_science | controlling for age, political_orientation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_media: partial r = 0.019, p = 0.390  (zero-order r = 0.019), N = 1964</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_science: partial r = 0.033, p = 0.148  (zero-order r = 0.030), N = 1964</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media x trust_science: partial r = 0.009, p = 0.684  (zero-order r = 0.010), N = 1964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_media:   partial r = 0.019, p = 0.390 (zero-order r = 0.019), N = 1964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government x trust_science: partial r = 0.033, p = 0.148 (zero-order r = 0.030), N = 1964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media x trust_science:      partial r = 0.009, p = 0.684 (zero-order r = 0.010), N = 1964</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted (SPSS WEIGHT BY)</span></span></span>
@@ -239,11 +241,11 @@ vignette).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: Listwise deletion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable 1         Variable 2  Partial r  Zero-order r    df       t      p     n  sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction      income      0.448         0.448  2112  23.037  &lt;.001  2115  *** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable 1         Variable 2  Partial r  Zero-order r    df       t      p     n  sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction  income          0.448         0.448  2112  23.037  &lt;.001  2115  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

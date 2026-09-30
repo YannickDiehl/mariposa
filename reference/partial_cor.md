@@ -32,8 +32,10 @@ partial_cor(data, ..., controls, weights = NULL)
 
 - weights:
 
-  Optional survey weights (unquoted variable name), treated as frequency
-  weights matching SPSS `WEIGHT BY`.
+  Optional survey weights, treated as frequency weights matching SPSS
+  `WEIGHT BY`. Give a column name (unquoted or as a string), an
+  expression such as `sampling_weight * 2`, or a numeric vector with one
+  weight per row.
 
 ## Value
 
@@ -142,9 +144,9 @@ partial_cor(survey_data, life_satisfaction, income, controls = age)
 partial_cor(survey_data, trust_government, trust_media, trust_science,
             controls = c(age, political_orientation))
 #> Partial Correlation: trust_government, trust_media, trust_science | controlling for age, political_orientation
-#>   trust_government x trust_media: partial r = 0.019, p = 0.390  (zero-order r = 0.019), N = 1964
-#>   trust_government x trust_science: partial r = 0.033, p = 0.148  (zero-order r = 0.030), N = 1964
-#>   trust_media x trust_science: partial r = 0.009, p = 0.684  (zero-order r = 0.010), N = 1964
+#>   trust_government x trust_media:   partial r = 0.019, p = 0.390 (zero-order r = 0.019), N = 1964
+#>   trust_government x trust_science: partial r = 0.033, p = 0.148 (zero-order r = 0.030), N = 1964
+#>   trust_media x trust_science:      partial r = 0.009, p = 0.684 (zero-order r = 0.010), N = 1964
 #> Use summary() for detailed output.
 
 # Weighted (SPSS WEIGHT BY)
@@ -180,11 +182,11 @@ summary(result)     # full detailed output
 #> - Missing: Listwise deletion
 #> 
 #> Pairwise Results:
-#>   -------------------------------------------------------------------------------------- 
-#>   Variable 1         Variable 2  Partial r  Zero-order r    df       t      p     n  sig 
-#>   -------------------------------------------------------------------------------------- 
-#>   life_satisfaction      income      0.448         0.448  2112  23.037  <.001  2115  *** 
-#>   -------------------------------------------------------------------------------------- 
+#>   --------------------------------------------------------------------------------------
+#>   Variable 1         Variable 2  Partial r  Zero-order r    df       t      p     n  sig
+#>   --------------------------------------------------------------------------------------
+#>   life_satisfaction  income          0.448         0.448  2112  23.037  <.001  2115  ***
+#>   --------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

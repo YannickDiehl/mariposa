@@ -39,7 +39,8 @@ Invisibly returns the input object `x`.
 result <- t_test(survey_data, life_satisfaction, group = gender)
 result              # compact one-line overview
 #> t-Test: life_satisfaction by gender
-#>   t(2384.1) = -1.018, p = 0.309 , g = -0.041 (negligible), N = 2421
+#>   t(2384.1) = -1.018, p = 0.309, g = -0.041 (negligible), N = 2421
+#> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> t-Test Results
 #> --------------
@@ -50,24 +51,30 @@ summary(result)     # full detailed output
 #> - Alternative hypothesis: two.sided
 #> - Null hypothesis (mu): 0.000
 #> 
-#> 
 #> --- life_satisfaction ---
 #> 
-#>   Male: mean = 3.603, n = 1149.0
-#>   Female: mean = 3.651, n = 1272.0
+#> Group Statistics:
+#>   ----------------------------------------------------
+#>   gender     N   Mean  Std. Deviation  Std. Error Mean
+#>   ----------------------------------------------------
+#>   Male    1149  3.603           1.165            0.034
+#>   Female  1272  3.651           1.142            0.032
+#>   ----------------------------------------------------
 #> 
-#> t-test Results:
-#> -------------------------------------------------------------------------------- 
-#>         Assumption t_stat       df p_value mean_diff        conf_int sig
-#>    Equal variances -1.019 2419.000   0.308    -0.048 [-0.140, 0.044]    
-#>  Unequal variances -1.018 2384.147   0.309    -0.048 [-0.140, 0.044]    
-#> -------------------------------------------------------------------------------- 
+#> Independent Samples Test:
+#>   --------------------------------------------------------------------------------------------------------
+#>                                     t        df     p  Mean Diff.  SE Diff.  95% CI Lower  95% CI Upper   
+#>   --------------------------------------------------------------------------------------------------------
+#>   Equal variances assumed      -1.019      2419  .308      -0.048     0.047        -0.140         0.044   
+#>   Equal variances not assumed  -1.018  2384.147  .309      -0.048     0.047        -0.140         0.044   
+#>   --------------------------------------------------------------------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Cohens_d Hedges_g Glass_Delta Effect_Size
-#>  life_satisfaction   -0.041   -0.041      -0.041  negligible
-#> 
+#>   -----------------------------------------------------------------
+#>   Variable           Cohen's d  Hedges' g  Glass' Delta   Magnitude
+#>   -----------------------------------------------------------------
+#>   life_satisfaction     -0.041     -0.041        -0.041  negligible
+#>   -----------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 

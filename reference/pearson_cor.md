@@ -50,7 +50,9 @@ pearson_cor(
   expansion weights (e.g., summing to millions of population units), the
   resulting standard errors and confidence intervals will be drastically
   too narrow — in that case, normalize weights so that `sum(w) == n`, or
-  use the survey package for design-based inference.
+  use the survey package for design-based inference. Give a column name
+  (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - conf.level:
 
@@ -59,7 +61,9 @@ pearson_cor(
 - alternative:
 
   Direction of the test: `"two.sided"` (default), `"less"`, or
-  `"greater"`.
+  `"greater"`. A one-sided test gets the matching one-sided confidence
+  interval (`[-1, upper]` for `"less"`, `[lower, 1]` for `"greater"`),
+  as [`stats::cor.test()`](https://rdrr.io/r/stats/cor.test.html).
 
 - use:
 
@@ -212,182 +216,153 @@ data(survey_data)
 survey_data %>%
   pearson_cor(age, income)
 #> Pearson Correlation: age x income
-#>   r = -0.007, p = 0.761 , N = 2186
+#>   r = -0.007, p = 0.761, N = 2186
+#> Use summary() for detailed output.
 
 # Correlation matrix for multiple variables
 survey_data %>%
   pearson_cor(age, income, life_satisfaction)
 #> Pearson Correlation: 3 variables
-#>   age x income:                  r = -0.007, p = 0.761  
-#>   age x life_satisfaction:       r = -0.029, p = 0.158  
-#>   income x life_satisfaction:    r = 0.448, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 2186
+#>   age x income:               r = -0.007, p = 0.761
+#>   age x life_satisfaction:    r = -0.029, p = 0.158
+#>   income x life_satisfaction: r = 0.448, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 2115-2421
+#> Use summary() for detailed output.
 
 # Weighted correlations
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> Pearson Correlation: age x income [Weighted]
-#>   r = -0.005, p = 0.828 , N = 2201
+#>   r = -0.005, p = 0.828, N = 2201
+#> Use summary() for detailed output.
 
 # Grouped correlations
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, life_satisfaction)
-#> [region = 1]
+#> [region = East]
 #> Pearson Correlation: 3 variables
-#>   age x income:                  r = 0.039, p = 0.415  
-#>   age x life_satisfaction:       r = -0.043, p = 0.350  
-#>   income x life_satisfaction:    r = 0.448, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 429
-#> [region = 2]
+#>   age x income:               r = 0.039, p = 0.415
+#>   age x life_satisfaction:    r = -0.043, p = 0.350
+#>   income x life_satisfaction: r = 0.448, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 410-465
+#> [region = West]
 #> Pearson Correlation: 3 variables
-#>   age x income:                  r = -0.018, p = 0.462  
-#>   age x life_satisfaction:       r = -0.025, p = 0.274  
-#>   income x life_satisfaction:    r = 0.449, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 1757
+#>   age x income:               r = -0.018, p = 0.462
+#>   age x life_satisfaction:    r = -0.025, p = 0.274
+#>   income x life_satisfaction: r = 0.449, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 1705-1956
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   pearson_cor(where(is.numeric), weights = sampling_weight)
 #> Pearson Correlation: 10 variables [Weighted]
-#>   id x age:                      r = 0.009, p = 0.648  
-#>   id x income:                   r = 0.027, p = 0.206  
-#>   id x political_orientation:    r = -0.023, p = 0.271  
-#>   id x environmental_concern:    r = -0.006, p = 0.763  
-#>   id x life_satisfaction:        r = 0.011, p = 0.587  
-#>   id x trust_government:         r = 0.021, p = 0.310  
-#>   id x trust_media:              r = -0.008, p = 0.714  
-#>   id x trust_science:            r = 0.016, p = 0.439  
-#>   id x sampling_weight:          r = -0.016, p = 0.436  
-#>   age x income:                  r = -0.005, p = 0.828  
-#>   age x political_orientation:   r = -0.029, p = 0.168  
-#>   age x environmental_concern:   r = 0.024, p = 0.244  
-#>   age x life_satisfaction:       r = -0.029, p = 0.150  
-#>   age x trust_government:        r = 0.005, p = 0.804  
-#>   age x trust_media:             r = 0.005, p = 0.820  
-#>   age x trust_science:           r = 0.003, p = 0.902  
-#>   age x sampling_weight:         r = -0.009, p = 0.645  
-#>   income x political_orientation: r = -0.034, p = 0.125  
-#>   income x environmental_concern: r = 0.015, p = 0.503  
-#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
-#>   income x trust_government:     r = -0.001, p = 0.975  
-#>   income x trust_media:          r = -0.011, p = 0.629  
-#>   income x trust_science:        r = -0.024, p = 0.270  
-#>   income x sampling_weight:      r = -0.040, p = 0.058  
-#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 *** 
-#>   political_orientation x life_satisfaction: r = -0.004, p = 0.836  
-#>   political_orientation x trust_government: r = -0.057, p = 0.008 ** 
-#>   political_orientation x trust_media: r = 0.004, p = 0.835  
-#>   political_orientation x trust_science: r = 0.040, p = 0.059  
-#>   political_orientation x sampling_weight: r = 0.011, p = 0.590  
-#>   environmental_concern x life_satisfaction: r = -0.003, p = 0.866  
-#>   environmental_concern x trust_government: r = 0.064, p = 0.002 ** 
-#>   environmental_concern x trust_media: r = 0.002, p = 0.907  
-#>   environmental_concern x trust_science: r = -0.014, p = 0.507  
-#>   environmental_concern x sampling_weight: r = 0.020, p = 0.328  
-#>   life_satisfaction x trust_government: r = 0.011, p = 0.604  
-#>   life_satisfaction x trust_media: r = 0.020, p = 0.330  
-#>   life_satisfaction x trust_science: r = -0.019, p = 0.371  
-#>   life_satisfaction x sampling_weight: r = -0.019, p = 0.359  
-#>   trust_government x trust_media: r = 0.012, p = 0.582  
-#>   trust_government x trust_science: r = 0.031, p = 0.145  
-#>   trust_government x sampling_weight: r = -0.009, p = 0.679  
-#>   trust_media x trust_science:   r = 0.024, p = 0.259  
-#>   trust_media x sampling_weight: r = 0.022, p = 0.281  
-#>   trust_science x sampling_weight: r = 0.001, p = 0.961  
-#>   4/45 pairs significant (p < .05), N = 2516
+#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 ***
+#>   income x life_satisfaction:                    r = 0.450, p < 0.001 ***
+#>   environmental_concern x trust_government:      r = 0.064, p = 0.002 **
+#>   political_orientation x trust_government:      r = -0.057, p = 0.008 **
+#>   (Shown: the 4 strongest significant pairs; summary() shows all 45)
+#>   4/45 pairs significant (p < .05), N = 2020-2516
+#> Use summary() for detailed output.
 
 # Listwise deletion for missing data
 survey_data %>%
   pearson_cor(age, income, use = "listwise")
 #> Pearson Correlation: age x income
-#>   r = -0.007, p = 0.761 , N = 2186
+#>   r = -0.007, p = 0.761, N = 2186
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- survey_data %>%
   pearson_cor(age, income, life_satisfaction, weights = sampling_weight)
 result              # compact one-line overview
 #> Pearson Correlation: 3 variables [Weighted]
-#>   age x income:                  r = -0.005, p = 0.828  
-#>   age x life_satisfaction:       r = -0.029, p = 0.150  
-#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
-#>   1/3 pairs significant (p < .05), N = 2201
+#>   age x income:               r = -0.005, p = 0.828
+#>   age x life_satisfaction:    r = -0.029, p = 0.150
+#>   income x life_satisfaction: r = 0.450, p < 0.001 ***
+#>   1/3 pairs significant (p < .05), N = 2130-2437
+#> Use summary() for detailed output.
 summary(result)     # full correlation, p-value, and N matrices
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
+#> Weighted Pearson Correlation
+#> ----------------------------
 #> 
 #> - Weights variable: sampling_weight
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Correlation Matrix:
-#> ------------------- 
-#>                       age  income life_satisfaction
-#> age                 1.000  -0.005            -0.029
-#> income             -0.005   1.000             0.450
-#> life_satisfaction  -0.029   0.450             1.000
-#> ------------------- 
+#> -------------------
+#>                       age     income     life_satisfaction   
+#> age                     1     -0.005                -0.029   
+#> income             -0.005          1                 0.450***
+#> life_satisfaction  -0.029      0.450***                  1   
+#> -------------------
 #> 
-#> Significance Matrix (p-values):
-#> ------------------------------- 
-#>                       age  income life_satisfaction
-#> age                0.0000  0.8276            0.1496
-#> income             0.8276  0.0000            0.0000
-#> life_satisfaction  0.1496  0.0000            0.0000
-#> ------------------------------- 
+#> Significance Matrix (p-values, 2-tailed):
+#> -----------------------------------------
+#>                     age  income  life_satisfaction
+#> age                        .828               .150
+#> income             .828                      <.001
+#> life_satisfaction  .150   <.001                   
+#> -----------------------------------------
 #> 
 #> Sample Size Matrix:
-#> ------------------- 
-#>                     age income life_satisfaction
-#> age                2516   2201              2437
-#> income             2201   2201              2130
-#> life_satisfaction  2437   2130              2437
-#> ------------------- 
+#> -------------------
+#>                     age  income  life_satisfaction
+#> age                2516    2201               2437
+#> income             2201    2201               2130
+#> life_satisfaction  2437    2130               2437
+#> -------------------
 #> 
 #> Pairwise Results:
-#> ---------------- 
-#>               Variable_Pair      r r_squared p_value           CI_95    n sig
-#>                age × income -0.005     0.000  0.8276 [-0.046, 0.037] 2201    
-#>     age × life_satisfaction -0.029     0.001  0.1496 [-0.069, 0.011] 2437    
-#>  income × life_satisfaction  0.450     0.203  0.0000  [0.416, 0.483] 2130 ***
-#> ---------------- 
+#>   ---------------------------------------------------------------------
+#>   Pair                             r      p           95% CI     N     
+#>   ---------------------------------------------------------------------
+#>   age x income                -0.005   .828  [-0.046, 0.037]  2201     
+#>   age x life_satisfaction     -0.029   .150  [-0.069, 0.011]  2437     
+#>   income x life_satisfaction   0.450  <.001   [0.416, 0.483]  2130  ***
+#>   ---------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)  # hide p-values
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
+#> Weighted Pearson Correlation
+#> ----------------------------
 #> 
 #> - Weights variable: sampling_weight
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #> Correlation Matrix:
-#> ------------------- 
-#>                       age  income life_satisfaction
-#> age                 1.000  -0.005            -0.029
-#> income             -0.005   1.000             0.450
-#> life_satisfaction  -0.029   0.450             1.000
-#> ------------------- 
+#> -------------------
+#>                       age     income     life_satisfaction   
+#> age                     1     -0.005                -0.029   
+#> income             -0.005          1                 0.450***
+#> life_satisfaction  -0.029      0.450***                  1   
+#> -------------------
 #> 
 #> Sample Size Matrix:
-#> ------------------- 
-#>                     age income life_satisfaction
-#> age                2516   2201              2437
-#> income             2201   2201              2130
-#> life_satisfaction  2437   2130              2437
-#> ------------------- 
+#> -------------------
+#>                     age  income  life_satisfaction
+#> age                2516    2201               2437
+#> income             2201    2201               2130
+#> life_satisfaction  2437    2130               2437
+#> -------------------
 #> 
 #> Pairwise Results:
-#> ---------------- 
-#>               Variable_Pair      r r_squared p_value           CI_95    n sig
-#>                age × income -0.005     0.000  0.8276 [-0.046, 0.037] 2201    
-#>     age × life_satisfaction -0.029     0.001  0.1496 [-0.069, 0.011] 2437    
-#>  income × life_satisfaction  0.450     0.203  0.0000  [0.416, 0.483] 2130 ***
-#> ---------------- 
+#>   ---------------------------------------------------------------------
+#>   Pair                             r      p           95% CI     N     
+#>   ---------------------------------------------------------------------
+#>   age x income                -0.005   .828  [-0.046, 0.037]  2201     
+#>   age x life_satisfaction     -0.029   .150  [-0.069, 0.011]  2437     
+#>   income x life_satisfaction   0.450  <.001   [0.416, 0.483]  2130  ***
+#>   ---------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

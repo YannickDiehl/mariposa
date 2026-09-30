@@ -58,8 +58,8 @@ for the main analysis function.
 result <- spearman_rho(survey_data, trust_government, trust_media)
 summary(result)
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: trust_government, trust_media
@@ -68,15 +68,15 @@ summary(result)
 #> 
 #> 
 #>   Spearman's rho: rho = 0.008
-#>   p-value: p = 0.723 
+#>   p-value (2-tailed): p = 0.723
 #>   N = 2227
 #>   t-statistic: 0.355
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: trust_government, trust_media

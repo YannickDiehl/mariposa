@@ -39,29 +39,41 @@ efa(
 
 - n_factors:
 
-  Number of components to extract. Default `NULL` uses the Kaiser
-  criterion (eigenvalue \> 1).
+  Number of components to extract (a whole number). Default `NULL` uses
+  the Kaiser criterion (eigenvalue \> 1). A single component cannot be
+  rotated; it is shown unrotated with SPSS's note.
 
 - rotation:
 
   Rotation method: `"varimax"` (default, orthogonal), `"oblimin"`
-  (oblique, allows correlated factors), `"promax"` (oblique,
-  power-based), or `"none"`.
+  (oblique direct oblimin, delta = 0, allows correlated factors),
+  `"promax"` (oblique, power 4), or `"none"`. All rotations use Kaiser
+  normalization and SPSS FACTOR's own algorithms and stopping rules (at
+  most 25 iterations, as SPSS `/CRITERIA ITERATE(25)`), so they
+  reproduce SPSS's rotated matrices; they differ slightly from
+  [`stats::varimax()`](https://rdrr.io/r/stats/varimax.html),
+  [`stats::promax()`](https://rdrr.io/r/stats/varimax.html) and
+  [`GPArotation::oblimin()`](https://rdrr.io/pkg/GPArotation/man/rotations.html).
 
 - extraction:
 
   Extraction method: `"pca"` (default, Principal Component Analysis) or
   `"ml"` (Maximum Likelihood, enables goodness-of-fit testing, assumes
-  multivariate normality).
+  multivariate normality). ML uses SPSS's starting values, bounds a
+  Heywood variable's communality at .999 as SPSS does and keeps SPSS's
+  factor order.
 
 - weights:
 
-  Optional survey weights for population-representative results.
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - use:
 
   How to handle missing data for correlation computation: `"pairwise"`
-  (default, matches SPSS) or `"complete"` (listwise).
+  (default, matches SPSS) or `"complete"` (listwise; `"listwise"` is
+  accepted as an alias).
 
 - sort:
 
@@ -95,11 +107,21 @@ An `efa` result object containing:
 
 - variance_explained:
 
-  Tibble with Total, % of Variance, Cumulative %
+  Tibble with the initial eigenvalues: Total, % of Variance, Cumulative
+  % (one row per variable)
+
+- extraction_variance:
+
+  Tibble with the extraction sums of squared loadings of the extracted
+  components/factors (SPSS "Extraction Sums of Squared Loadings"). For
+  ML this is the variance the common factors explain - the figure the
+  compact print reports.
 
 - rotation_variance:
 
-  Tibble with rotation sums of squared loadings
+  Tibble with rotation sums of squared loadings (for the oblique
+  rotations the column sums of squares of the structure matrix, as SPSS
+  reports them)
 
 - communalities:
 
@@ -153,17 +175,41 @@ An `efa` result object containing:
 
   Factor correlation matrix (oblimin/promax only, NULL otherwise)
 
+- rotation_iterations, rotation_converged:
+
+  Iterations of the rotation as SPSS counts them ("Rotation converged in
+  4 iterations"; for promax those of its varimax step) and whether it
+  converged; NULL without rotation
+
 - variables:
 
   Character vector of variable names
+
+- variable_labels:
+
+  Named character vector with the variable labels (`NA` where a variable
+  has none); [`summary()`](https://rdrr.io/r/base/summary.html) shows
+  them next to the names, shortened to the console width in the tables
 
 - weights:
 
   Weights variable name or NULL
 
+- item_statistics:
+
+  Tibble with mean, SD, analysis N and missing N per item. With
+  `use = "pairwise"` each item uses its own valid cases; with
+  `use = "complete"` all items use the complete cases.
+
 - n:
 
-  Sample size
+  Sample size: the smallest pairwise N (`use = "pairwise"`, the N of
+  Bartlett's test as in SPSS) or the number of complete cases
+  (`use = "complete"`); the sum of weights when weighted
+
+- use:
+
+  The missing-data handling used (`"pairwise"` or `"complete"`)
 
 - col_prefix:
 
@@ -272,27 +318,26 @@ efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science)
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 
-# With Oblimin rotation (requires GPArotation package)
-# \donttest{
-if (requireNamespace("GPArotation", quietly = TRUE)) {
-  efa(survey_data,
-      political_orientation, environmental_concern, life_satisfaction,
-      trust_government, trust_media, trust_science,
-      rotation = "oblimin")
-}
+# With Oblimin rotation
+efa(survey_data,
+    political_orientation, environmental_concern, life_satisfaction,
+    trust_government, trust_media, trust_science,
+    rotation = "oblimin")
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Oblimin)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
-# }
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 
 # Maximum Likelihood extraction
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
     extraction = "ml")
-#> Exploratory Factor Analysis: 6 items, 3 components (ML/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#> Exploratory Factor Analysis: 6 items, 3 factors (ML/Varimax)
+#>   KMO = 0.505 (Miserable), Variance explained: 24.1%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 
 # Promax rotation (oblique)
 efa(survey_data,
@@ -300,7 +345,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     rotation = "promax")
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Promax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 
 # Fix number of factors
 efa(survey_data,
@@ -308,7 +354,8 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     n_factors = 2)
 #> Exploratory Factor Analysis: 6 items, 2 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 44.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 44.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 
 # With survey weights
 efa(survey_data,
@@ -316,141 +363,186 @@ efa(survey_data,
     trust_government, trust_media, trust_science,
     weights = sampling_weight)
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax) [Weighted]
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2182 (smallest pairwise)
+#> Use summary() for detailed output.
 
 # Grouped by region
 survey_data %>%
   group_by(region) %>%
   efa(political_orientation, environmental_concern, life_satisfaction,
       trust_government, trust_media, trust_science)
-#> [region = 1]
+#> [region = East]
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
-#>   KMO = 0.475 (Unacceptable), Variance explained: 62.1%
-#> [region = 2]
+#>   KMO = 0.475 (Unacceptable), Variance explained: 62.1%, N = 419 (smallest pairwise)
+#> [region = West]
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.3%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.3%, N = 1749 (smallest pairwise)
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- efa(survey_data, political_orientation, environmental_concern,
               life_satisfaction, trust_government, trust_media, trust_science)
 result              # compact overview
 #> Exploratory Factor Analysis: 6 items, 3 components (PCA/Varimax)
-#>   KMO = 0.505 (Miserable), Variance explained: 61.0%
+#>   KMO = 0.505 (Miserable), Variance explained: 61.0%, N = 2168 (smallest pairwise)
+#> Use summary() for detailed output.
 summary(result)     # full detailed output with all sections
 #> 
 #> Exploratory Factor Analysis (PCA, Varimax) Results
 #> --------------------------------------------------
-#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
+#> - Variables:
+#>     political_orientation  Political orientation (1=left, 5=right)
+#>     environmental_concern  Environmental concern (1=low, 5=high)
+#>     life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)
+#>     trust_government       Trust in government (1=none, 5=complete)
+#>     trust_media            Trust in media (1=none, 5=complete)
+#>     trust_science          Trust in science (1=none, 5=complete)
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
-#> - N of Factors: 3
+#> - N of Components: 3
+#> - N (smallest pairwise): 2168
+#> 
+#> Descriptive Statistics
+#>   -------------------------------------------------------------------
+#>   Variable                Mean  Std. Deviation  Analysis N  Missing N
+#>   -------------------------------------------------------------------
+#>   political_orientation  2.722           1.086        2299        201
+#>   environmental_concern  3.573           1.194        2400        100
+#>   life_satisfaction      3.628           1.153        2421         79
+#>   trust_government       2.621           1.163        2354        146
+#>   trust_media            2.452           1.163        2367        133
+#>   trust_science          3.641           1.028        2398        102
+#>   -------------------------------------------------------------------
 #> 
 #> KMO and Bartlett's Test
 #> ---------------------------------------- 
 #>   Kaiser-Meyer-Olkin Measure:     0.505
 #>   Bartlett's Chi-Square:          932.068
 #>   df:                             15
-#>   Sig.:                           0.000
+#>   Sig.:                           <.001
 #> 
 #> Communalities
-#> ---------------------------------------- 
-#>               variable initial extraction
-#>  political_orientation       1      0.786
-#>  environmental_concern       1      0.783
-#>      life_satisfaction       1      0.668
-#>       trust_government       1      0.347
-#>            trust_media       1      0.475
-#>          trust_science       1      0.598
+#>   ---------------------------------------------------------------------
+#>   Variable                                          Initial  Extraction
+#>   ---------------------------------------------------------------------
+#>   political_orientation  Political orientation ...    1.000       0.786
+#>   environmental_concern  Environmental concern ...    1.000       0.783
+#>   life_satisfaction      Life satisfaction (1=d...    1.000       0.668
+#>   trust_government       Trust in government (1...    1.000       0.347
+#>   trust_media            Trust in media (1=none...    1.000       0.475
+#>   trust_science          Trust in science (1=no...    1.000       0.598
+#>   ---------------------------------------------------------------------
 #> Extraction Method: Principal Component Analysis.
 #> 
 #> Total Variance Explained
-#> ---------------------------------------- 
-#>   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%
-#>   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%
-#>   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%
-#>   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%
-#>   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%
-#>   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%
-#> 
-#> Rotation Sums of Squared Loadings
-#> ---------------------------------------- 
-#>   PC1  SS Loading: 1.598  Variance: 26.634%  Cumulative: 26.634%
-#>   PC2  SS Loading: 1.039  Variance: 17.325%  Cumulative: 43.959%
-#>   PC3  SS Loading: 1.021  Variance: 17.020%  Cumulative: 60.979%
+#>   -------------------------------------------------------------------------
+#>              Initial Eigenvalues   Extraction Sums      Rotation Sums
+#>   Component  Total % Var.  Cum. %  Total % Var. Cum. %  Total % Var. Cum. %
+#>   -------------------------------------------------------------------------
+#>           1  1.600 26.666  26.666  1.600 26.666 26.666  1.598 26.635 26.635
+#>           2  1.041 17.358  44.024  1.041 17.358 44.024  1.039 17.324 43.959
+#>           3  1.017 16.955  60.979  1.017 16.955 60.979  1.021 17.020 60.979
+#>           4  0.980 16.334  77.313
+#>           5  0.949 15.814  93.127
+#>           6  0.412  6.873 100.000
+#>   -------------------------------------------------------------------------
+#> Sums = sums of squared loadings.
+#> Extraction Method: Principal Component Analysis.
 #> 
 #> Component Matrix (unrotated)
 #> ---------------------------------------- 
-#>                           PC1     PC2     PC3
-#> political_orientation   0.885                
-#> environmental_concern  -0.885                
-#> trust_science                  -0.672        
-#> trust_government               -0.547        
-#> trust_media                    -0.524  -0.448
-#> life_satisfaction                      -0.809
+#>                                                            PC1     PC2     PC3
+#> political_orientation  Political orientation (1=lef...  -0.885                
+#> environmental_concern  Environmental concern (1=low...   0.885                
+#> trust_science          Trust in science (1=none, 5=...           0.672        
+#> trust_government       Trust in government (1=none,...           0.547        
+#> trust_media            Trust in media (1=none, 5=co...           0.524   0.448
+#> life_satisfaction      Life satisfaction (1=dissati...                   0.809
 #> Extraction Method: Principal Component Analysis.
 #> 
 #> Rotated Component Matrix
 #> ---------------------------------------- 
-#>                           PC1     PC2     PC3
-#> political_orientation   0.887                
-#> environmental_concern  -0.884                
-#> trust_science                  -0.762        
-#> trust_government               -0.566        
-#> life_satisfaction                      -0.789
-#> trust_media                            -0.620
+#>                                                            PC1     PC2     PC3
+#> political_orientation  Political orientation (1=lef...  -0.887                
+#> environmental_concern  Environmental concern (1=low...   0.884                
+#> trust_science          Trust in science (1=none, 5=...           0.762        
+#> trust_government       Trust in government (1=none,...           0.566        
+#> life_satisfaction      Life satisfaction (1=dissati...                   0.789
+#> trust_media            Trust in media (1=none, 5=co...                   0.620
 #> Extraction Method: Principal Component Analysis.
 #> Rotation Method: Varimax with Kaiser Normalization.
+#> Rotation converged in 4 iterations.
 summary(result, communalities = FALSE)  # hide communalities table
 #> 
 #> Exploratory Factor Analysis (PCA, Varimax) Results
 #> --------------------------------------------------
-#> - Variables: political_orientation, environmental_concern, life_satisfaction, trust_government, trust_media, trust_science
+#> - Variables:
+#>     political_orientation  Political orientation (1=left, 5=right)
+#>     environmental_concern  Environmental concern (1=low, 5=high)
+#>     life_satisfaction      Life satisfaction (1=dissatisfied, 5=satisfied)
+#>     trust_government       Trust in government (1=none, 5=complete)
+#>     trust_media            Trust in media (1=none, 5=complete)
+#>     trust_science          Trust in science (1=none, 5=complete)
 #> - Extraction: Principal Component Analysis
 #> - Rotation: Varimax with Kaiser Normalization
-#> - N of Factors: 3
+#> - N of Components: 3
+#> - N (smallest pairwise): 2168
+#> 
+#> Descriptive Statistics
+#>   -------------------------------------------------------------------
+#>   Variable                Mean  Std. Deviation  Analysis N  Missing N
+#>   -------------------------------------------------------------------
+#>   political_orientation  2.722           1.086        2299        201
+#>   environmental_concern  3.573           1.194        2400        100
+#>   life_satisfaction      3.628           1.153        2421         79
+#>   trust_government       2.621           1.163        2354        146
+#>   trust_media            2.452           1.163        2367        133
+#>   trust_science          3.641           1.028        2398        102
+#>   -------------------------------------------------------------------
 #> 
 #> KMO and Bartlett's Test
 #> ---------------------------------------- 
 #>   Kaiser-Meyer-Olkin Measure:     0.505
 #>   Bartlett's Chi-Square:          932.068
 #>   df:                             15
-#>   Sig.:                           0.000
+#>   Sig.:                           <.001
 #> 
 #> Total Variance Explained
-#> ---------------------------------------- 
-#>   PC1  Eigenvalue: 1.600  Variance: 26.666%  Cumulative: 26.666%
-#>   PC2  Eigenvalue: 1.041  Variance: 17.358%  Cumulative: 44.024%
-#>   PC3  Eigenvalue: 1.017  Variance: 16.955%  Cumulative: 60.979%
-#>   PC4  Eigenvalue: 0.980  Variance: 16.334%  Cumulative: 77.313%
-#>   PC5  Eigenvalue: 0.949  Variance: 15.814%  Cumulative: 93.127%
-#>   PC6  Eigenvalue: 0.412  Variance: 6.873%  Cumulative: 100.000%
-#> 
-#> Rotation Sums of Squared Loadings
-#> ---------------------------------------- 
-#>   PC1  SS Loading: 1.598  Variance: 26.634%  Cumulative: 26.634%
-#>   PC2  SS Loading: 1.039  Variance: 17.325%  Cumulative: 43.959%
-#>   PC3  SS Loading: 1.021  Variance: 17.020%  Cumulative: 60.979%
+#>   -------------------------------------------------------------------------
+#>              Initial Eigenvalues   Extraction Sums      Rotation Sums
+#>   Component  Total % Var.  Cum. %  Total % Var. Cum. %  Total % Var. Cum. %
+#>   -------------------------------------------------------------------------
+#>           1  1.600 26.666  26.666  1.600 26.666 26.666  1.598 26.635 26.635
+#>           2  1.041 17.358  44.024  1.041 17.358 44.024  1.039 17.324 43.959
+#>           3  1.017 16.955  60.979  1.017 16.955 60.979  1.021 17.020 60.979
+#>           4  0.980 16.334  77.313
+#>           5  0.949 15.814  93.127
+#>           6  0.412  6.873 100.000
+#>   -------------------------------------------------------------------------
+#> Sums = sums of squared loadings.
+#> Extraction Method: Principal Component Analysis.
 #> 
 #> Component Matrix (unrotated)
 #> ---------------------------------------- 
-#>                           PC1     PC2     PC3
-#> political_orientation   0.885                
-#> environmental_concern  -0.885                
-#> trust_science                  -0.672        
-#> trust_government               -0.547        
-#> trust_media                    -0.524  -0.448
-#> life_satisfaction                      -0.809
+#>                                                            PC1     PC2     PC3
+#> political_orientation  Political orientation (1=lef...  -0.885                
+#> environmental_concern  Environmental concern (1=low...   0.885                
+#> trust_science          Trust in science (1=none, 5=...           0.672        
+#> trust_government       Trust in government (1=none,...           0.547        
+#> trust_media            Trust in media (1=none, 5=co...           0.524   0.448
+#> life_satisfaction      Life satisfaction (1=dissati...                   0.809
 #> Extraction Method: Principal Component Analysis.
 #> 
 #> Rotated Component Matrix
 #> ---------------------------------------- 
-#>                           PC1     PC2     PC3
-#> political_orientation   0.887                
-#> environmental_concern  -0.884                
-#> trust_science                  -0.762        
-#> trust_government               -0.566        
-#> life_satisfaction                      -0.789
-#> trust_media                            -0.620
+#>                                                            PC1     PC2     PC3
+#> political_orientation  Political orientation (1=lef...  -0.887                
+#> environmental_concern  Environmental concern (1=low...   0.884                
+#> trust_science          Trust in science (1=none, 5=...           0.762        
+#> trust_government       Trust in government (1=none,...           0.566        
+#> life_satisfaction      Life satisfaction (1=dissati...                   0.789
+#> trust_media            Trust in media (1=none, 5=co...                   0.620
 #> Extraction Method: Principal Component Analysis.
 #> Rotation Method: Varimax with Kaiser Normalization.
+#> Rotation converged in 4 iterations.
 ```

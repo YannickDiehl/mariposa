@@ -41,15 +41,16 @@ for summary options.
 result <- pearson_cor(survey_data, age, life_satisfaction)
 summary(result)                             # all matrices
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> Pearson Correlation
+#> -------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Correlation: r = -0.029
-#>   p-value: p = 0.158 
+#>   p-value (2-tailed): p = 0.158
 #>   N = 2421
 #>   95% CI: [-0.068, 0.011]
 #>   r-squared: 0.001
@@ -57,11 +58,12 @@ summary(result)                             # all matrices
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)      # hide p-values
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> Pearson Correlation
+#> -------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Correlation: r = -0.029

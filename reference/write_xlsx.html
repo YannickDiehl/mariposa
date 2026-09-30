@@ -3,32 +3,40 @@
 value labels, and tagged NA metadata. When exporting labelled survey data,
 a "Labels" reference sheet is automatically included so that reviewers
 can look up what each numeric code means – even without R access.
-Three input types are supported:
+Four input types are supported:
 Data frame: Exports the data plus a "Labels" reference sheet
 with variable labels, value labels, and missing value codes.
 Codebook object: Exports the codebook as it appears in the
 HTML viewer – with values, value labels, and frequencies stacked
 inside each cell, tagged NAs separated by a line, and an overview
 sheet with dataset metadata.
+Analysis results: frequency() and crosstab() tables in
+their printed layout; every other result (e.g. describe(),
+t_test(), oneway_anova(), reliability(),
+linear_regression()) as its result tables.
 Named list: Each list element becomes a separate sheet.
-Elements can be data frames, frequency() results, or codebook()
-results – types can be mixed freely. For data frame elements, a
+Elements can be data frames, codebook() results, or any analysis
+result – types can be mixed freely. For data frame elements, a
 combined "Labels" sheet is appended.
 
 '><meta property="og:description" content='Writes data to an Excel (.xlsx) file with support for variable labels,
 value labels, and tagged NA metadata. When exporting labelled survey data,
 a "Labels" reference sheet is automatically included so that reviewers
 can look up what each numeric code means – even without R access.
-Three input types are supported:
+Four input types are supported:
 Data frame: Exports the data plus a "Labels" reference sheet
 with variable labels, value labels, and missing value codes.
 Codebook object: Exports the codebook as it appears in the
 HTML viewer – with values, value labels, and frequencies stacked
 inside each cell, tagged NAs separated by a line, and an overview
 sheet with dataset metadata.
+Analysis results: frequency() and crosstab() tables in
+their printed layout; every other result (e.g. describe(),
+t_test(), oneway_anova(), reliability(),
+linear_regression()) as its result tables.
 Named list: Each list element becomes a separate sheet.
-Elements can be data frames, frequency() results, or codebook()
-results – types can be mixed freely. For data frame elements, a
+Elements can be data frames, codebook() results, or any analysis
+result – types can be mixed freely. For data frame elements, a
 combined "Labels" sheet is appended.
 
 '><meta property="og:image" content="https://YannickDiehl.github.io/mariposa/logo.png"></head><body>
@@ -89,15 +97,19 @@ combined "Labels" sheet is appended.
 value labels, and tagged NA metadata. When exporting labelled survey data,
 a "Labels" reference sheet is automatically included so that reviewers
 can look up what each numeric code means – even without R access.</p>
-<p>Three input types are supported:</p><ol><li><p><strong>Data frame</strong>: Exports the data plus a "Labels" reference sheet
+<p>Four input types are supported:</p><ol><li><p><strong>Data frame</strong>: Exports the data plus a "Labels" reference sheet
 with variable labels, value labels, and missing value codes.</p></li>
 <li><p><strong>Codebook object</strong>: Exports the codebook as it appears in the
 HTML viewer – with values, value labels, and frequencies stacked
 inside each cell, tagged NAs separated by a line, and an overview
 sheet with dataset metadata.</p></li>
+<li><p><strong>Analysis results</strong>: <code><a href="frequency.html">frequency()</a></code> and <code><a href="crosstab.html">crosstab()</a></code> tables in
+their printed layout; every other result (e.g. <code><a href="describe.html">describe()</a></code>,
+<code><a href="t_test.html">t_test()</a></code>, <code><a href="oneway_anova.html">oneway_anova()</a></code>, <code><a href="reliability.html">reliability()</a></code>,
+<code><a href="linear_regression.html">linear_regression()</a></code>) as its result tables.</p></li>
 <li><p><strong>Named list</strong>: Each list element becomes a separate sheet.
-Elements can be data frames, <code><a href="frequency.html">frequency()</a></code> results, or <code><a href="codebook.html">codebook()</a></code>
-results – types can be mixed freely. For data frame elements, a
+Elements can be data frames, <code><a href="codebook.html">codebook()</a></code> results, or any analysis
+result – types can be mixed freely. For data frame elements, a
 combined "Labels" sheet is appended.</p></li>
 </ol></div>
 
@@ -106,6 +118,9 @@ combined "Labels" sheet is appended.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_xlsx</span><span class="op">(</span><span class="va">x</span>, <span class="va">file</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'frequency'</span></span>
+<span><span class="fu">write_xlsx</span><span class="op">(</span><span class="va">x</span>, <span class="va">file</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Default S3 method</span></span>
 <span><span class="fu">write_xlsx</span><span class="op">(</span><span class="va">x</span>, <span class="va">file</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -114,8 +129,8 @@ combined "Labels" sheet is appended.</p></li>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Object to export: a data frame, a <code><a href="codebook.html">codebook()</a></code> result, or a
-named list of data frames.</p></dd>
+<dd><p>Object to export: a data frame, a <code><a href="codebook.html">codebook()</a></code> result, an
+analysis result, or a named list of these.</p></dd>
 
 
 <dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
@@ -177,6 +192,8 @@ RStudio Viewer.</p>
 <li><p>Want to export a codebook for manual review or documentation</p></li>
 <li><p>Need to combine multiple tables (data, codebook, frequencies) in
 one Excel file</p></li>
+<li><p>Want to hand analysis results (descriptives, crosstabs, test
+results) to colleagues as Excel tables</p></li>
 </ul></div>
 
     </div>
@@ -188,11 +205,23 @@ one Excel file</p></li>
 the console print output. Each variable gets a header row, stats summary,
 column headers, data rows, and total rows. Multiple variables are separated
 by 3 blank rows.</p></li>
+<li><p><code>write_xlsx(default)</code>: Export any other mariposa analysis result (e.g.
+<code><a href="describe.html">describe()</a></code>, <code><a href="crosstab.html">crosstab()</a></code>, <code><a href="t_test.html">t_test()</a></code>, <code><a href="reliability.html">reliability()</a></code>,
+<code><a href="linear_regression.html">linear_regression()</a></code>) to one sheet. <code><a href="crosstab.html">crosstab()</a></code> results are written
+in the SPSS table layout (counts and the requested percentages per
+row category, with totals); all other results as the table
+<a href="as.data.frame.mariposa.html">as.data.frame()</a> returns, followed by the
+secondary tables SPSS
+shows next to it (group descriptives, mean ranks, item statistics,
+model summary, ...). Grouped results keep the grouping variables as
+leading columns (crosstabs get one block per group).</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="codebook.html">codebook()</a></code> for generating codebook objects,
 <code><a href="frequency.html">frequency()</a></code> for frequency tables,
+<a href="as.data.frame.mariposa.html">as.data.frame()</a> for analysis results as data
+frames,
 <code><a href="read_spss.html">read_spss()</a></code>, <code><a href="read_por.html">read_por()</a></code>, <code><a href="read_stata.html">read_stata()</a></code>, <code><a href="read_sas.html">read_sas()</a></code>,
 <code><a href="read_xpt.html">read_xpt()</a></code>, <code><a href="read_xlsx.html">read_xlsx()</a></code> for importing labelled data</p>
 <p>Other data-export:
@@ -246,6 +275,24 @@ by 3 blank rows.</p></li>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="va">tmp2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"openxlsx2"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Analysis results: one sheet each, or several in one workbook</span></span></span>
+<span class="r-in"><span>  <span class="va">tmp_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".xlsx"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="t_test.html">t_test</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, <span class="va">income</span>, group <span class="op">=</span> <span class="va">gender</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">write_xlsx</span><span class="op">(</span><span class="va">tmp_res</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">tmp_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".xlsx"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">write_xlsx</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"Descriptives"</span> <span class="op">=</span> <span class="fu"><a href="describe.html">describe</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, <span class="va">income</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Crosstab"</span>     <span class="op">=</span> <span class="fu"><a href="crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">gender</span>, <span class="va">region</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"ANOVA"</span>        <span class="op">=</span> <span class="fu"><a href="oneway_anova.html">oneway_anova</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">age</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="va">tmp_list</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tmp_res</span>, <span class="va">tmp_list</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

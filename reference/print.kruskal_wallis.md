@@ -38,7 +38,7 @@ Invisibly returns the input object `x`.
 result <- kruskal_wallis(survey_data, life_satisfaction, group = education)
 result              # compact one-line overview
 #> Kruskal-Wallis Test: life_satisfaction by education
-#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071, N = 2421
+#>   H(3) = 171.178, p < 0.001 ***, eps2 = 0.071 (medium), N = 2421
 #> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> Kruskal-Wallis Test Results
@@ -50,26 +50,29 @@ summary(result)     # full detailed output
 #> life_satisfaction
 #> -----------------
 #>   Ranks:
-#>   --------------------------------------
-#>                     Group    N Mean Rank
-#>           Basic Secondary  809    974.29
-#>    Intermediate Secondary  618   1250.73
-#>        Academic Secondary  607   1329.56
-#>                University  387   1456.42
-#>                     Total 2421        NA
-#>   --------------------------------------
+#>   ---------------------------------------
+#>   Group                      N  Mean Rank
+#>   ---------------------------------------
+#>   Basic Secondary          809     974.29
+#>   Intermediate Secondary   618    1250.73
+#>   Academic Secondary       607    1329.56
+#>   University               387    1456.42
+#>   Total                   2421           
+#>   ---------------------------------------
 #> 
 #>   Test Statistics:
-#>   ------------------------------------------------
-#>    Kruskal-Wallis H df p value Epsilon-squared sig
-#>             171.178  3       0           0.071 ***
-#>   ------------------------------------------------
+#>   ---------------------------------------------------
+#>   Kruskal-Wallis H  df  p value  Epsilon-squared     
+#>   ---------------------------------------------------
+#>            171.178   3    <.001            0.071  ***
+#>   ---------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (Epsilon-squared):
-#> - Small effect: 0.01 - 0.06
-#> - Medium effect: 0.06 - 0.14
-#> - Large effect: > 0.14
+#> - Negligible: < 0.01
+#> - Small: 0.01 - 0.06
+#> - Medium: 0.06 - 0.14
+#> - Large: >= 0.14
 ```

@@ -114,28 +114,31 @@ H, degrees of freedom, p-value, and epsilon-squared.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Ranks:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Group    N Mean Rank</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Basic Secondary  809    974.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Intermediate Secondary  618   1250.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Academic Secondary  607   1329.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                University  387   1456.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Total 2421        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group                      N  Mean Rank</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Basic Secondary          809     974.29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Intermediate Secondary   618    1250.73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Academic Secondary       607    1329.56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   University               387    1456.42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total                   2421           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Epsilon-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             171.178  3       0           0.071 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Kruskal-Wallis H  df  p value  Epsilon-squared     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            171.178   3    &lt;.001            0.071  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Epsilon-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Negligible: &lt; 0.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Small: 0.01 - 0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium: 0.06 - 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Large: &gt;= 0.14</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, ranks <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
@@ -146,18 +149,20 @@ H, degrees of freedom, p-value, and epsilon-squared.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> life_satisfaction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Kruskal-Wallis H df p value Epsilon-squared sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             171.178  3       0           0.071 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Kruskal-Wallis H  df  p value  Epsilon-squared     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            171.178   3    &lt;.001            0.071  ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Effect Size Interpretation (Epsilon-squared):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Small effect: 0.01 - 0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium effect: 0.06 - 0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Large effect: &gt; 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Negligible: &lt; 0.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Small: 0.01 - 0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Medium: 0.06 - 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Large: &gt;= 0.14</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

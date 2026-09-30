@@ -107,7 +107,10 @@ Options: <code>"bonferroni"</code> (default, most conservative),
     <p>Pairwise comparison results showing:</p><ul><li><p>Which measurement pairs are significantly different</p></li>
 <li><p>Z-statistics from Wilcoxon signed-rank tests</p></li>
 <li><p>Adjusted p-values (controlling for multiple comparisons)</p></li>
-</ul></div>
+<li><p>The number of cases of each pair (<code>n</code>)</p></li>
+</ul><p>The comparison table (one row per pair) is stored as <code>$results</code>
+(also available as <code>$comparisons</code>).</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
@@ -116,8 +119,13 @@ Options: <code>"bonferroni"</code> (default, most conservative),
 
 
 <p><strong>Z-Statistics</strong>: Based on the Wilcoxon signed-rank test for each pair</p><ul><li><p>Large absolute Z values indicate big differences between two measurements</p></li>
-<li><p>Positive Z: Values in var1 tend to be higher than var2</p></li>
-<li><p>Negative Z: Values in var2 tend to be higher than var1</p></li>
+<li><p>Z is computed from the differences <code>var2 - var1</code>, like
+<code>wilcoxon_test(x = var1, y = var2)</code> and the SPSS pair
+"var2 - var1"</p></li>
+<li><p>As in SPSS, Z comes from the smaller rank sum and is never positive;
+<code>z_based_on</code> names that sum (SPSS's footnote)</p></li>
+<li><p>Based on negative ranks: values in var2 (Var 2) tend to be higher</p></li>
+<li><p>Based on positive ranks: values in var1 (Var 1) tend to be higher</p></li>
 </ul><p><strong>Adjusted P-values</strong>: Control for multiple comparisons</p><ul><li><p>p &lt; 0.05: Measurements are significantly different</p></li>
 <li><p>p &gt;= 0.05: No significant difference between these measurements</p></li>
 </ul></div>
@@ -131,6 +139,18 @@ Options: <code>"bonferroni"</code> (default, most conservative),
 <li><p>Computes a Z-statistic based on the rank sums</p></li>
 <li><p>Uses normal approximation with tie correction</p></li>
 </ol></div>
+
+<div class="section">
+<h3 id="which-cases-are-used">Which Cases Are Used<a class="anchor" aria-label="anchor" href="#which-cases-are-used"></a></h3>
+
+
+<p>Each pair uses all cases with valid values on both of its variables
+(pairwise deletion), exactly like the individual SPSS
+<code>NPAR TESTS /WILCOXON</code> tests these results are validated against.
+<code><a href="friedman_test.html">friedman_test()</a></code> uses only cases complete on all variables
+(listwise, as SPSS <code>/FRIEDMAN</code>), so a pair's <code>n</code> can be larger
+than the Friedman N.</p>
+</div>
 
 <div class="section">
 <h3 id="p-value-adjustment-methods">P-Value Adjustment Methods<a class="anchor" aria-label="anchor" href="#p-value-adjustment-methods"></a></h3>

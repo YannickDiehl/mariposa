@@ -45,8 +45,9 @@ factorial_anova(data, dv, between, weights = NULL, ss_type = 3)
 
 - weights:
 
-  Optional survey weights for population-representative results
-  (unquoted variable name)
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - ss_type:
 
@@ -82,7 +83,18 @@ An object of class `"factorial_anova"` containing:
   List with metadata (dv, factors, weighted, n_total, n_missing)
 
 Use [`summary()`](https://rdrr.io/r/base/summary.html) for the full
-SPSS-style output with toggleable sections.
+SPSS-style output with toggleable sections. For data grouped with
+[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html), one
+ANOVA is computed per group: the tables carry the group keys as leading
+columns, `group_results` holds the complete result of each group
+(`NULL`, with a warning, for a group that cannot be analysed), and
+[`print()`](https://rdrr.io/r/base/print.html),
+[`summary()`](https://rdrr.io/r/base/summary.html),
+[`tukey_test()`](https://YannickDiehl.github.io/mariposa/reference/tukey_test.md),
+[`scheffe_test()`](https://YannickDiehl.github.io/mariposa/reference/scheffe_test.md)
+and
+[`levene_test()`](https://YannickDiehl.github.io/mariposa/reference/levene_test.md)
+report per group.
 
 ## Details
 
@@ -196,31 +208,49 @@ data(survey_data)
 # Two-way ANOVA: income by gender and education
 survey_data %>%
   factorial_anova(dv = income, between = c(gender, education))
-#> Factorial ANOVA (2-Way): income by gender, education
-#>   gender:           F(1, 2178) = 0.098, p = 0.755 , eta2p = 0.000
+#> Factorial ANOVA (2-Way): income by gender, education, N = 2186
+#>   gender:           F(1, 2178) = 0.098, p = 0.755, eta2p = 0.000
 #>   education:        F(3, 2178) = 463.521, p < 0.001 ***, eta2p = 0.390
-#>   gender:education: F(3, 2178) = 0.399, p = 0.754 , eta2p = 0.001, N = 2186
+#>   gender:education: F(3, 2178) = 0.399, p = 0.754, eta2p = 0.001
+#> Use summary() for detailed output.
 
 # Two-way ANOVA with weights
 survey_data %>%
   factorial_anova(dv = life_satisfaction, between = c(gender, region),
                   weights = sampling_weight)
-#> Factorial ANOVA (2-Way): life_satisfaction by gender, region [Weighted]
-#>   gender:        F(1, 2417) = 0.008, p = 0.930 , eta2p = 0.000
-#>   region:        F(1, 2417) = 0.001, p = 0.979 , eta2p = 0.000
-#>   gender:region: F(1, 2417) = 1.642, p = 0.200 , eta2p = 0.001, N = 2421
+#> Factorial ANOVA (2-Way): life_satisfaction by gender, region [Weighted], N = 2421
+#>   gender:        F(1, 2417) = 0.008, p = 0.930, eta2p = 0.000
+#>   region:        F(1, 2417) = 0.001, p = 0.979, eta2p = 0.000
+#>   gender:region: F(1, 2417) = 1.642, p = 0.200, eta2p = 0.001
+#> Use summary() for detailed output.
+
+# Separate ANOVA for each region
+survey_data %>%
+  group_by(region) %>%
+  factorial_anova(dv = life_satisfaction, between = c(gender, education))
+#> Factorial ANOVA (2-Way): life_satisfaction by gender, education
+#> [region = East] N = 465
+#>   gender:           F(1, 457) = 0.340, p = 0.560, eta2p = 0.001
+#>   education:        F(3, 457) = 6.877, p < 0.001 ***, eta2p = 0.043
+#>   gender:education: F(3, 457) = 0.060, p = 0.981, eta2p = 0.000
+#> [region = West] N = 1956
+#>   gender:           F(1, 1948) = 3.631, p = 0.057, eta2p = 0.002
+#>   education:        F(3, 1948) = 61.144, p < 0.001 ***, eta2p = 0.086
+#>   gender:education: F(3, 1948) = 1.107, p = 0.345, eta2p = 0.002
+#> Use summary() for detailed output.
 
 # Three-way ANOVA
 survey_data %>%
   factorial_anova(dv = income, between = c(gender, region, education))
-#> Factorial ANOVA (3-Way): income by gender, region, education
-#>   gender:                  F(1, 2170) = 2.976, p = 0.085 , eta2p = 0.001
-#>   region:                  F(1, 2170) = 0.056, p = 0.812 , eta2p = 0.000
+#> Factorial ANOVA (3-Way): income by gender, region, education, N = 2186
+#>   gender:                  F(1, 2170) = 2.976, p = 0.085, eta2p = 0.001
+#>   region:                  F(1, 2170) = 0.056, p = 0.812, eta2p = 0.000
 #>   education:               F(3, 2170) = 279.309, p < 0.001 ***, eta2p = 0.279
 #>   gender:region:           F(1, 2170) = 5.769, p = 0.016 *, eta2p = 0.003
-#>   gender:education:        F(3, 2170) = 0.597, p = 0.617 , eta2p = 0.001
-#>   region:education:        F(3, 2170) = 0.990, p = 0.396 , eta2p = 0.001
-#>   gender:region:education: F(3, 2170) = 3.889, p = 0.009 **, eta2p = 0.005, N = 2186
+#>   gender:education:        F(3, 2170) = 0.597, p = 0.617, eta2p = 0.001
+#>   region:education:        F(3, 2170) = 0.990, p = 0.396, eta2p = 0.001
+#>   gender:region:education: F(3, 2170) = 3.889, p = 0.009 **, eta2p = 0.005
+#> Use summary() for detailed output.
 
 # Follow up with post-hoc tests
 result <- survey_data %>%
@@ -237,108 +267,81 @@ result %>% levene_test()
 
 # --- Three-layer output ---
 result              # compact overview
-#> Factorial ANOVA (2-Way): income by gender, education
-#>   gender:           F(1, 2178) = 0.098, p = 0.755 , eta2p = 0.000
+#> Factorial ANOVA (2-Way): income by gender, education, N = 2186
+#>   gender:           F(1, 2178) = 0.098, p = 0.755, eta2p = 0.000
 #>   education:        F(3, 2178) = 463.521, p < 0.001 ***, eta2p = 0.390
-#>   gender:education: F(3, 2178) = 0.399, p = 0.754 , eta2p = 0.001, N = 2186
+#>   gender:education: F(3, 2178) = 0.399, p = 0.754, eta2p = 0.001
+#> Use summary() for detailed output.
 summary(result)     # full detailed output with all sections
 #> Factorial ANOVA (2-Way ANOVA) Results
 #> -------------------------------------
 #> 
 #> - Dependent variable: income
 #> - Factors: gender x education
-#> - Type III Sum of Squares: Type 3
+#> - Sum of squares: Type III
 #> - N (complete cases): 2186
 #> - Missing: 314
 #> 
 #> Tests of Between-Subjects Effects
-#> ------------------------------------------------------------------ 
-#>  Source             Type III SS  df   Mean Square  F         Sig. 
-#>  Corrected Model    1.754652e+09    7 2.506646e+08   199.909 <.001
-#>  Intercept          3.221261e+10    1 3.221261e+10 25690.075 <.001
-#>  gender             1.226376e+05    1 1.226376e+05     0.098 0.755
-#>  education          1.743618e+09    3 5.812059e+08   463.521 <.001
-#>  gender * education 1.499441e+06    3 4.998136e+05     0.399 0.754
-#>  Error              2.730979e+09 2178 1.253893e+06                
-#>  Total              3.529079e+10 2186                             
-#>  Corrected Total    4.485631e+09 2185                             
-#>  Partial Eta Sq    
-#>  0.391          ***
-#>  0.922          ***
-#>  0.000             
-#>  0.390          ***
-#>  0.001             
-#>                    
-#>                    
-#>                    
-#> ------------------------------------------------------------------ 
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Source              Type III Sum of Squares    df      Mean Square          F    Sig  Partial Eta Squared     
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Corrected Model              1754652069.847     7    250664581.407    199.909  <.001                0.391  ***
+#>   Intercept                   32212607064.510     1  32212607064.510  25690.075  <.001                0.922  ***
+#>   gender                           122637.601     1       122637.601      0.098   .755                0.000     
+#>   education                    1743617622.524     3    581205874.175    463.521  <.001                0.390  ***
+#>   gender * education              1499440.759     3       499813.586      0.399   .754                0.001     
+#>   Error                        2730979096.667  2178      1253893.066                                            
+#>   Total                       35290790000.000  2186                                                             
+#>   Corrected Total              4485631166.514  2185                                                             
+#>   --------------------------------------------------------------------------------------------------------------
 #> R Squared = 0.391 (Adjusted R Squared = 0.389)
 #> 
 #> Descriptive Statistics
-#> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#>  gender education              Mean    Std. Deviation N  
-#>  Male   Basic Secondary        2803.43  774.959       350
-#>  Male   Intermediate Secondary 3574.09  996.649       247
-#>  Male   Academic Secondary     4246.45 1180.779       282
-#>  Male   University             5318.56 1718.805       167
-#>  Female Basic Secondary        2718.70  795.831       385
-#>  Female Intermediate Secondary 3607.64  996.214       301
-#>  Female Academic Secondary     4200.38 1178.118       266
-#>  Female University             5353.72 1612.265       188
-#> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+#>   -------------------------------------------------------------
+#>   gender  education                   Mean  Std. Deviation    N
+#>   -------------------------------------------------------------
+#>   Male    Basic Secondary         2803.429         774.959  350
+#>   Male    Intermediate Secondary  3574.089         996.649  247
+#>   Male    Academic Secondary      4246.454        1180.779  282
+#>   Male    University              5318.563        1718.805  167
+#>   Female  Basic Secondary         2718.701         795.831  385
+#>   Female  Intermediate Secondary  3607.641         996.214  301
+#>   Female  Academic Secondary      4200.376        1178.118  266
+#>   Female  University              5353.723        1612.265  188
+#>   -------------------------------------------------------------
 #> 
 #> Levene's Test of Equality of Error Variances
-#>   F(7, 2178) = 44.988, p = <.001
+#>   F(7, 2178) = 44.988, p < 0.001 ***
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
-summary(result, marginal_means = FALSE)  # hide estimated marginal means
+summary(result, descriptives = FALSE)  # hide the cell descriptives
 #> Factorial ANOVA (2-Way ANOVA) Results
 #> -------------------------------------
 #> 
 #> - Dependent variable: income
 #> - Factors: gender x education
-#> - Type III Sum of Squares: Type 3
+#> - Sum of squares: Type III
 #> - N (complete cases): 2186
 #> - Missing: 314
 #> 
 #> Tests of Between-Subjects Effects
-#> ------------------------------------------------------------------ 
-#>  Source             Type III SS  df   Mean Square  F         Sig. 
-#>  Corrected Model    1.754652e+09    7 2.506646e+08   199.909 <.001
-#>  Intercept          3.221261e+10    1 3.221261e+10 25690.075 <.001
-#>  gender             1.226376e+05    1 1.226376e+05     0.098 0.755
-#>  education          1.743618e+09    3 5.812059e+08   463.521 <.001
-#>  gender * education 1.499441e+06    3 4.998136e+05     0.399 0.754
-#>  Error              2.730979e+09 2178 1.253893e+06                
-#>  Total              3.529079e+10 2186                             
-#>  Corrected Total    4.485631e+09 2185                             
-#>  Partial Eta Sq    
-#>  0.391          ***
-#>  0.922          ***
-#>  0.000             
-#>  0.390          ***
-#>  0.001             
-#>                    
-#>                    
-#>                    
-#> ------------------------------------------------------------------ 
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Source              Type III Sum of Squares    df      Mean Square          F    Sig  Partial Eta Squared     
+#>   --------------------------------------------------------------------------------------------------------------
+#>   Corrected Model              1754652069.847     7    250664581.407    199.909  <.001                0.391  ***
+#>   Intercept                   32212607064.510     1  32212607064.510  25690.075  <.001                0.922  ***
+#>   gender                           122637.601     1       122637.601      0.098   .755                0.000     
+#>   education                    1743617622.524     3    581205874.175    463.521  <.001                0.390  ***
+#>   gender * education              1499440.759     3       499813.586      0.399   .754                0.001     
+#>   Error                        2730979096.667  2178      1253893.066                                            
+#>   Total                       35290790000.000  2186                                                             
+#>   Corrected Total              4485631166.514  2185                                                             
+#>   --------------------------------------------------------------------------------------------------------------
 #> R Squared = 0.391 (Adjusted R Squared = 0.389)
 #> 
-#> Descriptive Statistics
-#> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#>  gender education              Mean    Std. Deviation N  
-#>  Male   Basic Secondary        2803.43  774.959       350
-#>  Male   Intermediate Secondary 3574.09  996.649       247
-#>  Male   Academic Secondary     4246.45 1180.779       282
-#>  Male   University             5318.56 1718.805       167
-#>  Female Basic Secondary        2718.70  795.831       385
-#>  Female Intermediate Secondary 3607.64  996.214       301
-#>  Female Academic Secondary     4200.38 1178.118       266
-#>  Female University             5353.72 1612.265       188
-#> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
-#> 
 #> Levene's Test of Equality of Error Variances
-#>   F(7, 2178) = 44.988, p = <.001
+#>   F(7, 2178) = 44.988, p < 0.001 ***
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

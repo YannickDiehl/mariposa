@@ -18,8 +18,11 @@ three methods for different situations:
 | Spearman’s \rho | [`spearman_rho()`](https://YannickDiehl.github.io/mariposa/reference/spearman_rho.md) | Monotonic relationships, ordinal data, or data with outliers |
 | Kendall’s \tau | [`kendall_tau()`](https://YannickDiehl.github.io/mariposa/reference/kendall_tau.md) | Ordinal data, small samples, or many tied values |
 
-All three support survey weights, multiple variables (correlation
-matrices), and grouped analysis.
+All three support multiple variables (correlation matrices), grouped
+analysis, and a `weights` argument. Pearson and Kendall compute weighted
+coefficients; for Spearman, following SPSS NONPAR CORR, weights only
+select cases (weight \<= 0 or missing is excluded) and rho itself is
+unweighted.
 
 ## Pearson Correlation
 
@@ -30,7 +33,8 @@ matrices), and grouped analysis.
 survey_data %>%
   pearson_cor(age, income)
 #> Pearson Correlation: age x income
-#>   r = -0.007, p = 0.761 , N = 2186
+#>   r = -0.007, p = 0.761, N = 2186
+#> Use summary() for detailed output.
 ```
 
 Interpretation of *r*:
@@ -46,7 +50,8 @@ Interpretation of *r*:
 survey_data %>%
   pearson_cor(age, income, weights = sampling_weight)
 #> Pearson Correlation: age x income [Weighted]
-#>   r = -0.005, p = 0.828 , N = 2201
+#>   r = -0.005, p = 0.828, N = 2201
+#> Use summary() for detailed output.
 ```
 
 ### Correlation Matrix
@@ -59,10 +64,11 @@ survey_data %>%
   pearson_cor(trust_government, trust_media, trust_science,
               weights = sampling_weight)
 #> Pearson Correlation: 3 variables [Weighted]
-#>   trust_government x trust_media: r = 0.012, p = 0.582  
-#>   trust_government x trust_science: r = 0.031, p = 0.145  
-#>   trust_media x trust_science:   r = 0.024, p = 0.259  
-#>   0/3 pairs significant (p < .05), N = 2242
+#>   trust_government x trust_media:   r = 0.012, p = 0.582
+#>   trust_government x trust_science: r = 0.031, p = 0.145
+#>   trust_media x trust_science:      r = 0.024, p = 0.259
+#>   0/3 pairs significant (p < .05), N = 2242-2286
+#> Use summary() for detailed output.
 ```
 
 ### Detailed Output
@@ -74,16 +80,17 @@ result <- survey_data %>%
 
 summary(result)
 #> 
-#> Weighted Pearson Correlation 
-#> -----------------------------
+#> Weighted Pearson Correlation
+#> ----------------------------
 #> 
 #> - Weights variable: sampling_weight
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Correlation: r = -0.005
-#>   p-value: p = 0.828 
+#>   p-value (2-tailed): p = 0.828
 #>   N = 2201
 #>   95% CI: [-0.046, 0.037]
 #>   r-squared: 0.000
@@ -98,12 +105,13 @@ summary(result)
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> [region = 1]
+#> [region = East]
 #> Pearson Correlation: age x income [Weighted]
-#>   r = 0.050, p = 0.293 , N = 449
-#> [region = 2]
+#>   r = 0.050, p = 0.293, N = 449
+#> [region = West]
 #> Pearson Correlation: age x income [Weighted]
-#>   r = -0.019, p = 0.427 , N = 1751
+#>   r = -0.019, p = 0.427, N = 1751
+#> Use summary() for detailed output.
 ```
 
 ## Spearman Correlation
@@ -117,8 +125,9 @@ outliers:
 survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                weights = sampling_weight)
-#> Spearman Correlation: political_orientation x environmental_concern [Weighted]
+#> Spearman Correlation: political_orientation x environmental_concern
 #>   rho = -0.576, p < 0.001 ***, N = 2207
+#> Use summary() for detailed output.
 ```
 
 ### Multiple Variables
@@ -129,14 +138,15 @@ survey_data %>%
   spearman_rho(political_orientation, environmental_concern,
                life_satisfaction, trust_government,
                weights = sampling_weight)
-#> Spearman Correlation: 4 variables [Weighted]
-#>   political_orientation x environmental_concern: rho = -0.576, p < 0.001 *** 
-#>   political_orientation x life_satisfaction: rho = -0.004, p = 0.833  
-#>   political_orientation x trust_government: rho = -0.055, p = 0.011 * 
-#>   environmental_concern x life_satisfaction: rho = 0.003, p = 0.904  
-#>   environmental_concern x trust_government: rho = 0.067, p = 0.002 ** 
-#>   life_satisfaction x trust_government: rho = 0.002, p = 0.942  
-#>   3/6 pairs significant (p < .05), N = 2207
+#> Spearman Correlation: 4 variables
+#>   political_orientation x environmental_concern: rho = -0.576, p < 0.001 ***
+#>   political_orientation x life_satisfaction:     rho = -0.004, p = 0.833
+#>   political_orientation x trust_government:      rho = -0.055, p = 0.011 *
+#>   environmental_concern x life_satisfaction:     rho = 0.003, p = 0.904
+#>   environmental_concern x trust_government:      rho = 0.067, p = 0.002 **
+#>   life_satisfaction x trust_government:          rho = 0.002, p = 0.942
+#>   3/6 pairs significant (p < .05), N = 2168-2324
+#> Use summary() for detailed output.
 ```
 
 ## Kendall’s Tau
@@ -151,7 +161,8 @@ survey_data %>%
   kendall_tau(political_orientation, life_satisfaction,
               weights = sampling_weight)
 #> Kendall's Tau: political_orientation x life_satisfaction [Weighted]
-#>   tau = -0.005, p = 0.747 , N = 2241
+#>   tau = -0.005, p = 0.747, N = 2241
+#> Use summary() for detailed output.
 ```
 
 ## Partial Correlation
@@ -191,21 +202,21 @@ summary(result)
 #> - Missing: Listwise deletion
 #> 
 #> Partial Correlation Matrix:
-#> --------------------------- 
-#>                  trust_government trust_media trust_science
-#> trust_government            1.000       0.019         0.033
-#> trust_media                 0.019       1.000         0.009
-#> trust_science               0.033       0.009         1.000
-#> --------------------------- 
+#> ---------------------------
+#>                   trust_government  trust_media  trust_science
+#> trust_government                 1        0.019          0.033
+#> trust_media                  0.019            1          0.009
+#> trust_science                0.033        0.009              1
+#> ---------------------------
 #> 
 #> Pairwise Results:
-#>   -------------------------------------------------------------------------------------- 
-#>   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig 
-#>   -------------------------------------------------------------------------------------- 
-#>   trust_government    trust_media      0.019         0.019  1960  0.859  .390  1964      
-#>   trust_government  trust_science      0.033         0.030  1960  1.447  .148  1964      
-#>   trust_media       trust_science      0.009         0.010  1960  0.407  .684  1964      
-#>   -------------------------------------------------------------------------------------- 
+#>   --------------------------------------------------------------------------------------
+#>   Variable 1        Variable 2     Partial r  Zero-order r    df      t     p     n  sig
+#>   --------------------------------------------------------------------------------------
+#>   trust_government  trust_media        0.019         0.019  1960  0.859  .390  1964     
+#>   trust_government  trust_science      0.033         0.030  1960  1.447  .148  1964     
+#>   trust_media       trust_science      0.009         0.010  1960  0.407  .684  1964     
+#>   --------------------------------------------------------------------------------------
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```
@@ -250,8 +261,8 @@ kendall_result <- survey_data %>%
 comparison <- data.frame(
   Method = c("Pearson", "Spearman", "Kendall"),
   Correlation = c(pearson_result$correlations$correlation[1],
-                  spearman_result$correlations$correlation[1],
-                  kendall_result$correlations$correlation[1]),
+                  spearman_result$correlations$rho[1],
+                  kendall_result$correlations$tau[1]),
   P_Value = c(pearson_result$correlations$p_value[1],
               spearman_result$correlations$p_value[1],
               kendall_result$correlations$p_value[1])
@@ -259,8 +270,8 @@ comparison <- data.frame(
 print(comparison)
 #>     Method Correlation       P_Value
 #> 1  Pearson   0.4501535 8.997507e-107
-#> 2 Spearman   0.4501535 2.322944e-113
-#> 3  Kendall   0.4501535 6.963954e-132
+#> 2 Spearman   0.4639317 2.322944e-113
+#> 3  Kendall   0.3532949 6.963954e-132
 ```
 
 ### Correlation Does Not Imply Causation
@@ -283,17 +294,18 @@ cor_result <- survey_data %>%
               weights = sampling_weight)
 cor_result
 #> Pearson Correlation: 5 variables [Weighted]
-#>   age x income:                  r = -0.005, p = 0.828  
-#>   age x life_satisfaction:       r = -0.029, p = 0.150  
-#>   age x political_orientation:   r = -0.029, p = 0.168  
-#>   age x environmental_concern:   r = 0.024, p = 0.244  
-#>   income x life_satisfaction:    r = 0.450, p < 0.001 *** 
-#>   income x political_orientation: r = -0.034, p = 0.125  
-#>   income x environmental_concern: r = 0.015, p = 0.503  
-#>   life_satisfaction x political_orientation: r = -0.004, p = 0.836  
-#>   life_satisfaction x environmental_concern: r = -0.003, p = 0.866  
-#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 *** 
-#>   2/10 pairs significant (p < .05), N = 2201
+#>   age x income:                                  r = -0.005, p = 0.828
+#>   age x life_satisfaction:                       r = -0.029, p = 0.150
+#>   age x political_orientation:                   r = -0.029, p = 0.168
+#>   age x environmental_concern:                   r = 0.024, p = 0.244
+#>   income x life_satisfaction:                    r = 0.450, p < 0.001 ***
+#>   income x political_orientation:                r = -0.034, p = 0.125
+#>   income x environmental_concern:                r = 0.015, p = 0.503
+#>   life_satisfaction x political_orientation:     r = -0.004, p = 0.836
+#>   life_satisfaction x environmental_concern:     r = -0.003, p = 0.866
+#>   political_orientation x environmental_concern: r = -0.584, p < 0.001 ***
+#>   2/10 pairs significant (p < .05), N = 2020-2437
+#> Use summary() for detailed output.
 
 # 2. Identify the strongest correlations
 significant <- cor_result$correlations %>%
@@ -311,12 +323,13 @@ print(significant)
 survey_data %>%
   group_by(region) %>%
   pearson_cor(age, income, weights = sampling_weight)
-#> [region = 1]
+#> [region = East]
 #> Pearson Correlation: age x income [Weighted]
-#>   r = 0.050, p = 0.293 , N = 449
-#> [region = 2]
+#>   r = 0.050, p = 0.293, N = 449
+#> [region = West]
 #> Pearson Correlation: age x income [Weighted]
-#>   r = -0.019, p = 0.427 , N = 1751
+#>   r = -0.019, p = 0.427, N = 1751
+#> Use summary() for detailed output.
 ```
 
 ## Reporting Results (APA Style)
@@ -351,8 +364,9 @@ sample size:
     data
 3.  **Kendall** is the most robust choice for ordinal data and small
     samples
-4.  All three support **weights**, **correlation matrices**, and
-    **group_by()**
+4.  All three support **correlation matrices** and **group_by()**;
+    Pearson and Kendall are weighted, Spearman uses weights as a case
+    filter only
 5.  Correlation does **not** imply causation
 
 ## Next Steps

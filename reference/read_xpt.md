@@ -71,7 +71,7 @@ Other data-import:
 if (requireNamespace("haven", quietly = TRUE)) {
   # Roundtrip through a temporary .xpt transport file
   tmp <- tempfile(fileext = ".xpt")
-  write_xpt(survey_data, tmp)
+  write_xpt(survey_data, tmp, version = 8)  # names longer than 8 chars
   data <- read_xpt(tmp)
 
   # Read with numeric missing codes tagged as distinct NA types
@@ -79,6 +79,6 @@ if (requireNamespace("haven", quietly = TRUE)) {
 
   unlink(tmp)
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file19bf7c7519de.xpt
+#> ✔ Wrote 16 variables (2500 obs.) to file19411dd7947e.xpt
 # }
 ```

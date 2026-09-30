@@ -57,15 +57,16 @@ summary(result)                       # all sections
 #> - Grouping variable: education
 #> - P-value adjustment: Bonferroni
 #> 
-#> ---------------------------------------------------------------------------- 
-#>                 Group 1                Group 2       Z p (unadj) p (adj) Sig 
-#>         Basic Secondary Intermediate Secondary  -7.658     <.001   <.001 *** 
-#>         Basic Secondary     Academic Secondary  -9.792     <.001   <.001 *** 
-#>         Basic Secondary             University -11.545     <.001   <.001 *** 
-#>  Intermediate Secondary     Academic Secondary  -2.042     0.041   0.247     
-#>  Intermediate Secondary             University  -4.696     <.001   <.001 *** 
-#>      Academic Secondary             University  -2.886     0.004   0.023   * 
-#> ---------------------------------------------------------------------------- 
+#> --------------------------------------------------------------------------------
+#> Group 1                 Group 2                       Z  p (unadj)  p (adj)     
+#> --------------------------------------------------------------------------------
+#> Basic Secondary         Intermediate Secondary   -7.658      <.001    <.001  ***
+#> Basic Secondary         Academic Secondary       -9.792      <.001    <.001  ***
+#> Basic Secondary         University              -11.545      <.001    <.001  ***
+#> Intermediate Secondary  Academic Secondary       -2.042       .041     .247     
+#> Intermediate Secondary  University               -4.696      <.001    <.001  ***
+#> Academic Secondary      University               -2.886       .004     .023    *
+#> --------------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05

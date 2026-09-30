@@ -44,7 +44,9 @@ describe(
 
   Optional survey weights for population-representative results. Without
   weights, you describe your sample. With weights, you describe the
-  population.
+  population. Give a column name (unquoted or as a string), an
+  expression such as `sampling_weight * 2`, or a numeric vector with one
+  weight per row.
 
 - show:
 
@@ -53,17 +55,25 @@ describe(
   - `"short"` (default): Essential stats (mean, median, SD, range, IQR,
     skewness)
 
-  - `"all"`: Everything including variance, kurtosis, mode, quantiles
+  - `"all"`: Everything including min/max, variance, kurtosis, mode,
+    quantiles
 
   - Custom list: Choose specific stats like `c("mean", "sd", "range")`
+    from `"mean"`, `"median"`, `"sd"`, `"se"`, `"var"`, `"min"`, `"max"`
+    (SPSS DESCRIPTIVES' Minimum/Maximum), `"range"`, `"iqr"`, `"skew"`,
+    `"kurtosis"`, `"mode"`, `"quantiles"`. Unknown names are an error.
 
 - probs:
 
-  For quantiles, which percentiles to show (default: 25th, 50th, 75th)
+  For quantiles, which percentiles to show (default: 25th, 50th, 75th).
+  The 50th percentile is the median; when the median is shown it is not
+  printed a second time (the result keeps both columns).
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 - excess:
 
@@ -95,6 +105,11 @@ Key statistics and what they tell you:
 - **Skewness**: Whether data leans left (negative) or right (positive)
 
 - **Kurtosis**: Whether you have unusual outliers
+
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as in SPSS FREQUENCIES with
+  `WEIGHT BY`. Kish's effective sample size is kept in the result
+  (`<variable>_Effective_N`) but not printed.
 
 ### When to Use This
 
@@ -156,35 +171,44 @@ survey_data %>% describe(age)
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>  Variable  Mean Median     SD Range IQR Skewness    N Missing
-#>       age 50.55     50 16.976    77  24    0.172 2500       0
-#> ----------------------------------------
+#> 
+#>   -------------------------------------------------------------------------
+#>   Variable    Mean  Median      SD   Range     IQR  Skewness     N  Missing
+#>   -------------------------------------------------------------------------
+#>   age       50.550  50.000  16.976  77.000  24.000     0.172  2500        0
+#>   -------------------------------------------------------------------------
 
 # Weighted analysis
 survey_data %>% describe(age, weights = sampling_weight)
 #> 
 #> Weighted Descriptive Statistics
 #> -------------------------------
-#>  Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>       age 50.514     50 17.084    77  25    0.159      2468.8
-#> ----------------------------------------
+#> 
+#>   -------------------------------------------------------------------------
+#>   Variable    Mean  Median      SD   Range     IQR  Skewness     N  Missing
+#>   -------------------------------------------------------------------------
+#>   age       50.514  50.000  17.084  77.000  25.000     0.159  2516        0
+#>   -------------------------------------------------------------------------
 
 # Multiple variables with custom statistics
-survey_data %>% describe(age, income, life_satisfaction, 
-                        weights = sampling_weight, 
+survey_data %>% describe(age, income, life_satisfaction,
+                        weights = sampling_weight,
                         show = c("mean", "sd", "skew"))
 #> 
 #> Weighted Descriptive Statistics
 #> -------------------------------
-#>           Variable     Mean       SD Skewness Effective_N
-#>                age   50.514   17.084    0.159      2468.8
-#>             income 3743.099 1423.966    0.725      2158.9
-#>  life_satisfaction    3.625    1.152   -0.499      2390.9
-#> ----------------------------------------
+#> 
+#>   --------------------------------------------------------------
+#>   Variable               Mean        SD  Skewness     N  Missing
+#>   --------------------------------------------------------------
+#>   age                  50.514    17.084     0.159  2516        0
+#>   income             3743.099  1423.966     0.725  2201      315
+#>   life_satisfaction     3.625     1.152    -0.499  2437       79
+#>   --------------------------------------------------------------
 
 # Grouped analysis
-survey_data %>% 
-  group_by(region) %>% 
+survey_data %>%
+  group_by(region) %>%
   describe(age, weights = sampling_weight)
 #> 
 #> Weighted Descriptive Statistics
@@ -192,15 +216,19 @@ survey_data %>%
 #> 
 #> Group: region = East
 #> --------------------
-#> ----------------------------------------
-#>  Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>       age 52.278     53 17.595    77  24    0.098         477
-#> ----------------------------------------
+#> 
+#>   ------------------------------------------------------------------------
+#>   Variable    Mean  Median      SD   Range     IQR  Skewness    N  Missing
+#>   ------------------------------------------------------------------------
+#>   age       52.278  53.000  17.595  77.000  24.000     0.098  509        0
+#>   ------------------------------------------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
-#> ----------------------------------------
-#>  Variable   Mean Median     SD Range IQR Skewness Effective_N
-#>       age 50.067     49 16.927    77  24     0.17      1993.1
-#> ----------------------------------------
+#> 
+#>   -------------------------------------------------------------------------
+#>   Variable    Mean  Median      SD   Range     IQR  Skewness     N  Missing
+#>   -------------------------------------------------------------------------
+#>   age       50.067  49.000  16.927  77.000  24.000     0.170  2007        0
+#>   -------------------------------------------------------------------------
 ```

@@ -104,7 +104,7 @@ survey_data %>%
 # Grouped weighted analysis
 survey_data %>%
   group_by(region) %>%
-  describe(satisfaction, weights = sampling_weight)
+  describe(life_satisfaction, weights = sampling_weight)
 ```
 
 ### Tidyverse Integration
@@ -209,7 +209,7 @@ workflows translate directly:
 ``` spss
 WEIGHT BY sampling_weight.
 T-TEST GROUPS=gender(1 2)
-  /VARIABLES=satisfaction.
+  /VARIABLES=life_satisfaction.
 ```
 
 **mariposa:**
@@ -217,7 +217,7 @@ T-TEST GROUPS=gender(1 2)
 ``` r
 
 survey_data %>%
-  t_test(satisfaction, group = gender, weights = sampling_weight)
+  t_test(life_satisfaction, group = gender, weights = sampling_weight)
 ```
 
 ## Documentation

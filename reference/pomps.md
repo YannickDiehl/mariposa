@@ -35,7 +35,9 @@ pomps(x, scale_min = NULL, scale_max = NULL)
 ## Value
 
 A numeric vector of the same length as `x`, with values rescaled to the
-0-100 range.
+0-100 range. The variable label of `x` is kept; missing values
+(including the SPSS missing types of imported data) become plain `NA`,
+as in an SPSS `COMPUTE`.
 
 ## Details
 
@@ -56,7 +58,9 @@ range:
 - A 0-10 scale: `scale_min = 0, scale_max = 10`
 
 Using theoretical values ensures that the transformation is consistent
-across samples and time points.
+across samples and time points. Values outside the range (e.g. an
+unrecoded "don't know" = 9 on a 1-5 scale) give scores below 0 or above
+100; `pomps()` warns about them, so recode missing codes first.
 
 ### When to Use This
 

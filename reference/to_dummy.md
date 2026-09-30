@@ -35,7 +35,11 @@ to_dummy(data, ..., suffix = "val", ref = NULL, append = TRUE)
 
   A value to use as reference category (omitted from output). If `NULL`
   (default), all categories get a dummy variable. Set to a specific
-  value for n-1 coding (e.g., for regression).
+  value for n-1 coding (e.g., for regression). For a factor, give a
+  level name (`ref = "Male"`) or a number: the original code of a
+  [`to_label()`](https://YannickDiehl.github.io/mariposa/reference/to_label.md)
+  factor, otherwise the level position (`ref = 1` = first level). A
+  `ref` that matches no category is an error.
 
 - append:
 
@@ -55,7 +59,11 @@ vector input, always a tibble of dummy columns.
 
 With `suffix = "val"`: `{varname}_{value}` (e.g., `gender_1`,
 `gender_2`). With `suffix = "label"`: `{varname}_{label}` where labels
-are cleaned (spaces replaced with `_`, special characters removed).
+are cleaned (umlauts transliterated, e.g. "männlich" -\> `maennlich`;
+spaces replaced with `_`; other special characters removed). Values
+without a usable label (e.g. "..") use their value; labels shared by
+several values get the value appended, so every category keeps its own
+column.
 
 ### Reference Category
 

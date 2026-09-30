@@ -56,25 +56,28 @@ summary(result)
 #> 
 #>   Ranks:
 #>   ---------------------------
-#>            Variable Mean Rank
-#>    trust_government      1.81
-#>         trust_media      1.68
-#>       trust_science      2.51
+#>   Variable          Mean Rank
+#>   ---------------------------
+#>   trust_government       1.81
+#>   trust_media            1.68
+#>   trust_science          2.51
 #>   ---------------------------
 #> 
 #>   Test Statistics:
-#>   -------------------------------------------
-#>       N Chi-Square df p value Kendall's W sig
-#>    2135   1009.035  2       0       0.236 ***
-#>   -------------------------------------------
+#>   -----------------------------------------------
+#>   N     Chi-Square  df  p value  Kendall's W     
+#>   -----------------------------------------------
+#>   2135    1009.035   2    <.001        0.236  ***
+#>   -----------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (Kendall's W):
+#> - Negligible: < 0.1
 #> - Weak agreement: 0.1 - 0.3
 #> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> - Strong agreement: >= 0.5
 summary(result, ranks = FALSE)
 #> Friedman Test Results
 #> ---------------------
@@ -83,16 +86,18 @@ summary(result, ranks = FALSE)
 #> - Number of conditions: 3
 #> 
 #>   Test Statistics:
-#>   -------------------------------------------
-#>       N Chi-Square df p value Kendall's W sig
-#>    2135   1009.035  2       0       0.236 ***
-#>   -------------------------------------------
+#>   -----------------------------------------------
+#>   N     Chi-Square  df  p value  Kendall's W     
+#>   -----------------------------------------------
+#>   2135    1009.035   2    <.001        0.236  ***
+#>   -----------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (Kendall's W):
+#> - Negligible: < 0.1
 #> - Weak agreement: 0.1 - 0.3
 #> - Moderate agreement: 0.3 - 0.5
-#> - Strong agreement: > 0.5
+#> - Strong agreement: >= 0.5
 ```

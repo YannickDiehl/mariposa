@@ -133,6 +133,8 @@ the numeric codes. This is the standard used by <code><a href="read_spss.html">r
 <p>By default, SET mode replaces all existing value labels. Use <code>.add = TRUE</code>
 to keep existing labels and only add new ones. If a value already has a
 label, the new label overwrites it.</p>
+<p>Value labels belong to numeric codes: setting them on a factor or a
+character column is an error (convert it with <code><a href="to_labelled.html">to_labelled()</a></code> first).</p>
 </div>
 
     </div>
@@ -155,32 +157,34 @@ labelled vectors to factors, <code><a href="drop_labels.html">drop_labels()</a><
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># GET: retrieve value labels from a vector</span></span></span>
-<span class="r-in"><span><span class="fu">val_labels</span><span class="op">(</span><span class="va">survey_data</span><span class="op">$</span><span class="va">gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># SET: assign value labels to a numeric rating (1-5)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">val_labels</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
+<span class="r-in"><span>  life_satisfaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Very dissatisfied"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"Very satisfied"</span> <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># GET: retrieve value labels from a vector</span></span></span>
+<span class="r-in"><span><span class="fu">val_labels</span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">life_satisfaction</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Very dissatisfied    Very satisfied </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 1                 5 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># GET: from specific variables (returns list)</span></span></span>
-<span class="r-in"><span><span class="fu">val_labels</span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $gender</span>
+<span class="r-in"><span><span class="fu">val_labels</span><span class="op">(</span><span class="va">data</span>, <span class="va">life_satisfaction</span>, <span class="va">trust_government</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $life_satisfaction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Very dissatisfied    Very satisfied </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 1                 5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $trust_government</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># SET: assign value labels</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">val_labels</span><span class="op">(</span><span class="va">survey_data</span>,</span></span>
-<span class="r-in"><span>  gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Male"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"Female"</span> <span class="op">=</span> <span class="fl">2</span>, <span class="st">"Non-binary"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># ADD: add labels without removing existing ones</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">val_labels</span><span class="op">(</span><span class="va">data</span>,</span></span>
-<span class="r-in"><span>  gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Prefer not to say"</span> <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  life_satisfaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Neither"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  .add <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># REMOVE: set to NULL</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">val_labels</span><span class="op">(</span><span class="va">data</span>, gender <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">val_labels</span><span class="op">(</span><span class="va">data</span>, life_satisfaction <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

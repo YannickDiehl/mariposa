@@ -27,6 +27,9 @@ set_na(data, ..., tag = TRUE, verbose = FALSE)
   - **Named pairs**: Applied to specific variables (e.g.,
     `set_na(data, income = c(-9, -8), age = -1)`)
 
+  Factors are left unchanged (with a warning when named explicitly):
+  `set_na()` works on numeric codes.
+
 - tag:
 
   If `TRUE` (default), uses tagged NAs to preserve distinct missing
@@ -110,6 +113,6 @@ if (requireNamespace("haven", quietly = TRUE)) {
   # Check the result
   na_frequencies(data$income)
 }
-#>    tag   n code            label
-#> 1 <NA> 314 <NA> (System Missing)
+#>   code            label   n   prc  tag
+#> 1   NA (System Missing) 314 12.56 <NA>
 ```

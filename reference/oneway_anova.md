@@ -51,7 +51,9 @@ oneway_anova(
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - var.equal:
 
@@ -210,6 +212,7 @@ survey_data %>%
   oneway_anova(life_satisfaction, group = education)
 #> One-Way ANOVA: life_satisfaction by education
 #>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
+#> Use summary() for detailed output.
 
 # Multiple dependent variables
 survey_data %>%
@@ -217,34 +220,38 @@ survey_data %>%
 #> One-Way ANOVA: life_satisfaction by education
 #>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
 #> One-Way ANOVA: trust_government by education
-#>   F(3, 2350) = 0.431, p = 0.731 , eta2 = 0.001 (negligible), N = 2354
+#>   F(3, 2350) = 0.431, p = 0.731, eta2 = 0.001 (negligible), N = 2354
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   oneway_anova(starts_with("trust_"), group = education)
 #> One-Way ANOVA: trust_government by education
-#>   F(3, 2350) = 0.431, p = 0.731 , eta2 = 0.001 (negligible), N = 2354
+#>   F(3, 2350) = 0.431, p = 0.731, eta2 = 0.001 (negligible), N = 2354
 #> One-Way ANOVA: trust_media by education
-#>   F(3, 2363) = 0.902, p = 0.439 , eta2 = 0.001 (negligible), N = 2367
+#>   F(3, 2363) = 0.902, p = 0.439, eta2 = 0.001 (negligible), N = 2367
 #> One-Way ANOVA: trust_science by education
-#>   F(3, 2394) = 0.605, p = 0.612 , eta2 = 0.001 (negligible), N = 2398
+#>   F(3, 2394) = 0.605, p = 0.612, eta2 = 0.001 (negligible), N = 2398
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>%
   oneway_anova(income, group = education, weights = sampling_weight)
 #> One-Way ANOVA: income by education [Weighted]
 #>   F(3, 2196) = 462.115, p < 0.001 ***, eta2 = 0.387 (large), N = 2200
+#> Use summary() for detailed output.
 
 # Grouped analysis (separate ANOVA for each region)
 survey_data %>%
   group_by(region) %>%
   oneway_anova(life_satisfaction, group = education)
-#> [region = 1]
+#> [region = East]
 #> One-Way ANOVA: life_satisfaction by education
 #>   F(3, 461) = 6.950, p < 0.001 ***, eta2 = 0.043 (small), N = 465
-#> [region = 2]
+#> [region = West]
 #> One-Way ANOVA: life_satisfaction by education
 #>   F(3, 1952) = 62.153, p < 0.001 ***, eta2 = 0.087 (medium), N = 1956
+#> Use summary() for detailed output.
 
 # Store results for post-hoc analysis
 result <- survey_data %>%
@@ -264,6 +271,7 @@ result %>% levene_test()  # Check homogeneity of variances
 result              # compact one-line overview
 #> One-Way ANOVA: life_satisfaction by education
 #>   F(3, 2417) = 67.096, p < 0.001 ***, eta2 = 0.077 (medium), N = 2421
+#> Use summary() for detailed output.
 summary(result)     # full detailed output with all sections
 #> One-Way ANOVA Results
 #> ---------------------
@@ -277,29 +285,38 @@ summary(result)     # full detailed output with all sections
 #> 
 #> --- life_satisfaction ---
 #> 
-#> Descriptive Statistics by Group:
-#>   Basic Secondary: mean = 3.204, sd = 1.243, n = 809
-#>   Intermediate Secondary: mean = 3.701, sd = 1.112, n = 618
-#>   Academic Secondary: mean = 3.853, sd = 0.998, n = 607
-#>   University: mean = 4.047, sd = 0.957, n = 387
+#> Descriptive Statistics:
+#>   ------------------------------------------------------------------------------------------
+#>   education                 N   Mean  Std. Deviation  Std. Error  95% CI Lower  95% CI Upper
+#>   ------------------------------------------------------------------------------------------
+#>   Basic Secondary         809  3.204           1.243       0.044         3.118         3.290
+#>   Intermediate Secondary  618  3.701           1.112       0.045         3.613         3.789
+#>   Academic Secondary      607  3.853           0.998       0.041         3.774         3.933
+#>   University              387  4.047           0.957       0.049         3.951         4.142
+#>   ------------------------------------------------------------------------------------------
 #> 
 #> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
-#>   Within Groups    2970.080 2417       1.229                   
-#>           Total    3217.428 2420                               
-#> -------------------------------------------------------------------------------- 
+#>   ---------------------------------------------------------------------
+#>                   Sum of Squares    df  Mean Square       F    Sig     
+#>   ---------------------------------------------------------------------
+#>   Between Groups         247.347     3       82.449  67.096  <.001  ***
+#>   Within Groups         2970.080  2417        1.229                    
+#>   Total                 3217.428  2420                                 
+#>   ---------------------------------------------------------------------
 #> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    64.489   3 1229   <.001 ***
+#> Robust Tests of Equality of Means:
+#>   -------------------------------------------
+#>          Statistic  df1       df2    Sig     
+#>   -------------------------------------------
+#>   Welch     64.489    3  1229.456  <.001  ***
+#>   -------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.077           0.076         0.076      medium
+#>   -------------------------------------------------------------------------
+#>   Variable           Eta Squared  Epsilon Squared  Omega Squared  Magnitude
+#>   -------------------------------------------------------------------------
+#>   life_satisfaction        0.077            0.076          0.076     medium
+#>   -------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
@@ -326,22 +343,27 @@ summary(result, descriptives = FALSE)  # hide group statistics
 #> 
 #> 
 #> ANOVA Results:
-#> -------------------------------------------------------------------------------- 
-#>          Source Sum_Squares   df Mean_Square      F p_value sig
-#>  Between Groups     247.347    3      82.449 67.096   <.001 ***
-#>   Within Groups    2970.080 2417       1.229                   
-#>           Total    3217.428 2420                               
-#> -------------------------------------------------------------------------------- 
+#>   ---------------------------------------------------------------------
+#>                   Sum of Squares    df  Mean Square       F    Sig     
+#>   ---------------------------------------------------------------------
+#>   Between Groups         247.347     3       82.449  67.096  <.001  ***
+#>   Within Groups         2970.080  2417        1.229                    
+#>   Total                 3217.428  2420                                 
+#>   ---------------------------------------------------------------------
 #> 
-#> Assumption Tests:
-#> ---------------- 
-#>  Assumption Statistic df1  df2 p_value sig
-#>       Welch    64.489   3 1229   <.001 ***
+#> Robust Tests of Equality of Means:
+#>   -------------------------------------------
+#>          Statistic  df1       df2    Sig     
+#>   -------------------------------------------
+#>   Welch     64.489    3  1229.456  <.001  ***
+#>   -------------------------------------------
 #> 
 #> Effect Sizes:
-#> ------------ 
-#>           Variable Eta_Squared Epsilon_Squared Omega_Squared Effect_Size
-#>  life_satisfaction       0.077           0.076         0.076      medium
+#>   -------------------------------------------------------------------------
+#>   Variable           Eta Squared  Epsilon Squared  Omega Squared  Magnitude
+#>   -------------------------------------------------------------------------
+#>   life_satisfaction        0.077            0.076          0.076     medium
+#>   -------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05

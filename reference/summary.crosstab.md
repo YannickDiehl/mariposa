@@ -13,7 +13,7 @@ summary(
   crosstab_table = TRUE,
   percentages = TRUE,
   residuals = FALSE,
-  digits = 1,
+  digits = object$digits %||% 1,
   ...
 )
 ```
@@ -46,7 +46,10 @@ summary(
 
 - digits:
 
-  Number of decimal places for percentages (Default: 1).
+  Number of decimal places for percentages (Default: the `digits` given
+  to
+  [`crosstab`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
+  i.e. 1 unless set).
 
 - ...:
 
@@ -67,67 +70,69 @@ for the main analysis function.
 result <- crosstab(survey_data, gender, region)
 summary(result)
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - N (valid): 2500
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    238 |    956 |   1194 |
-#> |   row %    |  19.9% |  80.1% | 100.0% |
-#> +------------+--------+--------+--------+
-#> | Female     |    247 |   1059 |   1306 |
-#> |   row %    |  18.9% |  81.1% | 100.0% |
-#> +============+========+========+========+
-#> | Total      |    485 |   2015 |   2500 |
-#> +------------+--------+--------+--------+
+#> +---------+-------+-------+--------+
+#> |         |   Region (East/West)   |
+#> | Gender  |  East |  West |  Total |
+#> +---------+-------+-------+--------+
+#> | Male    |   238 |   956 |   1194 |
+#> |   row % | 19.9% | 80.1% | 100.0% |
+#> +---------+-------+-------+--------+
+#> | Female  |   247 |  1059 |   1306 |
+#> |   row % | 18.9% | 81.1% | 100.0% |
+#> +=========+=======+=======+========+
+#> | Total   |   485 |  2015 |   2500 |
+#> |   row % | 19.4% | 80.6% | 100.0% |
+#> +---------+-------+-------+--------+
 summary(result, percentages = FALSE)
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
-#> - Percentages: Row percentages
+#> - Percentages: Counts only
 #> - N (valid): 2500
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    238 |    956 |   1194 |
-#> +------------+--------+--------+--------+
-#> | Female     |    247 |   1059 |   1306 |
-#> +============+========+========+========+
-#> | Total      |    485 |   2015 |   2500 |
-#> +------------+--------+--------+--------+
+#> +--------+------+------+-------+
+#> |        | Region (East/West)  |
+#> | Gender | East | West | Total |
+#> +--------+------+------+-------+
+#> | Male   |  238 |  956 |  1194 |
+#> +--------+------+------+-------+
+#> | Female |  247 | 1059 |  1306 |
+#> +========+======+======+=======+
+#> | Total  |  485 | 2015 |  2500 |
+#> +--------+------+------+-------+
 summary(result, residuals = TRUE)   # which cells drive the association?
 #> 
-#> Crosstabulation: gender × region
-#> -------------------------------- 
+#> Crosstabulation: Gender x Region (East/West)
+#> --------------------------------------------
 #> - Row variable: gender
 #> - Column variable: region
 #> - Percentages: Row percentages
 #> - N (valid): 2500
 #> 
-#> +------------+--------+--------+--------+
-#> |            |          region          |
-#> | gender     |   East |   West |  Total |
-#> +------------+--------+--------+--------+
-#> | Male       |    238 |    956 |   1194 |
-#> |   row %    |  19.9% |  80.1% | 100.0% |
-#> |   adj.res. |    0.6 |   -0.6 |        |
-#> +------------+--------+--------+--------+
-#> | Female     |    247 |   1059 |   1306 |
-#> |   row %    |  18.9% |  81.1% | 100.0% |
-#> |   adj.res. |   -0.6 |    0.6 |        |
-#> +============+========+========+========+
-#> | Total      |    485 |   2015 |   2500 |
-#> +------------+--------+--------+--------+
+#> +------------+-------+-------+--------+
+#> |            |   Region (East/West)   |
+#> | Gender     |  East |  West |  Total |
+#> +------------+-------+-------+--------+
+#> | Male       |   238 |   956 |   1194 |
+#> |   row %    | 19.9% | 80.1% | 100.0% |
+#> |   adj.res. |   0.6 |  -0.6 |        |
+#> +------------+-------+-------+--------+
+#> | Female     |   247 |  1059 |   1306 |
+#> |   row %    | 18.9% | 81.1% | 100.0% |
+#> |   adj.res. |  -0.6 |   0.6 |        |
+#> +============+=======+=======+========+
+#> | Total      |   485 |  2015 |   2500 |
+#> |   row %    | 19.4% | 80.6% | 100.0% |
+#> +------------+-------+-------+--------+
 #> adj.res. = adjusted standardized residual; |adj.res.| > 2 marks cells
 #> deviating from independence (use chi_square() for the overall test).
 ```

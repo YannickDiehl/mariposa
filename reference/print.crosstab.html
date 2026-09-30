@@ -77,7 +77,7 @@ test of independence.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'crosstab'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">digits</span> <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -89,7 +89,8 @@ test of independence.</p>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
-<dd><p>Number of decimal places for percentages (default: 1)</p></dd>
+<dd><p>Number of decimal places for percentages (default: the
+<code>digits</code> given to <code><a href="crosstab.html">crosstab</a></code>, i.e. 1 unless set)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -106,46 +107,48 @@ test of independence.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">gender</span>, <span class="va">region</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># full cross-tabulation table</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: Gender x Region (East/West)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |    238 |    956 |   1194 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  19.9% |  80.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |    247 |   1059 |   1306 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  18.9% |  81.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |    485 |   2015 |   2500 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |         |   Region (East/West)   |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Gender  |  East |  West |  Total |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male    |   238 |   956 |   1194 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |   row % | 19.9% | 80.1% | 100.0% |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female  |   247 |  1059 |   1306 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |   row % | 18.9% | 81.1% | 100.0% |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +=========+=======+=======+========+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total   |   485 |  2015 |   2500 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |   row % | 19.4% | 80.6% | 100.0% |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># same table, with section toggles</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: gender × region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Crosstabulation: Gender x Region (East/West)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Row variable: gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Column variable: region</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Percentages: Row percentages</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N (valid): 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |            |          region          |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | gender     |   East |   West |  Total |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Male       |    238 |    956 |   1194 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  19.9% |  80.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female     |    247 |   1059 |   1306 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   row %    |  18.9% |  81.1% | 100.0% |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +============+========+========+========+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      |    485 |   2015 |   2500 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |         |   Region (East/West)   |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Gender  |  East |  West |  Total |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male    |   238 |   956 |   1194 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |   row % | 19.9% | 80.1% | 100.0% |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female  |   247 |  1059 |   1306 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |   row % | 18.9% | 81.1% | 100.0% |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +=========+=======+=======+========+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total   |   485 |  2015 |   2500 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |   row % | 19.4% | 80.6% | 100.0% |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +---------+-------+-------+--------+</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

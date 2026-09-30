@@ -156,8 +156,13 @@ normality_test(survey_data, age, income, life_satisfaction)
 survey_data %>%
   group_by(gender) %>%
   normality_test(age, income)
-#> Normality Tests: age, income
-#>   2 group combination(s) x 2 variable(s) [Grouped: gender]
+#> Normality Tests: age, income [Grouped: gender]
+#> [gender = Male]
+#>   age: KS = 0.029, p = 0.018; Shapiro-Wilk W = 0.989, p < 0.001 (n = 1194)
+#>   income: KS = 0.080, p < 0.001; Shapiro-Wilk W = 0.960, p < 0.001 (n = 1046)
+#> [gender = Female]
+#>   age: KS = 0.030, p = 0.007; Shapiro-Wilk W = 0.990, p < 0.001 (n = 1306)
+#>   income: KS = 0.081, p < 0.001; Shapiro-Wilk W = 0.965, p < 0.001 (n = 1140)
 #> Use summary() for detailed output.
 
 # --- Three-layer output ---
@@ -174,12 +179,12 @@ summary(result)     # full SPSS-style table
 #> - Variables: age, income
 #> 
 #> Tests of Normality
-#>   ------------------------------------------ 
-#>   Variable     KS    df   KS p      W    W p 
-#>   ------------------------------------------ 
-#>   age       0.028  2500  <.001  0.990  <.001 
-#>   income    0.079  2186  <.001  0.963  <.001 
-#>   ------------------------------------------ 
+#>   ------------------------------------------
+#>   Variable     KS    df   KS p      W    W p
+#>   ------------------------------------------
+#>   age       0.028  2500  <.001  0.990  <.001
+#>   income    0.079  2186  <.001  0.963  <.001
+#>   ------------------------------------------
 #> 
 #> KS = Kolmogorov-Smirnov statistic with Lilliefors significance correction.
 #> W = Shapiro-Wilk statistic (computed for 3 <= n <= 5000, as in SPSS).

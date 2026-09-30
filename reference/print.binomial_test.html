@@ -100,7 +100,7 @@ confidence interval), use <code><a href="https://rdrr.io/r/base/summary.html" cl
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="binomial_test.html">binomial_test</a></span><span class="op">(</span><span class="va">survey_data</span>, <span class="va">gender</span>, p <span class="op">=</span> <span class="fl">0.50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test: gender</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Binomial Test Results</span>
@@ -112,18 +112,20 @@ confidence interval), use <code><a href="https://rdrr.io/r/base/summary.html" cl
 <span class="r-out co"><span class="r-pr">#&gt;</span> gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Categories:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       N Observed Prop.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Group 1: Male 1194          0.478</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Group 2: Female 1306          0.522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Total 2500          1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       N  Observed Prop.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 1: Female  1306           0.522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group 2: Male    1194           0.478</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total            2500           1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test Statistics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Test Prop. p value CI lower CI upper sig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           0.5   0.026    0.458    0.497   *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Test Prop.  p (2-tailed)  CI lower  CI upper   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        0.500          .026     0.503     0.542  *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>

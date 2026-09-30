@@ -87,7 +87,10 @@ data ready for plotting, cross-tabulation, and regression analysis.</p>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Optional: unquoted variable names (tidyselect supported). If
-empty, converts all <code>haven_labelled</code> columns.</p></dd>
+empty, converts every <code>haven_labelled</code> column whose values are all
+value-labelled; metric variables (e.g. age with labels only for its
+missing codes), weights and partially labelled variables are left
+unchanged with a message. Selected variables are always converted.</p></dd>
 
 
 <dt id="arg-ordered">ordered<a class="anchor" aria-label="anchor" href="#arg-ordered"></a></dt>
@@ -108,7 +111,8 @@ Default: <code>FALSE</code>.</p></dd>
 <dt id="arg-add-non-labelled">add_non_labelled<a class="anchor" aria-label="anchor" href="#arg-add-non-labelled"></a></dt>
 <dd><p>If <code>TRUE</code>, values without labels are included as
 factor levels using their numeric value as the level name.
-Default: <code>FALSE</code> (unlabelled values become <code>NA</code>).</p></dd>
+Default: <code>FALSE</code> (unlabelled values become <code>NA</code>, with a warning naming
+the variables).</p></dd>
 
 
 <dt id="arg-drop-na-drop-unused-add-non-labelled">drop.na, drop.unused, add.non.labelled<a class="anchor" aria-label="anchor" href="#arg-drop-na-drop-unused-add-non-labelled"></a></dt>
@@ -128,7 +132,16 @@ single vector input, returns a factor.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For each labelled variable, the numeric codes are replaced by their
 associated value labels. The resulting factor levels are ordered by the
-original numeric values (not alphabetically).</p><div class="section">
+original numeric values (not alphabetically). Distinct codes that share a
+label text (e.g. ".." for the unlabelled points of a scale) stay distinct
+levels with their code appended: <code>".. (2)"</code>, <code>".. (3)"</code>.</p>
+<p>The original code of every level is kept in the factor's <code>"codes"</code>
+attribute (a named numeric vector, names = levels), so <code><a href="to_numeric.html">to_numeric()</a></code>
+and <code><a href="to_labelled.html">to_labelled()</a></code> can restore the original values (e.g. 6, 42, 90)
+instead of renumbering the levels 1, 2, 3. The attribute survives dplyr
+verbs (<code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>, ...) but, like the variable
+label, is dropped by base subsetting (<code>x[i]</code>) and no longer applies once
+the levels are renamed or extended.</p><div class="section">
 <h3 id="when-to-use-this">When to Use This<a class="anchor" aria-label="anchor" href="#when-to-use-this"></a></h3>
 
 

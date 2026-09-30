@@ -119,9 +119,11 @@ variables separated by commas, or use helpers like <code>starts_with("trust")</c
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results.
-Without weights, you get sample frequencies. With weights, you get
-population estimates.</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Without weights, you get sample frequencies. With weights, you get
+population estimates. Give a column name (unquoted or as a string), an
+expression such as <code>sampling_weight * 2</code>, or a numeric vector with one
+weight per row.</p></dd>
 
 
 <dt id="arg-sort-frq">sort_frq<a class="anchor" aria-label="anchor" href="#arg-sort-frq"></a></dt>
@@ -140,11 +142,13 @@ population estimates.</p></dd>
 
 
 <dt id="arg-show-valid">show_valid<a class="anchor" aria-label="anchor" href="#arg-show-valid"></a></dt>
-<dd><p>Show percentages excluding missing values? (Default: TRUE)</p></dd>
+<dd><p>Show percentages excluding missing values? (Default: TRUE).
+The cumulative percentages are cumulative valid percentages, so
+<code>show_valid = FALSE</code> hides them too.</p></dd>
 
 
 <dt id="arg-show-sum">show_sum<a class="anchor" aria-label="anchor" href="#arg-show-sum"></a></dt>
-<dd><p>Show cumulative totals? (Default: TRUE)</p></dd>
+<dd><p>Show the cumulative (valid) percentages? (Default: TRUE)</p></dd>
 
 
 <dt id="arg-show-labels">show_labels<a class="anchor" aria-label="anchor" href="#arg-show-labels"></a></dt>
@@ -157,8 +161,9 @@ labels when they exist)</p></dd>
 observations? (Default: FALSE). When TRUE, values that have labels defined
 (e.g., from statistical software files) but no cases in the data are
 included with frequency 0. This is useful for labelled datasets where
-unused categories should still appear in the output. Automatically enables
-label display.</p></dd>
+unused categories should still appear in the output. The same applies
+to empty factor levels, which are hidden by default (as SPSS lists only
+observed values). Automatically enables label display.</p></dd>
 
 
 <dt id="arg-sort-frq-show-na-show-prc-show-valid-show-sum-show-labels-show-unused">sort.frq, show.na, show.prc, show.valid, show.sum, show.labels, show.unused<a class="anchor" aria-label="anchor" href="#arg-sort-frq-show-na-show-prc-show-valid-show-sum-show-labels-show-unused"></a></dt>
@@ -179,11 +184,19 @@ names error clearly instead of being swallowed by <code>...</code>.)</p></dd>
 <h3 id="understanding-the-results">Understanding the Results<a class="anchor" aria-label="anchor" href="#understanding-the-results"></a></h3>
 
 
-<p>The frequency table shows:</p><ul><li><p><strong>Freq</strong>: Number of responses in each category</p></li>
-<li><p><strong>%</strong>: Percentage including missing values (use for "response rate")</p></li>
+<p>The frequency table follows the SPSS FREQUENCIES layout:</p><ul><li><p><strong>N</strong>: Number of responses in each category (weighted: sum of weights,
+displayed rounded)</p></li>
+<li><p><strong>Raw %</strong>: Percentage including missing values (use for "response rate")</p></li>
 <li><p><strong>Valid %</strong>: Percentage excluding missing values (use for "among those who answered")</p></li>
-<li><p><strong>Cum %</strong>: Running total percentage (helps identify cutoff points)</p></li>
-</ul></div>
+<li><p><strong>Cum. %</strong>: Running total of the valid percentages (helps identify cutoff points)</p></li>
+<li><p><strong>Total valid</strong>, the missing categories, <strong>Total missing</strong> (with two
+or more missing categories) and the grand <strong>Total</strong>; without missing
+values a single <strong>Total</strong> row ends the table.</p></li>
+</ul><p>Factors, character and logical variables show their categories in the
+Value column; labelled numeric variables show the code and its label.
+Long labels are never cut; they wrap when the table would be wider than
+the console.</p>
+</div>
 
 <div class="section">
 <h3 id="when-to-use-this">When to Use This<a class="anchor" aria-label="anchor" href="#when-to-use-this"></a></h3>
@@ -242,16 +255,16 @@ Missing</strong>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> gender (Gender)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Male |   Male |   1194 |  47.76 |  47.76 |  47.76 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | Female |   1306 |  52.24 |  52.24 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |   2500 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male   | 1194 |  47.76 |   47.76 |  47.76 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | 1306 |  52.24 |   52.24 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total  | 2500 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables with weights</span></span></span>
@@ -261,29 +274,29 @@ Missing</strong>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> gender (Gender)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Male |   Male |   1195 |  47.48 |  47.48 |  47.48 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | Female |   1321 |  52.52 |  52.52 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |   2516 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male   | 1195 |  47.48 |   47.48 |  47.48 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | 1321 |  52.52 |   52.52 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total  | 2516 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> region (Region (East/West))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   East |   East |    509 |  20.23 |  20.23 |  20.23 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   West |   West |   2007 |  79.77 |  79.77 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |   2516 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | East  |  509 |  20.23 |   20.23 |  20.23 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | West  | 2007 |  79.77 |   79.77 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total | 2516 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +-------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis by region</span></span></span>
@@ -298,30 +311,30 @@ Missing</strong>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=509 valid N=509 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=509 valid N=509</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Male |   Male |    249 |  49.01 |  49.01 |  49.01 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | Female |    260 |  50.99 |  50.99 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |    509 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+-----+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value  |   N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+-----+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male   | 249 |  49.01 |   49.01 |  49.01 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | 260 |  50.99 |   50.99 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+-----+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total  | 509 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+-----+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2007 valid N=2007 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2007 valid N=2007</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Male |   Male |    945 |  47.09 |  47.09 |  47.09 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | Female |   1062 |  52.91 |  52.91 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |  Total |        |   2007 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+--------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Male   |  945 |  47.09 |   47.09 |  47.09 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Female | 1062 |  52.91 |   52.91 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total  | 2007 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +--------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Education levels with sorting</span></span></span>
@@ -331,18 +344,18 @@ Missing</strong>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> education (Highest educational attainment)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2500 valid N=2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                  Value |                  Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |        Basic Secondary |        Basic Secondary |    841 |  33.64 |  33.64 |  33.64 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |     Academic Secondary |     Academic Secondary |    631 |  25.24 |  25.24 |  58.88 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Intermediate Secondary | Intermediate Secondary |    629 |  25.16 |  25.16 |  84.04 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |             University |             University |    399 |  15.96 |  15.96 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                  Total |                        |   2500 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------------------------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value                  |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Basic Secondary        |  841 |  33.64 |   33.64 |  33.64 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Academic Secondary     |  631 |  25.24 |   25.24 |  58.88 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Intermediate Secondary |  629 |  25.16 |   25.16 |  84.04 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | University             |  399 |  15.96 |   15.96 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total                  | 2500 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------------------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Employment status with custom display options</span></span></span>
@@ -353,19 +366,19 @@ Missing</strong>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> employment (Employment status)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516 mean=NA sd=NA skewness=NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # total N=2516 valid N=2516</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |      Value |      Label |      N |  Raw % |Valid % | Cum. % |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |    Student |    Student |     80 |   3.18 |   3.18 |   3.18 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |   Employed |   Employed |   1603 |  63.71 |  63.71 |  66.89 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | Unemployed | Unemployed |    184 |   7.32 |   7.32 |  74.21 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |    Retired |    Retired |    534 |  21.21 |  21.21 |  95.41 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |      Other |      Other |    115 |   4.59 |   4.59 | 100.00 |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------------+--------+--------+--------+--------+</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |      Total |            |   2516 | 100.00 | 100.00 |        |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------------+--------+--------+--------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Value      |    N |  Raw % | Valid % | Cum. % |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Student    |   80 |   3.18 |    3.18 |   3.18 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Employed   | 1603 |  63.71 |   63.71 |  66.89 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Unemployed |  184 |   7.32 |    7.32 |  74.21 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Retired    |  534 |  21.21 |   21.21 |  95.41 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Other      |  115 |   4.59 |    4.59 | 100.00 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------+--------+---------+--------+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | Total      | 2516 | 100.00 |  100.00 |        |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +------------+------+--------+---------+--------+</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

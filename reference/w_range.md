@@ -32,7 +32,9 @@ w_range(data, ..., weights = NULL, na.rm = TRUE)
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -50,7 +52,10 @@ number of valid observations used.
 - **Effective N**: Reported when weights are provided, for consistency
   with other weighted statistics.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 Note: The range is sensitive to outliers. A single extreme value can
 dramatically increase the range. Consider using
@@ -116,45 +121,52 @@ survey_data %>% w_range(age, weights = sampling_weight)
 #> 
 #> Weighted Range Statistics
 #> -------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_range Effective_N
-#>       age             77      2468.8
-#> 
+#>   -------------------------------
+#>   Variable   Range     N  Missing
+#>   -------------------------------
+#>   age       77.000  2516        0
+#>   -------------------------------
 
 # Multiple variables
 survey_data %>% w_range(age, income, weights = sampling_weight)
 #> 
 #> Weighted Range Statistics
 #> -------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_range Effective_N
-#>       age             77      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_range Effective_N
-#>    income           7200      2158.9
-#> 
+#>   ---------------------------------
+#>   Variable     Range     N  Missing
+#>   ---------------------------------
+#>   age         77.000  2516        0
+#>   income    7200.000  2201      315
+#>   ---------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_range(age, weights = sampling_weight)
 #> 
 #> Weighted Range Statistics
 #> -------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_range Effective_N
-#>       age             77         477
+#>   ------------------------------
+#>   Variable   Range    N  Missing
+#>   ------------------------------
+#>   age       77.000  509        0
+#>   ------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_range Effective_N
-#>       age             77      1993.1
-#> 
+#>   -------------------------------
+#>   Variable   Range     N  Missing
+#>   -------------------------------
+#>   age       77.000  2007        0
+#>   -------------------------------
 
 # In summarise context
 survey_data %>% summarise(range_age = w_range(age, weights = sampling_weight))
@@ -169,8 +181,9 @@ survey_data %>% w_range(age)
 #> Range Statistics
 #> ----------------
 #> 
-#> --- age ---
-#>  Variable range    N
-#>       age    77 2500
-#> 
+#>   -------------------------------
+#>   Variable   Range     N  Missing
+#>   -------------------------------
+#>   age       77.000  2500        0
+#>   -------------------------------
 ```

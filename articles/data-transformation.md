@@ -49,17 +49,17 @@ frequency(survey_data, age_group)
 #> --------------------------
 #> 
 #> age_group (Age in years (recoded))
-#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> # total N=2500 valid N=2500
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Young |  Young |    292 |  11.68 |  11.68 |  11.68 |
-#> | Middle | Middle |    935 |  37.40 |  37.40 |  49.08 |
-#> |  Older |  Older |   1273 |  50.92 |  50.92 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2500 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +--------+------+--------+---------+--------+
+#> | Value  |    N |  Raw % | Valid % | Cum. % |
+#> +--------+------+--------+---------+--------+
+#> | Young  |  292 |  11.68 |   11.68 |  11.68 |
+#> | Middle |  935 |  37.40 |   37.40 |  49.08 |
+#> | Older  | 1273 |  50.92 |   50.92 | 100.00 |
+#> +--------+------+--------+---------+--------+
+#> | Total  | 2500 | 100.00 |  100.00 |        |
+#> +--------+------+--------+---------+--------+
 ```
 
 The bracket notation (`[Young]`) automatically creates value labels on
@@ -69,12 +69,16 @@ the recoded variable. The `suffix` argument creates a new column (here
 ### Reverse-Coding
 
 Reverse the direction of a Likert scale. Useful when some items in a
-scale are negatively worded:
+scale are negatively worded. Give the scale range explicitly with
+`"rev(min, max)"`: reversing is `min + max - x` on the *scale*, which
+differs from the observed range whenever nobody chose an end point
+(common in subgroups). With plain `"rev"`, the range comes from the
+value labels, or from the observed values with a message saying so:
 
 ``` r
 
 survey_data <- rec(survey_data, trust_government,
-  rules = "rev", suffix = "_rev"
+  rules = "rev(1, 5)", suffix = "_rev"
 )
 
 # Original: 1=low trust ... 5=high trust
@@ -110,18 +114,18 @@ frequency(survey_data, income_dicho)
 #> income_dicho (Monthly household income (EUR) (recoded))
 #> # total N=2500 valid N=2186 mean=0.49 sd=0.50 skewness=0.03
 #> 
-#> +------+--------+--------+--------+--------+
-#> |Value |      N |  Raw % |Valid % | Cum. % |
-#> +------+--------+--------+--------+--------+
-#> |    0 |   1108 |  44.32 |  50.69 |  50.69 |
-#> |    1 |   1078 |  43.12 |  49.31 | 100.00 |
-#> +------+--------+--------+--------+--------+
-#> |Total |   2186 |  87.44 | 100.00 |        |
-#> +------+--------+--------+--------+--------+
-#> |   NA |    314 |  12.56 |     NA |     NA |
-#> +------+--------+--------+--------+--------+
-#> |Total |    314 |  12.56 |     NA |        |
-#> +------+--------+--------+--------+--------+
+#> +-------------+------+--------+---------+--------+
+#> |       Value |    N |  Raw % | Valid % | Cum. % |
+#> +-------------+------+--------+---------+--------+
+#> |           0 | 1108 |  44.32 |   50.69 |  50.69 |
+#> |           1 | 1078 |  43.12 |   49.31 | 100.00 |
+#> +-------------+------+--------+---------+--------+
+#> | Total valid | 2186 |  87.44 |  100.00 |        |
+#> +-------------+------+--------+---------+--------+
+#> |      System |  314 |  12.56 |         |        |
+#> +-------------+------+--------+---------+--------+
+#> | Total       | 2500 | 100.00 |         |        |
+#> +-------------+------+--------+---------+--------+
 ```
 
 Other split options:
@@ -157,16 +161,16 @@ frequency(survey_data, education_binary)
 #> --------------------------
 #> 
 #> education_binary (Highest educational attainment (recoded))
-#> # total N=2500 valid N=2500 mean=NA sd=NA skewness=NA
+#> # total N=2500 valid N=2500
 #> 
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Value |  Label |      N |  Raw % |Valid % | Cum. % |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Lower |  Lower |   1470 |  58.80 |  58.80 |  58.80 |
-#> | Higher | Higher |   1030 |  41.20 |  41.20 | 100.00 |
-#> +--------+--------+--------+--------+--------+--------+
-#> |  Total |        |   2500 | 100.00 | 100.00 |        |
-#> +--------+--------+--------+--------+--------+--------+
+#> +--------+------+--------+---------+--------+
+#> | Value  |    N |  Raw % | Valid % | Cum. % |
+#> +--------+------+--------+---------+--------+
+#> | Lower  | 1470 |  58.80 |   58.80 |  58.80 |
+#> | Higher | 1030 |  41.20 |   41.20 | 100.00 |
+#> +--------+------+--------+---------+--------+
+#> | Total  | 2500 | 100.00 |  100.00 |        |
+#> +--------+------+--------+---------+--------+
 ```
 
 ## Dummy Coding with to_dummy()
@@ -222,18 +226,16 @@ omitted as reference):
 
 dummies <- to_dummy(survey_data, education, ref = 1, append = FALSE)
 head(dummies)
-#> # A tibble: 6 × 4
-#>   `education_Basic Secondary` education_Intermediate Se…¹ education_Academic S…²
-#>                         <int>                       <int>                  <int>
-#> 1                           0                           1                      0
-#> 2                           0                           0                      1
-#> 3                           0                           0                      1
-#> 4                           1                           0                      0
-#> 5                           1                           0                      0
-#> 6                           0                           1                      0
-#> # ℹ abbreviated names: ¹​`education_Intermediate Secondary`,
-#> #   ²​`education_Academic Secondary`
-#> # ℹ 1 more variable: education_University <int>
+#> # A tibble: 6 × 3
+#>   `education_Intermediate Secondary` education_Academic S…¹ education_University
+#>                                <int>                  <int>                <int>
+#> 1                                  1                      0                    0
+#> 2                                  0                      1                    0
+#> 3                                  0                      1                    0
+#> 4                                  0                      0                    0
+#> 5                                  0                      0                    0
+#> 6                                  1                      0                    0
+#> # ℹ abbreviated name: ¹​`education_Academic Secondary`
 ```
 
 ### Adding to Existing Data
@@ -265,10 +267,13 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>  Variable Mean SD    N Missing
-#>       age    0  1 2500       0
-#>    income    0  1 2186     314
-#> ----------------------------------------
+#> 
+#>   -------------------------------------
+#>   Variable   Mean     SD     N  Missing
+#>   -------------------------------------
+#>   age       0.000  1.000  2500        0
+#>   income    0.000  1.000  2186      314
+#>   -------------------------------------
 ```
 
 ### Standardization Methods
@@ -290,11 +295,14 @@ survey_data_methods %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>               Variable   Mean    SD    N Missing
-#>   life_satisfaction_sd  0.000 1.000 2421      79
-#>  life_satisfaction_2sd  0.000 0.500 2421      79
-#>  life_satisfaction_mad -0.251 0.778 2421      79
-#> ----------------------------------------
+#> 
+#>   ---------------------------------------------------
+#>   Variable                 Mean     SD     N  Missing
+#>   ---------------------------------------------------
+#>   life_satisfaction_sd    0.000  1.000  2421       79
+#>   life_satisfaction_2sd   0.000  0.500  2421       79
+#>   life_satisfaction_mad  -0.251  0.778  2421       79
+#>   ---------------------------------------------------
 ```
 
 - **`"sd"`** (default): Classic z-standardization (\frac{x -
@@ -317,9 +325,12 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>     Variable  Mean    SD    N Missing
-#>  income_wstd 0.008 1.006 2186     314
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------
+#>   Variable      Mean     SD     N  Missing
+#>   ----------------------------------------
+#>   income_wstd  0.008  1.006  2186      314
+#>   ----------------------------------------
 ```
 
 ### Group-Wise Standardization
@@ -352,10 +363,13 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>  Variable Mean SD    N Missing
-#>     age_c    0  1 2500       0
-#>  income_c    0  1 2186     314
-#> ----------------------------------------
+#> 
+#>   ----------------------------------------------------
+#>   Variable   Mean     SD     Min    Max     N  Missing
+#>   ----------------------------------------------------
+#>   age_c     0.000  1.000  -1.917  2.618  2500        0
+#>   income_c  0.000  1.000  -2.062  2.963  2186      314
+#>   ----------------------------------------------------
 ```
 
 ### Group-Mean Centering
@@ -380,17 +394,21 @@ survey_data %>%
 #> 
 #> Group: region = East
 #> --------------------
-#> ----------------------------------------
-#>   Variable Mean    SD   N Missing
-#>  income_gc    0 0.968 429      56
-#> ----------------------------------------
+#> 
+#>   -------------------------------------
+#>   Variable    Mean     SD    N  Missing
+#>   -------------------------------------
+#>   income_gc  0.000  0.968  429       56
+#>   -------------------------------------
 #> 
 #> Group: region = West
 #> --------------------
-#> ----------------------------------------
-#>   Variable Mean    SD    N Missing
-#>  income_gc    0 1.008 1757     258
-#> ----------------------------------------
+#> 
+#>   --------------------------------------
+#>   Variable    Mean     SD     N  Missing
+#>   --------------------------------------
+#>   income_gc  0.000  1.008  1757      258
+#>   --------------------------------------
 ```
 
 ### Weighted Centering
@@ -421,9 +439,12 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>  Variable  Mean Median  SD Range IQR Skewness    N Missing
-#>   m_trust 2.915      3 0.7     4   1    0.015 2500       0
-#> ----------------------------------------
+#> 
+#>   ---------------------------------------------------------------------
+#>   Variable   Mean  Median     SD  Range    IQR  Skewness     N  Missing
+#>   ---------------------------------------------------------------------
+#>   m_trust   2.915   3.000  0.700  4.000  1.000     0.015  2500        0
+#>   ---------------------------------------------------------------------
 ```
 
 #### Using tidyselect
@@ -481,9 +502,12 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>     Variable  Mean Median   SD Range IQR Skewness    N Missing
-#>  trust_total 8.282      8 2.17    13   3   -0.164 2500       0
-#> ----------------------------------------
+#> 
+#>   -------------------------------------------------------------------------
+#>   Variable      Mean  Median     SD   Range    IQR  Skewness     N  Missing
+#>   -------------------------------------------------------------------------
+#>   trust_total  8.282   8.000  2.170  13.000  3.000    -0.164  2500        0
+#>   -------------------------------------------------------------------------
 ```
 
 ### Row Count
@@ -508,15 +532,15 @@ frequency(survey_data, n_high_trust)
 #> n_high_trust
 #> # total N=2500 valid N=2500 mean=0.29 sd=0.49 skewness=1.39
 #> 
-#> +------+--------+--------+--------+--------+
-#> |Value |      N |  Raw % |Valid % | Cum. % |
-#> +------+--------+--------+--------+--------+
-#> |    0 |   1829 |  73.16 |  73.16 |  73.16 |
-#> |    1 |    628 |  25.12 |  25.12 |  98.28 |
-#> |    2 |     43 |   1.72 |   1.72 | 100.00 |
-#> +------+--------+--------+--------+--------+
-#> |Total |   2500 | 100.00 | 100.00 |        |
-#> +------+--------+--------+--------+--------+
+#> +-------+------+--------+---------+--------+
+#> | Value |    N |  Raw % | Valid % | Cum. % |
+#> +-------+------+--------+---------+--------+
+#> |     0 | 1829 |  73.16 |   73.16 |  73.16 |
+#> |     1 |  628 |  25.12 |   25.12 |  98.28 |
+#> |     2 |   43 |   1.72 |    1.72 | 100.00 |
+#> +-------+------+--------+---------+--------+
+#> | Total | 2500 | 100.00 |  100.00 |        |
+#> +-------+------+--------+---------+--------+
 ```
 
 ## POMPS Transformation
@@ -535,9 +559,12 @@ survey_data %>%
 #> 
 #> Descriptive Statistics
 #> ----------------------
-#>     Variable   Mean Median   SD Range IQR Skewness    N Missing
-#>  trust_pomps 47.885     50 17.5   100  25    0.015 2500       0
-#> ----------------------------------------
+#> 
+#>   -----------------------------------------------------------------------------
+#>   Variable       Mean  Median      SD    Range     IQR  Skewness     N  Missing
+#>   -----------------------------------------------------------------------------
+#>   trust_pomps  47.885  50.000  17.500  100.000  25.000     0.015  2500        0
+#>   -----------------------------------------------------------------------------
 ```
 
 A score of 0 means the respondent chose the minimum on every item; 100
@@ -571,7 +598,7 @@ survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
   suffix = "_group", as_factor = TRUE)
 survey_data <- rec(survey_data, trust_government,
-  rules = "rev", suffix = "_rev")
+  rules = "rev(1, 5)", suffix = "_rev")
 
 # 2. Create scale score
 survey_data <- survey_data %>%
@@ -587,12 +614,14 @@ survey_data %>%
   t_test(m_trust, group = gender, weights = sampling_weight)
 #> t-Test: m_trust by gender [Weighted]
 #>   t(2457.6) = -2.362, p = 0.018 *, g = -0.095 (negligible), N = 2499
+#> Use summary() for detailed output.
 
 survey_data %>%
   linear_regression(life_satisfaction ~ age_z + income_z + m_trust,
                     weights = sampling_weight)
 #> Linear Regression: life_satisfaction ~ age_z + income_z + m_trust [Weighted]
 #>   R2 = 0.201, adj.R2 = 0.200, F(3, 2109) = 177.02, p < 0.001 ***, N = 2113
+#> Use summary() for detailed output.
 ```
 
 ## Practical Tips

@@ -128,8 +128,11 @@ provides three methods for different situations:</p>
 </tr>
 </tbody>
 </table>
-<p>All three support survey weights, multiple variables (correlation
-matrices), and grouped analysis.</p>
+<p>All three support multiple variables (correlation matrices), grouped
+analysis, and a <code>weights</code> argument. Pearson and Kendall
+compute weighted coefficients; for Spearman, following SPSS NONPAR CORR,
+weights only select cases (weight &lt;= 0 or missing is excluded) and
+rho itself is unweighted.</p>
 </div>
 <div class="section level2">
 <h2 id="pearson-correlation">Pearson Correlation<a class="anchor" aria-label="anchor" href="#pearson-correlation"></a>
@@ -141,7 +144,8 @@ matrices), and grouped analysis.</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income</span></span>
-<span><span class="co">#&gt;   r = -0.007, p = 0.761 , N = 2186</span></span></code></pre></div>
+<span><span class="co">#&gt;   r = -0.007, p = 0.761, N = 2186</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <p>Interpretation of <em>r</em>:</p>
 <ul>
 <li>
@@ -161,7 +165,8 @@ correlation</li>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
-<span><span class="co">#&gt;   r = -0.005, p = 0.828 , N = 2201</span></span></code></pre></div>
+<span><span class="co">#&gt;   r = -0.005, p = 0.828, N = 2201</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="correlation-matrix">Correlation Matrix<a class="anchor" aria-label="anchor" href="#correlation-matrix"></a>
@@ -172,10 +177,11 @@ correlation</li>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span>,</span>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Pearson Correlation: 3 variables [Weighted]</span></span>
-<span><span class="co">#&gt;   trust_government x trust_media: r = 0.012, p = 0.582  </span></span>
-<span><span class="co">#&gt;   trust_government x trust_science: r = 0.031, p = 0.145  </span></span>
-<span><span class="co">#&gt;   trust_media x trust_science:   r = 0.024, p = 0.259  </span></span>
-<span><span class="co">#&gt;   0/3 pairs significant (p &lt; .05), N = 2242</span></span></code></pre></div>
+<span><span class="co">#&gt;   trust_government x trust_media:   r = 0.012, p = 0.582</span></span>
+<span><span class="co">#&gt;   trust_government x trust_science: r = 0.031, p = 0.145</span></span>
+<span><span class="co">#&gt;   trust_media x trust_science:      r = 0.024, p = 0.259</span></span>
+<span><span class="co">#&gt;   0/3 pairs significant (p &lt; .05), N = 2242-2286</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="detailed-output">Detailed Output<a class="anchor" aria-label="anchor" href="#detailed-output"></a>
@@ -186,16 +192,17 @@ correlation</li>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Weighted Pearson Correlation </span></span>
-<span><span class="co">#&gt; -----------------------------</span></span>
+<span><span class="co">#&gt; Weighted Pearson Correlation</span></span>
+<span><span class="co">#&gt; ----------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Weights variable: sampling_weight</span></span>
 <span><span class="co">#&gt; - Missing data handling: pairwise deletion</span></span>
 <span><span class="co">#&gt; - Confidence level: 95.0%</span></span>
+<span><span class="co">#&gt; - Alternative hypothesis: two.sided</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Correlation: r = -0.005</span></span>
-<span><span class="co">#&gt;   p-value: p = 0.828 </span></span>
+<span><span class="co">#&gt;   p-value (2-tailed): p = 0.828</span></span>
 <span><span class="co">#&gt;   N = 2201</span></span>
 <span><span class="co">#&gt;   95% CI: [-0.046, 0.037]</span></span>
 <span><span class="co">#&gt;   r-squared: 0.000</span></span>
@@ -209,12 +216,13 @@ correlation</li>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [region = 1]</span></span>
+<span><span class="co">#&gt; [region = East]</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
-<span><span class="co">#&gt;   r = 0.050, p = 0.293 , N = 449</span></span>
-<span><span class="co">#&gt; [region = 2]</span></span>
+<span><span class="co">#&gt;   r = 0.050, p = 0.293, N = 449</span></span>
+<span><span class="co">#&gt; [region = West]</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
-<span><span class="co">#&gt;   r = -0.019, p = 0.427 , N = 1751</span></span></code></pre></div>
+<span><span class="co">#&gt;   r = -0.019, p = 0.427, N = 1751</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -227,8 +235,9 @@ with ordinal data or data with outliers:</p>
 <code class="sourceCode R"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/spearman_rho.html">spearman_rho</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">environmental_concern</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Spearman Correlation: political_orientation x environmental_concern [Weighted]</span></span>
-<span><span class="co">#&gt;   rho = -0.576, p &lt; 0.001 ***, N = 2207</span></span></code></pre></div>
+<span><span class="co">#&gt; Spearman Correlation: political_orientation x environmental_concern</span></span>
+<span><span class="co">#&gt;   rho = -0.576, p &lt; 0.001 ***, N = 2207</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="multiple-variables">Multiple Variables<a class="anchor" aria-label="anchor" href="#multiple-variables"></a>
 </h3>
@@ -237,14 +246,15 @@ with ordinal data or data with outliers:</p>
 <span>  <span class="fu"><a href="../reference/spearman_rho.html">spearman_rho</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">environmental_concern</span>,</span>
 <span>               <span class="va">life_satisfaction</span>, <span class="va">trust_government</span>,</span>
 <span>               weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Spearman Correlation: 4 variables [Weighted]</span></span>
-<span><span class="co">#&gt;   political_orientation x environmental_concern: rho = -0.576, p &lt; 0.001 *** </span></span>
-<span><span class="co">#&gt;   political_orientation x life_satisfaction: rho = -0.004, p = 0.833  </span></span>
-<span><span class="co">#&gt;   political_orientation x trust_government: rho = -0.055, p = 0.011 * </span></span>
-<span><span class="co">#&gt;   environmental_concern x life_satisfaction: rho = 0.003, p = 0.904  </span></span>
-<span><span class="co">#&gt;   environmental_concern x trust_government: rho = 0.067, p = 0.002 ** </span></span>
-<span><span class="co">#&gt;   life_satisfaction x trust_government: rho = 0.002, p = 0.942  </span></span>
-<span><span class="co">#&gt;   3/6 pairs significant (p &lt; .05), N = 2207</span></span></code></pre></div>
+<span><span class="co">#&gt; Spearman Correlation: 4 variables</span></span>
+<span><span class="co">#&gt;   political_orientation x environmental_concern: rho = -0.576, p &lt; 0.001 ***</span></span>
+<span><span class="co">#&gt;   political_orientation x life_satisfaction:     rho = -0.004, p = 0.833</span></span>
+<span><span class="co">#&gt;   political_orientation x trust_government:      rho = -0.055, p = 0.011 *</span></span>
+<span><span class="co">#&gt;   environmental_concern x life_satisfaction:     rho = 0.003, p = 0.904</span></span>
+<span><span class="co">#&gt;   environmental_concern x trust_government:      rho = 0.067, p = 0.002 **</span></span>
+<span><span class="co">#&gt;   life_satisfaction x trust_government:          rho = 0.002, p = 0.942</span></span>
+<span><span class="co">#&gt;   3/6 pairs significant (p &lt; .05), N = 2168-2324</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -259,7 +269,8 @@ smaller absolute values:</p>
 <span>  <span class="fu"><a href="../reference/kendall_tau.html">kendall_tau</a></span><span class="op">(</span><span class="va">political_orientation</span>, <span class="va">life_satisfaction</span>,</span>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Kendall's Tau: political_orientation x life_satisfaction [Weighted]</span></span>
-<span><span class="co">#&gt;   tau = -0.005, p = 0.747 , N = 2241</span></span></code></pre></div>
+<span><span class="co">#&gt;   tau = -0.005, p = 0.747, N = 2241</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="partial-correlation">Partial Correlation<a class="anchor" aria-label="anchor" href="#partial-correlation"></a>
@@ -292,21 +303,21 @@ partial-correlation matrix:</p>
 <span><span class="co">#&gt; - Missing: Listwise deletion</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Partial Correlation Matrix:</span></span>
-<span><span class="co">#&gt; --------------------------- </span></span>
-<span><span class="co">#&gt;                  trust_government trust_media trust_science</span></span>
-<span><span class="co">#&gt; trust_government            1.000       0.019         0.033</span></span>
-<span><span class="co">#&gt; trust_media                 0.019       1.000         0.009</span></span>
-<span><span class="co">#&gt; trust_science               0.033       0.009         1.000</span></span>
-<span><span class="co">#&gt; --------------------------- </span></span>
+<span><span class="co">#&gt; ---------------------------</span></span>
+<span><span class="co">#&gt;                   trust_government  trust_media  trust_science</span></span>
+<span><span class="co">#&gt; trust_government                 1        0.019          0.033</span></span>
+<span><span class="co">#&gt; trust_media                  0.019            1          0.009</span></span>
+<span><span class="co">#&gt; trust_science                0.033        0.009              1</span></span>
+<span><span class="co">#&gt; ---------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Pairwise Results:</span></span>
-<span><span class="co">#&gt;   -------------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig </span></span>
-<span><span class="co">#&gt;   -------------------------------------------------------------------------------------- </span></span>
-<span><span class="co">#&gt;   trust_government    trust_media      0.019         0.019  1960  0.859  .390  1964      </span></span>
-<span><span class="co">#&gt;   trust_government  trust_science      0.033         0.030  1960  1.447  .148  1964      </span></span>
-<span><span class="co">#&gt;   trust_media       trust_science      0.009         0.010  1960  0.407  .684  1964      </span></span>
-<span><span class="co">#&gt;   -------------------------------------------------------------------------------------- </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Variable 1        Variable 2     Partial r  Zero-order r    df      t     p     n  sig</span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;   trust_government  trust_media        0.019         0.019  1960  0.859  .390  1964     </span></span>
+<span><span class="co">#&gt;   trust_government  trust_science      0.033         0.030  1960  1.447  .148  1964     </span></span>
+<span><span class="co">#&gt;   trust_media       trust_science      0.009         0.010  1960  0.407  .684  1964     </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span></span></code></pre></div>
 </div>
@@ -374,8 +385,8 @@ may be non-linear:</p>
 <span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  Method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Pearson"</span>, <span class="st">"Spearman"</span>, <span class="st">"Kendall"</span><span class="op">)</span>,</span>
 <span>  Correlation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">pearson_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">correlation</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>                  <span class="va">spearman_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">correlation</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>                  <span class="va">kendall_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">correlation</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                  <span class="va">spearman_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">rho</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>                  <span class="va">kendall_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">tau</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>  P_Value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">pearson_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">p_value</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>              <span class="va">spearman_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">p_value</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>              <span class="va">kendall_result</span><span class="op">$</span><span class="va">correlations</span><span class="op">$</span><span class="va">p_value</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
@@ -383,8 +394,8 @@ may be non-linear:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     Method Correlation       P_Value</span></span>
 <span><span class="co">#&gt; 1  Pearson   0.4501535 8.997507e-107</span></span>
-<span><span class="co">#&gt; 2 Spearman   0.4501535 2.322944e-113</span></span>
-<span><span class="co">#&gt; 3  Kendall   0.4501535 6.963954e-132</span></span></code></pre></div>
+<span><span class="co">#&gt; 2 Spearman   0.4639317 2.322944e-113</span></span>
+<span><span class="co">#&gt; 3  Kendall   0.3532949 6.963954e-132</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="correlation-does-not-imply-causation">Correlation Does Not Imply Causation<a class="anchor" aria-label="anchor" href="#correlation-does-not-imply-causation"></a>
@@ -410,17 +421,18 @@ other:</p>
 <span>              weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
 <span><span class="va">cor_result</span></span>
 <span><span class="co">#&gt; Pearson Correlation: 5 variables [Weighted]</span></span>
-<span><span class="co">#&gt;   age x income:                  r = -0.005, p = 0.828  </span></span>
-<span><span class="co">#&gt;   age x life_satisfaction:       r = -0.029, p = 0.150  </span></span>
-<span><span class="co">#&gt;   age x political_orientation:   r = -0.029, p = 0.168  </span></span>
-<span><span class="co">#&gt;   age x environmental_concern:   r = 0.024, p = 0.244  </span></span>
-<span><span class="co">#&gt;   income x life_satisfaction:    r = 0.450, p &lt; 0.001 *** </span></span>
-<span><span class="co">#&gt;   income x political_orientation: r = -0.034, p = 0.125  </span></span>
-<span><span class="co">#&gt;   income x environmental_concern: r = 0.015, p = 0.503  </span></span>
-<span><span class="co">#&gt;   life_satisfaction x political_orientation: r = -0.004, p = 0.836  </span></span>
-<span><span class="co">#&gt;   life_satisfaction x environmental_concern: r = -0.003, p = 0.866  </span></span>
-<span><span class="co">#&gt;   political_orientation x environmental_concern: r = -0.584, p &lt; 0.001 *** </span></span>
-<span><span class="co">#&gt;   2/10 pairs significant (p &lt; .05), N = 2201</span></span>
+<span><span class="co">#&gt;   age x income:                                  r = -0.005, p = 0.828</span></span>
+<span><span class="co">#&gt;   age x life_satisfaction:                       r = -0.029, p = 0.150</span></span>
+<span><span class="co">#&gt;   age x political_orientation:                   r = -0.029, p = 0.168</span></span>
+<span><span class="co">#&gt;   age x environmental_concern:                   r = 0.024, p = 0.244</span></span>
+<span><span class="co">#&gt;   income x life_satisfaction:                    r = 0.450, p &lt; 0.001 ***</span></span>
+<span><span class="co">#&gt;   income x political_orientation:                r = -0.034, p = 0.125</span></span>
+<span><span class="co">#&gt;   income x environmental_concern:                r = 0.015, p = 0.503</span></span>
+<span><span class="co">#&gt;   life_satisfaction x political_orientation:     r = -0.004, p = 0.836</span></span>
+<span><span class="co">#&gt;   life_satisfaction x environmental_concern:     r = -0.003, p = 0.866</span></span>
+<span><span class="co">#&gt;   political_orientation x environmental_concern: r = -0.584, p &lt; 0.001 ***</span></span>
+<span><span class="co">#&gt;   2/10 pairs significant (p &lt; .05), N = 2020-2437</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span>
 <span></span>
 <span><span class="co"># 2. Identify the strongest correlations</span></span>
 <span><span class="va">significant</span> <span class="op">&lt;-</span> <span class="va">cor_result</span><span class="op">$</span><span class="va">correlations</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -438,12 +450,13 @@ other:</p>
 <span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/pearson_cor.html">pearson_cor</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [region = 1]</span></span>
+<span><span class="co">#&gt; [region = East]</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
-<span><span class="co">#&gt;   r = 0.050, p = 0.293 , N = 449</span></span>
-<span><span class="co">#&gt; [region = 2]</span></span>
+<span><span class="co">#&gt;   r = 0.050, p = 0.293, N = 449</span></span>
+<span><span class="co">#&gt; [region = West]</span></span>
 <span><span class="co">#&gt; Pearson Correlation: age x income [Weighted]</span></span>
-<span><span class="co">#&gt;   r = -0.019, p = 0.427 , N = 1751</span></span></code></pre></div>
+<span><span class="co">#&gt;   r = -0.019, p = 0.427, N = 1751</span></span>
+<span><span class="co">#&gt; Use summary() for detailed output.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="reporting-results-apa-style">Reporting Results (APA Style)<a class="anchor" aria-label="anchor" href="#reporting-results-apa-style"></a>
@@ -488,9 +501,9 @@ with ordinal data</li>
 <li>
 <strong>Kendall</strong> is the most robust choice for ordinal data
 and small samples</li>
-<li>All three support <strong>weights</strong>, <strong>correlation
-matrices</strong>, and <strong>group_by()</strong>
-</li>
+<li>All three support <strong>correlation matrices</strong> and
+<strong>group_by()</strong>; Pearson and Kendall are weighted, Spearman
+uses weights as a case filter only</li>
 <li>Correlation does <strong>not</strong> imply causation</li>
 </ol>
 </div>

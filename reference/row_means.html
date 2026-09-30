@@ -81,21 +81,26 @@ to <code>MEAN.2(a, b, c)</code>.</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>Your survey data (a data frame or tibble). When used inside
-<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, pass <code>.</code> or use <code><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick()</a></code>.</p></dd>
+<dd><p>Your survey data (a data frame or tibble). Inside
+<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, the recommended form is <code><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick()</a></code>:
+<code>mutate(score = row_means(pick(item1, item2, item3)))</code>. It also
+works in a grouped <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>; <code>.</code> (the magrittr placeholder)
+is the whole data set and therefore only works without groups.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>The variables to average. Use bare column names separated by
 commas, or tidyselect helpers like <code>starts_with("trust")</code>. If no
 variables are specified, all numeric columns in <code>data</code> are used
-(useful with <code><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick()</a></code>).</p></dd>
+(useful with <code><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick()</a></code>; non-numeric columns are ignored with a
+warning).</p></dd>
 
 
 <dt id="arg-min-valid">min_valid<a class="anchor" aria-label="anchor" href="#arg-min-valid"></a></dt>
 <dd><p>Minimum number of non-missing values required to compute
-a mean. If a row has fewer valid values, <code>NA</code> is returned. Default
-is <code>NULL</code> (compute mean if at least 1 value is valid).</p></dd>
+a mean (a whole number). If a row has fewer valid values, <code>NA</code> is
+returned. Default is <code>NULL</code> (compute mean if at least 1 value is
+valid).</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
@@ -161,13 +166,20 @@ specific values, <code><a href="pomps.html">pomps()</a></code> for rescaling to 
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create a trust scale from 3 items</span></span></span>
+<span class="r-in"><span><span class="co"># Create a trust scale from 3 items (recommended: pick())</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu">row_means</span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick</a></span><span class="op">(</span><span class="va">trust_government</span>, <span class="va">trust_media</span>,</span></span>
+<span class="r-in"><span>                                  <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># tidyselect helpers inside pick(); also works after group_by()</span></span></span>
+<span class="r-in"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu">row_means</span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Alternative without groups: the data placeholder `.`</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu">row_means</span><span class="op">(</span><span class="va">.</span>, <span class="va">trust_government</span>, <span class="va">trust_media</span>, <span class="va">trust_science</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Using pick()</span></span></span>
-<span class="r-in"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>m_trust <span class="op">=</span> <span class="fu">row_means</span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pick.html" class="external-link">pick</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Require at least 2 valid items (like SPSS MEAN.2)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>

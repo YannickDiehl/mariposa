@@ -84,7 +84,9 @@ factor.</p>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Optional: unquoted variable names (tidyselect supported). If
-empty, converts all <code>haven_labelled</code> columns.</p></dd>
+empty, converts every <code>haven_labelled</code> column whose values are all
+value-labelled (metric variables are left unchanged with a message, as
+in <code><a href="to_label.html">to_label()</a></code>).</p></dd>
 
 
 <dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>

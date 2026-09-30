@@ -6,7 +6,7 @@ data, a "Labels" reference sheet is automatically included so that
 reviewers can look up what each numeric code means – even without R
 access.
 
-Three input types are supported:
+Four input types are supported:
 
 1.  **Data frame**: Exports the data plus a "Labels" reference sheet
     with variable labels, value labels, and missing value codes.
@@ -16,13 +16,23 @@ Three input types are supported:
     each cell, tagged NAs separated by a line, and an overview sheet
     with dataset metadata.
 
-3.  **Named list**: Each list element becomes a separate sheet. Elements
-    can be data frames,
+3.  **Analysis results**:
     [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
-    results, or
+    and
+    [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+    tables in their printed layout; every other result (e.g.
+    [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),
+    [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
+    [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md),
+    [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md),
+    [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md))
+    as its result tables.
+
+4.  **Named list**: Each list element becomes a separate sheet. Elements
+    can be data frames,
     [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
-    results – types can be mixed freely. For data frame elements, a
-    combined "Labels" sheet is appended.
+    results, or any analysis result – types can be mixed freely. For
+    data frame elements, a combined "Labels" sheet is appended.
 
 ## Usage
 
@@ -30,6 +40,9 @@ Three input types are supported:
 write_xlsx(x, file, ...)
 
 # S3 method for class 'frequency'
+write_xlsx(x, file, overwrite = TRUE, ...)
+
+# Default S3 method
 write_xlsx(x, file, overwrite = TRUE, ...)
 ```
 
@@ -39,7 +52,7 @@ write_xlsx(x, file, overwrite = TRUE, ...)
 
   Object to export: a data frame, a
   [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
-  result, or a named list of data frames.
+  result, an analysis result, or a named list of these.
 
 - file:
 
@@ -99,6 +112,9 @@ Use `write_xlsx()` when you:
 - Need to combine multiple tables (data, codebook, frequencies) in one
   Excel file
 
+- Want to hand analysis results (descriptives, crosstabs, test results)
+  to colleagues as Excel tables
+
 ## Methods (by class)
 
 - `write_xlsx(frequency)`: Export frequency tables to Excel
@@ -108,12 +124,31 @@ Use `write_xlsx()` when you:
   stats summary, column headers, data rows, and total rows. Multiple
   variables are separated by 3 blank rows.
 
+- `write_xlsx(default)`: Export any other mariposa analysis result (e.g.
+  [`describe()`](https://YannickDiehl.github.io/mariposa/reference/describe.md),
+  [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md),
+  [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md),
+  [`reliability()`](https://YannickDiehl.github.io/mariposa/reference/reliability.md),
+  [`linear_regression()`](https://YannickDiehl.github.io/mariposa/reference/linear_regression.md))
+  to one sheet.
+  [`crosstab()`](https://YannickDiehl.github.io/mariposa/reference/crosstab.md)
+  results are written in the SPSS table layout (counts and the requested
+  percentages per row category, with totals); all other results as the
+  table
+  [as.data.frame()](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+  returns, followed by the secondary tables SPSS shows next to it (group
+  descriptives, mean ranks, item statistics, model summary, ...).
+  Grouped results keep the grouping variables as leading columns
+  (crosstabs get one block per group).
+
 ## See also
 
 [`codebook()`](https://YannickDiehl.github.io/mariposa/reference/codebook.md)
 for generating codebook objects,
 [`frequency()`](https://YannickDiehl.github.io/mariposa/reference/frequency.md)
 for frequency tables,
+[as.data.frame()](https://YannickDiehl.github.io/mariposa/reference/as.data.frame.mariposa.md)
+for analysis results as data frames,
 [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md),
 [`read_por()`](https://YannickDiehl.github.io/mariposa/reference/read_por.md),
 [`read_stata()`](https://YannickDiehl.github.io/mariposa/reference/read_stata.md),
@@ -173,4 +208,22 @@ if (requireNamespace("openxlsx2", quietly = TRUE)) {
   unlink(c(tmp, tmp2))
 }
 # }
+
+if (requireNamespace("openxlsx2", quietly = TRUE)) {
+  # Analysis results: one sheet each, or several in one workbook
+  tmp_res <- tempfile(fileext = ".xlsx")
+  t_test(survey_data, age, income, group = gender) |> write_xlsx(tmp_res)
+
+  tmp_list <- tempfile(fileext = ".xlsx")
+  write_xlsx(
+    list(
+      "Descriptives" = describe(survey_data, age, income),
+      "Crosstab"     = crosstab(survey_data, gender, region),
+      "ANOVA"        = oneway_anova(survey_data, age, group = education)
+    ),
+    tmp_list
+  )
+
+  unlink(c(tmp_res, tmp_list))
+}
 ```

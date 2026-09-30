@@ -102,11 +102,15 @@ correlations, and item-total statistics, use <code><a href="https://rdrr.io/r/ba
 <span class="r-in"><span><span class="va">result</span>              <span class="co"># compact one-line overview</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis: 3 items</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Cronbach's Alpha = 0.047 (Poor), McDonald's Omega = 0.047, N = 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>     <span class="co"># full detailed output</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Analysis Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Items: trust_government, trust_media, trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Items:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_government  Trust in government (1=none, 5=complete)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_media       Trust in media (1=none, 5=complete)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science     Trust in science (1=none, 5=complete)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - N of Items: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Reliability Statistics</span>
@@ -119,30 +123,32 @@ correlations, and item-total statistics, use <code><a href="https://rdrr.io/r/ba
 <span class="r-out co"><span class="r-pr">#&gt;</span>   N (listwise):                  2135</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Item Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item  mean    sd    n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government 2.621 1.162 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media 2.430 1.156 2135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science 3.624 1.034 2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Item                                        Mean  Std. Deviation     N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  Trust in government ...  2.621           1.162  2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media       Trust in media (1=no...  2.430           1.156  2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_science     Trust in science (1=...  3.624           1.034  2135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.014         0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.014       1.000         0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.020       0.015         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Inter-Item Correlation Matrix</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                           (1)    (2)    (3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (1) trust_government  1.000  0.014  0.020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (2) trust_media       0.014  1.000  0.015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (3) trust_science     0.020  0.015  1.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Item-Total Statistics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              item scale_mean_deleted scale_var_deleted corrected_r</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  trust_government               6.05             2.440       0.024</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trust_media               6.25             2.467       0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trust_science               5.05             2.723       0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  alpha_deleted omega_deleted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.029            NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.040            NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.027            NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     Scale Mean  Scale Var.   Corrected  Alpha if  Omega if</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Item              if Deleted  if Deleted  Item-Total   Deleted   Deleted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government       6.054       2.440       0.024     0.029          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media            6.245       2.467       0.020     0.040          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_science          5.051       2.723       0.025     0.027          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Note: Omega if item deleted requires at least 4 items</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (a one-factor model on the remaining 2 items is not identified).</span>
 <span class="r-in"><span></span></span>

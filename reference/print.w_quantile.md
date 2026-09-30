@@ -1,8 +1,8 @@
 # Print method for w_quantile objects
 
-Prints a formatted summary of weighted quantile calculations, including
-quantiles, sample sizes, and weights (if applicable). For grouped data,
-results are displayed by group.
+Prints one row per variable with the requested quantiles, N and Missing
+(with weights: sums of weights, as in SPSS). For grouped data, one table
+per group.
 
 ## Usage
 

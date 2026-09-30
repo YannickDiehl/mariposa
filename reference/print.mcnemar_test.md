@@ -43,7 +43,7 @@ result <- mcnemar_test(test_data, var1 = trust_gov_high,
                        var2 = trust_media_high)
 result              # compact one-line overview
 #> McNemar Test: trust_gov_high x trust_media_high
-#>   chi2 = 15.116, p < 0.001 (asymp), p < 0.001 (exact) ***, N = 2227
+#>   chi2(1) = 15.116 (cc), p < 0.001 (asymptotic), p < 0.001 *** (exact), N = 2227
 #> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> McNemar Test Results
@@ -51,20 +51,20 @@ summary(result)     # full detailed output
 #> 
 #> - Variable 1: trust_gov_high
 #> - Variable 2: trust_media_high
+#> - Continuity correction: yes (cc)
 #> 
 #> 2x2 Contingency Table:
-#> ---------------------------------------- 
-#>    v2
-#> v1     0    1
-#>   0 1342  338
-#>   1  448   99
-#> ---------------------------------------- 
+#>               trust_media_high
+#> trust_gov_high    0   1
+#>              0 1342 338
+#>              1  448  99
 #> 
 #> Test Results:
-#> ----------------------------------------- 
-#>  Chi-Sq (cc) p (asymp) p (exact)    N Sig 
-#>       15.116     <.001     <.001 2227 *** 
-#> ----------------------------------------- 
+#> ---------------------------------------------------------
+#>          Chi-Sq (cc)  df  p (asymp)  p (exact)          N
+#> ---------------------------------------------------------
+#> McNemar       15.116   1      <.001      <.001  ***  2227
+#> ---------------------------------------------------------
 #> 
 #> Discordant pairs: b = 338, c = 448
 #> 

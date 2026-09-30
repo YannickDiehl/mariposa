@@ -38,18 +38,20 @@ Invisibly returns the input object `x`.
 result <- pearson_cor(survey_data, age, life_satisfaction)
 result              # compact one-line overview
 #> Pearson Correlation: age x life_satisfaction
-#>   r = -0.029, p = 0.158 , N = 2421
+#>   r = -0.029, p = 0.158, N = 2421
+#> Use summary() for detailed output.
 summary(result)     # full correlation matrices
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> Pearson Correlation
+#> -------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Correlation: r = -0.029
-#>   p-value: p = 0.158 
+#>   p-value (2-tailed): p = 0.158
 #>   N = 2421
 #>   95% CI: [-0.068, 0.011]
 #>   r-squared: 0.001

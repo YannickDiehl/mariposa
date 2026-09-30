@@ -41,12 +41,16 @@ binomial_test(data, ..., p = 0.5, weights = NULL, conf.level = 0.95)
 - p:
 
   The hypothesized proportion to test against (Default: 0.50 = 50
-  percent). This refers to the proportion of the first category (first
-  factor level, or the lower numeric value).
+  percent). It refers to Group 1, the category of the first valid case
+  in the data (as in SPSS). With 0.5 the test is two-tailed; with any
+  other value it is one-tailed in the direction of the observed
+  proportion, as SPSS reports it.
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - conf.level:
 
@@ -61,9 +65,11 @@ including:
 
 - Test proportion (null hypothesis)
 
-- Exact p-value (two-sided)
+- Exact p-value (two-tailed for `p = 0.5`, otherwise one-tailed; column
+  `alternative`: "two.sided", "less" or "greater")
 
-- Confidence interval for the true proportion
+- Confidence interval for the true proportion of Group 1
+  (Clopper-Pearson)
 
 ## Details
 
@@ -108,7 +114,19 @@ Use the binomial test when:
 - For comparing proportions between groups: Use chi-square or z-test for
   proportions
 
-- For larger samples with normal approximation:
+- For larger samples with normal approximation: results will be very
+  similar to a one-sample z-test for proportions
+
+### Group 1 and one-tailed tests
+
+As in SPSS `NPAR TESTS /BINOMIAL`, Group 1 is the category of the first
+valid case in the data (per group with
+[`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)),
+and `p` is its hypothesized proportion. For `p = 0.5` the p-value is
+two-tailed. For any other `p` SPSS reports a one-tailed p-value in the
+direction of the observed proportion ("the proportion of cases in the
+first group \< p"); `binomial_test()` does the same. To test the other
+category, put a case of it first or use `1 - p`.
 
 ### Weighted variants
 
@@ -118,8 +136,6 @@ that reduces exactly to the unweighted test when all weights equal 1
 (enforced by an internal invariance suite); see
 [`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
 for validation status.
-
-Results will be very similar to a one-sample z-test for proportions
 
 ## References
 
@@ -159,7 +175,7 @@ data(survey_data)
 survey_data %>%
   binomial_test(gender, p = 0.50)
 #> Binomial Test: gender
-#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500
 #> Use summary() for detailed output.
 
 # Test whether East region proportion is 50%
@@ -173,7 +189,7 @@ survey_data %>%
 survey_data %>%
   binomial_test(gender, region, p = 0.50)
 #> Binomial Test: gender
-#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500
 #> Binomial Test: region
 #>   Group 1 (East): prop = 0.194 vs 0.500, p < 0.001 ***, N = 2500
 #> Use summary() for detailed output.
@@ -182,17 +198,17 @@ survey_data %>%
 survey_data %>%
   binomial_test(gender, p = 0.50, weights = sampling_weight)
 #> Binomial Test: gender [Weighted]
-#>   Group 1 (Male): prop = 0.478 vs 0.500, p = 0.026 *, N = 2500
+#>   Group 1 (Female): prop = 0.522 vs 0.500, p = 0.026 *, N = 2500
 #> Use summary() for detailed output.
 
 # Grouped analysis (separate test per region)
 survey_data %>%
   group_by(region) %>%
   binomial_test(gender, p = 0.50)
-#> [region = 1]
+#> [region = East]
 #> Binomial Test: gender
-#>   Group 1 (Male): prop = 0.491 vs 0.500, p = 0.716 , N = 485
-#> [region = 2]
+#>   Group 1 (Female): prop = 0.509 vs 0.500, p = 0.716, N = 485
+#> [region = West]
 #> Binomial Test: gender
 #>   Group 1 (Male): prop = 0.474 vs 0.500, p = 0.023 *, N = 2015
 #> Use summary() for detailed output.

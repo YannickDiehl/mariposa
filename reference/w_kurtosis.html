@@ -96,12 +96,16 @@ variables or use helpers like <code>starts_with("trust")</code></p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Survey weights to make results representative of your population.
-Without weights, you get the simple sample kurtosis.</p></dd>
+<dd><p>Survey weights to make results representative of your
+population. Without weights, you get the simple sample kurtosis. Give a
+column name (unquoted or as a string), an expression such as
+<code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Remove missing values before calculating? (Default: TRUE)</p></dd>
+<dd><p>Remove missing values before calculating? (Default: TRUE).
+With <code>FALSE</code>, the result for a variable that contains missing
+values is <code>NA</code> (as in base R).</p></dd>
 
 
 <dt id="arg-excess">excess<a class="anchor" aria-label="anchor" href="#arg-excess"></a></dt>
@@ -129,7 +133,9 @@ number of valid observations used.</p>
 </ul></li>
 <li><p><strong>Effective N</strong>: How many independent observations your weighted data
 represents.</p></li>
-<li><p><strong>N</strong>: The actual number of observations used.</p></li>
+<li><p><strong>N / Missing</strong>: Valid and missing cases. With weights, both are sums
+of weights (displayed rounded), as SPSS reports them under
+<code>WEIGHT BY</code>; Kish's effective N is shown by <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</p></li>
 </ul><p>Kurtosis is often checked together with skewness to assess normality. Both
 should be close to zero for normally distributed data.</p>
 </div>
@@ -193,60 +199,66 @@ and kurtosis. The Statistician, 47(1), 183-189.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Excess Kurtosis Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age            -0.396      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Kurtosis     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         -0.396  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_kurtosis</span><span class="op">(</span><span class="va">age</span>, <span class="va">income</span>, <span class="va">life_satisfaction</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Excess Kurtosis Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age            -0.396      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- income ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    income             0.388      2158.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- life_satisfaction ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  life_satisfaction            -0.598      2390.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable           Kurtosis     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age                  -0.396  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   income                0.388  2201      315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   life_satisfaction    -0.598  2437       79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped data</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_kurtosis</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Excess Kurtosis Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = East</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age            -0.389         477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Kurtosis    N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         -0.389  509        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group: region = West</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age            -0.396      1993.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Kurtosis     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         -0.396  2007        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Raw kurtosis (not excess)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">w_kurtosis</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span>, excess <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Kurtosis Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weights: sampling_weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable weighted_kurtosis Effective_N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age             2.604      2468.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Kurtosis     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age          2.604  2516        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In summarise context</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>kurt_age <span class="op">=</span> <span class="fu">w_kurtosis</span><span class="op">(</span><span class="va">age</span>, weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -261,10 +273,11 @@ and kurtosis. The Statistician, 47(1), 183-189.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Excess Kurtosis Statistics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --- age ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Variable kurtosis    N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       age   -0.364 2500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable  Kurtosis     N  Missing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   age         -0.364  2500        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---------------------------------</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

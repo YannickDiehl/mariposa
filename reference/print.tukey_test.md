@@ -57,21 +57,22 @@ summary(result)     # full comparison tables
 #> --- life_satisfaction ---
 #> 
 #> Tukey Results:
-#>   --------------------------------------------------------------------------------------- 
-#>   Comparison                                 Difference  Lower CI  Upper CI  p-value  Sig 
-#>   --------------------------------------------------------------------------------------- 
-#>   Intermediate Secondary-Basic Secondary          0.497     0.344     0.649    <.001  *** 
-#>   Academic Secondary-Basic Secondary              0.649     0.496     0.802    <.001  *** 
-#>   University-Basic Secondary                      0.843     0.666     1.019    <.001  *** 
-#>   Academic Secondary-Intermediate Secondary       0.153    -0.010     0.316     .075      
-#>   University-Intermediate Secondary               0.346     0.161     0.531    <.001  *** 
-#>   University-Academic Secondary                   0.193     0.008     0.379     .037    * 
-#>   --------------------------------------------------------------------------------------- 
+#>   ----------------------------------------------------------------------------------------------------------------
+#>   (I) - (J)                                    Mean Difference (I-J)  Std. Error  p-value  Lower CI  Upper CI     
+#>   ----------------------------------------------------------------------------------------------------------------
+#>   Basic Secondary - Intermediate Secondary                    -0.497       0.059    <.001    -0.649    -0.344  ***
+#>   Basic Secondary - Academic Secondary                        -0.649       0.060    <.001    -0.802    -0.496  ***
+#>   Basic Secondary - University                                -0.843       0.069    <.001    -1.019    -0.666  ***
+#>   Intermediate Secondary - Academic Secondary                 -0.153       0.063     .075    -0.316     0.010     
+#>   Intermediate Secondary - University                         -0.346       0.072    <.001    -0.531    -0.161  ***
+#>   Academic Secondary - University                             -0.193       0.072     .037    -0.379    -0.008    *
+#>   ----------------------------------------------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
+#> - (I) - (J): mean of the first group (I) minus mean of the second (J)
 #> - Positive differences: First group > Second group
 #> - Negative differences: First group < Second group
 #> - Confidence intervals not containing 0 indicate significant differences

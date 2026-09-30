@@ -25,9 +25,10 @@ center(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE)
 
 - weights:
 
-  Optional survey weights (unquoted column name or numeric vector). When
-  provided, the weighted mean is subtracted instead of the unweighted
-  mean.
+  Optional survey weights. When provided, the weighted mean is
+  subtracted instead of the unweighted mean. Give a column name
+  (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - suffix:
 
@@ -58,6 +59,13 @@ frame, the modified data frame (invisibly).
 
 When `weights` is provided, the weighted mean is used for centering.
 This accounts for survey design in the centering computation.
+
+### Missing Values
+
+The result is a plain numeric variable (value labels are dropped, the
+variable label is kept with " (centered)" appended). Missing values of
+imported data, including their SPSS missing types, become plain `NA`, as
+in an SPSS `COMPUTE`.
 
 ## See also
 

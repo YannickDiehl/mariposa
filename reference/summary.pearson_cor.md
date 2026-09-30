@@ -59,15 +59,16 @@ for the main analysis function.
 result <- pearson_cor(survey_data, trust_government, trust_media)
 summary(result)
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> Pearson Correlation
+#> -------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Correlation: r = 0.009
-#>   p-value: p = 0.674 
+#>   p-value (2-tailed): p = 0.674
 #>   N = 2227
 #>   95% CI: [-0.033, 0.050]
 #>   r-squared: 0.000
@@ -75,11 +76,12 @@ summary(result)
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)
 #> 
-#> Pearson Correlation 
-#> --------------------
+#> Pearson Correlation
+#> -------------------
 #> 
 #> - Missing data handling: pairwise deletion
 #> - Confidence level: 95.0%
+#> - Alternative hypothesis: two.sided
 #> 
 #> 
 #>   Correlation: r = 0.009

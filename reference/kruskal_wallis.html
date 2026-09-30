@@ -116,11 +116,14 @@ employment). Must have at least 2 groups (3+ for meaningful use).</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Optional survey weights for population-representative results</p></dd>
+<dd><p>Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as <code>sampling_weight * 2</code>, or a numeric vector with one weight per row.</p></dd>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
-<dd><p>Confidence level for intervals (Default: 0.95 = 95%)</p></dd>
+<dd><p>Not used. Rank tests report no confidence interval (SPSS
+<code>NPAR TESTS</code> neither); kept for backward compatibility.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -230,7 +233,7 @@ in Sport Sciences, 1(21), 19-25.</p>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071 (medium), N = 2421</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple variables</span></span></span>
@@ -238,22 +241,22 @@ in Sport Sciences, 1(21), 19-25.</p>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, <span class="va">income</span>, <span class="va">trust_government</span>,</span></span>
 <span class="r-in"><span>                 group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071, N = 2421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 171.178, p &lt; 0.001 ***, eps2 = 0.071 (medium), N = 2421</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: income by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 814.174, p &lt; 0.001 ***, eps2 = 0.373, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 814.174, p &lt; 0.001 ***, eps2 = 0.373 (large), N = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_government by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 1.235, p = 0.745, eps2 = 0.001 (negligible), N = 2354</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"trust_"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_government by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 1.235, p = 0.745 , eps2 = 0.001, N = 2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 1.235, p = 0.745, eps2 = 0.001 (negligible), N = 2354</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_media by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 2.709, p = 0.439 , eps2 = 0.001, N = 2367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 2.709, p = 0.439, eps2 = 0.001 (negligible), N = 2367</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: trust_science by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 3.047, p = 0.384 , eps2 = 0.001, N = 2398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 3.047, p = 0.384, eps2 = 0.001 (negligible), N = 2398</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weighted analysis</span></span></span>
@@ -261,26 +264,26 @@ in Sport Sciences, 1(21), 19-25.</p>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span>,</span></span>
 <span class="r-in"><span>                 weights <span class="op">=</span> <span class="va">sampling_weight</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education [Weighted]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 167.075, p &lt; 0.001 ***, eps2 = 0.069, N = 2437</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 167.075, p &lt; 0.001 ***, eps2 = 0.069 (medium), N = 2437</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Grouped analysis (separate test for each region)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">education</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = East]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 17.105, p &lt; 0.001 ***, eps2 = 0.037, N = 465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [region = 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 17.105, p &lt; 0.001 ***, eps2 = 0.037 (small), N = 465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [region = West]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: life_satisfaction by education</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 158.807, p &lt; 0.001 ***, eps2 = 0.081, N = 1956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(3) = 158.807, p &lt; 0.001 ***, eps2 = 0.081 (medium), N = 1956</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare across employment status (5 groups)</span></span></span>
 <span class="r-in"><span><span class="va">survey_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">kruskal_wallis</span><span class="op">(</span><span class="va">income</span>, group <span class="op">=</span> <span class="va">employment</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Kruskal-Wallis Test: income by employment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   H(4) = 28.026, p &lt; 0.001 ***, eps2 = 0.013, N = 2186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   H(4) = 28.026, p &lt; 0.001 ***, eps2 = 0.013 (small), N = 2186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use summary() for detailed output.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

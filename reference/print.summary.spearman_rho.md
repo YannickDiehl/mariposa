@@ -41,8 +41,8 @@ for summary options.
 result <- spearman_rho(survey_data, age, life_satisfaction)
 summary(result)                             # all matrices
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: age, life_satisfaction
@@ -51,15 +51,15 @@ summary(result)                             # all matrices
 #> 
 #> 
 #>   Spearman's rho: rho = -0.024
-#>   p-value: p = 0.238 
+#>   p-value (2-tailed): p = 0.238
 #>   N = 2421
 #>   t-statistic: -1.180
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 summary(result, pvalue_matrix = FALSE)      # hide p-values
 #> 
-#> Spearman's Rank Correlation Analysis 
-#> -------------------------------------
+#> Spearman's Rank Correlation Analysis
+#> ------------------------------------
 #> 
 #> - Method: Spearman's rho (rank correlation)
 #> - Variables: age, life_satisfaction

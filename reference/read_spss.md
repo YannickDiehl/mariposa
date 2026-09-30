@@ -53,7 +53,13 @@ A tibble with the SPSS data. When `tag_na = TRUE`:
   [`haven::na_tag()`](https://haven.tidyverse.org/reference/tagged_na.html)
 
 - Each tagged variable has an `"na_tag_map"` attribute mapping tag
-  characters to original SPSS codes
+  characters to original SPSS codes, and an `"spss_missing"` attribute
+  with the original missing-value definition (used by
+  [`write_spss()`](https://YannickDiehl.github.io/mariposa/reference/write_spss.md)
+  for an exact round trip)
+
+A file that is not an SPSS `.sav` file (e.g. a Stata or Excel file) is
+reported with its apparent type and the matching reader.
 
 ## Details
 
@@ -122,6 +128,6 @@ if (requireNamespace("haven", quietly = TRUE)) {
 
   unlink(tmp)
 }
-#> ✔ Wrote 16 variables (2500 obs.) to file19bf547a10cf.sav
+#> ✔ Wrote 16 variables (2500 obs.) to file19412a420b0a.sav
 # }
 ```

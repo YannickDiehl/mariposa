@@ -3,8 +3,12 @@
 Convenience helpers that run
 [`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
 and return just the requested effect size as a numeric value (named by
-group for grouped data): `phi()` for 2x2 tables, `cramers_v()` for
-larger tables, and `goodman_gamma()` for ordinal variables.
+group for grouped data): `phi()` (sqrt(chi-squared / N); in a 2x2 table
+signed like SPSS's Phi, negative when the first row goes with the second
+column; bounded by 1 only in 2x2 tables), `cramers_v()` (normalized to
+0-1 for any table size), and `goodman_gamma()` for two ordinal
+variables. As in SPSS, Phi and Cramer's V are computed for any table
+size.
 
 For the full test output (chi-square statistic, p-value, all effect
 sizes), call
@@ -34,7 +38,9 @@ goodman_gamma(data, ..., weights = NULL)
 
 - weights:
 
-  Optional survey weights
+  Optional survey weights. Give a column name (unquoted or as a string),
+  an expression such as `sampling_weight * 2`, or a numeric vector with
+  one weight per row.
 
 ## Value
 

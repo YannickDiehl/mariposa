@@ -118,21 +118,21 @@ more analysis variables)? (Default: TRUE)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: Listwise deletion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Partial Correlation Matrix:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  trust_government trust_media trust_science</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government            1.000       0.014         0.020</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                 0.014       1.000         0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science               0.020       0.015         1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> --------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   trust_government  trust_media  trust_science</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_government                 1        0.014          0.020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_media                  0.014            1          0.015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trust_science                0.020        0.015              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government    trust_media      0.014         0.014  2132  0.645  .519  2135      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable 1        Variable 2     Partial r  Zero-order r    df      t     p     n  sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  trust_media        0.014         0.014  2132  0.645  .519  2135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, matrix <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
@@ -144,13 +144,13 @@ more analysis variables)? (Default: TRUE)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> - Missing: Listwise deletion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pairwise Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable 1           Variable 2  Partial r  Zero-order r    df      t     p     n  sig </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government    trust_media      0.014         0.014  2132  0.645  .519  2135      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Variable 1        Variable 2     Partial r  Zero-order r    df      t     p     n  sig</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  trust_media        0.014         0.014  2132  0.645  .519  2135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_government  trust_science      0.020         0.020  2132  0.938  .348  2135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trust_media       trust_science      0.015         0.015  2132  0.687  .492  2135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   --------------------------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05</span>
 <span class="r-in"><span></span></span>

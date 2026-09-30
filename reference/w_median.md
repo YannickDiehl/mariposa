@@ -26,11 +26,15 @@ w_median(data, ..., weights = NULL, na.rm = TRUE)
 - weights:
 
   Survey weights to make results representative of your population.
-  Without weights, you get the simple sample median.
+  Without weights, you get the simple sample median. Give a column name
+  (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - na.rm:
 
-  Remove missing values before calculating? (Default: TRUE)
+  Remove missing values before calculating? (Default: TRUE). With
+  `FALSE`, the result for a variable that contains missing values is
+  `NA` (as in base R).
 
 ## Value
 
@@ -49,7 +53,10 @@ of valid observations used.
 - **Effective N**: How many independent observations your weighted data
   represents.
 
-- **N**: The actual number of observations used.
+- **N / Missing**: Valid and missing cases. With weights, both are sums
+  of weights (displayed rounded), as SPSS reports them under
+  `WEIGHT BY`; Kish's effective N is shown by
+  [`summary()`](https://rdrr.io/r/base/summary.html).
 
 Comparing the weighted median to the weighted mean is informative:
 
@@ -122,45 +129,52 @@ survey_data %>% w_median(age, weights = sampling_weight)
 #> 
 #> Weighted Median Statistics
 #> --------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_median Effective_N
-#>       age              50      2468.8
-#> 
+#>   -------------------------------
+#>   Variable  Median     N  Missing
+#>   -------------------------------
+#>   age       50.000  2516        0
+#>   -------------------------------
 
 # Multiple variables
 survey_data %>% w_median(age, income, weights = sampling_weight)
 #> 
 #> Weighted Median Statistics
 #> --------------------------
+#> Weights: sampling_weight
 #> 
-#> --- age ---
-#>  Variable weighted_median Effective_N
-#>       age              50      2468.8
-#> 
-#> --- income ---
-#>  Variable weighted_median Effective_N
-#>    income            3500      2158.9
-#> 
+#>   ---------------------------------
+#>   Variable    Median     N  Missing
+#>   ---------------------------------
+#>   age         50.000  2516        0
+#>   income    3500.000  2201      315
+#>   ---------------------------------
 
 # Grouped data
 survey_data %>% group_by(region) %>% w_median(age, weights = sampling_weight)
 #> 
 #> Weighted Median Statistics
 #> --------------------------
+#> Weights: sampling_weight
 #> 
 #> Group: region = East
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_median Effective_N
-#>       age              53         477
+#>   ------------------------------
+#>   Variable  Median    N  Missing
+#>   ------------------------------
+#>   age       53.000  509        0
+#>   ------------------------------
 #> 
 #> Group: region = West
+#> --------------------
 #> 
-#> --- age ---
-#>  Variable weighted_median Effective_N
-#>       age              49      1993.1
-#> 
+#>   -------------------------------
+#>   Variable  Median     N  Missing
+#>   -------------------------------
+#>   age       49.000  2007        0
+#>   -------------------------------
 
 # In summarise context
 survey_data %>% summarise(med_age = w_median(age, weights = sampling_weight))
@@ -175,8 +189,9 @@ survey_data %>% w_median(age)
 #> Median Statistics
 #> -----------------
 #> 
-#> --- age ---
-#>  Variable median    N
-#>       age     50 2500
-#> 
+#>   -------------------------------
+#>   Variable  Median     N  Missing
+#>   -------------------------------
+#>   age       50.000  2500        0
+#>   -------------------------------
 ```

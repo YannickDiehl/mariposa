@@ -52,25 +52,37 @@ mann_whitney(
 
 - weights:
 
-  Optional survey weights for population-representative results
+  Optional survey weights for population-representative results. Give a
+  column name (unquoted or as a string), an expression such as
+  `sampling_weight * 2`, or a numeric vector with one weight per row.
 
 - mu:
 
-  The hypothesized difference (Default: 0, meaning no difference)
+  The hypothesized location shift of group 1 against group 2 (Default:
+  0, meaning no difference; this is the SPSS test). As in
+  [`wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html), group-1
+  values are shifted by `mu` before ranking, so U, W, Z, r and p all
+  refer to the same hypothesis. Only `mu = 0` is available with
+  `weights`.
 
 - alternative:
 
   Direction of the test:
 
-  - `"two.sided"` (default): Test if groups are different
+  - `"two.sided"` (default): Test if groups are different. Z is reported
+    as SPSS does, from the smaller U (never positive).
 
   - `"greater"`: Test if group 1 \> group 2
 
   - `"less"`: Test if group 1 \< group 2
 
+  For a one-sided test Z is directional (positive when group 1 tends to
+  have higher values), so its sign matches the p-value.
+
 - conf.level:
 
-  Confidence level for intervals (Default: 0.95 = 95%)
+  Not used. Rank tests report no confidence interval (SPSS `NPAR TESTS`
+  neither); kept for backward compatibility.
 
 ## Value
 
@@ -104,13 +116,11 @@ Test results showing whether groups differ, including:
 
 - \|r\| \< 0.1: Negligible difference
 
-- \|r\| ~ 0.1: Small difference
+- 0.1 to \< 0.3: Small difference
 
-- \|r\| ~ 0.3: Medium difference
+- 0.3 to \< 0.5: Medium difference
 
-- \|r\| ~ 0.5: Large difference
-
-- \|r\| \> 0.5: Very large difference
+- 0.5 or higher: Large difference
 
 **Rank Mean Difference**:
 
@@ -221,63 +231,70 @@ data(survey_data)
 survey_data %>%
   mann_whitney(age, group = gender)
 #> Mann-Whitney U Test: age by gender
-#>   U = 776,732, Z = -0.164, p = 0.870 , r = 0.003 (negligible), N = 2500
+#>   U = 776732, Z = -0.164, p = 0.870, r = 0.003 (negligible), N = 2500
+#> Use summary() for detailed output.
 
 # Multiple variables
 survey_data %>%
   mann_whitney(age, income, life_satisfaction, group = region)
 #> Mann-Whitney U Test: age by region
-#>   U = 462,234, Z = -1.850, p = 0.064 , r = 0.037 (negligible), N = 2500
+#>   U = 462234.5, Z = -1.850, p = 0.064, r = 0.037 (negligible), N = 2500
 #> Mann-Whitney U Test: income by region
-#>   U = 374,226, Z = -0.226, p = 0.821 , r = 0.005 (negligible), N = 2186
+#>   U = 374226.5, Z = -0.226, p = 0.821, r = 0.005 (negligible), N = 2186
 #> Mann-Whitney U Test: life_satisfaction by region
-#>   U = 452,568, Z = -0.168, p = 0.867 , r = 0.003 (negligible), N = 2421
+#>   U = 452568.5, Z = -0.168, p = 0.867, r = 0.003 (negligible), N = 2421
+#> Use summary() for detailed output.
 
 # Using tidyselect helpers
 survey_data %>%
   mann_whitney(starts_with("trust_"), group = gender)
 #> Mann-Whitney U Test: trust_government by gender
-#>   U = 678,806, Z = -0.775, p = 0.438 , r = 0.016 (negligible), N = 2354
+#>   U = 678805.5, Z = -0.775, p = 0.438, r = 0.016 (negligible), N = 2354
 #> Mann-Whitney U Test: trust_media by gender
-#>   U = 661,523, Z = -2.320, p = 0.020 *, r = 0.048 (negligible), N = 2367
+#>   U = 661523, Z = -2.320, p = 0.020 *, r = 0.048 (negligible), N = 2367
 #> Mann-Whitney U Test: trust_science by gender
-#>   U = 697,309, Z = -1.234, p = 0.217 , r = 0.025 (negligible), N = 2398
+#>   U = 697309, Z = -1.234, p = 0.217, r = 0.025 (negligible), N = 2398
+#> Use summary() for detailed output.
 
 # Weighted analysis
 survey_data %>%
   mann_whitney(income, group = region, weights = sampling_weight)
 #> Mann-Whitney U Test: income by region [Weighted]
-#>   U = 386,321, Z = -0.536, p = 0.592 , r = 0.011 (negligible), N = 2201
+#>   U = 386321.2, Z = -0.536, p = 0.592, r = 0.011 (negligible), N = 2201
+#> Use summary() for detailed output.
 
 # Grouped analysis (separate tests for each education level)
 survey_data %>%
   group_by(education) %>%
   mann_whitney(life_satisfaction, group = gender)
-#> [education = 1]
+#> [education = Basic Secondary]
 #> Mann-Whitney U Test: life_satisfaction by gender
-#>   U = 81,439, Z = -0.036, p = 0.971 , r = 0.001 (negligible), N = 809
-#> [education = 2]
+#>   U = 81439, Z = -0.036, p = 0.971, r = 0.001 (negligible), N = 809
+#> [education = Intermediate Secondary]
 #> Mann-Whitney U Test: life_satisfaction by gender
-#>   U = 45,218, Z = -1.001, p = 0.317 , r = 0.040 (negligible), N = 618
-#> [education = 3]
+#>   U = 45218, Z = -1.001, p = 0.317, r = 0.040 (negligible), N = 618
+#> [education = Academic Secondary]
 #> Mann-Whitney U Test: life_satisfaction by gender
-#>   U = 45,788, Z = -0.130, p = 0.897 , r = 0.005 (negligible), N = 607
-#> [education = 4]
+#>   U = 45787.5, Z = -0.130, p = 0.897, r = 0.005 (negligible), N = 607
+#> [education = University]
 #> Mann-Whitney U Test: life_satisfaction by gender
-#>   U = 17,319, Z = -1.281, p = 0.200 , r = 0.065 (negligible), N = 387
+#>   U = 17319, Z = -1.281, p = 0.200, r = 0.065 (negligible), N = 387
+#> Use summary() for detailed output.
 
 # One-sided test
 survey_data %>%
   mann_whitney(life_satisfaction, group = region, alternative = "greater")
 #> Mann-Whitney U Test: life_satisfaction by region
-#>   U = 452,568, Z = -0.168, p = 0.433 , r = 0.003 (negligible), N = 2421
+#>   U = 452568.5, Z = 0.168, p = 0.433, r = 0.003 (negligible), N = 2421
+#> Use summary() for detailed output.
 
 # --- Three-layer output ---
 result <- survey_data %>%
   mann_whitney(income, group = gender, weights = sampling_weight)
 result              # compact one-line overview
 #> Mann-Whitney U Test: income by gender [Weighted]
-#>   U = 592,273, Z = -0.755, p = 0.450 , r = 0.016 (negligible), N = 2201
+#>   U = 592273.4, Z = -0.755, p = 0.450, r = 0.016 (negligible), N = 2201
+#> Use summary() for detailed output.
 summary(result)     # full detailed output with all sections
 #> Weighted Mann-Whitney U Test Results
 #> ------------------------------------
@@ -285,22 +302,20 @@ summary(result)     # full detailed output with all sections
 #> - Grouping variable: gender
 #> - Groups compared: Male vs. Female
 #> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
 #> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
 #> 
-#>   Male: rank mean = 1111.3, n = 1047.9
-#>   Female: rank mean = 1090.7, n = 1153.1
-#> 
+#>   Male:    rank mean = 1111.32, n = 1048
+#>   Female:  rank mean = 1090.68, n = 1153
 #> 
 #> Weighted Mann-Whitney U Test Results:
-#> ------------------------------------------------------------ 
-#>            Test       U         W      Z p_value effect_r sig
-#>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    
-#> ------------------------------------------------------------ 
+#> ---------------------------------------------------------------------
+#>                          U            W       Z  p value  Effect r   
+#> ---------------------------------------------------------------------
+#> Mann-Whitney U  592273.432  1257619.327  -0.755     .450     0.016   
+#> ---------------------------------------------------------------------
 #> 
 #> 
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).
@@ -309,10 +324,10 @@ summary(result)     # full detailed output with all sections
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Effect Size Interpretation (r):
-#> - Negligible effect: |r| < 0.1
-#> - Small effect: |r| ~ 0.1
-#> - Medium effect: |r| ~ 0.3
-#> - Large effect: |r| ~ 0.5
+#> - Negligible: |r| < 0.1
+#> - Small: 0.1 <= |r| < 0.3
+#> - Medium: 0.3 <= |r| < 0.5
+#> - Large: |r| >= 0.5
 summary(result, effect_sizes = FALSE)  # hide effect sizes
 #> Weighted Mann-Whitney U Test Results
 #> ------------------------------------
@@ -320,22 +335,20 @@ summary(result, effect_sizes = FALSE)  # hide effect sizes
 #> - Grouping variable: gender
 #> - Groups compared: Male vs. Female
 #> - Weights variable: sampling_weight
-#> - Confidence level: 95.0%
 #> - Alternative hypothesis: two.sided
-#> - Null hypothesis (mu): 0.000
 #> 
 #> 
 #> --- income ---
 #> 
-#>   Male: rank mean = 1111.3, n = 1047.9
-#>   Female: rank mean = 1090.7, n = 1153.1
-#> 
+#>   Male:    rank mean = 1111.32, n = 1048
+#>   Female:  rank mean = 1090.68, n = 1153
 #> 
 #> Weighted Mann-Whitney U Test Results:
-#> ------------------------------------------------------------ 
-#>            Test       U         W      Z p_value effect_r sig
-#>  Mann-Whitney U 592,273 1,257,619 -0.755    0.45    0.016    
-#> ------------------------------------------------------------ 
+#> ---------------------------------------------------------------------
+#>                          U            W       Z  p value  Effect r   
+#> ---------------------------------------------------------------------
+#> Mann-Whitney U  592273.432  1257619.327  -0.755     .450     0.016   
+#> ---------------------------------------------------------------------
 #> 
 #> 
 #> Note: Weighted analysis uses design-based rank test (Lumley & Scott, 2013).

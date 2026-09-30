@@ -45,12 +45,12 @@ summary(result)
 #> - Variables: age, income
 #> 
 #> Tests of Normality
-#>   ------------------------------------------ 
-#>   Variable     KS    df   KS p      W    W p 
-#>   ------------------------------------------ 
-#>   age       0.028  2500  <.001  0.990  <.001 
-#>   income    0.079  2186  <.001  0.963  <.001 
-#>   ------------------------------------------ 
+#>   ------------------------------------------
+#>   Variable     KS    df   KS p      W    W p
+#>   ------------------------------------------
+#>   age       0.028  2500  <.001  0.990  <.001
+#>   income    0.079  2186  <.001  0.963  <.001
+#>   ------------------------------------------
 #> 
 #> KS = Kolmogorov-Smirnov statistic with Lilliefors significance correction.
 #> W = Shapiro-Wilk statistic (computed for 3 <= n <= 5000, as in SPSS).

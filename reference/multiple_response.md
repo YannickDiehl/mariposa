@@ -39,12 +39,17 @@ multiple_response(data, ..., by = NULL, counted = 1, weights = NULL)
 - counted:
 
   The value that counts as a mention (default `1`, matching SPSS
-  dichotomy sets with counted value 1).
+  dichotomy sets with counted value 1). For factor or character
+  indicators give the level that marks a mention, e.g.
+  `counted = "yes"`; a value that does not occur among their levels is
+  an error.
 
 - weights:
 
-  Optional survey weights (unquoted variable name), treated as frequency
-  weights matching SPSS `WEIGHT BY`.
+  Optional survey weights, treated as frequency weights matching SPSS
+  `WEIGHT BY`. Give a column name (unquoted or as a string), an
+  expression such as `sampling_weight * 2`, or a numeric vector with one
+  weight per row.
 
 ## Value
 
@@ -150,13 +155,15 @@ multiple_response(trust, gov, media, science)
 #> - Counted value: 1
 #> 
 #> Frequencies
-#>   --------------------------------------------- 
-#>   Option   Responses n  Responses %  % of Cases 
-#>   --------------------------------------------- 
-#>   gov            583.0         23.0        23.3 
-#>   media          470.0         18.6        18.8 
-#>   science       1479.0         58.4        59.2 
-#>   --------------------------------------------- 
+#>   ---------------------------------------------
+#>   Option   Responses n  Responses %  % of Cases
+#>   ---------------------------------------------
+#>   gov              583         23.0        23.3
+#>   media            470         18.6        18.8
+#>   science         1479         58.4        59.2
+#>   ---------------------------------------------
+#>   Total           2532        100.0       101.3
+#>   ---------------------------------------------
 #>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0
 #>   % of Cases can sum above 100% (multiple mentions per case).
 
@@ -172,29 +179,33 @@ multiple_response(trust, gov, media, science,
 #> - By: gender
 #> 
 #> Frequencies
-#>   --------------------------------------------- 
-#>   Option   Responses n  Responses %  % of Cases 
-#>   --------------------------------------------- 
-#>   gov            585.8         22.9        23.3 
-#>   media          476.5         18.7        18.9 
-#>   science       1490.3         58.4        59.2 
-#>   --------------------------------------------- 
+#>   ---------------------------------------------
+#>   Option   Responses n  Responses %  % of Cases
+#>   ---------------------------------------------
+#>   gov              586         22.9        23.3
+#>   media            477         18.7        18.9
+#>   science         1490         58.4        59.2
+#>   ---------------------------------------------
+#>   Total           2553        100.0       101.5
+#>   ---------------------------------------------
 #>   Valid cases: 2516 | Total responses: 2553 | Excluded (all missing): 0
 #>   % of Cases can sum above 100% (multiple mentions per case).
 #> 
 #> Crosstab: set BY gender (% of cases per column)
-#>   --------------------------------- 
-#>   Option          Male       Female 
-#>   --------------------------------- 
-#>   gov      280 (23.4%)  306 (23.2%) 
-#>   media    214 (17.9%)  262 (19.8%) 
-#>   science  694 (58.1%)  797 (60.3%) 
-#>   --------------------------------- 
-#>   Cases per column - Male: 1195, Female: 1321
+#>   -----------------------------------------------------
+#>   Option                Male       Female         Total
+#>   -----------------------------------------------------
+#>   gov            280 (23.4%)  306 (23.2%)   586 (23.3%)
+#>   media          214 (17.9%)  262 (19.8%)   477 (18.9%)
+#>   science        694 (58.1%)  797 (60.3%)  1490 (59.2%)
+#>   -----------------------------------------------------
+#>   Total (cases)         1195         1321          2516
+#>   -----------------------------------------------------
+#>   Percentages and totals are based on cases (respondents).
 
 # --- Three-layer output ---
 result <- multiple_response(trust, gov, media, science)
-result              # compact overview
+result              # full tables
 #> 
 #> Multiple Response Results
 #> -------------------------
@@ -202,16 +213,18 @@ result              # compact overview
 #> - Counted value: 1
 #> 
 #> Frequencies
-#>   --------------------------------------------- 
-#>   Option   Responses n  Responses %  % of Cases 
-#>   --------------------------------------------- 
-#>   gov            583.0         23.0        23.3 
-#>   media          470.0         18.6        18.8 
-#>   science       1479.0         58.4        59.2 
-#>   --------------------------------------------- 
+#>   ---------------------------------------------
+#>   Option   Responses n  Responses %  % of Cases
+#>   ---------------------------------------------
+#>   gov              583         23.0        23.3
+#>   media            470         18.6        18.8
+#>   science         1479         58.4        59.2
+#>   ---------------------------------------------
+#>   Total           2532        100.0       101.3
+#>   ---------------------------------------------
 #>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0
 #>   % of Cases can sum above 100% (multiple mentions per case).
-summary(result)     # full detailed output
+summary(result)     # same tables, with section toggles
 #> 
 #> Multiple Response Results
 #> -------------------------
@@ -219,13 +232,15 @@ summary(result)     # full detailed output
 #> - Counted value: 1
 #> 
 #> Frequencies
-#>   --------------------------------------------- 
-#>   Option   Responses n  Responses %  % of Cases 
-#>   --------------------------------------------- 
-#>   gov            583.0         23.0        23.3 
-#>   media          470.0         18.6        18.8 
-#>   science       1479.0         58.4        59.2 
-#>   --------------------------------------------- 
+#>   ---------------------------------------------
+#>   Option   Responses n  Responses %  % of Cases
+#>   ---------------------------------------------
+#>   gov              583         23.0        23.3
+#>   media            470         18.6        18.8
+#>   science         1479         58.4        59.2
+#>   ---------------------------------------------
+#>   Total           2532        100.0       101.3
+#>   ---------------------------------------------
 #>   Valid cases: 2500 | Total responses: 2532 | Excluded (all missing): 0
 #>   % of Cases can sum above 100% (multiple mentions per case).
 ```

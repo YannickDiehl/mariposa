@@ -73,21 +73,22 @@ summary(result)
 #> --- life_satisfaction ---
 #> 
 #> Scheffe Results:
-#>   ----------------------------------------------------------------------------------------- 
-#>   Comparison                                   Difference  Lower CI  Upper CI  p-value  Sig 
-#>   ----------------------------------------------------------------------------------------- 
-#>   Basic Secondary - Intermediate Secondary         -0.497    -0.662    -0.331    <.001  *** 
-#>   Basic Secondary - Academic Secondary             -0.649    -0.816    -0.483    <.001  *** 
-#>   Basic Secondary - University                     -0.843    -1.034    -0.651    <.001  *** 
-#>   Intermediate Secondary - Academic Secondary      -0.153    -0.330     0.024     .121      
-#>   Intermediate Secondary - University              -0.346    -0.547    -0.145    <.001  *** 
-#>   Academic Secondary - University                  -0.193    -0.395     0.009     .067      
-#>   ----------------------------------------------------------------------------------------- 
+#>   ----------------------------------------------------------------------------------------------------------------
+#>   (I) - (J)                                    Mean Difference (I-J)  Std. Error  p-value  Lower CI  Upper CI     
+#>   ----------------------------------------------------------------------------------------------------------------
+#>   Basic Secondary - Intermediate Secondary                    -0.497       0.059    <.001    -0.662    -0.331  ***
+#>   Basic Secondary - Academic Secondary                        -0.649       0.060    <.001    -0.816    -0.483  ***
+#>   Basic Secondary - University                                -0.843       0.069    <.001    -1.034    -0.651  ***
+#>   Intermediate Secondary - Academic Secondary                 -0.153       0.063     .121    -0.330     0.024     
+#>   Intermediate Secondary - University                         -0.346       0.072    <.001    -0.547    -0.145  ***
+#>   Academic Secondary - University                             -0.193       0.072     .067    -0.395     0.009     
+#>   ----------------------------------------------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 #> 
 #> Interpretation:
+#> - (I) - (J): mean of the first group (I) minus mean of the second (J)
 #> - Positive differences: First group > Second group
 #> - Negative differences: First group < Second group
 #> - Confidence intervals not containing 0 indicate significant differences
@@ -107,16 +108,16 @@ summary(result, interpretation = FALSE)
 #> --- life_satisfaction ---
 #> 
 #> Scheffe Results:
-#>   ----------------------------------------------------------------------------------------- 
-#>   Comparison                                   Difference  Lower CI  Upper CI  p-value  Sig 
-#>   ----------------------------------------------------------------------------------------- 
-#>   Basic Secondary - Intermediate Secondary         -0.497    -0.662    -0.331    <.001  *** 
-#>   Basic Secondary - Academic Secondary             -0.649    -0.816    -0.483    <.001  *** 
-#>   Basic Secondary - University                     -0.843    -1.034    -0.651    <.001  *** 
-#>   Intermediate Secondary - Academic Secondary      -0.153    -0.330     0.024     .121      
-#>   Intermediate Secondary - University              -0.346    -0.547    -0.145    <.001  *** 
-#>   Academic Secondary - University                  -0.193    -0.395     0.009     .067      
-#>   ----------------------------------------------------------------------------------------- 
+#>   ----------------------------------------------------------------------------------------------------------------
+#>   (I) - (J)                                    Mean Difference (I-J)  Std. Error  p-value  Lower CI  Upper CI     
+#>   ----------------------------------------------------------------------------------------------------------------
+#>   Basic Secondary - Intermediate Secondary                    -0.497       0.059    <.001    -0.662    -0.331  ***
+#>   Basic Secondary - Academic Secondary                        -0.649       0.060    <.001    -0.816    -0.483  ***
+#>   Basic Secondary - University                                -0.843       0.069    <.001    -1.034    -0.651  ***
+#>   Intermediate Secondary - Academic Secondary                 -0.153       0.063     .121    -0.330     0.024     
+#>   Intermediate Secondary - University                         -0.346       0.072    <.001    -0.547    -0.145  ***
+#>   Academic Secondary - University                             -0.193       0.072     .067    -0.395     0.009     
+#>   ----------------------------------------------------------------------------------------------------------------
 #> 
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05

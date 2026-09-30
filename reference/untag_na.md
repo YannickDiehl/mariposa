@@ -15,23 +15,31 @@ instead.
 ## Usage
 
 ``` r
-untag_na(x)
+untag_na(x, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  A numeric vector with tagged NAs.
+  A numeric vector with tagged NAs, or a data frame.
+
+- ...:
+
+  For a data frame: the columns to convert (tidyselect). If empty, every
+  numeric column is converted. Ignored for vectors.
 
 ## Value
 
-A numeric vector where tagged NAs with numeric codes have been replaced
-with their original values (e.g., -9, -8, -42). System NAs (untagged)
-remain as `NA`. For native Stata/SAS tagged NAs (no numeric codes),
+The input with tagged NAs that have numeric codes replaced by their
+original values (e.g., -9, -8, -42). System NAs (untagged) remain `NA`.
+Value labels and the variable label are kept (labels of missing types
+are attached to their codes again), so the result is `haven_labelled`
+when the input was. For native Stata/SAS tagged NAs (no numeric codes),
 falls back to
 [`strip_tags()`](https://YannickDiehl.github.io/mariposa/reference/strip_tags.md)
-behavior with a warning.
+behavior with a warning. A data frame is returned with the selected
+columns converted.
 
 ## See also
 
@@ -60,6 +68,7 @@ if (requireNamespace("haven", quietly = TRUE)) {
   x <- set_na(c(1, 2, -9, 3, -8), -9, -8)
   untag_na(x)   # -9 and -8 are back
 }
+#> <labelled<double>[5]>
 #> [1]  1  2 -9  3 -8
 # }
 ```

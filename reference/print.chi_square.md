@@ -38,41 +38,44 @@ Invisibly returns the input object `x`.
 ``` r
 result <- chi_square(survey_data, gender, education)
 result              # compact one-line overview
-#> Chi-Squared Test: gender × education
-#>   chi2(3) = 3.470, p = 0.325 , V = 0.037 (neglig.), N = 2500
+#> Chi-Squared Test: gender x education
+#>   chi2(3) = 3.470, p = 0.325, V = 0.037 (negligible), N = 2500
+#> Use summary() for detailed output.
 summary(result)     # full detailed output
 #> 
-#> Chi-Squared Test of Independence 
-#> ---------------------------------
+#> Chi-Squared Test of Independence
+#> --------------------------------
 #> 
-#> - Variables: gender × education
+#> - Variables: gender x education
 #> 
 #> Observed Frequencies:
 #>         education
-#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
-#>   Male               401                  289                320        184
-#>   Female             440                  340                311        215
+#> gender   Basic Secondary Intermediate Secondary Academic Secondary University
+#>   Male               401                    289                320        184
+#>   Female             440                    340                311        215
 #> 
 #> Expected Frequencies:
 #>         education
-#> gender   Basic Secondary Intermediate Seco... Academic Secondary University
-#>   Male           401.662               300.41            301.366    190.562
-#>   Female         439.338               328.59            329.634    208.438
+#> gender   Basic Secondary Intermediate Secondary Academic Secondary University
+#>   Male           401.662                300.410            301.366    190.562
+#>   Female         439.338                328.590            329.634    208.438
 #> 
 #> Chi-Squared Test Results:
-#> -------------------------------------------------- 
-#>  Chi_squared df p_value sig
-#>         3.47  3   0.325    
-#> -------------------------------------------------- 
+#> -----------------------------------------
+#>                     Value  df  p value   
+#> -----------------------------------------
+#> Pearson Chi-Square  3.470   3     .325   
+#> -----------------------------------------
 #> 
 #> Effect Sizes:
-#> ---------------------------------------------------------------------- 
-#>     Measure  Value p_value sig Interpretation
-#>  Cramer's V  0.037   0.325            Neglig.
-#>       Gamma -0.008   0.850               Weak
-#> ---------------------------------------------------------------------- 
-#> Table size: 2×4 | N = 2500
-#> Note: Phi coefficient only shown for 2x2 tables
+#> ---------------------------------------------
+#> Measure     Value  p value     Interpretation
+#> ---------------------------------------------
+#> Phi         0.037     .325                   
+#> Cramer's V  0.037     .325         Negligible
+#> ---------------------------------------------
+#> Table size: 2 x 4 | N = 2500
+#> Note: Gamma is shown for two ordinal variables (ordered factor or numeric) only.
 #> 
 #> Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05
 ```

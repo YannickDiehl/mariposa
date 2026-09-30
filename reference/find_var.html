@@ -67,7 +67,12 @@ and the actual meaning is stored in variable labels.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">find_var</span><span class="op">(</span><span class="va">data</span>, <span class="va">pattern</span>, search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name_label"</span>, <span class="st">"name"</span>, <span class="st">"label"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">find_var</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">pattern</span>,</span>
+<span>  search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name_label"</span>, <span class="st">"name"</span>, <span class="st">"label"</span><span class="op">)</span>,</span>
+<span>  fixed <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -88,6 +93,16 @@ names and/or labels. Case-insensitive by default.</p></dd>
 variable names and labels, <code>"name"</code> searches only names, <code>"label"</code>
 searches only labels.</p></dd>
 
+
+<dt id="arg-fixed">fixed<a class="anchor" aria-label="anchor" href="#arg-fixed"></a></dt>
+<dd><p>If <code>TRUE</code>, <code>pattern</code> is searched as literal text
+(case-insensitive), e.g. <code>find_var(data, "BEFRAGTE(R)", fixed =
+  TRUE)</code> for label text with parentheses. Default <code>FALSE</code>: regular
+expression. A pattern that is not a valid regular expression (e.g.
+<code>"("</code>) is searched as literal text automatically, and a message
+points to <code>fixed = TRUE</code> when the literal text would give other
+matches.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -101,7 +116,9 @@ searches only labels.</p></dd>
 <dd><p>Variable label (or <code>""</code> if none)</p></dd>
 
 
-</dl></div>
+</dl><p>Without matches, an empty data frame is returned invisibly (with a
+message).</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
@@ -125,7 +142,11 @@ case-insensitive. Some examples:</p>
 <li><p><code>"^trust"</code> — matches only names/labels starting with "trust"</p></li>
 <li><p><code>"^q[0-9]+"</code> — matches variable names like q1, q23, q104</p></li>
 <li><p><code>"zufried"</code> — finds German labels containing "Zufriedenheit"</p></li>
-</ul></div>
+</ul><p>Label text often contains characters with a special meaning in regular
+expressions, such as parentheses: <code>"BEFRAGTE(R)"</code> as a regular
+expression matches "BEFRAGTER". Use <code>fixed = TRUE</code> to search for
+the text exactly as written.</p>
+</div>
 
     </div>
     <div class="section level2">
@@ -165,8 +186,11 @@ case-insensitive. Some examples:</p>
 <span class="r-in"><span><span class="co"># Use regex to find numbered items</span></span></span>
 <span class="r-in"><span><span class="fu">find_var</span><span class="op">(</span><span class="va">survey_data</span>, <span class="st">"^q[0-9]+"</span>, search <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No variables found matching <span style="color: #0000BB;">"^q[0-9]+"</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] col   name  label</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Literal text with regex characters, e.g. parentheses in a label</span></span></span>
+<span class="r-in"><span><span class="fu">find_var</span><span class="op">(</span><span class="va">survey_data</span>, <span class="st">"(1=left"</span>, fixed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   col                  name                                   label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   8 political_orientation Political orientation (1=left, 5=right)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
