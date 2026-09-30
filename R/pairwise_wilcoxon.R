@@ -560,7 +560,7 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
     cat("(pairwise deletion, as SPSS NPAR TESTS /WILCOXON), so N can exceed\n")
     if (!is.null(fr_n) && !is.na(fr_n)) {
       cat(sprintf("the Friedman test's N = %s (cases complete on all variables).\n",
-                  format(fr_n, big.mark = "")))
+                  fmt_int(fr_n)))
     } else {
       cat("the Friedman test's N (cases complete on all variables).\n")
     }

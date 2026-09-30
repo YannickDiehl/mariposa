@@ -949,7 +949,7 @@ codebook <- function(data, ..., weights = NULL,
 
   # Subtitle
   subtitle_parts <- c(
-    paste0(format(info$nrow, big.mark = ","), " observation",
+    paste0(fmt_int(info$nrow), " observation",
            if (info$nrow == 1) "" else "s"),
     paste0(info$n_selected, " variable",
            if (info$n_selected == 1) "" else "s")

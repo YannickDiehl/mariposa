@@ -565,8 +565,14 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     sprintf(", r = %s (%s)", fmt_num(r_val, digits), .interpret_r_effect(r_val))
   } else ""
 
+  # no thousands separator (the summary table and SPSS print 776732)
+  u_txt <- if (!is.na(U_val) && abs(U_val - round(U_val)) < 1e-8) {
+    fmt_int(U_val)
+  } else {
+    fmt_num(U_val, 1)
+  }
   cat(sprintf("  U = %s, Z = %s, %s%s%s\n",
-              format(round(U_val, 1), big.mark = ","),
+              u_txt,
               fmt_num(Z_val, digits),
               format_p_stars(p_val, digits), r_part, n_part))
 }

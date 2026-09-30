@@ -305,7 +305,7 @@ print.fisher_test <- function(x, digits = 3, ...) {
     }
   }
   cat(sprintf("  %s%s%s, N = %s\n", format_p_stars(p_val, digits), mc, or_part,
-              format(round(results$n[i]), big.mark = "")))
+              fmt_int(results$n[i])))
 }
 
 #' Summary method for Fisher's exact test results

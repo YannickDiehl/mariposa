@@ -144,6 +144,25 @@ test_that("SCALE note: weighted formulas are defined only in kernels-weighted.R"
                stats::cor(m[, 1], m[, 2]))
 })
 
+# --- FMT-THOU: no thousands separators -----------------------------------------
+
+test_that("DESC-22: counts carry no thousands separators (codebook HTML, MW U)", {
+  skip_if_not_installed("htmltools")
+  # The HTML codebook wrote "2,500 observations" while the console header
+  # and every table print 2500 (SPSS default); mann_whitney()'s compact line
+  # printed "U = 776,732" but its summary table 776732.
+  cb <- codebook(survey_data, age, gender, view = FALSE)
+  html <- paste(as.character(cb$html), collapse = "\n")
+  expect_match(html, "2500 observations", fixed = TRUE)
+  expect_false(grepl("2,500", html, fixed = TRUE))
+
+  out <- capture.output(print(mann_whitney(survey_data, age, group = gender)))
+  expect_true(any(grepl("U = 776732,", out, fixed = TRUE)))
+  d <- survey_data[survey_data$region == "East", ]
+  out2 <- capture.output(print(mann_whitney(d, life_satisfaction, group = gender)))
+  expect_true(any(grepl("U = 26095.5,", out2, fixed = TRUE)))
+})
+
 # --- EDGE-23: one group-header style, no trailing blanks in headers -----------
 
 test_that("EDGE-23: verbose group headers share one style without a trailing blank", {

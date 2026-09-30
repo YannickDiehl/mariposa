@@ -414,7 +414,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
                    col_types = c(Value = "num"),
                    col_labels = c(p = "p value", stars = ""))
   cat(sprintf("Table size: %d\u00d7%d | N = %s\n", as.integer(rows),
-              as.integer(cols), format(n, big.mark = "")))
+              as.integer(cols), fmt_int(n)))
   if (!show_gamma) {
     cat("Note: Gamma is shown for two ordinal variables (ordered factor or numeric) only.\n")
   }
@@ -530,7 +530,7 @@ print.chi_square <- function(x, digits = 3, ...) {
               formatC(as.integer(df_val), format = "d"),
               fmt_num(chi_val, digits), cc_tag,
               format_p_stars(p_val, digits), v_part,
-              format(round(n_val), big.mark = "")))
+              fmt_int(n_val)))
 }
 
 #' Summary method for chi-squared test results

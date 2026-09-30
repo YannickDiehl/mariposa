@@ -364,7 +364,7 @@ print.mcnemar_test <- function(x, digits = 3, ...) {
     cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
     return(invisible(NULL))
   }
-  n_txt <- format(round(results$n[i]), big.mark = "")
+  n_txt <- fmt_int(results$n[i])
   if (is.na(results$chi_squared[i])) {
     cat(sprintf("  chi2 not computed (%s), %s (exact), N = %s\n",
                 .np_reason(results, i), format_p_stars(results$exact_p[i], digits),
@@ -529,8 +529,8 @@ print.summary.mcnemar_test <- function(x, ...) {
 
   if (show_discordant) {
     cat(sprintf("\nDiscordant pairs: b = %s, c = %s\n",
-                format(round(results$b[i]), big.mark = ""),
-                format(round(results$c[i]), big.mark = "")))
+                fmt_int(results$b[i]),
+                fmt_int(results$c[i])))
   }
   invisible(NULL)
 }

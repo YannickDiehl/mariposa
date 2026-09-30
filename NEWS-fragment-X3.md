@@ -35,3 +35,10 @@
   `R/kernels-weighted.R`, the single home of every weighted formula; a
   static test keeps `.weighted_*` definitions out of other files. Results
   are unchanged.
+* Counts carry no thousands separators anywhere, as in SPSS tables and
+  the console: the HTML `codebook()` header wrote "2,500 observations",
+  `mann_whitney()`'s compact line "U = 776,732" (its summary table
+  776732). The N/discordant-pair lines of `fisher_test()`,
+  `mcnemar_test()`, `chi_square()` and the Friedman note of
+  `pairwise_wilcoxon()` use the same whole-number formatter (the latter
+  printed "N = 9.36e+09" for large sums of weights).
