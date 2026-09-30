@@ -128,3 +128,12 @@
   was dropped), the compact line uses 3 decimals like the rest of the
   family (was "p = 0.5435") and reports the odds ratio with its 95% CI for
   2x2 tables (SPSS "Risk Estimate": sample odds ratio, Woolf interval).
+* `mcnemar_test()` output: without discordant pairs the output says
+  "chi2 not computed (no discordant pairs), p = 1.000 (exact)" instead
+  of "chi2 = ,  (asymp)"; tables are labelled with the variable names and
+  value labels (was "v1"/"v2" and codes); grouped `summary()` shows each
+  group's table and the "(cc)" continuity-correction marker (both were
+  dropped); the compact line reports the degrees of freedom
+  ("chi2(1) = ..."). Two variables with different category sets (e.g.
+  0/1 against 1/2) are now an error instead of being tabulated as if the
+  categories matched.

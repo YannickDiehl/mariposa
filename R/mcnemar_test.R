@@ -151,40 +151,60 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
   data <- weights_info$data
   w_name <- weights_info$name
 
+  # Both variables must use the same two categories (SPSS builds a square
+  # table from them); {0,1} against {1,2} used to be tabulated as if the
+  # categories matched.
+  l1 <- levels(.np_factor(data[[var1_name]]))
+  l2 <- levels(.np_factor(data[[var2_name]]))
+  cats <- union(l1, l2)
+  if (length(cats) > 2) {
+    cli_abort(c(
+      "{.var {var1_name}} and {.var {var2_name}} must share the same two categories.",
+      "x" = "{.var {var1_name}}: {.val {l1}}; {.var {var2_name}}: {.val {l2}}."
+    ))
+  }
+  # category order of the variable that shows both (SPSS: by code)
+  if (length(l1) == 2) cats <- l1 else if (length(l2) == 2) cats <- l2
+
   # Helper to perform McNemar test on a single data slice
   perform_single_mcnemar <- function(data_slice) {
-    v1 <- data_slice[[var1_name]]
-    v2 <- data_slice[[var2_name]]
+    f1 <- factor(as.character(.np_factor(data_slice[[var1_name]])), levels = cats)
+    f2 <- factor(as.character(.np_factor(data_slice[[var2_name]])), levels = cats)
 
     # Remove NAs
-    valid <- !is.na(v1) & !is.na(v2)
+    valid <- !is.na(f1) & !is.na(f2)
     if (!is.null(w_name)) {
       w <- data_slice[[w_name]]
       valid <- valid & !is.na(w)
-      w <- w[valid]
-    }
-    v1 <- v1[valid]
-    v2 <- v2[valid]
-
-    # Build 2x2 table
-    if (!is.null(w_name)) {
-      tbl <- xtabs(w ~ v1 + v2)
-      tbl <- round(tbl)
+      tbl <- round(tapply(w[valid], list(f1[valid], f2[valid]), sum))
+      tbl[is.na(tbl)] <- 0
+      tbl <- as.table(tbl)
     } else {
-      tbl <- table(v1, v2)
+      tbl <- table(f1[valid], f2[valid])
     }
+    names(dimnames(tbl)) <- c(var1_name, var2_name)
 
     n <- sum(tbl)
+    if (n == 0) {
+      cli_abort("no valid pairs of {.var {var1_name}} and {.var {var2_name}}")
+    }
 
     # Discordant cells: b = tbl[1,2], c = tbl[2,1]
-    b <- tbl[1, 2]
-    c_val <- tbl[2, 1]
+    if (length(cats) == 2) {
+      b <- tbl[1, 2]
+      c_val <- tbl[2, 1]
+    } else {
+      b <- 0
+      c_val <- 0
+    }
 
-    # McNemar chi-square (with continuity correction)
+    reason <- NA_character_
     if ((b + c_val) == 0) {
-      chi_sq <- NaN
-      p_value <- NaN
+      # Nothing changed: no evidence of change (exact binomial p = 1)
+      chi_sq <- NA_real_
+      p_value <- NA_real_
       exact_p <- 1.0
+      reason <- "no discordant pairs"
     } else {
       if (correct) {
         chi_sq <- (abs(b - c_val) - 1)^2 / (b + c_val)
@@ -204,8 +224,23 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
       exact_p = exact_p,
       n = n,
       table = tbl,
-      b = b,
-      c = c_val
+      b = as.numeric(b),
+      c = as.numeric(c_val),
+      reason = reason
+    )
+  }
+
+  result_row <- function(res) {
+    data.frame(
+      chi_squared = res$statistic,
+      df = 1,
+      p_value = res$p_value,
+      exact_p = res$exact_p,
+      n = res$n,
+      b = res$b,
+      c = res$c,
+      reason = res$reason,
+      stringsAsFactors = FALSE
     )
   }
 
@@ -213,35 +248,23 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
   if (is_grouped) {
     data_list <- dplyr::group_split(data)
     group_keys_df <- dplyr::group_keys(data)
+    tables <- vector("list", length(data_list))
 
     results_list <- lapply(seq_along(data_list), function(i) {
+      key <- group_keys_df[i, , drop = FALSE]
       tryCatch({
         res <- perform_single_mcnemar(data_list[[i]])
-        cbind(
-          group_keys_df[i, , drop = FALSE],
-          data.frame(
-            chi_squared = res$statistic,
-            p_value = res$p_value,
-            exact_p = res$exact_p,
-            n = res$n,
-            b = res$b,
-            c = res$c,
-            stringsAsFactors = FALSE
-          )
-        )
+        tables[[i]] <<- res$table
+        cbind(key, result_row(res))
       }, error = function(e) {
-        cbind(
-          group_keys_df[i, , drop = FALSE],
-          data.frame(
-            chi_squared = NA_real_,
-            p_value = NA_real_,
-            exact_p = NA_real_,
-            n = NA_integer_,
-            b = NA_integer_,
-            c = NA_integer_,
-            stringsAsFactors = FALSE
-          )
-        )
+        where <- .np_where(key)
+        reason <- .np_error_reason(e)
+        cli_warn(c("McNemar test skipped{where}.", "x" = "{reason}."))
+        cbind(key, data.frame(
+          chi_squared = NA_real_, df = 1, p_value = NA_real_,
+          exact_p = NA_real_, n = NA_real_, b = NA_real_, c = NA_real_,
+          reason = reason, stringsAsFactors = FALSE
+        ))
       })
     })
 
@@ -255,27 +278,20 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
       exact_p = results_df$exact_p[1],
       n = results_df$n[1],
       table = NULL,
+      tables = tables,
       b = results_df$b[1],
       c = results_df$c[1],
       var1_name = var1_name,
       var2_name = var2_name,
       weights = w_name,
+      correct = correct,
       is_grouped = TRUE,
       groups = grp_vars
     )
 
   } else {
     res <- perform_single_mcnemar(data)
-
-    results_df <- data.frame(
-      chi_squared = res$statistic,
-      p_value = res$p_value,
-      exact_p = res$exact_p,
-      n = res$n,
-      b = res$b,
-      c = res$c,
-      stringsAsFactors = FALSE
-    )
+    results_df <- result_row(res)
 
     result <- list(
       results = results_df,
@@ -284,11 +300,13 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
       exact_p = res$exact_p,
       n = res$n,
       table = res$table,
+      tables = list(res$table),
       b = res$b,
       c = res$c,
       var1_name = var1_name,
       var2_name = var2_name,
       weights = w_name,
+      correct = correct,
       is_grouped = FALSE,
       groups = NULL
     )
@@ -325,42 +343,40 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
 #' @export
 print.mcnemar_test <- function(x, digits = 3, ...) {
   weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-  pair_label <- paste(x$var1_name, "x", x$var2_name)
+  pair_label <- paste(x$var1_name, "\u00d7", x$var2_name)
+  correct <- !isFALSE(x$correct)
 
-  print_row <- function(stat, p_asymp, p_exact, n_val) {
-    cat(sprintf("  chi2 = %s, %s (asymp), %s (exact) %s, N = %s\n",
-                fmt_num(stat, digits),
-                fmt_p(p_asymp, digits, style = "compact"),
-                fmt_p(p_exact, digits, style = "compact"),
-                add_significance_stars(p_exact),
-                formatC(as.integer(n_val), format = "d")))
-  }
-
-  if (isTRUE(x$is_grouped)) {
-    groups <- unique(x$results[x$groups])
-
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-      group_label <- .format_group_label(group_values)
-      cat(sprintf("[%s]\n", group_label))
-
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
-      }
-      if (nrow(group_results) == 0) next
-
-      cat(sprintf("McNemar Test: %s%s\n", pair_label, weighted_tag))
-      print_row(group_results$chi_squared[1], group_results$p_value[1],
-                group_results$exact_p[1], group_results$n[1])
-    }
-  } else {
+  for_each_group(x$results, if (isTRUE(x$is_grouped)) x$groups, function(rows, key) {
+    if (!is.null(key)) cat(sprintf("[%s]\n", .format_group_label(key)))
     cat(sprintf("McNemar Test: %s%s\n", pair_label, weighted_tag))
-    print_row(x$statistic, x$p_value, x$exact_p, x$n)
-  }
+    .print_mcnemar_compact(rows, 1, digits, correct,
+                           grouped = isTRUE(x$is_grouped))
+  }, header = FALSE)
 
   cat("Use summary() for detailed output.\n")
   invisible(x)
+}
+
+#' One compact McNemar line
+#' @noRd
+.print_mcnemar_compact <- function(results, i, digits, correct, grouped = FALSE) {
+  if (is.na(results$exact_p[i])) {
+    cat(sprintf("  %s\n", .np_not_computed(results, i, grouped)))
+    return(invisible(NULL))
+  }
+  n_txt <- format(round(results$n[i]), big.mark = "")
+  if (is.na(results$chi_squared[i])) {
+    cat(sprintf("  chi2 not computed (%s), %s (exact), N = %s\n",
+                .np_reason(results, i), format_p_stars(results$exact_p[i], digits),
+                n_txt))
+    return(invisible(NULL))
+  }
+  cat(sprintf("  chi2(1) = %s%s, %s (asymptotic), %s (exact), N = %s\n",
+              fmt_num(results$chi_squared[i], digits),
+              if (correct) " (cc)" else "",
+              format_p_compact(results$p_value[i], digits),
+              format_p_stars(results$exact_p[i], digits),
+              n_txt))
 }
 
 #' Summary method for McNemar test results
@@ -442,99 +458,79 @@ print.summary.mcnemar_test <- function(x, ...) {
   show_table      <- isTRUE(x$show$contingency_table)
   show_results    <- isTRUE(x$show$results)
   show_discordant <- isTRUE(x$show$discordant_pairs)
+  correct <- !isFALSE(x$correct)
 
   cat("\n")
   test_info <- list(
     "Variable 1" = x$var1_name,
     "Variable 2" = x$var2_name,
-    "Weights variable" = x$weights
+    "Weights variable" = x$weights,
+    "Continuity correction" = if (correct) "yes (cc)" else "no"
   )
   print_info_section(test_info)
-  cat("\n")
 
-  if (isTRUE(x$is_grouped)) {
-    groups <- unique(x$results[x$groups])
+  tables <- x$tables
+  if (is.null(tables)) tables <- list(x$table)
 
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-      print_group_header(group_values)
-
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
-      }
-
-      if (nrow(group_results) > 0) {
-        if (show_results) {
-          sig <- add_significance_stars(group_results$exact_p[1])
-
-          display <- data.frame(
-            `Chi-Sq` = round(group_results$chi_squared[1], 3),
-            `p (asymp)` = ifelse(group_results$p_value[1] < 0.001, "<.001",
-                                 format(round(group_results$p_value[1], digits),
-                                        nsmall = digits)),
-            `p (exact)` = ifelse(group_results$exact_p[1] < 0.001, "<.001",
-                                 format(round(group_results$exact_p[1], digits),
-                                        nsmall = digits)),
-            N = group_results$n[1],
-            Sig = as.character(sig),
-            check.names = FALSE,
-            stringsAsFactors = FALSE
-          )
-
-          output <- capture.output(print(display, row.names = FALSE))
-          border <- paste(rep("-", max(nchar(output))), collapse = "")
-          cat(border, "\n")
-          for (line in output) cat(line, "\n")
-          cat(border, "\n\n")
-        }
-
-        if (show_discordant) {
-          cat(sprintf("Discordant pairs: b = %d, c = %d\n\n",
-                      group_results$b[1], group_results$c[1]))
-        }
-      }
+  for (i in seq_len(nrow(x$results))) {
+    if (isTRUE(x$is_grouped)) {
+      print_group_header(x$results[i, x$groups, drop = FALSE])
     }
-  } else {
-    # Print 2x2 table if available (gated by contingency_table toggle)
-    if (show_table && !is.null(x$table)) {
-      cat("2x2 Contingency Table:\n")
-      border <- paste(rep("-", 40), collapse = "")
-      cat(border, "\n")
-      print(x$table)
-      cat(border, "\n\n")
-    }
-
-    if (show_results) {
-      sig <- add_significance_stars(x$exact_p)
-
-      cat("Test Results:\n")
-      display <- data.frame(
-        `Chi-Sq (cc)` = round(x$statistic, 3),
-        `p (asymp)` = ifelse(x$p_value < 0.001, "<.001",
-                             format(round(x$p_value, digits), nsmall = digits)),
-        `p (exact)` = ifelse(x$exact_p < 0.001, "<.001",
-                             format(round(x$exact_p, digits), nsmall = digits)),
-        N = x$n,
-        Sig = as.character(sig),
-        check.names = FALSE,
-        stringsAsFactors = FALSE
-      )
-
-      output <- capture.output(print(display, row.names = FALSE))
-      border <- paste(rep("-", max(nchar(output))), collapse = "")
-      cat(border, "\n")
-      for (line in output) cat(line, "\n")
-      cat(border, "\n")
-    }
-
-    if (show_discordant) {
-      cat(sprintf("\nDiscordant pairs: b = %d, c = %d\n", x$b, x$c))
-    }
+    .print_mcnemar_block(x$results, i, tables[[i]], digits, correct,
+                         show_table, show_results, show_discordant,
+                         grouped = isTRUE(x$is_grouped))
   }
 
   if (show_results) {
     print_significance_legend()
   }
   invisible(x)
+}
+
+#' Table, test results and discordant pairs of one McNemar test
+#' @noRd
+.print_mcnemar_block <- function(results, i, tbl, digits, correct, show_table,
+                                 show_results, show_discordant,
+                                 grouped = FALSE) {
+  if (is.na(results$exact_p[i])) {
+    txt <- .np_not_computed(results, i, grouped)
+    cat(sprintf("\n%s%s.\n", toupper(substr(txt, 1, 1)), substring(txt, 2)))
+    return(invisible(NULL))
+  }
+
+  if (show_table && !is.null(tbl)) {
+    cat("\n2x2 Contingency Table:\n")
+    .print_chi_matrix(tbl, digits = 0)
+  }
+
+  if (show_results) {
+    cat("\nTest Results:\n")
+    display <- data.frame(
+      test = "McNemar",
+      chi = results$chi_squared[i],
+      df = 1,
+      p = results$p_value[i],
+      p_exact = results$exact_p[i],
+      stars = add_significance_stars(results$exact_p[i]),
+      N = round(results$n[i]),
+      stringsAsFactors = FALSE
+    )
+    print_stat_table(display, digits = digits, indent = 0,
+                     col_types = c(chi = "num", df = "int", p = "pvalue",
+                                   p_exact = "pvalue", N = "int"),
+                     col_labels = c(test = "", chi = if (correct) "Chi-Sq (cc)" else "Chi-Sq",
+                                    p = "p (asymp)", p_exact = "p (exact)",
+                                    stars = ""))
+    if (is.na(results$chi_squared[i])) {
+      cat(sprintf("Chi-square not computed (%s); exact p = 1.\n",
+                  .np_reason(results, i)))
+    }
+  }
+
+  if (show_discordant) {
+    cat(sprintf("\nDiscordant pairs: b = %s, c = %s\n",
+                format(round(results$b[i]), big.mark = ""),
+                format(round(results$c[i]), big.mark = "")))
+  }
+  invisible(NULL)
 }

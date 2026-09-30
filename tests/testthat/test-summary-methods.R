@@ -1855,7 +1855,7 @@ test_that("compact print.mcnemar_test works", {
   result <- mcnemar_test(test_data, var1 = trust_gov_high,
                          var2 = trust_media_high)
   output <- expect_compact_print(result, "McNemar Test")
-  expect_true(any(grepl("chi2 = ", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2(1) = ", output, fixed = TRUE)))
   expect_true(any(grepl("(exact)", output, fixed = TRUE)))
   expect_true(any(grepl("N = ", output, fixed = TRUE)))
 })

@@ -584,6 +584,59 @@ test_that("NP-06 fisher_test ignores empty factor levels", {
   expect_equal(r3$p_value, r2$p_value)
 })
 
+# --- mcnemar_test output (NP-13, NP-18, NP-20, NP-07, NP-24) -------------------
+
+mcnemar_data <- function() {
+  dplyr::mutate(survey_data,
+                gov_high = as.integer(trust_government >= 4),
+                media_high = as.integer(trust_media >= 4))
+}
+
+test_that("NP-13 mcnemar_test without discordant pairs prints a reason", {
+  # Was: "chi2 = ,  (asymp)".
+  d <- dplyr::mutate(mcnemar_data(), same = gov_high)
+  r <- mcnemar_test(d, var1 = gov_high, var2 = same)
+  expect_equal(r$exact_p, 1)
+  out <- c(capture.output(print(r)), capture.output(print(summary(r))))
+  no_broken_text(out)
+  expect_true(any(grepl("no discordant pairs", out, fixed = TRUE)))
+})
+
+test_that("NP-18/NP-20 mcnemar_test: named tables, grouped tables, chi2(1)", {
+  # Was: dimnames "v1"/"v2"; grouped summaries dropped the table and the
+  # "(cc)" note; the compact chi2 had no df.
+  d <- mcnemar_data()
+  r <- mcnemar_test(d, var1 = gov_high, var2 = media_high)
+  expect_equal(names(dimnames(r$table)), c("gov_high", "media_high"))
+  expect_true(any(grepl("chi2(1) = ", capture.output(print(r)), fixed = TRUE)))
+
+  g <- mcnemar_test(dplyr::group_by(d, region), var1 = gov_high,
+                    var2 = media_high)
+  out <- capture.output(print(summary(g)))
+  expect_equal(sum(grepl("Contingency Table", out, fixed = TRUE)), 2L)
+  expect_true(any(grepl("(cc)", out, fixed = TRUE)))
+})
+
+test_that("NP-07 mcnemar_test shows value labels", {
+  skip_if_not_installed("haven")
+  d <- make_labelled_np()
+  d$bin2 <- haven::labelled(rev(as.numeric(d$bin)), labels = c(No = 1, Yes = 2))
+  r <- mcnemar_test(d, var1 = bin, var2 = bin2)
+  expect_equal(dimnames(r$table), list(bin = c("No", "Yes"), bin2 = c("No", "Yes")))
+})
+
+test_that("NP-24 mcnemar_test rejects variables with different categories", {
+  # Was: {0,1} vs {1,2} was tabulated as if the categories matched.
+  d <- dplyr::mutate(mcnemar_data(), media12 = media_high + 1L)
+  expect_error(mcnemar_test(d, var1 = gov_high, var2 = media12), "categor")
+  # one variable observing only one of the two shared categories is fine
+  d2 <- dplyr::mutate(mcnemar_data(), all_high = 1L)
+  expect_no_error(suppressWarnings(
+    mcnemar_test(d2, var1 = gov_high, var2 = all_high)))
+  r2 <- mcnemar_test(d2, var1 = gov_high, var2 = all_high)
+  expect_equal(dim(r2$table), c(2L, 2L))
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

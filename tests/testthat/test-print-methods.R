@@ -331,7 +331,7 @@ test_that("print.mcnemar_test: ungrouped", {
   result <- mcnemar_test(test_data, var1 = trust_gov_high,
                          var2 = trust_media_high)
   output <- expect_prints(result, "McNemar")
-  expect_true(any(grepl("chi2 = ", output, fixed = TRUE)))
+  expect_true(any(grepl("chi2(1) = ", output, fixed = TRUE)))
   expect_true(any(grepl("(exact)", output, fixed = TRUE)))
   expect_true(any(grepl("Use summary() for detailed output.", output, fixed = TRUE)))
 })
