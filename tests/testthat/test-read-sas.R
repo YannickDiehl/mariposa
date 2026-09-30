@@ -132,7 +132,7 @@ test_that("strip_tags works with SAS-style tagged NAs", {
   stripped <- strip_tags(x)
 
   expect_true(is.numeric(stripped))
-  expect_equal(stripped[1:3], c(1, 2, 3))
+  expect_equal(as.numeric(stripped[1:3]), c(1, 2, 3))
   expect_equal(sum(is.na(stripped)), 4L)  # 2A + 1B + 1 system
 })
 

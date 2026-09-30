@@ -71,6 +71,14 @@
 #' performed separately within each group. This is useful for within-group
 #' comparisons. Weights are also subsetted per group.
 #'
+#' ## Missing Values
+#'
+#' The result is a plain numeric variable (value labels are dropped, the
+#' variable label is kept with " (standardized)" appended). Missing values
+#' of imported data, including their SPSS missing types, become plain
+#' \code{NA} -- as SPSS's \code{DESCRIPTIVES /SAVE} gives system-missing
+#' z-scores.
+#'
 #' @examples
 #' library(dplyr)
 #' data(survey_data)
@@ -181,6 +189,12 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 
 #' @noRd
 .std_vec <- function(x, method = "sd", w = NULL, na.rm = TRUE) {
+  # Bare numbers; missing values of imported variables (tagged NAs) become
+  # plain NA in the result, like SPSS DESCRIPTIVES /SAVE (system-missing
+  # z-scores). Tagged payloads without their code map would otherwise break
+  # write_spss().
+  x <- as.double(.plain_numeric(x))
+  x[is.na(x)] <- NA_real_
 
   # Weighted path
   if (!is.null(w)) .check_weights(w)
@@ -293,6 +307,13 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 #' When \code{weights} is provided, the weighted mean is used for centering.
 #' This accounts for survey design in the centering computation.
 #'
+#' ## Missing Values
+#'
+#' The result is a plain numeric variable (value labels are dropped, the
+#' variable label is kept with " (centered)" appended). Missing values of
+#' imported data, including their SPSS missing types, become plain
+#' \code{NA}, as in an SPSS \code{COMPUTE}.
+#'
 #' @examples
 #' library(dplyr)
 #' data(survey_data)
@@ -383,6 +404,9 @@ center <- function(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE) {
 
 #' @noRd
 .center_vec <- function(x, w = NULL, na.rm = TRUE) {
+  # Bare numbers, missing types become plain NA (see .std_vec)
+  x <- as.double(.plain_numeric(x))
+  x[is.na(x)] <- NA_real_
   if (!is.null(w)) .check_weights(w)
   if (!is.null(w)) {
     if (isTRUE(na.rm)) {

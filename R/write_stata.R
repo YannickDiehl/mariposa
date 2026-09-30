@@ -107,6 +107,8 @@ write_stata <- function(data, path, version = 14) {
 .prepare_for_stata <- function(data) {
   # Convert haven_labelled_spss columns to tagged NA format first
   data <- .ensure_tagged_na_format(data)
+  # Bare "labels" attributes -> haven_labelled, or write_dta() drops them
+  data <- .promote_bare_labels(data)
 
   has_spss_codes <- FALSE
   non_int_labelled <- character(0)

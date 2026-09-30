@@ -317,8 +317,10 @@ to_character <- function(data, ..., drop_na = TRUE,
 #'   sequential integers (1, 2, 3, ...).
 #' @param start_at If not `NULL`, the lowest numeric value in the output
 #'   starts at this number. Default: `NULL` (use original values).
-#' @param keep_labels If `TRUE`, the former factor levels are stored as
-#'   value labels on the result. Default: `FALSE`.
+#' @param keep_labels If `TRUE`, the result is a `haven_labelled` vector:
+#'   the former factor levels (or the existing value labels and missing-value
+#'   types of a labelled input) are kept, so they survive [write_spss()].
+#'   Default: `FALSE` (plain numeric; missing-value types become `NA`).
 #' @param use.labels,start.at,keep.labels Defunct dot-case argument names,
 #'   removed in mariposa 0.6.9. Calling the function with any of them is an
 #'   error; use the snake_case equivalents instead. (The formals are
@@ -341,7 +343,8 @@ to_character <- function(data, ..., drop_na = TRUE,
 #'     Converts to sequential integers (1, 2, 3, ... in level order). Use
 #'     `use_labels = FALSE` to force this behavior for any factor.
 #'   \item **haven_labelled**: Extracts the underlying numeric vector,
-#'     stripping the labelled class.
+#'     stripping the labelled class. Missing-value types of imported data
+#'     (tagged NAs) become plain `NA`.
 #' }
 #'
 #' @seealso [to_label()] for the reverse (numeric -> factor),
@@ -403,15 +406,17 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
                             keep_labels = FALSE) {
   var_lbl <- attr(x, "label", exact = TRUE)
 
-  # haven_labelled → extract underlying numeric
+  # haven_labelled → extract underlying numeric. Missing types (tagged NAs)
+  # become plain NA unless keep_labels = TRUE, which keeps the labelled
+  # vector with its value labels and missing-value map (exportable).
   if (inherits(x, "haven_labelled")) {
-    old_labels <- attr(x, "labels", exact = TRUE)
-    result <- as.double(x)
-    if (!is.null(var_lbl)) attr(result, "label") <- var_lbl
-    if (isTRUE(keep_labels) && !is.null(old_labels)) {
-      attr(result, "labels") <- old_labels
+    if (isTRUE(keep_labels)) {
+      old_labels <- attr(x, "labels", exact = TRUE)
+      return(.with_label_meta(x, x, labels = old_labels, label = var_lbl,
+                              labelled = TRUE))
     }
-    return(result)
+    return(.with_label_meta(x, x, label = var_lbl, keep_missing = FALSE,
+                            labelled = FALSE))
   }
 
   # Factor → numeric
@@ -437,17 +442,20 @@ to_numeric <- function(data, ..., use_labels = TRUE, start_at = NULL,
       result <- result - min_val + start_at
     }
 
-    if (!is.null(var_lbl)) attr(result, "label") <- var_lbl
-
+    labels <- NULL
     if (isTRUE(keep_labels)) {
       vals <- level_vals
       if (!is.null(start_at)) {
         vals <- vals - min(vals, na.rm = TRUE) + start_at
       }
-      attr(result, "labels") <- stats::setNames(vals, lvls)
+      labels <- stats::setNames(as.double(vals), lvls)
     }
 
-    return(result)
+    # haven_labelled when labels are kept (a bare "labels" attribute was
+    # dropped by every exporter); tagged-NA codes restored from a
+    # to_label(drop_na = FALSE) factor have no code map any more and become
+    # plain NA.
+    return(.with_label_meta(result, x, labels = labels, label = var_lbl))
   }
 
   # Already numeric
@@ -584,9 +592,11 @@ to_labelled <- function(data, ..., labels = NULL, label = NULL) {
   }
 
   if (is.numeric(x)) {
-    result <- haven::labelled(as.double(x), labels = labels,
-                              label = var_lbl)
-    return(result)
+    # An existing bare "labels" attribute (e.g. from sjlabelled or older
+    # mariposa versions) is used when no labels are given
+    labels <- labels %||% attr(x, "labels", exact = TRUE)
+    return(.with_label_meta(x, x, labels = labels, label = var_lbl,
+                            labelled = TRUE))
   }
 
   cli::cli_abort("Cannot convert {.cls {class(x)}} to labelled. Expected factor, character, or numeric.")

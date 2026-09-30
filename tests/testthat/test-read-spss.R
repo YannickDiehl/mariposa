@@ -157,7 +157,7 @@ test_that("strip_tags converts all tagged NAs to regular NA", {
 
   expect_true(is.numeric(stripped))
   # Valid values unchanged
-  expect_equal(stripped[1:8], c(1, 2, 3, 4, 5, 1, 2, 3))
+  expect_equal(as.numeric(stripped[1:8]), c(1, 2, 3, 4, 5, 1, 2, 3))
   # All NAs are regular (untagged)
   na_positions <- which(is.na(stripped))
   expect_equal(length(na_positions), 6L)  # 2 + 3 + 1 system

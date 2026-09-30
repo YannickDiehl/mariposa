@@ -11,3 +11,26 @@
   all columns 9.8 s -> 0.15 s, `write_spss()` 11.5 s -> 1.7 s,
   `write_xlsx()` 22 s -> 8 s (the rest is openxlsx2 itself). Output is
   unchanged.
+* `write_spss()` no longer crashes ("Failed to insert value ...: The file
+  format does not supported character tags for missing values") after
+  `rec()`, `std()`, `center()`, `pomps()`, `to_numeric()` or arithmetic on
+  variables imported with `read_spss()`. These results kept the tagged-NA
+  payloads but lost the code map. Now `rec()` keeps the missing-value
+  types, their code map and their labels (so `na_frequencies()`,
+  `frequency()` and the SPSS export still show "no answer" etc.), while
+  `std()`, `center()`, `pomps()` and `to_numeric()` return plain `NA` by
+  design (as an SPSS `COMPUTE` gives system-missing). `write_spss()` writes
+  remaining unmapped tags as system missing with one warning naming the
+  variables.
+* Value labels created by `rec()` (inline `[label]` syntax, `val_labels`,
+  mirrored labels of `"rev"`), kept by `strip_tags()` or by
+  `to_numeric(keep_labels = TRUE)` now survive `write_spss()` and
+  `write_stata()`. They were attached as a bare `labels` attribute without
+  the `haven_labelled` class, which haven's writers ignore. The results are
+  `haven_labelled` now; `to_labelled()` picks up an existing `labels`
+  attribute; the exporters also promote such bare attributes themselves.
+* `rec(as_factor = TRUE)` names the levels by the result's value labels
+  (e.g. the mirrored labels of `"rev"`, previously ignored: levels "1".."7")
+  in code order. Values without a label keep their code as level name
+  instead of becoming `NA`, and duplicate label texts are disambiguated by
+  their code.

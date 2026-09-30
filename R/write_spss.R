@@ -37,6 +37,16 @@
 #' represented as SPSS user-defined missing values. In this case, they are
 #' written as system missing (regular `NA`) with a warning.
 #'
+#' ## Derived Variables
+#'
+#' Arithmetic on an imported variable (e.g. `x + 1` inside `mutate()`)
+#' keeps its tagged NAs but loses the code map, so the original codes are
+#' unknown. Such values are written as system missing with a warning
+#' naming the variables. [rec()] keeps the map; [std()], [center()],
+#' [pomps()] and [to_numeric()] return plain `NA` by design. Numeric
+#' columns that carry a bare `"labels"` attribute (without the
+#' `haven_labelled` class) are exported with their value labels.
+#'
 #' ## When to Use This
 #'
 #' Use `write_spss()` when you:
@@ -112,13 +122,14 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
 #' @return The data frame with columns converted for SPSS export.
 #' @noRd
 .prepare_for_spss <- function(data) {
+  data <- .promote_bare_labels(data)
+  orphaned <- character(0)
+
   for (i in seq_len(ncol(data))) {
     x <- data[[i]]
     tag_map <- attr(x, "na_tag_map", exact = TRUE)
 
-    if (is.null(tag_map)) next
-
-    if (!is.numeric(tag_map)) {
+    if (!is.null(tag_map) && !is.numeric(tag_map)) {
       # Native Stata/SAS tags (.a, .A) cannot be represented as SPSS na_values
       format_name <- attr(x, "na_tag_format", exact = TRUE)
       if (is.null(format_name)) format_name <- "unknown"
@@ -129,6 +140,30 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
       data[[i]] <- strip_tags(x)
       next
     }
+
+    # Tagged NAs without a code map (e.g. after arithmetic on an imported
+    # variable: vctrs keeps the NaN payload but drops the map) cannot be
+    # written by haven ("character tags for missing values"): system missing.
+    if (is.double(x)) {
+      tags <- .na_tags(x)
+      orphan <- !is.na(tags) & !(tags %in% names(tag_map))
+      if (any(orphan)) {
+        orphaned <- c(orphaned, names(data)[i])
+        raw <- .plain_numeric(x)
+        raw[orphan] <- NA_real_
+        attributes(raw) <- attributes(x)
+        x <- raw
+        data[[i]] <- x
+      }
+      labels <- attr(x, "labels", exact = TRUE)
+      if (is.null(tag_map) && !is.null(labels) && anyNA(labels)) {
+        # labelled missing types whose codes are unknown: drop the entries
+        attr(x, "labels") <- labels[!is.na(labels)]
+        data[[i]] <- x
+      }
+    }
+
+    if (is.null(tag_map)) next
 
     # Numeric codes: reconstruct haven_labelled_spss
     na_codes <- unname(tag_map)
@@ -143,15 +178,11 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
       na_entries   <- labels[is.na(labels)]
 
       if (length(na_entries) > 0L) {
-        na_tags <- .na_tags(na_entries)
-        for (j in seq_along(na_entries)) {
-          tag <- na_tags[j]
-          if (!is.na(tag) && tag %in% names(tag_map)) {
-            new_entry <- tag_map[tag]
-            names(new_entry) <- names(na_entries)[j]
-            valid_labels <- c(valid_labels, new_entry)
-          }
-        }
+        hit <- match(.na_tags(na_entries), names(tag_map))
+        ok <- !is.na(hit)
+        valid_labels <- c(valid_labels, stats::setNames(
+          unname(tag_map)[hit[ok]], names(na_entries)[ok]
+        ))
       }
 
       labels <- valid_labels
@@ -198,5 +229,34 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
     }
   }
 
+  if (length(orphaned) > 0L) {
+    cli::cli_warn(c(
+      "Tagged missing values without a code map in {.var {orphaned}} are written as system missing.",
+      "i" = "The map is lost by arithmetic on an imported variable; {.fn rec} keeps it (e.g. {.code rec(x, rules = \"rev\")})."
+    ))
+  }
+
+  data
+}
+
+
+#' Give numeric columns with a bare "labels" attribute the haven_labelled
+#' class
+#'
+#' haven's writers only store value labels of haven_labelled vectors; a
+#' plain numeric vector with a "labels" attribute (sjlabelled, older
+#' mariposa versions) silently lost them on export.
+#' @noRd
+.promote_bare_labels <- function(data) {
+  for (i in seq_len(ncol(data))) {
+    x <- data[[i]]
+    labels <- attr(x, "labels", exact = TRUE)
+    if (is.numeric(x) && !inherits(x, "haven_labelled") &&
+        !is.null(labels) && is.numeric(labels) && !is.null(names(labels))) {
+      data[[i]] <- .with_label_meta(x, x, labels = labels,
+                                    label = attr(x, "label", exact = TRUE),
+                                    labelled = TRUE)
+    }
+  }
   data
 }

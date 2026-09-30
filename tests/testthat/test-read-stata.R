@@ -139,7 +139,7 @@ test_that("strip_tags works with Stata-style tagged NAs", {
 
   expect_true(is.numeric(stripped))
   # Valid values unchanged
-  expect_equal(stripped[1:5], c(1, 2, 3, 4, 5))
+  expect_equal(as.numeric(stripped[1:5]), c(1, 2, 3, 4, 5))
   # All NAs are regular
   expect_equal(sum(is.na(stripped)), 4L)  # 2 + 1 + 1 system
 })

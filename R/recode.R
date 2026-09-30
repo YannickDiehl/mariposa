@@ -41,7 +41,12 @@
 #'
 #' @return If \code{data} is a vector, a recoded vector is returned. If
 #'   \code{data} is a data frame, the modified data frame is returned
-#'   (invisibly).
+#'   (invisibly). A recoded variable is \code{haven_labelled} whenever it
+#'   carries value labels or the missing-value types of an imported variable,
+#'   so the labels survive \code{\link{write_spss}()} and
+#'   \code{\link{write_stata}()}. With \code{as_factor = TRUE} the factor
+#'   levels are ordered by code and named by the result's value labels
+#'   (unlabelled values keep their code as level name).
 #'
 #' @details
 #' ## Recoding Syntax
@@ -67,6 +72,14 @@
 #' }
 #'
 #' Rules are evaluated in order — the first matching rule wins.
+#'
+#' ## Missing Values of Imported Data
+#'
+#' Missing values keep their type (the tagged NAs of \code{\link{read_spss}()},
+#' e.g. "no answer" vs. "not applicable") unless an \code{"NA=..."} or
+#' \code{"else=..."} rule recodes them, like SPSS's \code{RECODE} keeps
+#' user-missing codes. \code{\link{na_frequencies}()}, \code{frequency()}
+#' and \code{\link{write_spss}()} therefore still see them on the result.
 #'
 #' ## Decimal Values
 #'
@@ -214,11 +227,22 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
   rules_trimmed <- trimws(rules)
 
+  # Every mode ends here: the result keeps the missing types of x (tagged
+  # NAs + na_tag_map + labelled missing codes) and is haven_labelled when it
+  # carries labels, so write_spss()/na_frequencies()/frequency() keep
+  # working on recoded imported variables.
+  finish <- function(result, labels) {
+    out <- .with_label_meta(result, x, labels = labels, label = new_label)
+    if (isTRUE(as_factor)) out <- .rec_to_factor(out, labels)
+    out
+  }
+  explicit_labels <- if (!is.null(val_labels)) {
+    stats::setNames(as.numeric(names(val_labels)), unname(val_labels))
+  }
+
   if (rules_trimmed == "rev") {
     result <- .apply_rev(x)
-    if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
-    return(result)
+    return(finish(result, explicit_labels %||% attr(result, "labels")))
   }
 
   if (grepl("^dicho(\\(|$)", rules_trimmed)) {
@@ -230,26 +254,19 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
         cli::cli_abort("Invalid cut-point in {.val {rules}}.")
       }
     }
-    result <- .apply_dicho(x, cut_point = cut_point, val_labels = val_labels)
-    if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
-    return(result)
+    result <- .apply_dicho(x, cut_point = cut_point)
+    return(finish(result, explicit_labels))
   }
 
   if (rules_trimmed == "quart") {
-    result <- .apply_quart(x, val_labels = val_labels)
-    if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
-    return(result)
+    result <- .apply_quart(x)
+    return(finish(result, explicit_labels))
   }
 
   if (rules_trimmed == "mean") {
-    x_num <- suppressWarnings(as.numeric(x))
-    cut_point <- mean(x_num, na.rm = TRUE)
-    result <- .apply_dicho(x, cut_point = cut_point, val_labels = val_labels)
-    if (!is.null(new_label)) attr(result, "label") <- new_label
-    if (isTRUE(as_factor)) result <- .rec_to_factor(result, val_labels)
-    return(result)
+    cut_point <- mean(.rec_numeric(x), na.rm = TRUE)
+    result <- .apply_dicho(x, cut_point = cut_point)
+    return(finish(result, explicit_labels))
   }
 
   # ---- Standard recoding ----------------------------------------------------
@@ -258,14 +275,11 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   result <- .apply_rec_rules(x, parsed)
 
   # Apply value labels: explicit val_labels > inline + preserved originals > none
-  effective_labels <- val_labels
+  effective_labels <- NULL
 
   if (!is.null(val_labels)) {
     # Explicit val_labels always take full precedence
-    attr(result, "labels") <- stats::setNames(
-      as.numeric(names(val_labels)),
-      unname(val_labels)
-    )
+    effective_labels <- explicit_labels
   } else {
     # Collect inline labels from parsed rules
     inline_labels <- character(0)
@@ -309,28 +323,25 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
       }
 
       if (length(merged) > 0L) {
-        effective_labels <- merged
-        attr(result, "labels") <- stats::setNames(
-          as.numeric(names(merged)),
-          unname(merged)
-        )
+        effective_labels <- stats::setNames(as.numeric(names(merged)),
+                                            unname(merged))
       }
     } else if (length(inline_labels) > 0L) {
-      effective_labels <- inline_labels
-      attr(result, "labels") <- stats::setNames(
-        as.numeric(names(inline_labels)),
-        unname(inline_labels)
-      )
+      effective_labels <- stats::setNames(as.numeric(names(inline_labels)),
+                                          unname(inline_labels))
     }
   }
 
-  # Set variable label
-  if (!is.null(new_label)) attr(result, "label") <- new_label
+  finish(result, effective_labels)
+}
 
-  # Optional factor conversion
-  if (isTRUE(as_factor)) result <- .rec_to_factor(result, effective_labels)
 
-  result
+#' Numeric view of a rec() input: bare numbers (tagged-NA payloads kept),
+#' factor codes, or character parsed as numbers
+#' @noRd
+.rec_numeric <- function(x) {
+  if (is.character(x)) return(suppressWarnings(as.numeric(x)))
+  as.double(.plain_numeric(x))
 }
 
 
@@ -441,7 +452,7 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
 #' @noRd
 .apply_rec_rules <- function(x, parsed) {
-  x_num <- suppressWarnings(as.numeric(x))
+  x_num <- .rec_numeric(x)
   # Character form for single-value matching. as.character() rounds to 15
   # significant digits, which absorbs floating-point representation error so
   # decimal codes (e.g. 3.6, or a computed 0.1 + 0.2) match reliably. Mirrors
@@ -457,8 +468,8 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
       mask <- is.na(x_num) & !matched
       if (any(mask)) {
         if (identical(rule$new, "copy")) {
-          # copy on NA → keep NA
-          result[mask] <- NA_real_
+          # copy on NA → keep NA (including its missing type)
+          result[mask] <- x_num[mask]
         } else {
           result[mask] <- rule$new
         }
@@ -510,7 +521,12 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
     }
   }
 
-  # Unmatched values that are not NA stay as NA in result
+  # Unmatched missing values keep their missing type (tagged NA) like an
+  # SPSS in-place RECODE keeps user-missing codes; unmatched valid values
+  # become NA.
+  keep_na <- !matched & is.na(x_num)
+  result[keep_na] <- x_num[keep_na]
+
   result
 }
 
@@ -521,30 +537,23 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
 #' @noRd
 .apply_rev <- function(x) {
-  x_num <- suppressWarnings(as.numeric(x))
+  x_num <- .rec_numeric(x)
   x_min <- min(x_num, na.rm = TRUE)
   x_max <- max(x_num, na.rm = TRUE)
 
+  # Arithmetic keeps the tagged-NA payloads (missing types) of x
   result <- x_max + x_min - x_num
 
-  # Mirror value labels
+  # Mirror the valid value labels (missing labels are re-attached by
+  # .with_label_meta())
   old_labels <- attr(x, "labels", exact = TRUE)
   if (!is.null(old_labels)) {
-    # Filter out NA-tagged labels
-    valid <- !is.na(old_labels)
-    valid_labels <- old_labels[valid]
-    na_labels <- old_labels[!valid]
-
-    # Reverse the values
-    new_vals <- x_max + x_min - unname(valid_labels)
-    new_labels <- stats::setNames(new_vals, names(valid_labels))
-
-    # Recombine
-    attr(result, "labels") <- c(new_labels, na_labels)
+    valid_labels <- old_labels[!is.na(old_labels)]
+    attr(result, "labels") <- stats::setNames(
+      x_max + x_min - as.double(.plain_numeric(valid_labels)),
+      names(valid_labels)
+    )
   }
-
-  # Preserve variable label
-  attr(result, "label") <- attr(x, "label", exact = TRUE)
 
   result
 }
@@ -555,24 +564,17 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.apply_dicho <- function(x, cut_point = NULL, val_labels = NULL) {
-  x_num <- suppressWarnings(as.numeric(x))
+.apply_dicho <- function(x, cut_point = NULL) {
+  x_num <- .rec_numeric(x)
 
   if (is.null(cut_point)) {
     cut_point <- stats::median(x_num, na.rm = TRUE)
   }
 
-  result <- ifelse(is.na(x_num), NA_real_,
-                   ifelse(x_num <= cut_point, 0, 1))
-
-  # Apply value labels
-  if (!is.null(val_labels)) {
-    attr(result, "labels") <- stats::setNames(
-      as.numeric(names(val_labels)),
-      unname(val_labels)
-    )
-  }
-
+  # Missing positions keep their (tagged) NA
+  result <- x_num
+  ok <- !is.na(x_num)
+  result[ok] <- ifelse(x_num[ok] <= cut_point, 0, 1)
   result
 }
 
@@ -582,24 +584,17 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.apply_quart <- function(x, val_labels = NULL) {
-  x_num <- suppressWarnings(as.numeric(x))
+.apply_quart <- function(x) {
+  x_num <- .rec_numeric(x)
 
   q <- stats::quantile(x_num, probs = c(0.25, 0.50, 0.75), na.rm = TRUE)
 
-  result <- ifelse(is.na(x_num), NA_real_,
-                   ifelse(x_num <= q[1], 1,
-                   ifelse(x_num <= q[2], 2,
-                   ifelse(x_num <= q[3], 3, 4))))
-
-  # Apply value labels
-  if (!is.null(val_labels)) {
-    attr(result, "labels") <- stats::setNames(
-      as.numeric(names(val_labels)),
-      unname(val_labels)
-    )
-  }
-
+  # Missing positions keep their (tagged) NA
+  result <- x_num
+  ok <- !is.na(x_num)
+  v <- x_num[ok]
+  result[ok] <- ifelse(v <= q[1], 1, ifelse(v <= q[2], 2,
+                                             ifelse(v <= q[3], 3, 4)))
   result
 }
 
@@ -609,14 +604,23 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.rec_to_factor <- function(x, val_labels = NULL) {
-  if (!is.null(val_labels)) {
-    lvls <- as.numeric(names(val_labels))
-    lbl_text <- unname(val_labels)
-    result <- factor(x, levels = lvls, labels = lbl_text)
-  } else {
-    result <- factor(x)
-  }
+.rec_to_factor <- function(x, labels = NULL) {
+  # Levels in code order (as SPSS), named by the value labels of the result
+  # (haven form: names = text, values = codes). Values without a label keep
+  # their code as level name instead of silently becoming NA; duplicate
+  # label texts get their code appended so distinct values never merge.
+  raw <- .plain_numeric(x)
+  if (!is.null(labels)) labels <- labels[!is.na(labels)]
+  codes <- sort(unique(c(as.double(.plain_numeric(labels)), raw[!is.na(raw)])))
+  lv <- as.character(codes)
+  hit <- match(codes, as.double(.plain_numeric(labels)))
+  lv[!is.na(hit)] <- names(labels)[hit[!is.na(hit)]]
+  dup <- lv %in% lv[duplicated(lv)]
+  lv[dup] <- paste0(lv[dup], " (", codes[dup], ")")
+
+  result <- factor(match(raw, codes), levels = seq_along(codes), labels = lv)
+  # Original codes for the to_numeric()/to_labelled() round trip
+  attr(result, "codes") <- stats::setNames(codes, lv)
 
   # Preserve variable label
   var_lbl <- attr(x, "label", exact = TRUE)

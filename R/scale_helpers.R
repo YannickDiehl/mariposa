@@ -19,7 +19,9 @@
 #'   (default), the observed maximum of \code{x} is used.
 #'
 #' @return A numeric vector of the same length as \code{x}, with values
-#'   rescaled to the 0-100 range.
+#'   rescaled to the 0-100 range. The variable label of \code{x} is kept;
+#'   missing values (including the SPSS missing types of imported data)
+#'   become plain \code{NA}, as in an SPSS \code{COMPUTE}.
 #'
 #' @details
 #' ## The Formula
@@ -104,7 +106,14 @@ pomps <- function(x, scale_min = NULL, scale_max = NULL) {
   # POMPS TRANSFORMATION
   # ============================================================================
 
-  result <- ((x - scale_min) / (scale_max - scale_min)) * 100
+  # Bare numbers: missing values of imported variables (tagged NAs) become
+  # plain NA, like an SPSS COMPUTE (system-missing result). Arithmetic on
+  # the labelled vector kept the tag payloads without their code map, which
+  # made write_spss() fail.
+  raw <- as.double(.plain_numeric(x))
+  raw[is.na(raw)] <- NA_real_
+  result <- ((raw - scale_min) / (scale_max - scale_min)) * 100
+  attr(result, "label") <- attr(x, "label", exact = TRUE)
 
   return(result)
 }

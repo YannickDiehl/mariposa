@@ -596,7 +596,9 @@ untag_na <- function(x) {
 #'
 #' @return A numeric vector where all tagged NAs have been replaced with
 #'   regular `NA`. Value labels for missing types are removed; labels for
-#'   valid values are preserved.
+#'   valid values and the variable label are preserved. A `haven_labelled`
+#'   input stays `haven_labelled`, so the labels survive [write_spss()] and
+#'   [write_stata()].
 #'
 #' @examples
 #' \donttest{
@@ -612,15 +614,76 @@ untag_na <- function(x) {
 #' @family data-import
 #' @export
 strip_tags <- function(x) {
-  raw <- as.double(x)
-  raw[is.na(x)] <- NA_real_
+  labels <- attr(x, "labels", exact = TRUE)
+  .with_label_meta(
+    x, x,
+    labels = if (!is.null(labels)) labels[!is.na(labels)],
+    label = attr(x, "label", exact = TRUE),
+    keep_missing = FALSE,
+    labelled = inherits(x, "haven_labelled") || length(labels) > 0L
+  )
+}
 
-  # Keep only labels for valid (non-NA) values
-  labels <- attr(x, "labels")
+
+#' Re-attach label and missing-value metadata to a transformed vector
+#'
+#' Shared finisher for every function that computes a new numeric vector
+#' from a (possibly imported) labelled one: rec(), to_numeric(),
+#' strip_tags(), to_labelled(), std(), center(), pomps(). Arithmetic keeps
+#' the tagged-NA payload bits but vctrs drops the class and the na_tag_map,
+#' which left "orphan" tags that write_spss() could not write and that
+#' na_frequencies() could not map to codes.
+#'
+#' With `keep_missing = TRUE` the tags of `x`'s na_tag_map survive, the map
+#' and format are re-attached and `x`'s labelled missing types are appended
+#' to `labels`. Tags that are not in the map (or all tags, with
+#' `keep_missing = FALSE`) become plain NA.
+#'
+#' @param result Numeric vector computed from x
+#' @param x The source vector (metadata donor)
+#' @param labels Value labels for the valid values of `result`, or NULL
+#' @param label Variable label, or NULL
+#' @param keep_missing Keep x's missing types (tags + map + missing labels)?
+#' @param labelled Force (TRUE) or suppress (FALSE) the haven_labelled
+#'   class; NULL = haven_labelled when labels or a tag map remain
+#' @return haven_labelled vector, or a plain double with a "label" attribute
+#' @noRd
+.with_label_meta <- function(result, x, labels = NULL, label = NULL,
+                             keep_missing = TRUE, labelled = NULL) {
+  result <- as.double(.plain_numeric(result))
+
+  tag_map <- if (isTRUE(keep_missing)) attr(x, "na_tag_map", exact = TRUE)
+  tags <- .na_tags(result)
+  orphan <- !is.na(tags) & !(tags %in% names(tag_map))
+  if (any(orphan)) result[orphan] <- NA_real_
+
   if (!is.null(labels)) {
-    attr(raw, "labels") <- labels[!is.na(labels)]
+    labels <- stats::setNames(as.double(.plain_numeric(labels)), names(labels))
+    labels <- labels[!is.na(labels)]
   }
-  attr(raw, "label") <- attr(x, "label", exact = TRUE)
+  if (!is.null(tag_map)) {
+    x_labels <- attr(x, "labels", exact = TRUE)
+    if (!is.null(x_labels)) {
+      miss <- x_labels[is.na(x_labels)]
+      miss <- miss[.na_tags(miss) %in% names(tag_map)]
+      labels <- c(labels, stats::setNames(as.double(.plain_numeric(miss)),
+                                          names(miss)))
+    }
+  }
+  if (length(labels) == 0L) labels <- NULL
 
-  raw
+  make_labelled <- labelled %||% (!is.null(labels) || !is.null(tag_map))
+  if (isTRUE(make_labelled) && requireNamespace("haven", quietly = TRUE)) {
+    out <- haven::labelled(result, labels = labels, label = label)
+  } else {
+    out <- result
+    if (!is.null(labels)) attr(out, "labels") <- labels
+    if (!is.null(label)) attr(out, "label") <- label
+  }
+  if (!is.null(tag_map)) {
+    attr(out, "na_tag_map") <- tag_map
+    attr(out, "na_tag_format") <- attr(x, "na_tag_format", exact = TRUE) %||%
+      "spss"
+  }
+  out
 }
