@@ -196,7 +196,8 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
       group_weights <- if (!is.null(weights_info$name)) group_data[[weights_info$name]] else NULL
 
       results_list[[i]] <- .reliability_core(
-        group_data, var_names, group_weights, na.rm
+        group_data, var_names, group_weights, na.rm,
+        group_label = .format_group_label(group_keys_df[i, , drop = FALSE])
       )
       results_list[[i]]$group_values <- as.list(group_keys_df[i, , drop = FALSE])
     }
@@ -233,36 +234,52 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
 #' Compute reliability statistics for a single group
 #' @noRd
-.reliability_core <- function(data, var_names, weights_vec, na.rm) {
+.reliability_core <- function(data, var_names, weights_vec, na.rm,
+                              group_label = NULL) {
 
-  # Extract item matrix and apply listwise deletion
-  item_data <- data[, var_names, drop = FALSE]
+  # Item matrix as plain numbers (label classes dropped)
+  k <- length(var_names)
+  mat <- vapply(var_names, function(v) as.double(.plain_numeric(data[[v]])),
+                numeric(nrow(data)))
+  mat <- matrix(mat, nrow = nrow(data), dimnames = list(NULL, var_names))
+  if (!is.null(weights_vec)) weights_vec <- .plain_numeric(weights_vec)
+  in_group <- if (is.null(group_label)) "" else paste0(" (group ", group_label, ")")
 
-  if (na.rm) {
-    complete <- stats::complete.cases(item_data)
-    if (!is.null(weights_vec)) {
-      complete <- complete & !is.na(weights_vec)
-      weights_vec <- weights_vec[complete]
+  if (!na.rm) {
+    # na.rm = FALSE keeps incomplete cases, so every statistic is
+    # undefined as soon as one value is missing (the NA previously reached
+    # an if() and crashed with "missing value where TRUE/FALSE needed").
+    incomplete <- !stats::complete.cases(mat)
+    if (!is.null(weights_vec)) incomplete <- incomplete | is.na(weights_vec)
+    if (any(incomplete)) {
+      miss_vars <- var_names[colSums(is.na(mat)) > 0]
+      if (!is.null(weights_vec) && anyNA(weights_vec)) miss_vars <- c(miss_vars, "the weights")
+      cli_warn(c(
+        "{.fn reliability} with {.code na.rm = FALSE}{in_group}: {sum(incomplete)} case{?s} with missing values; all statistics are NA.",
+        "i" = "Missing values in: {.var {miss_vars}}.",
+        "i" = "Use {.code na.rm = TRUE} for listwise deletion (as SPSS RELIABILITY does)."
+      ))
+      return(.reliability_na_result(
+        k, nrow(mat), "missing values with na.rm = FALSE",
+        weighted_n = if (!is.null(weights_vec)) sum(weights_vec, na.rm = TRUE) else NULL
+      ))
     }
-    item_data <- item_data[complete, , drop = FALSE]
   }
 
-  n <- nrow(item_data)
-  k <- length(var_names)
-  mat <- as.matrix(item_data)
+  # Listwise deletion (only complete cases across all items)
+  complete <- stats::complete.cases(mat)
+  if (!is.null(weights_vec)) {
+    complete <- complete & !is.na(weights_vec)
+    weights_vec <- weights_vec[complete]
+  }
+  mat <- mat[complete, , drop = FALSE]
+  n <- nrow(mat)
 
   if (n < 2) {
     cli_warn("Insufficient data for reliability analysis (n = {n}).")
-    return(list(
-      alpha = NA_real_,
-      alpha_standardized = NA_real_,
-      omega = NA_real_,
-      omega_std = NA_real_,
-      n_items = k,
-      item_statistics = NULL,
-      item_total = NULL,
-      inter_item_cor = NULL,
-      n = n
+    return(.reliability_na_result(
+      k, n, sprintf("%d complete case%s", n, if (n == 1) "" else "s"),
+      weighted_n = if (!is.null(weights_vec)) sum(weights_vec) else NULL
     ))
   }
 
@@ -445,6 +462,30 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 }
 
 
+#' Result skeleton for a scale that cannot be analysed
+#'
+#' @param k Number of items
+#' @param n Number of cases
+#' @param reason Short text for "not computed (<reason>)" in the output
+#' @param weighted_n Sum of weights or NULL
+#' @noRd
+.reliability_na_result <- function(k, n, reason, weighted_n = NULL) {
+  list(
+    alpha = NA_real_,
+    alpha_standardized = NA_real_,
+    omega = NA_real_,
+    omega_std = NA_real_,
+    n_items = k,
+    item_statistics = NULL,
+    item_total = NULL,
+    inter_item_cor = NULL,
+    n = n,
+    weighted_n = weighted_n,
+    not_computed = reason
+  )
+}
+
+
 # ============================================================================
 # MCDONALD'S OMEGA HELPER
 # ============================================================================
@@ -606,6 +647,11 @@ print.reliability <- function(x, digits = 3, ...) {
 #' Print compact one-liner for a single reliability result
 #' @noRd
 .print_reliability_compact <- function(res, n_items, weighted_tag, digits) {
+  if (!is.null(res$not_computed)) {
+    cat(sprintf("Reliability Analysis: %d items%s\n", n_items, weighted_tag))
+    cat(sprintf("  not computed (%s)\n", res$not_computed))
+    return(invisible(NULL))
+  }
   alpha <- res$alpha
   interp <- .alpha_interpretation(alpha)
   n_display <- if (!is.null(res$weighted_n)) {
@@ -720,6 +766,11 @@ print.summary.reliability <- function(x, ...) {
     "N of Items" = x$n_items,
     "Weights" = x$weights
   ))
+
+  if (!is.null(x$not_computed)) {
+    cat(sprintf("\n  not computed (%s)\n", x$not_computed))
+    return(invisible(NULL))
+  }
 
   # Reliability Statistics
   if (show_reliability_stats) {

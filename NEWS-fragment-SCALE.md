@@ -50,3 +50,9 @@
   solution cannot be rotated." as SPSS does. Communalities print with
   fixed decimals ("1.000" instead of "1" next to "0.457"), and the
   summary says "N of Components" for PCA.
+* `reliability(na.rm = FALSE)` no longer crashes with "missing value where
+  TRUE/FALSE needed" (German: "Fehlender Wert, wo TRUE/FALSE nötig ist")
+  as soon as a value is missing. All statistics are `NA`, a warning names
+  the items with missing values and points to `na.rm = TRUE` (listwise
+  deletion, as SPSS), and `print()`/`summary()` say "not computed (...)"
+  instead of "Cronbach's Alpha = NA ()".

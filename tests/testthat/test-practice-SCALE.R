@@ -315,3 +315,31 @@ test_that("SCALE-17: communalities print with fixed decimals", {
   expect_match(row, "1.000", fixed = TRUE)
   expect_true(any(grepl("N of Components: 3", s, fixed = TRUE)))
 })
+
+# --- SCALE-07: reliability(na.rm = FALSE) ---------------------------------------
+
+test_that("SCALE-07: na.rm = FALSE with missing values gives NA, not a crash", {
+  # Crashed with "Fehlender Wert, wo TRUE/FALSE noetig ist" (after a
+  # German factanal warning) as soon as any value was missing.
+  cnd <- conditions_of(reliability(survey_data, trust_government, trust_media,
+                                   trust_science, na.rm = FALSE))
+  r <- cnd$result
+  expect_s3_class(r, "reliability")
+  expect_true(is.na(r$alpha))
+  expect_true(is.na(r$omega))
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "^WARNING:")
+  expect_match(cnd$msgs, "na.rm = FALSE", fixed = TRUE)
+  expect_match(cnd$msgs, "trust_government", fixed = TRUE)
+  out <- c(capture.output(print(r)), capture.output(print(summary(r))))
+  expect_true(any(grepl("not computed", out, fixed = TRUE)))
+  expect_false(any(grepl("NA", out, fixed = TRUE)))
+
+  # Without missing values na.rm = FALSE computes as usual
+  cc <- survey_data[stats::complete.cases(
+    survey_data[, c("trust_government", "trust_media", "trust_science")]), ]
+  a <- reliability(cc, trust_government, trust_media, trust_science,
+                   na.rm = FALSE)
+  b <- reliability(cc, trust_government, trust_media, trust_science)
+  expect_equal(a$alpha, b$alpha)
+})
