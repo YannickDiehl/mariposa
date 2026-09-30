@@ -164,8 +164,7 @@ efa(survey_data,
 
 **Oblimin** --- another oblique rotation, common in psychology:
 
-```{r, eval = FALSE}
-# Requires GPArotation package
+```{r}
 efa(survey_data,
     political_orientation, environmental_concern, life_satisfaction,
     trust_government, trust_media, trust_science,
