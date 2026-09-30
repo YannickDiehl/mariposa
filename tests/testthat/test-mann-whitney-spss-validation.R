@@ -332,10 +332,11 @@ test_that("Test 3c: Mann-Whitney age by gender, grouped by region — matches SP
 # algorithm change with documented rationale.
 # =============================================================================
 
-# R-only mariposa baselines (NOT from SPSS; see header note above)
+# R-only mariposa baselines (NOT from SPSS; see header note above).
+# 0.7.4: two-sided Z carries SPSS's sign convention (Z <= 0).
 r_only_baselines <- list(
   life_satisfaction = list(U = 722281.0998, W = 1383240.4633,
-                            Z = 1.0201, p_value = 0.307792,
+                            Z = -1.0201, p_value = 0.307792,
                             r_effect = 0.020736),
   income            = list(U = 592273.4323, W = 1257619.3267,
                             Z = -0.7552, p_value = 0.450199,

@@ -371,8 +371,10 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       U <- min(U1, U2)
       W_report <- if (U1 < U2) R1 else R2
 
-      # 8. Z = t-statistic (asymptotically equivalent)
-      Z <- t_stat
+      # 8. Z = t-statistic (asymptotically equivalent). Two-sided: SPSS's
+      # sign convention (from the smaller U, Z <= 0) as in the unweighted
+      # path; one-sided: directional, so its sign matches the alternative
+      Z <- if (alternative == "two.sided") -abs(t_stat) else t_stat
 
       # 9. Effect size: r = |t| / sqrt(t^2 + df)
       r <- abs(t_stat) / sqrt(t_stat^2 + df_t)

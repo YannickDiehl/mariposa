@@ -867,3 +867,18 @@ test_that("chisq_gof prints expected counts and residuals half up like SPSS", {
   out <- capture.output(print(summary(g)))
   expect_true(any(grepl("503.8", out, fixed = TRUE)))
 })
+
+test_that("weighted two-sided mann_whitney Z follows SPSS's sign (Z <= 0)", {
+  # Was: the weighted (design-based) path reported the directional t as Z
+  # (+1.020 for life_satisfaction by gender, SPSS -.989), while the
+  # unweighted path already used SPSS's convention (smaller U, Z <= 0).
+  r <- mann_whitney(survey_data, life_satisfaction, group = gender,
+                    weights = sampling_weight)
+  expect_lte(r$results$Z, 0)
+  u <- mann_whitney(survey_data, life_satisfaction, group = gender)
+  expect_lte(u$results$Z, 0)
+  # One-sided tests keep the directional statistic their p refers to
+  g <- mann_whitney(survey_data, life_satisfaction, group = gender,
+                    weights = sampling_weight, alternative = "greater")
+  expect_equal(abs(g$results$Z), abs(r$results$Z))
+})
