@@ -25,6 +25,9 @@
 #' - Adjusted p-values (controlling for multiple comparisons)
 #' - The number of cases of each pair (\code{n})
 #'
+#' The comparison table (one row per pair) is stored as \code{$results}
+#' (also available as \code{$comparisons}).
+#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -364,6 +367,10 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
   structure(
     list(
       comparisons = results_df,
+      # Same table under the name every other result class uses
+      # (x$results was NULL here, so code written against the common
+      # shape silently received nothing)
+      results = results_df,
       variables = x$variables,
       weights = x$weights,
       groups = if (x$is_grouped) dplyr::group_vars(x$data) else NULL,

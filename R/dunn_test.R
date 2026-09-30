@@ -24,6 +24,9 @@
 #' - Z-statistics based on rank differences
 #' - Adjusted p-values (controlling for multiple comparisons)
 #'
+#' The comparison table (one row per pair) is stored as \code{$results}
+#' (also available as \code{$comparisons}).
+#'
 #' @details
 #' ## Understanding the Results
 #'
@@ -365,6 +368,10 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
   structure(
     list(
       comparisons = results_df,
+      # Same table under the name every other result class uses
+      # (x$results was NULL here, so code written against the common
+      # shape silently received nothing)
+      results = results_df,
       variables = x$variables,
       group = x$group,
       weights = x$weights,

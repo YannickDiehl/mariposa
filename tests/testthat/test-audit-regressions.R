@@ -52,10 +52,18 @@ test_that("weighted pairwise_wilcoxon with weights == 1 equals unweighted", {
   )
   fr_uw <- friedman_test(d, t1, t2, t3)
   fr_ww <- friedman_test(d, t1, t2, t3, weights = w1)
-  pw_uw <- pairwise_wilcoxon(fr_uw)$results
-  pw_ww <- pairwise_wilcoxon(fr_ww)$results
+  # The table lives in $comparisons ($results was NULL until 0.7.4, which
+  # made this test compare NULL with NULL); guard against an empty table
+  # so the reduction is actually exercised.
+  pw_uw <- pairwise_wilcoxon(fr_uw)$comparisons
+  pw_ww <- pairwise_wilcoxon(fr_ww)$comparisons
 
+  expect_equal(nrow(pw_uw), 3L)
+  expect_equal(nrow(pw_ww), 3L)
   expect_equal(pw_ww$z, pw_uw$z, tolerance = 1e-10)
+  expect_equal(pw_ww$p, pw_uw$p, tolerance = 1e-10)
+  expect_equal(pw_ww$p_adj, pw_uw$p_adj, tolerance = 1e-10)
+  expect_equal(pw_ww$n, pw_uw$n)
 })
 
 test_that("mann_whitney asymptotic p agrees with its own Z (no continuity correction)", {
