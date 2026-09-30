@@ -39,7 +39,11 @@
 #'   \emph{ordered} factors, "dummy" applies R's default polynomial
 #'   contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}), not
 #'   treatment dummies; convert with \code{factor(x, ordered = FALSE)}
-#'   first if you want dummy coding.
+#'   first if you want dummy coding. \code{factors} applies to factors
+#'   only: labelled predictors from SPSS files (\code{haven_labelled}) are
+#'   numeric and enter with their numeric codes, as in SPSS LOGISTIC
+#'   REGRESSION without \code{/CATEGORICAL}; \code{summary()} notes them.
+#'   Convert them with \code{\link{to_label}} first to get dummy coding.
 #'
 #' @return For ungrouped data, an object of class
 #'   \code{c("logistic_regression", "glm", "lm")} — \strong{the fitted
@@ -233,6 +237,9 @@ logistic_regression <- function(data, formula = NULL,
   all_vars <- c(dep_name, pred_names)
   # The call a user would type, in formula form: update()/step() re-run it
   user_call <- .regression_call(user_call, model_formula)
+  # Labelled (SPSS) predictors enter with their numeric codes, as in SPSS
+  # LOGISTIC REGRESSION without /CATEGORICAL; the summary says so
+  labelled_preds <- .labelled_predictors(data, pred_names)
 
   # Outcome encoding (SPSS "Dependent Variable Encoding"), fixed once on
   # the cases in the analysis so every group models the same category
@@ -286,7 +293,8 @@ logistic_regression <- function(data, formula = NULL,
         conf.level = conf.level,
         dv_encoding = .logistic_encoding_table(dv_encoding),
         dv_labels = dv_encoding$short,
-        call = user_call
+        call = user_call,
+        labelled_predictors = labelled_preds
       ),
       class = "logistic_regression"
     )
@@ -295,6 +303,7 @@ logistic_regression <- function(data, formula = NULL,
                         weights_vec, conf.level, factors, dv_encoding)
     # result IS the fitted glm (with mariposa slots attached).
     result$call <- user_call
+    result$labelled_predictors <- labelled_preds
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -759,9 +768,9 @@ print.logistic_regression <- function(x, ...) {
   } else ""
 
   fit_line <- function(m) {
-    sprintf("Nagelkerke R2 = %.3f, chi2(%d) = %.2f, %s, Accuracy = %.1f%%, N = %s",
-            m$model_summary$nagelkerke_r2,
-            as.integer(m$omnibus_test$df), m$omnibus_test$chi_sq,
+    sprintf("Nagelkerke R2 = %s, chi2(%s) = %s, %s, Accuracy = %.1f%%, N = %s",
+            .fmt_fixed(m$model_summary$nagelkerke_r2, 3),
+            .fmt_n(m$omnibus_test$df), .fmt_est(m$omnibus_test$chi_sq, 2),
             format_p_stars(m$omnibus_test$p),
             m$classification$overall_pct,
             .fmt_n(m$n))
@@ -876,16 +885,19 @@ print.summary.logistic_regression <- function(x, ...) {
   title <- get_standard_title("Logistic Regression", x$weight_name, "Results")
   print_header(title)
 
+  digits <- x$digits %||% 3
+
   formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
     "Method" = "ENTER",
-    "N" = x$n
+    "N" = .fmt_n(x$n)
   )
   if (isTRUE(x$weighted)) {
     info[["Weights"]] <- x$weight_name
   }
   print_info_section(info)
+  .print_labelled_note(x$labelled_predictors, "LOGISTIC REGRESSION")
 
   show_omnibus <- if (!is.null(x$show)) isTRUE(x$show$omnibus_test) else TRUE
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
@@ -898,17 +910,17 @@ print.summary.logistic_regression <- function(x, ...) {
 
   if (show_omnibus) {
     cat("\n")
-    .print_omnibus_test(x$omnibus_test)
+    .print_omnibus_test(x$omnibus_test, digits)
   }
 
   if (show_model) {
     cat("\n")
-    .print_logistic_model_summary(x$model_summary)
+    .print_logistic_model_summary(x$model_summary, digits)
   }
 
   if (show_hl) {
     cat("\n")
-    .print_hosmer_lemeshow(x$hosmer_lemeshow)
+    .print_hosmer_lemeshow(x$hosmer_lemeshow, digits)
   }
 
   if (show_class) {
@@ -918,7 +930,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
   if (show_coefs) {
     cat("\n")
-    .print_logistic_coefficients(x$coef_table)
+    .print_logistic_coefficients(x$coef_table, digits, x$conf.level)
   }
 
   # Show significance legend if any section with p-values is visible
@@ -944,6 +956,8 @@ print.summary.logistic_regression <- function(x, ...) {
     info[["Weights"]] <- x$weight_name
   }
   print_info_section(info)
+  .print_labelled_note(x$labelled_predictors, "LOGISTIC REGRESSION")
+  digits <- x$digits %||% 3
 
   show_omnibus <- if (!is.null(x$show)) isTRUE(x$show$omnibus_test) else TRUE
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
@@ -962,17 +976,17 @@ print.summary.logistic_regression <- function(x, ...) {
 
     if (show_omnibus) {
       cat("\n")
-      .print_omnibus_test(grp$omnibus_test)
+      .print_omnibus_test(grp$omnibus_test, digits)
     }
 
     if (show_model) {
       cat("\n")
-      .print_logistic_model_summary(grp$model_summary)
+      .print_logistic_model_summary(grp$model_summary, digits)
     }
 
     if (show_hl) {
       cat("\n")
-      .print_hosmer_lemeshow(grp$hosmer_lemeshow)
+      .print_hosmer_lemeshow(grp$hosmer_lemeshow, digits)
     }
 
     if (show_class) {
@@ -982,7 +996,7 @@ print.summary.logistic_regression <- function(x, ...) {
 
     if (show_coefs) {
       cat("\n")
-      .print_logistic_coefficients(grp$coef_table)
+      .print_logistic_coefficients(grp$coef_table, digits, x$conf.level)
     }
   }
   .print_skipped_groups(x$skipped_groups, verbose = TRUE)
@@ -999,44 +1013,47 @@ print.summary.logistic_regression <- function(x, ...) {
 
 #' Print omnibus test of model coefficients
 #' @noRd
-.print_omnibus_test <- function(omnibus) {
+.print_omnibus_test <- function(omnibus, digits = 3) {
   cat("  Omnibus Tests of Model Coefficients\n")
-  w <- 50
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-20s %12s %5s %10s\n", "", "Chi-square", "df", "Sig."))
-  cat(paste0("  ", strrep("-", w), "\n"))
-  stars <- add_significance_stars(omnibus$p)
-  cat(sprintf("  %-20s %12.3f %5d %10.3f %s\n",
-              "Model", omnibus$chi_sq, omnibus$df, omnibus$p, stars))
-  cat(paste0("  ", strrep("-", w), "\n"))
+  tab <- data.frame(
+    step = "Model",
+    chi = .fmt_est(omnibus$chi_sq, digits),
+    dfv = .fmt_n(omnibus$df),
+    pv = fmt_p(omnibus$p, digits, style = "table"),
+    stars = add_significance_stars(omnibus$p),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(tab, col_labels = c(step = "", chi = "Chi-square",
+                                       dfv = "df", pv = "Sig.", stars = ""))
 }
 
 
 #' Print logistic model summary
 #' @noRd
-.print_logistic_model_summary <- function(ms) {
-  cat("  Model Summary\n")
-  w <- 60
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-30s %12.3f\n", "-2 Log Likelihood", ms$minus2LL))
-  cat(sprintf("  %-30s %12.3f\n", "Cox & Snell R Square", ms$cox_snell_r2))
-  cat(sprintf("  %-30s %12.3f\n", "Nagelkerke R Square", ms$nagelkerke_r2))
-  cat(sprintf("  %-30s %12.3f\n", "McFadden R Square", ms$mcfadden_r2))
-  cat(paste0("  ", strrep("-", w), "\n"))
+.print_logistic_model_summary <- function(ms, digits = 3) {
+  .print_kv_block(
+    "Model Summary",
+    c("-2 Log Likelihood", "Cox & Snell R Square", "Nagelkerke R Square",
+      "McFadden R Square"),
+    c(.fmt_est(ms$minus2LL, digits), .fmt_fixed(ms$cox_snell_r2, digits),
+      .fmt_fixed(ms$nagelkerke_r2, digits), .fmt_fixed(ms$mcfadden_r2, digits))
+  )
 }
 
 
 #' Print Hosmer-Lemeshow test
 #' @noRd
-.print_hosmer_lemeshow <- function(hl) {
+.print_hosmer_lemeshow <- function(hl, digits = 3) {
   cat("  Hosmer and Lemeshow Test\n")
-  w <- 50
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-20s %12s %5s %10s\n", "", "Chi-square", "df", "Sig."))
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-20s %12.3f %5d %10.3f\n",
-              "", hl$chi_sq, hl$df, hl$p))
-  cat(paste0("  ", strrep("-", w), "\n"))
+  tab <- data.frame(
+    step = "",
+    chi = .fmt_est(hl$chi_sq, digits),
+    dfv = .fmt_n(hl$df),
+    pv = fmt_p(hl$p, digits, style = "table"),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(tab, col_labels = c(step = "", chi = "Chi-square",
+                                       dfv = "df", pv = "Sig."))
 }
 
 
@@ -1064,50 +1081,50 @@ print.summary.logistic_regression <- function(x, ...) {
   incorrect_0 <- cls$n_0 - cls$correct_0
   incorrect_1 <- cls$n_1 - cls$correct_1
   pct <- function(v) ifelse(is.na(v), "", sprintf("%.1f", v))
+  # Counts as text (.fmt_n): weighted counts can exceed the integer range
   tab <- data.frame(
     Observed = c(labels, "Overall Percentage"),
-    c0 = c(cls$correct_0, incorrect_1, NA),
-    c1 = c(incorrect_0, cls$correct_1, NA),
+    c0 = c(.fmt_n(c(cls$correct_0, incorrect_1)), ""),
+    c1 = c(.fmt_n(c(incorrect_0, cls$correct_1)), ""),
     correct = pct(c(cls$pct_correct_0, cls$pct_correct_1, cls$overall_pct)),
     stringsAsFactors = FALSE
   )
-  print_stat_table(tab, col_types = c(c0 = "int", c1 = "int"),
-                   col_labels = c(c0 = labels[1], c1 = labels[2],
-                                  correct = "% Correct"))
+  print_stat_table(tab, col_labels = c(c0 = labels[1], c1 = labels[2],
+                                       correct = "% Correct"))
 }
 
 
 #' Print logistic regression coefficients table
 #' @noRd
-.print_logistic_coefficients <- function(coefs) {
+.print_logistic_coefficients <- function(coefs, digits = 3, conf.level = 0.95) {
   cat("  Variables in the Equation\n")
-  w <- 95
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-20s %9s %9s %9s %4s %8s %10s %9s %9s %s\n",
-              "Term", "B", "S.E.", "Wald", "df", "Sig.", "Exp(B)",
-              "Lower", "Upper", ""))
-  cat(paste0("  ", strrep("-", w), "\n"))
+  # Exp(B) with its interval: enough decimals per row that the limits
+  # differ once displayed (odds ratios per EUR income: 1.000540/1.000706)
+  or <- .fmt_ratio_ci(coefs$`Exp(B)`, coefs$CI_lower, coefs$CI_upper, digits)
+  # No interval for the constant (as in SPSS)
+  is_const <- coefs$Term == "(Intercept)"
+  or[is_const, 2:3] <- ""
 
-  for (i in seq_len(nrow(coefs))) {
-    term <- coefs$Term[i]
-    if (nchar(term) > 20) term <- paste0(substr(term, 1, 17), "...")
-
-    stars <- add_significance_stars(coefs$Sig.[i])
-
-    # For intercept, don't show Exp(B) CI
-    if (coefs$Term[i] == "(Intercept)") {
-      cat(sprintf("  %-20s %9.3f %9.3f %9.3f %4d %8.3f %10.3f %9s %9s %s\n",
-                  term, coefs$B[i], coefs$S.E.[i], coefs$Wald[i],
-                  coefs$df[i], coefs$Sig.[i], coefs$`Exp(B)`[i],
-                  "", "", stars))
-    } else {
-      cat(sprintf("  %-20s %9.3f %9.3f %9.3f %4d %8.3f %10.3f %9.3f %9.3f %s\n",
-                  term, coefs$B[i], coefs$S.E.[i], coefs$Wald[i],
-                  coefs$df[i], coefs$Sig.[i], coefs$`Exp(B)`[i],
-                  coefs$CI_lower[i], coefs$CI_upper[i], stars))
-    }
-  }
-  cat(paste0("  ", strrep("-", w), "\n"))
+  tab <- data.frame(
+    Term = coefs$Term,
+    b = .fmt_est(coefs$B, digits),
+    se = .fmt_est(coefs$S.E., digits),
+    wald = .fmt_est(coefs$Wald, digits),
+    dfv = .fmt_n(coefs$df),
+    pv = fmt_p(coefs$Sig., digits, style = "table"),
+    expb = or[, 1],
+    lo = or[, 2],
+    hi = or[, 3],
+    stars = add_significance_stars(coefs$Sig.),
+    stringsAsFactors = FALSE
+  )
+  ci <- .ci_label(conf.level)
+  print_stat_table(tab, col_labels = c(b = "B", se = "S.E.", wald = "Wald",
+                                       dfv = "df", pv = "Sig.",
+                                       expb = "Exp(B)",
+                                       lo = paste(ci, "CI Lower"),
+                                       hi = paste(ci, "CI Upper"),
+                                       stars = ""))
 }
 
 

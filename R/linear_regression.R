@@ -48,6 +48,10 @@
 #'   polynomial contrasts (terms suffixed \code{.L}, \code{.Q}, \code{.C}),
 #'   not treatment dummies; convert with
 #'   \code{factor(x, ordered = FALSE)} first if you want dummy coding.
+#'   \code{factors} applies to factors only: labelled predictors from SPSS
+#'   files (\code{haven_labelled}) are numeric and enter with their numeric
+#'   codes, exactly as in SPSS REGRESSION; \code{summary()} notes them.
+#'   Convert them with \code{\link{to_label}} first to get dummy coding.
 #'
 #' @return For ungrouped + listwise data, an object of class
 #'   \code{c("linear_regression", "lm")} — \strong{the fitted \code{lm}
@@ -241,6 +245,9 @@ linear_regression <- function(data, formula = NULL,
   pred_names <- fb$pred_names
   # The call a user would type, in formula form: update()/step() re-run it
   user_call <- .regression_call(user_call, model_formula)
+  # Labelled (SPSS) predictors enter with their numeric codes, as in SPSS
+  # REGRESSION; the summary says so (factors = "dummy" applies to factors)
+  labelled_preds <- .labelled_predictors(data, pred_names)
 
   if (use == "pairwise" && !identical(dep_vars, dep_name)) {
     cli_abort(c(
@@ -292,7 +299,8 @@ linear_regression <- function(data, formula = NULL,
         group_vars = group_vars,
         standardized = standardized,
         conf.level = conf.level,
-        call = user_call
+        call = user_call,
+        labelled_predictors = labelled_preds
       ),
       class = "linear_regression"
     )
@@ -303,6 +311,7 @@ linear_regression <- function(data, formula = NULL,
     # Listwise: result IS the lm (mariposa slots attached).
     # Pairwise: result is a custom list (no fitted lm available).
     result$call <- user_call
+    result$labelled_predictors <- labelled_preds
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -885,37 +894,45 @@ linear_regression <- function(data, formula = NULL,
 
 #' Compute descriptive statistics for regression variables
 #'
-#' For factor predictors entered as dummies (the default), this still reports
-#' Mean/SD of the integer-coded factor levels — that matches what SPSS
-#' \code{REGRESSION} prints in its Descriptive Statistics block (ordinal-as-
-#' scale summary), regardless of how the factor is entered into the model.
+#' One row per outcome and numeric predictor (Mean, SD, N as in SPSS
+#' REGRESSION /DESCRIPTIVES). A factor predictor entered with dummy coding
+#' gets one row per dummy (non-reference level), named like its
+#' coefficient: the mean of a dummy is the share of that category - the
+#' variables SPSS would describe for a dummy-coded predictor. (The mean of
+#' the factor's level index, shown before, has no meaning for a nominal
+#' variable.) Factors entered with factors = "numeric" are already
+#' integer codes here. Weighted: SPSS frequency weights via the kernels,
+#' unrounded sum(w) (Charter 5.1), N rounded for display.
 #' @noRd
 .lm_descriptives <- function(data, dep_name, y, pred_names, weights_vec) {
-  var_names <- c(dep_name, pred_names)
-  desc_list <- lapply(seq_along(var_names), function(i) {
-    v <- var_names[i]
-    # Outcome: the fitted response (a transformed outcome such as
-    # log(income) has no column of its own)
-    x <- if (i == 1L) y else data[[v]]
-    if (is.factor(x)) {
-      # Descriptives are informational; coerce only here, model uses dummy coding
-      x <- as.numeric(x)
-    }
+  stat_row <- function(label, x) {
+    x <- as.numeric(x)
     if (!is.null(weights_vec)) {
-      # Weighted descriptives (matching SPSS WEIGHT BY behavior)
-      w <- weights_vec
-      wm <- stats::weighted.mean(x, w)
-      # Weighted SD using unrounded sum(w) — Charter §5.1
-      sw <- sum(w)
-      wsd <- sqrt(sum(w * (x - wm)^2) / (sw - 1))
-      wn <- round(sw)
-      tibble::tibble(Variable = v, Mean = wm, Std.Deviation = wsd, N = wn)
+      tibble::tibble(Variable = label,
+                     Mean = .w_mean(x, weights_vec),
+                     Std.Deviation = .w_sd(x, weights_vec),
+                     N = round(sum(weights_vec)))
     } else {
-      tibble::tibble(Variable = v, Mean = mean(x), Std.Deviation = stats::sd(x),
-                     N = length(x))
+      tibble::tibble(Variable = label, Mean = mean(x),
+                     Std.Deviation = stats::sd(x), N = length(x))
     }
-  })
-  do.call(rbind, desc_list)
+  }
+
+  # Outcome: the fitted response (a transformed outcome such as
+  # log(income) has no column of its own)
+  rows <- list(stat_row(dep_name, y))
+  for (v in pred_names) {
+    x <- data[[v]]
+    if (is.factor(x)) {
+      levs <- levels(droplevels(x))
+      for (lv in levs[-1]) {
+        rows[[length(rows) + 1]] <- stat_row(paste0(v, lv), x == lv)
+      }
+    } else {
+      rows[[length(rows) + 1]] <- stat_row(v, .plain_numeric(x))
+    }
+  }
+  do.call(rbind, rows)
 }
 
 
@@ -1049,11 +1066,11 @@ print.linear_regression <- function(x, ...) {
   formula_str <- .formula_label(x$formula)
 
   fit_line <- function(m) {
-    sprintf("R2 = %.3f, adj.R2 = %.3f, F(%s, %s) = %.2f, %s, N = %s",
-            m$model_summary$R_squared,
-            m$model_summary$adj_R_squared,
+    sprintf("R2 = %s, adj.R2 = %s, F(%s, %s) = %s, %s, N = %s",
+            .fmt_fixed(m$model_summary$R_squared, 3),
+            .fmt_fixed(m$model_summary$adj_R_squared, 3),
             .fmt_n(m$anova_table$df[1]), .fmt_n(m$anova_table$df[2]),
-            m$anova_table$F_statistic[1],
+            .fmt_est(m$anova_table$F_statistic[1], 2),
             format_p_stars(m$anova_table$Sig[1]),
             .fmt_n(m$n))
   }
@@ -1172,12 +1189,14 @@ print.summary.linear_regression <- function(x, ...) {
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
   print_header(title)
 
+  digits <- x$digits %||% 3
+
   # Formula info
   formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
     "Method" = "ENTER (all predictors)",
-    "N" = x$n
+    "N" = .fmt_n(x$n)
   )
   if (isTRUE(x$weighted)) {
     info[["Weights"]] <- x$weight_name
@@ -1186,6 +1205,7 @@ print.summary.linear_regression <- function(x, ...) {
     info[["Missing"]] <- "Pairwise deletion"
   }
   print_info_section(info)
+  .print_labelled_note(x$labelled_predictors)
 
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
@@ -1196,26 +1216,27 @@ print.summary.linear_regression <- function(x, ...) {
 
   if (show_desc) {
     cat("\n")
-    .print_descriptives_table(x$descriptives)
+    .print_descriptives_table(x$descriptives, digits)
   }
 
   if (show_model) {
     cat("\n")
-    .print_model_summary(x$model_summary)
+    .print_model_summary(x$model_summary, digits)
   }
 
   if (show_anova) {
     cat("\n")
-    .print_anova_table(x$anova_table)
+    .print_anova_table(x$anova_table, digits)
   }
 
   if (show_coefs) {
     cat("\n")
-    .print_coefficients_table(x$coef_table, x$standardized, show_ci)
+    .print_coefficients_table(x$coef_table, x$standardized, show_ci, digits,
+                              x$conf.level)
   }
 
   if (show_collin) {
-    .print_collinearity_table(x$coef_table)
+    .print_collinearity_table(x$coef_table, digits)
   }
 
   # Show significance legend if any p-value section is visible
@@ -1231,6 +1252,8 @@ print.summary.linear_regression <- function(x, ...) {
   title <- get_standard_title("Linear Regression", x$weight_name, "Results")
   print_header(title)
 
+  digits <- x$digits %||% 3
+
   formula_str <- .formula_label(x$formula)
   info <- list(
     "Formula" = formula_str,
@@ -1240,7 +1263,11 @@ print.summary.linear_regression <- function(x, ...) {
   if (isTRUE(x$weighted)) {
     info[["Weights"]] <- x$weight_name
   }
+  if (identical(x$use, "pairwise")) {
+    info[["Missing"]] <- "Pairwise deletion"
+  }
   print_info_section(info)
+  .print_labelled_note(x$labelled_predictors)
 
   show_model <- if (!is.null(x$show)) isTRUE(x$show$model_summary) else TRUE
   show_anova <- if (!is.null(x$show)) isTRUE(x$show$anova_table) else TRUE
@@ -1257,26 +1284,27 @@ print.summary.linear_regression <- function(x, ...) {
 
     if (show_desc) {
       cat("\n")
-      .print_descriptives_table(grp$descriptives)
+      .print_descriptives_table(grp$descriptives, digits)
     }
 
     if (show_model) {
       cat("\n")
-      .print_model_summary(grp$model_summary)
+      .print_model_summary(grp$model_summary, digits)
     }
 
     if (show_anova) {
       cat("\n")
-      .print_anova_table(grp$anova_table)
+      .print_anova_table(grp$anova_table, digits)
     }
 
     if (show_coefs) {
       cat("\n")
-      .print_coefficients_table(grp$coef_table, x$standardized, show_ci)
+      .print_coefficients_table(grp$coef_table, x$standardized, show_ci,
+                                digits, x$conf.level)
     }
 
     if (show_collin) {
-      .print_collinearity_table(grp$coef_table)
+      .print_collinearity_table(grp$coef_table, digits)
     }
   }
   .print_skipped_groups(x$skipped_groups, verbose = TRUE)
@@ -1294,74 +1322,55 @@ print.summary.linear_regression <- function(x, ...) {
 
 #' Print model summary table
 #' @noRd
-.print_model_summary <- function(ms) {
-  cat("  Model Summary\n")
-  w <- 60
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-25s %10.3f\n", "R", ms$R))
-  cat(sprintf("  %-25s %10.3f\n", "R Square", ms$R_squared))
-  cat(sprintf("  %-25s %10.3f\n", "Adjusted R Square", ms$adj_R_squared))
-  cat(sprintf("  %-25s %10.3f\n", "Std. Error of Estimate", ms$std_error))
-  cat(paste0("  ", strrep("-", w), "\n"))
+.print_model_summary <- function(ms, digits = 3) {
+  .print_kv_block(
+    "Model Summary",
+    c("R", "R Square", "Adjusted R Square", "Std. Error of the Estimate"),
+    c(.fmt_fixed(ms$R, digits), .fmt_fixed(ms$R_squared, digits),
+      .fmt_fixed(ms$adj_R_squared, digits), .fmt_est(ms$std_error, digits))
+  )
 }
 
 
 #' Print ANOVA table
+#'
+#' Columns are pre-formatted text sized to their content by
+#' print_stat_table(): digits honoured, Sig. in SPSS table style
+#' ("<.001"), df rounded for display (non-integer when weighted).
 #' @noRd
-.print_anova_table <- function(anova) {
+.print_anova_table <- function(anova, digits = 3) {
   cat("  ANOVA\n")
-  w <- 78
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-14s %16s %5s %16s %10s %8s\n",
-              "Source", "Sum of Squares", "df", "Mean Square", "F", "Sig."))
-  cat(paste0("  ", strrep("-", w), "\n"))
-
-  for (i in seq_len(nrow(anova))) {
-    ss_str <- format(round(anova$Sum_of_Squares[i], 3), big.mark = "", nsmall = 3)
-    # df may be non-integer for weighted models — SPSS rounds for display
-    df_str <- format(round(anova$df[i]))
-
-    if (i <= 2) {
-      ms_str <- format(round(anova$Mean_Square[i], 3), big.mark = "", nsmall = 3)
-    } else {
-      ms_str <- ""
-    }
-
-    if (i == 1) {
-      f_str <- format(round(anova$F_statistic[i], 3), nsmall = 3)
-      p_str <- format(round(anova$Sig[i], 3), nsmall = 3)
-      stars <- add_significance_stars(anova$Sig[i])
-    } else {
-      f_str <- ""
-      p_str <- ""
-      stars <- ""
-    }
-
-    cat(sprintf("  %-14s %16s %5s %16s %10s %8s %s\n",
-                anova$Source[i], ss_str, df_str, ms_str, f_str, p_str, stars))
-  }
-  cat(paste0("  ", strrep("-", w), "\n"))
+  first <- seq_len(nrow(anova)) == 1L
+  tab <- data.frame(
+    Source = anova$Source,
+    ss = .fmt_est(anova$Sum_of_Squares, digits),
+    dfv = .fmt_n(anova$df),
+    ms = .fmt_est(anova$Mean_Square, digits),
+    fv = ifelse(first, .fmt_est(anova$F_statistic, digits), ""),
+    pv = ifelse(first, fmt_p(anova$Sig, digits, style = "table"), ""),
+    stars = ifelse(first, add_significance_stars(anova$Sig), ""),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(tab, col_labels = c(ss = "Sum of Squares", dfv = "df",
+                                       ms = "Mean Square", fv = "F",
+                                       pv = "Sig.", stars = ""))
 }
 
 
 #' Print descriptive statistics table
 #' @noRd
-.print_descriptives_table <- function(desc) {
+.print_descriptives_table <- function(desc, digits = 3) {
   if (is.null(desc) || nrow(desc) == 0) return(invisible(NULL))
   cat("  Descriptive Statistics\n")
-  w <- 70
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-35s %12s %12s %6s\n",
-              "Variable", "Mean", "Std.Dev.", "N"))
-  cat(paste0("  ", strrep("-", w), "\n"))
-  for (i in seq_len(nrow(desc))) {
-    v <- desc$Variable[i]
-    if (nchar(v) > 35) v <- paste0(substr(v, 1, 32), "...")
-    cat(sprintf("  %-35s %12.3f %12.3f %6d\n",
-                v, desc$Mean[i], desc$Std.Deviation[i],
-                as.integer(round(desc$N[i]))))
-  }
-  cat(paste0("  ", strrep("-", w), "\n"))
+  tab <- data.frame(
+    Variable = desc$Variable,
+    mean = .fmt_est(desc$Mean, digits),
+    sd = .fmt_est(desc$Std.Deviation, digits),
+    nv = .fmt_n(desc$N),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(tab, col_labels = c(mean = "Mean", sd = "Std. Deviation",
+                                       nv = "N"))
 }
 
 
@@ -1410,23 +1419,19 @@ print.summary.linear_regression <- function(x, ...) {
 
 #' Print collinearity statistics block (Tolerance / VIF)
 #' @noRd
-.print_collinearity_table <- function(coefs) {
+.print_collinearity_table <- function(coefs, digits = 3) {
   if (!"VIF" %in% names(coefs)) return(invisible(NULL))
   rows <- which(!is.na(coefs$VIF))
   if (length(rows) == 0) return(invisible(NULL))
 
   cat("\n  Collinearity Statistics\n")
-  w <- 50
-  cat(paste0("  ", strrep("-", w), "\n"))
-  cat(sprintf("  %-25s %10s %10s\n", "Term", "Tolerance", "VIF"))
-  cat(paste0("  ", strrep("-", w), "\n"))
-  for (i in rows) {
-    term <- coefs$Term[i]
-    if (nchar(term) > 25) term <- paste0(substr(term, 1, 22), "...")
-    cat(sprintf("  %-25s %10.3f %10.3f\n",
-                term, coefs$Tolerance[i], coefs$VIF[i]))
-  }
-  cat(paste0("  ", strrep("-", w), "\n"))
+  tab <- data.frame(
+    Term = coefs$Term[rows],
+    tol = .fmt_est(coefs$Tolerance[rows], digits),
+    vif = .fmt_est(coefs$VIF[rows], digits),
+    stringsAsFactors = FALSE
+  )
+  print_stat_table(tab, col_labels = c(tol = "Tolerance", vif = "VIF"))
   cat("  VIF > 10 (Tolerance < 0.1) indicates problematic collinearity.\n")
 }
 
@@ -1435,48 +1440,36 @@ print.summary.linear_regression <- function(x, ...) {
 #'
 #' show_ci appends the confidence-interval columns for B (SPSS
 #' /STATISTICS CI); the interval level is the conf.level the model was
-#' fitted with.
+#' fitted with. Term names are never truncated: print_stat_table() sizes
+#' the column to the longest term (dummy names of long factor levels were
+#' cut to 25 characters and became ambiguous).
 #' @noRd
-.print_coefficients_table <- function(coefs, show_beta, show_ci = FALSE) {
+.print_coefficients_table <- function(coefs, show_beta, show_ci = FALSE,
+                                      digits = 3, conf.level = 0.95) {
   cat("  Coefficients\n")
   show_ci <- isTRUE(show_ci) && all(c("CI_lower", "CI_upper") %in% names(coefs))
 
-  w <- if (show_beta) 88 else 78
-  if (show_ci) w <- w + 22
-  ci_header <- if (show_ci) sprintf(" %10s %10s", "CI Lower", "CI Upper") else ""
-
-  cat(paste0("  ", strrep("-", w), "\n"))
-  if (show_beta) {
-    cat(sprintf("  %-25s %10s %10s %8s %10s %8s%s %s\n",
-                "Term", "B", "Std.Error", "Beta", "t", "Sig.", ci_header, ""))
-  } else {
-    cat(sprintf("  %-25s %10s %10s %10s %8s%s %s\n",
-                "Term", "B", "Std.Error", "t", "Sig.", ci_header, ""))
+  tab <- data.frame(
+    Term = coefs$Term,
+    b = .fmt_est(coefs$B, digits),
+    se = .fmt_est(coefs$Std.Error, digits),
+    stringsAsFactors = FALSE
+  )
+  if (isTRUE(show_beta)) tab$beta <- .fmt_est(coefs$Beta, digits)
+  tab$tv <- .fmt_est(coefs$t, digits)
+  tab$pv <- fmt_p(coefs$p, digits, style = "table")
+  if (show_ci) {
+    tab$lo <- .fmt_est(coefs$CI_lower, digits)
+    tab$hi <- .fmt_est(coefs$CI_upper, digits)
   }
-  cat(paste0("  ", strrep("-", w), "\n"))
+  tab$stars <- add_significance_stars(coefs$p)
 
-  for (i in seq_len(nrow(coefs))) {
-    term <- coefs$Term[i]
-    if (nchar(term) > 25) term <- paste0(substr(term, 1, 22), "...")
-    stars <- add_significance_stars(coefs$p[i])
-    ci_cells <- if (show_ci) {
-      sprintf(" %10.3f %10.3f", coefs$CI_lower[i], coefs$CI_upper[i])
-    } else {
-      ""
-    }
-
-    if (show_beta) {
-      beta_str <- if (is.na(coefs$Beta[i])) "" else sprintf("%.3f", coefs$Beta[i])
-      cat(sprintf("  %-25s %10.3f %10.3f %8s %10.3f %8.3f%s %s\n",
-                  term, coefs$B[i], coefs$Std.Error[i], beta_str,
-                  coefs$t[i], coefs$p[i], ci_cells, stars))
-    } else {
-      cat(sprintf("  %-25s %10.3f %10.3f %10.3f %8.3f%s %s\n",
-                  term, coefs$B[i], coefs$Std.Error[i],
-                  coefs$t[i], coefs$p[i], ci_cells, stars))
-    }
-  }
-  cat(paste0("  ", strrep("-", w), "\n"))
+  ci <- .ci_label(conf.level)
+  print_stat_table(tab, col_labels = c(b = "B", se = "Std. Error",
+                                       beta = "Beta", tv = "t", pv = "Sig.",
+                                       lo = paste(ci, "CI Lower"),
+                                       hi = paste(ci, "CI Upper"),
+                                       stars = ""))
 }
 
 
@@ -1962,6 +1955,111 @@ df.residual.linear_regression <- function(object, ...) {
   out <- formatC(round(as.numeric(n)), format = "f", digits = 0)
   out[is.na(n)] <- "NA"
   out
+}
+
+#' Fixed-decimal display without a negative zero
+#'
+#' For bounded fit statistics (R2, adjusted R2, pseudo R2): -0.0002 shows
+#' as "0.000", not "-0.000". NA shows as "".
+#' @noRd
+.fmt_fixed <- function(x, digits = 3) {
+  x <- as.numeric(x)
+  out <- formatC(x, format = "f", digits = digits)
+  out <- sub("^-(0(\\.0*)?)$", "\\1", out)
+  out[is.na(x)] <- ""
+  out
+}
+
+#' Display estimates: fixed decimals, scientific where fixed hides them
+#'
+#' A per-unit effect such as income's B (0.00062) printed as "0.000" and a
+#' separation estimate (Exp(B) ~ 4e30) as a 31-digit number that broke the
+#' table. Values that would round to zero at `digits` decimals, and values
+#' of 1e10 or more, are shown in scientific notation with `digits`
+#' significant digits (as SPSS shows "6.234E-4"). NA shows as "".
+#' @noRd
+.fmt_est <- function(x, digits = 3) {
+  x <- as.numeric(x)
+  out <- formatC(x, format = "f", digits = digits)
+  sci <- !is.na(x) & is.finite(x) & x != 0 &
+    (abs(x) < 0.5 * 10^(-digits) | abs(x) >= 1e10)
+  out[sci] <- formatC(x[sci], format = "e", digits = max(digits - 1L, 1L))
+  out[is.na(x)] <- ""
+  out
+}
+
+#' Display a ratio estimate with its interval (odds ratios)
+#'
+#' Row-wise: adds decimals (up to digits + 6) until the displayed limits
+#' differ - an odds ratio per EUR of income printed as 1.001 [1.001,
+#' 1.001]. Returns a character matrix with columns est, lower, upper.
+#' @noRd
+.fmt_ratio_ci <- function(est, lower, upper, digits = 3) {
+  out <- matrix("", nrow = length(est), ncol = 3)
+  for (i in seq_along(est)) {
+    d <- digits
+    lo <- lower[i]
+    hi <- upper[i]
+    if (!is.na(lo) && !is.na(hi) && is.finite(lo) && is.finite(hi) &&
+        lo != hi && max(abs(c(lo, hi))) < 1e10) {
+      while (d < digits + 6 &&
+             formatC(lo, format = "f", digits = d) ==
+             formatC(hi, format = "f", digits = d)) {
+        d <- d + 1L
+      }
+    }
+    out[i, ] <- .fmt_est(c(est[i], lo, hi), d)
+  }
+  out
+}
+
+#' Confidence-level label for table headers ("95%")
+#' @noRd
+.ci_label <- function(conf.level) {
+  paste0(format(100 * (conf.level %||% 0.95), trim = TRUE,
+                drop0trailing = TRUE), "%")
+}
+
+#' Two-column statistic/value block (model summaries)
+#'
+#' Width follows the content (pad_utf8), replacing fixed %-25s/%-30s
+#' layouts.
+#' @noRd
+.print_kv_block <- function(title, labels, values) {
+  cat("  ", title, "\n", sep = "")
+  lw <- max(nchar(labels, type = "width"))
+  vw <- max(nchar(values, type = "width"), 1L)
+  border <- paste0("  ", strrep("-", lw + vw + 3L), "\n")
+  cat(border)
+  for (i in seq_along(labels)) {
+    cat("  ", pad_utf8(labels[i], lw), "   ",
+        pad_utf8(values[i], vw, align = "right"), "\n", sep = "")
+  }
+  cat(border)
+  invisible(NULL)
+}
+
+#' Note on labelled predictors entered with their numeric codes (REG-19)
+#' @noRd
+.print_labelled_note <- function(vars, procedure = "REGRESSION") {
+  if (length(vars) == 0) return(invisible(NULL))
+  cat(sprintf(
+    "- Note: labelled predictor%s %s entered with %s numeric codes, as SPSS %s does.\n  Use to_label() first to enter %s as dummy-coded categories.\n",
+    if (length(vars) > 1) "s" else "",
+    paste(vars, collapse = ", "),
+    if (length(vars) > 1) "their" else "its",
+    procedure,
+    if (length(vars) > 1) "them" else "it"
+  ))
+  invisible(NULL)
+}
+
+#' Labelled (haven) predictors among the model variables
+#' @noRd
+.labelled_predictors <- function(data, pred_names) {
+  pred_names[vapply(pred_names, function(v) {
+    inherits(data[[v]], "haven_labelled")
+  }, logical(1))]
 }
 
 #' Abort for too few complete cases, naming the cause

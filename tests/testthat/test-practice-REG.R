@@ -492,3 +492,112 @@ test_that("REG-22: weighted pairwise regression uses the unrounded N", {
   ru <- linear_regression(d, life_satisfaction ~ age + income, use = "pairwise")
   expect_equal(ru$anova_table$df[2], round(ru$anova_table$df[2]))
 })
+
+# Row of a printed table whose first cell is `term`
+.table_row <- function(out, term) {
+  out[grepl(paste0("^\\s+", term, "\\s"), out)]
+}
+
+# REG-17: regression summaries ignored digits; small-unit effects printed as
+# 0.000 / -0.000 (income B 0.000 [0.000, 0.000], Exp(B) 1.001 [1.001,
+# 1.001], AME 0.000, adj.R2 -0.000); huge values (separation) in fixed
+# notation broke the tables.
+test_that("REG-17: regression output honours digits and shows small/huge values", {
+  m <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  out <- capture.output(print(summary(m)))
+  inc <- .table_row(out, "income")
+  expect_length(inc, 3L)            # descriptives, coefficients, collinearity
+  expect_false(grepl("\\s0\\.000\\s", inc[2]))
+  expect_true(grepl("e-0", inc[2]))
+  out5 <- capture.output(print(summary(m, digits = 5)))
+  expect_true(any(grepl(sprintf("%.5f", m$model_summary$R_squared), out5,
+                        fixed = TRUE)))
+  expect_true(any(grepl(sprintf("%.5f", coef(m)[["age"]]), out5, fixed = TRUE)))
+  expect_false(any(grepl("-0.000", capture.output(print(m)), fixed = TRUE)))
+  expect_equal(.fmt_fixed(c(-0.0002, 0.1234, NA), 3), c("0.000", "0.123", ""))
+
+  # Odds ratio close to 1: enough decimals to separate the CI limits
+  d <- .reg_sd2()
+  ml <- logistic_regression(d, high_sat ~ age + income)
+  inc <- .table_row(capture.output(print(summary(ml))), "income")
+  cells <- strsplit(trimws(inc), "\\s+")[[1]]
+  n <- length(cells)
+  lims <- if (cells[n] %in% c("*", "**", "***")) cells[(n - 2):(n - 1)] else cells[(n - 1):n]
+  expect_false(lims[1] == lims[2])
+
+  # AME per income unit is tiny: not printed as 0.000
+  me_out <- capture.output(print(summary(marginal_effects(ml))))
+  expect_false(grepl("\\s0\\.000\\s", .table_row(me_out, "income")))
+  expect_false(any(grepl("AME = 0.000", capture.output(print(marginal_effects(ml))),
+                         fixed = TRUE)))
+
+  # Separation: huge estimates in scientific notation, no 30-digit numbers
+  set.seed(4)
+  x <- stats::rnorm(60)
+  ds <- data.frame(y = as.integer(x > 0), x = x)
+  ms <- suppressWarnings(logistic_regression(ds, y ~ x))
+  out_s <- capture.output(print(summary(ms)))
+  expect_false(any(grepl("[0-9]{12,}", out_s)))
+})
+
+# REG-18: term names were truncated to 20 (logistic) / 25 (linear)
+# characters ("educationIntermediate S..."), making dummies ambiguous.
+test_that("REG-18: term names are printed in full", {
+  d <- .reg_sd2()
+  d$edu <- factor(as.character(d$education))
+  m <- linear_regression(d, life_satisfaction ~ age + edu)
+  out <- capture.output(print(summary(m)))
+  for (lv in levels(d$edu)[-1]) {
+    expect_true(any(grepl(paste0("edu", lv), out, fixed = TRUE)), info = lv)
+  }
+  expect_false(any(grepl("...", out, fixed = TRUE)))
+  ml <- logistic_regression(d, high_sat ~ age + edu)
+  out_l <- capture.output(print(summary(ml)))
+  for (lv in levels(d$edu)[-1]) {
+    expect_true(any(grepl(paste0("edu", lv), out_l, fixed = TRUE)), info = lv)
+  }
+})
+
+# REG-19: labelled SPSS predictors silently entered as numeric codes
+# although factors = "dummy"; the descriptives showed the mean of the
+# factor level index for factor predictors.
+test_that("REG-19: labelled-as-numeric note and meaningful factor descriptives", {
+  skip_if_not_installed("haven")
+  d <- .reg_sd2()
+  d$edu_lab <- haven::labelled(as.integer(d$education),
+                               c(Basic = 1, Intermediate = 2, Academic = 3, University = 4))
+  m <- linear_regression(d, life_satisfaction ~ age + edu_lab)
+  expect_equal(m$labelled_predictors, "edu_lab")
+  out <- capture.output(print(summary(m)))
+  expect_true(any(grepl("numeric codes", out, fixed = TRUE)))
+  expect_true(any(grepl("to_label", out, fixed = TRUE)))
+  ml <- logistic_regression(d, high_sat ~ age + edu_lab)
+  expect_true(any(grepl("numeric codes", capture.output(print(summary(ml))),
+                        fixed = TRUE)))
+
+  # Factor predictor (dummy coding): descriptives per dummy = proportion
+  mf <- linear_regression(d, life_satisfaction ~ age + gender)
+  row <- mf$descriptives[mf$descriptives$Variable == "genderFemale", ]
+  cc <- stats::complete.cases(d[c("life_satisfaction", "age", "gender")])
+  expect_equal(row$Mean, mean(d$gender[cc] == "Female"))
+  expect_false("gender" %in% mf$descriptives$Variable)
+})
+
+# EDGE-17: sum of weights > 2^31 (expansion weights): print failed with
+# "invalid format '%d'".
+test_that("EDGE-17: regression prints survive very large weighted N", {
+  d <- .reg_sd2()
+  d$wbig <- d$sampling_weight * 1e7
+  m <- linear_regression(d, life_satisfaction ~ age, weights = wbig)
+  expect_no_error(out <- capture.output(print(m)))
+  expect_true(any(grepl("N = 2", out)))
+  expect_no_error(capture.output(print(summary(m))))
+  # glm's IRLS may warn about convergence with weights this large; the
+  # point here is the print layer
+  ml <- suppressWarnings(logistic_regression(d, high_sat ~ age, weights = wbig))
+  expect_no_error(capture.output(print(ml)))
+  expect_no_error(capture.output(print(summary(ml))))
+  mg <- linear_regression(dplyr::group_by(d, region), life_satisfaction ~ age,
+                          weights = wbig)
+  expect_no_error(capture.output(print(mg), print(summary(mg))))
+})

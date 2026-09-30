@@ -379,10 +379,11 @@ print.marginal_effects <- function(x, digits = 3, ...) {
   print_rows <- function(rows, indent = "  ") {
     for (i in seq_len(nrow(rows))) {
       r <- rows[i, ]
-      cat(sprintf("%s%s: AME = %.*f, %s %s\n",
-                  indent, r$Term, digits, r$AME,
-                  format_p_compact(r$p_value, digits),
-                  add_significance_stars(r$p_value)))
+      # .fmt_est: a per-unit effect (e.g. per EUR income) is shown in
+      # scientific notation instead of "0.000"
+      cat(sprintf("%s%s: AME = %s, %s\n",
+                  indent, r$Term, .fmt_est(r$AME, digits),
+                  format_p_stars(r$p_value, digits)))
     }
   }
 
@@ -474,18 +475,31 @@ print.summary.marginal_effects <- function(x, ...) {
   if (x$is_grouped) {
     info[["Grouped by"]] <- paste(x$group_vars, collapse = ", ")
   } else {
-    info[["N"]] <- x$n
+    info[["N"]] <- .fmt_n(x$n)
   }
   print_info_section(info)
 
   if (isTRUE(x$show$effects)) {
-    stat_cols <- c("Term", "AME", "SE", "z", "p_value", "CI_lower", "CI_upper")
-    labels <- c(p_value = "p", CI_lower = "CI Lower", CI_upper = "CI Upper")
+    ci <- .ci_label(x$conf.level)
+    labels <- c(ame = "AME", se = "SE", zv = "z", pv = "p",
+                lo = paste(ci, "CI Lower"), hi = paste(ci, "CI Upper"),
+                stars = "")
 
     emit <- function(rows) {
-      df <- rows[stat_cols]
-      df$sig <- add_significance_stars(df$p_value)
-      print_stat_table(df, digits = digits, col_labels = labels)
+      # Pre-formatted: per-unit effects that round to 0 at `digits`
+      # decimals show in scientific notation (see .fmt_est)
+      df <- data.frame(
+        Term = rows$Term,
+        ame = .fmt_est(rows$AME, digits),
+        se = .fmt_est(rows$SE, digits),
+        zv = .fmt_est(rows$z, digits),
+        pv = fmt_p(rows$p_value, digits, style = "table"),
+        lo = .fmt_est(rows$CI_lower, digits),
+        hi = .fmt_est(rows$CI_upper, digits),
+        stars = add_significance_stars(rows$p_value),
+        stringsAsFactors = FALSE
+      )
+      print_stat_table(df, col_labels = labels)
     }
 
     cat("\n")

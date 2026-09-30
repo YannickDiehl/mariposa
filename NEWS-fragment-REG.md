@@ -90,3 +90,26 @@
   squares and standard errors (Validation Charter §5.1); it was rounded
   first. The displayed N stays rounded; results move by a fraction of the
   rounding error.
+* Regression output (`linear_regression()`, `logistic_regression()`,
+  `marginal_effects()`) is readable for every scale of variable:
+  - `summary(digits = )` is honoured in all tables (it was ignored).
+  - Estimates that would round to zero are shown in scientific notation
+    instead of `0.000` / `-0.000` (e.g. income B = 3.72e-04, as SPSS
+    shows 3.72E-4); huge values such as separation estimates no longer
+    print as 30-digit numbers. Odds ratios get as many decimals as needed
+    to separate their confidence limits (`1.0007 [1.0006, 1.0008]`
+    instead of `1.001 [1.001, 1.001]`). Fit statistics never show
+    `-0.000`.
+  - Term names are printed in full; the column is sized to the longest
+    term (dummy names were cut to 20/25 characters, e.g.
+    "educationIntermediate S...").
+  - Sig. columns use the SPSS style (`<.001`, `.466`) instead of `0.000`.
+  - The CI columns name their level ("95% CI Lower").
+  - A very large weighted N (sum of weights above 2^31) no longer breaks
+    the output with "invalid format '%d'".
+* Labelled predictors from SPSS files enter `linear_regression()` and
+  `logistic_regression()` with their numeric codes (as in SPSS; `factors
+  = "dummy"` applies to factors only). `summary()` now says so and points
+  to `to_label()` for dummy coding. The Descriptive Statistics table shows
+  one row per dummy (the share of each category) for factor predictors
+  instead of the meaningless mean of the level index.
