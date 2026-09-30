@@ -116,7 +116,7 @@ test_that("pomps works with across() for multiple variables", {
 test_that("pomps can handle values outside scale range", {
   # Values outside the scale range should still work (can be > 100 or < 0)
   x <- c(0, 3, 6)
-  result <- pomps(x, scale_min = 1, scale_max = 5)
+  expect_warning(result <- pomps(x, scale_min = 1, scale_max = 5), "outside")
 
   # ((0-1)/4)*100 = -25
   expect_equal(result[1], -25)

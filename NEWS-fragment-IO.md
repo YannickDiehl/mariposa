@@ -107,3 +107,8 @@
   the documented, recommended form. Non-numeric columns handed over by
   `pick()` are ignored with a warning naming them (they were dropped
   silently), and a fractional `min_valid` (e.g. 2.5) is rejected.
+* `pomps()` warns when values lie outside `scale_min`-`scale_max` (an
+  unrecoded "don't know" = 9 on a 1-5 scale silently scored 200), checks
+  that `scale_min`/`scale_max` are single finite numbers (a vector gave
+  the German base error "Bedingung hat Länge > 1", `NA` a cryptic one),
+  and says clearly when an all-`NA` input leaves no range to derive.

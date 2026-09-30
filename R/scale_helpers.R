@@ -41,7 +41,9 @@
 #' }
 #'
 #' Using theoretical values ensures that the transformation is consistent
-#' across samples and time points.
+#' across samples and time points. Values outside the range (e.g. an
+#' unrecoded "don't know" = 9 on a 1-5 scale) give scores below 0 or above
+#' 100; \code{pomps()} warns about them, so recode missing codes first.
 #'
 #' ## When to Use This
 #'
@@ -82,29 +84,11 @@ pomps <- function(x, scale_min = NULL, scale_max = NULL) {
   # INPUT VALIDATION
   # ============================================================================
 
+  x_name <- sub(".*\\$", "", deparse(substitute(x))[1])
+
   if (!is.numeric(x)) {
     cli_abort("{.arg x} must be a numeric vector.")
   }
-
-  # ============================================================================
-  # DETERMINE SCALE RANGE
-  # ============================================================================
-
-  if (is.null(scale_min)) {
-    scale_min <- min(x, na.rm = TRUE)
-  }
-
-  if (is.null(scale_max)) {
-    scale_max <- max(x, na.rm = TRUE)
-  }
-
-  if (scale_min >= scale_max) {
-    cli_abort("{.arg scale_min} ({scale_min}) must be less than {.arg scale_max} ({scale_max}).")
-  }
-
-  # ============================================================================
-  # POMPS TRANSFORMATION
-  # ============================================================================
 
   # Bare numbers: missing values of imported variables (tagged NAs) become
   # plain NA, like an SPSS COMPUTE (system-missing result). Arithmetic on
@@ -112,6 +96,55 @@ pomps <- function(x, scale_min = NULL, scale_max = NULL) {
   # made write_spss() fail.
   raw <- as.double(.plain_numeric(x))
   raw[is.na(raw)] <- NA_real_
+
+  for (arg in c("scale_min", "scale_max")) {
+    val <- get(arg)
+    if (!is.null(val) &&
+        (!is.numeric(val) || length(val) != 1L || !is.finite(val))) {
+      cli_abort(c(
+        "{.arg {arg}} must be a single finite number.",
+        "x" = "Got {.val {format(val)}}."
+      ))
+    }
+  }
+
+  # ============================================================================
+  # DETERMINE SCALE RANGE
+  # ============================================================================
+
+  if ((is.null(scale_min) || is.null(scale_max)) && all(is.na(raw))) {
+    cli_abort(c(
+      "{.var {x_name}} has no valid values to derive the scale range from.",
+      "i" = "Set {.arg scale_min} and {.arg scale_max} explicitly."
+    ))
+  }
+
+  if (is.null(scale_min)) {
+    scale_min <- min(raw, na.rm = TRUE)
+  }
+
+  if (is.null(scale_max)) {
+    scale_max <- max(raw, na.rm = TRUE)
+  }
+
+  if (scale_min >= scale_max) {
+    cli_abort("{.arg scale_min} ({scale_min}) must be less than {.arg scale_max} ({scale_max}).")
+  }
+
+  # Values outside the theoretical range (typically an unrecoded
+  # "don't know" = 9 on a 1-5 scale) silently gave scores such as -25 or 200
+  outside <- sort(unique(raw[!is.na(raw) & (raw < scale_min | raw > scale_max)]))
+  if (length(outside) > 0L) {
+    cli::cli_warn(c(
+      "{.var {x_name}} has {cli::qty(length(outside))}value{?s} outside the scale range {scale_min}-{scale_max}: {outside}.",
+      "i" = "They give scores below 0 or above 100. Recode them first (e.g. missing codes to {.val NA} with {.fn set_na} or {.fn rec}) or adjust {.arg scale_min}/{.arg scale_max}."
+    ))
+  }
+
+  # ============================================================================
+  # POMPS TRANSFORMATION
+  # ============================================================================
+
   result <- ((raw - scale_min) / (scale_max - scale_min)) * 100
   attr(result, "label") <- attr(x, "label", exact = TRUE)
 

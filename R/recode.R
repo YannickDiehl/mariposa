@@ -641,7 +641,7 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
     outside <- sort(unique(x_num[!is.na(x_num) & (x_num < lo | x_num > hi)]))
     if (length(outside) > 0L) {
       cli::cli_warn(c(
-        "{.var {var_name}} has value{?s} outside the scale range {lo}-{hi}: {outside}.",
+        "{.var {var_name}} has {cli::qty(length(outside))}value{?s} outside the scale range {lo}-{hi}: {outside}.",
         "i" = "They are reversed as well ({lo} + {hi} - x); recode them first (e.g. to {.val NA}) if they are not part of the scale."
       ))
     }

@@ -489,3 +489,23 @@ test_that("SCALE-19: pick() with non-numeric columns warns; min_valid integer", 
   expect_error(row_means(survey_data, trust_government, trust_media,
                          min_valid = 2.5), "whole number")
 })
+
+# SCALE-15: pomps() silently produced -25 / 200 for values outside the
+# scale (a typical unrecoded 9 = "don't know"); scale_min = c(1, 2) gave a
+# German base error, scale_min = NA a cryptic one, all-NA input German
+# warnings.
+test_that("SCALE-15: pomps() warns about values outside the scale range", {
+  expect_warning(r <- pomps(c(0, 3, 6, 9), 1, 5), "outside")
+  expect_equal(r, c(-25, 50, 125, 200))
+  expect_no_warning(pomps(c(1, 3, 5, NA), 1, 5))
+})
+
+test_that("SCALE-15: pomps() validates the scale range and all-NA input", {
+  expect_error(pomps(1:5, scale_min = c(1, 2), scale_max = 5), "scale_min")
+  expect_error(pomps(1:5, scale_min = NA, scale_max = 5), "scale_min")
+  expect_error(pomps(1:5, scale_min = 1, scale_max = Inf), "scale_max")
+  expect_error(pomps(1:5, scale_min = 5, scale_max = 1), "less than")
+  expect_error(pomps(c(NA_real_, NA_real_)), "no valid values")
+  expect_no_warning(r <- pomps(c(NA_real_, NA_real_), 1, 5))
+  expect_true(all(is.na(r)))
+})
