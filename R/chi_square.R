@@ -231,7 +231,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
              " only one observed category")
     }
     cli_warn(c(
-      "Chi-squared test not computed for {.var {var_names[1]}} × {.var {var_names[2]}}{where}.",
+      "Chi-squared test not computed for {.var {var_names[1]}} \u00d7 {.var {var_names[2]}}{where}.",
       "x" = "{reason}."
     ))
     return(empty_row(reason))

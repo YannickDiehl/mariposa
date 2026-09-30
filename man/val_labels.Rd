@@ -60,25 +60,25 @@ character column is an error (convert it with \code{\link[=to_labelled]{to_label
 }
 }
 \examples{
+# SET: assign value labels to a numeric rating (1-5)
+data <- val_labels(survey_data,
+  life_satisfaction = c("Very dissatisfied" = 1, "Very satisfied" = 5)
+)
+
 # GET: retrieve value labels from a vector
-val_labels(survey_data$gender)
+val_labels(data$life_satisfaction)
 
 # GET: from specific variables (returns list)
-val_labels(survey_data, gender, region)
-
-# SET: assign value labels
-data <- val_labels(survey_data,
-  gender = c("Male" = 1, "Female" = 2, "Non-binary" = 3)
-)
+val_labels(data, life_satisfaction, trust_government)
 
 # ADD: add labels without removing existing ones
 data <- val_labels(data,
-  gender = c("Prefer not to say" = 4),
+  life_satisfaction = c("Neither" = 3),
   .add = TRUE
 )
 
 # REMOVE: set to NULL
-data <- val_labels(data, gender = NULL)
+data <- val_labels(data, life_satisfaction = NULL)
 
 }
 \seealso{

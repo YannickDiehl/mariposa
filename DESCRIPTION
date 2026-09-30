@@ -48,6 +48,7 @@ Suggests:
     MASS,
     openxlsx2,
     survey,
+    withr,
     broom,
     psych,
     lavaan,

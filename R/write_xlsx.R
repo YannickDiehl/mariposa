@@ -386,7 +386,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
     } else {
       var_name
     }
-    if (!is.null(blk$group)) header_text <- paste0(header_text, " — ", blk$group)
+    if (!is.null(blk$group)) header_text <- paste0(header_text, " \u2014 ", blk$group)
     .freq_write_variable_header(wb, sheet, cur_row, ncols, header_text)
     cur_row <- cur_row + 1L
 

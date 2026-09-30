@@ -1006,8 +1006,8 @@ to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
   # Transliterate German umlauts ("männlich" -> "maennlich", not
   # "mnnlich"), then other accented letters via iconv where available
   out <- label
-  from <- c("ä", "ö", "ü", "Ä", "Ö", "Ü",
-            "ß")
+  from <- c("\u00e4", "\u00f6", "\u00fc", "\u00c4", "\u00d6", "\u00dc",
+            "\u00df")
   to <- c("ae", "oe", "ue", "Ae", "Oe", "Ue", "ss")
   for (k in seq_along(from)) out <- gsub(from[k], to[k], out, fixed = TRUE)
   ascii <- suppressWarnings(iconv(out, from = "UTF-8", to = "ASCII//TRANSLIT",
