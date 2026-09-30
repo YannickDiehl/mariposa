@@ -3,6 +3,77 @@
 Accumulates all changes since 0.7.3 went live on CRAN (see
 `.claude/VERSIONING_POLICY.md` §5, CRAN cadence).
 
+## Breaking changes
+
+Result objects and defaults that change in ways existing code can notice.
+All of them move mariposa closer to SPSS or remove silently wrong output;
+none has a deprecation bridge because the old values were wrong or
+misleading (VERSIONING_POLICY §4.2).
+
+* One-sample `t_test()`: `mean_diff` and its CI are now the difference
+  mean - `mu` as in SPSS's One-Sample Test (before: the mean itself, e.g.
+  3.628 instead of 0.628 for `mu = 3`).
+* `tukey_test()`/`scheffe_test()`: one row per pair in SPSS's
+  "(I) - (J)" orientation on every path (before: `"B-A"` unweighted,
+  `"A - B"` weighted), so unweighted differences can change sign; new
+  `SE` and `t_value` columns.
+* Grouped `levene_test()`: results carry the group-key columns instead of
+  one `Group` string, the `sig` column is gone, values are no longer
+  rounded, and the grouped method no longer has a `variable` argument
+  (analysis variables go through `...` as in the data-frame method).
+* `w_*()` results use one long format for all eleven functions (columns
+  such as `income`, `income_n`, `income_eff_n` are replaced by `Variable`,
+  the statistic, `n`, `weighted_n`, `effective_n`, `missing`).
+* Weighted `describe()`: the N column is the sum of weights (SPSS
+  FREQUENCIES/DESCRIPTIVES), no longer Kish's effective n; `Missing` is
+  weighted.
+* Weighted `crosstab()`: cell counts follow SPSS's default `/COUNT ROUND
+  CELL` (rounded cells, margins and percentages from the rounded cells).
+* `chi_square()`: with `correct = TRUE`, Phi and Cramér's V come from the
+  Pearson chi-square (SPSS Symmetric Measures); the Goodman-Kruskal gamma
+  p-value now uses SPSS's ASE0 (it was wrong before, e.g. .614 instead of
+  .460); gamma is only reported for ordinal pairs; `label_maps` is gone
+  (the tables carry the labels in their dimnames).
+* Rank tests (`mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`,
+  `friedman_test()`): nominal factors are an error; ordered factors are
+  ranked by level order everywhere.
+* `print.fisher_test()` default `digits` 4 -> 3.
+* Weighted `linear_regression()`: `vcov()`, `confint()`, `nobs()`,
+  `df.residual()`, `tidy()` and `glance()` use SPSS's frequency-weight df
+  (N = sum of weights), matching the summary (before: R's analytic-weight
+  df, so SEs and CIs disagreed with the summary).
+* `logistic_regression()`: `confint()` and `broom::tidy(conf.int = TRUE)`
+  return Wald intervals (the SPSS "C.I. for EXP(B)"); profile likelihood
+  via `confint(method = "profile")`.
+* `pearson_cor(alternative = "less"/"greater")` returns a one-sided CI;
+  the pairwise summary table no longer shows r² (still in
+  `$correlations`).
+* Grouped regressions, tests and scale analyses skip a group that cannot
+  be computed (with a warning naming it) instead of aborting the whole
+  call; skipped groups are listed in the result.
+* `efa()`: components/factors are reflected to SPSS's sign convention
+  (positive loading sum), so signs can flip relative to 0.7.3; the ML
+  compact line reports the extraction variance.
+* `reliability()`: an item with zero variance is removed from the scale
+  (with a warning), so alpha changes where such an item was included;
+  omega from a Heywood solution is `NA`.
+* `ancova()` "Parameter Estimates" use SPSS indicator coding with the last
+  category as reference (term names change); `factorial_anova()` and
+  `ancova()` stop with an error on a constant dependent variable.
+* `rec(rules = "rev")` reverses on the scale range (valid value labels
+  plus observed values) instead of the observed range; `rec()` returns a
+  `haven_labelled` vector when labels exist.
+* `to_label()` on a data frame skips metric variables whose valid values
+  carry no labels; duplicate label texts become distinct levels
+  ("<label> (<code>)").
+* `strip_tags()`/`untag_na()` keep the value labels (labelled result);
+  `na_frequencies()` reports numeric codes in code order.
+* `std()`, `center()`, `pomps()` and `to_numeric()` return plain `NA` for
+  SPSS missing values (SPSS COMPUTE semantics).
+* `row_count(count = c(4, 5))` counts cases with any of the values (SPSS
+  `COUNT`); it used to recycle the vector.
+* `frequency()` hides empty factor levels unless `show_unused = TRUE`.
+
 ## Output
 
 * `frequency()`, `crosstab()`, and `multiple_response()` now print
@@ -106,6 +177,929 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
 * `chi_square()` excludes cases with a missing weight. `NA` weights were
   summed into the table and made `chisq.test()` abort ("all entries of
   'x' must be nonnegative and finite").
+
+## Practice-test fixes (2026-09/10)
+
+Found by a seven-agent practice test of the package in everyday analysis
+use (`survey_data` and the ALLBUS 2023 SPSS file), each finding reproduced
+before it was fixed; SPSS-validated numbers only moved where the SPSS
+reference output showed mariposa was wrong.
+
+### Descriptive statistics
+
+* `describe()` and the `w_*` functions with `na.rm = FALSE`: a variable
+  with missing values now gets `NA` for every statistic, as in base R.
+  The weighted quantile family returned values computed on shifted
+  positions (the weighted median of `income` was 3800 instead of `NA`),
+  and the unweighted `describe()` / `w_iqr()` aborted with a base-R
+  `quantile()` error.
+* `describe(show = "all")` locates the quantile columns by their exact
+  names. The print matched them by a regular-expression prefix, so a
+  second variable such as `income_Quintile` crashed the print and a name
+  with special characters (`Einkommen (EUR)`) silently lost its quantiles.
+* `describe()` rejects unknown `show` values with an error listing the
+  valid ones (`show = "min"` used to print a table with nothing but N and
+  Missing), names quantile columns with at most two decimals
+  (`probs = 1/3` gives `Q33.33`, not `Q33.3333333333333`), no longer
+  prints Q50 next to the identical Median, and reports undefined
+  statistics of a constant variable as `NA` instead of `NaN`.
+* `describe()` and the `w_*` functions on grouped data no longer crash when
+  the selection contains a grouping variable (explicitly or through a
+  helper such as `where(is.numeric)`); errors ranged from "'x' is NULL"
+  and "quantile.haven_labelled() not implemented" to a dplyr internal
+  error. As in `dplyr::across()`, grouping variables are excluded from the
+  analysed variables, with a message.
+* Weighted `describe()` prints N and Missing like SPSS FREQUENCIES with
+  `WEIGHT BY`: N is the sum of the weights of the valid cases and Missing
+  the weighted missing count (income: N 2201, Missing 315). The table used
+  to show only Kish's effective sample size (2158.9) under the name
+  `Effective_N` and no Missing column. The effective N stays available in
+  `$results` (`<variable>_Effective_N`); `<variable>_Missing` is now the
+  weighted missing count for weighted analyses.
+* `describe()` output: the table is sized to its content (the borders were
+  always 40 dashes), grouped output no longer stacks the table rule
+  directly under the group underline, every statistic column uses the
+  same number of decimals (no `50` next to `50.550`), and a table wider
+  than the console is split into column blocks that each repeat the
+  Variable column (the continuation block used to lose it).
+* `w_mean()` and the other `w_*` functions (including `w_modus()`) print
+  every group combination when data are grouped by two or more variables.
+  The print iterated over the first grouping variable only: region x
+  gender showed two blocks labelled "region = East"/"West" that silently
+  contained the Male rows.
+* The `w_*` functions print one uniform table: Variable, the statistic,
+  N and Missing, one table per group. The prints used to differ across the
+  family (raw column names such as `weighted_mean`/`Effective_N` under
+  "--- var ---" headers, `w_modus()` as a raw tibble, `w_quantile()`
+  repeating the weights name on every row). With weights, N and Missing
+  are sums of weights as in SPSS; Kish's effective N (previously the only
+  N shown) is displayed by the new `summary()` methods for all eleven
+  `w_*` classes. `$results` has the same columns for one or several
+  variables (`Variable`, the statistic, `n` or `weighted_n` +
+  `effective_n`, `missing`); single-variable results no longer carry the
+  duplicated raw columns (`age`, `age_n`, `age_eff_n`).
+* `w_*` input checks: `w_mean(1:4, weights = c(1, 3))` says that the
+  lengths differ (was a cryptic base-R error), `w_mean(c("a", "b"))` says
+  that a numeric vector is needed (was "data must be a data frame"), and
+  `w_mean(survey_data, gender)` names the non-numeric variable (was `NA`
+  plus a base-R warning).
+* `w_modus()`: when several values share the highest frequency, the
+  smallest value (first factor level) is returned for weighted and
+  unweighted data alike, as in SPSS (the weighted version took the first
+  value in data order), `$results$n_modes` counts the tied values, and
+  the print flags the result ("Multiple modes exist").
+* Weighted `frequency()` of several labelled variables no longer aborts
+  with "Can't convert ... due to loss of precision" depending on the order
+  of the variables. The weighted branch kept the `haven_labelled` class in
+  the value column, so combining variables with different label sets
+  failed; values are now bare numbers, as in the unweighted branch.
+* `frequency()` no longer lists empty factor levels (e.g. "Student 0" after
+  `filter(employment != "Student")`) unless `show_unused = TRUE`, as SPSS
+  FREQUENCIES lists observed values only; with `show_unused = TRUE` they
+  now also appear in weighted tables.
+* `frequency(show_labels = "auto")` also shows the Label column when a
+  labelled missing-value code occurs (ALLBUS `age`: -32 "NICHT
+  GENERIERBAR"); the automatic mode only looked at the labels of valid
+  values, so metric variables printed their missing codes without the
+  explaining label.
+* `frequency()` tables follow the SPSS FREQUENCIES layout: valid
+  categories, "Total valid", the missing categories, "Total missing" (only
+  with two or more missing categories) and a grand "Total" row (N and
+  100 %). Cells without a value are empty instead of reading "NA"; plain
+  numeric, logical and character variables no longer end with two rows
+  both called "Total", and tagged missing values no longer end with a
+  "NA(total)" row. Further:
+  - `show_valid = FALSE` also hides the cumulative percentages (they are
+    cumulative *valid* percentages).
+  - every column is sized to its content: large weighted counts were cut
+    to "2798..." by a fixed 8-character N column.
+  - factors, character and logical variables show their categories once
+    (Value and Label columns used to repeat each other), and the summary
+    line leaves out statistics that do not exist ("mean=NA sd=NA",
+    "mean=NaN" for an all-missing variable).
+  - labels are left-aligned and never cut (they were cut at 40
+    characters); when the table is wider than the console, long labels
+    wrap onto extra lines.
+  - an all-missing variable prints its missing rows and the Total without
+    a "Valid % 100.00" of zero cases or an R warning.
+  - `print(x, digits = 0)` rounds the percentages only; the summary line
+    keeps two decimals.
+* Weighted `crosstab()` reproduces SPSS CROSSTABS' default
+  `/COUNT ROUND CELL`: every weighted cell count is rounded first, the
+  margins are sums of the rounded cells and percentages, expected counts
+  and adjusted residuals come from the rounded table. Cells used to be
+  rounded only for display while margins and percentages came from the
+  unrounded sums (402 + 447 shown with a margin of 848; ALLBUS DIVERS
+  15 | 3 with a row percentage of 81.7). Weighted counts, margins and
+  percentages now match the SPSS reference exactly (validated for the
+  weighted ungrouped and grouped scenarios).
+* `crosstab()`: the Total row shows every requested percentage as SPSS
+  CROSSTABS does (row % = column shares, col % = 100 %, total % = column
+  shares). With `percentages = "col"` it showed the column shares
+  labelled "col %", with `"row"`/`"total"` it had no percentage line and
+  with `"all"` only that mislabelled line.
+* `crosstab(digits = 2)` is honoured by `print()` and `summary()`; their
+  own default of 1 decimal overrode the value stored by `crosstab()`.
+* `crosstab()`: `na.rm = FALSE` now keeps cases with a missing value as
+  their own "NA" row or column (it had no visible effect),
+  `summary(x, percentages = FALSE)` says "Counts only" instead of "Row
+  percentages", and `crosstab(data, gender)` without a column variable
+  gives a clear error (was the base error 'argument "x" is missing').
+* `crosstab()` shows observed categories only, as SPSS CROSSTABS does: an
+  empty factor level (e.g. after `filter(employment != "Student")`) used
+  to print a "0 0 0" row with a row percentage of "100.0%" of zero cases.
+* Weighted `crosstab()` reports missing cases like SPSS's Case Processing
+  Summary: as the sum of their weights (it printed an unweighted count
+  next to the weighted "N (valid)").
+* `crosstab()` output: category labels are shown in full (they were cut
+  at 20 characters, so eight ALLBUS ISCO categories all read
+  "FUEHRUNGSKRAEFTE,..."), each column is as wide as its own content
+  (every column took the width of the widest label: sex x educ was 182
+  characters wide), long column headings and row labels wrap when the
+  table would be wider than the console, and the title and the column
+  spanner show the variable labels, as SPSS does, instead of the
+  variable names.
+* `multiple_response()` on data grouped by a labelled variable (e.g.
+  ALLBUS `eastwest`) no longer aborts with "arguments imply differing
+  number of rows: 1, 2".
+* `multiple_response(by = )` with a labelled `by` variable heads the
+  crosstab columns with the value labels in code order (it showed the
+  codes, e.g. "1"/"2" for ALLBUS `eastwest`).
+* `multiple_response()` tables: counts are whole numbers (unweighted
+  counts printed as "583.0"; weighted counts had one decimal in the
+  frequencies table but none in the crosstab), the frequencies table ends
+  with a Total row, and the crosstab has a Total column and a
+  "Total (cases)" row as in SPSS MULT RESPONSE (replacing the unwrapped
+  "Cases per column" footer). Factor or character indicators whose levels
+  do not contain `counted` (e.g. "no"/"yes" with the default
+  `counted = 1`) are an error instead of silently counting 0 mentions.
+* `codebook()` console output (`print()`/`summary()`) writes counts
+  without thousands separators ("2500 observations"), like every other
+  table in the package and SPSS's default output.
+
+### Parametric tests
+
+* `t_test()`, `oneway_anova()`, `factorial_anova()`, `ancova()` and the
+  post-hoc tests on their results order the groups of a numeric or
+  labelled grouping variable by code, as SPSS does, and show value labels
+  instead of codes. `t_test()` took the group order from the order of
+  appearance in the data, so sorting the data flipped the sign of t and
+  of the mean difference; labelled groups printed as "Groups compared:
+  1 vs. 2", Tukey/Scheffe rows as "1 - 2", and factorial descriptives and
+  ANCOVA marginal means by code. (PAR-02, PAR-10)
+* A dependent variable without variance is no longer "tested".
+  `oneway_anova()` on a constant variable reported F = 7256 *** (weighted)
+  or F = 0.992 computed from floating-point noise in sums of squares that
+  are exactly 0, `factorial_anova()` F = 4.011 *, and `tukey_test()`
+  adjusted p-values. `oneway_anova()`, `t_test()`, `tukey_test()` and
+  `scheffe_test()` now report such a variable (and one without any
+  non-missing value) as "not computed (<reason>)" with a warning naming the
+  variable; the other variables of the call are still tested.
+  `factorial_anova()` and `ancova()` stop with a clear error. `t_test()`
+  no longer aborts a multi-variable call with the raw base-R message
+  (German locale: "Daten sind praktisch konstant", printed twice as
+  "t_test() failed: ... / Caused by: ..."), no longer reports an all-missing
+  variable as a grouping problem ("Found 0 levels"), and a grouping
+  variable with 3 or more groups gives one error that points to
+  `oneway_anova()`. (PAR-01, PAR-24)
+* A group with a single case (weighted: a sum of weights <= 1) no longer
+  aborts `oneway_anova()` and `t_test()` with the raw base-R error "not
+  enough observations" from the Welch part. As in SPSS, the classical
+  ANOVA / Student's t-test is computed and Welch's test is marked "not
+  computed" with the reason; `t_test(var.equal = FALSE)` then reports
+  Student's t with a warning. A group with zero variance no longer
+  prints a Welch row "NaN 3 NaN NA <NA>" (weighted) or an infinite Glass'
+  Delta, and the Welch block of `summary(oneway_anova())` is titled
+  "Robust Tests of Equality of Means" (SPSS) instead of "Assumption
+  Tests", with df2 shown with decimals (1229.456, not 1229). (PAR-07,
+  PAR-17)
+* Grouped `oneway_anova()`, `tukey_test()`, `scheffe_test()` and
+  `levene_test()`: a group that cannot be tested (e.g. only one level of
+  `group` present in that group) is reported with a warning that names the
+  group label and the reason. `oneway_anova()` printed a silent "Results
+  not available", the post-hoc tests dropped the group without a word,
+  and `levene_test()` warned "in group 1" (the factor code). (PAR-18,
+  EDGE-13)
+* One-sample `t_test()` follows the SPSS One-Sample Test: `mean_diff` is
+  now the mean minus the test value `mu` (was: the mean itself, e.g.
+  3.628 instead of 0.628) and `conf_int_lower`/`conf_int_upper` are the
+  confidence interval of that difference. The weighted interval now
+  follows `alternative` (it was always two-sided). `summary()` shows the
+  test value, alternative, confidence level and a One-Sample Statistics
+  table (N, Mean, Std. Deviation, Std. Error Mean) and no longer prints an
+  effect-size legend for effect sizes a one-sample test does not have.
+  (PAR-05, PAR-06)
+* `summary(t_test())` prints SPSS-style tables: a Group Statistics table
+  (N, Mean, Std. Deviation, Std. Error Mean per group; SD and SE were
+  missing) and an Independent Samples Test table with t, df, p, mean
+  difference, its standard error and the confidence interval for both
+  variance assumptions. Significance stars now come from the exact
+  p-value (p = 0.0008 was rounded to 0.001 first and got "**", p = 0.0497
+  printed as "0.05" without a star); p-values print as "<.001"/".308"
+  instead of a bare "0", df as 2419 / 2384.147, weighted N as whole
+  numbers ("1149", not "1149.0"), and `digits` applies to every column.
+  Tables with umlaut labels stay aligned. (PAR-15, PAR-21, PAR-26)
+* `summary(oneway_anova())` prints an SPSS-style Descriptives table (N,
+  Mean, Std. Deviation, Std. Error and the confidence interval of each
+  group mean at `conf.level`) and formats the ANOVA, Welch and effect-size
+  tables with fixed decimals and `digits`. With `conf.level = 0.99` the
+  header said 99% but no interval was printed anywhere; weighted N printed
+  as "618.0", Mean Square as "289.79" next to "1.077", and `digits` had no
+  effect. `tukey_test()` and `scheffe_test()` on a `oneway_anova()` result
+  now default to the ANOVA's `conf.level` instead of silently using 95%.
+  (PAR-19, PAR-21)
+* `group_by() %>% levene_test()` takes its variables through `...` like
+  the ungrouped method: several variables, tidyselect helpers
+  (`starts_with("trust")`) and `group = "education"` as a string work, and
+  `group`/`weights` must be named. The old grouped method had the
+  signature `(x, variable, group, weights)`, so a second variable was
+  silently used as `weights` ("[Weighted] F(3, 1544896) = 40250"). Grouped
+  results now carry the group keys as columns: two `group_by()` variables
+  no longer print "region = East, gender = East", and a missing key (`NA`)
+  is its own group instead of a false "constant values" warning with
+  "F(NA, NA) = ,". An invalid `center` is an error, a variable without
+  variance prints "not computed (no variance ...)", and `weights` follow
+  the package policy (negative or non-numeric weights are an error; they
+  were accepted). (PAR-03, PAR-12, EDGE-04)
+* `summary(levene_test())` prints one SPSS-style table per group (Levene
+  Statistic, df1, df2, Sig.) with fixed decimals and `digits` (p printed as
+  a bare 0, df2 as 474.2032 next to 3), and its recommendation fits the
+  design: Welch's ANOVA for three or more groups, Welch's t-test only for
+  two groups, a caution for factorial designs. It used to recommend
+  "Welch's t-test" after `oneway_anova()` and `factorial_anova()`. The
+  compact line no longer ends in "p = 0.125 , variances equal". (PAR-14,
+  PAR-21)
+* `tukey_test()` and `scheffe_test()` report every comparison in the SPSS
+  "(I) - (J)" orientation (I before J in the category order, difference =
+  mean(I) - mean(J)) with a spaced separator, identically for the
+  unweighted, weighted, Scheffe and `factorial_anova()` paths, and add the
+  standard error of the difference. Unweighted Tukey rows came from
+  `TukeyHSD()` as "Intermediate Secondary-Basic Secondary 0.497" (later
+  minus earlier, unspaced) while weighted Tukey and Scheffe printed
+  "Basic Secondary - Intermediate Secondary -0.490". The comparison tables
+  stay aligned with umlaut labels (they were padded by bytes). (PAR-11,
+  PAR-22)
+* `factorial_anova()` and `ancova()` output: the Tests of Between-Subjects
+  Effects table no longer wraps at 80 columns (Partial Eta Squared and the
+  stars moved into a second block) and shows sums of squares with fixed
+  decimals instead of scientific notation (1.754652e+09); the header reads
+  "Sum of squares: Type III" instead of "Type III Sum of Squares: Type 3";
+  Levene's test prints "p < 0.001 ***" instead of "p = <.001"; the
+  compact print shows N once in its title instead of on the last effect
+  line only; descriptives, parameter estimates and marginal means honour
+  `digits`. The `?factorial_anova` examples no longer call a
+  non-existent `summary(marginal_means = FALSE)` toggle. (PAR-20, PAR-26)
+* `ancova()` Parameter Estimates follow the SPSS UNIANOVA coding: one row
+  per category ("[education=Basic Secondary]"), the last category of each
+  factor (and every interaction cell involving it) is the reference and
+  shown as a redundant 0, and the intercept is SPSS's. They are now
+  validated against the SPSS reference output. R's internal contrasts
+  leaked into the table before (education.L/.Q/.C for the ordered
+  `education`, gender1, a different intercept). Tiny coefficients print
+  in e-notation instead of "0.000 [0.000, 0.000]". With two or more
+  factors, `ancova()` also reports the main-effect marginal means (SPSS
+  `/EMMEANS=TABLES(factor)`, new element `emm_main_effects`) besides the
+  cell means. (PAR-16, EDGE-25)
+* `factorial_anova()` and `ancova()` with an empty design cell (e.g. no
+  women with a university degree after filtering): `ancova()` no longer
+  crashes with "Tibble columns must have compatible sizes", and effects
+  whose Type III hypothesis has no degrees of freedom are reported as
+  "not computed (not testable: the design has empty cells)" with a
+  warning that lists the empty cells, instead of "F(0, 2208) = NaN, p =
+  NA" (factorial) or F = -Inf (ANCOVA). The Corrected Model df is the
+  rank of the design minus 1, as in SPSS (unchanged for complete designs).
+  (PAR-08, PAR-09)
+* `factorial_anova()` and `ancova()` honour `group_by()`: one complete
+  analysis per group, with the group keys as leading columns of the
+  result tables, per-group `print()`/`summary()` output, and grouped
+  `tukey_test()`, `scheffe_test()` and `levene_test()` on the result. Both
+  ignored the grouping silently and reported one pooled table. A group
+  that cannot be analysed (e.g. no variance, a factor with one level) is
+  skipped with a warning naming the group. The weighting of each group's
+  fit is that of an ungrouped call. (PAR-04, EDGE-02)
+* Clear errors for arguments that do not exist: `t_test(paired = TRUE)`
+  explains that paired t-tests are not supported and points to
+  `wilcoxon_test()` (was: "Can't select columns with TRUE");
+  `t_test(x = , y = )` explains that variables come from `data` (was:
+  "Variable x is not numeric"); `normality_test(weights = )` says the
+  tests are unweighted by design and `normality_test(group = )` points to
+  `group_by()` (was: "Variable weights/group is not numeric"). The
+  errors of `tukey_test()`, `scheffe_test()` and `levene_test()` for
+  unsupported objects now mention `factorial_anova()` results, which work
+  as well. (PAR-23, PAR-24)
+* The compact `oneway_anova()` line no longer leaves a dangling space
+  ("p = 0.396 , eta2 = ...") and prints the total N also when the weights
+  sum to more than 2^31 (was "N = NA"). (PAR-21)
+* `normality_test()` names the variable (and, for grouped data, the
+  group) it cannot test - no variance or fewer than 3 valid values - in a
+  warning and prints "not computed (<reason>)" instead of silent "n/a"
+  results; the Tests of Normality table stays aligned with umlaut
+  variable names. (EDGE-13)
+* `summary(t_test())` with weights prints the Student and one-sample df as
+  whole numbers like SPSS (2435, not 2434.609) and the Welch df with
+  decimals; the unrounded values stay in `$results`. (PAR-21)
+
+### Non-parametric and categorical tests
+
+* `chisq_gof(expected = )` is applied to every selected variable. With
+  several variables it was silently dropped (equal proportions were
+  tested while the summary header still showed the custom proportions);
+  a variable whose categories do not fit `expected` is now a clear error.
+  A named `expected` vector is matched by category name instead of by
+  position (`c(Female = .3, Male = .7)` gave Male 30%). As with SPSS
+  `/EXPECTED=50 30 20`, counts or other relative frequencies are accepted
+  and divided by their sum; proportions that sum to about 1 (e.g. 0.995
+  from rounding) are rescaled with a message instead of shrinking every
+  expected count, and proportions that clearly do not sum to 1 are an
+  error. Categories with an expected count below 5 now trigger a warning,
+  as in `chi_square()`, and a group that cannot be tested is reported
+  with a warning naming the group instead of an unexplained `NA` row.
+* `chi_square()`, `phi()`, `cramers_v()`, `goodman_gamma()` and
+  `chisq_gof()` use the categories that actually occur in the data, as
+  SPSS does. An empty factor level (typically left over after
+  `filter()`) made chi-square, V and gamma `NaN` - also the cause of the
+  silent `NA` row of grouped `chi_square()` - and gave `chisq_gof()` a
+  phantom category with an extra degree of freedom (chi2 = 1257.5
+  instead of 5.0). A constant variable no longer crashes
+  `chi_square()` and the effect-size helpers ("replacement has length
+  zero"): the result is `NA` with a warning naming the variable (and
+  group), and the output says "not computed (x has only one observed
+  category)". The `summary()` tables show full value labels (no longer
+  cut at 20 characters) and fixed decimals.
+* `goodman_gamma()` and the gamma row of `chi_square()` are dramatically
+  faster and their p-value now matches SPSS. The concordant/discordant
+  counts came from a quadruple R loop over the table (`cramers_v(survey_data,
+  age, income)` took ~50 s, because `chi_square()` always computes gamma);
+  they now come from 2-D cumulative sums (0.03 s). The loop also counted
+  only the pairs below each cell, which mis-stated the null-hypothesis
+  standard error (ASE0): the approximate significance of gamma was wrong
+  (education x employment: p = .122 where SPSS prints .027). The gamma
+  value itself is unchanged.
+* `chi_square(correct = TRUE)` computes Phi, Cramer's V and the
+  contingency coefficient from the Pearson chi-square, as SPSS does; they
+  were computed from the Yates-corrected statistic (gender x region: 0.0119
+  instead of 0.0129). The Pearson statistic is kept in
+  `pearson_chi_squared`/`pearson_p_value`, `summary()` shows both rows
+  ("Pearson Chi-Square" and "Continuity Correction") like SPSS, and the
+  compact `print()` marks the statistic as "(continuity-corrected)". The
+  compact line now spells out "negligible" (was "neglig.") and ends with
+  the "Use summary()" hint.
+* `summary()` of `chi_square()` follows the SPSS "Symmetric Measures"
+  table: Phi and Cramer's V are shown for every table (Phi was hidden
+  outside 2x2 although `phi()` returned it and SPSS prints it), and
+  Goodman's gamma - with its verbal label - only when both variables are
+  ordinal (ordered factor or numeric). For nominal variables such as
+  gender x region its sign depends on the arbitrary category order.
+  `goodman_gamma()` still computes gamma on request.
+* `chi_square()` and the effect-size helpers warn once about expected
+  counts below 5. Base `chisq.test()` added its own "Chi-squared
+  approximation may be incorrect" warning (German: "Chi-Quadrat-
+  Approximation kann inkorrekt sein") next to mariposa's message; that
+  specific warning is now muffled in every locale.
+* `mann_whitney(mu = , alternative = )`: U, Z, r and the p-value now
+  refer to the same hypothesis. With `mu` the statistics were computed
+  for a shift of 0 while the p-value came from `wilcox.test(mu = )`
+  ("Z = -0.696, p < 0.001"); group-1 values are now shifted by `mu`
+  before ranking, as `wilcox.test()` does. For one-sided tests Z is
+  directional (positive when group 1 tends to be larger) so that its sign
+  matches the p-value (was Z = -0.226 next to p(less) = .589); the
+  two-sided Z keeps the SPSS convention. The weighted (design-based) test
+  supports only `mu = 0` and now says so instead of printing
+  "Null hypothesis (mu): 500" for an unshifted test.
+* The unused confidence interval of `mann_whitney()` is no longer
+  computed: `wilcox.test(conf.int = TRUE)` ran for every variable and
+  was discarded (the source of German "cannot compute confidence
+  interval" warnings for a constant variable), and `summary()` no longer
+  advertises a "Confidence level: 95.0%" for which no interval exists.
+  `conf.level` of `mann_whitney()`, `kruskal_wallis()`,
+  `wilcoxon_test()` and `friedman_test()` is documented as not used.
+* `pairwise_wilcoxon()`: the interpretation legend and help page now match
+  the sign of Z. Z is computed from the differences second minus first
+  variable (like `wilcoxon_test(x, y)` and the SPSS pair "var2 - var1"),
+  so a positive Z means the *second* variable tends to be higher; the
+  legend said the opposite (score_T1 vs score_T2: Z = +5.43 while T2 is
+  higher).
+* `pairwise_wilcoxon()` reports the number of cases of every pair (new
+  `n` column, shown in `summary()`) and explains why it can exceed the
+  Friedman N: each pair uses all cases with both values (pairwise
+  deletion, exactly like the SPSS `/WILCOXON` tests the results are
+  validated against), while `friedman_test()` uses complete cases. The
+  comparison table prints p-values in SPSS style (`<.001`, `.123`).
+* `fisher_test()` handles larger tables: instead of aborting with the raw
+  "FEXACT error 501 ... hash table key cannot be computed" it now falls
+  back to a Monte Carlo p-value with a warning (SPSS offers the same
+  "Monte Carlo" option next to "Exact"). The new arguments
+  `simulate.p.value` and `B` (default 10000 replicates, the SPSS default)
+  choose it directly; before, `simulate.p.value = TRUE` was silently
+  swallowed by `...`. A group that cannot be tested under `group_by()`
+  is reported with a warning instead of a silent `NA` row.
+* The rank tests treat ordered factors consistently as ordinal: they are
+  ranked by their level order. `mann_whitney()` aborted with "'x' must be
+  numeric" and `wilcoxon_test()` with "'-' not meaningful for factors"
+  (printing "Z = ,"), while `kruskal_wallis()` and `friedman_test()`
+  accepted them. A nominal (unordered) factor or character variable is
+  now a clear error in all four tests instead of running silently
+  (`kruskal_wallis(gender, group = education)`) or failing with "not
+  computed for this group" outside any `group_by()`.
+* `group_by() %>% binomial_test()` no longer aborts because the variable
+  has only one category in one group: that group gets an `NA` row, a
+  warning naming the group and the reason, and the output says "not
+  computed (gender has 1 observed category; ...)". An ungrouped single
+  variable still stops with a clear error.
+* Degenerate cases in the rank tests print a reason instead of broken
+  text. `wilcoxon_test()` with identical variables reports Z = 0 and
+  p = 1 as SPSS does (was "Z = ," and `NA`); a grouped `friedman_test()`
+  whose group cannot be tested no longer prints "chi2(NA) = ,  , W = ,
+  N = NA" and its warning names the group; a constant variable in
+  `kruskal_wallis()`/`mann_whitney()` is reported ("all values of x are
+  identical") instead of "(see warning)" without a warning or German
+  "cannot compute confidence interval" warnings; an all-missing variable
+  says "x has no valid values" instead of blaming the grouping variable
+  ("Found 0 groups ... use a Kruskal-Wallis test"). "not computed for
+  this group" appears only under `group_by()`; otherwise the output says
+  "not computed (reason)".
+* Labelled (SPSS) variables show their value labels instead of codes in
+  `kruskal_wallis()` ("Groups: 1, 2, ..., 7"), the pairs of
+  `dunn_test()`, `mann_whitney()` ("1 vs. 2"), `binomial_test()`
+  ("Group 1 (1)") and the categories of `chisq_gof()`, as `chi_square()`
+  already did. Grouping variables are ordered by code, as in SPSS: a
+  numeric 0/1 group was ordered by first appearance ("1 vs. 0" while the
+  ranks listed 0 first).
+* `fisher_test()` output: the contingency table is labelled with the
+  variable names and value labels (was "r"/"cc" and codes), empty factor
+  levels are dropped, grouped `summary()` shows each group's table (it
+  was dropped), the compact line uses 3 decimals like the rest of the
+  family (was "p = 0.5435") and reports the odds ratio with its 95% CI for
+  2x2 tables (SPSS "Risk Estimate": sample odds ratio, Woolf interval).
+* `mcnemar_test()` output: without discordant pairs the output says
+  "chi2 not computed (no discordant pairs), p = 1.000 (exact)" instead
+  of "chi2 = ,  (asymp)"; tables are labelled with the variable names and
+  value labels (was "v1"/"v2" and codes); grouped `summary()` shows each
+  group's table and the "(cc)" continuity-correction marker (both were
+  dropped); the compact line reports the degrees of freedom
+  ("chi2(1) = ..."). Two variables with different category sets (e.g.
+  0/1 against 1/2) are now an error instead of being tabulated as if the
+  categories matched.
+* `mann_whitney()` without `group` stops with "`group` is required" (as
+  `kruskal_wallis()` does) instead of the internal "Can't extract column
+  with `g_name`".
+* Output of the rank and exact tests is formatted consistently.
+  `summary()` tables print p-values in SPSS style ("<.001", ".026")
+  instead of a bare "p value 0" (Kruskal-Wallis, Wilcoxon, Friedman,
+  binomial, Mann-Whitney), leave empty cells blank instead of "NA"
+  ("Total 2500 NA", "Ties 502 NA NA"), show counts as integers (Mann-
+  Whitney "n = 1149.0") and give every column a fixed number of decimals
+  (0.52 next to 0.537, Mean Rank 19 next to 40.19, expected 538.24 next
+  to 26.239). Compact lines label Kruskal-Wallis epsilon-squared and
+  Kendall's W with an interpretation, `mann_whitney()` ends with the
+  "Use summary()" hint, and Mann-Whitney and Wilcoxon share one set of
+  r thresholds. The `dunn_test()` comparison table no longer wraps at 80
+  characters with long group labels, and a group or variable that
+  `dunn_test()` cannot compare is reported with a warning naming the
+  group.
+* Skipped groups are reported consistently: `mann_whitney()` says how
+  many groups with valid values a split has ("gender has 1 group ...")
+  instead of suggesting a Kruskal-Wallis test, and `pairwise_wilcoxon()`
+  names the group in its warnings; a pair whose values are all tied gets
+  Z = 0, p = 1 (as `wilcoxon_test()` and SPSS) instead of a silent `NA`.
+
+### Correlation and regression
+
+* `linear_regression()`, `logistic_regression()` and `marginal_effects()`
+  print models with long formulas correctly. A formula longer than about
+  70 characters (a normal model with five or more predictors) was split
+  into two lines: the compact title was printed twice and `summary()`
+  aborted with "'length = 2' in coercion to 'logical(1)'". The formula is
+  now always shown on one line.
+* `confint()` and `profile()` work on `logistic_regression()` results.
+  Both failed with "incorrect number of dimensions" because profiling
+  called `summary()` and got mariposa's SPSS-style summary instead of the
+  glm one. `confint()` now returns Wald intervals by default - the SPSS
+  "95% C.I. for EXP(B)" that `summary()` prints (`exp(confint(model))`
+  reproduces its Lower/Upper columns); `confint(model, method =
+  "profile")` gives glm's profile-likelihood intervals.
+  `broom::tidy(model, conf.int = TRUE)` uses the same Wald intervals and
+  no longer prints dozens of "non-integer #successes" warnings for
+  weighted models.
+* `marginal_effects()` computes correct AMEs for transformed predictors.
+  It perturbed one column of the model frame, so the transformed column
+  kept its fitted values: for `y ~ x + I(x^2)` the AME of `x` was 0.466
+  instead of 0.173. Variables that enter only transformed (`log(income)`,
+  `poly(x, 2)`, `I(x / 10)`), character and logical predictors were
+  dropped without a word. The AMEs are now rebuilt from the original data
+  for each variable (all terms using it move together); character and
+  logical predictors get discrete-change rows, and a numeric variable
+  used only as `factor(x)` is skipped with a warning that says how to get
+  its AMEs.
+* `marginal_effects()` on a grouped model whose grouping variable is
+  haven-labelled no longer aborts with "arguments imply differing number
+  of rows: 1, 2".
+* Weighted `linear_regression()`: `vcov()`, `confint()`, `nobs()`,
+  `df.residual()`, `anova()`, `predict()` (standard errors/intervals),
+  `broom::tidy()` and `broom::glance()` now use the SPSS frequency-weight
+  convention of `summary()` (N = `sum(w)`, residual df = `sum(w) - rank`).
+  They were inherited from `lm()`, which treats weights as analytic
+  weights: with `weights = w * 3`, `summary()` showed SE = .0527 but
+  `tidy()` .0916, and `nobs()` returned 2115 cases instead of N = 6388.
+  Unweighted models are unchanged.
+* `logistic_regression()` accepts every outcome with exactly two values,
+  as SPSS does: 1/2 codings (lower value = 0, higher = 1), factors with
+  an unused level (as `to_label()` leaves them; unused levels are
+  dropped, the first remaining level = 0), labelled, character and
+  logical outcomes. It used to demand 0/1 or a factor with exactly two
+  levels. The output now says which category is modelled: the compact
+  print shows `[P(y = category)]`, `summary()` starts with the SPSS
+  "Dependent Variable Encoding" table, and the classification table is
+  labelled with the categories instead of 0/1. A constant outcome
+  (previously "Nagelkerke R2 = -Inf ... Accuracy = 100%") and outcomes
+  with more than two values now stop with a clear message.
+* Grouped `linear_regression()` and `logistic_regression()` no longer
+  abort when one group cannot be fitted (too few cases, a constant
+  outcome, ...). Like SPSS SPLIT FILE, the group is skipped with a
+  warning naming it and the reason, the other groups are reported, and
+  `print()`/`summary()` list the group as "not computed". Before, one
+  small group stopped the whole analysis with "Insufficient observations
+  for the number of predictors" without saying which group. The message
+  itself now names an all-missing variable ("`x` has no non-missing
+  values") or gives the case count.
+* Model specification in `linear_regression()` / `logistic_regression()`:
+  - `dependent =` / `predictors =` work with non-syntactic names such as
+    `` `my var` `` or `` `Zufriedenheit (0-10)` `` (they were pasted into
+    the formula without backticks: parse error).
+  - `linear_regression(data, log(income) ~ age)` fits the transformed
+    outcome instead of failing with "Variable(s) not found in data: log.";
+    `logistic_regression()` says the outcome must be a single variable.
+  - `y ~ .` uses all other columns except the weights and grouping
+    variables; `y ~ 1` and an outcome that is also a predictor stop with
+    a clear message.
+  - A predictor selection that also picks the outcome, the weights or a
+    grouping variable (e.g. `predictors = where(is.numeric)`) drops them
+    with a message instead of regressing the outcome on itself.
+  - Character predictors enter as factors (no more `NA` descriptives and
+    base-R warnings).
+  - `weights =` accepts an expression such as `sampling_weight * 2`
+    (it failed with "Can't convert a call to a string").
+  - `anova()` on a weighted logistic model no longer leaks
+    "non-integer #successes" warnings.
+* `update()` and `step()` work on `linear_regression()` and
+  `logistic_regression()` results. The objects stored lm's internal call
+  (`data = data_complete, weights = .wt`), so both failed with "object
+  'data_complete' not found". The stored call is now the user's own call
+  in formula form. A model fitted inside a `%>%` pipe (no data name to
+  re-use) gets a clear error instead. `coef()`, `residuals()`,
+  `fitted()`, `confint()`, `nobs()` and `vcov()` on grouped results (and
+  all but `coef()` on pairwise results) now stop with an informative
+  message instead of returning `NULL` or a base-R error; `coef()` of a
+  pairwise regression returns its coefficients. `nobs()` of a weighted
+  logistic model is the sum of the weights (SPSS N).
+* Weighted `linear_regression(use = "pairwise")` uses the unrounded
+  smallest pairwise sum of weights in its degrees of freedom, sums of
+  squares and standard errors (Validation Charter §5.1); it was rounded
+  first. The displayed N stays rounded; results move by a fraction of the
+  rounding error.
+* Regression output (`linear_regression()`, `logistic_regression()`,
+  `marginal_effects()`) is readable for every scale of variable:
+  - `summary(digits = )` is honoured in all tables (it was ignored).
+  - Estimates that would round to zero are shown in scientific notation
+    instead of `0.000` / `-0.000` (e.g. income B = 3.72e-04, as SPSS
+    shows 3.72E-4); huge values such as separation estimates no longer
+    print as 30-digit numbers. Odds ratios get as many decimals as needed
+    to separate their confidence limits (`1.0007 [1.0006, 1.0008]`
+    instead of `1.001 [1.001, 1.001]`). Fit statistics never show
+    `-0.000`.
+  - Term names are printed in full; the column is sized to the longest
+    term (dummy names were cut to 20/25 characters, e.g.
+    "educationIntermediate S...").
+  - Sig. columns use the SPSS style (`<.001`, `.466`) instead of `0.000`.
+  - The CI columns name their level ("95% CI Lower").
+  - A very large weighted N (sum of weights above 2^31) no longer breaks
+    the output with "invalid format '%d'".
+* Labelled predictors from SPSS files enter `linear_regression()` and
+  `logistic_regression()` with their numeric codes (as in SPSS; `factors
+  = "dummy"` applies to factors only). `summary()` now says so and points
+  to `to_label()` for dummy coding. The Descriptive Statistics table shows
+  one row per dummy (the share of each category) for factor predictors
+  instead of the meaningless mean of the level index.
+* Correlation output (`pearson_cor()`, `spearman_rho()`, `kendall_tau()`,
+  `partial_cor()`):
+  - The compact print of a matrix shows the N range over the pairs
+    (`N = 2008-2421`); it showed the N of the first pair only (even
+    `N = 0`). With more than 15 pairs it lists the strongest significant
+    pairs instead of every pair (45 lines for 10 variables).
+  - `pearson_cor()` labels the interval by `conf.level` ("90% CI"; every
+    interval was called "95% CI", the column `CI_95`). A one-sided test
+    (`alternative = "less"`/`"greater"`) is named in print and summary
+    and gets the matching one-sided interval, as `cor.test()`.
+  - Matrices follow SPSS: blank p-value diagonal (was 0.0000), p in table
+    style (`<.001` instead of 0.0000), significance flags on the
+    coefficients, `digits` honoured for any number of variables (it
+    dropped to 2 decimals above 6 variables), and columns split into
+    blocks that fit the console instead of widening the `width` option.
+  - A constant variable gives one warning naming it and "not computed (no
+    variance)" instead of "r = NA, p = NA ," and one base-R warning per
+    pair; `partial_cor()` with a constant control variable no longer
+    crashes with "missing value where TRUE/FALSE needed".
+  - Aligned pair labels and a pairwise table that no longer wraps; a very
+    large weighted N (above 2^31) no longer breaks the output.
+* `logistic_regression()` also finds the value labels of an outcome that
+  carries them as a plain `labels` attribute (e.g. `rec()` output) for the
+  encoding table and the `[P(y = category)]` tag, and both regression
+  functions fit labelled (SPSS) variables on their bare numeric codes, so
+  a fit no longer depends on haven's arithmetic methods being loaded
+  ("<haven_labelled> - <haven_labelled> is not permitted").
+
+### Scale analysis
+
+* `efa()` components and factors now carry SPSS's sign convention. The
+  eigenvectors kept the arbitrary sign `eigen()` returned, so three
+  positively correlated trust items could load -0.597/-0.475/-0.678 on
+  their single component and signs could flip between groups. Every
+  extracted column is now reflected to a positive loading sum (as SPSS
+  FACTOR does); rotated, pattern and structure matrices and factor
+  correlations follow from the reflected solution. This reproduces every
+  signed loading SPSS prints in the reference runs, now asserted in the
+  SPSS validation tests.
+* `efa(extraction = "ml")` no longer reports the PCA share of variance.
+  The compact line read "Variance explained: 61.0%" (the eigenvalue share
+  of three components) although the three ML factors explain about 24%,
+  and it called ML factors "components". The result gains
+  `$extraction_variance` (SPSS's "Extraction Sums of Squared Loadings");
+  the compact line reports its cumulative percentage and says "factors"
+  for ML. `summary()` prints "Total Variance Explained" as one aligned
+  SPSS-style table (initial eigenvalues, extraction sums, rotation sums)
+  instead of free-text lines whose columns shifted from the 10th
+  component on.
+* `efa()` no longer crashes with the base error "infinite or missing
+  values in 'x'" (German: "unendliche oder fehlende Werte in 'x'") when a
+  correlation cannot be computed. A constant item, an item without valid
+  values, two items without cases in common, or too few complete cases
+  now give an error that names the item(s) and the reason. Under
+  `group_by()`, such a group is skipped with a warning naming the group,
+  and every other group is still analysed (previously the whole grouped
+  result was lost); `print()`/`summary()` show "not computed (...)" for it.
+* `efa()` flags singular correlation matrices like SPSS ("not positive
+  definite"). A duplicated item used to yield KMO 0.500 (from a
+  pseudo-inverse), Bartlett's chi-square `Inf` and "Sig.: 0.000", and
+  fewer cases than variables gave KMO `NaN`. Now a warning names the
+  perfectly correlated items or the case shortage, KMO and Bartlett's
+  test are reported as not computed, and ML extraction stops with a clear
+  message instead of "Lapack routine dgesv: system is exactly singular".
+  A separate warning appears when there are no more cases than variables.
+  Bartlett's and the goodness-of-fit significance use the SPSS style
+  ("<.001") instead of "0.000".
+* `efa()` shows its sample size. `print()` adds "N = 2168 (smallest
+  pairwise)" (or "(listwise)"), `summary()` an N line and SPSS's
+  "Descriptive Statistics" table (mean, SD, analysis N, missing N; new
+  toggle `descriptives`). With `use = "complete"`, `$item_statistics` now
+  describes the complete cases the analysis uses; the analysis N was
+  pairwise before.
+* `efa()` input and output details: `n_factors = 2.7` is an error instead
+  of being truncated to 2; `use = "listwise"` (the SPSS term) is accepted
+  as an alias of `"complete"`, and invalid `rotation`/`extraction`/`use`
+  values give an English error instead of a translated `match.arg()`
+  message. A requested rotation of a single component is no longer
+  dropped silently: output says "Only one component was extracted. The
+  solution cannot be rotated." as SPSS does. Communalities print with
+  fixed decimals ("1.000" instead of "1" next to "0.457"), and the
+  summary says "N of Components" for PCA.
+* `reliability(na.rm = FALSE)` no longer crashes with "missing value where
+  TRUE/FALSE needed" (German: "Fehlender Wert, wo TRUE/FALSE nötig ist")
+  as soon as a value is missing. All statistics are `NA`, a warning names
+  the items with missing values and points to `na.rm = TRUE` (listwise
+  deletion, as SPSS), and `print()`/`summary()` say "not computed (...)"
+  instead of "Cronbach's Alpha = NA ()".
+* `reliability()` warnings are clearer. An item with zero variance is
+  removed from the scale with a warning naming it, as SPSS RELIABILITY
+  does; it used to stay in (alpha 0.042 instead of 0.047, standardized
+  alpha `NA`) next to the German base warnings "Standardabweichung ist
+  Null" and "NaNs wurden erzeugt". When omega cannot be computed (e.g. a
+  duplicated item makes the correlation matrix singular), the warning
+  says why in English and names the perfectly correlated items instead
+  of relaying factanal's translated error. The "omega requires at least
+  3 items" warning appears once per call instead of once per group, and
+  "Insufficient data (n = 0)" now names the group and the items without
+  valid values.
+* `reliability()` no longer reports McDonald's omega from a Heywood
+  solution. For the trust items in the East region the one-factor model
+  put one uniqueness at its lower bound (loading of about 1), and omega
+  0.349 was printed next to alpha 0.037 without comment. Omega is now
+  `NA` in such cases, with a warning that names the item and the group.
+* `reliability()` flags a negative Cronbach's alpha like SPSS: "The value
+  is negative due to a negative average covariance among items ... check
+  item codings." A warning and the `summary()` footnote name the items
+  with a negative corrected item-total correlation (usually items that
+  need reverse-coding; new `$negative_items`), and the compact print says
+  "negative; check item coding" instead of classifying alpha -0.929 as
+  "Poor".
+* `reliability()` output is easier to read. The Item-Total Statistics
+  table no longer wraps at 80 columns under snake_case headers
+  (`scale_mean_deleted`, `corrected_r`, ...); it has SPSS-style two-line
+  headers ("Scale Mean / if Deleted", "Alpha if / Deleted", ...). The
+  inter-item correlation matrix honours `digits` for more than six items
+  (it was forced to 2 decimals) and uses numbered columns so it stays
+  narrow. Item statistics print with fixed decimals (no more "1.16" next
+  to "2.615"), and a missing omega reads "not computed" with the reason
+  instead of "NA".
+* `reliability()` and `efa()` show variable labels, as SPSS does.
+  `summary()` lists every item with its full label, and the per-item
+  tables (item statistics, communalities, loading matrices) add the
+  label next to the name, shortened with "..." so that rows fit the
+  console width; wide tables keep the names only. Labels with umlauts
+  stay aligned. The labels are stored in `$variable_labels`.
+
+### Data import/export, labels and transformation
+
+* `read_sas()` reads `.sas7bdat` files again with the default arguments.
+  It passed `catalog_encoding = NULL` explicitly, which haven 2.5 rejects
+  ("Expected string vector of length 1"), so every call without an explicit
+  catalog encoding failed. The catalog encoding now falls back to the data
+  file's encoding, as documented.
+* `untag_na()`, `na_frequencies()`, `write_spss()`, `write_xlsx()` and
+  `write_xpt()` are much faster on large imported files. The NA tag of
+  every missing value was read one element at a time, each through vctrs
+  dispatch, and the Excel "Labels" sheet was built from thousands of
+  one-row data frames. Full ALLBUS 2023 (579 variables): `untag_na()` over
+  all columns 9.8 s -> 0.15 s, `write_spss()` 11.5 s -> 1 s,
+  `write_xlsx()` 22 s -> 8 s (the rest is openxlsx2 itself). Output is
+  unchanged.
+* `write_spss()` no longer crashes ("Failed to insert value ...: The file
+  format does not supported character tags for missing values") after
+  `rec()`, `std()`, `center()`, `pomps()`, `to_numeric()` or arithmetic on
+  variables imported with `read_spss()`. These results kept the tagged-NA
+  payloads but lost the code map. Now `rec()` keeps the missing-value
+  types, their code map and their labels (so `na_frequencies()`,
+  `frequency()` and the SPSS export still show "no answer" etc.), while
+  `std()`, `center()`, `pomps()` and `to_numeric()` return plain `NA` by
+  design (as an SPSS `COMPUTE` gives system-missing). `write_spss()` writes
+  remaining unmapped tags as system missing with one warning naming the
+  variables.
+* Value labels created by `rec()` (inline `[label]` syntax, `val_labels`,
+  mirrored labels of `"rev"`), kept by `strip_tags()` or by
+  `to_numeric(keep_labels = TRUE)` now survive `write_spss()` and
+  `write_stata()`. They were attached as a bare `labels` attribute without
+  the `haven_labelled` class, which haven's writers ignore. The results are
+  `haven_labelled` now; `to_labelled()` picks up an existing `labels`
+  attribute; the exporters also promote such bare attributes themselves.
+* `rec(as_factor = TRUE)` names the levels by the result's value labels
+  (e.g. the mirrored labels of `"rev"`, previously ignored: levels "1".."7")
+  in code order. Values without a label keep their code as level name
+  instead of becoming `NA`, and duplicate label texts are disambiguated by
+  their code.
+* `rec(rules = "rev")` reverses on the scale range instead of the observed
+  range. It computed `max(x) + min(x) - x` over the data, so a 1-5 item
+  answered only with 2-5 became 5..2 instead of 4..1, and the value labels
+  were mirrored to codes that do not exist. The range now comes from the
+  value labels of the valid codes (together with the observed values);
+  without labels the observed range is used with a message, and the new
+  syntax `rules = "rev(1, 5)"` sets the range explicitly (values outside it
+  are reported).
+* `rec()` on `haven_labelled_spss` vectors (`haven::read_sav(user_na =
+  TRUE)`) treats the user-missing codes as missing: they were reversed or
+  recoded like valid values and lost their codes and labels. The input is
+  converted to the tagged-NA form of `read_spss()` first. `val_labels` is
+  honoured with `rules = "rev"` (it was silently ignored).
+* `rec()` syntax is more forgiving and never loses values silently:
+  valid values that match no rule still become `NA` but now with a warning
+  that lists them and suggests `else=copy` (SPSS's in-place `RECODE`
+  keeps them) or `else=NA`; value lists work (`"1,2=1; 3,4:5=2"`, as
+  SPSS's `RECODE (1,2=1)`); keywords are case-insensitive (`"REV"`,
+  `"Dicho(3)"`); a reversed range such as `"5:1=1"` is an error instead of
+  silently matching nothing; inline labels may contain semicolons
+  (`"[niedrig; gering]"`); `"dicho(x)"` and a missing `rules` argument give
+  clear English errors instead of leaked base-R (German) messages; the
+  `" (recoded)"` label suffix is no longer appended again on every call.
+* `to_label()` and `to_character()` no longer merge distinct codes that
+  share a label text. ALLBUS labels the scale points 2-6 of 88 items "..",
+  so e.g. `pt12` collapsed into three levels ("GAR KEIN VERTRAUEN", "..",
+  "GROSSES VERTRAUEN") and the `to_numeric()` round trip turned 3-6 into 2.
+  Duplicate texts now get their code appended (`".. (2)"`, `".. (3)"`), the
+  same rule the test functions use for grouping variables.
+* `to_label(data)` and `to_character(data)` without a variable selection
+  no longer turn metric variables into factors. ALLBUS `age` and `isei08`
+  (whose only labels are missing codes) became all-`NA` factors and the
+  weight a factor with one level per value, silently. Now only variables
+  whose values are all value-labelled are converted; the others are left
+  unchanged with one message listing them. Selected variables are still
+  converted, and whenever values without a label become `NA` a warning
+  names the variables and points to `add_non_labelled = TRUE`.
+* `copy_labels()` no longer forces the source's value labels and class
+  onto columns that were converted or summarised: a `to_label()` factor
+  became `int+lbl` 1, 2, 3 carrying the labels 1/5/9 of the source codes,
+  and group means were labelled as if they were codes. Value labels,
+  missing-value metadata and the class are now copied only when the target
+  still holds the source's codes; the variable label is always copied.
+* `set_na(data, -9, -8, tag = FALSE)` (the documented example) no longer
+  strips the labels of every numeric column (`survey_data`: 15 variable
+  labels -> 6). Variable labels, the value labels of the remaining codes,
+  the `haven_labelled` class and existing missing-value types are kept;
+  integer columns stay integer.
+* `val_labels()` refuses to set value labels on a factor or character
+  column (they were stored but never used) and points to `to_labelled()`;
+  `set_na()` warns when a named variable or a vector is a factor instead of
+  silently returning it unchanged.
+* `to_dummy()` fixes: with `suffix = "label"`, values sharing a label text
+  (ALLBUS ".." scale points) all wrote into one column `pt12_` and their
+  dummies were lost - every category now gets its own column (value
+  appended to duplicate or empty labels); umlauts are transliterated
+  (`"männlich"` -> `maennlich`, was `mnnlich`); `ref` works for factors,
+  by level name or number (it was compared with the level names only, so
+  `ref = 1` silently returned all dummies), and a `ref` that matches no
+  category is an error.
+* `row_count()` counts value sets and missing values: `count = c(4, 5)`
+  was recycled over the cells (wrong counts without a warning), and
+  `count = NA` always returned 0. It now counts cells equal to any listed
+  value (SPSS `COUNT n = v1 TO v5 (4, 5)`), `NA` counts missing values
+  (SPSS `MISSING`), and SPSS missing codes of imported data (e.g. -9, a
+  tagged NA after `read_spss()`) are counted when listed - they were
+  always 0.
+* `row_means()`, `row_sums()` and `row_count()` inside a grouped
+  `mutate()` with the `.` placeholder now stop with an explanation and the
+  `pick()` form instead of dplyr's bare size-mismatch error; `pick()` is
+  the documented, recommended form. Non-numeric columns handed over by
+  `pick()` are ignored with a warning naming them (they were dropped
+  silently), and a fractional `min_valid` (e.g. 2.5) is rejected.
+* `pomps()` warns when values lie outside `scale_min`-`scale_max` (an
+  unrecoded "don't know" = 9 on a 1-5 scale silently scored 200), checks
+  that `scale_min`/`scale_max` are single finite numbers (a vector gave
+  the German base error "Bedingung hat Länge > 1", `NA` a cryptic one),
+  and says clearly when an all-`NA` input leaves no range to derive.
+* `std()` and `center()` keep the variable label of imported (SPSS)
+  variables when overwriting them in place: the label was read after the
+  column had already been replaced, so it was lost. Grouped
+  standardization/centering returns a plain numeric column instead of
+  leaving a `dbl+lbl` vector behind, vector input keeps its label (with
+  " (standardized)"/" (centered)"), and the zero-spread warning names the
+  variable and the group (e.g. "`x` (g = a): the spread (sd) is zero").
+  The weighted mean/SD now come from the shared SPSS kernels (results
+  unchanged).
+* `write_spss()` and `write_stata()` export a factor created by
+  `to_label()` with its original codes and value labels: haven renumbered
+  it 1..k (ALLBUS `dm06` codes 100, 120, ... became 1, 2, ...), although
+  the factor carries its codes. Other factors are still written as 1..k
+  with their levels as labels.
+* `read_spss()` -> `write_spss()` round trips the SPSS missing-value
+  definitions exactly and quietly. `read_spss()` kept only the codes that
+  occur, so an unchanged ALLBUS export produced 133 warnings ("4 discrete
+  missing codes exceed SPSS's limit of 3 ... range -42--8") and rewrote
+  `LOWEST THRU -1` as `-42 THRU -8`. The original definition is now
+  remembered (attribute `spss_missing`) and written back while it fits
+  (ALLBUS 2023: all 579 definitions and values identical, no warning).
+  Variables with more than 3 codes otherwise use SPSS's "range plus one
+  discrete value" form when that avoids valid values (e.g. codes 0, 7, 8,
+  9 around valid 1-6, which used to be an error), reported in one message
+  with readable ranges ("-11 to -8 and -42").
+* `read_spss()`, `read_por()`, `read_stata()`, `read_sas()`, `read_xpt()`
+  and `read_xlsx()` recognise a file of the wrong type from its first bytes
+  and say what it looks like and which reader to use (e.g. "read_spss()
+  cannot read x.dta: it looks like a Stata file (.dta). Use read_stata()
+  instead."), instead of readstat's cryptic errors; a missing file is
+  reported as such.
+* `write_xpt()` no longer truncates variable names silently: the default
+  SAS transport version 5 allows 8 characters, and truncation even created
+  duplicate names. It now warns (listing old -> new names, suggesting
+  `version = 8`) and refuses to write when truncation would produce
+  duplicates.
+* `write_xlsx()` makes sheet names unique within Excel's 31-character,
+  case-insensitive limit (two list names sharing their first 31
+  characters, or an element called "Labels", crashed without writing a
+  file); renamed sheets are listed in one message. A missing output
+  directory is reported clearly, as in `codebook(file = )`.
+* `write_xlsx()` of a grouped `frequency()` result writes one block per
+  group, headed by the variable and the group ("gender (Gender) - region =
+  East") with its own N line. All groups were written as one block under
+  the first group's header, without group labels, and the Total row summed
+  the groups (Raw % = 200). Weighted N is rounded like the console print
+  ("N=2516", was "N=5245.99999999998").
+* `find_var()` gains `fixed = TRUE` for literal (case-insensitive) search,
+  e.g. label text with parentheses: `"BEFRAGTE(R)"` as a regular expression
+  matched "BEFRAGTER" instead. Regular expressions stay the default; a
+  message points to `fixed = TRUE` when the literal text would match other
+  variables, an invalid regular expression such as `"("` is searched as
+  text (the regex engine's warning no longer leaks), and an empty result
+  is returned invisibly instead of printing `<0 rows>`.
+* `strip_tags()` and `untag_na()` accept a data frame (all numeric
+  columns, or the ones selected via `...`) instead of failing with a
+  German base-R error, and reject non-numeric vectors with a clear message
+  (`strip_tags("a")` returned `NA`). `untag_na()` keeps the value and
+  variable labels: the labels of the missing types are attached to their
+  restored codes (e.g. -9 = "KEINE ANGABE"), so the result is still
+  `haven_labelled`.
+* `na_frequencies()` output is reorganised: rows are ordered by code like
+  the missing block of `frequency()` (they were sorted by count), columns
+  are `code`, `label`, `n`, `prc` (percent of all cases, new) and `tag`
+  (the technical tag letter moved last), SPSS codes are numeric (were
+  character), the "(System Missing)" row appears only when system-missing
+  values occur, and a variable without missing values gives a message
+  instead of printing `<0 rows>`. Data frames are accepted
+  (`na_frequencies(data, q1, q2)`, as the data-io vignette shows) and
+  return one table with a `variable` column.
+* New replacement form `var_label(x) <- "Label"` (and
+  `var_label(data) <- list(age = "Age", sex = "Sex")`; `NULL` removes a
+  label). `drop_labels()` also drops unused factor levels (keeping the
+  variable label and the codes of `to_label()` factors); its example
+  filtered on a non-existent category and did nothing. The `copy_labels()`
+  help no longer claims that `filter()`/`select()`/`mutate()` strip labels
+  (they keep them) and names the operations that do.
 
 # mariposa 0.7.3
 
