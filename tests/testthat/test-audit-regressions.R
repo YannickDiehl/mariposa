@@ -1196,7 +1196,8 @@ test_that("read_spss() reports counts without thousands separators", {
   f <- tempfile(fileext = ".sav")
   on.exit(unlink(f), add = TRUE)
   haven::write_sav(data.frame(x = x), f)
-  msg <- paste(capture.output(invisible(read_spss(f)), type = "message"),
+  msg <- paste(capture.output(invisible(read_spss(f, verbose = TRUE)),
+                              type = "message"),
                collapse = " ")
   expect_match(msg, "1500 values")
   expect_false(grepl("1,500", msg, fixed = TRUE))
