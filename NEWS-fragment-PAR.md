@@ -48,3 +48,13 @@
   table (N, Mean, Std. Deviation, Std. Error Mean) and no longer prints an
   effect-size legend for effect sizes a one-sample test does not have.
   (PAR-05, PAR-06)
+* `summary(t_test())` prints SPSS-style tables: a Group Statistics table
+  (N, Mean, Std. Deviation, Std. Error Mean per group; SD and SE were
+  missing) and an Independent Samples Test table with t, df, p, mean
+  difference, its standard error and the confidence interval for both
+  variance assumptions. Significance stars now come from the exact
+  p-value (p = 0.0008 was rounded to 0.001 first and got "**", p = 0.0497
+  printed as "0.05" without a star); p-values print as "<.001"/".308"
+  instead of a bare "0", df as 2419 / 2384.147, weighted N as whole
+  numbers ("1149", not "1149.0"), and `digits` applies to every column.
+  Tables with umlaut labels stay aligned. (PAR-15, PAR-21, PAR-26)

@@ -262,3 +262,49 @@ test_that("PAR-06: one-sample mean difference and CI are relative to mu (SPSS)",
   expect_false(any(grepl("Effect Size Interpretation", out, fixed = TRUE)))
   expect_false(any(grepl("Cohen", out, fixed = TRUE)))
 })
+
+# --- PAR-15 / PAR-21 / PAR-26: t_test() summary tables -------------------------
+
+.p_data <- function(shift) {
+  base <- stats::qnorm(stats::ppoints(40))
+  data.frame(y = c(base, base + shift), g = rep(c("a", "b"), each = 40))
+}
+
+test_that("PAR-15: summary stars come from the exact p, not the rounded one", {
+  # p = 0.0008 was rounded to 0.001 first and got "**" (compact print: ***);
+  # p = 0.0497 printed as "0.05" without a star.
+  r <- t_test(.p_data(0.7777), y, group = g)
+  expect_lt(r$results$unequal_var_result[[1]]$p.value, 0.001)
+  out <- capture.output(print(summary(r)))
+  row <- out[grepl("not assumed", out)]
+  expect_match(row, "<\\.001 .*\\*\\*\\* *$")
+  r2 <- t_test(.p_data(0.4444), y, group = g)
+  out2 <- capture.output(print(summary(r2)))
+  row2 <- out2[grepl("not assumed", out2)]
+  expect_match(row2, "\\.050 .* \\* *$")
+})
+
+test_that("PAR-21/PAR-26: t_test() summary tables: SPSS formats, Group Statistics, digits", {
+  # p printed as a bare 0, df column mixing 2419 / 2384.147 / 2419.000,
+  # weighted n "1149.0", digits ignored; no SD / SE of the mean per group.
+  r <- t_test(.p_data(2), y, group = g)
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("<.001", out, fixed = TRUE)))
+  expect_false(any(grepl("(^| )0( |$)", out[grepl("assumed", out)])))
+
+  tt <- t_test(survey_data, life_satisfaction, group = gender,
+               weights = sampling_weight)
+  out <- capture.output(print(summary(tt)))
+  expect_true(any(grepl("Group Statistics", out, fixed = TRUE)))
+  expect_true(any(grepl("Std. Deviation", out, fixed = TRUE)))
+  expect_true(any(grepl("Std. Error Mean", out, fixed = TRUE)))
+  expect_false(any(grepl("\\b\\d+\\.0\\b", out[grepl("^ +(Male|Female) ", out)])))
+  stats <- tt$results$group_stats[[1]]
+  expect_equal(stats$group1$sd,
+               sqrt(w_var(survey_data[survey_data$gender == "Male", ],
+                          life_satisfaction, weights = sampling_weight)$results$weighted_var))
+
+  out2 <- capture.output(print(summary(tt, digits = 2)))
+  t_row <- out2[grepl("^ +Equal variances assumed", out2)]
+  expect_match(t_row, "-1\\.07 ")
+})

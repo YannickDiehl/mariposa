@@ -126,3 +126,32 @@
   out[whole] <- formatC(round(df[whole]), format = "d")
   out
 }
+
+#' Bordered table with display-width (UTF-8 safe) padding
+#'
+#' print_stat_table() pads with sprintf(), which counts bytes: a label with
+#' umlauts ("Hochschulabschluss (Universit\u00e4t)") ends up one column short
+#' per multi-byte character. Pre-padding every cell (and header) to the
+#' column's display width with pad_utf8() leaves sprintf() nothing to pad.
+#' The first column is left-aligned, the others right-aligned (as in
+#' print_stat_table()). All cells are expected to be formatted already.
+#'
+#' @param df Data frame of pre-formatted (character) columns
+#' @param col_labels Named character vector of header labels
+#' @noRd
+.print_table_utf8 <- function(df, col_labels = NULL) {
+  labels <- stats::setNames(names(df), names(df))
+  if (!is.null(col_labels)) labels[names(col_labels)] <- col_labels
+  for (j in seq_along(df)) {
+    nm <- names(df)[j]
+    vals <- as.character(df[[j]])
+    vals[is.na(vals)] <- ""
+    w <- max(nchar(c(labels[[nm]], vals), type = "width"), 1L)
+    align <- if (j == 1) "left" else "right"
+    df[[j]] <- vapply(vals, pad_utf8, character(1), width = w, align = align,
+                      USE.NAMES = FALSE)
+    labels[[nm]] <- pad_utf8(labels[[nm]], w, align)
+  }
+  print_stat_table(df, col_types = stats::setNames(rep("char", ncol(df)), names(df)),
+                   col_labels = labels)
+}

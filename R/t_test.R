@@ -513,7 +513,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
     if (length(g_levels) != 2) {
       .not_computed(sprintf(
-        "Grouping variable `%s` must have exactly 2 levels with valid data; found %d%s.",
+        "grouping variable `%s` needs exactly 2 levels with valid data; found %d%s",
         group_name, length(g_levels),
         if (length(g_levels) > 0) paste0(" (", paste(g_levels, collapse = ", "), ")") else ""
       ))
@@ -561,9 +561,14 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
       cohens_d <- .t_test_cohens_d(x1, x2)
 
+      # SPSS Group Statistics: N, Mean, Std. Deviation, Std. Error Mean
+      sd1 <- if (length(x1) > 1) stats::sd(x1) else NA_real_
+      sd2 <- if (length(x2) > 1) stats::sd(x2) else NA_real_
       group_stats <- list(
-        group1 = list(name = as.character(g_levels[1]), mean = mean(x1, na.rm = TRUE), n = length(x1)),
-        group2 = list(name = as.character(g_levels[2]), mean = mean(x2, na.rm = TRUE), n = length(x2))
+        group1 = list(name = as.character(g_levels[1]), mean = mean(x1), n = length(x1),
+                      sd = sd1, se = sd1 / sqrt(length(x1))),
+        group2 = list(name = as.character(g_levels[2]), mean = mean(x2), n = length(x2),
+                      sd = sd2, se = sd2 / sqrt(length(x2)))
       )
 
     } else {
@@ -645,7 +650,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         parameter = df_equal,
         p.value = p_value_equal,
         conf.int = conf_int_equal,
-        estimate = c(mu_x, mu_y)
+        estimate = c(mu_x, mu_y),
+        stderr = se_equal
       )
 
       test_unequal_weighted <- if (is.null(welch_reason)) {
@@ -654,7 +660,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
           parameter = df_unequal,
           p.value = p_value_unequal,
           conf.int = conf_int_unequal,
-          estimate = c(mu_x, mu_y)
+          estimate = c(mu_x, mu_y),
+          stderr = se_unequal
         )
       } else {
         .t_test_na_htest(c(mu_x, mu_y), welch_reason)
@@ -673,8 +680,10 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
       # Group statistics carry the SPSS-displayed (rounded) N
       group_stats <- list(
-        group1 = list(name = as.character(g_levels[1]), mean = mu_x, n = n1_display),
-        group2 = list(name = as.character(g_levels[2]), mean = mu_y, n = n2_display)
+        group1 = list(name = as.character(g_levels[1]), mean = mu_x, n = n1_display,
+                      sd = sd_x, se = sd_x / sqrt(sw1)),
+        group2 = list(name = as.character(g_levels[2]), mean = mu_y, n = n2_display,
+                      sd = sd_y, se = sd_y / sqrt(sw2))
       )
     }
 
@@ -748,40 +757,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   result_df
 }
 
-#' Create effect size data frame
-#' @noRd
-.create_effect_size_df <- function(var_name, cohens_d_val, hedges_g_val, glass_delta_val, is_paired = FALSE) {
-  effect_size_g <- if (abs(hedges_g_val) < 0.2) "negligible" else
-                  if (abs(hedges_g_val) < 0.5) "small" else
-                  if (abs(hedges_g_val) < 0.8) "medium" else "large"
-
-  if (is_paired) {
-    # For paired tests, don't show Glass' Delta
-    data.frame(
-      Variable = var_name,
-      Cohens_d = round(cohens_d_val, 3),
-      Hedges_g = round(hedges_g_val, 3),
-      Effect_Size = effect_size_g,
-      stringsAsFactors = FALSE
-    )
-  } else {
-    data.frame(
-      Variable = var_name,
-      Cohens_d = round(cohens_d_val, 3),
-      Hedges_g = round(hedges_g_val, 3),
-      Glass_Delta = round(glass_delta_val, 3),
-      Effect_Size = effect_size_g,
-      stringsAsFactors = FALSE
-    )
-  }
-}
-
 # Internal implementation shared by both print methods
 .print_t_test_impl <- function(x, digits = 3) {
   weights_name <- x$weights
   is_weighted <- !is.null(weights_name)
   is_grouped_data <- isTRUE(x$is_grouped)
-  results_label <- if (is_weighted) "Weighted t-test Results" else "t-test Results"
+  weighted_prefix <- if (is_weighted) "Weighted " else ""
 
   # Print test info
   if (!is.null(x$group)) {
@@ -802,7 +783,6 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         conf.level = x$conf.level
       )
       print_test_parameters(test_params)
-      cat("\n")
     }
   } else {
     # One-sample test: the SPSS "Test Value" and the test settings
@@ -813,7 +793,6 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     ))
     print_test_parameters(list(alternative = x$alternative,
                                conf.level = x$conf.level))
-    cat("\n")
   }
 
   # Resolve show toggles (default TRUE when called without summary object)
@@ -823,29 +802,39 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   # Effect sizes exist only for two-sample tests: no legend for tables
   # that are never printed (one-sample)
   any_effects <- show_effect_sizes && any(!is.na(x$results$cohens_d))
+  ci_label <- paste0(format(100 * x$conf.level), "% CI")
 
   # Internal helper: print a single variable row from a results data frame
   .print_var_row <- function(row_results, idx, show_group_means) {
     var_name <- row_results$Variable[idx]
     stats <- row_results$group_stats[[idx]]
 
-    cat(sprintf("\n--- %s ---\n\n", var_name))
+    cat(sprintf("\n--- %s ---\n", var_name))
 
     # Variable/group skipped at computation time (warned there): no NA tables
     if (is.na(row_results$t_stat[idx]) && is.null(stats)) {
       note <- if ("note" %in% names(row_results)) row_results$note[idx] else NA_character_
-      cat(sprintf("  Not computed%s: %s.\n",
+      cat(sprintf("\n  Not computed%s: %s.\n",
                   if (is_grouped_data) " for this group" else "",
                   if (!is.na(note)) note else "see warning"))
       return(invisible(NULL))
     }
 
-    # Group means (gated by descriptives toggle)
+    # Group Statistics (SPSS T-TEST): N, Mean, Std. Deviation, Std. Error
+    # Mean per group (gated by descriptives toggle). Weighted N is the
+    # rounded sum of weights, as SPSS displays it.
     if (show_descriptives && show_group_means && !is.null(stats) && !is.null(stats$group1)) {
-      cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
-                  stats$group1$name, digits, stats$group1$mean, stats$group1$n))
-      cat(sprintf("  %s: mean = %.*f, n = %.1f\n",
-                  stats$group2$name, digits, stats$group2$mean, stats$group2$n))
+      gs <- list(stats$group1, stats$group2)
+      num <- function(field) vapply(gs, function(s) as.numeric(s[[field]] %||% NA_real_), numeric(1))
+      cat(sprintf("\n%sGroup Statistics:\n", weighted_prefix))
+      .print_table_utf8(data.frame(
+        Group = vapply(gs, function(s) as.character(s$name), character(1)),
+        N = formatC(round(num("n")), format = "d"),
+        Mean = fmt_num(num("mean"), digits),
+        `Std. Deviation` = fmt_num(num("sd"), digits),
+        `Std. Error Mean` = fmt_num(num("se"), digits),
+        check.names = FALSE, stringsAsFactors = FALSE
+      ), col_labels = c(Group = x$group))
     }
 
     # Results table (gated by results toggle)
@@ -853,27 +842,40 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       has_both <- !is.null(row_results$equal_var_result[[idx]])
 
       if (has_both) {
-        equal_result <- row_results$equal_var_result[[idx]]
-        unequal_result <- row_results$unequal_var_result[[idx]]
-        spss_df <- data.frame(
-          Assumption = c("Equal variances", "Unequal variances"),
-          t_stat = c(round(equal_result$statistic, 3), round(unequal_result$statistic, 3)),
-          df = c(equal_result$parameter, round(unequal_result$parameter, 3)),
-          p_value = c(round(equal_result$p.value, 3), round(unequal_result$p.value, 3)),
-          mean_diff = c(round(equal_result$estimate[1] - equal_result$estimate[2], 3),
-                       round(unequal_result$estimate[1] - unequal_result$estimate[2], 3)),
-          conf_int = c(sprintf("[%.3f, %.3f]", equal_result$conf.int[1], equal_result$conf.int[2]),
-                      sprintf("[%.3f, %.3f]", unequal_result$conf.int[1], unequal_result$conf.int[2]))
+        # SPSS Independent Samples Test: both variance assumptions, stars
+        # from the exact p (rounding first turned p = 0.0008 into "**")
+        tests <- list(row_results$equal_var_result[[idx]],
+                      row_results$unequal_var_result[[idx]])
+        num <- function(f) vapply(tests, function(t) {
+          v <- t[[f]]
+          if (is.null(v) || length(v) == 0) NA_real_ else as.numeric(v[1])
+        }, numeric(1))
+        p_vals <- num("p.value")
+        mean_diff <- vapply(tests, function(t) {
+          as.numeric(t$estimate[1] - t$estimate[2])
+        }, numeric(1))
+        ci_lo <- vapply(tests, function(t) as.numeric(t$conf.int[1]), numeric(1))
+        ci_hi <- vapply(tests, function(t) as.numeric(t$conf.int[2]), numeric(1))
+        tbl <- data.frame(
+          Assumption = c("Equal variances assumed", "Equal variances not assumed"),
+          t = fmt_num(num("statistic"), digits),
+          df = .fmt_df(num("parameter"), digits),
+          p = fmt_p(p_vals, digits),
+          `Mean Diff.` = fmt_num(ifelse(is.na(num("statistic")), NA_real_, mean_diff), digits),
+          `SE Diff.` = fmt_num(num("stderr"), digits),
+          Lower = fmt_num(ci_lo, digits),
+          Upper = fmt_num(ci_hi, digits),
+          sig = add_significance_stars(p_vals),
+          check.names = FALSE, stringsAsFactors = FALSE
         )
-        spss_df$sig <- cut(spss_df$p_value,
-                          breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                          labels = c("***", "**", "*", ""),
-                          right = FALSE)
-        cat(sprintf("\n%s:\n", results_label))
-        border <- paste(rep("-", 80), collapse = "")
-        cat(border, "\n")
-        print(spss_df, row.names = FALSE)
-        cat(border, "\n")
+        cat(sprintf("\n%sIndependent Samples Test:\n", weighted_prefix))
+        .print_table_utf8(tbl, col_labels = c(Assumption = "",
+                                              Lower = paste(ci_label, "Lower"),
+                                              Upper = paste(ci_label, "Upper"),
+                                              sig = ""))
+        for (t in tests) {
+          if (!is.null(t$note)) cat(sprintf("  Not computed: %s.\n", t$note))
+        }
       } else {
         .print_t_test_one_sample(row_results, idx, x, digits,
                                  show_descriptives)
@@ -887,13 +889,21 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       glass_delta_val <- if ("glass_delta" %in% names(row_results)) row_results$glass_delta[idx] else cohens_d_val
 
       if (!is.na(cohens_d_val)) {
-        effect_df <- .create_effect_size_df(var_name, cohens_d_val, hedges_g_val, glass_delta_val, FALSE)
+        magnitude <- if (is.na(hedges_g_val)) "" else
+          if (abs(hedges_g_val) < 0.2) "negligible" else
+          if (abs(hedges_g_val) < 0.5) "small" else
+          if (abs(hedges_g_val) < 0.8) "medium" else "large"
         cat("\nEffect Sizes:\n")
-        cat(paste(rep("-", 12), collapse = ""), "\n")
-        print(effect_df, row.names = FALSE)
+        .print_table_utf8(data.frame(
+          Variable = var_name,
+          `Cohen's d` = fmt_num(cohens_d_val, digits),
+          `Hedges' g` = fmt_num(hedges_g_val, digits),
+          `Glass' Delta` = fmt_num(glass_delta_val, digits),
+          Magnitude = magnitude,
+          check.names = FALSE, stringsAsFactors = FALSE
+        ))
       }
     }
-    cat("\n")
   }
 
   if (is_grouped_data) {
@@ -948,13 +958,13 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   weighted <- !is.null(x$weights)
   if (show_descriptives && !is.null(stats)) {
     cat(sprintf("\n%sOne-Sample Statistics:\n", if (weighted) "Weighted " else ""))
-    print_stat_table(data.frame(
+    .print_table_utf8(data.frame(
       N = formatC(round(stats$n), format = "d"),
       Mean = fmt_num(stats$means, digits),
       `Std. Deviation` = fmt_num(stats$sd %||% NA_real_, digits),
       `Std. Error Mean` = fmt_num(stats$se %||% NA_real_, digits),
       check.names = FALSE, stringsAsFactors = FALSE
-    ), digits = digits)
+    ))
   }
   p_val <- as.numeric(row_results$p_value[idx])
   ci_label <- paste0(format(100 * x$conf.level), "% CI")
@@ -970,11 +980,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   )
   cat(sprintf("\n%sOne-Sample Test (test value = %s):\n",
               if (weighted) "Weighted " else "", format(x$mu)))
-  print_stat_table(tbl, digits = digits,
-                   col_types = c(p = "char"),
-                   col_labels = c(Lower = paste(ci_label, "Lower"),
-                                  Upper = paste(ci_label, "Upper"),
-                                  sig = ""))
+  .print_table_utf8(tbl, col_labels = c(Lower = paste(ci_label, "Lower"),
+                                        Upper = paste(ci_label, "Upper"),
+                                        sig = ""))
   invisible(NULL)
 }
 
@@ -1058,16 +1066,19 @@ print.t_test <- function(x, digits = 3, ...) {
       round(stats$group1$n + stats$group2$n)
     } else NA_real_
 
-    cat(sprintf("  t(%.1f) = %.*f, %s %s, g = %.*f (%s), N = %d\n",
-                df_val, digits, t_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val),
-                digits, g_val, g_interp, n_total))
+    cat(sprintf("  t(%s) = %.*f, %s, g = %.*f (%s), N = %s\n",
+                .fmt_df(df_val, 1), digits, t_val,
+                format_p_stars(p_val, digits),
+                digits, g_val, g_interp,
+                formatC(n_total, format = "f", digits = 0)))
   } else {
-    cat(sprintf("  t(%.1f) = %.*f, %s %s\n",
-                df_val, digits, t_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val)))
+    stats <- results$group_stats[[i]]
+    n_str <- if (!is.null(stats$n)) {
+      paste0(", N = ", formatC(round(stats$n), format = "f", digits = 0))
+    } else ""
+    cat(sprintf("  t(%s) = %.*f, %s%s\n",
+                .fmt_df(df_val, 1), digits, t_val,
+                format_p_stars(p_val, digits), n_str))
   }
 }
 
