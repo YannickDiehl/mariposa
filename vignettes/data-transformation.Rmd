@@ -58,11 +58,11 @@ The bracket notation (`[Young]`) automatically creates value labels on the recod
 
 ### Reverse-Coding
 
-Reverse the direction of a Likert scale. Useful when some items in a scale are negatively worded:
+Reverse the direction of a Likert scale. Useful when some items in a scale are negatively worded. Give the scale range explicitly with `"rev(min, max)"`: reversing is `min + max - x` on the *scale*, which differs from the observed range whenever nobody chose an end point (common in subgroups). With plain `"rev"`, the range comes from the value labels, or from the observed values with a message saying so:
 
 ```{r}
 survey_data <- rec(survey_data, trust_government,
-  rules = "rev", suffix = "_rev"
+  rules = "rev(1, 5)", suffix = "_rev"
 )
 
 # Original: 1=low trust ... 5=high trust
@@ -358,7 +358,7 @@ survey_data <- rec(survey_data, age,
   rules = "18:29=1 [Young]; 30:49=2 [Middle]; 50:99=3 [Older]",
   suffix = "_group", as_factor = TRUE)
 survey_data <- rec(survey_data, trust_government,
-  rules = "rev", suffix = "_rev")
+  rules = "rev(1, 5)", suffix = "_rev")
 
 # 2. Create scale score
 survey_data <- survey_data %>%
