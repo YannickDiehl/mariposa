@@ -73,3 +73,25 @@
   GENERIERBAR"); the automatic mode only looked at the labels of valid
   values, so metric variables printed their missing codes without the
   explaining label.
+* `frequency()` tables follow the SPSS FREQUENCIES layout: valid
+  categories, "Total valid", the missing categories, "Total missing" (only
+  with two or more missing categories) and a grand "Total" row (N and
+  100 %). Cells without a value are empty instead of reading "NA"; plain
+  numeric, logical and character variables no longer end with two rows
+  both called "Total", and tagged missing values no longer end with a
+  "NA(total)" row. Further:
+  - `show_valid = FALSE` also hides the cumulative percentages (they are
+    cumulative *valid* percentages).
+  - every column is sized to its content: large weighted counts were cut
+    to "2798..." by a fixed 8-character N column.
+  - factors, character and logical variables show their categories once
+    (Value and Label columns used to repeat each other), and the summary
+    line leaves out statistics that do not exist ("mean=NA sd=NA",
+    "mean=NaN" for an all-missing variable).
+  - labels are left-aligned and never cut (they were cut at 40
+    characters); when the table is wider than the console, long labels
+    wrap onto extra lines.
+  - an all-missing variable prints its missing rows and the Total without
+    a "Valid % 100.00" of zero cases or an R warning.
+  - `print(x, digits = 0)` rounds the percentages only; the summary line
+    keeps two decimals.

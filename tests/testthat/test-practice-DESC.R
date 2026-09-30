@@ -378,3 +378,120 @@ test_that("DESC-12: auto label mode shows the labels of missing-value codes", {
   # without labelled missing codes the auto mode stays off
   expect_false(frequency(survey_data, age)$options$show_labels)
 })
+
+
+# --- DESC-03/09/10/11/12: frequency() table layout -----------------------------
+
+# Cells of the "|"-delimited table rows of a frequency print
+.fre_rows <- function(out) {
+  rows <- out[grepl("^\\|", out)]
+  lapply(strsplit(rows, "|", fixed = TRUE), function(r) trimws(r[-1]))
+}
+
+test_that("DESC-11: frequency() table has SPSS-like total rows and no NA cells", {
+  # Missing and total rows showed literal "NA" in Valid %/Cum. %, plain
+  # numeric/logical/character variables got two rows both called "Total",
+  # tagged missing values ended with a "NA(total)" row, and there was no
+  # grand total (SPSS ends with "Total 2500 100.0").
+  out <- capture.output(print(frequency(survey_data, life_satisfaction)))
+  rows <- .fre_rows(out)
+  first <- vapply(rows, `[`, "", 1)
+  expect_false(any(unlist(lapply(rows, `[`, -1)) == "NA"))
+  expect_equal(sum(first == "Total valid"), 1L)
+  expect_equal(sum(first == "Total"), 1L)
+  expect_equal(first[length(first)], "Total")
+  last <- rows[[length(rows)]]
+  expect_true("2500" %in% last && "100.00" %in% last)
+  expect_equal(sum(first == "NA"), 1L)                   # system missing row
+  expect_false(any(first == "Total missing"))           # only one missing row
+
+  for (x in list(c(1, 2, 2, 3, NA), c(TRUE, FALSE, NA), c("a", "b", NA))) {
+    o <- capture.output(print(frequency(tibble::tibble(x = x), x)))
+    f <- vapply(.fre_rows(o), `[`, "", 1)
+    expect_equal(sum(f == "Total"), 1L)
+    expect_equal(sum(f == "Total valid"), 1L)
+  }
+
+  # Without missing values there is a single Total row (as in SPSS)
+  f <- vapply(.fre_rows(capture.output(print(frequency(survey_data, gender)))),
+              `[`, "", 1)
+  expect_equal(sum(grepl("^Total", f)), 1L)
+
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(1, 2, 2, haven::tagged_na("a"), haven::tagged_na("b"), NA),
+                       labels = c(Low = 1, High = 2,
+                                  "No answer" = haven::tagged_na("a"),
+                                  "Refused" = haven::tagged_na("b")))
+  attr(x, "na_tag_map") <- c(a = -9, b = -8)
+  attr(x, "na_tag_format") <- "spss"
+  o <- capture.output(print(frequency(tibble::tibble(x = x), x)))
+  expect_false(any(grepl("NA(total)", o, fixed = TRUE)))
+  f <- vapply(.fre_rows(o), `[`, "", 1)
+  expect_true(all(c("Total valid", "-9", "-8", "NA", "Total missing", "Total") %in% f))
+  expect_false(any(unlist(lapply(.fre_rows(o), `[`, -1)) == "NA"))
+})
+
+test_that("DESC-10: show_valid = FALSE also hides the cumulative (valid) percent", {
+  out <- capture.output(print(frequency(survey_data, political_orientation,
+                                        show_valid = FALSE)))
+  expect_false(any(grepl("Cum. %", out, fixed = TRUE)))
+  expect_false(any(grepl("Valid %", out, fixed = TRUE)))
+  expect_true(any(grepl("Raw %", out, fixed = TRUE)))
+})
+
+test_that("DESC-03: frequency() N column is sized to its content", {
+  # A fixed 8-character N column cut large weighted counts to "2798...".
+  d <- survey_data |> mutate(popw = sampling_weight * 33000)
+  out <- capture.output(print(frequency(d, education, weights = popw)))
+  expect_false(any(grepl("...", out, fixed = TRUE)))
+  expect_true(any(grepl("83031049", out, fixed = TRUE)))
+})
+
+test_that("DESC-09: all-missing variable prints without NaN, 100% of 0 or warnings", {
+  r <- frequency(tibble::tibble(allna = rep(NA_real_, 5)), allna)
+  out <- expect_no_warning(capture.output(print(r)))
+  expect_false(any(grepl("NaN", out)))
+  rows <- .fre_rows(out)
+  expect_false(any(vapply(rows, function(r) r[1] == "Total valid", logical(1))))
+  last <- rows[[length(rows)]]
+  expect_equal(last[1], "Total")
+  expect_true("5" %in% last && "100.00" %in% last)
+})
+
+test_that("DESC-12: frequency() table formatting (factors, labels, width, header)", {
+  # Factors printed identical Value and Label columns and a header
+  # "mean=NA sd=NA skewness=NA"; labels were right-aligned and cut at 40
+  # characters; the table ignored the console width; print(digits = 0)
+  # rounded the header statistics to integers.
+  out <- capture.output(print(frequency(survey_data, gender)))
+  hdr <- out[grepl("^\\|\\s*Value", out)]
+  expect_false(grepl("Label", hdr))
+  expect_false(any(grepl("=NA", out)))
+  expect_true(any(grepl("# total N=2500 valid N=2500", out, fixed = TRUE)))
+  # an unlabelled numeric variable next to a factor gets no empty Label column
+  out_ga <- capture.output(print(frequency(survey_data, gender, age)))
+  expect_false(any(grepl("Label", out_ga)))
+
+  skip_if_not_installed("haven")
+  long <- "A very long value label that clearly exceeds forty characters"
+  x <- haven::labelled(c(1, 1, 2), labels = c(Short = 1, stats::setNames(2, long)))
+  old <- options(width = 200)
+  on.exit(options(old))
+  o <- capture.output(print(frequency(tibble::tibble(x = x), x)))
+  expect_true(any(grepl(long, o, fixed = TRUE)))        # no 40-char cut
+  expect_true(any(grepl("^\\| +1 \\| Short +\\|", o)))  # left-aligned label
+
+  options(width = 60)
+  o2 <- capture.output(print(frequency(tibble::tibble(x = x), x)))
+  expect_true(all(nchar(o2) <= 60))
+  rows2 <- .fre_rows(o2)
+  rows2 <- rows2[!vapply(rows2, function(r) grepl("^(Total|Value)", r[1]), logical(1))]
+  cells <- vapply(rows2, `[`, "", 2)
+  expect_equal(paste(cells[cells != "" & cells != "Short"], collapse = " "),
+               long)                                     # wrapped, not cut
+  options(old)
+
+  o3 <- capture.output(print(frequency(survey_data, life_satisfaction), digits = 0))
+  expect_true(any(grepl("mean=3.63", o3, fixed = TRUE)))
+  expect_equal(.fre_rows(o3)[[2]], c("1", "118", "5", "5", "5"))  # rounded %
+})
