@@ -19,7 +19,18 @@ spss_values <- list(
   test_1a = list(p_exact_2sided = 0.544, n = 2500L),   # fisher_test_output.txt:30
 
   # ---- Test 2a: gender × region 2×2 weighted ------
-  test_2a = list(p_exact_2sided = 0.487, n = 2516L)    # fisher_test_output.txt:153
+  test_2a = list(p_exact_2sided = 0.487, n = 2516L),   # fisher_test_output.txt:153
+
+  # ---- Test 1c: gender × region, SELECT IF id <= 50 ------
+  # A negative association: SPSS prints Phi of a 2x2 table with its sign
+  test_1c = list(
+    p_exact_2sided = 0.734,   # fisher_test_output.txt:111
+    n = 50L,                  # fisher_test_output.txt:113
+    chi_squared = 0.334,      # fisher_test_output.txt:108
+    chi_p = 0.563,            # fisher_test_output.txt:108
+    phi = -0.082,             # fisher_test_output.txt:120
+    cramers_v = 0.082         # fisher_test_output.txt:121
+  )
 )
 
 
@@ -43,6 +54,29 @@ test_that("Test 2a: Fisher gender × region weighted — matches SPSS", {
   assert_spss(as.numeric(r$results$n), spss_values$test_2a$n,
               tier = "display", precision = 0,
               label = "[2a] N weighted")
+})
+
+test_that("Test 1c: small subset — Fisher p and signed Phi match SPSS", {
+  small <- dplyr::filter(survey_data, id <= 50)
+  r <- fisher_test(small, gender, region)
+  assert_spss(as.numeric(r$results$p_value), spss_values$test_1c$p_exact_2sided,
+              tier = "display", precision = 3, what = "p_value",
+              label = "[1c] Fisher p-value (2-sided)")
+  assert_spss_count(as.numeric(r$results$n), spss_values$test_1c$n,
+                    label = "[1c] N")
+  cs <- suppressWarnings(chi_square(small, gender, region))$results
+  assert_spss(cs$pearson_chi_squared, spss_values$test_1c$chi_squared,
+              tier = "display", precision = 3, label = "[1c] Pearson chi-square")
+  assert_spss(cs$pearson_p_value, spss_values$test_1c$chi_p,
+              tier = "display", precision = 3, what = "p_value",
+              label = "[1c] Pearson p")
+  assert_spss(cs$phi, spss_values$test_1c$phi,
+              tier = "display", precision = 3, label = "[1c] Phi (signed)")
+  assert_spss(cs$cramers_v, spss_values$test_1c$cramers_v,
+              tier = "display", precision = 3, label = "[1c] Cramer's V")
+  assert_spss(suppressWarnings(phi(small, gender, region)),
+              spss_values$test_1c$phi, tier = "display", precision = 3,
+              label = "[1c] phi()")
 })
 
 test_that("Test 3: Fisher grouped by education — structural", {

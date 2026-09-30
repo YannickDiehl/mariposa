@@ -26,8 +26,10 @@ grouped data).
 \description{
 Convenience helpers that run \code{\link{chi_square}} and return just the
 requested effect size as a numeric value (named by group for grouped
-data): \code{phi()} (sqrt(chi-squared / N); bounded by 1 only in 2x2
-tables), \code{cramers_v()} (normalized to 0-1 for any table size), and
+data): \code{phi()} (sqrt(chi-squared / N); in a 2x2 table signed like
+SPSS's Phi, negative when the first row goes with the second column;
+bounded by 1 only in 2x2 tables), \code{cramers_v()} (normalized to 0-1
+for any table size), and
 \code{goodman_gamma()} for two ordinal variables. As in SPSS, Phi and
 Cramer's V are computed for any table size.
 

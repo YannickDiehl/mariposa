@@ -1398,6 +1398,10 @@ but were never asserted. These are now fixed and asserted:
   full precision. `qtukey()` is accurate to about 1e-8, which moved
   4-decimal limits of income differences (214.4432 instead of SPSS's
   214.4433).
+* Phi of a 2x2 table (`chi_square()`, `phi()`) carries the sign of the
+  association, as SPSS's Symmetric Measures print it: -.082 instead of
+  .082 for a negative association (reference Fisher Test 1c). Larger
+  tables keep the unsigned sqrt(chi-square / N).
 
 ## Validation
 

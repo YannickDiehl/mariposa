@@ -265,6 +265,13 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 
   gam <- .goodman_gamma_stats(tbl)
 
+  # Phi: sqrt(chi^2 / N); in a 2x2 table SPSS prints it with the sign of
+  # the association (ad - bc), as the correlation of the two dichotomies
+  phi_value <- sqrt(pearson_chi / n)
+  if (r == 2 && c == 2) {
+    phi_value <- phi_value * sign(tbl[1, 1] * tbl[2, 2] - tbl[1, 2] * tbl[2, 1])
+  }
+
   data.frame(
     chi_squared = chi_squared,
     df = as.numeric(test_result$parameter),
@@ -278,7 +285,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     residuals = I(list(test_result$residuals)),
     # Phi and Cramer's V (and their p-value) from the Pearson chi-square
     cramers_v = sqrt(pearson_chi / (n * min(r - 1, c - 1))),
-    phi = sqrt(pearson_chi / n),
+    phi = phi_value,
     gamma = gam$gamma,
     contingency_c = sqrt(pearson_chi / (pearson_chi + n)),
     table_rows = r,
@@ -715,8 +722,10 @@ print.summary.chi_square <- function(x, ...) {
 #' @description
 #' Convenience helpers that run \code{\link{chi_square}} and return just the
 #' requested effect size as a numeric value (named by group for grouped
-#' data): \code{phi()} (sqrt(chi-squared / N); bounded by 1 only in 2x2
-#' tables), \code{cramers_v()} (normalized to 0-1 for any table size), and
+#' data): \code{phi()} (sqrt(chi-squared / N); in a 2x2 table signed like
+#' SPSS's Phi, negative when the first row goes with the second column;
+#' bounded by 1 only in 2x2 tables), \code{cramers_v()} (normalized to 0-1
+#' for any table size), and
 #' \code{goodman_gamma()} for two ordinal variables. As in SPSS, Phi and
 #' Cramer's V are computed for any table size.
 #'
