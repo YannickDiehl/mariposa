@@ -75,6 +75,25 @@ VERSIONING_POLICY §3).
 * `row_count(count = c(4, 5))` counts cases with any of the values (SPSS
   `COUNT`); it used to recycle the vector.
 * `frequency()` hides empty factor levels unless `show_unused = TRUE`.
+* Arguments must be spelled out: a named argument inside a variable
+  selection (`w_mean(data, age, weight = w)`) or an abbreviation
+  (`crosstab(..., percent = "col")`) is an error naming the intended
+  argument (before: `weight = w` was silently treated as a second
+  variable and the result was unweighted).
+* Grouping variables are dropped from variable selections under
+  `group_by()` (with a message), as `dplyr::across()` does.
+* Weights that contain no positive value are an error (before:
+  `describe()` fell back to an unweighted analysis with a warning).
+* `efa()` rotations follow SPSS FACTOR's own varimax, direct oblimin and
+  promax algorithms (Kaiser normalization, SPSS stopping rules): rotated
+  loadings change slightly (varimax up to .004, promax factor correlations
+  noticeably, e.g. .055 -> -.002), and oblimin no longer needs
+  GPArotation. ML extraction uses SPSS's Heywood bound (.999) and keeps
+  the eigenvalue order of the factors.
+* `codebook()` returns its result visibly (it prints the overview after
+  opening the viewer); `std()`/`center()` no longer add the weights column
+  to the returned data; `dunn_test()`/`pairwise_wilcoxon()` also expose
+  their table as `$results`.
 
 ## Output
 
@@ -1106,6 +1125,253 @@ reference output showed mariposa was wrong.
   filtered on a non-existent category and did nothing. The `copy_labels()`
   help no longer claims that `filter()`/`select()`/`mutate()` strip labels
   (they keep them) and names the operations that do.
+
+### Across functions
+
+* Selecting a grouping variable of `group_by()` data (explicitly or through
+  a helper such as `where(is.numeric)`) no longer analyses it within its
+  own groups. `pearson_cor()`, `spearman_rho()` and `kendall_tau()` warned
+  "No variance" in every group and returned `NA` rows, `reliability()`
+  used the constant grouping variable as an item, `t_test()` warned
+  "constant value" per group. As `dplyr::across()` does, every analysis
+  function now leaves grouping variables out of the selection with a
+  message (previously only `describe()` and the `w_*` functions did);
+  `rec()`, `to_dummy()` and the row operations, which do not compute per
+  group, still accept them.
+* A misspelled argument name is now an error that names the intended
+  argument: "Unknown argument `weight` of `w_mean()`. Did you mean
+  `weights`?". In functions whose `...` selects variables, `weight =`
+  (for `weights`), `na_rm =`, `groups =`, `conf =` ... were taken as a
+  tidyselect rename: `w_mean(data, age, weight = w)` returned an
+  *unweighted* mean plus a bogus "weight" row, `binomial_test()` a garbage
+  row, and `describe()`, `frequency()`, `chi_square()`, `kruskal_wallis()`
+  failed with unrelated messages. Inside `summarise()` the `w_*` functions
+  ignored `...` entirely (`w_mean(age, weight = w)` was silently
+  unweighted). Renaming selections (`describe(data, Age = age)`) are refused
+  with an explanation. For consistency, functions whose arguments R would
+  partially match (`crosstab()`, `fisher_test()`, `mcnemar_test()`,
+  `wilcoxon_test()`, `factorial_anova()`, `ancova()`, the regressions,
+  `tukey_test()`, `scheffe_test()`, `marginal_effects()`) no longer accept
+  abbreviated names such as `weight =` or `percent =`: the same typo now
+  gives the same error everywhere. `fisher_test()` and `mcnemar_test()` no
+  longer ignore unknown arguments.
+* `weights` accepts the same forms in every function: a bare column name,
+  a column name as string (`"sampling_weight"`, `all_of(w)`, `!!w`), an
+  expression evaluated in the data (`sampling_weight * 2`,
+  `survey_data$sampling_weight`), or a numeric vector with one value per
+  row. Outside the regressions only the bare column name worked:
+  `weights = survey_data$sampling_weight` and `weights = all_of(w)` failed
+  with "Can't convert a call to a string.", `weights = 1` with "Can't
+  convert a double vector to a string". An expression is shown by its text
+  ("Weights: sampling_weight * 2"). `weights = w` with `w` holding a column
+  name now points to `all_of(w)`; a vector of the wrong length or an
+  unknown variable inside an expression is named in the error. The `w_*`
+  functions no longer accept a factor as weights (its level codes were used
+  silently), and in `summarise()` a non-numeric `weights` is an error
+  instead of a silent unweighted result. `std()` and `center()` return the
+  weights column unchanged (it lost its attributes).
+* Labelled data (`haven_labelled`) work when the haven package is not
+  loaded, e.g. data restored with `readRDS()` in a fresh session.
+  haven is only suggested, and without its namespace the labelled vectors
+  have no methods for comparison and arithmetic: `frequency()` failed with
+  "Can't convert `x` <haven_labelled> to <character>", `describe()` and
+  `w_mean()` with "<haven_labelled_spss> * <double> is not permitted",
+  `crosstab()`, `codebook()`, `unlabel()`, `drop_labels()`, `rec()` and
+  `write_xlsx()` likewise. The entry helpers now load haven's namespace
+  when a selected data set or vector is labelled (and say that haven is
+  needed when it is not installed).
+* Calling a function without a required argument gives a clear error
+  naming it ("Argument `covariate` is missing, with no default."), in every
+  exported function. Previously base-R errors surfaced from inside, often
+  localized and naming internal arguments: 'Argument "data" fehlt (ohne
+  Standardwert)', `oneway_anova(data, age)` "Can't extract column with
+  `g_name`", `ancova()`/`factorial_anova()` 'Argument "between_expr"
+  fehlt', `fisher_test()`/`mcnemar_test()` 'Argument "x" fehlt',
+  `crosstab()`/`write_xlsx()` "no applicable method ... class NULL". A bare
+  variable name where a value is expected (`linear_regression(data, age)`,
+  `find_var(data, age)`, a `path`) is named instead of "object 'age' not
+  found"; `set_na(data, age)` explains that it takes values, not variable
+  names.
+* Weights without any positive value (all zero or missing) are refused
+  with one clear error. The analyses failed deep inside with base-R errors
+  ("'n' must be a positive integer", "missing value where TRUE/FALSE
+  needed", "object 'fit' not found"), and `describe()` silently fell back to
+  an unweighted analysis when all weights were missing.
+* `group =` given as an expression (`group = region == "East"`) explains
+  that the grouping variable must be created first (it failed with "object
+  'region' not found"); a `group` selecting no or several columns is an
+  error naming the selection. `spearman_rho()` and `kendall_tau()` accept
+  ordered factors (ranked by level order) like `mann_whitney()` and
+  `kruskal_wallis()`; they rejected e.g. `education` as "not numeric".
+* Result tables stay aligned with umlauts and other multi-byte characters
+  in variable names, value labels and terms (Tukey/Scheffe, Dunn,
+  pairwise correlations, regression coefficients, Kruskal-Wallis ranks,
+  goodness-of-fit and many more): the shared table printer padded cells
+  with `sprintf("%-20s")`, which counts bytes, so every umlaut shifted the
+  rest of its row one column to the left. Cells are now padded by display
+  width. Counts and sums of weights of 2^31 or more (expansion weights)
+  print as whole numbers instead of `NA` with a coercion warning; leading
+  label columns such as "Group 2" are left-aligned like "Group 1"; table
+  lines no longer end in a blank.
+* Sums of weights of 2^31 or more (expansion weights) no longer print
+  as `N = NA` in the compact lines of the rank tests and the
+  goodness-of-fit test, as `NA` in the N column of the one-sample t-test,
+  and no longer raise integer-coercion warnings in the t-test, one-way
+  ANOVA, factorial ANOVA/ANCOVA, Levene and reliability tables: every
+  count is formatted as a whole number without integer coercion.
+* Grouped output uses one group-header style in every verbose table:
+  `describe()`, the `w_*()` functions and the summaries of
+  `levene_test()`, `normality_test()`, `marginal_effects()` and the
+  post-hoc tests printed "Group: region = East " with a trailing blank and
+  no underline, all other summaries an underlined header. Section titles
+  without a suffix ("Pearson Correlation", "Chi-Squared Test of
+  Independence", "Levene's Test for Homogeneity of Variance") no longer end
+  in a blank with an underline one dash too long.
+* Counts carry no thousands separators anywhere, as in SPSS tables and
+  the console: the HTML `codebook()` header wrote "2,500 observations",
+  `mann_whitney()`'s compact line "U = 776,732" (its summary table
+  776732). The N/discordant-pair lines of `fisher_test()`,
+  `mcnemar_test()`, `chi_square()` and the Friedman note of
+  `pairwise_wilcoxon()` use the same whole-number formatter (the latter
+  printed "N = 9.36e+09" for large sums of weights).
+* Weighted `frequency()` of a factor together with a numeric variable
+  (`frequency(survey_data, education, life_satisfaction, weights =
+  sampling_weight)`) no longer turns the numeric variable's categories
+  into `NA` (listed under "Total missing") with the base-R warning
+  "invalid factor level, NA generated": the weighted branch kept the
+  factor as the value column when the tables were combined.
+* Variable pairs are joined by an ASCII "x" in every output: the titles
+  of `chi_square()`, `fisher_test()`, `mcnemar_test()` and `crosstab()`
+  and the chi-square "Table size" line used the multiplication sign
+  (U+00D7), the correlation, factorial and post-hoc output an "x".
+* `print()` of `linear_regression()`, `logistic_regression()` and
+  `normality_test()` results accepts `digits` like every other compact
+  print (R-squared, statistics and p-values ignored it). The grouped
+  `normality_test()` compact print shows the test results under a
+  `[group]` line for every group instead of only the number of groups.
+* Every compact `print()` of a test or model result now ends with
+  "Use summary() for detailed output." (`t_test()`, `oneway_anova()`,
+  `factorial_anova()`, `ancova()`, the three correlation functions, both
+  regressions, `reliability()` and `efa()` did not show it, the rank tests,
+  chi-square family, Levene and normality tests did).
+* Grouped compact prints of `linear_regression()` and
+  `logistic_regression()` put each group on its own `[region = East]`
+  line (they printed "  region = East: R2 = ..."), like every other
+  compact print; a skipped group shows "not computed (reason)" under its
+  `[group]` line.
+
+### Result export and R Markdown
+
+* `dunn_test()` and `pairwise_wilcoxon()` store their comparison table as
+  `$results`, like every other result class (it lived only in
+  `$comparisons`, so `x$results` was `NULL`; `$comparisons` is kept). A
+  weights-invariance regression test that compared these `NULL`s with
+  each other now checks the real comparisons.
+* Every analysis result can be turned into a plain table:
+  `as.data.frame()` (and `tibble::as_tibble()`) now work for all result
+  classes instead of failing with "cannot coerce class ... to a
+  data.frame". The table has one row per test/variable/group (per pair
+  for correlations and post-hoc tests, per term for ANOVA and regression
+  tables, per cell for `crosstab()`, per item for `efa()` loadings); list
+  columns are flattened (`t_test()` gets `group1`, `group2`, `mean1`,
+  `mean2`, `sd1`, `sd2`), written out as text (the values and value
+  labels of a `codebook()`) or dropped (the observed/expected tables of
+  `chi_square()`), so `write.csv()` works; grouping variables are the
+  leading columns, labelled ones as their value labels. With broom
+  loaded, `broom::tidy()` now works for all test and descriptive classes
+  (it covered only the two regressions), using broom's column names
+  (`statistic`, `p.value`, `parameter`/`num.df`/`den.df`, `estimate`,
+  `conf.low`, `conf.high`, `adj.p.value`, `method`).
+* `write_xlsx()` exports analysis results. `crosstab()` results are
+  written in the SPSS table layout (Count and the requested "% within"
+  / "% of Total" rows per category, Total row and column; one block per
+  group), every other result (e.g. `describe()`, `t_test()`,
+  `oneway_anova()`, `reliability()`, `linear_regression()`) as its result
+  table followed by the secondary tables (group descriptives, mean ranks,
+  item statistics, model summary, ...). A named list may now mix data
+  frames with any result (`list(Descriptives = describe(...), Data = df)`
+  was rejected), and unsupported objects get a clear error instead of
+  "no applicable method for 'write_xlsx'".
+* `codebook()` works in R Markdown and Quarto. It returned invisibly and
+  (with `view = interactive()` being `FALSE` while knitting) a chunk
+  `codebook(data)` produced nothing. It now returns visibly, and a
+  `knit_print()` method embeds the HTML codebook in HTML output (styles
+  scoped to the codebook, so the rest of the document keeps its look);
+  PDF/Word output shows the console overview. While knitting, the viewer
+  is no longer opened by default (`rmarkdown::render()` from an
+  interactive session used to open it). In the console, the compact
+  overview is now printed after the viewer opens.
+
+### SPSS parity: ANCOVA Levene and factor rotations
+
+* `ancova()`: Levene's test of equality of error variances now matches
+  SPSS UNIANOVA. It was computed on the deviations of the dependent
+  variable from its raw cell means, ignoring the covariates
+  (`life_satisfaction BY gender WITH age`: F = 1.277, p = .258 instead of
+  SPSS 1.306, p = .253). SPSS tests the absolute residuals of the full
+  model (covariates and factors) across the design cells; mariposa now does
+  the same and reproduces all six unweighted Levene tests of the SPSS
+  reference run. The weighted path is unchanged until the pending weighted
+  reference run. New `levene_test()` method for `ancova()` results
+  (`ancova(...) |> levene_test()`, also per group under `group_by()`).
+* `efa(rotation = "promax")` now matches SPSS FACTOR `/ROTATION PROMAX`.
+  mariposa used `stats::promax()`, which builds the promax target from the
+  raw varimax loadings; SPSS first normalizes every row (Kaiser
+  normalization). Pattern loadings differed by up to .03 and the component
+  correlations were .055 / .155 instead of SPSS -.002 / -.012. The new
+  implementation follows the SPSS algorithm and reproduces every pattern,
+  structure and correlation matrix of the SPSS reference runs (unweighted,
+  weighted, per region), now asserted in the validation suite.
+* `efa()` with an oblique rotation (promax, oblimin): the "Rotation Sums of
+  Squared Loadings" are now the sums of squares of the structure matrix, as
+  SPSS reports them (they were taken from the pattern matrix: 1.604 / 1.065
+  / 1.045 instead of SPSS 1.599 / 1.039 / 1.021).
+* `efa()` varimax and oblimin rotations now use SPSS FACTOR's own
+  algorithms and stopping rules (Kaiser's cyclic pairwise varimax; the
+  Jennrich-Sampson direct oblimin, delta = 0; at most 25 iterations).
+  `stats::varimax()` stopped earlier and missed SPSS's component
+  transformation matrix by up to .004 (2-factor solution: 26.653 % instead
+  of SPSS 26.655 % for the first rotated component);
+  `GPArotation::oblimin()` iterated past SPSS's stopping point (weighted
+  solution: pattern loadings off by up to .002). The rotated factors are
+  reflected to a positive sum and ordered by their sums of squares as in
+  SPSS. Every varimax, oblimin and promax reference solution (unweighted,
+  weighted, per region) now matches SPSS, including SPSS's iteration
+  counts, which `summary()` prints as SPSS does ("Rotation converged in 4
+  iterations."). Oblimin no longer needs the GPArotation package.
+* `efa(extraction = "ml")`: a Heywood variable is now bounded at a
+  communality of .999, as SPSS FACTOR does (it was .995, the default bound
+  of `stats::factanal()`), and the factors keep SPSS's order (by the
+  eigenvalues of the rescaled correlation matrix; `factanal()` re-sorted
+  them by sums of squares, so the unrotated factor matrix and the
+  extraction sums came in a different order). Where SPSS's ML iteration
+  converges (reference runs per region, West), the whole solution now
+  matches SPSS: communalities, factor and rotated factor matrices,
+  extraction and rotation sums, transformation matrix. The remaining
+  reference runs end without convergence in SPSS itself (a model with
+  0 degrees of freedom and Heywood cases); see Validation.
+* `levene_test()` compact print: a whole-number weighted `df2` above 2^31
+  (sums of weights in the billions) printed as `F(1, NA)` with an integer
+  overflow warning; it is now printed in full.
+* Weighted `ancova()`: Levene's test uses sqrt(w) * |WLS residual| of the
+  full model, as SPSS UNIANOVA does with /REGWGT. This reproduces all five
+  weighted SPSS references exactly (e.g. 0.902 instead of 0.880) and
+  restores the rule that `weights = 1` gives the unweighted result (the
+  residual-based unweighted test made the old cell-mean-based weighted
+  test disagree with it).
+
+## Validation
+
+* New Tier-3 exceptions for `efa()` ML extraction: EXC-001 (±.002; SPSS stops its
+  Newton-Raphson iteration at ECONVERGE(.001), so loadings, sums of
+  squares and percentages of variance of converged solutions agree to
+  about 1e-3) and EXC-002 (±.05; SPSS reference runs 5a/6a that end
+  without convergence, "More than 25 iterations required").
+* `efa()` rotations are now validated in full against SPSS: 8 varimax,
+  6 oblimin and 6 promax solutions (transformation, pattern, structure and
+  correlation matrices, rotation sums, iteration counts); the ML initial
+  communalities of all 6 ML reference runs; `ancova()` Levene tests of the
+  6 unweighted reference runs.
 
 # mariposa 0.7.3
 
