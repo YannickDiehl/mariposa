@@ -356,3 +356,25 @@ test_that("DESC-08: frequency() hides empty factor levels unless show_unused = T
   expect_true("Student" %in% as.character(rwu$results$value))
   expect_equal(rwu$results$freq[as.character(rwu$results$value) %in% "Student"], 0)
 })
+
+
+# --- DESC-12 (label mode): labels of missing-value codes ----------------------
+
+test_that("DESC-12: auto label mode shows the labels of missing-value codes", {
+  # show_labels = "auto" looked only at the labels of valid values, so a
+  # metric variable such as ALLBUS age printed its missing code -32
+  # without the label "NICHT GENERIERBAR".
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(18, 25, 40, 40, haven::tagged_na("a")),
+                       labels = c("NICHT GENERIERBAR" = haven::tagged_na("a")),
+                       label = "Age")
+  attr(x, "na_tag_map") <- c(a = -32)
+  attr(x, "na_tag_format") <- "spss"
+  d <- tibble::tibble(age = x)
+  r <- frequency(d, age)
+  expect_true(r$options$show_labels)
+  out <- capture.output(print(r))
+  expect_true(any(grepl("-32", out) & grepl("NICHT GENERIERBAR", out)))
+  # without labelled missing codes the auto mode stays off
+  expect_false(frequency(survey_data, age)$options$show_labels)
+})

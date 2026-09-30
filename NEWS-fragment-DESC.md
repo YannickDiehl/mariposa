@@ -68,3 +68,8 @@
   `filter(employment != "Student")`) unless `show_unused = TRUE`, as SPSS
   FREQUENCIES lists observed values only; with `show_unused = TRUE` they
   now also appear in weighted tables.
+* `frequency(show_labels = "auto")` also shows the Label column when a
+  labelled missing-value code occurs (ALLBUS `age`: -32 "NICHT
+  GENERIERBAR"); the automatic mode only looked at the labels of valid
+  values, so metric variables printed their missing codes without the
+  explaining label.

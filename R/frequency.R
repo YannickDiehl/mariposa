@@ -173,7 +173,17 @@ frequency <- function(data, ..., weights = NULL, sort_frq = "none",
       # For variables with sjlabelled value labels
       if (!is.null(attr(x, "labels"))) {
         value_labels <- attr(x, "labels")
-        
+
+        # Labelled missing-value codes (tagged NAs such as ALLBUS -32
+        # "NICHT GENERIERBAR") that occur in the data: their label is the
+        # only explanation of the code, so show the Label column even for a
+        # metric variable whose valid values carry no labels
+        if (show_na && any(is.na(value_labels)) && anyNA(x)) {
+          label_tags <- .na_tags(value_labels[is.na(value_labels)])
+          data_tags <- .na_tags(x[is.na(x)])
+          if (any(label_tags %in% data_tags[!is.na(data_tags)])) return(TRUE)
+        }
+
         # Get actually occurring values in the data (excluding NA)
         actual_values <- unique(x[!is.na(x)])
         
