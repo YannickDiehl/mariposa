@@ -95,27 +95,25 @@ print_group_header <- function(group_values, prefix = "Group") {
   cat(paste(rep("-", nchar(header_text)), collapse = ""), "\n", sep = "")
 }
 
-#' UTF-8 safe left-pad a string to a given display width
+#' Pad strings to a given display width (UTF-8 safe)
 #'
-#' \code{sprintf} counts bytes instead of display characters for multi-byte
-#' UTF-8 strings (e.g. umlauts), causing misaligned columns. This helper
-#' compensates by adding the byte/character difference to the target width.
+#' \code{sprintf("\%-20s")} counts bytes instead of display characters for
+#' multi-byte UTF-8 strings (umlauts), which misaligned columns. Pads by
+#' display width (\code{nchar(type = "width")}); text longer than
+#' \code{width} is returned unchanged. Vectorized over \code{text}.
 #'
-#' @param text Character scalar to pad
+#' @param text Character vector to pad (NA shows as "NA")
 #' @param width Target display width
 #' @param align "left" for left-aligned (default), "right" for right-aligned
-#' @return Padded character string
+#' @return Padded character vector
 #' @noRd
 pad_utf8 <- function(text, width, align = "left") {
   text <- as.character(text)
-  if (is.na(text)) text <- "NA"
-  extra <- nchar(text, type = "bytes") - nchar(text, type = "chars")
-  adjusted_width <- width + extra
-  if (align == "left") {
-    sprintf(paste0("%-", adjusted_width, "s"), text)
-  } else {
-    sprintf(paste0("%", adjusted_width, "s"), text)
-  }
+  text[is.na(text)] <- "NA"
+  w <- nchar(text, type = "width", allowNA = TRUE)
+  w[is.na(w)] <- nchar(text[is.na(w)], type = "bytes")
+  spaces <- strrep(" ", pmax(0L, width - w))
+  if (identical(align, "right")) paste0(spaces, text) else paste0(text, spaces)
 }
 
 #' Calculate dynamic table width

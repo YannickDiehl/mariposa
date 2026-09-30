@@ -54,6 +54,25 @@ fmt_p <- function(p, digits = 3, style = c("table", "compact")) {
   as.character(out)
 }
 
+#' Format whole numbers (counts, N, sums of weights) for display
+#'
+#' formatC(format = "d") and sprintf("%d") coerce to integer: a count or a
+#' sum of weights of 2^31 or more (expansion weights) became NA with a
+#' coercion warning, or "invalid format '%d'" aborted the print. Rounds for
+#' display only (Charter 5.1), no thousands separators (as SPSS tables), ""
+#' for NA and no negative zero.
+#'
+#' @param x Numeric vector
+#' @return Character vector
+#' @noRd
+fmt_int <- function(x) {
+  x <- round(as.numeric(x))
+  out <- formatC(x, format = "f", digits = 0)
+  out[!is.na(x) & x == 0] <- "0"
+  out[is.na(x)] <- ""
+  as.character(out)
+}
+
 #' Print a bordered statistics table (column-spec driven)
 #'
 #' Replaces the hand-rolled "compute widths -> border -> sprintf rows ->
@@ -63,10 +82,16 @@ fmt_p <- function(p, digits = 3, style = c("table", "compact")) {
 #'                     col_types = c(p_adjusted = "pvalue", n = "int"),
 #'                     col_labels = c(p_adjusted = "Adj. p"))
 #'
-#' Types: "num" (fmt_num), "pvalue" (fmt_p table style), "int"
-#' (rounded, no decimals), "char" (as.character). Auto-detection: columns
-#' named like p-values -> "pvalue"; whole-number numerics -> "int"; other
-#' numerics -> "num"; everything else "char". NA displays as "".
+#' Types: "num" (fmt_num), "pvalue" (fmt_p table style), "int" (fmt_int:
+#' rounded, no decimals, safe beyond 2^31), "char" (as.character).
+#' Auto-detection: columns named like p-values -> "pvalue"; whole-number
+#' numerics -> "int"; other numerics -> "num"; everything else "char". NA
+#' displays as "".
+#'
+#' Cells are padded by display width (pad_utf8()): sprintf("%-20s") counts
+#' bytes, so every umlaut shifted the rest of its row. The leading text
+#' columns (row labels such as "Group 1", "Group 2") are left-aligned,
+#' numbers and everything after them right-aligned.
 #'
 #' @param df Data frame to render
 #' @param digits Decimal places for "num" columns
@@ -97,11 +122,11 @@ print_stat_table <- function(df, digits = 3, indent = 2,
     "char"
   }
 
-  format_col <- function(name, values) {
-    switch(detect_type(name, values),
+  format_col <- function(type, values) {
+    switch(type,
       pvalue = fmt_p(values, digits, style = "table"),
       num    = fmt_num(values, digits),
-      int    = ifelse(is.na(values), "", formatC(round(as.numeric(values)), format = "d")),
+      int    = fmt_int(values),
       ifelse(is.na(values), "", as.character(values))
     )
   }
@@ -111,28 +136,42 @@ print_stat_table <- function(df, digits = 3, indent = 2,
     if (!is.null(col_labels) && nm %in% names(col_labels)) col_labels[[nm]] else nm
   }, character(1))
 
-  formatted <- lapply(cols, function(nm) format_col(nm, df[[nm]]))
-  widths <- mapply(function(lab, vals) max(nchar(lab), nchar(vals), 1L),
-                   labels, formatted)
+  types <- vapply(cols, function(nm) detect_type(nm, df[[nm]]), character(1))
+  formatted <- lapply(seq_along(cols), function(j) {
+    as.character(format_col(types[[j]], df[[cols[j]]]))
+  })
+  widths <- mapply(function(lab, vals) {
+    max(nchar(c(lab, vals), type = "width", allowNA = TRUE), 1L, na.rm = TRUE)
+  }, labels, formatted)
+
+  # Leading text columns are row labels (left-aligned); a text column that
+  # only holds pre-formatted numbers ("2421", "<.001") is right-aligned
+  textual <- function(v) {
+    v <- v[nzchar(trimws(v))]
+    length(v) > 0 && !all(grepl("^\\s*[-+<>]?\\.?[0-9]", v))
+  }
+  left <- logical(length(cols))
+  left[1] <- types[[1]] == "char"
+  for (j in seq_along(cols)[-1]) {
+    if (!left[j - 1]) break
+    left[j] <- types[[j]] == "char" && textual(formatted[[j]])
+  }
+  align <- ifelse(left, "left", "right")
 
   pad_left <- strrep(" ", indent)
   border <- paste0(pad_left, strrep("-", sum(widths) + 2L * (length(widths) - 1L)))
-
-  # First column left-aligned (usually a label), the rest right-aligned
-  align <- c("-", rep("", length(cols) - 1L))
-  row_fmt <- paste0(
-    pad_left,
-    paste0("%", align, widths, "s", collapse = "  ")
-  )
-
-  cat(border, "\n")
-  cat(do.call(sprintf, c(list(row_fmt), as.list(labels))), "\n")
-  cat(border, "\n")
-  for (i in seq_len(nrow(df))) {
-    row_vals <- vapply(formatted, `[[`, character(1), i)
-    cat(do.call(sprintf, c(list(row_fmt), as.list(row_vals))), "\n")
+  render <- function(cells) {
+    paste0(pad_left, paste(mapply(pad_utf8, cells, widths, align),
+                           collapse = "  "))
   }
-  cat(border, "\n")
+
+  cat(border, "\n", sep = "")
+  cat(render(labels), "\n", sep = "")
+  cat(border, "\n", sep = "")
+  for (i in seq_len(nrow(df))) {
+    cat(render(vapply(formatted, `[[`, character(1), i)), "\n", sep = "")
+  }
+  cat(border, "\n", sep = "")
 
   invisible(df)
 }
