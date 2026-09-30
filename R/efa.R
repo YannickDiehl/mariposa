@@ -535,6 +535,7 @@ efa <- function(data, ...,
   # Unrotated component matrix
   raw_loadings <- eigenvectors[, seq_len(n_factors_used), drop = FALSE] %*%
     diag(sqrt(eigenvalues[seq_len(n_factors_used)]), nrow = n_factors_used)
+  raw_loadings <- .efa_reflect(raw_loadings)
   rownames(raw_loadings) <- var_names
   colnames(raw_loadings) <- paste0("PC", seq_len(n_factors_used))
 
@@ -598,8 +599,9 @@ efa <- function(data, ...,
     }
   )
 
-  # Extract unrotated loadings
-  raw_loadings <- unclass(fa_result$loadings)
+  # Extract unrotated loadings (factanal already reflects to positive
+  # column sums; applied again so both extractions share one rule)
+  raw_loadings <- .efa_reflect(unclass(fa_result$loadings))
   rownames(raw_loadings) <- var_names
   colnames(raw_loadings) <- paste0("Factor", seq_len(n_factors_used))
 
@@ -654,6 +656,31 @@ efa <- function(data, ...,
     uniquenesses = uniquenesses,
     col_prefix = "Factor"
   )
+}
+
+
+#' Reflect extracted components/factors to a positive loading sum
+#'
+#' @description
+#' An eigenvector (and hence a component) is only defined up to its sign,
+#' and eigen() picks one arbitrarily: three positively correlated items
+#' could come out with all-negative loadings, and the sign could differ
+#' between groups. SPSS FACTOR reflects every extracted column so that its
+#' loadings sum to a positive value; this reproduces the signs of every
+#' Component/Factor, Rotated, Pattern and Structure matrix and every factor
+#' correlation in the SPSS v29 reference output (efa_output.txt,
+#' efa_ml_promax_output.txt). The reflection is applied to the unrotated
+#' solution only: varimax, oblimin and promax are sign-equivariant, so the
+#' rotated matrices and the factor correlations follow consistently (a
+#' second reflection after rotation contradicts SPSS for the oblique
+#' solutions).
+#' @param L Unrotated loading matrix (variables x factors)
+#' @return L with columns of negative sum multiplied by -1
+#' @noRd
+.efa_reflect <- function(L) {
+  flip <- colSums(L) < 0
+  L[, flip] <- -L[, flip]
+  L
 }
 
 
