@@ -271,6 +271,40 @@ test_that("DESC-18/DESC-13: the w_* family prints one uniform table", {
                       "effective_n", "missing"))
   expect_equal(round(r1w$weighted_n), 2201)
   expect_equal(round(r1w$missing), 315)
-  expect_named(w_modus(survey_data, gender)$results,
-               c("Variable", "mode", "n", "missing"))
+  expect_true(all(c("Variable", "mode", "n", "missing") %in%
+                    names(w_modus(survey_data, gender)$results)))
+})
+
+
+# --- DESC-17: w_* input checks and w_modus ties -------------------------------
+
+test_that("DESC-17: w_* give clear errors for bad input and report tied modes", {
+  # w_mean(1:4, weights = c(1, 3)) failed with a cryptic base-R error
+  # (German "Fehlender Wert, wo TRUE/FALSE noetig ist"), w_mean(c("a", "b"))
+  # claimed "data must be a data frame", w_mean(survey_data, gender)
+  # returned NA with a base-R warning, and a tie in w_modus() was not
+  # reported at all (weighted: first value in data order).
+  expect_error(w_mean(1:4, weights = c(1, 3)), "length")
+  expect_error(w_median(c(1, 2, 3), weights = 1:2), "length")
+  expect_error(w_mean(c("a", "b")), "numeric")
+  expect_error(w_mean(survey_data, gender), "gender")
+  expect_error(w_sd(survey_data, age, gender), "not numeric")
+  expect_no_warning(expect_error(w_mean(survey_data, gender)))
+  expect_error(w_mean("not a data frame", age), "must be a data frame")
+  # w_modus works on any variable type
+  expect_no_error(w_modus(survey_data, gender))
+
+  # Ties: the smallest value (first level) is shown, as in SPSS, weighted
+  # and unweighted alike, and the print says so
+  tie <- data.frame(t = c(2, 2, 1, 1, 3), f = factor(c("b", "b", "a", "a", "c")),
+                    w = rep(1, 5))
+  expect_equal(w_modus(tie$t), 1)
+  expect_equal(w_modus(tie$t, weights = tie$w), 1)
+  expect_equal(as.character(w_modus(tie$f, weights = tie$w)), "a")
+  r <- w_modus(tie, t, f, weights = w)
+  expect_equal(r$results$n_modes, c(2L, 2L))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("Multiple modes exist", out)))
+  out1 <- capture.output(print(w_modus(survey_data, gender)))
+  expect_false(any(grepl("Multiple modes", out1)))
 })

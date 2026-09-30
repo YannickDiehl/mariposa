@@ -63,7 +63,8 @@
                          class_name, extra_args = list(),
                          multi_value = FALSE, value_names = NULL,
                          empty_stat = NA_real_, empty_n = 0L,
-                         vector_ok = is.numeric) {
+                         vector_ok = is.numeric,
+                         call = rlang::caller_env()) {
 
   # Capture the weights expression once as a quosure. Because the w_*
   # wrappers pass weights = {{ weights }}, this quosure carries the
@@ -80,6 +81,12 @@
 
     weighted <- .are_weights(weights_vec)
     if (weighted) .check_weights(weights_vec)
+    if (weighted && length(weights_vec) != length(x)) {
+      cli_abort(c(
+        "{.arg weights} and the data must have the same length.",
+        "x" = "The data have {length(x)} value{?s}, {.arg weights} has {length(weights_vec)}."
+      ), call = call)
+    }
     # na.rm = FALSE with missing values: the statistic is undefined (NA),
     # as in base R - never a crash or a value computed on shifted positions
     if (!na.rm && .w_has_missing(x, if (weighted) weights_vec)) {
@@ -91,7 +98,7 @@
       # Empty input: same short-circuit as the weighted branch (stat_fn on
       # numeric(0) gave e.g. mean() = NaN)
       if (length(x) == 0) return(empty_stat)
-      return(stat_fn(x, w = NULL))
+      return(.w_strip_extra(stat_fn(x, w = NULL)))
     } else {
       # Weighted
       if (na.rm) {
@@ -100,18 +107,36 @@
         weights_vec <- weights_vec[valid]
       }
       if (length(x) == 0) return(empty_stat)
-      return(stat_fn(x, w = weights_vec))
+      return(.w_strip_extra(stat_fn(x, w = weights_vec)))
     }
   }
 
   # --- Data frame mode -------------------------------------------------------
   if (!is.data.frame(data)) {
-    cli_abort("{.arg data} must be a data frame.")
+    if (...length() == 0 && is.atomic(data)) {
+      # A vector of the wrong type (e.g. character): say so instead of
+      # claiming that a data frame was expected
+      cli_abort(c(
+        "{.fn {class_name}} needs a numeric vector or a data frame.",
+        "x" = "{.arg data} is a {.cls {class(data)[1]}} vector."
+      ), call = call)
+    }
+    cli_abort("{.arg data} must be a data frame.", call = call)
   }
 
-  vars <- .process_variables(data, ...)
-  vars <- .drop_grouping_vars(data, vars)
+  vars <- .process_variables(data, ..., call = call)
+  vars <- .drop_grouping_vars(data, vars, call = call)
   var_names <- names(vars)
+
+  # Selected variables must suit the statistic (numeric, except for the
+  # mode): a factor used to give NA plus a base-R warning
+  bad <- var_names[!vapply(var_names, function(v) vector_ok(data[[v]]), logical(1))]
+  if (length(bad) > 0) {
+    cli_abort(c(
+      "{cli::qty(bad)}Variable{?s} {.var {bad}} {?is/are} not numeric.",
+      "i" = "{.fn {class_name}} needs numeric variables; use {.fn w_modus} or {.fn frequency} for categorical ones."
+    ), call = call)
+  }
 
   if (rlang::quo_is_null(weights_quo)) {
     weights_vec <- NULL
@@ -167,6 +192,16 @@
           stat_val <- if (undefined) empty_stat else stat_fn(x, w = w)
           n_val <- sum(valid)
           eff_n <- .effective_n(w_vec[valid])
+        }
+      }
+
+      # Extra per-variable information returned by stat_fn as attribute
+      # "w_extra" (w_modus: the number of modes) becomes its own column
+      extra <- attr(stat_val, "w_extra")
+      if (!is.null(extra)) {
+        stat_val <- .w_strip_extra(stat_val)
+        for (e in names(extra)) {
+          result_cols[[paste0(var_name, "_", e)]] <- extra[[e]]
         }
       }
 
@@ -279,6 +314,8 @@
       out$n <- results[[paste0(v, "_n")]]
     }
     out$missing <- results[[paste0(v, "_missing")]]
+    n_modes_col <- paste0(v, "_n_modes")
+    if (n_modes_col %in% names(results)) out$n_modes <- results[[n_modes_col]]
     out
   })
   dplyr::bind_rows(parts)
@@ -309,10 +346,19 @@
   if (weighted) cat("Weights: ", x$weights, "\n", sep = "")
 
   stat_col <- if (weighted) weighted_col else unweighted_col
+  multiple_modes <- FALSE
 
   emit <- function(rows) {
     val <- rows[[stat_col]]
     if (is.factor(val)) val <- as.character(val)
+    # Several values share the highest frequency: flag the cell (SPSS
+    # footnote "Multiple modes exist. The smallest value is shown.")
+    tied <- if ("n_modes" %in% names(rows)) !is.na(rows$n_modes) & rows$n_modes > 1 else FALSE
+    if (any(tied)) {
+      txt <- if (is.numeric(val)) fmt_num(val, digits) else as.character(val)
+      val <- paste0(txt, ifelse(tied, " (a)", ""))
+      multiple_modes <<- TRUE
+    }
     tab <- data.frame(Variable = rows$Variable, stringsAsFactors = FALSE)
     tab[[stat_label]] <- val
     tab$N <- if (weighted) rows$weighted_n else rows$n
@@ -326,6 +372,9 @@
   } else {
     cat("\n")
     emit(x$results)
+  }
+  if (multiple_modes) {
+    cat("  (a) Multiple modes exist; the smallest value is shown.\n")
   }
   if (weighted && effective_n) {
     cat("  N and Missing are sums of weights; Effective N = (sum w)^2 / sum w^2 (Kish).\n")
@@ -432,4 +481,12 @@ print.summary.w_statistic <- function(x, ...) {
     if (!anyDuplicated(nm) || anyDuplicated(pct)) break
   }
   nm
+}
+
+
+#' Remove the "w_extra" attribute from a statistic value
+#' @noRd
+.w_strip_extra <- function(val) {
+  attr(val, "w_extra") <- NULL
+  val
 }

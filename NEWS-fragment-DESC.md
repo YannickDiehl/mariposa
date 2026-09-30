@@ -49,3 +49,13 @@
   variables (`Variable`, the statistic, `n` or `weighted_n` +
   `effective_n`, `missing`); single-variable results no longer carry the
   duplicated raw columns (`age`, `age_n`, `age_eff_n`).
+* `w_*` input checks: `w_mean(1:4, weights = c(1, 3))` says that the
+  lengths differ (was a cryptic base-R error), `w_mean(c("a", "b"))` says
+  that a numeric vector is needed (was "data must be a data frame"), and
+  `w_mean(survey_data, gender)` names the non-numeric variable (was `NA`
+  plus a base-R warning).
+* `w_modus()`: when several values share the highest frequency, the
+  smallest value (first factor level) is returned for weighted and
+  unweighted data alike, as in SPSS (the weighted version took the first
+  value in data order), `$results$n_modes` counts the tied values, and
+  the print flags the result ("Multiple modes exist").

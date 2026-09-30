@@ -36,8 +36,10 @@
 #'   of weights (displayed rounded), as SPSS reports them under
 #'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
-#' If multiple values share the highest weighted frequency (ties), the first
-#' value encountered is returned.
+#' If multiple values share the highest (weighted) frequency, the smallest
+#' value (for factors: the first level) is returned, as in SPSS; the print
+#' flags such results ("Multiple modes exist") and \code{$results$n_modes}
+#' holds the number of tied values.
 #'
 #' ## When to Use This
 #'
@@ -112,10 +114,13 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
 #' Mode statistic kernel for the w_* factory
 #'
-#' Unweighted: most frequent value via table(); ties resolved by first
-#' occurrence in table order; numeric input is converted back from the
-#' character table names. Weighted: the value whose observations have the
-#' largest total weight; ties resolved by first occurrence in the data.
+#' Unweighted: most frequent value via table(); numeric input is converted
+#' back from the character table names. Weighted: the value whose
+#' observations have the largest total weight. Ties: the smallest value
+#' (first factor level) in both branches, as SPSS FREQUENCIES shows it
+#' (the weighted branch used to take the first value in data order). The
+#' number of tied values travels as attribute "w_extra" (n_modes) for the
+#' factory.
 #'
 #' @noRd
 .modus_stat <- function(x, w) {
@@ -127,16 +132,17 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
     modes <- names(freq_table)[freq_table == max_freq]
     result <- modes[1]
     if (is.numeric(x)) result <- as.numeric(result)
-    result
   } else {
-    unique_vals <- unique(x)
-    weighted_freqs <- vapply(unique_vals, function(val) {
-      sum(w[x == val])
+    unique_vals <- sort(unique(x))
+    weighted_freqs <- vapply(seq_along(unique_vals), function(i) {
+      sum(w[x == unique_vals[i]])
     }, numeric(1))
     max_weight <- max(weighted_freqs)
     modes <- unique_vals[weighted_freqs == max_weight]
-    modes[1]
+    result <- modes[1]
   }
+  attr(result, "w_extra") <- list(n_modes = length(modes))
+  result
 }
 
 #' Print method for w_modus objects
