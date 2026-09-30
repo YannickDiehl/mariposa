@@ -169,6 +169,34 @@ test_that("NP-23 gamma p-value uses the SPSS ASE0 (both pair directions)", {
   }
 })
 
+test_that("NP-05 chi_square(correct = TRUE): Phi/V from the Pearson chi-square", {
+  # Was: Phi and Cramer's V were computed from the Yates-corrected chi2
+  # (0.011876 instead of SPSS/phi() 0.012888); the compact print did not
+  # say that a continuity correction was applied.
+  r <- chi_square(survey_data, gender, region, correct = TRUE)
+  expect_equal(r$results$phi, unname(phi(survey_data, gender, region)))
+  expect_equal(r$results$cramers_v, unname(cramers_v(survey_data, gender, region)))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("continuity", out, ignore.case = TRUE)))
+
+  # SPSS Test 2a (chi_squared_output.txt): Continuity Correction .477 /
+  # .490, Pearson .548 / .459, Phi = V = .015
+  w <- chi_square(survey_data, gender, region, correct = TRUE,
+                  weights = sampling_weight)$results
+  assert_spss(w$chi_squared, 0.477, tier = "display", precision = 3,
+              label = "2a continuity correction")
+  assert_spss(w$p_value, 0.490, tier = "display", precision = 3,
+              what = "p_value", label = "2a continuity p")
+  assert_spss(w$pearson_chi_squared, 0.548, tier = "display", precision = 3,
+              label = "2a Pearson chi2")
+  assert_spss(w$phi, 0.015, tier = "display", precision = 3, label = "2a phi")
+  assert_spss(w$phi_p_value, 0.459, tier = "display", precision = 3,
+              what = "p_value", label = "2a phi p")
+  out_s <- capture.output(print(summary(r)))
+  expect_true(any(grepl("Pearson Chi-Square", out_s, fixed = TRUE)))
+  expect_true(any(grepl("Continuity Correction", out_s, fixed = TRUE)))
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

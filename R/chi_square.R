@@ -14,7 +14,12 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... Two categorical variables to test (e.g., gender, region)
 #' @param weights Optional survey weights for population-representative results
-#' @param correct Apply continuity correction for small samples? (Default: FALSE)
+#' @param correct Apply Yates' continuity correction to a 2x2 table?
+#'   (Default: FALSE). The corrected statistic is reported as
+#'   \code{chi_squared}; as in SPSS (which prints "Pearson Chi-Square" and
+#'   "Continuity Correction" side by side), the uncorrected Pearson value is
+#'   kept in \code{pearson_chi_squared} and Phi / Cramer's V are always
+#'   computed from it.
 #'
 #' @return Test results showing whether the variables are related, including:
 #' - Chi-squared statistic and p-value
@@ -201,6 +206,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     data.frame(
       chi_squared = NA_real_, df = NA_real_, p_value = NA_real_,
       n = n,
+      pearson_chi_squared = NA_real_, pearson_p_value = NA_real_,
+      continuity_correction = FALSE,
       observed = I(list(tbl)), expected = I(list(NULL)),
       residuals = I(list(NULL)),
       cramers_v = NA_real_, phi = NA_real_, gamma = NA_real_,
@@ -233,6 +240,19 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   chi_squared <- as.numeric(test_result$statistic)
   p_value <- test_result$p.value
 
+  # SPSS reports the Pearson chi-square next to the continuity correction
+  # (2x2 only) and derives Phi / Cramer's V and their significance from
+  # the Pearson statistic, never from the corrected one.
+  corrected <- isTRUE(correct) && r == 2 && c == 2
+  if (corrected) {
+    pearson <- stats::chisq.test(tbl, correct = FALSE)
+    pearson_chi <- as.numeric(pearson$statistic)
+    pearson_p <- pearson$p.value
+  } else {
+    pearson_chi <- chi_squared
+    pearson_p <- p_value
+  }
+
   # SPSS footnotes cells with an expected count below 5
   exp_tbl <- test_result$expected
   n_low <- sum(exp_tbl < 5)
@@ -248,18 +268,21 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     df = as.numeric(test_result$parameter),
     p_value = p_value,
     n = n,
+    pearson_chi_squared = pearson_chi,
+    pearson_p_value = pearson_p,
+    continuity_correction = corrected,
     observed = I(list(test_result$observed)),
     expected = I(list(exp_tbl)),
     residuals = I(list(test_result$residuals)),
-    # Phi and Cramer's V share the chi-square p-value (SPSS)
-    cramers_v = sqrt(chi_squared / (n * min(r - 1, c - 1))),
-    phi = sqrt(chi_squared / n),
+    # Phi and Cramer's V (and their p-value) from the Pearson chi-square
+    cramers_v = sqrt(pearson_chi / (n * min(r - 1, c - 1))),
+    phi = sqrt(pearson_chi / n),
     gamma = gam$gamma,
-    contingency_c = sqrt(chi_squared / (chi_squared + n)),
+    contingency_c = sqrt(pearson_chi / (pearson_chi + n)),
     table_rows = r,
     table_cols = c,
-    phi_p_value = p_value,
-    cramers_v_p_value = p_value,
+    phi_p_value = pearson_p,
+    cramers_v_p_value = pearson_p,
     gamma_p_value = gam$p_value,
     reason = NA_character_,
     stringsAsFactors = FALSE
@@ -371,7 +394,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 
 .interpret_cramers_v <- function(v) {
   if (is.na(v)) return("-")
-  if (v < 0.1) return("Neglig.")
+  if (v < 0.1) return("Negligible")
   if (v < 0.3) return("Small")
   if (v < 0.5) return("Medium")
   return("Large")
@@ -380,7 +403,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 .interpret_phi <- function(phi) {
   if (is.na(phi)) return("-")
   abs_phi <- abs(phi)
-  if (abs_phi < 0.1) return("Neglig.")
+  if (abs_phi < 0.1) return("Negligible")
   if (abs_phi < 0.3) return("Small")
   if (abs_phi < 0.5) return("Medium")
   return("Large")
@@ -443,6 +466,7 @@ print.chi_square <- function(x, digits = 3, ...) {
     }
   }
 
+  cat("Use summary() for detailed output.\n")
   invisible(x)
 }
 
@@ -466,20 +490,19 @@ print.chi_square <- function(x, digits = 3, ...) {
     reason <- results$reason[i]
     cat(sprintf("  not computed (%s)\n",
                 if (is.null(reason) || is.na(reason)) "see warning" else reason))
-  } else if (!is.na(v_val)) {
-    v_interp <- .interpret_cramers_v(v_val)
-    cat(sprintf("  chi2(%d) = %.*f, %s %s, V = %.*f (%s), N = %d\n",
-                as.integer(df_val), digits, chi_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val),
-                digits, v_val, tolower(v_interp), as.integer(n_val)))
-  } else {
-    cat(sprintf("  chi2(%d) = %.*f, %s %s, N = %d\n",
-                as.integer(df_val), digits, chi_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val),
-                as.integer(n_val)))
+    return(invisible(NULL))
   }
+
+  cc_tag <- if (isTRUE(results$continuity_correction[i])) " (continuity-corrected)" else ""
+  v_part <- if (!is.na(v_val)) {
+    sprintf(", V = %s (%s)", fmt_num(v_val, digits),
+            tolower(.interpret_cramers_v(v_val)))
+  } else ""
+  cat(sprintf("  chi2(%s) = %s%s, %s%s, N = %s\n",
+              formatC(as.integer(df_val), format = "d"),
+              fmt_num(chi_val, digits), cc_tag,
+              format_p_stars(p_val, digits), v_part,
+              format(round(n_val), big.mark = "")))
 }
 
 #' Summary method for chi-squared test results
@@ -609,14 +632,17 @@ print.summary.chi_square <- function(x, ...) {
 
   if (show$results) {
     cat("\nChi-Squared Test Results:\n")
+    corrected <- isTRUE(results$continuity_correction[i])
+    pearson_chi <- if (corrected) results$pearson_chi_squared[i] else results$chi_squared[i]
+    pearson_p <- if (corrected) results$pearson_p_value[i] else results$p_value[i]
     tab <- data.frame(
-      Statistic = "Pearson Chi-Square",
-      Value = results$chi_squared[i],
+      Statistic = c("Pearson Chi-Square", if (corrected) "Continuity Correction"),
+      Value = c(pearson_chi, if (corrected) results$chi_squared[i]),
       df = results$df[i],
-      p = results$p_value[i],
-      stars = add_significance_stars(results$p_value[i]),
+      p = c(pearson_p, if (corrected) results$p_value[i]),
       stringsAsFactors = FALSE
     )
+    tab$stars <- add_significance_stars(tab$p)
     print_stat_table(tab, digits = digits, indent = 0,
                      col_types = c(Value = "num", df = "int"),
                      col_labels = c(Statistic = "", p = "p value", stars = ""))

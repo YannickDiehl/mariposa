@@ -32,3 +32,12 @@
   standard error (ASE0): the approximate significance of gamma was wrong
   (education x employment: p = .122 where SPSS prints .027). The gamma
   value itself is unchanged.
+* `chi_square(correct = TRUE)` computes Phi, Cramer's V and the
+  contingency coefficient from the Pearson chi-square, as SPSS does; they
+  were computed from the Yates-corrected statistic (gender x region: 0.0119
+  instead of 0.0129). The Pearson statistic is kept in
+  `pearson_chi_squared`/`pearson_p_value`, `summary()` shows both rows
+  ("Pearson Chi-Square" and "Continuity Correction") like SPSS, and the
+  compact `print()` marks the statistic as "(continuity-corrected)". The
+  compact line now spells out "negligible" (was "neglig.") and ends with
+  the "Use summary()" hint.
