@@ -107,6 +107,43 @@ test_that("REG-16: the legacy .print_cor_matrix()/.print_single_pair() are gone"
   expect_true(any(grepl("1\\.0000", out[i:(i + 12)])))
 })
 
+# --- Weighted-formula hygiene -------------------------------------------------
+
+.weighted_defs_outside_kernels <- function(r_dir) {
+  files <- list.files(r_dir, pattern = "\\.R$", full.names = TRUE)
+  bad <- character(0)
+  for (f in files) {
+    if (basename(f) == "kernels-weighted.R") next
+    exprs <- parse(f, keep.source = FALSE)
+    for (e in exprs) {
+      if (is.call(e) && (identical(e[[1]], as.name("<-")) ||
+                         identical(e[[1]], as.name("="))) &&
+          is.name(e[[2]]) && grepl("^\\.weighted_", as.character(e[[2]]))) {
+        bad <- c(bad, paste0(basename(f), ": ", as.character(e[[2]])))
+      }
+    }
+  }
+  bad
+}
+
+test_that("SCALE note: weighted formulas are defined only in kernels-weighted.R", {
+  # .weighted_cov/.weighted_cor/.weighted_cor_vec lived in reliability.R
+  # (also used by efa()), against the rule that every weighted formula
+  # lives in R/kernels-weighted.R (the weighted variance once drifted in
+  # six files).
+  r_dir <- testthat::test_path("..", "..", "R")
+  skip_if(!dir.exists(r_dir), "R/ sources not available (installed package)")
+  expect_identical(.weighted_defs_outside_kernels(r_dir), character(0))
+  # behaviour unchanged: w == 1 reproduces the unweighted matrices
+  m <- as.matrix(stats::na.omit(survey_data[c("trust_government",
+                                               "trust_media", "trust_science")]))
+  w1 <- rep(1, nrow(m))
+  expect_equal(mariposa:::.weighted_cov(m, w1), stats::cov(m), ignore_attr = TRUE)
+  expect_equal(mariposa:::.weighted_cor(m, w1), stats::cor(m), ignore_attr = TRUE)
+  expect_equal(mariposa:::.weighted_cor_vec(m[, 1], m[, 2], w1),
+               stats::cor(m[, 1], m[, 2]))
+})
+
 # --- EDGE-23: one group-header style, no trailing blanks in headers -----------
 
 test_that("EDGE-23: verbose group headers share one style without a trailing blank", {

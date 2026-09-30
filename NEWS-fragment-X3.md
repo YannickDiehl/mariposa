@@ -29,3 +29,9 @@
   without a suffix ("Pearson Correlation", "Chi-Squared Test of
   Independence", "Levene's Test for Homogeneity of Variance") no longer end
   in a blank with an underline one dash too long.
+* Internal: the weighted covariance/correlation formulas used by
+  `reliability()` and `efa()` (`.weighted_cov()`, `.weighted_cor()`,
+  `.weighted_cor_vec()`) moved from `R/reliability.R` to
+  `R/kernels-weighted.R`, the single home of every weighted formula; a
+  static test keeps `.weighted_*` definitions out of other files. Results
+  are unchanged.

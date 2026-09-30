@@ -661,54 +661,6 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
 
 # ============================================================================
-# WEIGHTED COVARIANCE AND CORRELATION HELPERS
-# ============================================================================
-
-#' Compute weighted covariance matrix (SPSS-compatible)
-#' @description Uses frequency-weighted formula: cov = sum(w*(x-mx)*(y-my)) / (V1 - 1)
-#' @noRd
-.weighted_cov <- function(mat, w) {
-  k <- ncol(mat)
-  V1 <- sum(w)
-
-  # Weighted means
-  w_means <- colSums(mat * w) / V1
-
-  # Center the data
-  centered <- sweep(mat, 2, w_means)
-
-  # Weighted covariance: (t(centered) %*% diag(w) %*% centered) / (V1 - 1)
-  cov_mat <- (t(centered * w) %*% centered) / (V1 - 1)
-
-  return(cov_mat)
-}
-
-#' Compute weighted correlation matrix from weighted covariance
-#' @noRd
-.weighted_cor <- function(mat, w) {
-  cov_mat <- .weighted_cov(mat, w)
-  sds <- sqrt(diag(cov_mat))
-  cor_mat <- cov_mat / outer(sds, sds)
-  # Ensure diagonal is exactly 1
-  diag(cor_mat) <- 1
-  return(cor_mat)
-}
-
-#' Compute weighted correlation between two vectors
-#' @noRd
-.weighted_cor_vec <- function(x, y, w) {
-  V1 <- sum(w)
-  mx <- sum(x * w) / V1
-  my <- sum(y * w) / V1
-  cov_xy <- sum(w * (x - mx) * (y - my)) / (V1 - 1)
-  var_x <- sum(w * (x - mx)^2) / (V1 - 1)
-  var_y <- sum(w * (y - my)^2) / (V1 - 1)
-  if (var_x <= 0 || var_y <= 0) return(NA_real_)
-  cov_xy / sqrt(var_x * var_y)
-}
-
-
-# ============================================================================
 # HELPERS
 # ============================================================================
 
