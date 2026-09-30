@@ -322,6 +322,20 @@ test_that("NP-04 pairwise_wilcoxon legend matches the sign of Z", {
   expect_false(any(grepl("Positive Z: First", out, fixed = TRUE)))
 })
 
+test_that("NP-14 pairwise_wilcoxon reports the N of each pair", {
+  # Was: pairs used pairwise-complete cases (as the SPSS /WILCOXON
+  # references they are validated against) while friedman_test() uses
+  # complete cases, without any n column or note - N 105 vs 75 unexplained.
+  fr <- friedman_test(survey_data, trust_government, trust_media, trust_science)
+  pw <- pairwise_wilcoxon(fr)
+  expect_true("n" %in% names(pw$comparisons))
+  # SPSS pairwise_wilcoxon_output.txt: Totals 2227 / 2255 / 2272
+  expect_equal(pw$comparisons$n, c(2227, 2255, 2272))
+  out <- capture.output(print(summary(pw)))
+  expect_true(any(grepl("pairwise deletion", out, fixed = TRUE)))
+  expect_true(any(grepl(as.character(fr$results$n), out, fixed = TRUE)))
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

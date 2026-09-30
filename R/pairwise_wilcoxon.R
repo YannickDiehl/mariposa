@@ -23,6 +23,7 @@
 #' - Which measurement pairs are significantly different
 #' - Z-statistics from Wilcoxon signed-rank tests
 #' - Adjusted p-values (controlling for multiple comparisons)
+#' - The number of cases of each pair (\code{n})
 #'
 #' @details
 #' ## Understanding the Results
@@ -48,6 +49,15 @@
 #' 2. Ranks the absolute differences
 #' 3. Computes a Z-statistic based on the rank sums
 #' 4. Uses normal approximation with tie correction
+#'
+#' ## Which Cases Are Used
+#'
+#' Each pair uses all cases with valid values on both of its variables
+#' (pairwise deletion), exactly like the individual SPSS
+#' \code{NPAR TESTS /WILCOXON} tests these results are validated against.
+#' \code{friedman_test()} uses only cases complete on all variables
+#' (listwise, as SPSS \code{/FRIEDMAN}), so a pair's \code{n} can be larger
+#' than the Friedman N.
 #'
 #' ## P-Value Adjustment Methods
 #'
@@ -168,6 +178,8 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
     }
     x_vals <- x_vals[valid_indices]
     y_vals <- y_vals[valid_indices]
+    # N of the pair (pairwise deletion, as SPSS NPAR TESTS /WILCOXON)
+    n_pair <- if (is.null(weight_name)) length(x_vals) else round(sum(w))
 
     # Compute differences (y - x, matching SPSS convention)
     d <- y_vals - x_vals
@@ -184,7 +196,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
     n_ranked <- length(d_no_ties)
 
     if (n_ranked == 0) {
-      return(list(z = NA_real_, p = NA_real_))
+      return(list(z = NA_real_, p = NA_real_, n = n_pair))
     }
 
     if (is.null(weight_name)) {
@@ -230,7 +242,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
       p_value <- core$p_value
     }
 
-    return(list(z = Z, p = p_value))
+    return(list(z = Z, p = p_value, n = n_pair))
   }
 
   # Generate all pairs of variables
@@ -266,6 +278,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
           pair_results[[idx]] <- data.frame(
             var1 = vars[v1],
             var2 = vars[v2],
+            n = result$n,
             z = result$z,
             p = result$p,
             stringsAsFactors = FALSE
@@ -306,6 +319,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
         pair_results[[idx]] <- data.frame(
           var1 = vars[v1],
           var2 = vars[v2],
+          n = result$n,
           z = result$z,
           p = result$p,
           stringsAsFactors = FALSE
@@ -521,6 +535,18 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
       .print_pw_table(x$comparisons, digits)
     }
 
+    fr_n <- if (!is_grouped_data && !is.null(x$friedman_results)) {
+      x$friedman_results$results$n[1]
+    }
+    cat("Note: Each pair uses all cases with values on both variables\n")
+    cat("(pairwise deletion, as SPSS NPAR TESTS /WILCOXON), so N can exceed\n")
+    if (!is.null(fr_n) && !is.na(fr_n)) {
+      cat(sprintf("the Friedman test's N = %s (cases complete on all variables).\n",
+                  format(fr_n, big.mark = "")))
+    } else {
+      cat("the Friedman test's N (cases complete on all variables).\n")
+    }
+
     print_significance_legend()
   }
 
@@ -541,28 +567,21 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
 #' @noRd
 .print_pw_table <- function(pw_results, digits = 3) {
   display_table <- data.frame(
-    `Var 1` = pw_results$var1,
-    `Var 2` = pw_results$var2,
-    Z = round(pw_results$z, digits),
-    `p (unadj)` = ifelse(pw_results$p < 0.001,
-                          "<.001",
-                          format(round(pw_results$p, digits), nsmall = digits)),
-    `p (adj)` = ifelse(pw_results$p_adj < 0.001,
-                        "<.001",
-                        format(round(pw_results$p_adj, digits), nsmall = digits)),
-    Sig = pw_results$sig,
-    check.names = FALSE,
+    var1 = pw_results$var1,
+    var2 = pw_results$var2,
+    n = if (!is.null(pw_results$n)) pw_results$n else NA_real_,
+    z = pw_results$z,
+    p = pw_results$p,
+    p_adj = pw_results$p_adj,
+    stars = pw_results$sig,
     stringsAsFactors = FALSE
   )
-
-  # Calculate border width based on table content
-  output <- capture.output(print(display_table, row.names = FALSE))
-  border_width <- max(nchar(output), na.rm = TRUE)
-  border <- paste(rep("-", border_width), collapse = "")
-
-  cat(border, "\n")
-  for (line in output) {
-    cat(line, "\n")
-  }
-  cat(border, "\n\n")
+  if (all(is.na(display_table$n))) display_table$n <- NULL
+  print_stat_table(
+    display_table, digits = digits, indent = 0,
+    col_types = c(z = "num", n = "int"),
+    col_labels = c(var1 = "Var 1", var2 = "Var 2", n = "N", z = "Z",
+                   p = "p (unadj)", p_adj = "p (adj)", stars = "")
+  )
+  cat("\n")
 }

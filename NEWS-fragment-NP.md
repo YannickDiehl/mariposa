@@ -76,3 +76,9 @@
   so a positive Z means the *second* variable tends to be higher; the
   legend said the opposite (score_T1 vs score_T2: Z = +5.43 while T2 is
   higher).
+* `pairwise_wilcoxon()` reports the number of cases of every pair (new
+  `n` column, shown in `summary()`) and explains why it can exceed the
+  Friedman N: each pair uses all cases with both values (pairwise
+  deletion, exactly like the SPSS `/WILCOXON` tests the results are
+  validated against), while `friedman_test()` uses complete cases. The
+  comparison table prints p-values in SPSS style (`<.001`, `.123`).
