@@ -13,8 +13,10 @@
 #' @param data A data frame to export.
 #' @param path Path to the output file. Must end in `.xpt`.
 #' @param version SAS transport file version. Either `5` (default, SAS
-#'   Transport v5, most compatible) or `8` (SAS Transport v8, supports
-#'   longer variable names).
+#'   Transport v5, most compatible, variable names of up to 8 characters)
+#'   or `8` (SAS Transport v8, names of up to 32 characters). Longer names
+#'   are truncated with a warning; if truncation would create duplicate
+#'   names, the export stops.
 #' @param name Member name for the dataset within the transport file. If
 #'   `NULL`, derived from the file name. Maximum 8 characters for version 5.
 #'
@@ -53,7 +55,7 @@
 #' if (requireNamespace("haven", quietly = TRUE)) {
 #'   # Roundtrip: write to a temporary .xpt transport file, read back
 #'   tmp <- tempfile(fileext = ".xpt")
-#'   write_xpt(survey_data, tmp)
+#'   write_xpt(survey_data, tmp, version = 8)  # names longer than 8 chars
 #'   data <- read_xpt(tmp)
 #'
 #'   unlink(tmp)
@@ -87,6 +89,35 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
     if (nchar(name) > max_len) {
       name <- substr(name, 1L, max_len)
     }
+  }
+
+  # SAS transport limits variable names to 8 (v5) / 32 (v8) characters and
+  # the format truncates longer ones silently; truncation can even produce
+  # duplicate names (SAS names are case-insensitive).
+  max_name <- if (version == 5L) 8L else 32L
+  long <- nchar(names(data)) > max_name
+  if (any(long)) {
+    short <- substr(names(data), 1L, max_name)
+    dup <- duplicated(toupper(short)) | duplicated(toupper(short), fromLast = TRUE)
+    if (any(dup)) {
+      clash <- paste0(names(data)[dup], " -> ", short[dup])
+      cli::cli_abort(c(
+        "SAS transport version {version} allows variable names of up to {max_name} characters; truncating them would create duplicate names:",
+        stats::setNames(clash, rep("x", length(clash))),
+        "i" = if (version == 5L) {
+          "Use {.code version = 8} (up to 32 characters) or rename the variables."
+        } else {
+          "Rename the variables."
+        }
+      ))
+    }
+    renamed <- paste0(names(data)[long], " -> ", short[long])
+    cli::cli_warn(c(
+      "SAS transport version {version} truncates {sum(long)} variable name{?s} to {max_name} characters:",
+      stats::setNames(utils::head(renamed, 10L), rep("*", min(10L, length(renamed)))),
+      if (length(renamed) > 10L) c(" " = paste0("... and ", length(renamed) - 10L, " more.")),
+      "i" = if (version == 5L) "Use {.code version = 8} to keep names of up to 32 characters."
+    ))
   }
 
   # Prepare data: ensure tagged NAs are in haven format, clean up attributes

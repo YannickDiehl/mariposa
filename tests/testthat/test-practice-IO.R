@@ -651,3 +651,18 @@ test_that("IO-25: readers say which file type they were given", {
   expect_equal(nrow(read_spss(sav)), 3L)
   expect_equal(nrow(read_stata(dta)), 3L)
 })
+
+# IO-13: write_xpt() (default version 5) silently truncated variable names
+# to 8 characters, creating duplicates (trust_government, trust_media ->
+# "trust_go", "trust_me"; life_satisfaction ...).
+test_that("IO-13: write_xpt() warns about truncated names, refuses duplicates", {
+  skip_if_not_installed("haven")
+  tf <- tempfile(fileext = ".xpt")
+  on.exit(unlink(tf))
+  d <- data.frame(id = 1:2, satisfaction = c(1, 2))
+  expect_warning(suppressMessages(write_xpt(d, tf)), "version = 8")
+  d2 <- data.frame(trust_government = 1:2, trust_goals = 3:4)
+  expect_error(suppressMessages(write_xpt(d2, tf)), "duplicate")
+  expect_no_warning(suppressMessages(write_xpt(d2, tf, version = 8)))
+  expect_equal(names(read_xpt(tf)), c("trust_government", "trust_goals"))
+})

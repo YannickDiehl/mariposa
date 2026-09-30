@@ -143,3 +143,8 @@
   cannot read x.dta: it looks like a Stata file (.dta). Use read_stata()
   instead."), instead of readstat's cryptic errors; a missing file is
   reported as such.
+* `write_xpt()` no longer truncates variable names silently: the default
+  SAS transport version 5 allows 8 characters, and truncation even created
+  duplicate names. It now warns (listing old -> new names, suggesting
+  `version = 8`) and refuses to write when truncation would produce
+  duplicates.
