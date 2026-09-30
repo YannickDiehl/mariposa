@@ -58,3 +58,74 @@ test_that("PAR-10: labelled grouping variables show value labels, not codes", {
   ref <- oneway_anova(survey_data, life_satisfaction, group = education)
   expect_equal(ow$results$F_statistic, ref$results$F_statistic)
 })
+
+# --- PAR-01 / PAR-24: degenerate dependent variables --------------------------
+
+test_that("PAR-01: a constant DV is not tested (no spurious F from rounding noise)", {
+  # SS were 0/0 up to floating-point noise: weighted F = 7256 ***, eta2 .897;
+  # unweighted F = 0.992; factorial F = 4.011 *; Tukey p-values.
+  d <- survey_data
+  d$const <- 3
+  expect_warning(
+    r <- oneway_anova(d, const, group = education, weights = sampling_weight),
+    "const.*no variance"
+  )
+  expect_true(is.na(r$results$F_statistic))
+  expect_warning(
+    r2 <- oneway_anova(d, const, life_satisfaction, group = education),
+    "no variance"
+  )
+  expect_true(is.na(r2$results$F_statistic[1]))
+  expect_false(is.na(r2$results$F_statistic[2]))
+  out <- capture.output(print(r2))
+  expect_true(any(grepl("not computed (no variance", out, fixed = TRUE)))
+  out_s <- capture.output(print(summary(r2)))
+  expect_false(any(grepl("NaN", out_s, fixed = TRUE)))
+  expect_true(any(grepl("not computed", out_s, fixed = TRUE)))
+
+  expect_error(factorial_anova(d, dv = const, between = c(gender, region)),
+               "no variance")
+  expect_error(ancova(d, dv = const, between = gender, covariate = age),
+               "no variance")
+
+  ow <- suppressWarnings(oneway_anova(d, const, group = education))
+  expect_warning(tk <- tukey_test(ow), "const.*no variance")
+  expect_equal(nrow(tk$results), 0L)
+  expect_warning(scheffe_test(ow), "const.*no variance")
+})
+
+test_that("PAR-01/PAR-24: t_test() skips constant or empty variables with a clear warning", {
+  # A constant variable aborted the whole multi-variable call with the raw
+  # base-R message (German locale: "Daten sind praktisch konstant", no
+  # variable name, printed twice); an all-NA variable was reported as a
+  # grouping problem ("must have exactly 2 levels. Found 0 levels").
+  d <- survey_data
+  d$const <- 3
+  d$allna <- NA_real_
+  w <- NULL
+  r <- withCallingHandlers(
+    t_test(d, const, life_satisfaction, group = gender),
+    warning = function(cnd) {
+      w <<- conditionMessage(cnd)
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_match(w, "const.*no variance")
+  expect_false(grepl("konstant|constant data", w))
+  expect_true(is.na(r$results$t_stat[1]))
+  expect_false(is.na(r$results$t_stat[2]))
+  expect_true(any(grepl("not computed (no variance",
+                        capture.output(print(r)), fixed = TRUE)))
+
+  expect_warning(r2 <- t_test(d, allna, group = gender), "allna.*no non-missing")
+  expect_true(is.na(r2$results$t_stat))
+  expect_warning(t_test(d, const), "const.*no variance")
+
+  # A grouping variable with 3+ groups is an input error for all variables:
+  # one clear error with a hint instead of "t_test() failed: X / Caused by: X"
+  err <- tryCatch(t_test(d, age, group = education), error = identity)
+  msg <- conditionMessage(err)
+  expect_match(msg, "exactly 2 groups")
+  expect_match(msg, "oneway_anova")
+  expect_false(grepl("Caused by", msg))
+})

@@ -222,6 +222,19 @@ factorial_anova <- function(data, dv, between, weights = NULL, ss_type = 3) {
     data_complete[[bn]] <- droplevels(data_complete[[bn]])
   }
 
+  # A constant DV (or one constant within every cell) has SS = 0/0 up to
+  # floating-point noise: every F would be pure rounding error
+  reason <- .dv_degenerate_reason(
+    data_complete[[dv_name]],
+    interaction(data_complete[between_names], drop = TRUE)
+  )
+  if (!is.null(reason)) {
+    cli_abort(c(
+      "Dependent variable {.var {dv_name}} cannot be analysed.",
+      "x" = "{reason}"
+    ))
+  }
+
   # ============================================================================
   # MODEL FITTING WITH TYPE III SS
   # ============================================================================

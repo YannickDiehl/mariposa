@@ -140,6 +140,10 @@
     return(NULL)
   }
 
+  # A constant DV has MSE = 0 up to floating-point noise: no comparisons
+  reason <- .dv_degenerate_reason(y, g)
+  if (!is.null(reason)) .not_computed(reason)
+
   # Unweighted Tukey HSD: delegate to stats::TukeyHSD (verbatim original path)
   if (method == "tukey" && is.null(weight_name)) {
     aov_result <- aov(y ~ g)
@@ -330,6 +334,9 @@
             result_with_groups <- cbind(group_info_expanded, single_result)
             all_results <- append(all_results, list(result_with_groups))
           }
+        }, mariposa_not_computed = function(e) {
+          .warn_not_computed(paste0(method, "_test"), var_name,
+                             conditionMessage(e), group_info)
         }, error = function(e) {
           cli_warn("{method_label} test failed for variable {.var {var_name}} in group {paste(unlist(group_info), collapse = ', ')}: {e$message}")
         })
@@ -347,6 +354,9 @@
         if (!is.null(single_result)) {
           all_results <- append(all_results, list(single_result))
         }
+      }, mariposa_not_computed = function(e) {
+        .warn_not_computed(paste0(method, "_test"), var_name,
+                           conditionMessage(e))
       }, error = function(e) {
         cli_warn("{method_label} test failed for variable {.var {var_name}}: {e$message}")
       })

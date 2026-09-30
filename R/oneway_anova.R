@@ -230,6 +230,10 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
         tryCatch({
           anova_result <- .anova_single(group_data, var_name, g_name, w_name,
                                         conf.level)
+          if (!is.na(anova_result$note)) {
+            .warn_not_computed("oneway_anova", var_name, anova_result$note,
+                               group_info)
+          }
           .anova_result_row(anova_result, var_name, group_info)
         }, error = function(e) {
           # Ensure var_name is scalar
@@ -249,6 +253,7 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
             anova_table = I(list(NULL)),
             welch_result = I(list(NULL)),
             is_weighted = NA,
+            note = conditionMessage(e),
             stringsAsFactors = FALSE
           )
           
@@ -268,9 +273,13 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
       tryCatch({
         anova_result <- .anova_single(data, var_name, g_name, w_name,
                                       conf.level)
+        if (!is.na(anova_result$note)) {
+          .warn_not_computed("oneway_anova", var_name, anova_result$note)
+        }
         .anova_result_row(anova_result, var_name)
       }, error = function(e) {
-        cli_abort("oneway_anova() failed: {e$message}", parent = e)
+        cli_abort("{.fn oneway_anova} failed for {.var {var_name}}.",
+                  parent = e, call = NULL)
       })
     })
 
@@ -532,6 +541,11 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   y <- y[valid_indices]
   g <- g[valid_indices]
 
+  if (length(y) == 0) {
+    return(.anova_not_computed("no non-missing values",
+                               is_weighted = !is.null(weight_name)))
+  }
+
   if (length(unique(g)) < 2) {
     cli_abort("Variable {.var {var_name}}: After removing NAs, grouping variable must have at least 2 levels.")
   }
@@ -541,6 +555,15 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   group_levels <- levels(g)
 
   group_stats <- .anova_descriptives(y, g, w, group_levels, conf.level)
+
+  # A constant DV (or one constant within every group) has SS = 0/0 up to
+  # floating-point noise: F would be pure rounding error
+  reason <- .dv_degenerate_reason(y, g)
+  if (!is.null(reason)) {
+    return(.anova_not_computed(reason, group_stats,
+                               is_weighted = !is.null(weight_name)))
+  }
+
   classical <- .anova_classical(y, g, w, group_levels)
 
   if (is.null(weight_name)) {
@@ -574,7 +597,24 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
     group_stats = group_stats,
     anova_table = anova_table,
     welch_result = welch_result,
-    is_weighted = !is.null(weight_name)
+    is_weighted = !is.null(weight_name),
+    note = NA_character_
+  )
+}
+
+#' Result of a one-way ANOVA that cannot be computed
+#'
+#' Same shape as a regular .anova_single() result, statistics NA, the
+#' reason in `note` (printed as "not computed (<reason>)").
+#' @noRd
+.anova_not_computed <- function(reason, group_stats = NULL, is_weighted = FALSE) {
+  list(
+    f_stat = NA_real_, df1 = NA_real_, df2 = NA_real_, p_value = NA_real_,
+    eta_squared = NA_real_, epsilon_squared = NA_real_,
+    omega_squared = NA_real_,
+    group_stats = group_stats, anova_table = NULL, welch_result = NULL,
+    is_weighted = is_weighted,
+    note = reason
   )
 }
 
@@ -602,6 +642,7 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
   result_df$anova_table <- list(anova_result$anova_table)
   result_df$welch_result <- list(anova_result$welch_result)
   result_df$is_weighted <- anova_result$is_weighted
+  result_df$note <- anova_result$note %||% NA_character_
   result_df
 }
 
@@ -697,7 +738,9 @@ print.oneway_anova <- function(x, digits = 3, ...) {
                 add_significance_stars(p_val),
                 digits, eta_val, eta_interp, as.integer(n_total)))
   } else {
-    cat("  Results not available\n")
+    note <- if ("note" %in% names(results)) results$note[i] else NA_character_
+    cat(sprintf("  not computed (%s)\n",
+                if (!is.na(note)) note else "see warning"))
   }
 }
 
@@ -816,6 +859,13 @@ print.oneway_anova <- function(x, digits = 3, ...) {
 
         print(welch_table, row.names = FALSE)
       }
+    }
+
+    # Not computed (constant DV, ...): say why instead of NA tables
+    if (is.na(var_results$F_statistic[idx]) && (show_anova_table || show_effect_sizes)) {
+      note <- if ("note" %in% names(var_results)) var_results$note[idx] else NA_character_
+      cat(sprintf("\nANOVA not computed (%s).\n",
+                  if (!is.na(note)) note else "see warning"))
     }
 
     # Effect sizes (gated)

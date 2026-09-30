@@ -207,6 +207,20 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     # SPSS order (by code, not by first appearance: the sign of t must not
     # depend on the row order) and value labels instead of codes
     data[[g_name]] <- .group_factor(data[[g_name]])
+    g_present <- levels(data[[g_name]])[levels(data[[g_name]]) %in% data[[g_name]]]
+    if (length(g_present) != 2) {
+      cli_abort(c(
+        "Grouping variable {.var {g_name}} must have exactly 2 groups.",
+        "x" = if (length(g_present) > 0) {
+          "Found {length(g_present)}: {.val {g_present}}."
+        } else {
+          "It has no non-missing values."
+        },
+        "i" = if (length(g_present) > 2) {
+          "For 3 or more groups use {.fn oneway_anova}; to compare two of them, filter the data first."
+        }
+      ))
+    }
   } else {
     g_name <- NULL
   }
@@ -216,6 +230,32 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   data <- weights_info$data
   w_name <- weights_info$name
 
+  # One variable (in one group): a variable/group that cannot be tested
+  # (no valid values, no variance, a group without data, ...) keeps an
+  # all-NA row with the reason in `note` and a warning naming variable and
+  # group, so the other variables/groups still report. Built through
+  # .t_test_result_row() so the columns match the successful rows exactly.
+  run_one <- function(var_data, var_name, group_info = NULL) {
+    not_computed <- function(reason) {
+      .warn_not_computed("t_test", var_name, reason, group_info)
+      .t_test_result_row(.t_test_na_result(!is.null(w_name), reason),
+                         var_name, group_info)
+    }
+    tryCatch({
+      test_result <- .t_test_single(var_data, var_name, g_name, w_name,
+                                    var.equal, mu, alternative, conf.level)
+      .t_test_result_row(test_result, var_name, group_info)
+    }, mariposa_not_computed = function(e) {
+      not_computed(conditionMessage(e))
+    }, error = function(e) {
+      if (is.null(group_info)) {
+        cli_abort("{.fn t_test} failed for {.var {var_name}}.",
+                  parent = e, call = NULL)
+      }
+      not_computed(conditionMessage(e))
+    })
+  }
+
   # Main execution logic
   if (is_grouped) {
     # Split data by groups
@@ -224,52 +264,17 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
     # Perform t-tests for each group
     results_list <- lapply(seq_along(data_list), function(i) {
-      group_data <- data_list[[i]]
       group_info <- group_keys[i, , drop = FALSE]
-
-      # Regular t-tests for each variable in this group
-      group_results <- lapply(var_names, function(var_name) {
-        tryCatch({
-          test_result <- .t_test_single(group_data, var_name, g_name, w_name,
-                                        var.equal, mu, alternative, conf.level)
-          .t_test_result_row(test_result, var_name, group_info)
-        }, error = function(e) {
-          # This group cannot be tested (e.g. only one level of `group`
-          # present): say why, and keep an all-NA row so the other groups
-          # still report. Built through .t_test_result_row() so the columns
-          # match the successful rows exactly.
-          cli_warn(c(
-            "{.fn t_test} skipped {.var {var_name}} in group {.val {(.format_group_label(group_info))}}.",
-            "x" = "{conditionMessage(e)}"
-          ))
-          na_result <- list(
-            t_stat = NA_real_, df = NA_real_, p_value = NA_real_,
-            mean_diff = NA_real_, cohens_d = NA_real_,
-            conf_int = c(NA_real_, NA_real_), group_stats = NULL,
-            equal_var_result = NULL, unequal_var_result = NULL,
-            is_weighted = !is.null(w_name)
-          )
-          .t_test_result_row(na_result, var_name, group_info)
-        })
-      })
-
-      do.call(rbind, group_results)
+      do.call(rbind, lapply(var_names, function(var_name) {
+        run_one(data_list[[i]], var_name, group_info)
+      }))
     })
 
     results_df <- do.call(rbind, results_list)
 
   } else {
     # Perform t-tests for each variable (ungrouped)
-    results_list <- lapply(var_names, function(var_name) {
-      tryCatch({
-        test_result <- .t_test_single(data, var_name, g_name, w_name,
-                                      var.equal, mu, alternative, conf.level)
-        .t_test_result_row(test_result, var_name)
-      }, error = function(e) {
-        cli_abort("t_test() failed: {e$message}", parent = e)
-      })
-    })
-
+    results_list <- lapply(var_names, function(var_name) run_one(data, var_name))
     results_df <- do.call(rbind, results_list)
   }
 
@@ -367,6 +372,18 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   return(list(cohens_d = cohens_d, hedges_g = hedges_g, glass_delta = glass_delta))
 }
 
+#' All-NA t-test result for a variable/group that cannot be tested
+#' @noRd
+.t_test_na_result <- function(is_weighted, note = NA_character_) {
+  list(
+    t_stat = NA_real_, df = NA_real_, p_value = NA_real_,
+    mean_diff = NA_real_, cohens_d = NA_real_,
+    conf_int = c(NA_real_, NA_real_), group_stats = NULL,
+    equal_var_result = NULL, unequal_var_result = NULL,
+    is_weighted = is_weighted, note = note
+  )
+}
+
 #' Perform a one- or two-sample t-test for a single variable
 #'
 #' Returns the raw test components (statistics, confidence intervals,
@@ -390,8 +407,13 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   }
   x <- x[valid_indices]
 
+  if (length(x) == 0) .not_computed("no non-missing values")
+
   if (is.null(group_name)) {
     # One-sample t-test
+    reason <- .dv_degenerate_reason(x)
+    if (!is.null(reason)) .not_computed(reason)
+    if (length(x) < 2) .not_computed("fewer than 2 valid values")
     if (is.null(weight_name)) {
       test_result <- t.test(x, mu = mu, alternative = alternative, conf.level = conf.level)
       group_stats <- list(means = mean(x, na.rm = TRUE), n = length(x))
@@ -464,11 +486,16 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     g_levels <- levels(g)[levels(g) %in% g]
 
     if (length(g_levels) != 2) {
-      cli_abort(c(
-        "Grouping variable {.var {group_name}} must have exactly 2 levels.",
-        "x" = "Found {length(g_levels)} level{?s}."
+      .not_computed(sprintf(
+        "Grouping variable `%s` must have exactly 2 levels with valid data; found %d%s.",
+        group_name, length(g_levels),
+        if (length(g_levels) > 0) paste0(" (", paste(g_levels, collapse = ", "), ")") else ""
       ))
     }
+
+    # Both groups constant: t = 0/0 (base R: "data are essentially constant")
+    reason <- .dv_degenerate_reason(x, g)
+    if (!is.null(reason)) .not_computed(sub("any group", "either group", reason))
 
     # Split data by groups
     x1 <- x[g == g_levels[1]]
@@ -651,6 +678,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   result_df$equal_var_result <- list(test_result$equal_var_result)
   result_df$unequal_var_result <- list(test_result$unequal_var_result)
   result_df$is_weighted <- test_result$is_weighted
+  result_df$note <- test_result$note %||% NA_character_
   result_df
 }
 
@@ -724,9 +752,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
     cat(sprintf("\n--- %s ---\n\n", var_name))
 
-    # Group skipped at computation time (warned there): no NA tables
+    # Variable/group skipped at computation time (warned there): no NA tables
     if (is.na(row_results$t_stat[idx]) && is.null(stats)) {
-      cat("  Not computed for this group (see warning).\n")
+      note <- if ("note" %in% names(row_results)) row_results$note[idx] else NA_character_
+      cat(sprintf("  Not computed%s: %s.\n",
+                  if (is_grouped_data) " for this group" else "",
+                  if (!is.na(note)) note else "see warning"))
       return(invisible(NULL))
     }
 
@@ -906,7 +937,9 @@ print.t_test <- function(x, digits = 3, ...) {
   cat(sprintf("t-Test: %s%s%s\n", var_name, group_tag, weighted_tag))
 
   if (is.na(t_val)) {
-    cat("  not computed for this group (see warning)\n")
+    note <- if ("note" %in% names(results)) results$note[i] else NA_character_
+    cat(sprintf("  not computed (%s)\n",
+                if (!is.na(note)) note else "see warning"))
   } else if (!is.na(g_val)) {
     g_interp <- if (abs(g_val) < 0.2) "negligible"
                 else if (abs(g_val) < 0.5) "small"
