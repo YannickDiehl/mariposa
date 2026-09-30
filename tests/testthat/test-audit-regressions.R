@@ -665,7 +665,7 @@ test_that("write_xpt() roundtrips data with integer columns", {
   data(survey_data)
   tmp <- tempfile(fileext = ".xpt")
   on.exit(unlink(tmp), add = TRUE)
-  expect_no_error(write_xpt(survey_data, tmp))
+  expect_no_error(write_xpt(survey_data, tmp, version = 8))  # IO-13: v5 warns on long names
   back <- read_xpt(tmp)
   expect_equal(nrow(back), nrow(survey_data))
 })
