@@ -247,6 +247,12 @@ assertion. NA-as-match is forbidden by Charter §8.",
 
   diff <- abs(actual - expected)
 
+  # Floating-point representation slack: a value exactly on the half unit
+  # (15598 / 320 = 48.74375, printed by SPSS half up as 48.7438) differs by
+  # the tolerance itself, and the subtraction lands a few ulps above it.
+  # 1e-12 relative is far below any printed precision.
+  abs_tol <- abs_tol + 1e-12 * max(1, abs(expected))
+
   # Use <= because tolerance "within X" is inclusive of the boundary. This
   # also handles the tol == 0 case (e.g., count comparisons) where strict <
   # would always fail for exact matches.

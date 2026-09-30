@@ -22,8 +22,7 @@
 #   Test  7      — multiple variables at once
 #
 # Not asserted: the Descriptives "Total" rows and Minimum/Maximum columns and
-# the Brown-Forsythe rows (mariposa does not compute them); the Test 3c West
-# University mean (an exact half-way value, see its entry).
+# the Brown-Forsythe rows (mariposa does not compute them).
 #
 # Tolerance tier assignments (per Charter §5):
 #   N (unweighted)            — Spec (count, exact integer)
@@ -686,10 +685,8 @@ spss_values$test_3c_age_by_education_grouped <- list(
       "Basic Secondary"        = list(n = 671, mean = 49.9046, sd = 16.89864, se = 0.65236, ci_lower = 48.6237, ci_upper = 51.1855),  # oneway_anova_output.txt:528
       "Intermediate Secondary" = list(n = 508, mean = 51.2598, sd = 17.02184, se = 0.75522, ci_lower = 49.7761, ci_upper = 52.7436),  # oneway_anova_output.txt:529
       "Academic Secondary"     = list(n = 516, mean = 50.5698, sd = 16.86592, se = 0.74248, ci_lower = 49.1111, ci_upper = 52.0284),  # oneway_anova_output.txt:530
-      # mean not asserted: 15598 / 320 = 48.74375 exactly, which SPSS prints
-      # half up as 48.7438; |diff| is the Display half-unit itself and fails
-      # assert_spss's <= by floating-point representation
-      "University"             = list(n = 320, sd = 16.43368, se = 0.91867, ci_lower = 46.9363, ci_upper = 50.5512)   # oneway_anova_output.txt:531
+      # mean 15598 / 320 = 48.74375 exactly, printed half up by SPSS
+      "University"             = list(n = 320, mean = 48.7438, sd = 16.43368, se = 0.91867, ci_lower = 46.9363, ci_upper = 50.5512)   # oneway_anova_output.txt:531
     ),
     anova = list(
       ss_between = 1376.231, df_between = 3, ms_between = 458.744, f_stat = 1.616, p_value = 0.184,  # oneway_anova_output.txt:541
