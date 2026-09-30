@@ -209,7 +209,8 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   perform_single_mann_whitney <- function(data, var_name, group_name, weight_name = NULL) {
     # Get the variable values (ordered factors ranked by level order)
     x <- .np_rank_values(data[[var_name]])
-    g <- data[[group_name]]
+    # SPSS order (by code) and value labels instead of codes
+    g <- .group_factor(data[[group_name]])
     
     # Remove NA values
     valid_indices <- !is.na(x) & !is.na(g)
@@ -223,13 +224,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     .np_check_values(x, var_name)
 
     # Get unique levels preserving original order (SPSS convention)
-    if (is.factor(g)) {
-      all_levels <- levels(g)
-      g_levels <- all_levels[all_levels %in% unique(g)]
-    } else {
-      # For non-factors, sort to ensure consistency
-      g_levels <- sort(unique(g))
-    }
+    g_levels <- levels(droplevels(g))
     
     if (length(g_levels) != 2) {
       cli_abort(c(
@@ -456,13 +451,7 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
 
   # Get group levels for output
   if (!is.null(g_name)) {
-    group_col <- data[[g_name]]
-    if (is.factor(group_col)) {
-      all_levels <- levels(group_col)
-      group_levels <- all_levels[all_levels %in% unique(group_col)]
-    } else {
-      group_levels <- unique(group_col)
-    }
+    group_levels <- levels(droplevels(.group_factor(data[[g_name]])))
   } else {
     group_levels <- NULL
   }

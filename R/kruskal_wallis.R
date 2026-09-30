@@ -171,7 +171,8 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
   perform_single_kw <- function(data, var_name, group_name, weight_name = NULL) {
     # Get variable values (ordered factors ranked by level order)
     x <- .np_rank_values(data[[var_name]])
-    g <- data[[group_name]]
+    # SPSS order (by code) and value labels instead of codes
+    g <- .group_factor(data[[group_name]])
 
     # Remove NA values
     valid_indices <- !is.na(x) & !is.na(g)
@@ -183,11 +184,6 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
     x <- x[valid_indices]
     g <- g[valid_indices]
     .np_check_values(x, var_name)
-
-    # Ensure grouping variable is a factor
-    if (!is.factor(g)) {
-      g <- factor(g)
-    }
 
     # Get group levels (only those present in data)
     g_levels <- levels(g)[levels(g) %in% unique(as.character(g))]
@@ -347,9 +343,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
 
   # Validate group levels upfront (before entering the loop)
   if (!is_grouped) {
-    group_col_pre <- data[[g_name]]
-    group_col_pre <- group_col_pre[!is.na(group_col_pre)]
-    n_groups <- length(unique(as.character(group_col_pre)))
+    n_groups <- nlevels(droplevels(.group_factor(data[[g_name]])))
     if (n_groups < 2) {
       cli_abort(c(
         "Kruskal-Wallis test requires at least 2 groups.",
@@ -368,13 +362,7 @@ kruskal_wallis <- function(data, ..., group, weights = NULL,
   }
 
   # Get group levels for output
-  group_col <- data[[g_name]]
-  if (is.factor(group_col)) {
-    all_levels <- levels(group_col)
-    group_levels <- all_levels[all_levels %in% unique(as.character(group_col))]
-  } else {
-    group_levels <- sort(unique(group_col[!is.na(group_col)]))
-  }
+  group_levels <- levels(droplevels(.group_factor(data[[g_name]])))
 
   # Create result object
   result <- list(

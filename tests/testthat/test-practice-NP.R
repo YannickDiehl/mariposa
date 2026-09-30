@@ -481,6 +481,66 @@ test_that("NP-13 constant and all-NA variables in MW/KW: clear reasons", {
   expect_warning(kruskal_wallis(d, allna, group = education), "no valid values")
 })
 
+# --- NP-07: value labels instead of codes -------------------------------------
+
+make_labelled_np <- function() {
+  set.seed(7)
+  n <- 90
+  data.frame(
+    y = round(rnorm(n, 50, 10)),
+    g2 = haven::labelled(rep(c(1, 2), length.out = n),
+                         labels = c(East = 1, West = 2)),
+    g3 = haven::labelled(rep(c(3, 1, 2), length.out = n),
+                         labels = c(Low = 1, Mid = 2, High = 3)),
+    bin = haven::labelled(rep(c(1, 2, 2), length.out = n),
+                          labels = c(No = 1, Yes = 2))
+  )
+}
+
+test_that("NP-07 rank tests show value labels of labelled groups", {
+  # Was: "Groups: 1, 2, 3", Dunn pairs "1 - 2", "1 vs. 2", rank rows "1".
+  skip_if_not_installed("haven")
+  d <- make_labelled_np()
+  kw <- kruskal_wallis(d, y, group = g3)
+  expect_equal(as.character(kw$group_levels), c("Low", "Mid", "High"))
+  expect_equal(names(kw$results$group_stats[[1]]), c("Low", "Mid", "High"))
+  out <- capture.output(print(summary(kw)))
+  expect_true(any(grepl("Low, Mid, High", out, fixed = TRUE)))
+
+  dn <- dunn_test(kw)
+  expect_true(all(c(dn$comparisons$group1, dn$comparisons$group2) %in%
+                    c("Low", "Mid", "High")))
+
+  mw <- mann_whitney(d, y, group = g2)
+  out <- capture.output(print(summary(mw)))
+  expect_true(any(grepl("East vs. West", out, fixed = TRUE)))
+  expect_equal(mw$results$group_stats[[1]]$group1$name, "East")
+})
+
+test_that("NP-07 binomial_test and chisq_gof show value labels", {
+  # Was: "Group 1 (1)" and category codes.
+  skip_if_not_installed("haven")
+  d <- make_labelled_np()
+  bt <- binomial_test(d, bin)
+  expect_equal(bt$results$cat1_name, "No")
+  expect_true(any(grepl("Group 1 (No)", capture.output(print(bt)), fixed = TRUE)))
+  gof <- chisq_gof(d, g3)
+  expect_equal(gof$frequencies$category, c("Low", "Mid", "High"))
+  # a named `expected` may use labels or codes
+  by_label <- chisq_gof(d, g3, expected = c(High = .5, Low = .25, Mid = .25))
+  by_code <- chisq_gof(d, g3, expected = c(`3` = .5, `1` = .25, `2` = .25))
+  expect_equal(by_label$results$chi_squared, by_code$results$chi_squared)
+})
+
+test_that("NP-07 numeric 0/1 group is ordered by value (was '1 vs. 0')", {
+  # Was: group levels in order of first appearance for non-factors.
+  d <- data.frame(y = c(5, 3, 4, 1, 2, 6, 7, 8),
+                  g = c(1, 0, 1, 0, 0, 1, 1, 0))
+  mw <- mann_whitney(d, y, group = g)
+  expect_equal(as.character(mw$group_levels), c("0", "1"))
+  expect_equal(mw$results$group_stats[[1]]$group1$name, "0")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

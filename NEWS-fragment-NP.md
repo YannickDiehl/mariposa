@@ -115,3 +115,10 @@
   ("Found 0 groups ... use a Kruskal-Wallis test"). "not computed for
   this group" appears only under `group_by()`; otherwise the output says
   "not computed (reason)".
+* Labelled (SPSS) variables show their value labels instead of codes in
+  `kruskal_wallis()` ("Groups: 1, 2, ..., 7"), the pairs of
+  `dunn_test()`, `mann_whitney()` ("1 vs. 2"), `binomial_test()`
+  ("Group 1 (1)") and the categories of `chisq_gof()`, as `chi_square()`
+  already did. Grouping variables are ordered by code, as in SPSS: a
+  numeric 0/1 group was ordered by first appearance ("1 vs. 0" while the
+  ranks listed 0 first).

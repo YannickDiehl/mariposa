@@ -159,7 +159,8 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
                                   weight_name = NULL, p_adjust_method) {
     # Get variable values (ordered factors ranked by level order)
     y <- .np_rank_values(data[[var_name]])
-    g <- data[[group_name]]
+    # SPSS order (by code) and value labels instead of codes
+    g <- .group_factor(data[[group_name]])
 
     # Remove NA values
     valid_indices <- !is.na(y) & !is.na(g)
@@ -172,11 +173,7 @@ dunn_test.kruskal_wallis <- function(x, p_adjust = "bonferroni", ...) {
     g <- g[valid_indices]
 
     # Get group levels
-    if (is.factor(g)) {
-      group_levels <- levels(g)[levels(g) %in% unique(as.character(g))]
-    } else {
-      group_levels <- sort(unique(as.character(g)))
-    }
+    group_levels <- levels(droplevels(g))
 
     if (length(group_levels) < 2) {
       return(NULL)

@@ -154,13 +154,9 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       x <- x[valid_idx]
     }
 
-    # Get categories
-    if (is.factor(x)) {
-      cats <- levels(x)
-      cats <- cats[cats %in% unique(as.character(x))]
-    } else {
-      cats <- sort(unique(x))
-    }
+    # Observed categories in SPSS order (by code), with value labels
+    x <- .np_factor(x)
+    cats <- levels(x)
 
     if (length(cats) != 2) {
       cli_abort(c(
