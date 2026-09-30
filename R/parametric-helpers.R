@@ -123,7 +123,8 @@
   df <- as.numeric(df)
   whole <- !is.na(df) & abs(df - round(df)) < 1e-8
   out <- fmt_num(df, digits)
-  out[whole] <- formatC(round(df[whole]), format = "d")
+  # format "f": "d" coerces to integer (NA beyond 2^31, e.g. huge weights)
+  out[whole] <- formatC(round(df[whole]), format = "f", digits = 0)
   out
 }
 
