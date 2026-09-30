@@ -129,3 +129,68 @@ test_that("PAR-01/PAR-24: t_test() skips constant or empty variables with a clea
   expect_match(msg, "oneway_anova")
   expect_false(grepl("Caused by", msg))
 })
+
+# --- PAR-07 / PAR-17: groups whose variance is undefined or zero --------------
+
+test_that("PAR-07: a one-case group gives the classical ANOVA, Welch not computed", {
+  # oneway.test() (Welch) aborted the whole call: "not enough observations";
+  # the weighted path printed a Welch row "NaN 4 NaN NA <NA>".
+  d <- survey_data
+  d$edu2 <- as.character(d$education)
+  d$edu2[1] <- "Solo"
+  r <- oneway_anova(d, life_satisfaction, group = edu2)
+  ref <- stats::anova(stats::lm(life_satisfaction ~ edu2, data = d))
+  expect_equal(r$results$F_statistic, ref[["F value"]][1])
+  welch <- r$results$welch_result[[1]]
+  expect_true(is.na(welch$statistic))
+  expect_match(welch$note, "Solo")
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("Welch.*not computed", out)))
+  expect_false(any(grepl("NaN|<NA>", out)))
+
+  rw <- oneway_anova(d, life_satisfaction, group = edu2, weights = sampling_weight)
+  expect_false(is.na(rw$results$F_statistic))
+  out_w <- capture.output(print(summary(rw)))
+  expect_false(any(grepl("NaN|<NA>", out_w)))
+  expect_true(any(grepl("Welch.*not computed", out_w)))
+})
+
+test_that("PAR-07: t_test() with a one-case group reports Student's t, Welch not computed", {
+  # t.test(var.equal = FALSE) aborted: "not enough 'y' observations"; the
+  # weighted path computed a Welch t from an undefined variance.
+  d <- survey_data
+  d$g2 <- ifelse(seq_len(nrow(d)) == 1, "Solo", "Rest")
+  expect_warning(tt <- t_test(d, life_satisfaction, group = g2), "Welch.*Solo")
+  ref <- stats::t.test(life_satisfaction ~ g2, data = d, var.equal = TRUE)
+  expect_equal(tt$results$t_stat, unname(ref$statistic))
+  expect_equal(tt$results$df, unname(ref$parameter))
+  expect_true(is.na(tt$results$unequal_var_result[[1]]$statistic))
+  expect_false(any(grepl("NaN", capture.output(print(summary(tt))))))
+
+  d$sampling_weight[1] <- 1  # group weight sum 1: variance undefined
+  expect_warning(tw <- t_test(d, life_satisfaction, group = g2,
+                              weights = sampling_weight), "Welch.*Solo")
+  expect_false(is.na(tw$results$t_stat))
+  expect_true(is.na(tw$results$unequal_var_result[[1]]$statistic))
+})
+
+test_that("PAR-17: zero-variance groups: no NaN Welch rows, no infinite Glass' Delta", {
+  d <- survey_data
+  d$life_satisfaction[d$education == "University"] <- 5
+  for (w in list(NULL, "sampling_weight")) {
+    r <- if (is.null(w)) {
+      oneway_anova(d, life_satisfaction, group = education)
+    } else {
+      oneway_anova(d, life_satisfaction, group = education, weights = sampling_weight)
+    }
+    expect_true(is.na(r$results$welch_result[[1]]$statistic))
+    out <- capture.output(print(summary(r)))
+    expect_false(any(grepl("NaN|<NA>", out)))
+    expect_true(any(grepl("zero variance", out)))
+  }
+  d2 <- survey_data
+  d2$life_satisfaction[d2$gender == "Male"] <- 3
+  tt <- t_test(d2, life_satisfaction, group = gender)
+  expect_true(is.na(tt$results$glass_delta))
+  expect_false(any(grepl("Inf", capture.output(print(summary(tt))))))
+})

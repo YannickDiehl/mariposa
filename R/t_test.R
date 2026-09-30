@@ -94,26 +94,26 @@
 #' - Plot your data first to check assumptions
 #' - Report confidence intervals along with p-values
 #'
-#' @seealso 
+#' @seealso
 #' \code{\link[stats]{t.test}} for the base R t-test function.
-#' 
+#'
 #' \code{\link{print.t_test}} for printing results.
-#' 
+#'
 #' \code{\link[dplyr]{group_by}} for grouped analyses.
 #'
 #' \code{\link{summary.t_test}} for detailed output with toggleable sections.
 #'
 #' @references
-#' Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.). 
+#' Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.).
 #' Lawrence Erlbaum Associates.
-#' 
-#' Hedges, L. V. (1981). Distribution theory for Glass's estimator of effect size 
+#'
+#' Hedges, L. V. (1981). Distribution theory for Glass's estimator of effect size
 #' and related estimators. Journal of Educational Statistics, 6(2), 107-128.
-#' 
-#' Glass, G. V. (1976). Primary, secondary, and meta-analysis of research. 
+#'
+#' Glass, G. V. (1976). Primary, secondary, and meta-analysis of research.
 #' Educational Researcher, 5(10), 3-8.
-#' 
-#' Welch, B. L. (1947). The generalization of "Student's" problem when several 
+#'
+#' Welch, B. L. (1947). The generalization of "Student's" problem when several
 #' different population variances are involved. Biometrika, 34(1-2), 28-35.
 #'
 #' @examples
@@ -167,15 +167,15 @@
 #'
 #' @family hypothesis_tests
 #' @export
-t_test <- function(data, ..., group = NULL, weights = NULL, 
+t_test <- function(data, ..., group = NULL, weights = NULL,
                   var.equal = FALSE, mu = 0, alternative = c("two.sided", "less", "greater"),
                   conf.level = 0.95) {
-  
+
   # Input validation
   if (!is.data.frame(data)) {
     cli_abort("{.arg data} must be a data frame.")
   }
-  
+
   alternative <- match.arg(alternative)
 
   # Validate conf.level
@@ -187,7 +187,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   # Check if data is grouped
   is_grouped <- inherits(data, "grouped_df")
   grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
-  
+
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
@@ -244,6 +244,14 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     tryCatch({
       test_result <- .t_test_single(var_data, var_name, g_name, w_name,
                                     var.equal, mu, alternative, conf.level)
+      if (isTRUE(test_result$welch_fallback)) {
+        where <- .where_group(group_info)
+        reason <- test_result$unequal_var_result$note
+        cli_warn(c(
+          "{.fn t_test}: Welch's t-test not computed for {.var {var_name}}{where}.",
+          "i" = "{reason}; Student's t-test (equal variances assumed) is reported instead."
+        ), call = NULL)
+      }
       .t_test_result_row(test_result, var_name, group_info)
     }, mariposa_not_computed = function(e) {
       not_computed(conditionMessage(e))
@@ -316,19 +324,20 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
 
     d <- mean(x1) - mean(x2)
     s1 <- sd(x1)
-    s2 <- sd(x2)
     n1 <- length(x1)
     n2 <- length(x2)
 
-    # Pooled standard deviation
-    s <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
+    # Pooled standard deviation, (n - 1) * s^2 written as the sum of squares
+    # so that a one-case group (sd = NA) still contributes its 0
+    s <- sqrt((sum((x1 - mean(x1))^2) + sum((x2 - mean(x2))^2)) / (n1 + n2 - 2))
     cohens_d <- d / s
 
-    # Glass' Delta (uses only control group SD - first group)
-    glass_delta <- d / s1
+    # Glass' Delta (uses only control group SD - first group); undefined
+    # when that group has no variance (d / 0 = +-Inf)
+    glass_delta <- if (!is.na(s1) && s1 > 0) d / s1 else NA_real_
 
     # Hedges' bias correction (methodologically superior)
-    # J = 1 - 3/(4*(n1+n2-2)-1) 
+    # J = 1 - 3/(4*(n1+n2-2)-1)
     hedges_j <- 1 - (3 / (4 * (n1 + n2 - 2) - 1))
     hedges_g <- cohens_d * hedges_j
 
@@ -358,9 +367,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     s_pooled <- sqrt((ss1 + ss2) / (V1_total - 2))
     cohens_d <- d / s_pooled
 
-    # Glass' Delta (uses only control group weighted SD)
-    s1_weighted <- sqrt(ss1 / (V1_1 - 1))
-    glass_delta <- d / s1_weighted
+    # Glass' Delta (uses only control group weighted SD); undefined when
+    # that group has no variance or its weights sum to <= 1
+    s1_weighted <- if (V1_1 > 1) sqrt(ss1 / (V1_1 - 1)) else NA_real_
+    glass_delta <- if (!is.na(s1_weighted) && s1_weighted > 0) {
+      d / s1_weighted
+    } else NA_real_
 
     # Hedges' bias correction using effective N
     eff_n1 <- sum(w1)^2 / sum(w1^2)
@@ -503,16 +515,31 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
     w1 <- if (!is.null(weight_name)) w[g == g_levels[1]] else NULL
     w2 <- if (!is.null(weight_name)) w[g == g_levels[2]] else NULL
 
+    # Welch's test needs a variance estimate in both groups (n >= 2;
+    # weighted: sum of weights > 1). Like SPSS, the classical (pooled) test
+    # is still computed when one group has a single case.
+    var_problems <- .group_variance_problems(x, g, w = if (!is.null(weight_name)) w)
+    welch_reason <- .group_variance_reason(
+      list(small = var_problems$small, zero = character(0)),
+      weighted = !is.null(weight_name)
+    )
+    welch_fallback <- !var.equal && !is.null(welch_reason)
+
     if (is.null(weight_name)) {
       # Unweighted two-sample t-test - SPSS style (both equal and unequal variance)
       # Calculate both variants like SPSS does
-      test_equal <- t.test(x1, x2, var.equal = TRUE, alternative = alternative, 
+      test_equal <- t.test(x1, x2, var.equal = TRUE, alternative = alternative,
                           conf.level = conf.level, mu = mu)
-      test_unequal <- t.test(x1, x2, var.equal = FALSE, alternative = alternative, 
-                            conf.level = conf.level, mu = mu)
+      test_unequal <- if (is.null(welch_reason)) {
+        t.test(x1, x2, var.equal = FALSE, alternative = alternative,
+               conf.level = conf.level, mu = mu)
+      } else {
+        .t_test_na_htest(c(mean(x1), mean(x2)), welch_reason)
+      }
 
       # Use the variant specified by var.equal parameter as primary result
-      test_result <- if (var.equal) test_equal else test_unequal
+      # (Student's t when Welch's test cannot be computed)
+      test_result <- if (var.equal || welch_fallback) test_equal else test_unequal
 
       # Store both results for SPSS-style display
       test_result$equal_var_result <- test_equal
@@ -542,9 +569,12 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       n1_display <- round(sw1)        # rounded; for display N column
       n2_display <- round(sw2)
 
-      # Variances with unrounded sw in denominator
-      var_x <- sum(w1 * (x1 - mu_x)^2) / (sw1 - 1)
-      var_y <- sum(w2 * (x2 - mu_y)^2) / (sw2 - 1)
+      # Variances with unrounded sw in denominator (undefined for a group
+      # whose weights sum to <= 1)
+      ss_x <- sum(w1 * (x1 - mu_x)^2)
+      ss_y <- sum(w2 * (x2 - mu_y)^2)
+      var_x <- if (sw1 > 1) ss_x / (sw1 - 1) else NA_real_
+      var_y <- if (sw2 > 1) ss_y / (sw2 - 1) else NA_real_
 
       sd_x <- sqrt(var_x)
       sd_y <- sqrt(var_y)
@@ -552,7 +582,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       mean_diff <- mu_x - mu_y
 
       # === EQUAL VARIANCE (Student's t-test) ===
-      pooled_var <- ((sw1 - 1) * var_x + (sw2 - 1) * var_y) / (sw1 + sw2 - 2)
+      # (sw1 - 1) * var_x + (sw2 - 1) * var_y, written with the sums of
+      # squares so that a group with sum(w) <= 1 still contributes
+      pooled_var <- (ss_x + ss_y) / (sw1 + sw2 - 2)
       pooled_sd <- sqrt(pooled_var)
       se_equal <- pooled_sd * sqrt(1/sw1 + 1/sw2)
       t_stat_equal <- (mean_diff - mu) / se_equal
@@ -602,18 +634,26 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         estimate = c(mu_x, mu_y)
       )
 
-      test_unequal_weighted <- list(
-        statistic = t_stat_unequal,
-        parameter = df_unequal,
-        p.value = p_value_unequal,
-        conf.int = conf_int_unequal,
-        estimate = c(mu_x, mu_y)
-      )
+      test_unequal_weighted <- if (is.null(welch_reason)) {
+        list(
+          statistic = t_stat_unequal,
+          parameter = df_unequal,
+          p.value = p_value_unequal,
+          conf.int = conf_int_unequal,
+          estimate = c(mu_x, mu_y)
+        )
+      } else {
+        .t_test_na_htest(c(mu_x, mu_y), welch_reason)
+      }
 
       # Honor var.equal for the primary result (both variants stay
       # available for the SPSS-style two-row output), matching the
       # unweighted path.
-      test_result <- if (var.equal) test_equal_weighted else test_unequal_weighted
+      test_result <- if (var.equal || welch_fallback) {
+        test_equal_weighted
+      } else {
+        test_unequal_weighted
+      }
       test_result$equal_var_result <- test_equal_weighted
       test_result$unequal_var_result <- test_unequal_weighted
 
@@ -640,9 +680,21 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       # Store both variance assumptions for SPSS-style display (now for all tests)
       equal_var_result = test_result$equal_var_result,
       unequal_var_result = test_result$unequal_var_result,
-      is_weighted = !is.null(weight_name)
+      is_weighted = !is.null(weight_name),
+      welch_fallback = welch_fallback,
+      note = if (welch_fallback) {
+        sprintf("Welch's t-test not computed (%s); Student's t-test reported",
+                welch_reason)
+      } else NA_character_
     ))
   }
+}
+
+#' Placeholder htest-like result for a test variant that cannot be computed
+#' @noRd
+.t_test_na_htest <- function(estimate, note) {
+  list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_,
+       conf.int = c(NA_real_, NA_real_), estimate = estimate, note = note)
 }
 
 #' Build one row of the t_test results data frame
@@ -688,7 +740,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   effect_size_g <- if (abs(hedges_g_val) < 0.2) "negligible" else
                   if (abs(hedges_g_val) < 0.5) "small" else
                   if (abs(hedges_g_val) < 0.8) "medium" else "large"
-  
+
   if (is_paired) {
     # For paired tests, don't show Glass' Delta
     data.frame(

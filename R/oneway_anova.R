@@ -320,8 +320,8 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
       sd_val <- sd(group_data)
       se_val <- sd_val / sqrt(n)
 
-      # Confidence interval for mean
-      t_val <- qt((1 + conf.level) / 2, df = n - 1)
+      # Confidence interval for mean (undefined for a one-case group)
+      t_val <- if (n > 1) qt((1 + conf.level) / 2, df = n - 1) else NA_real_
       ci_lower <- mean_val - t_val * se_val
       ci_upper <- mean_val + t_val * se_val
 
@@ -358,15 +358,18 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
       # Weighted mean
       weighted_mean <- sum(group_data * group_weights) / sw
 
-      # Sample-formula weighted variance (divisor sw - 1)
-      weighted_var <- sum(group_weights * (group_data - weighted_mean)^2) / (sw - 1)
+      # Sample-formula weighted variance (divisor sw - 1; undefined for a
+      # group whose weights sum to <= 1)
+      weighted_var <- if (sw > 1) {
+        sum(group_weights * (group_data - weighted_mean)^2) / (sw - 1)
+      } else NA_real_
       weighted_sd <- sqrt(weighted_var)
 
       # SE = SD / sqrt(weighted N)
       weighted_se <- weighted_sd / sqrt(sw)
 
       # CI with df = sw - 1 (SPSS sample-formula convention)
-      t_val <- qt((1 + conf.level) / 2, df = sw - 1)
+      t_val <- if (sw > 1) qt((1 + conf.level) / 2, df = sw - 1) else NA_real_
       ci_lower <- weighted_mean - t_val * weighted_se
       ci_upper <- weighted_mean + t_val * weighted_se
 
@@ -566,7 +569,18 @@ oneway_anova <- function(data, ..., group, weights = NULL, var.equal = TRUE,
 
   classical <- .anova_classical(y, g, w, group_levels)
 
-  if (is.null(weight_name)) {
+  # Welch's robust test needs a variance estimate > 0 in every group; like
+  # SPSS, it is not computed otherwise (oneway.test() aborted the whole
+  # call on a one-case group, the weighted formula returned NaN)
+  welch_reason <- .group_variance_reason(.group_variance_problems(y, g, w),
+                                         weighted = !is.null(weight_name))
+  if (!is.null(welch_reason)) {
+    welch_result <- list(statistic = NA_real_,
+                         parameter = c(NA_real_, NA_real_),
+                         p.value = NA_real_,
+                         method = "Welch",
+                         note = welch_reason)
+  } else if (is.null(weight_name)) {
     # Welch's ANOVA (robust test)
     welch_result <- oneway.test(y ~ g, var.equal = FALSE)
   } else {
@@ -837,27 +851,30 @@ print.oneway_anova <- function(x, digits = 3, ...) {
         cat(border_width, "\n")
       }
 
-      # Welch test (part of anova_table section)
+      # Welch test (part of anova_table section). SPSS ONEWAY prints it as
+      # "Robust Tests of Equality of Means" (not an assumption test), df2
+      # with decimals.
       if (!is.null(welch_result)) {
-        cat("\nAssumption Tests:\n")
-        cat(paste(rep("-", 16), collapse = ""), "\n")
-
-        welch_p <- welch_result$p.value
-        welch_sig <- cut(welch_p,
-                        breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
-                        labels = c("***", "**", "*", ""),
-                        right = FALSE)
-
-        welch_table <- data.frame(
-          Assumption = "Welch",
-          Statistic = round(welch_result$statistic, 3),
-          df1 = welch_result$parameter[1],
-          df2 = round(welch_result$parameter[2], 0),
-          p_value = ifelse(welch_p < 0.001, "<.001", round(welch_p, 3)),
-          sig = welch_sig
-        )
-
-        print(welch_table, row.names = FALSE)
+        cat("\nRobust Tests of Equality of Means:\n")
+        if (!is.null(welch_result$note) || is.na(welch_result$statistic)) {
+          cat(sprintf("  Welch: not computed (%s)\n",
+                      welch_result$note %||% "see warning"))
+        } else {
+          welch_p <- as.numeric(welch_result$p.value)
+          welch_table <- data.frame(
+            Test = "Welch",
+            Statistic = fmt_num(as.numeric(welch_result$statistic), digits),
+            df1 = formatC(as.numeric(welch_result$parameter[1]), format = "d"),
+            df2 = fmt_num(as.numeric(welch_result$parameter[2]), digits),
+            Sig = fmt_p(welch_p, digits),
+            sig = add_significance_stars(welch_p),
+            stringsAsFactors = FALSE
+          )
+          print_stat_table(welch_table, digits = digits,
+                           col_types = c(Statistic = "char", df1 = "char",
+                                         df2 = "char", Sig = "char"),
+                           col_labels = c(Test = "", sig = ""))
+        }
       }
     }
 

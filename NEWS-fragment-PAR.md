@@ -21,3 +21,14 @@
   variable as a grouping problem ("Found 0 levels"), and a grouping
   variable with 3 or more groups gives one error that points to
   `oneway_anova()`. (PAR-01, PAR-24)
+* A group with a single case (weighted: a sum of weights <= 1) no longer
+  aborts `oneway_anova()` and `t_test()` with the raw base-R error "not
+  enough observations" from the Welch part. As in SPSS, the classical
+  ANOVA / Student's t-test is computed and Welch's test is marked "not
+  computed" with the reason; `t_test(var.equal = FALSE)` then reports
+  Student's t with a warning. A group with zero variance no longer
+  prints a Welch row "NaN 3 NaN NA <NA>" (weighted) or an infinite Glass'
+  Delta, and the Welch block of `summary(oneway_anova())` is titled
+  "Robust Tests of Equality of Means" (SPSS) instead of "Assumption
+  Tests", with df2 shown with decimals (1229.456, not 1229). (PAR-07,
+  PAR-17)
