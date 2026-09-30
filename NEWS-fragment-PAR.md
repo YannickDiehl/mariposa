@@ -146,3 +146,6 @@
   errors of `tukey_test()`, `scheffe_test()` and `levene_test()` for
   unsupported objects now mention `factorial_anova()` results, which work
   as well. (PAR-23, PAR-24)
+* The compact `oneway_anova()` line no longer leaves a dangling space
+  ("p = 0.396 , eta2 = ...") and prints the total N also when the weights
+  sum to more than 2^31 (was "N = NA"). (PAR-21)

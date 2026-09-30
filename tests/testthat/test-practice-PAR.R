@@ -712,6 +712,18 @@ test_that("PAR-24: post-hoc / levene default methods mention factorial_anova()",
   }
 })
 
+test_that("PAR-21: oneway compact line without dangling space, N for huge weights", {
+  # "p = 0.396 , eta2 = ..." and N = %d (NA / format error for sum(w) > 2^31)
+  out <- capture.output(print(oneway_anova(survey_data, age, group = education)))
+  expect_false(any(grepl(" ,", out, fixed = TRUE)))
+  d <- survey_data
+  d$w_big <- d$sampling_weight * 1e7
+  out2 <- capture.output(print(oneway_anova(d, life_satisfaction, group = education,
+                                            weights = w_big)))
+  expect_false(any(grepl("N = NA", out2, fixed = TRUE)))
+  expect_true(any(grepl("N = 2[0-9]{10}", out2)))
+})
+
 test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
   # The example called summary(result, marginal_means = FALSE), a toggle
   # factorial_anova's summary() does not have (silently ignored).

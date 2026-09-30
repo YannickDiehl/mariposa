@@ -755,11 +755,11 @@ print.oneway_anova <- function(x, digits = 3, ...) {
       n_total <- df1_val + df2_val + 1
     }
 
-    cat(sprintf("  F(%d, %d) = %.*f, %s %s, eta2 = %.*f (%s), N = %d\n",
-                as.integer(df1_val), as.integer(df2_val), digits, f_val,
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val),
-                digits, eta_val, eta_interp, as.integer(n_total)))
+    cat(sprintf("  F(%s, %s) = %.*f, %s, eta2 = %.*f (%s), N = %s\n",
+                .fmt_df(df1_val, 1), .fmt_df(df2_val, 1), digits, f_val,
+                format_p_stars(p_val, digits),
+                digits, eta_val, eta_interp,
+                formatC(round(n_total), format = "f", digits = 0)))
   } else {
     note <- if ("note" %in% names(results)) results$note[i] else NA_character_
     cat(sprintf("  not computed (%s)\n",
