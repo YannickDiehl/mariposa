@@ -615,11 +615,11 @@ reference output showed mariposa was wrong.
   `conf.level` of `mann_whitney()`, `kruskal_wallis()`,
   `wilcoxon_test()` and `friedman_test()` is documented as not used.
 * `pairwise_wilcoxon()`: the interpretation legend and help page now match
-  the sign of Z. Z is computed from the differences second minus first
-  variable (like `wilcoxon_test(x, y)` and the SPSS pair "var2 - var1"),
-  so a positive Z means the *second* variable tends to be higher; the
-  legend said the opposite (score_T1 vs score_T2: Z = +5.43 while T2 is
-  higher).
+  the direction of the test. The legend said that a positive Z meant the
+  *first* variable was higher, while it was the second (score_T1 vs
+  score_T2: Z = +5.43 while T2 is higher). Z now follows SPSS (see
+  "SPSS parity audit" below) and the new `z_based_on` column carries the
+  direction.
 * `pairwise_wilcoxon()` reports the number of cases of every pair (new
   `n` column, shown in `summary()`) and explains why it can exceed the
   Friedman N: each pair uses all cases with both values (pairwise
@@ -1402,6 +1402,13 @@ but were never asserted. These are now fixed and asserted:
   association, as SPSS's Symmetric Measures print it: -.082 instead of
   .082 for a negative association (reference Fisher Test 1c). Larger
   tables keep the unsigned sqrt(chi-square / N).
+* `wilcoxon_test()` and `pairwise_wilcoxon()` report Z as SPSS does: from
+  the smaller rank sum, so it is never positive, with a new `z_based_on`
+  column ("negative ranks"/"positive ranks") that names that sum like
+  SPSS's footnote; `summary()` prints it. Before, Z was positive whenever
+  increases dominated (trust_science - trust_government: +25.945 instead
+  of SPSS's -25.945); the tests compared |Z| only. An empty rank
+  category has mean rank 0 (SPSS: .00) instead of `NA`.
 
 ## Validation
 

@@ -73,6 +73,11 @@ The test tells you:
 \item Positive Ranks: subjects where y > x (increased)
 \item Ties: subjects where y = x (no change)
 }
+
+\strong{Z}: as in SPSS, computed from the smaller of the two rank sums, so it
+is never positive; \code{z_based_on} ("negative ranks" or "positive
+ranks") names that sum, like SPSS's footnote. "Based on negative ranks"
+means that increases (y > x) dominate.
 }
 
 \subsection{When to Use This}{

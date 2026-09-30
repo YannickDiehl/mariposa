@@ -51,6 +51,11 @@
 #' - Positive Ranks: subjects where y > x (increased)
 #' - Ties: subjects where y = x (no change)
 #'
+#' **Z**: as in SPSS, computed from the smaller of the two rank sums, so it
+#' is never positive; \code{z_based_on} ("negative ranks" or "positive
+#' ranks") names that sum, like SPSS's footnote. "Based on negative ranks"
+#' means that increases (y > x) dominate.
+#'
 #' ## When to Use This
 #'
 #' Use Wilcoxon signed-rank test when:
@@ -193,9 +198,9 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
         n_total <- n_ties
       }
       return(list(
-        Z = 0, p_value = 1, r_effect = 0,
+        Z = 0, p_value = 1, r_effect = 0, z_based_on = NA_character_,
         n_neg = 0, n_pos = 0, n_ties = n_ties, n_total = n_total,
-        mean_rank_neg = NA_real_, mean_rank_pos = NA_real_,
+        mean_rank_neg = 0, mean_rank_pos = 0,
         sum_rank_neg = 0, sum_rank_pos = 0,
         V = 0
       ))
@@ -217,8 +222,9 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
       sum_rank_pos <- sum(ranks[pos_in_ranked])
       sum_rank_neg <- sum(ranks[neg_in_ranked])
 
-      mean_rank_pos <- if (n_pos > 0) sum_rank_pos / n_pos else NA_real_
-      mean_rank_neg <- if (n_neg > 0) sum_rank_neg / n_neg else NA_real_
+      # SPSS prints .00 for an empty rank category
+      mean_rank_pos <- if (n_pos > 0) sum_rank_pos / n_pos else 0
+      mean_rank_neg <- if (n_neg > 0) sum_rank_neg / n_neg else 0
 
       V <- sum_rank_pos  # V = W+ (sum of positive ranks)
 
@@ -273,8 +279,8 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
       n_neg_w <- sum(w[neg_idx])
       n_ties_w <- sum(w[tie_idx])
 
-      mean_rank_pos <- if (n_pos_w > 0) sum_rank_pos / n_pos_w else NA_real_
-      mean_rank_neg <- if (n_neg_w > 0) sum_rank_neg / n_neg_w else NA_real_
+      mean_rank_pos <- if (n_pos_w > 0) sum_rank_pos / n_pos_w else 0
+      mean_rank_neg <- if (n_neg_w > 0) sum_rank_neg / n_neg_w else 0
 
       n_neg <- round(n_neg_w)
       n_pos <- round(n_pos_w)
@@ -283,6 +289,11 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
       n_ranked <- round(core$N_pop)
     }
 
+    # SPSS computes Z from the smaller rank sum, so Z <= 0, and names that
+    # sum in a footnote ("Based on negative ranks")
+    z_based_on <- if (sum_rank_neg <= sum_rank_pos) "negative ranks" else "positive ranks"
+    Z <- -abs(Z)
+
     # Effect size: r = Z / sqrt(N)
     r_effect <- abs(Z) / sqrt(n_ranked)
 
@@ -290,6 +301,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
       Z = Z,
       p_value = p_value,
       r_effect = r_effect,
+      z_based_on = z_based_on,
       n_neg = n_neg,
       n_pos = n_pos,
       n_ties = n_ties,
@@ -312,6 +324,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
         Z = result$Z,
         p_value = result$p_value,
         r_effect = result$r_effect,
+        z_based_on = result$z_based_on,
         n_neg = result$n_neg,
         n_pos = result$n_pos,
         n_ties = result$n_ties,
@@ -333,6 +346,7 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
       tibble(
         pair = paste(y_name, "-", x_name),
         Z = NA_real_, p_value = NA_real_, r_effect = NA_real_,
+        z_based_on = NA_character_,
         n_neg = NA_real_, n_pos = NA_real_,
         n_ties = NA_real_, n_total = NA_real_,
         mean_rank_neg = NA_real_, mean_rank_pos = NA_real_,
@@ -417,6 +431,10 @@ wilcoxon_test <- function(data, x, y, weights = NULL, conf.level = 0.95) {
     print_stat_table(test_df, digits = digits, indent = 2,
                      col_types = c(Z = "num", r = "num"),
                      col_labels = c(p = "p value", r = "Effect r", stars = ""))
+    based_on <- row_data[["z_based_on"]]
+    if (!is.null(based_on) && !is.na(based_on)) {
+      cat(sprintf("  Z is based on %s (the smaller rank sum), as in SPSS.\n", based_on))
+    }
     cat("\n")
   }
 }

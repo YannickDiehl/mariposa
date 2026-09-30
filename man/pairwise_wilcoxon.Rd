@@ -52,10 +52,10 @@ Think of it as:
 \item Z is computed from the differences \code{var2 - var1}, like
 \code{wilcoxon_test(x = var1, y = var2)} and the SPSS pair
 "var2 - var1"
-\item Positive Z: Values in var2 (Var 2) tend to be higher than var1
-\item Negative Z: Values in var1 (Var 1) tend to be higher than var2
-\item SPSS prints the same |Z| always with a negative sign and a footnote
-("Based on positive/negative ranks") telling the direction
+\item As in SPSS, Z comes from the smaller rank sum and is never positive;
+\code{z_based_on} names that sum (SPSS's footnote)
+\item Based on negative ranks: values in var2 (Var 2) tend to be higher
+\item Based on positive ranks: values in var1 (Var 1) tend to be higher
 }
 
 \strong{Adjusted P-values}: Control for multiple comparisons

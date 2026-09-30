@@ -306,20 +306,21 @@ test_that("NP-21 no confidence level is advertised for rank tests", {
 
 # --- NP-04 / NP-14: pairwise_wilcoxon ----------------------------------------
 
-test_that("NP-04 pairwise_wilcoxon legend matches the sign of Z", {
-  # Was: Z is based on Var 2 - Var 1 (positive: Var 2 higher, as
-  # wilcoxon_test and SPSS "Var 2 - Var 1"), but the legend said
-  # "Positive Z: First variable tends to have higher values".
+test_that("NP-04 pairwise_wilcoxon legend matches the direction of Z", {
+  # Was: the legend contradicted the sign of Z. Since 0.7.4 Z follows SPSS
+  # (smaller rank sum, <= 0) and z_based_on carries the direction.
   set.seed(4)
   d <- data.frame(t1 = sample(1:5, 60, TRUE))
   d$t2 <- pmin(d$t1 + sample(0:2, 60, TRUE), 7)
   d$t3 <- d$t1
   pw <- pairwise_wilcoxon(friedman_test(d, t1, t2, t3))
   row <- pw$comparisons[pw$comparisons$var1 == "t1" & pw$comparisons$var2 == "t2", ]
-  expect_gt(row$z, 0)                       # t2 is higher
+  expect_lt(row$z, 0)
+  expect_identical(row$z_based_on, "negative ranks")   # t2 is higher
   out <- capture.output(print(summary(pw)))
-  expect_true(any(grepl("Positive Z: Second variable", out, fixed = TRUE)))
-  expect_false(any(grepl("Positive Z: First", out, fixed = TRUE)))
+  expect_true(any(grepl("Based on negative ranks: the second variable tends to be higher",
+                        out, fixed = TRUE)))
+  expect_false(any(grepl("Positive Z", out, fixed = TRUE)))
 })
 
 test_that("NP-14 pairwise_wilcoxon reports the N of each pair", {

@@ -36,10 +36,10 @@
 #' - Z is computed from the differences \code{var2 - var1}, like
 #'   \code{wilcoxon_test(x = var1, y = var2)} and the SPSS pair
 #'   "var2 - var1"
-#' - Positive Z: Values in var2 (Var 2) tend to be higher than var1
-#' - Negative Z: Values in var1 (Var 1) tend to be higher than var2
-#' - SPSS prints the same |Z| always with a negative sign and a footnote
-#'   ("Based on positive/negative ranks") telling the direction
+#' - As in SPSS, Z comes from the smaller rank sum and is never positive;
+#'   \code{z_based_on} names that sum (SPSS's footnote)
+#' - Based on negative ranks: values in var2 (Var 2) tend to be higher
+#' - Based on positive ranks: values in var1 (Var 1) tend to be higher
 #'
 #' **Adjusted P-values**: Control for multiple comparisons
 #' - p < 0.05: Measurements are significantly different
@@ -204,7 +204,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
     }
     if (n_ranked == 0) {
       # every pair tied: no difference (SPSS: Z = 0, p = 1)
-      return(list(z = 0, p = 1, n = n_pair))
+      return(list(z = 0, p = 1, n = n_pair, based_on = NA_character_))
     }
 
     if (is.null(weight_name)) {
@@ -250,7 +250,10 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
       p_value <- core$p_value
     }
 
-    return(list(z = Z, p = p_value, n = n_pair))
+    # SPSS convention: Z from the smaller rank sum, so Z <= 0; Z >= 0 above
+    # means the positive ranks (var2 > var1) have the larger sum
+    return(list(z = -abs(Z), p = p_value, n = n_pair,
+                based_on = if (Z >= 0) "negative ranks" else "positive ranks"))
   }
 
   # Generate all pairs of variables
@@ -288,6 +291,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
             var2 = vars[v2],
             n = result$n,
             z = result$z,
+            z_based_on = result$based_on,
             p = result$p,
             stringsAsFactors = FALSE
           )
@@ -333,6 +337,7 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
           var2 = vars[v2],
           n = result$n,
           z = result$z,
+          z_based_on = result$based_on,
           p = result$p,
           stringsAsFactors = FALSE
         )
@@ -571,9 +576,10 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
 
   if (show_interpretation) {
     cat("\nInterpretation:\n")
-    cat("- Z is based on second minus first variable (SPSS prints |Z| with a negative sign)\n")
-    cat("- Positive Z: Second variable tends to have higher values\n")
-    cat("- Negative Z: First variable tends to have higher values\n")
+    cat("- Z is based on second minus first variable and, as in SPSS, on the\n")
+    cat("  smaller rank sum (so it is never positive)\n")
+    cat("- Based on negative ranks: the second variable tends to be higher\n")
+    cat("- Based on positive ranks: the first variable tends to be higher\n")
     cat("- p-values are adjusted for multiple comparisons\n")
   }
 
@@ -590,6 +596,10 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
     var2 = pw_results$var2,
     n = if (!is.null(pw_results$n)) pw_results$n else NA_real_,
     z = pw_results$z,
+    based_on = if (!is.null(pw_results$z_based_on)) {
+      ifelse(is.na(pw_results$z_based_on), "",
+             sub(" ranks$", "", pw_results$z_based_on))
+    } else "",
     p = pw_results$p,
     p_adj = pw_results$p_adj,
     stars = pw_results$sig,
@@ -600,7 +610,8 @@ print.summary.pairwise_wilcoxon <- function(x, ...) {
     display_table, digits = digits, indent = 0,
     col_types = c(z = "num", n = "int"),
     col_labels = c(var1 = "Var 1", var2 = "Var 2", n = "N", z = "Z",
-                   p = "p (unadj)", p_adj = "p (adj)", stars = "")
+                   based_on = "Based on", p = "p (unadj)",
+                   p_adj = "p (adj)", stars = "")
   )
   cat("\n")
 }

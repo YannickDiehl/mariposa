@@ -35,7 +35,8 @@ spss_values <- list(
     n_ties = 502L,                                                    # wilcoxon_test_output.txt:30
     n_total = 2227L,                                                  # wilcoxon_test_output.txt:31
     z = -5.097,                                                       # wilcoxon_test_output.txt:39
-    p = "<.001"                                                       # wilcoxon_test_output.txt:40
+    p = "<.001",                                                      # wilcoxon_test_output.txt:40
+    based_on = "positive ranks"                                       # wilcoxon_test_output.txt:42
   ),
 
   # ---- Test 1b: trust_government WITH trust_science ---------------------
@@ -45,7 +46,8 @@ spss_values <- list(
     n_ties = 476L,                                                     # wilcoxon_test_output.txt:73
     n_total = 2255L,                                                   # wilcoxon_test_output.txt:74
     z = -25.945,                                                       # wilcoxon_test_output.txt:82
-    p = "<.001"                                                        # wilcoxon_test_output.txt:83
+    p = "<.001",                                                       # wilcoxon_test_output.txt:83
+    based_on = "negative ranks"                                        # wilcoxon_test_output.txt:85
   ),
 
   # ---- Test 1c: trust_media WITH trust_science --------------------------
@@ -55,7 +57,8 @@ spss_values <- list(
     n_ties = 392L,                                                      # wilcoxon_test_output.txt:116
     n_total = 2272L,                                                    # wilcoxon_test_output.txt:117
     z = -29.091,                                                        # wilcoxon_test_output.txt:125
-    p = "<.001"                                                         # wilcoxon_test_output.txt:126
+    p = "<.001",                                                        # wilcoxon_test_output.txt:126
+    based_on = "negative ranks"                                         # wilcoxon_test_output.txt:128
   ),
 
   # ---- Test 3a: trust_gov WITH trust_media, grouped by region ----------
@@ -110,13 +113,15 @@ spss_values <- list(
 #' rows where second < first. mariposa's wilcoxon_test(data, var1, var2)
 #' uses the same convention (verified empirically against Test 1a).
 compare_wilcoxon <- function(row, spss, scenario) {
-  # Test statistics — SPSS convention picks the smaller-rank-sum side and
-  # reports Z as negative; mariposa returns the signed (V - E_V)/sqrt(Var_V)
-  # which can be positive. Compare absolute values: the test of significance
-  # depends on |Z|, not its sign. Magnitude must match.
-  assert_spss(abs(as.numeric(row$Z)), abs(spss$z),
+  # Test statistics — SPSS computes Z from the smaller rank sum, so Z <= 0,
+  # and names that sum in a footnote ("Based on negative ranks")
+  assert_spss(as.numeric(row$Z), spss$z,
               tier = "display", precision = 3,
-              label = sprintf("[%s] |Z|", scenario))
+              label = sprintf("[%s] Z", scenario))
+  if (!is.null(spss$based_on)) {
+    expect_identical(row$z_based_on, spss$based_on,
+                     label = sprintf("[%s] Z based on", scenario))
+  }
   assert_spss(as.numeric(row$p_value), spss$p,
               tier = "display", precision = 3, what = "p_value",
               label = sprintf("[%s] p-value", scenario))
@@ -229,12 +234,13 @@ test_that("Test 3b: Wilcoxon trust_gov / trust_science, grouped by region — ma
 # downward bias in Z — the former rank - 1/2 convention was inconsistent
 # with E(V) = N(N+1)/4. With weights == 1 the weighted path now reproduces
 # the unweighted statistic exactly (asserted below).
+# 0.7.4: Z carries SPSS's sign convention (from the smaller rank sum, <= 0).
 # =============================================================================
 
 r_only_baselines <- list(
   gov_media    = list(Z = -5.034890, p_value = 0.0000005, r_effect = 0.120876, n_total = 2242L),
-  gov_science  = list(Z = 26.035233, p_value = 0.0000000, r_effect = 0.615368, n_total = 2271L),
-  media_science = list(Z = 29.129375, p_value = 0.0000000, r_effect = 0.670217, n_total = 2286L)
+  gov_science  = list(Z = -26.035233, p_value = 0.0000000, r_effect = 0.615368, n_total = 2271L),
+  media_science = list(Z = -29.129375, p_value = 0.0000000, r_effect = 0.670217, n_total = 2286L)
 )
 
 compare_weighted_baseline <- function(row, baseline, scenario) {
