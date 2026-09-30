@@ -182,6 +182,9 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   .np_check_rank_vars(data, var_names)
 
   # Process group variable (required for Mann-Whitney test)
+  if (missing(group)) {
+    cli_abort("{.arg group} is required for Mann-Whitney test.")
+  }
   group_quo <- enquo(group)
   if (quo_is_null(group_quo)) {
     cli_abort("{.arg group} is required for Mann-Whitney test.")

@@ -137,3 +137,6 @@
   ("chi2(1) = ..."). Two variables with different category sets (e.g.
   0/1 against 1/2) are now an error instead of being tabulated as if the
   categories matched.
+* `mann_whitney()` without `group` stops with "`group` is required" (as
+  `kruskal_wallis()` does) instead of the internal "Can't extract column
+  with `g_name`".

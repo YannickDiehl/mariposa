@@ -637,6 +637,11 @@ test_that("NP-24 mcnemar_test rejects variables with different categories", {
   expect_equal(dim(r2$table), c(2L, 2L))
 })
 
+test_that("NP-24 mann_whitney without `group` gives a clear error", {
+  # Was: internal rlang error "Can't extract column with `g_name`".
+  expect_error(mann_whitney(survey_data, age), "group.*required")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()
