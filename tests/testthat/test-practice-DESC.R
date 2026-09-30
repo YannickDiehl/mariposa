@@ -336,3 +336,23 @@ test_that("IO-12: weighted frequency() of several labelled variables does not cr
   expect_equal(pick(r_xy, "x"), pick(r_yx, "x"))
   expect_equal(pick(r_xy, "y")$label, c("No answer", "Male", "Female", "Diverse"))
 })
+
+
+# --- DESC-08 (frequency part): empty factor levels ----------------------------
+
+test_that("DESC-08: frequency() hides empty factor levels unless show_unused = TRUE", {
+  # table() keeps every factor level, so after filter(employment !=
+  # "Student") the table listed "Student 0 0.00" although show_unused =
+  # FALSE is the default (SPSS FREQUENCIES lists observed values only).
+  d <- dplyr::filter(survey_data, employment != "Student")
+  r <- frequency(d, employment)
+  expect_false("Student" %in% r$results$value)
+  expect_false(any(grepl("Student", capture.output(print(r)))))
+  expect_true("Student" %in% frequency(d, employment, show_unused = TRUE)$results$value)
+
+  rw <- frequency(d, employment, weights = sampling_weight)
+  expect_false("Student" %in% as.character(rw$results$value))
+  rwu <- frequency(d, employment, weights = sampling_weight, show_unused = TRUE)
+  expect_true("Student" %in% as.character(rwu$results$value))
+  expect_equal(rwu$results$freq[as.character(rwu$results$value) %in% "Student"], 0)
+})

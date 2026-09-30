@@ -64,3 +64,7 @@
   of the variables. The weighted branch kept the `haven_labelled` class in
   the value column, so combining variables with different label sets
   failed; values are now bare numbers, as in the unweighted branch.
+* `frequency()` no longer lists empty factor levels (e.g. "Student 0" after
+  `filter(employment != "Student")`) unless `show_unused = TRUE`, as SPSS
+  FREQUENCIES lists observed values only; with `show_unused = TRUE` they
+  now also appear in weighted tables.

@@ -32,8 +32,9 @@
 #'   observations? (Default: FALSE). When TRUE, values that have labels defined
 #'   (e.g., from statistical software files) but no cases in the data are
 #'   included with frequency 0. This is useful for labelled datasets where
-#'   unused categories should still appear in the output. Automatically enables
-#'   label display.
+#'   unused categories should still appear in the output. The same applies
+#'   to empty factor levels, which are hidden by default (as SPSS lists only
+#'   observed values). Automatically enables label display.
 #' @param sort.frq,show.na,show.prc,show.valid,show.sum,show.labels,show.unused
 #'   Defunct dot-case argument names, removed in mariposa 0.6.9. Calling
 #'   the function with any of them is an error; use the snake_case
@@ -237,6 +238,11 @@ calculate_single_frequency <- function(x, w = NULL, sort_frq = "none", show_na =
   if (is.null(w)) {
     # Unweighted frequencies
     freq_table <- table(x, useNA = if (show_na) "ifany" else "no")
+    # table() keeps every factor level; like SPSS FREQUENCIES, empty
+    # categories are listed only on request (show_unused = TRUE)
+    if (is.factor(x) && !show_unused) {
+      freq_table <- freq_table[freq_table > 0 | is.na(names(freq_table))]
+    }
     total <- sum(freq_table)
     na_idx <- is.na(names(freq_table))
     valid_total <- sum(freq_table[!na_idx])
@@ -296,6 +302,10 @@ calculate_single_frequency <- function(x, w = NULL, sort_frq = "none", show_na =
       if (inherits(x_valid, "haven_labelled")) x_valid <- .plain_numeric(x_valid)
       w_valid <- w[valid_idx]
       unique_vals <- sort(unique(x_valid))
+      # show_unused: empty factor levels are listed with frequency 0
+      if (is.factor(x_valid) && show_unused) {
+        unique_vals <- factor(levels(x_valid), levels = levels(x_valid))
+      }
       freq_weighted <- vapply(unique_vals, function(val) sum(w_valid[x_valid == val]), numeric(1))
       n_eff <- (sum(w_valid))^2 / sum(w_valid^2)
     } else {
