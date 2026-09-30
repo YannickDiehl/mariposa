@@ -303,3 +303,37 @@ get_value_labels <- function(x, freq_names) {
     call = rlang::caller_env()
   )
 }
+
+#' Grouping variable as a factor in SPSS order with value labels
+#'
+#' SPSS orders groups by code and shows value labels. Used by the tests that
+#' split by a `group` variable so that (a) a numeric or labelled grouping
+#' variable is ordered by value, not by first appearance in the data (the
+#' sign of t no longer depends on row order), and (b) labelled codes are
+#' displayed with their value labels ("East" instead of "1"). Factors are
+#' returned unchanged; values without a label keep their code as level
+#' name; missing values (including tagged NAs) stay NA. Duplicate label
+#' texts (ALLBUS uses ".." for unlabelled scale points) get their code
+#' appended so distinct groups are never merged.
+#'
+#' @param g Grouping vector
+#' @return A factor
+#' @noRd
+.group_factor <- function(g) {
+  if (is.factor(g)) return(g)
+  if (inherits(g, "haven_labelled")) {
+    v <- .plain_numeric(g)
+    vals <- sort(unique(v[!is.na(v)]))
+    lv <- as.character(vals)
+    labs <- attr(g, "labels", exact = TRUE)
+    if (!is.null(labs)) {
+      labs <- labs[!is.na(labs)]
+      hit <- match(vals, .plain_numeric(labs))
+      lv[!is.na(hit)] <- names(labs)[hit[!is.na(hit)]]
+    }
+    dup <- lv %in% lv[duplicated(lv)]
+    lv[dup] <- paste0(lv[dup], " (", vals[dup], ")")
+    return(factor(match(v, vals), levels = seq_along(vals), labels = lv))
+  }
+  factor(g)
+}

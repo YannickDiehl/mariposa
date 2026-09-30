@@ -1111,3 +1111,28 @@ test_that("every grouped print path labels groups by level, not code", {
   expect_true(any(grepl("reg = East", lg_out, fixed = TRUE)))
   expect_false(any(grepl("reg = 1", lg_out, fixed = TRUE)))
 })
+
+# --- 0.7.4: shared helpers for the practice-test fixes ------------------------
+
+test_that("format_p_stars() never leaves a dangling space", {
+  expect_identical(format_p_stars(0.55), "p = 0.550")
+  expect_identical(format_p_stars(0.0004), "p < 0.001 ***")
+  expect_identical(format_p_stars(0.02), "p = 0.020 *")
+  expect_identical(format_p_stars(NA_real_), "p = NA")
+})
+
+test_that(".group_factor() orders by code and shows value labels", {
+  skip_if_not_installed("haven")
+  # numeric: sorted by value, not by first appearance (t-test sign)
+  expect_identical(levels(.group_factor(c(1, 0, 1, 0))), c("0", "1"))
+  # labelled: code order, label text, unlabelled code kept, NA stays NA
+  g <- haven::labelled(c(2, 1, NA, 3, 2), c(West = 2, East = 1))
+  f <- .group_factor(g)
+  expect_identical(levels(f), c("East", "West", "3"))
+  expect_identical(as.character(f), c("West", "East", NA, "3", "West"))
+  # duplicate label texts would merge groups: disambiguated by code
+  d <- haven::labelled(c(1, 2, 3), c(low = 1, ".." = 2, ".." = 3))
+  expect_identical(levels(.group_factor(d)), c("low", ".. (2)", ".. (3)"))
+  # factors unchanged
+  expect_identical(.group_factor(factor(c("b", "a"))), factor(c("b", "a")))
+})

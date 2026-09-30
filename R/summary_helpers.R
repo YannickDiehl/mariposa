@@ -43,3 +43,20 @@ format_p_compact <- function(p, digits = 3) {
   if (p < 0.001) return("p < 0.001")
   sprintf("p = %s", format(round(p, digits), nsmall = digits))
 }
+
+#' Compact p-value with significance stars, without a dangling space
+#'
+#' "p = 0.550" or "p < 0.001 ***": stars are appended only when there are
+#' any. The historical `sprintf("%s %s,", format_p_compact(p),
+#' add_significance_stars(p))` pattern left "p = 0.550 ," behind whenever
+#' the result was not significant.
+#'
+#' @param p Numeric scalar p-value
+#' @param digits Decimal places
+#' @return Character scalar
+#' @noRd
+format_p_stars <- function(p, digits = 3) {
+  stars <- add_significance_stars(p)
+  out <- format_p_compact(p, digits)
+  if (nzchar(stars)) paste(out, stars) else out
+}
