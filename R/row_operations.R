@@ -314,7 +314,7 @@ row_count <- function(data, ..., count, na.rm = TRUE) {
   for (j in seq_along(var_names)) {
     x <- data[[var_names[j]]]
     if (is.numeric(attr(x, "na_tag_map", exact = TRUE))) {
-      codes[, j] <- as.double(untag_na(x))
+      codes[, j] <- as.double(.plain_numeric(untag_na(x)))
     }
   }
   codes

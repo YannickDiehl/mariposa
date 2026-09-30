@@ -178,7 +178,7 @@ write_spss <- function(data, path, compress = c("byte", "none", "zsav")) {
     na_codes <- unname(tag_map)
 
     # Untag NAs back to their original numeric codes
-    raw <- untag_na(x)
+    raw <- as.double(.plain_numeric(untag_na(x)))
 
     # Reconstruct labels: convert tagged NA label entries back to regular entries
     labels <- attr(x, "labels", exact = TRUE)

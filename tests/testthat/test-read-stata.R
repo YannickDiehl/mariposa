@@ -298,7 +298,7 @@ test_that("untag_na recovers numeric codes from tag_na Stata data", {
   data <- read_stata(tmp, tag_na = c(-9, -8))
 
   # untag_na should recover codes WITHOUT warning
-  expect_no_warning(result <- untag_na(data$income))
+  expect_no_warning(result <- as.numeric(untag_na(data$income)))
 
   # Check recovered values
   expect_equal(sort(result[!is.na(result)]),

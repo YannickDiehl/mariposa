@@ -125,7 +125,7 @@ test_that("na_frequencies results are sorted by count descending", {
 # ============================================================================
 test_that("untag_na recovers original SPSS codes", {
   x <- make_tagged_vector()
-  recovered <- untag_na(x)
+  recovered <- as.numeric(untag_na(x))
 
   expect_true(is.numeric(recovered))
   # Valid values unchanged
@@ -144,7 +144,7 @@ test_that("untag_na returns double vector without tag_map", {
   x <- haven::labelled(c(1, 2, NA), labels = c("A" = 1, "B" = 2))
   result <- untag_na(x)
   expect_true(is.double(result))
-  expect_equal(result[1:2], c(1, 2))
+  expect_equal(as.numeric(result[1:2]), c(1, 2))
   expect_true(is.na(result[3]))
 })
 

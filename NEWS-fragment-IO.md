@@ -166,3 +166,10 @@
   variables, an invalid regular expression such as `"("` is searched as
   text (the regex engine's warning no longer leaks), and an empty result
   is returned invisibly instead of printing `<0 rows>`.
+* `strip_tags()` and `untag_na()` accept a data frame (all numeric
+  columns, or the ones selected via `...`) instead of failing with a
+  German base-R error, and reject non-numeric vectors with a clear message
+  (`strip_tags("a")` returned `NA`). `untag_na()` keeps the value and
+  variable labels: the labels of the missing types are attached to their
+  restored codes (e.g. -9 = "KEINE ANGABE"), so the result is still
+  `haven_labelled`.

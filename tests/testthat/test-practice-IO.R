@@ -752,3 +752,42 @@ test_that("IO-17: invalid regex falls back to literal text, empty result is quie
   expect_false(out$visible)
   expect_equal(nrow(out$value), 0L)
 })
+
+# IO-20: strip_tags()/untag_na() had no data-frame support (German base
+# error), weak input checks (strip_tags("a") returned NA), untag_na()
+# dropped the value and variable labels.
+test_that("IO-20: untag_na() keeps labels, missing labels move to their codes", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(1, -9, 2, -8), labels = c(yes = 1, no = 2,
+                                                  "no answer" = -9),
+                       label = "Q1")
+  x <- set_na(x, -9, -8)
+  u <- untag_na(x)
+  expect_s3_class(u, "haven_labelled")
+  expect_equal(as.numeric(u), c(1, -9, 2, -8))
+  expect_equal(attr(u, "labels"), c(yes = 1, no = 2, "no answer" = -9))
+  expect_equal(attr(u, "label"), "Q1")
+  expect_null(attr(u, "na_tag_map"))
+})
+
+test_that("IO-20: strip_tags()/untag_na() work on data frames", {
+  skip_if_not_installed("haven")
+  d <- tibble::tibble(a = set_na(c(1, -9, 2), -9), b = c("x", "y", "z"),
+                      c = set_na(c(-8, 1, 1), -8))
+  s <- strip_tags(d)
+  expect_true(all(is.na(.na_tags(s$a))))
+  expect_identical(s$b, d$b)
+  u <- untag_na(d)
+  expect_equal(as.numeric(u$a), c(1, -9, 2))
+  expect_equal(as.numeric(u$c), c(-8, 1, 1))
+  u2 <- untag_na(d, a)
+  expect_equal(as.numeric(u2$a), c(1, -9, 2))
+  expect_true(is.na(u2$c[1]))
+})
+
+test_that("IO-20: strip_tags()/untag_na() reject non-numeric vectors clearly", {
+  skip_if_not_installed("haven")
+  expect_error(strip_tags(c("a", "b")), "numeric")
+  expect_error(untag_na(c("a", "b")), "numeric")
+  expect_error(strip_tags(list(1)), "numeric")
+})

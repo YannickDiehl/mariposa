@@ -621,12 +621,17 @@ na_frequencies <- function(x) {
 #' [read_xpt()]). For native Stata/SAS tagged NAs (e.g., `.a`, `.A`) that
 #' have no numeric codes to recover, use [strip_tags()] instead.
 #'
-#' @param x A numeric vector with tagged NAs.
+#' @param x A numeric vector with tagged NAs, or a data frame.
+#' @param ... For a data frame: the columns to convert (tidyselect). If
+#'   empty, every numeric column is converted. Ignored for vectors.
 #'
-#' @return A numeric vector where tagged NAs with numeric codes have been
-#'   replaced with their original values (e.g., -9, -8, -42). System NAs
-#'   (untagged) remain as `NA`. For native Stata/SAS tagged NAs (no numeric
-#'   codes), falls back to [strip_tags()] behavior with a warning.
+#' @return The input with tagged NAs that have numeric codes replaced by
+#'   their original values (e.g., -9, -8, -42). System NAs (untagged)
+#'   remain `NA`. Value labels and the variable label are kept (labels of
+#'   missing types are attached to their codes again), so the result is
+#'   `haven_labelled` when the input was. For native Stata/SAS tagged NAs
+#'   (no numeric codes), falls back to [strip_tags()] behavior with a
+#'   warning. A data frame is returned with the selected columns converted.
 #'
 #' @examples
 #' \donttest{
@@ -641,11 +646,16 @@ na_frequencies <- function(x) {
 #'   [strip_tags()]
 #' @family data-import
 #' @export
-untag_na <- function(x) {
+untag_na <- function(x, ...) {
   .check_haven("tagged NA recovery")
+  if (is.data.frame(x)) {
+    return(.tag_fun_df(x, untag_na, rlang::enexprs(...),
+                       rlang::expr(c(...))))
+  }
+  .check_tag_input(x, "untag_na")
 
-  tag_map <- attr(x, "na_tag_map")
-  if (is.null(tag_map)) return(as.double(x))
+  tag_map <- attr(x, "na_tag_map", exact = TRUE)
+  if (is.null(tag_map)) return(x)
 
   # Check if tag_map contains recoverable numeric codes (from tag_na)
   # vs native format codes (character strings like ".a", ".A")
@@ -669,7 +679,22 @@ untag_na <- function(x) {
   hit <- !is.na(tags) & tags %in% names(tag_map)
   raw[hit] <- unname(tag_map)[match(tags[hit], names(tag_map))]
 
-  raw
+  # Labels: valid labels plus the labels of the missing types, now attached
+  # to their codes again (they used to be dropped with the class)
+  labels <- attr(x, "labels", exact = TRUE)
+  if (!is.null(labels)) {
+    lab_vals <- as.double(.plain_numeric(labels))
+    lab_tags <- .na_tags(lab_vals)
+    code <- match(lab_tags, names(tag_map))
+    lab_vals[!is.na(code)] <- unname(tag_map)[code[!is.na(code)]]
+    labels <- stats::setNames(lab_vals, names(labels))
+  }
+
+  .with_label_meta(raw, x, labels = labels,
+                   label = attr(x, "label", exact = TRUE),
+                   keep_missing = FALSE,
+                   labelled = inherits(x, "haven_labelled") ||
+                     length(labels) > 0L)
 }
 
 
@@ -681,13 +706,16 @@ untag_na <- function(x) {
 #' format: [read_spss()], [read_por()], [read_stata()], [read_sas()], or
 #' [read_xpt()].
 #'
-#' @param x A numeric vector with tagged NAs.
+#' @param x A numeric vector with tagged NAs, or a data frame.
+#' @param ... For a data frame: the columns to convert (tidyselect). If
+#'   empty, every numeric column is converted. Ignored for vectors.
 #'
-#' @return A numeric vector where all tagged NAs have been replaced with
-#'   regular `NA`. Value labels for missing types are removed; labels for
-#'   valid values and the variable label are preserved. A `haven_labelled`
-#'   input stays `haven_labelled`, so the labels survive [write_spss()] and
-#'   [write_stata()].
+#' @return The input with all tagged NAs replaced by regular `NA`. Value
+#'   labels for missing types are removed; labels for valid values and the
+#'   variable label are preserved. A `haven_labelled` input stays
+#'   `haven_labelled`, so the labels survive [write_spss()] and
+#'   [write_stata()]. A data frame is returned with the selected columns
+#'   converted.
 #'
 #' @examples
 #' \donttest{
@@ -702,7 +730,12 @@ untag_na <- function(x) {
 #'   [na_frequencies()], [untag_na()]
 #' @family data-import
 #' @export
-strip_tags <- function(x) {
+strip_tags <- function(x, ...) {
+  if (is.data.frame(x)) {
+    return(.tag_fun_df(x, strip_tags, rlang::enexprs(...),
+                       rlang::expr(c(...))))
+  }
+  .check_tag_input(x, "strip_tags")
   labels <- attr(x, "labels", exact = TRUE)
   .with_label_meta(
     x, x,
@@ -711,6 +744,39 @@ strip_tags <- function(x) {
     keep_missing = FALSE,
     labelled = inherits(x, "haven_labelled") || length(labels) > 0L
   )
+}
+
+
+#' Input check for strip_tags()/untag_na() vectors
+#' @noRd
+.check_tag_input <- function(x, fn, call = rlang::caller_env()) {
+  if (!is.numeric(x) || is.factor(x)) {
+    cli::cli_abort(c(
+      "{.fn {fn}} needs a numeric vector (or a data frame), not {.cls {class(x)[1]}}.",
+      "i" = "Tagged missing values only exist in numeric variables."
+    ), call = call)
+  }
+  invisible(TRUE)
+}
+
+
+#' Apply strip_tags()/untag_na() to data frame columns
+#'
+#' Selected columns (tidyselect), or every numeric column when nothing is
+#' selected; non-numeric columns are left unchanged.
+#' @noRd
+.tag_fun_df <- function(data, fun, dots, select_expr,
+                        call = rlang::caller_env()) {
+  cols <- if (length(dots) == 0L) {
+    which(vapply(data, function(v) is.numeric(v) && !is.factor(v), logical(1)))
+  } else {
+    tidyselect::eval_select(select_expr, data, env = call)
+  }
+  for (i in cols) {
+    if (!is.numeric(data[[i]]) || is.factor(data[[i]])) next
+    data[[i]] <- fun(data[[i]])
+  }
+  data
 }
 
 

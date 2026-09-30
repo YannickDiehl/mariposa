@@ -267,7 +267,7 @@ test_that("untag_na recovers numeric codes from tag_na XPT data", {
   data <- read_xpt(tmp, tag_na = c(-9, -8))
 
   # Should recover without warning
-  expect_no_warning(result <- untag_na(data$SCORE))
+  expect_no_warning(result <- as.numeric(untag_na(data$SCORE)))
 
   expect_equal(sort(result[!is.na(result)]),
                sort(c(10, 20, 30, -9, -8)))

@@ -912,7 +912,7 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
       if (!is.null(tag_map) && is.numeric(tag_map)) {
         # Preserve original missing codes (-9, -11, etc.) in data cells
         # so read_xlsx() can reconstruct tagged NAs on roundtrip
-        df[[i]] <- untag_na(df[[i]])
+        df[[i]] <- as.double(.plain_numeric(untag_na(df[[i]])))
       } else {
         df[[i]] <- as.double(df[[i]])
       }
