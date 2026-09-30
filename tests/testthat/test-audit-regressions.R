@@ -280,7 +280,9 @@ test_that("grouped single-variable w_* results print the statistics", {
     w_mean(age, weights = sampling_weight)
   expect_true("Variable" %in% names(gw$results))
   out <- expect_no_warning(capture.output(print(gw)))
-  expect_true(any(grepl("weighted_mean", out)))
+  # (0.7.4: the uniform w_* table labels the column "Mean", not the raw
+  # result column name weighted_mean - practice-test finding DESC-18)
+  expect_true(any(grepl("Mean", out)))
   expect_true(any(grepl("52.278", out, fixed = TRUE)))
 })
 

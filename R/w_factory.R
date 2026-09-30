@@ -47,10 +47,15 @@
 #'   a double 0, which promotes the n columns to double across groups.
 #' @param vector_ok Predicate deciding whether a non-data-frame `data` is
 #'   treated as a vector in summarise context (default: numeric vectors only).
-#' @param single_var_variable_col If FALSE, single-variable results omit the
-#'   `Variable` column (legacy w_modus format).
 #' @return S3 object of class `class_name`, or scalar/named vector in
-#'   summarise context
+#'   summarise context. `$results` has one row per variable (and group):
+#'   group columns, `Variable`, the statistic (`<stat>` or
+#'   `weighted_<stat>`), `n` (valid cases; unweighted) or `weighted_n`
+#'   (sum of the weights of the valid cases) plus `effective_n` (Kish;
+#'   weighted), and `missing` (missing cases, weighted: sum of their
+#'   weights). Multi-value statistics (w_quantile) stay wide:
+#'   `<var>_<value>`, `<var>_n`, `<var>_eff_n`, `<var>_weighted_n`,
+#'   `<var>_missing`.
 #' @noRd
 .w_statistic <- function(data, ..., weights = NULL, na.rm = TRUE,
                          stat_fn, stat_name, weighted_col = NULL,
@@ -58,8 +63,7 @@
                          class_name, extra_args = list(),
                          multi_value = FALSE, value_names = NULL,
                          empty_stat = NA_real_, empty_n = 0L,
-                         vector_ok = is.numeric,
-                         single_var_variable_col = TRUE) {
+                         vector_ok = is.numeric) {
 
   # Capture the weights expression once as a quosure. Because the w_*
   # wrappers pass weights = {{ weights }}, this quosure carries the
@@ -135,13 +139,20 @@
       undefined <- !na.rm && .w_has_missing(x, w_vec)
 
       if (is.null(w_vec)) {
+        n_missing <- sum(is.na(x))
+        n_valid <- length(x) - n_missing
         if (na.rm) x <- x[!is.na(x)]
         stat_val <- if (length(x) == 0 || undefined) empty_stat else stat_fn(x, w = NULL)
-        n_val <- if (length(x) == 0) empty_n else length(x)
+        n_val <- if (n_valid == 0) empty_n else n_valid
         eff_n <- n_val
       } else {
+        # SPSS WEIGHT BY: N and Missing are sums of weights; cases without
+        # a weight count nowhere
+        has_w <- !is.na(w_vec)
+        valid <- !is.na(x) & has_w
+        n_missing <- sum(w_vec[is.na(x) & has_w])
+        sum_w <- sum(w_vec[valid])
         if (na.rm) {
-          valid <- !is.na(x) & !is.na(w_vec)
           x <- x[valid]
           w <- w_vec[valid]
         } else {
@@ -154,8 +165,8 @@
           eff_n <- 0
         } else {
           stat_val <- if (undefined) empty_stat else stat_fn(x, w = w)
-          n_val <- length(x)
-          eff_n <- .effective_n(w)
+          n_val <- sum(valid)
+          eff_n <- .effective_n(w_vec[valid])
         }
       }
 
@@ -171,6 +182,8 @@
       }
       result_cols[[paste0(var_name, "_n")]] <- n_val
       result_cols[[paste0(var_name, "_eff_n")]] <- eff_n
+      if (!is.null(w_vec)) result_cols[[paste0(var_name, "_weighted_n")]] <- sum_w
+      result_cols[[paste0(var_name, "_missing")]] <- n_missing
     }
     tibble::tibble(!!!result_cols)
   }
@@ -194,10 +207,10 @@
     results
   } else {
     .w_format_results(
-      results, var_names, weights_name, is_grouped,
+      results, var_names, weights_name,
+      group_vars = if (is_grouped) dplyr::group_vars(data) else character(0),
       weighted_col = weighted_col,
-      unweighted_col = unweighted_col,
-      single_var_variable_col = single_var_variable_col
+      unweighted_col = unweighted_col
     )
   }
 
@@ -218,191 +231,143 @@
 }
 
 
-#' Format raw w_* results into standardized output structure
+#' Format raw w_* results into the standard long format
 #'
-#' Handles multi-variable (long format) vs single-variable, and
-#' grouped vs ungrouped results.
+#' One row per variable (and group combination), the same columns for a
+#' single and for several variables: single-variable results used to carry
+#' the raw computation columns (`age`, `age_n`, `age_eff_n`) next to the
+#' formatted ones.
 #'
-#' @param results Raw tibble from computation
+#' @param results Raw tibble from computation (one row per group)
 #' @param var_names Character vector of variable names
 #' @param weights_name Weight variable name or NULL
-#' @param is_grouped Logical
+#' @param group_vars Grouping column names (character(0) when ungrouped)
 #' @param weighted_col Name for weighted statistic column
 #' @param unweighted_col Name for unweighted statistic column
-#' @param single_var_variable_col If FALSE, omit the Variable column for
-#'   single-variable results (legacy w_modus format)
 #' @return Formatted tibble
 #' @noRd
-.w_format_results <- function(results, var_names, weights_name, is_grouped,
-                              weighted_col, unweighted_col,
-                              single_var_variable_col = TRUE) {
+.w_format_results <- function(results, var_names, weights_name,
+                              group_vars = character(0),
+                              weighted_col, unweighted_col) {
+  weighted <- !is.null(weights_name)
 
-  # Factors (e.g. the mode of a factor variable) are converted to character
-  # in long format to avoid level conflicts across variables in bind_rows().
-  # No-op for numeric statistics.
-  .devalue_factor <- function(val) {
-    if (is.factor(val) || is.ordered(val)) as.character(val) else val
+  # Statistic values per variable. With several variables they share one
+  # column: factors (the mode of a factor) become character, and if the
+  # types still differ (numeric mode next to a text mode) all values are
+  # shown as text. Label classes are dropped (bare numbers).
+  vals <- lapply(var_names, function(v) {
+    val <- results[[v]]
+    if (inherits(val, "haven_labelled")) val <- .plain_numeric(val)
+    if (length(var_names) > 1 && is.factor(val)) val <- as.character(val)
+    val
+  })
+  if (length(var_names) > 1 &&
+      length(unique(vapply(vals, function(v) class(v)[1], character(1)))) > 1) {
+    vals <- lapply(vals, as.character)
   }
 
-  if (length(var_names) > 1) {
-    # Multiple variables: build long format
-    results_long <- list()
-
-    if (is_grouped) {
-      group_vars <- setdiff(names(results),
-                            c(var_names,
-                              paste0(var_names, "_n"),
-                              paste0(var_names, "_eff_n")))
-
-      group_combinations <- results[group_vars] %>% dplyr::distinct()
-
-      for (var_name in var_names) {
-        for (j in seq_len(nrow(group_combinations))) {
-          group_filter <- group_combinations[j, , drop = FALSE]
-          group_results <- results
-          for (grp in names(group_filter)) {
-            group_results <- group_results[.group_match(group_results[[grp]], group_filter[[grp]]), ]
-          }
-
-          if (nrow(group_results) > 0) {
-            row_data <- group_filter
-            row_data$Variable <- var_name
-
-            if (!is.null(weights_name)) {
-              row_data[[weighted_col]] <- .devalue_factor(group_results[[var_name]][1])
-              row_data$effective_n <- group_results[[paste0(var_name, "_eff_n")]][1]
-            } else {
-              row_data[[unweighted_col]] <- .devalue_factor(group_results[[var_name]][1])
-              row_data$n <- group_results[[paste0(var_name, "_n")]][1]
-            }
-
-            results_long[[length(results_long) + 1]] <- row_data
-          }
-        }
-      }
+  parts <- lapply(seq_along(var_names), function(i) {
+    v <- var_names[i]
+    out <- results[group_vars]
+    out$Variable <- rep(v, nrow(results))
+    if (weighted) {
+      out[[weighted_col]] <- vals[[i]]
+      out$weighted_n <- results[[paste0(v, "_weighted_n")]]
+      out$effective_n <- results[[paste0(v, "_eff_n")]]
     } else {
-      for (i in seq_along(var_names)) {
-        var_name <- var_names[i]
-        row_data <- tibble::tibble(Variable = var_name)
-
-        if (!is.null(weights_name)) {
-          row_data[[weighted_col]] <- .devalue_factor(results[[var_name]][1])
-          row_data$effective_n <- results[[paste0(var_name, "_eff_n")]][1]
-        } else {
-          row_data[[unweighted_col]] <- .devalue_factor(results[[var_name]][1])
-          row_data$n <- results[[paste0(var_name, "_n")]][1]
-        }
-
-        results_long[[i]] <- row_data
-      }
+      out[[unweighted_col]] <- vals[[i]]
+      out$n <- results[[paste0(v, "_n")]]
     }
-
-    dplyr::bind_rows(results_long)
-
-  } else {
-    # Single variable: direct column mapping. The Variable column is
-    # included here too - the grouped print path iterates over it, and
-    # omitting it made grouped single-variable results print group headers
-    # with no statistics at all (audit finding). w_modus opts out for
-    # backward compatibility (its print method handles the absence).
-    var_name <- var_names[1]
-
-    if (single_var_variable_col) {
-      results <- dplyr::mutate(results, Variable = var_name)
-    }
-
-    if (!is.null(weights_name)) {
-      results %>%
-        dplyr::mutate(
-          !!weighted_col := !!rlang::sym(var_name),
-          effective_n = !!rlang::sym(paste0(var_name, "_eff_n"))
-        )
-    } else {
-      results %>%
-        dplyr::mutate(
-          !!unweighted_col := !!rlang::sym(var_name),
-          n = !!rlang::sym(paste0(var_name, "_n"))
-        )
-    }
-  }
+    out$missing <- results[[paste0(v, "_missing")]]
+    out
+  })
+  dplyr::bind_rows(parts)
 }
 
 
 #' Generic print method for w_* statistic objects
 #'
-#' Shared print implementation used by all standard w_* functions.
+#' Shared print implementation used by all standard w_* functions (and
+#' their summary() output): one table per group with Variable, the
+#' statistic, N and Missing. With weights, N and Missing are sums of
+#' weights (display-rounded) as in SPSS; Kish's effective N is shown only
+#' by summary().
 #'
-#' @param x A w_* object
-#' @param stat_label Display name (e.g., "Mean", "Standard Deviation")
+#' @param x A w_* object (or its summary object)
+#' @param stat_label Column header for the statistic (e.g., "Mean")
 #' @param weighted_col Column name for weighted values
 #' @param unweighted_col Column name for unweighted values
 #' @param digits Number of decimal places to display (default: 3)
+#' @param effective_n Show Kish's effective N (weighted results only)?
+#' @param title Statistic name used in the title (default: stat_label)
 #' @noRd
 .print_w_statistic <- function(x, stat_label, weighted_col, unweighted_col,
-                               digits = 3) {
-  test_type <- get_standard_title(stat_label, x$weights, "Statistics")
-  print_header(test_type)
+                               digits = 3, effective_n = FALSE,
+                               title = stat_label) {
+  weighted <- !is.null(x$weights)
+  print_header(get_standard_title(title, x$weights, "Statistics"))
+  if (weighted) cat("Weights: ", x$weights, "\n", sep = "")
 
-  is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
+  stat_col <- if (weighted) weighted_col else unweighted_col
 
-  .make_output_df <- function(var_name, data_row) {
-    if (!is.null(x$weights)) {
-      data.frame(
-        Variable = var_name,
-        stat = round(data_row[[weighted_col]][1], digits),
-        Effective_N = round(data_row$effective_n[1], 1),
-        stringsAsFactors = FALSE
-      )
-    } else {
-      data.frame(
-        Variable = var_name,
-        stat = round(data_row[[unweighted_col]][1], digits),
-        N = round(data_row$n[1], 0),
-        stringsAsFactors = FALSE
-      )
-    }
+  emit <- function(rows) {
+    val <- rows[[stat_col]]
+    if (is.factor(val)) val <- as.character(val)
+    tab <- data.frame(Variable = rows$Variable, stringsAsFactors = FALSE)
+    tab[[stat_label]] <- val
+    tab$N <- if (weighted) rows$weighted_n else rows$n
+    tab$Missing <- rows$missing
+    if (weighted && effective_n) tab[["Effective N"]] <- rows$effective_n
+    .print_desc_table(tab, digits = digits, col_digits = c("Effective N" = 1))
   }
 
-  # Rename the generic "stat" column to the proper name
-  .rename_stat <- function(df) {
-    col <- if (!is.null(x$weights)) weighted_col else unweighted_col
-    names(df)[names(df) == "stat"] <- col
-    df
-  }
-
-  if (is_grouped_data) {
-    # One block per combination of ALL grouping variables (iterating over
-    # the first variable only dropped half the groups and mislabelled the
-    # rest)
-    for_each_group(x$results, x$groups, function(group_results, combo) {
-      for (var_name in unique(group_results$Variable)) {
-        var_data <- group_results[group_results$Variable == var_name, ]
-        cat(sprintf("\n--- %s ---\n", var_name))
-        print(.rename_stat(.make_output_df(var_name, var_data)), row.names = FALSE)
-      }
-    })
+  if (isTRUE(x$is_grouped)) {
+    for_each_group(x$results, x$groups, function(rows, combo) emit(rows))
   } else {
-    variables <- if ("Variable" %in% names(x$results)) {
-      unique(x$results$Variable)
-    } else {
-      x$variables
-    }
-
-    for (var_name in variables) {
-      cat(sprintf("\n--- %s ---\n", var_name))
-
-      if ("Variable" %in% names(x$results)) {
-        var_data <- x$results[x$results$Variable == var_name, ]
-      } else {
-        var_data <- x$results
-      }
-
-      print(.rename_stat(.make_output_df(var_name, var_data)), row.names = FALSE)
-    }
+    cat("\n")
+    emit(x$results)
   }
-
-  cat("\n")
+  if (weighted && effective_n) {
+    cat("  N and Missing are sums of weights; Effective N = (sum w)^2 / sum w^2 (Kish).\n")
+  }
   invisible(x)
+}
+
+
+#' Summary object for the standard w_* statistics
+#'
+#' summary() adds Kish's effective sample size to the table (weighted
+#' results) and a digits option; the statistic metadata travels with the
+#' object so print.summary.w_statistic() needs no per-class method.
+#'
+#' @noRd
+.w_summary <- function(object, stat_label, weighted_col, unweighted_col,
+                       effective_n = TRUE, digits = 3, title = stat_label) {
+  out <- build_summary_object(
+    object,
+    show = list(statistics = TRUE, effective_n = effective_n),
+    digits = digits,
+    class_name = "summary.w_statistic"
+  )
+  out$stat_info <- list(label = stat_label, weighted_col = weighted_col,
+                        unweighted_col = unweighted_col, title = title)
+  out
+}
+
+#' Print summary of a w_* statistic (detailed output)
+#'
+#' @param x A \code{summary.w_statistic} object created by
+#'   \code{summary()} on a \code{w_*} result.
+#' @param ... Additional arguments (not used).
+#' @return Invisibly returns the input object \code{x}.
+#' @export
+#' @method print summary.w_statistic
+print.summary.w_statistic <- function(x, ...) {
+  info <- x$stat_info
+  .print_w_statistic(x, info$label, info$weighted_col, info$unweighted_col,
+                     digits = x$digits,
+                     effective_n = isTRUE(x$show$effective_n),
+                     title = info$title)
 }
 
 
@@ -448,4 +413,23 @@
     "Grouping variable{?s} {.var {grp}} {?is/are} not analyzed ({?it defines/they define} the groups)."
   )
   vars
+}
+
+
+#' Percent label of a probability, with at most two decimals
+#'
+#' "33.33" for p = 1/3 instead of "33.3333333333333"; more decimals only
+#' when two requested probabilities would otherwise get the same label.
+#' Used for describe()'s Q-columns and w_quantile()'s columns.
+#'
+#' @param p Probabilities
+#' @return Character vector
+#' @noRd
+.pct_label <- function(p) {
+  pct <- p * 100
+  for (d in 2:10) {
+    nm <- as.character(round(pct, d))
+    if (!anyDuplicated(nm) || anyDuplicated(pct)) break
+  }
+  nm
 }

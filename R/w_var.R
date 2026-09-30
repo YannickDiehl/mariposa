@@ -30,7 +30,9 @@
 #'   easier to interpret the standard deviation (\code{\link{w_sd}}) instead.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents. Always less than or equal to the actual sample size.
-#' - **N**: The actual number of observations used in the calculation.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' ## When to Use This
 #'
@@ -109,4 +111,11 @@ w_var <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @method print w_var
 print.w_var <- function(x, digits = 3, ...) {
   .print_w_statistic(x, "Variance", "weighted_var", "var", digits)
+}
+
+#' @export
+#' @method summary w_var
+summary.w_var <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Variance", "weighted_var", "var",
+             effective_n = effective_n, digits = digits, title = "Variance")
 }

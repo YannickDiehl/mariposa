@@ -28,7 +28,9 @@
 #'   range indicates that at least some values are far apart.
 #' - **Effective N**: Reported when weights are provided, for consistency with
 #'   other weighted statistics.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' Note: The range is sensitive to outliers. A single extreme value can
 #' dramatically increase the range. Consider using \code{\link{w_iqr}} for a
@@ -102,4 +104,11 @@ w_range <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @method print w_range
 print.w_range <- function(x, digits = 3, ...) {
   .print_w_statistic(x, "Range", "weighted_range", "range", digits)
+}
+
+#' @export
+#' @method summary w_range
+summary.w_range <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Range", "weighted_range", "range",
+             effective_n = effective_n, digits = digits, title = "Range")
 }

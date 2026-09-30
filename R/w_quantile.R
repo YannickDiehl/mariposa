@@ -33,7 +33,9 @@
 #'   of income is 35,000, then 25% of the population earns less than that.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' Common percentiles and their meaning:
 #' - **0% (minimum)**: The smallest observed value
@@ -102,9 +104,7 @@
 w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE) {
 
   # Display labels used in data-frame mode ("Min"/"Max" instead of "0%"/"100%")
-  quantile_labels <- paste0(probs * 100, "%")
-  quantile_labels[quantile_labels == "0%"] <- "Min"
-  quantile_labels[quantile_labels == "100%"] <- "Max"
+  quantile_labels <- .w_quantile_labels(probs)
 
   # Weighted computation with zero valid observations
   empty_quantiles <- rep(NA_real_, length(probs))
@@ -151,12 +151,24 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
   }
 }
 
+#' Column labels of w_quantile() results
+#'
+#' "25%", "33.33%" (at most two decimals, see .pct_label()), "Min"/"Max"
+#' for 0 and 1.
+#' @noRd
+.w_quantile_labels <- function(probs) {
+  labels <- paste0(.pct_label(probs), "%")
+  labels[probs == 0] <- "Min"
+  labels[probs == 1] <- "Max"
+  labels
+}
+
 #' Print method for w_quantile objects
 #'
 #' @description
-#' Prints a formatted summary of weighted quantile calculations, including quantiles,
-#' sample sizes, and weights (if applicable). For grouped data, results are
-#' displayed by group.
+#' Prints one row per variable with the requested quantiles, N and Missing
+#' (with weights: sums of weights, as in SPSS). For grouped data, one table
+#' per group.
 #'
 #' @param x An object of class "w_quantile"
 #' @param digits Number of decimal places to display (default: 3)
@@ -167,83 +179,71 @@ w_quantile <- function(data, ..., weights = NULL, probs = c(0, 0.25, 0.5, 0.75, 
 #' @keywords internal
 #' @export
 print.w_quantile <- function(x, digits = 3, ...) {
-  is_weighted <- !is.null(x$weights)
+  .print_w_quantile(x, digits = digits)
+}
 
-  test_type <- get_standard_title("Quantile", x$weights, "Statistics")
-  print_header(test_type)
+#' @export
+#' @method summary w_quantile
+summary.w_quantile <- function(object, effective_n = TRUE, digits = 3, ...) {
+  build_summary_object(object,
+                       show = list(statistics = TRUE, effective_n = effective_n),
+                       digits = digits, class_name = "summary.w_quantile")
+}
 
-  # Build the per-variable display table (Variable / Quantile / Value / N /
-  # Effective_N / Weights) from the wide results columns
-  .quantile_display <- function(results) {
-    all_results <- list()
+#' Print summary of w_quantile results (with Kish's effective N)
+#'
+#' @param x A \code{summary.w_quantile} object.
+#' @param ... Additional arguments (not used).
+#' @return Invisibly returns the input object \code{x}.
+#' @export
+#' @method print summary.w_quantile
+print.summary.w_quantile <- function(x, ...) {
+  .print_w_quantile(x, digits = x$digits, effective_n = isTRUE(x$show$effective_n))
+}
 
-    for (var_name in x$variables) {
-      var_quantile_cols <- names(results)[grepl(paste0("^", var_name, "_"), names(results))]
-      var_quantile_cols <- var_quantile_cols[!grepl("_(n|eff_n)$", var_quantile_cols)]
-      if (length(var_quantile_cols) == 0) next
+#' Shared printer for w_quantile results and their summary
+#'
+#' One table (per group) with Variable, one column per quantile, N and
+#' Missing. The weights variable is named once in the header block (it was
+#' repeated on every row).
+#' @noRd
+.print_w_quantile <- function(x, digits = 3, effective_n = FALSE) {
+  weighted <- !is.null(x$weights)
+  print_header(get_standard_title("Quantile", x$weights, "Statistics"))
+  if (weighted) cat("Weights: ", x$weights, "\n", sep = "")
 
-      quantile_values <- as.numeric(results[1, var_quantile_cols])
-      quantile_names <- gsub(paste0(var_name, "_"), "", var_quantile_cols)
+  labels <- .w_quantile_labels(x$probs)
 
-      var_results <- data.frame(
-        Variable = rep(var_name, length(quantile_names)),
-        Quantile = quantile_names,
-        Value = round(quantile_values, digits),
-        stringsAsFactors = FALSE
-      )
-
-      n_col <- paste0(var_name, "_n")
-      n_eff_col <- paste0(var_name, "_eff_n")
-      if (n_col %in% names(results)) {
-        var_results$N <- rep(round(results[[n_col]][1], 1), nrow(var_results))
-      }
-      if (is_weighted && n_eff_col %in% names(results)) {
-        var_results$Effective_N <- rep(round(results[[n_eff_col]][1], 1), nrow(var_results))
-      }
-      if (!is.null(x$weights)) {
-        var_results$Weights <- rep(x$weights, nrow(var_results))
-      }
-
-      all_results[[var_name]] <- var_results
+  emit <- function(rows) {
+    tab <- data.frame(Variable = x$variables, stringsAsFactors = FALSE)
+    for (lab in labels) {
+      tab[[lab]] <- vapply(x$variables, function(v) {
+        col <- paste0(v, "_", lab)
+        if (col %in% names(rows)) as.numeric(rows[[col]][1]) else NA_real_
+      }, numeric(1))
     }
-
-    if (length(all_results) == 0) return(NULL)
-    as.data.frame(do.call(rbind, all_results))
+    get_col <- function(suffix) {
+      vapply(x$variables, function(v) {
+        col <- paste0(v, suffix)
+        if (col %in% names(rows)) as.numeric(rows[[col]][1]) else NA_real_
+      }, numeric(1))
+    }
+    tab$N <- if (weighted) get_col("_weighted_n") else get_col("_n")
+    tab$Missing <- get_col("_missing")
+    if (weighted && effective_n) tab[["Effective N"]] <- get_col("_eff_n")
+    .print_desc_table(tab, digits = digits, col_digits = c("Effective N" = 1))
   }
 
-  if (x$is_grouped) {
-    groups <- unique(x$results[x$groups])
-
-    for (i in seq_len(nrow(groups))) {
-      group_values <- groups[i, , drop = FALSE]
-
-      # Format group info with factor levels if available
-      group_info <- .format_group_label(group_values)
-
-      group_results <- x$results
-      for (g in names(group_values)) {
-        group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
-      }
-      if (nrow(group_results) == 0) next
-
-      cat(sprintf("\nGroup: %s\n", group_info))
-
-      results_df_print <- .quantile_display(group_results)
-      if (!is.null(results_df_print)) {
-        print_separator(get_table_width(results_df_print))
-        print(results_df_print, row.names = FALSE)
-        print_separator(get_table_width(results_df_print))
-      }
-    }
+  if (isTRUE(x$is_grouped)) {
+    for_each_group(x$results, x$groups, function(rows, combo) emit(rows))
   } else {
-    results_df_print <- .quantile_display(x$results)
-    if (!is.null(results_df_print)) {
-      print(results_df_print, row.names = FALSE)
-      print_separator(get_table_width(results_df_print))
-    } else {
-      cat("No results to display.\n")
-      cat("------------------------\n")
-    }
+    cat("\n")
+    emit(x$results)
+  }
+  if (weighted && effective_n) {
+    cat("  N and Missing are sums of weights; Effective N = (sum w)^2 / sum w^2 (Kish).\n")
   }
   invisible(x)
 }
+
+

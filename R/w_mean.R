@@ -30,7 +30,9 @@
 #'
 #' - **Weighted Mean**: The population-representative average
 #' - **Effective N**: How many independent observations your weighted data represents
-#' - **N**: Actual number of observations used
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' ## Formula
 #'
@@ -97,4 +99,11 @@ w_mean <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @method print w_mean
 print.w_mean <- function(x, digits = 3, ...) {
   .print_w_statistic(x, "Mean", "weighted_mean", "mean", digits)
+}
+
+#' @export
+#' @method summary w_mean
+summary.w_mean <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Mean", "weighted_mean", "mean",
+             effective_n = effective_n, digits = digits, title = "Mean")
 }

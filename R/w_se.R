@@ -28,7 +28,9 @@
 #'   interval as: weighted mean +/- 1.96 * weighted SE.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents. Weights that vary a lot reduce effective N, increasing the SE.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' ## When to Use This
 #'
@@ -100,5 +102,13 @@ w_se <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @export
 #' @method print w_se
 print.w_se <- function(x, digits = 3, ...) {
-  .print_w_statistic(x, "Standard Error", "weighted_se", "se", digits)
+  .print_w_statistic(x, "SE", "weighted_se", "se", digits,
+                     title = "Standard Error")
+}
+
+#' @export
+#' @method summary w_se
+summary.w_se <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "SE", "weighted_se", "se",
+             effective_n = effective_n, digits = digits, title = "Standard Error")
 }

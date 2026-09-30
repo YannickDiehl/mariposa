@@ -35,7 +35,9 @@
 #'   - Values beyond 2 or below -2 indicate notable departure from normality
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' Kurtosis is often checked together with skewness to assess normality. Both
 #' should be close to zero for normally distributed data.
@@ -121,5 +123,14 @@ w_kurtosis <- function(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE) {
 #' @method print w_kurtosis
 print.w_kurtosis <- function(x, digits = 3, ...) {
   kurtosis_type <- if (x$excess) "Excess Kurtosis" else "Kurtosis"
-  .print_w_statistic(x, kurtosis_type, "weighted_kurtosis", "kurtosis", digits)
+  .print_w_statistic(x, "Kurtosis", "weighted_kurtosis", "kurtosis", digits,
+                     title = kurtosis_type)
+}
+
+#' @export
+#' @method summary w_kurtosis
+summary.w_kurtosis <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Kurtosis", "weighted_kurtosis", "kurtosis",
+             effective_n = effective_n, digits = digits,
+             title = if (isTRUE(object$excess)) "Excess Kurtosis" else "Kurtosis")
 }

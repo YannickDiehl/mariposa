@@ -31,7 +31,9 @@
 #'   - Beyond -1 or 1: Highly skewed
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' High skewness suggests you might want to use the median instead of the mean
 #' as a measure of center, and non-parametric tests instead of t-tests.
@@ -113,4 +115,11 @@ w_skew <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @method print w_skew
 print.w_skew <- function(x, digits = 3, ...) {
   .print_w_statistic(x, "Skewness", "weighted_skew", "skew", digits)
+}
+
+#' @export
+#' @method summary w_skew
+summary.w_skew <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Skewness", "weighted_skew", "skew",
+             effective_n = effective_n, digits = digits, title = "Skewness")
 }

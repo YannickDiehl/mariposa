@@ -38,3 +38,14 @@
   The print iterated over the first grouping variable only: region x
   gender showed two blocks labelled "region = East"/"West" that silently
   contained the Male rows.
+* The `w_*` functions print one uniform table: Variable, the statistic,
+  N and Missing, one table per group. The prints used to differ across the
+  family (raw column names such as `weighted_mean`/`Effective_N` under
+  "--- var ---" headers, `w_modus()` as a raw tibble, `w_quantile()`
+  repeating the weights name on every row). With weights, N and Missing
+  are sums of weights as in SPSS; Kish's effective N (previously the only
+  N shown) is displayed by the new `summary()` methods for all eleven
+  `w_*` classes. `$results` has the same columns for one or several
+  variables (`Variable`, the statistic, `n` or `weighted_n` +
+  `effective_n`, `missing`); single-variable results no longer carry the
+  duplicated raw columns (`age`, `age_n`, `age_eff_n`).

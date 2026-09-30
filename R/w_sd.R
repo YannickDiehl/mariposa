@@ -29,7 +29,9 @@
 #'   68% of your population falls within one SD of the weighted mean.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents. Always less than or equal to the actual sample size.
-#' - **N**: The actual number of observations used in the calculation.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' A large difference between weighted and unweighted SD suggests that the
 #' variability in your sample does not accurately reflect the population.
@@ -106,5 +108,13 @@ w_sd <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @export
 #' @method print w_sd
 print.w_sd <- function(x, digits = 3, ...) {
-  .print_w_statistic(x, "Standard Deviation", "weighted_sd", "sd", digits)
+  .print_w_statistic(x, "SD", "weighted_sd", "sd", digits,
+                     title = "Standard Deviation")
+}
+
+#' @export
+#' @method summary w_sd
+summary.w_sd <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "SD", "weighted_sd", "sd",
+             effective_n = effective_n, digits = digits, title = "Standard Deviation")
 }

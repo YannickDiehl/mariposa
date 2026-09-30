@@ -32,7 +32,9 @@
 #'   have the largest total weight.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' If multiple values share the highest weighted frequency (ties), the first
 #' value encountered is returned.
@@ -104,9 +106,7 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
     empty_n = 0,
     # The mode accepts any vector type in summarise context (factor,
     # character, ...), not just numeric
-    vector_ok = function(x) TRUE,
-    # Historic w_modus results carry no Variable column for a single variable
-    single_var_variable_col = FALSE
+    vector_ok = function(x) TRUE
   )
 }
 
@@ -148,79 +148,12 @@ w_modus <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @export
 #' @method print w_modus
 print.w_modus <- function(x, digits = 3, ...) {
-  test_type <- get_standard_title("Mode", x$weights, "Statistics")
-  print_header(test_type)
+  .print_w_statistic(x, "Mode", "weighted_mode", "mode", digits)
+}
 
-  is_grouped_data <- !is.null(x$is_grouped) && x$is_grouped
-
-  if (is_grouped_data) {
-    # One block per combination of ALL grouping variables (the first
-    # grouping variable alone dropped/mislabelled groups)
-    for_each_group(x$results, x$groups, function(group_results, combo) {
-      print_df <- group_results
-      if (!is.null(x$weights)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "weighted_mode", "effective_n")))
-        if (is.numeric(print_df$weighted_mode)) {
-          print_df$weighted_mode <- round(print_df$weighted_mode, digits)
-        }
-        print_df$effective_n <- round(print_df$effective_n, 1)
-      } else {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "mode", "n")))
-        if (is.numeric(print_df$mode)) {
-          print_df$mode <- round(print_df$mode, digits)
-        }
-      }
-
-      print(print_df, row.names = FALSE)
-    })
-  } else {
-    # Handle ungrouped results
-    print_df <- x$results
-
-    if (!is.null(x$weights)) {
-      if ("Variable" %in% names(print_df)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "weighted_mode", "effective_n")))
-      } else {
-        mode_val <- print_df$weighted_mode[1]
-        if (is.numeric(mode_val)) {
-          mode_val <- round(mode_val, digits)
-        }
-        print_df <- tibble::tibble(
-          Variable = x$variables[1],
-          weighted_mode = mode_val,
-          effective_n = round(print_df$effective_n[1], 1)
-        )
-      }
-      if (is.numeric(print_df$weighted_mode)) {
-        print_df$weighted_mode <- round(print_df$weighted_mode, digits)
-      }
-      print_df$effective_n <- round(print_df$effective_n, 1)
-    } else {
-      if ("Variable" %in% names(print_df)) {
-        print_df <- print_df %>%
-          dplyr::select(dplyr::any_of(c("Variable", "mode", "n")))
-      } else {
-        mode_val <- print_df$mode[1]
-        if (is.numeric(mode_val)) {
-          mode_val <- round(mode_val, digits)
-        }
-        print_df <- tibble::tibble(
-          Variable = x$variables[1],
-          mode = mode_val,
-          n = round(print_df$n[1], 0)
-        )
-      }
-      if (is.numeric(print_df$mode)) {
-        print_df$mode <- round(print_df$mode, digits)
-      }
-    }
-
-    print(print_df, row.names = FALSE)
-  }
-
-  cat("\n")
-  invisible(x)
+#' @export
+#' @method summary w_modus
+summary.w_modus <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Mode", "weighted_mode", "mode",
+             effective_n = effective_n, digits = digits)
 }

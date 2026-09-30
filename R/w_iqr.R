@@ -26,7 +26,9 @@
 #'   population. A larger IQR means more spread in the central part of the data.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' The IQR is especially useful when your data is skewed. For example, with
 #' income data, the IQR gives a better sense of "typical spread" than the SD
@@ -117,5 +119,13 @@ w_iqr <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @export
 #' @method print w_iqr
 print.w_iqr <- function(x, digits = 3, ...) {
-  .print_w_statistic(x, "Interquartile Range", "weighted_iqr", "iqr", digits)
+  .print_w_statistic(x, "IQR", "weighted_iqr", "iqr", digits,
+                     title = "Interquartile Range")
+}
+
+#' @export
+#' @method summary w_iqr
+summary.w_iqr <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "IQR", "weighted_iqr", "iqr",
+             effective_n = effective_n, digits = digits, title = "Interquartile Range")
 }

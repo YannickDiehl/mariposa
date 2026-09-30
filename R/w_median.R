@@ -26,7 +26,9 @@
 #'   50% of the population (by weight) falls below this value, 50% above.
 #' - **Effective N**: How many independent observations your weighted data
 #'   represents.
-#' - **N**: The actual number of observations used.
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as SPSS reports them under
+#'   \code{WEIGHT BY}; Kish's effective N is shown by \code{summary()}.
 #'
 #' Comparing the weighted median to the weighted mean is informative:
 #' - If they are similar, the distribution is roughly symmetric.
@@ -109,4 +111,11 @@ w_median <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @method print w_median
 print.w_median <- function(x, digits = 3, ...) {
   .print_w_statistic(x, "Median", "weighted_median", "median", digits)
+}
+
+#' @export
+#' @method summary w_median
+summary.w_median <- function(object, effective_n = TRUE, digits = 3, ...) {
+  .w_summary(object, "Median", "weighted_median", "median",
+             effective_n = effective_n, digits = digits, title = "Median")
 }

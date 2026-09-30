@@ -37,7 +37,7 @@ test_that("DESC-02: na.rm = FALSE gives NA for every statistic, never a crash", 
                           na.rm = FALSE)$results$weighted_iqr))
   q <- expect_no_error(w_quantile(survey_data, income, na.rm = FALSE))
   q_cols <- setdiff(grep("^income_", names(q$results), value = TRUE),
-                    c("income_n", "income_eff_n"))
+                    paste0("income_", c("n", "eff_n", "weighted_n", "missing")))
   expect_true(all(is.na(unlist(q$results[q_cols]))))
 
   r_u <- expect_no_error(describe(survey_data, income, na.rm = FALSE, show = "all"))
@@ -213,4 +213,64 @@ test_that("DESC-01: w_* print shows every combination of two group_by variables"
   out_m <- capture.output(print(w_modus(g, education, weights = sampling_weight)))
   expect_length(grep("^Group:", out_m), 4L)
   expect_true(any(grepl("region = West, gender = Female", out_m)))
+})
+
+
+# --- DESC-18 / DESC-13: uniform w_* print, N = sum of weights, summary() ------
+
+test_that("DESC-18/DESC-13: the w_* family prints one uniform table", {
+  # The prints differed across the family: raw column names
+  # (weighted_mean, Effective_N) under "--- var ---" headers, w_modus as a
+  # raw "# A tibble", w_quantile repeating the weights name on every row.
+  # Weighted results showed Kish's effective N instead of SPSS's
+  # N = sum of weights and no Missing; summary() fell back to
+  # summary.default.
+  fns <- list(w_mean = w_mean, w_median = w_median, w_sd = w_sd,
+              w_var = w_var, w_se = w_se, w_range = w_range, w_iqr = w_iqr,
+              w_skew = w_skew, w_kurtosis = w_kurtosis, w_modus = w_modus)
+  for (nm in names(fns)) {
+    f <- fns[[nm]]
+    for (wt in c(FALSE, TRUE)) {
+      r <- if (wt) f(survey_data, age, income, weights = sampling_weight)
+           else f(survey_data, age, income)
+      out <- capture.output(print(r))
+      info <- paste(nm, if (wt) "weighted" else "unweighted")
+      expect_false(any(grepl("weighted_|Effective|effective_n|# A tibble|^--- ",
+                             out)), info = info)
+      hdr <- out[grepl("^\\s*Variable\\s", out)]
+      expect_length(hdr, 1L)
+      expect_true(grepl("\\sN\\s", hdr) && grepl("Missing", hdr), info = info)
+      inc <- out[grepl("^\\s*income\\s", out)]
+      if (wt) {
+        expect_true(grepl(" 2201 ", inc) && grepl(" 315$", inc), info = info)
+      } else {
+        expect_true(grepl(" 2186 ", inc) && grepl(" 314$", inc), info = info)
+      }
+      s <- summary(r)
+      expect_s3_class(s, "summary.w_statistic")
+      out_s <- capture.output(print(s))
+      expect_equal(any(grepl("Effective N", out_s)), wt, info = info)
+    }
+  }
+
+  q <- w_quantile(survey_data, age, income, weights = sampling_weight)
+  out_q <- capture.output(print(q))
+  expect_equal(sum(grepl("sampling_weight", out_q)), 1L)   # named once
+  hdr_q <- out_q[grepl("^\\s*Variable\\s", out_q)]
+  expect_true(grepl("Min", hdr_q) && grepl("25%", hdr_q) && grepl("Missing", hdr_q))
+  expect_true(any(grepl("^\\s*income\\s.* 2201 ", out_q)))
+  expect_s3_class(summary(q), "summary.w_quantile")
+  expect_true(any(grepl("Effective N", capture.output(print(summary(q))))))
+
+  # Single-variable results carry the same columns as multi-variable ones
+  # (no duplicated raw columns income/income_n/income_eff_n)
+  expect_named(w_mean(survey_data, age)$results,
+               c("Variable", "mean", "n", "missing"))
+  r1w <- w_mean(survey_data, income, weights = sampling_weight)$results
+  expect_named(r1w, c("Variable", "weighted_mean", "weighted_n",
+                      "effective_n", "missing"))
+  expect_equal(round(r1w$weighted_n), 2201)
+  expect_equal(round(r1w$missing), 315)
+  expect_named(w_modus(survey_data, gender)$results,
+               c("Variable", "mode", "n", "missing"))
 })

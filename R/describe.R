@@ -440,7 +440,7 @@ print.summary.describe <- function(x, ...) {
   output_df <- .create_output_df(x$results, x$variables, x$show, is_weighted,
                                  digits = digits, probs = x$probs)
   cat("\n")
-  .print_describe_table(output_df, digits = digits)
+  .print_desc_table(output_df, digits = digits)
 }
 
 #' Print results for grouped data
@@ -451,7 +451,7 @@ print.summary.describe <- function(x, ...) {
   for_each_group(x$results, x$group_vars, function(group_data, combo) {
     temp_output <- .create_output_df(group_data, x$variables, x$show, is_weighted,
                                      digits = digits, probs = x$probs)
-    .print_describe_table(temp_output, digits = digits)
+    .print_desc_table(temp_output, digits = digits)
   })
 }
 
@@ -522,36 +522,38 @@ print.summary.describe <- function(x, ...) {
   return(output_df)
 }
 
-#' Print the describe() statistics table
+#' Print a descriptive statistics table (describe() and the w_* family)
 #'
 #' Bordered table sized to its content (the borders used to be a fixed 40
 #' dashes). Statistics use one decimal policy per column (fmt_num), N and
 #' Missing are whole numbers (sums of weights are display-rounded, as in
-#' SPSS). A table wider than the console is split into column blocks that
-#' each repeat the Variable column (print.data.frame's own wrapping lost
-#' it).
+#' SPSS). Text columns are left-aligned, numbers right-aligned. A table
+#' wider than the console is split into column blocks that each repeat the
+#' first (Variable) column (print.data.frame's own wrapping lost it).
 #'
-#' @param df Data frame from .create_output_df()
+#' @param df Data frame; first column is the row label
 #' @param digits Decimal places for the statistics
 #' @param width Console width
+#' @param col_digits Named integer vector overriding `digits` per column
 #' @noRd
-.print_describe_table <- function(df, digits = 3, width = getOption("width", 80)) {
+.print_desc_table <- function(df, digits = 3, width = getOption("width", 80),
+                              col_digits = NULL) {
   if (is.null(df) || nrow(df) == 0) return(invisible(NULL))
 
   count_cols <- c("N", "Missing")
   cells <- lapply(names(df), function(nm) {
     v <- df[[nm]]
-    if (nm == "Variable") {
-      as.character(v)
-    } else if (nm %in% count_cols) {
+    if (nm %in% count_cols) {
       ifelse(is.na(v), "", sprintf("%.0f", round(v)))
     } else if (is.numeric(v)) {
-      fmt_num(v, digits)
+      d <- if (!is.null(col_digits) && nm %in% names(col_digits)) col_digits[[nm]] else digits
+      fmt_num(v, d)
     } else {
       ifelse(is.na(v), "", as.character(v))
     }
   })
   names(cells) <- names(df)
+  is_text <- vapply(df, function(v) !is.numeric(v), logical(1))
   col_w <- vapply(names(df), function(nm) {
     max(nchar(nm, type = "width"), nchar(cells[[nm]], type = "width"), 1L)
   }, integer(1))
@@ -585,7 +587,7 @@ print.summary.describe <- function(x, ...) {
     line_for <- function(values) {
       parts <- vapply(seq_along(cols), function(k) {
         j <- cols[k]
-        pad_utf8(values[k], col_w[[j]], align = if (j == 1L) "left" else "right")
+        pad_utf8(values[k], col_w[[j]], align = if (is_text[[j]]) "left" else "right")
       }, character(1))
       paste0(indent, paste(parts, collapse = strrep(" ", gap)))
     }
@@ -615,10 +617,5 @@ print.summary.describe <- function(x, ...) {
 #' @return Character vector
 #' @noRd
 .desc_quantile_name <- function(p) {
-  pct <- p * 100
-  for (d in 2:10) {
-    nm <- as.character(round(pct, d))
-    if (!anyDuplicated(nm) || anyDuplicated(pct)) break
-  }
-  paste0("Q", nm)
+  paste0("Q", .pct_label(p))
 }
