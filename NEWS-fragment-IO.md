@@ -34,3 +34,16 @@
   in code order. Values without a label keep their code as level name
   instead of becoming `NA`, and duplicate label texts are disambiguated by
   their code.
+* `rec(rules = "rev")` reverses on the scale range instead of the observed
+  range. It computed `max(x) + min(x) - x` over the data, so a 1-5 item
+  answered only with 2-5 became 5..2 instead of 4..1, and the value labels
+  were mirrored to codes that do not exist. The range now comes from the
+  value labels of the valid codes (together with the observed values);
+  without labels the observed range is used with a message, and the new
+  syntax `rules = "rev(1, 5)"` sets the range explicitly (values outside it
+  are reported).
+* `rec()` on `haven_labelled_spss` vectors (`haven::read_sav(user_na =
+  TRUE)`) treats the user-missing codes as missing: they were reversed or
+  recoded like valid values and lost their codes and labels. The input is
+  converted to the tagged-NA form of `read_spss()` first. `val_labels` is
+  honoured with `rules = "rev"` (it was silently ignored).

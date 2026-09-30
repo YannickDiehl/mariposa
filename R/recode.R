@@ -63,6 +63,7 @@
 #'   \code{"copy"}         \tab Keep original value      \tab \code{"1:3=copy; else=NA"} \cr
 #'   \code{"min"/"max"}    \tab Dynamic boundaries       \tab \code{"min:3=1; 4:max=2"} \cr
 #'   \code{"rev"}          \tab Reverse scale            \tab \code{"rev"} \cr
+#'   \code{"rev(lo, hi)"}  \tab Reverse a lo-hi scale    \tab \code{"rev(1, 5)"} \cr
 #'   \code{"dicho"}        \tab Median split             \tab \code{"dicho"} \cr
 #'   \code{"dicho(x)"}     \tab Fixed cut-point          \tab \code{"dicho(3)"} \cr
 #'   \code{"mean"}         \tab Mean split               \tab \code{"mean"} \cr
@@ -80,6 +81,10 @@
 #' \code{"else=..."} rule recodes them, like SPSS's \code{RECODE} keeps
 #' user-missing codes. \code{\link{na_frequencies}()}, \code{frequency()}
 #' and \code{\link{write_spss}()} therefore still see them on the result.
+#' A \code{haven_labelled_spss} vector (from
+#' \code{haven::read_sav(user_na = TRUE)}) is first converted to this
+#' tagged-NA form, so its user-missing codes are neither reversed nor
+#' recoded as valid values.
 #'
 #' ## Decimal Values
 #'
@@ -102,8 +107,14 @@
 #'
 #' ## Special Modes
 #'
-#' \code{"rev"} reverses the scale by computing
-#' \code{max(x) + min(x) - x}. Value labels are mirrored accordingly.
+#' \code{"rev"} reverses the scale by computing \code{hi + lo - x}. The
+#' scale range \code{lo}-\code{hi} is taken from the value labels of the
+#' valid codes (together with the observed values), so an item answered
+#' only with 2-5 on a labelled 1-5 scale becomes 4-1, not 5-2. Without
+#' value labels the observed minimum and maximum are used and a message
+#' says so; set the range explicitly with \code{"rev(lo, hi)"}, e.g.
+#' \code{rules = "rev(1, 5)"}. Value labels are mirrored accordingly;
+#' missing values keep their type.
 #'
 #' \code{"dicho"} dichotomizes at the median: values \eqn{\le} median become 0,
 #' values \eqn{>} median become 1.
@@ -128,7 +139,7 @@
 #'
 #' # Reverse a scale (with suffix to keep original)
 #' data <- rec(survey_data, trust_government, trust_media,
-#'             rules = "rev", suffix = "_r")
+#'             rules = "rev(1, 5)", suffix = "_r")
 #'
 #' # Dichotomize at the median
 #' data <- rec(survey_data, age, rules = "dicho", suffix = "_d")
@@ -179,7 +190,8 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
       cli::cli_abort("{.arg data} must be a data frame, vector, or factor.")
     }
     return(.rec_vec(data, rules = rules, as_factor = as_factor,
-                    var_label = var_label, val_labels = val_labels))
+                    var_label = var_label, val_labels = val_labels,
+                    var_name = sub(".*\\$", "", deparse(substitute(data))[1])))
   }
 
   # ============================================================================
@@ -195,7 +207,8 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
   for (i in vars) {
     col_name <- names(data)[i]
     result <- .rec_vec(data[[i]], rules = rules, as_factor = as_factor,
-                       var_label = var_label, val_labels = val_labels)
+                       var_label = var_label, val_labels = val_labels,
+                       var_name = col_name)
 
     out_name <- if (!is.null(suffix)) paste0(col_name, suffix) else col_name
     data[[out_name]] <- result
@@ -211,10 +224,19 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 
 #' @noRd
 .rec_vec <- function(x, rules, as_factor = FALSE, var_label = NULL,
-                     val_labels = NULL) {
+                     val_labels = NULL, var_name = "x") {
 
   if (!is.character(rules) || length(rules) != 1L) {
     cli::cli_abort("{.arg rules} must be a single character string.")
+  }
+
+  # haven_labelled_spss (haven::read_sav(user_na = TRUE)): user-missing
+  # codes are ordinary values there. Convert to the tagged-NA form of
+  # read_spss() so they stay missing (not reversed or recoded as valid
+  # values) and keep their codes and labels for na_frequencies() and
+  # write_spss().
+  if (inherits(x, "haven_labelled_spss")) {
+    x <- .tag_spss_missing_values(tibble::tibble(x = x), verbose = FALSE)$x
   }
 
   # Preserve variable label
@@ -240,8 +262,22 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
     stats::setNames(as.numeric(names(val_labels)), unname(val_labels))
   }
 
-  if (rules_trimmed == "rev") {
-    result <- .apply_rev(x)
+  rev_match <- regmatches(
+    rules_trimmed,
+    regexec("^rev(\\(\\s*([^,]*?)\\s*,\\s*([^)]*?)\\s*\\))?$", rules_trimmed)
+  )[[1]]
+  if (length(rev_match) > 0L) {
+    bounds <- NULL
+    if (nzchar(rev_match[2])) {
+      bounds <- suppressWarnings(as.numeric(rev_match[3:4]))
+      if (anyNA(bounds) || bounds[1] >= bounds[2]) {
+        cli::cli_abort(c(
+          "Invalid scale range in {.val {rules}}.",
+          "i" = "Use {.code rev(lo, hi)} with numbers lo < hi, e.g. {.code rules = \"rev(1, 5)\"}."
+        ))
+      }
+    }
+    result <- .apply_rev(x, bounds = bounds, var_name = var_name)
     return(finish(result, explicit_labels %||% attr(result, "labels")))
   }
 
@@ -536,26 +572,80 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 # ============================================================================
 
 #' @noRd
-.apply_rev <- function(x) {
+.apply_rev <- function(x, bounds = NULL, var_name = "x") {
   x_num <- .rec_numeric(x)
-  x_min <- min(x_num, na.rm = TRUE)
-  x_max <- max(x_num, na.rm = TRUE)
+  valid_labels <- .valid_value_labels(x)
+  observed <- range(x_num, na.rm = TRUE, finite = TRUE)
+  if (all(is.na(x_num))) observed <- c(NA_real_, NA_real_)
+
+  if (!is.null(bounds)) {
+    # Explicit scale range: rev(lo, hi)
+    lo <- bounds[1]
+    hi <- bounds[2]
+    outside <- sort(unique(x_num[!is.na(x_num) & (x_num < lo | x_num > hi)]))
+    if (length(outside) > 0L) {
+      cli::cli_warn(c(
+        "{.var {var_name}} has value{?s} outside the scale range {lo}-{hi}: {outside}.",
+        "i" = "They are reversed as well ({lo} + {hi} - x); recode them first (e.g. to {.val NA}) if they are not part of the scale."
+      ))
+    }
+  } else if (length(valid_labels) > 0L) {
+    # Scale range: the labelled codes (the questionnaire's scale points)
+    # together with the observed values. The observed range alone reversed
+    # a 1-5 item answered only with 2-5 as 5..2 instead of 4..1.
+    rng <- range(c(unname(valid_labels), observed), na.rm = TRUE)
+    lo <- rng[1]
+    hi <- rng[2]
+    if (!isTRUE(all(observed == rng))) {
+      cli::cli_inform(c(
+        "i" = "Reversing {.var {var_name}} on the scale {lo}-{hi} defined by its value labels (observed {observed[1]}-{observed[2]})."
+      ))
+    }
+  } else {
+    lo <- observed[1]
+    hi <- observed[2]
+    if (!is.na(lo)) {
+      cli::cli_inform(c(
+        "i" = "Reversing {.var {var_name}} around its observed range {lo}-{hi} (no value labels define the scale).",
+        " " = "Set the scale range explicitly if it differs, e.g. {.code rules = \"rev(1, 5)\"}."
+      ))
+    }
+  }
 
   # Arithmetic keeps the tagged-NA payloads (missing types) of x
-  result <- x_max + x_min - x_num
+  result <- if (is.na(lo)) x_num else hi + lo - x_num
 
   # Mirror the valid value labels (missing labels are re-attached by
   # .with_label_meta())
-  old_labels <- attr(x, "labels", exact = TRUE)
-  if (!is.null(old_labels)) {
-    valid_labels <- old_labels[!is.na(old_labels)]
+  if (length(valid_labels) > 0L && !is.na(lo)) {
     attr(result, "labels") <- stats::setNames(
-      x_max + x_min - as.double(.plain_numeric(valid_labels)),
-      names(valid_labels)
+      hi + lo - unname(valid_labels), names(valid_labels)
     )
   }
 
   result
+}
+
+
+#' Value labels of the valid (non-missing) codes
+#'
+#' Drops tagged-NA label entries and codes declared missing (na_tag_map,
+#' or na_values / na_range of a haven_labelled_spss vector).
+#' @noRd
+.valid_value_labels <- function(x) {
+  labels <- attr(x, "labels", exact = TRUE)
+  if (is.null(labels) || !is.numeric(labels)) return(NULL)
+  vals <- as.double(.plain_numeric(labels))
+  keep <- !is.na(vals)
+  tag_map <- attr(x, "na_tag_map", exact = TRUE)
+  if (is.numeric(tag_map)) keep <- keep & !(vals %in% unname(tag_map))
+  na_values <- attr(x, "na_values", exact = TRUE)
+  if (!is.null(na_values)) keep <- keep & !(vals %in% na_values)
+  na_range <- attr(x, "na_range", exact = TRUE)
+  if (length(na_range) == 2L) {
+    keep <- keep & !(vals >= na_range[1] & vals <= na_range[2])
+  }
+  stats::setNames(vals[keep], names(labels)[keep])
 }
 
 

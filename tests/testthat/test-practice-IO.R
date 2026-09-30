@@ -183,3 +183,62 @@ test_that("IO-19: rec(as_factor = TRUE) uses the result's value labels", {
            val_labels = c("1" = "one"))
   expect_false(anyNA(h))
 })
+
+# SCALE-08 (= IO-06): rec(rules = "rev") reversed around the OBSERVED
+# min/max: c(2, 3, 4, 5) on a 1-5 scale gave 5 4 3 2, labels were mirrored
+# to codes that do not exist.
+test_that("SCALE-08: rev uses the scale range of the value labels", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(2, 3, 4, 5, NA),
+                       labels = c("low" = 1, "high" = 5))
+  r <- rec(x, rules = "rev")
+  expect_equal(as.numeric(r), c(4, 3, 2, 1, NA))
+  expect_equal(attr(r, "labels"), c(low = 5, high = 1))
+  # imported item: missing labels (tagged) do not widen the range
+  y <- set_na(haven::labelled(c(2, 3, 7, -9),
+                              labels = c("none" = 1, "all" = 7,
+                                         "no answer" = -9)), -9)
+  ry <- rec(y, rules = "rev")
+  expect_equal(as.numeric(ry)[1:3], c(6, 5, 1))
+})
+
+test_that("SCALE-08: explicit rev(lo, hi) and message for the observed range", {
+  expect_message(r <- rec(c(2, 3, 4, 5, NA), rules = "rev"),
+                 "observed range")
+  expect_equal(as.numeric(r), c(5, 4, 3, 2, NA))
+  expect_no_message(r2 <- rec(c(2, 3, 4, 5, NA), rules = "rev(1, 5)"))
+  expect_equal(as.numeric(r2), c(4, 3, 2, 1, NA))
+  expect_warning(rec(c(1, 9), rules = "rev(1, 5)"), "outside")
+  expect_error(rec(c(1, 2), rules = "rev(5, 1)"), "rev")
+  d <- rec(data.frame(q = c(2, 3, 4)), q, rules = "rev(1, 5)")
+  expect_equal(d$q, c(4, 3, 2))
+})
+
+# SCALE-09: rec() on haven_labelled_spss items (haven::read_sav(user_na =
+# TRUE)) dropped the class, the missing codes and their labels, and
+# reversed around the missing codes; val_labels = was ignored with "rev".
+test_that("SCALE-09: rec() on haven_labelled_spss keeps the missing codes", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled_spss(c(1, 2, 3, -9, 5),
+                            labels = c("low" = 1, "high" = 5,
+                                       "no answer" = -9),
+                            na_values = -9, label = "Item")
+  r <- rec(x, rules = "rev")
+  expect_equal(as.numeric(r)[c(1, 2, 3, 5)], c(5, 4, 3, 1))
+  expect_true(is.na(r[4]))
+  nf <- na_frequencies(r)
+  expect_equal(nf$code[!is.na(nf$tag)], "-9")
+  tf <- tempfile(fileext = ".sav")
+  on.exit(unlink(tf))
+  suppressMessages(write_spss(data.frame(r = r), tf))
+  back <- haven::read_sav(tf, user_na = TRUE)
+  expect_equal(attr(back$r, "na_values"), -9)
+  expect_equal(as.numeric(unclass(back$r)), c(5, 4, 3, -9, 1))
+})
+
+test_that("SCALE-09: val_labels are honoured with rules = 'rev'", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(1, 2, 5), labels = c("a" = 1, "e" = 5))
+  r <- rec(x, rules = "rev", val_labels = c("1" = "viel", "5" = "wenig"))
+  expect_equal(attr(r, "labels"), c(viel = 1, wenig = 5))
+})
