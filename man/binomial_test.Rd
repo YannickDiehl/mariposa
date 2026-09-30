@@ -13,8 +13,10 @@ binomial_test(data, ..., p = 0.5, weights = NULL, conf.level = 0.95)
 categories (e.g., Yes/No, Male/Female, 0/1, TRUE/FALSE)}
 
 \item{p}{The hypothesized proportion to test against (Default: 0.50 = 50 percent).
-This refers to the proportion of the first category (first factor level,
-or the lower numeric value).}
+It refers to Group 1, the category of the first valid case in the data
+(as in SPSS). With 0.5 the test is two-tailed; with any other value it
+is one-tailed in the direction of the observed proportion, as SPSS
+reports it.}
 
 \item{weights}{Optional survey weights for population-representative results}
 
@@ -26,8 +28,9 @@ including:
 \itemize{
 \item Category counts and observed proportions
 \item Test proportion (null hypothesis)
-\item Exact p-value (two-sided)
-\item Confidence interval for the true proportion
+\item Exact p-value (two-tailed for \code{p = 0.5}, otherwise one-tailed;
+column \code{alternative}: "two.sided", "less" or "greater")
+\item Confidence interval for the true proportion of Group 1 (Clopper-Pearson)
 }
 }
 \description{
@@ -87,8 +90,20 @@ Use the binomial test when:
 Use \code{\link{chi_square}()} instead
 \item For comparing proportions between groups:
 Use chi-square or z-test for proportions
-\item For larger samples with normal approximation:
+\item For larger samples with normal approximation: results will be very
+similar to a one-sample z-test for proportions
 }
+}
+
+\subsection{Group 1 and one-tailed tests}{
+
+As in SPSS \code{NPAR TESTS /BINOMIAL}, Group 1 is the category of the
+first valid case in the data (per group with \code{group_by()}), and
+\code{p} is its hypothesized proportion. For \code{p = 0.5} the p-value
+is two-tailed. For any other \code{p} SPSS reports a one-tailed p-value
+in the direction of the observed proportion ("the proportion of cases in
+the first group < p"); \code{binomial_test()} does the same. To test the
+other category, put a case of it first or use \code{1 - p}.
 }
 
 \subsection{Weighted variants}{
@@ -98,8 +113,6 @@ no SPSS reference. The weighted variant is an R-only frequency-weight
 extension that reduces exactly to the unweighted test when all weights
 equal 1 (enforced by an internal invariance suite); see
 \code{vignette("spss-compatibility")} for validation status.
-
-Results will be very similar to a one-sample z-test for proportions
 }
 }
 \examples{

@@ -753,3 +753,58 @@ test_that("NP-23 cramers_v on a large table is fast", {
   expect_lt(elapsed, 10)
   expect_true(is.finite(v))
 })
+
+# --- 0.7.4 audit: binomial_test() Group 1 and one-tailed p ---------------------
+
+test_that("binomial_test p-values and CI equal stats::binom.test", {
+  # The exact p-value now comes from pbinom() tails: two-tailed at .5,
+  # one-tailed in the observed direction otherwise (SPSS NPAR TESTS).
+  for (n in c(1, 7, 40, 333, 2421)) {
+    for (x in unique(round(seq(0, n, length.out = 9)))) {
+      two <- mariposa:::.binom_exact_p(x, n, 0.5)
+      expect_equal(two$p_value, stats::binom.test(x, n, 0.5)$p.value,
+                   tolerance = 1e-10)
+      for (p in c(0.1, 0.35, 0.6, 0.95)) {
+        one <- mariposa:::.binom_exact_p(x, n, p)
+        ref <- stats::binom.test(x, n, p, alternative = one$alternative)
+        expect_equal(one$p_value, ref$p.value, tolerance = 1e-10)
+        expect_identical(one$alternative,
+                         if (x / n <= p) "less" else "greater")
+      }
+      expect_equal(mariposa:::.clopper_pearson(x, n, 0.95),
+                   as.numeric(stats::binom.test(x, n)$conf.int),
+                   tolerance = 1e-10)
+    }
+  }
+})
+
+test_that("binomial_test: Group 1 is the first case, p != .5 is one-tailed", {
+  # Was: Group 1 was the lowest code and every test two-tailed, so
+  # p = .6 tested the other category: p = 8e-69 instead of SPSS's .011.
+  d <- survey_data
+  d$high <- haven::labelled(ifelse(d$life_satisfaction >= 4, 1, 0),
+                            c(Low = 0, High = 1))
+  r <- binomial_test(d, high, p = 0.6)
+  expect_identical(r$results$cat1_name, "High")
+  expect_identical(r$results$alternative, "less")
+  expect_equal(r$results$p_value, stats::pbinom(1397, 2421, 0.6))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("p (1-tailed) = 0.011", out, fixed = TRUE)))
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("p (1-tailed)", out, fixed = TRUE)))
+  expect_true(any(grepl("Group 1 is < 0.600", out, fixed = TRUE)))
+  # Two-tailed at .5: no one-tailed label
+  out <- capture.output(print(binomial_test(d, high)))
+  expect_false(any(grepl("1-tailed", out, fixed = TRUE)))
+})
+
+test_that("binomial_test with expansion weights is instant", {
+  # Was: binom.test() enumerated half the support - with weights summing to
+  # 2.5e9 it needed ~10 GB and minutes.
+  skip_on_cran()
+  d <- dplyr::mutate(survey_data, w = sampling_weight * 1e6)
+  elapsed <- system.time(r <- binomial_test(d, gender, weights = w))[["elapsed"]]
+  expect_lt(elapsed, 5)
+  expect_gt(r$results$n_total, 2e9)
+  expect_true(is.finite(r$results$p_value))
+})

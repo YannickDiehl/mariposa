@@ -237,3 +237,47 @@
   names(dimnames(tbl)) <- dnn
   tbl
 }
+
+#' Exact binomial p-value as SPSS NPAR TESTS /BINOMIAL reports it
+#'
+#' Test proportion .5: two-tailed, twice the smaller tail (at most 1), which
+#' equals stats::binom.test() for the symmetric distribution. Any other test
+#' proportion: one-tailed in the direction of the observed proportion of
+#' Group 1 (SPSS footnote "Alternative hypothesis states that the proportion
+#' of cases in the first group < p"). Tails come from pbinom(), so the cost
+#' does not grow with n (weighted counts in the billions).
+#'
+#' @param x Count of Group 1
+#' @param n Total count
+#' @param p Test proportion of Group 1
+#' @return list(p_value, alternative = "two.sided", "less" or "greater")
+#' @noRd
+.binom_exact_p <- function(x, n, p) {
+  lower <- stats::pbinom(x, n, p)
+  upper <- stats::pbinom(x - 1, n, p, lower.tail = FALSE)
+  if (isTRUE(all.equal(p, 0.5))) {
+    return(list(p_value = min(1, 2 * min(lower, upper)),
+                alternative = "two.sided"))
+  }
+  if (x / n <= p) {
+    list(p_value = lower, alternative = "less")
+  } else {
+    list(p_value = upper, alternative = "greater")
+  }
+}
+
+#' Clopper-Pearson confidence interval of a proportion
+#'
+#' The two-sided exact interval stats::binom.test() reports, computed from
+#' the beta quantiles directly.
+#'
+#' @param x Count of successes
+#' @param n Total count
+#' @param conf.level Confidence level
+#' @return Numeric vector c(lower, upper)
+#' @noRd
+.clopper_pearson <- function(x, n, conf.level) {
+  alpha <- (1 - conf.level) / 2
+  c(if (x == 0) 0 else stats::qbeta(alpha, x, n - x + 1),
+    if (x == n) 1 else stats::qbeta(1 - alpha, x + 1, n - x))
+}

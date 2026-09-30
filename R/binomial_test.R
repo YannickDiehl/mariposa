@@ -20,8 +20,10 @@
 #' @param ... One or more binary variables to test. Each must have exactly 2
 #'   categories (e.g., Yes/No, Male/Female, 0/1, TRUE/FALSE)
 #' @param p The hypothesized proportion to test against (Default: 0.50 = 50 percent).
-#'   This refers to the proportion of the first category (first factor level,
-#'   or the lower numeric value).
+#'   It refers to Group 1, the category of the first valid case in the data
+#'   (as in SPSS). With 0.5 the test is two-tailed; with any other value it
+#'   is one-tailed in the direction of the observed proportion, as SPSS
+#'   reports it.
 #' @param weights Optional survey weights for population-representative results
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95 percent)
 #'
@@ -29,8 +31,9 @@
 #'   including:
 #' - Category counts and observed proportions
 #' - Test proportion (null hypothesis)
-#' - Exact p-value (two-sided)
-#' - Confidence interval for the true proportion
+#' - Exact p-value (two-tailed for \code{p = 0.5}, otherwise one-tailed;
+#'   column \code{alternative}: "two.sided", "less" or "greater")
+#' - Confidence interval for the true proportion of Group 1 (Clopper-Pearson)
 #'
 #' @details
 #' ## Understanding the Results
@@ -64,7 +67,19 @@
 #'   Use \code{\link{chi_square}()} instead
 #' - For comparing proportions between groups:
 #'   Use chi-square or z-test for proportions
-#' - For larger samples with normal approximation:
+#' - For larger samples with normal approximation: results will be very
+#'   similar to a one-sample z-test for proportions
+#'
+#' ## Group 1 and one-tailed tests
+#'
+#' As in SPSS \code{NPAR TESTS /BINOMIAL}, Group 1 is the category of the
+#' first valid case in the data (per group with \code{group_by()}), and
+#' \code{p} is its hypothesized proportion. For \code{p = 0.5} the p-value
+#' is two-tailed. For any other \code{p} SPSS reports a one-tailed p-value
+#' in the direction of the observed proportion ("the proportion of cases in
+#' the first group < p"); \code{binomial_test()} does the same. To test the
+#' other category, put a case of it first or use \code{1 - p}.
+#'
 #' ## Weighted variants
 #'
 #' SPSS \code{NPAR TESTS} ignores \code{WEIGHT BY}, so weighted results have
@@ -72,8 +87,6 @@
 #' extension that reduces exactly to the unweighted test when all weights
 #' equal 1 (enforced by an internal invariance suite); see
 #' \code{vignette("spss-compatibility")} for validation status.
-#'
-#'   Results will be very similar to a one-sample z-test for proportions
 #'
 #' @seealso
 #' \code{\link[stats]{binom.test}} for the base R exact binomial test.
@@ -150,10 +163,13 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       valid_idx <- !is.na(x) & !is.na(w)
       x <- x[valid_idx]
       w <- w[valid_idx]
+      first <- which(w > 0)[1]
     } else {
+      first <- 1L
       valid_idx <- !is.na(x)
       x <- x[valid_idx]
     }
+    if (is.na(first)) first <- 1L
 
     # Observed categories in SPSS order (by code), with value labels
     x <- .np_factor(x)
@@ -166,9 +182,10 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       ))
     }
 
-    # Group 1 = first category (first factor level or lower value)
-    cat1 <- cats[1]
-    cat2 <- cats[2]
+    # Group 1 = category of the first valid case, as SPSS defines it ("the
+    # first value encountered in the data"); the test proportion refers to it
+    cat1 <- as.character(x[first])
+    cat2 <- setdiff(cats, cat1)
 
     if (is.null(weight_name)) {
       # Unweighted
@@ -188,13 +205,9 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     obs_prop1 <- n1 / n_total
     obs_prop2 <- n2 / n_total
 
-    # Exact binomial test
-    bt <- binom.test(n1, n_total, p = test_prop,
-                     alternative = "two.sided", conf.level = conf_level)
-
-    p_value <- bt$p.value
-    ci_lower <- bt$conf.int[1]
-    ci_upper <- bt$conf.int[2]
+    # Exact binomial test: two-tailed at .5, otherwise one-tailed (SPSS)
+    bt <- .binom_exact_p(n1, n_total, test_prop)
+    ci <- .clopper_pearson(n1, n_total, conf_level)
 
     return(list(
       cat1_name = as.character(cat1),
@@ -205,9 +218,10 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       obs_prop1 = obs_prop1,
       obs_prop2 = obs_prop2,
       test_prop = test_prop,
-      p_value = p_value,
-      ci_lower = ci_lower,
-      ci_upper = ci_upper
+      p_value = bt$p_value,
+      alternative = bt$alternative,
+      ci_lower = ci[1],
+      ci_upper = ci[2]
     ))
   }
 
@@ -223,6 +237,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       obs_prop2 = res$obs_prop2,
       test_prop = res$test_prop,
       p_value = res$p_value,
+      alternative = res$alternative,
       ci_lower = res$ci_lower,
       ci_upper = res$ci_upper,
       reason = NA_character_
@@ -240,6 +255,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       obs_prop2 = NA_real_,
       test_prop = p,
       p_value = NA_real_,
+      alternative = NA_character_,
       ci_lower = NA_real_,
       ci_upper = NA_real_,
       reason = reason
@@ -336,14 +352,21 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
       stars = add_significance_stars(row_data$p_value),
       stringsAsFactors = FALSE
     )
+    one_tailed <- .bt_one_tailed(row_data, 1)
     label <- if (!is.null(weights)) "Weighted Test Statistics:" else "Test Statistics:"
     cat(sprintf("  %s\n", label))
     print_stat_table(test_df, digits = digits, indent = 2,
                      col_types = c(test_prop = "num", ci_lower = "num",
                                    ci_upper = "num"),
-                     col_labels = c(test_prop = "Test Prop.", p = "p value",
+                     col_labels = c(test_prop = "Test Prop.",
+                                    p = if (one_tailed) "p (1-tailed)" else "p (2-tailed)",
                                     ci_lower = "CI lower", ci_upper = "CI upper",
                                     stars = ""))
+    if (one_tailed) {
+      cat(sprintf("  H1: the proportion of Group 1 is %s %s (one-tailed, as SPSS tests\n  a proportion other than 0.5).\n",
+                  if (row_data$alternative == "less") "<" else ">",
+                  fmt_num(row_data$test_prop, digits)))
+    }
     cat("\n")
   }
 }
@@ -356,11 +379,13 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     cat(sprintf("  not computed (%s)\n", .np_reason(results, i)))
     return(invisible(NULL))
   }
+  p_text <- format_p_stars(results$p_value[i], digits)
+  if (.bt_one_tailed(results, i)) p_text <- sub("^p", "p (1-tailed)", p_text)
   cat(sprintf("  Group 1 (%s): prop = %s vs %s, %s, N = %s\n",
               results$cat1_name[i],
               fmt_num(results$obs_prop1[i], digits),
               fmt_num(results$test_prop[i], digits),
-              format_p_stars(results$p_value[i], digits),
+              p_text,
               .np_count(results$n_total[i])))
 }
 
@@ -561,12 +586,20 @@ print.summary.binomial_test <- function(x, ...) {
   invisible(x)
 }
 
+#' Is row i of a binomial_test result a one-tailed test?
+#' @noRd
+.bt_one_tailed <- function(results, i) {
+  alt <- results[["alternative"]]
+  !is.null(alt) && !is.na(alt[i]) && alt[i] != "two.sided"
+}
+
 #' Grouping columns of a binomial_test result
 #' @noRd
 .bt_group_vars <- function(x) {
   if (!is.null(x$groups)) return(x$groups)
   setdiff(names(x$results), c("Variable", "cat1_name", "cat2_name", "n1",
                               "n2", "n_total", "obs_prop1", "obs_prop2",
-                              "test_prop", "p_value", "ci_lower",
+                              "test_prop", "p_value", "alternative",
+                              "ci_lower",
                               "ci_upper", "reason", "sig"))
 }

@@ -36,6 +36,14 @@ VERSIONING_POLICY §3).
   p-value now uses SPSS's ASE0 (it was wrong before, e.g. .614 instead of
   .460); gamma is only reported for ordinal pairs; `label_maps` is gone
   (the tables carry the labels in their dimnames).
+* `binomial_test()`: Group 1 is the category of the first valid case in
+  the data (per group), as SPSS NPAR TESTS /BINOMIAL defines it (before:
+  the lowest code), and a test proportion other than 0.5 gives SPSS's
+  one-tailed exact p-value in the observed direction (new column
+  `alternative`). Before, `p = 0.6` could test the other category
+  two-tailed: p = 8e-69 instead of SPSS's .011 (reference Test 1d, now
+  asserted). The p-values come from binomial tails, so weights summing to
+  billions no longer exhaust memory.
 * Rank tests (`mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`,
   `friedman_test()`): nominal factors are an error; ordered factors are
   ranked by level order everywhere.

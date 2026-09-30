@@ -11,11 +11,11 @@
 #
 # Source audit (R/binomial_test.R): no round(sum(w)) bug.
 #
-# Note on cell-count direction: SPSS reports "Group 1" as the first category
-# encountered in data; mariposa reports cat1 as the first level of the
-# factor. The label-to-count mapping is consistent, but which side is
-# "Group 1" vs "cat1" can differ. The test matches counts by NAME, not
-# by position.
+# Group 1: SPSS takes the category of the first valid case in the data
+# (per split group) as "Group 1"; mariposa does the same (0.7.4), so
+# cat1_name is asserted against SPSS's Group 1. It matters beyond display
+# when the test proportion is not .5: SPSS then tests Group 1 one-tailed
+# (Test 1d). Counts are matched by name.
 # =============================================================================
 
 library(testthat)
@@ -40,6 +40,7 @@ spss_values <- list(
   # (same total, same p-value, labels swapped). Reference counts here are
   # the R-level (mariposa) values; the p-value matches SPSS exactly.
   test_1a_gender = list(
+    group1 = "Female",                           # binomial_test_output.txt:9 (swapped label "Male")
     counts = c(Male = 1194L, Female = 1306L),   # swapped from SPSS line 9-10
     n_total = 2500L,                             # binomial_test_output.txt:11
     test_prop = 0.50,                            # binomial_test_output.txt:9
@@ -48,6 +49,7 @@ spss_values <- list(
 
   # ---- Test 1b: region East/West, test against 0.5 ----------------------
   test_1b_east = list(
+    group1 = "East",                             # binomial_test_output.txt:19
     counts = c(East = 485L, West = 2015L),       # binomial_test_output.txt:19-20
     n_total = 2500L,                             # binomial_test_output.txt:21
     test_prop = 0.50,                            # binomial_test_output.txt:19
@@ -57,26 +59,43 @@ spss_values <- list(
   # ---- Test 1c: derived High Life Satisfaction (life_sat >= 4) ---------
   # SPSS coding: 0 = Low (life_sat < 4), 1 = High (life_sat >= 4)
   test_1c_high_life = list(
+    group1 = "High",                             # binomial_test_output.txt:29
     counts = c(High = 1397L, Low = 1024L),       # binomial_test_output.txt:29-30
     n_total = 2421L,                             # binomial_test_output.txt:31
     test_prop = 0.50,                            # binomial_test_output.txt:29
     p = "<.001"                                  # binomial_test_output.txt:29
   ),
 
+  # ---- Test 1d: high_life_sat against 0.60 (1-tailed) --------------------
+  # With a test proportion other than .5 SPSS reports the exact one-tailed
+  # p of Group 1 in the direction of the observed proportion (footnote a).
+  test_1d_high_life_p60 = list(
+    group1 = "High",                             # binomial_test_output.txt:39
+    counts = c(High = 1397L, Low = 1024L),       # binomial_test_output.txt:39-40
+    n_total = 2421L,                             # binomial_test_output.txt:41
+    test_prop = 0.60,                            # binomial_test_output.txt:39
+    p = 0.011,                                   # binomial_test_output.txt:39 (Exact Sig. 1-tailed)
+    alternative = "less"                         # binomial_test_output.txt:42
+  ),
+
   # ---- Test 3a: gender grouped by region (2-tailed, p=0.5) -------------
   # Same gender-label swap as Test 1a — counts here are R-level (mariposa).
   test_3a_gender_by_region = list(
-    East = list(counts = c(Male = 238L, Female = 247L), n_total = 485L,
+    East = list(group1 = "Female",                                          # binomial_test_output.txt:74 (swapped label "Male")
+                counts = c(Male = 238L, Female = 247L), n_total = 485L,
                 p = 0.716),
-    West = list(counts = c(Male = 956L, Female = 1059L), n_total = 2015L,
+    West = list(group1 = "Male",                                            # binomial_test_output.txt:77 (swapped label "Female")
+                counts = c(Male = 956L, Female = 1059L), n_total = 2015L,
                 p = 0.023)
   ),
 
   # ---- Test 3b: high_life grouped by region -----------------------------
   test_3b_high_life_by_region = list(
-    East = list(counts = c(High = 271L, Low = 194L), n_total = 465L,       # binomial_test_output.txt:87-89
+    East = list(group1 = "High",                                            # binomial_test_output.txt:87
+                counts = c(High = 271L, Low = 194L), n_total = 465L,       # binomial_test_output.txt:87-89
                 p = "<.001"),                                                # binomial_test_output.txt:87
-    West = list(counts = c(High = 1126L, Low = 830L), n_total = 1956L,     # binomial_test_output.txt:90-92
+    West = list(group1 = "Low",                                             # binomial_test_output.txt:90
+                counts = c(High = 1126L, Low = 830L), n_total = 1956L,     # binomial_test_output.txt:90-92
                 p = "<.001")                                                 # binomial_test_output.txt:90
   )
 )
@@ -89,10 +108,17 @@ spss_values <- list(
 #' Compare a binomial_test row against SPSS reference.
 #'
 #' SPSS reports two categories. mariposa puts them as cat1_name/n1 and
-#' cat2_name/n2. We match by NAME (not position) since the two systems
-#' may label "Group 1" differently.
+#' cat2_name/n2; Group 1 must be the same category, counts are matched by
+#' name.
 compare_binomial <- function(row, spss, scenario) {
-  # p-value: symmetric for two-tailed binomial; compare directly
+  if (!is.null(spss$group1)) {
+    expect_identical(as.character(row$cat1_name), spss$group1,
+                     label = sprintf("[%s] Group 1", scenario))
+  }
+  if (!is.null(spss$alternative)) {
+    expect_identical(row$alternative, spss$alternative,
+                     label = sprintf("[%s] one-tailed direction", scenario))
+  }
   assert_spss(as.numeric(row$p_value), spss$p,
               tier = "display", precision = 3, what = "p_value",
               label = sprintf("[%s] p-value", scenario))
@@ -138,8 +164,10 @@ data(survey_data, envir = environment())
 # Derive the binary variables SPSS uses
 survey_data$east_region   <- ifelse(survey_data$region == "East", "East", "West")
 survey_data$east_region   <- factor(survey_data$east_region, levels = c("East", "West"))
-survey_data$high_life_sat <- ifelse(survey_data$life_satisfaction >= 4, "High", "Low")
-survey_data$high_life_sat <- factor(survey_data$high_life_sat, levels = c("High", "Low"))
+# Coded as in the SPSS syntax (0 = Low, 1 = High): Group 1 is still High,
+# the category of the first case, not the lowest code
+survey_data$high_life_sat <- haven::labelled(
+  ifelse(survey_data$life_satisfaction >= 4, 1, 0), c(Low = 0, High = 1))
 
 
 # =============================================================================
@@ -162,6 +190,12 @@ test_that("Test 1c: Binomial derived high_life_sat (vs 0.5) — matches SPSS", {
   r <- survey_data |> binomial_test(high_life_sat)
   compare_binomial(r$results, spss_values$test_1c_high_life,
                    "1c: high_life_sat vs 0.5")
+})
+
+test_that("Test 1d: Binomial high_life_sat (vs 0.6, 1-tailed) — matches SPSS", {
+  r <- survey_data |> binomial_test(high_life_sat, p = 0.60)
+  compare_binomial(r$results, spss_values$test_1d_high_life_p60,
+                   "1d: high_life_sat vs 0.6")
 })
 
 
