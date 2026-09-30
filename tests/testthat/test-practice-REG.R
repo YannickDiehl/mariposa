@@ -756,3 +756,21 @@ test_that("REG-21: partial_cor with a constant control variable", {
   expect_true(any(grepl("not computed", out, fixed = TRUE)))
   expect_no_error(capture.output(print(summary(pc))))
 })
+
+# --- 0.7.4 audit: logistic regression with expansion weights ---------------------
+
+test_that("logistic_regression converges with expansion weights", {
+  # Was: glm()'s binomial start (w*y + 0.5)/(w + 1) sits on 0/1 when the
+  # weights are huge, so IRLS diverged (intercept -3.7e15, "Algorithmus
+  # konvergierte nicht"). The MLE does not depend on the scale of the
+  # weights; only the standard errors shrink with the sum of weights.
+  d <- dplyr::mutate(survey_data, h = as.integer(life_satisfaction > 3),
+                     w6 = sampling_weight * 1e6)
+  r1 <- logistic_regression(d, h ~ age + income, weights = sampling_weight)
+  expect_no_warning(
+    r6 <- logistic_regression(d, h ~ age + income, weights = w6)
+  )
+  expect_equal(coef(r6), coef(r1), tolerance = 1e-6)
+  expect_equal(sqrt(diag(vcov(r6))) * 1e3, sqrt(diag(vcov(r1))),
+               tolerance = 1e-5)
+})

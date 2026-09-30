@@ -428,12 +428,21 @@ logistic_regression <- function(data, formula = NULL,
   # This is expected behavior matching SPSS WEIGHT BY
   if (!is.null(weights_vec)) {
     data_complete$.wt <- weights_vec
+    # Start IRLS at the weighted share of 1s: binomial()'s default start
+    # (w * y + 0.5) / (w + 1) sits on 0/1 when the weights are large
+    # (expansion weights), and IRLS then diverges. The estimates do not
+    # depend on the start.
+    data_complete$.mu0 <- sum(weights_vec * data_complete[[dep_name]]) /
+      sum(weights_vec)
     model <- .glm_quiet_weights(
       stats::glm(formula, data = data_complete, family = stats::binomial(),
-                 weights = .wt)
+                 weights = .wt, mustart = .mu0)
     )
   } else {
-    model <- stats::glm(formula, data = data_complete, family = stats::binomial())
+    # Same start as the weighted path, so weights == 1 reproduces it exactly
+    data_complete$.mu0 <- mean(data_complete[[dep_name]])
+    model <- stats::glm(formula, data = data_complete, family = stats::binomial(),
+                        mustart = .mu0)
   }
 
   # ============================================================================

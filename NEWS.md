@@ -706,6 +706,11 @@ reference output showed mariposa was wrong.
 
 ### Correlation and regression
 
+* `logistic_regression()` converges with expansion weights. `glm()`'s
+  binomial start value sits on 0/1 when the weights are large, so the
+  fit diverged (intercept -3.7e15, "algorithm did not converge") for
+  weights summing to billions. The IRLS now starts at the (weighted)
+  share of 1s; the estimates are unchanged.
 * `linear_regression()`, `logistic_regression()` and `marginal_effects()`
   print models with long formulas correctly. A formula longer than about
   70 characters (a normal model with five or more predictors) was split
