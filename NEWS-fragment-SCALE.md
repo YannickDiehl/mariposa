@@ -79,3 +79,12 @@
   need reverse-coding; new `$negative_items`), and the compact print says
   "negative; check item coding" instead of classifying alpha -0.929 as
   "Poor".
+* `reliability()` output is easier to read. The Item-Total Statistics
+  table no longer wraps at 80 columns under snake_case headers
+  (`scale_mean_deleted`, `corrected_r`, ...); it has SPSS-style two-line
+  headers ("Scale Mean / if Deleted", "Alpha if / Deleted", ...). The
+  inter-item correlation matrix honours `digits` for more than six items
+  (it was forced to 2 decimals) and uses numbered columns so it stays
+  narrow. Item statistics print with fixed decimals (no more "1.16" next
+  to "2.615"), and a missing omega reads "not computed" with the reason
+  instead of "NA".

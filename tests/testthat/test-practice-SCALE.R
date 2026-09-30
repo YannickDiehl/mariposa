@@ -457,3 +457,57 @@ test_that("SCALE-06: a positive alpha gets no negative-alpha note", {
   expect_length(cnd$msgs, 0)
   expect_null(cnd$result$negative_items)
 })
+
+# --- SCALE-16: reliability() output format ---------------------------------------
+
+section <- function(out, title) {
+  start <- grep(title, out, fixed = TRUE)[1]
+  rest <- out[(start + 1):length(out)]
+  end <- which(rest == "")[1]
+  if (is.na(end)) rest else rest[seq_len(end - 1)]
+}
+
+test_that("SCALE-16: item-total table fits 80 columns with readable headers", {
+  # print.data.frame wrapped the table at 80 columns under snake_case
+  # headers (scale_mean_deleted, corrected_r, ...).
+  r <- suppressWarnings(reliability(
+    survey_data, political_orientation, environmental_concern,
+    life_satisfaction, trust_government, trust_media, trust_science,
+    weights = sampling_weight))
+  s <- capture.output(print(summary(r)))
+  it <- section(s, "Item-Total Statistics")
+  expect_true(all(nchar(it) <= 80))
+  expect_false(any(grepl("scale_mean|corrected_r|alpha_deleted", s)))
+  expect_true(any(grepl("Alpha if", it, fixed = TRUE)))
+  # one line per item (no wrapped continuation block)
+  expect_length(grep("trust_media", it, fixed = TRUE), 1)
+})
+
+test_that("SCALE-16: the inter-item matrix honours digits for > 6 items", {
+  # .print_cor_matrix() forced 2 decimals for more than 6 items.
+  r <- suppressWarnings(reliability(
+    survey_data, political_orientation, environmental_concern,
+    life_satisfaction, trust_government, trust_media, trust_science, age))
+  s <- capture.output(print(summary(r, digits = 3)))
+  m <- section(s, "Inter-Item Correlation Matrix")
+  expect_true(any(grepl("1\\.000", m)))
+  expect_false(any(grepl("(^| )1\\.00( |$)", m)))
+})
+
+test_that("SCALE-16: compact and item statistics formatting", {
+  # "McDonald's Omega = NA" in the compact line; item statistics printed
+  # sd 1.16 next to mean 2.615 (print.data.frame dropped trailing zeros).
+  r <- suppressWarnings(reliability(survey_data, trust_government,
+                                    trust_media))
+  out <- capture.output(print(r))
+  expect_false(any(grepl("NA", out, fixed = TRUE)))
+  expect_true(any(grepl("McDonald's Omega = not computed", out, fixed = TRUE)))
+
+  r3 <- reliability(survey_data, trust_government, trust_media, trust_science)
+  s <- capture.output(print(summary(r3)))
+  it <- section(s, "Item Statistics")
+  rows <- grep("^ *trust_", it, value = TRUE)
+  expect_length(rows, 3)
+  nums <- unlist(regmatches(rows, gregexpr("[0-9]+\\.[0-9]+", rows)))
+  expect_true(all(grepl("\\.[0-9]{3}$", nums)))
+})

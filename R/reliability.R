@@ -777,13 +777,12 @@ print.reliability <- function(x, digits = 3, ...) {
     as.character(res$n)
   }
   omega <- res$omega %||% NA_real_
+  omega_text <- if (is.na(omega)) "not computed" else fmt_num(omega, digits)
+  n_items <- res$n_items %||% n_items
 
   cat(sprintf("Reliability Analysis: %d items%s\n", n_items, weighted_tag))
   cat(sprintf("  Cronbach's Alpha = %s (%s), McDonald's Omega = %s, N = %s\n",
-              format(round(alpha, digits), nsmall = digits),
-              interp,
-              format(round(omega, digits), nsmall = digits),
-              n_display))
+              fmt_num(alpha, digits), interp, omega_text, n_display))
 }
 
 
@@ -898,14 +897,16 @@ print.summary.reliability <- function(x, ...) {
     cat("Reliability Statistics\n")
     cat(paste(rep("-", 40), collapse = ""), "\n")
 
+    omega_na <- sprintf("not computed (%s)", x$omega_note %||% "see warning")
+    show_value <- function(v, na_text) if (is.na(v)) na_text else fmt_num(v, digits)
     cat(sprintf("  Cronbach's Alpha:              %s\n",
-                format(round(x$alpha, digits), nsmall = digits)))
+                show_value(x$alpha, "not computed")))
     cat(sprintf("  Alpha (standardized):          %s\n",
-                format(round(x$alpha_standardized, digits), nsmall = digits)))
+                show_value(x$alpha_standardized, "not computed")))
     cat(sprintf("  McDonald's Omega:              %s\n",
-                format(round(x$omega %||% NA_real_, digits), nsmall = digits)))
+                show_value(x$omega %||% NA_real_, omega_na)))
     cat(sprintf("  Omega (standardized):          %s\n",
-                format(round(x$omega_std %||% NA_real_, digits), nsmall = digits)))
+                show_value(x$omega_std %||% NA_real_, omega_na)))
     cat(sprintf("  N of Items:                    %d\n", x$n_items))
 
     n_label <- if (!is.null(x$weighted_n)) {
@@ -917,54 +918,120 @@ print.summary.reliability <- function(x, ...) {
     if (isTRUE(x$negative_alpha)) .print_negative_alpha_note(x$negative_items)
   }
 
-  # Item Statistics
+  # Item Statistics (fixed decimals; weighted N with 2 decimals as SPSS)
   if (show_item_stats && !is.null(x$item_statistics)) {
     cat("\nItem Statistics\n")
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-
-    item_df <- x$item_statistics
-    item_df$mean <- round(item_df$mean, digits)
-    item_df$sd <- round(item_df$sd, digits)
-    if (!is.null(x$weighted_n)) {
-      item_df$n <- round(item_df$n, 2)
+    item_df <- as.data.frame(x$item_statistics)
+    item_df$n <- if (!is.null(x$weighted_n)) {
+      formatC(item_df$n, format = "f", digits = 2)
+    } else {
+      formatC(round(item_df$n), format = "d")
     }
-    print(as.data.frame(item_df), row.names = FALSE)
+    print_stat_table(item_df, digits = digits,
+                     col_types = c(mean = "num", sd = "num", n = "char"),
+                     col_labels = c(item = "Item", mean = "Mean",
+                                    sd = "Std. Deviation", n = "N"))
   }
 
   # Inter-Item Correlation Matrix
   if (show_inter_item && !is.null(x$inter_item_cor)) {
-    .print_cor_matrix(x$inter_item_cor, digits = digits,
-                      title = "Inter-Item Correlation Matrix:",
-                      type = "correlation")
+    cat("\nInter-Item Correlation Matrix\n")
+    .print_numbered_matrix(x$inter_item_cor, digits)
   }
 
   # Item-Total Statistics
   if (show_item_total && !is.null(x$item_total)) {
     cat("\nItem-Total Statistics\n")
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-
-    total_df <- data.frame(
-      item = x$item_total$item,
-      scale_mean_deleted = round(x$item_total$scale_mean_if_deleted, 2),
-      scale_var_deleted = round(x$item_total$scale_var_if_deleted, digits),
-      corrected_r = round(x$item_total$corrected_item_total_r, digits),
-      alpha_deleted = round(x$item_total$alpha_if_deleted, digits),
-      stringsAsFactors = FALSE
+    it <- x$item_total
+    omega_del <- it$omega_if_deleted
+    cols <- list(
+      list(h1 = "Scale Mean", h2 = "if Deleted", v = it$scale_mean_if_deleted),
+      list(h1 = "Scale Var.", h2 = "if Deleted", v = it$scale_var_if_deleted),
+      list(h1 = "Corrected", h2 = "Item-Total", v = it$corrected_item_total_r),
+      list(h1 = "Alpha if", h2 = "Deleted", v = it$alpha_if_deleted)
     )
-    omega_del <- x$item_total$omega_if_deleted
     if (!is.null(omega_del)) {
-      total_df$omega_deleted <- round(omega_del, digits)
+      cols[[5]] <- list(h1 = "Omega if", h2 = "Deleted", v = omega_del)
     }
-    print(total_df, row.names = FALSE)
+    .print_two_header_table(it$item, "Item", cols, digits)
 
     # A 3-item scale leaves a 2-item one-factor model after deletion, which
-    # is not identified - explain the NA column instead of leaving it bare.
-    if (!is.null(omega_del) && all(is.na(omega_del)) &&
-        length(omega_del) == 3) {
-      cat("Note: Omega if item deleted requires at least 4 items\n")
-      cat("(a one-factor model on the remaining 2 items is not identified).\n")
+    # is not identified - explain the empty column instead of leaving it bare.
+    if (!is.null(omega_del) && all(is.na(omega_del))) {
+      if (length(omega_del) == 3) {
+        cat("Note: Omega if item deleted requires at least 4 items\n")
+        cat("(a one-factor model on the remaining 2 items is not identified).\n")
+      } else if (!is.null(x$omega_note)) {
+        cat(sprintf("Note: Omega if item deleted is not computed (%s).\n",
+                    x$omega_note))
+      }
     }
   }
+}
+
+#' Print a table with a two-line column header
+#'
+#' Used for Item-Total Statistics, whose SPSS column names ("Scale Mean if
+#' Item Deleted", ...) are too long for one header line: print.data.frame
+#' wrapped the table at 80 columns under snake_case names.
+#' @param labels Row labels (first column)
+#' @param label_head Header of the first column
+#' @param cols List of list(h1, h2, v): header lines and numeric values
+#' @param digits Decimal places
+#' @noRd
+.print_two_header_table <- function(labels, label_head, cols, digits) {
+  w0 <- max(nchar(label_head), nchar(labels, type = "width"))
+  cells <- lapply(cols, function(cl) fmt_num(cl$v, digits))
+  widths <- mapply(function(cl, ce) max(nchar(cl$h1), nchar(cl$h2), nchar(ce)),
+                   cols, cells)
+  total <- w0 + sum(widths + 2L)
+  border <- paste0("  ", strrep("-", total))
+  line <- function(first, parts) {
+    paste0("  ", pad_utf8(first, w0),
+           paste0("  ", mapply(pad_utf8, parts, widths, "right"), collapse = ""))
+  }
+  cat(border, "\n", sep = "")
+  cat(line("", vapply(cols, `[[`, "", "h1")), "\n", sep = "")
+  cat(line(label_head, vapply(cols, `[[`, "", "h2")), "\n", sep = "")
+  cat(border, "\n", sep = "")
+  for (i in seq_along(labels)) {
+    cat(line(labels[i], vapply(cells, `[`, "", i)), "\n", sep = "")
+  }
+  cat(border, "\n", sep = "")
+  invisible(NULL)
+}
+
+#' Print a correlation matrix with numbered columns
+#'
+#' Rows show "(1) item_name", columns only "(1)", "(2)", ...: the matrix
+#' stays narrow however long the item names are, the digits argument is
+#' honoured (the shared .print_cor_matrix() forced 2 decimals for more than
+#' 6 items), and columns are split into blocks that fit the console.
+#' @noRd
+.print_numbered_matrix <- function(mat, digits) {
+  k <- ncol(mat)
+  idx <- paste0("(", seq_len(k), ")")
+  row_lab <- paste(idx, rownames(mat))
+  w0 <- max(nchar(row_lab, type = "width"))
+  cells <- matrix(fmt_num(as.numeric(mat), digits), k)
+  wc <- max(nchar(cells), nchar(idx))
+  per_block <- max(1L, floor((getOption("width", 80) - 2 - w0) / (wc + 2)))
+  blocks <- split(seq_len(k), ceiling(seq_len(k) / per_block))
+  for (b in blocks) {
+    border <- paste0("  ", strrep("-", w0 + length(b) * (wc + 2)))
+    cat(border, "\n", sep = "")
+    cat("  ", strrep(" ", w0),
+        paste0("  ", vapply(idx[b], pad_utf8, "", wc, "right"), collapse = ""),
+        "\n", sep = "")
+    cat(border, "\n", sep = "")
+    for (i in seq_len(k)) {
+      cat("  ", pad_utf8(row_lab[i], w0),
+          paste0("  ", vapply(cells[i, b], pad_utf8, "", wc, "right"), collapse = ""),
+          "\n", sep = "")
+    }
+    cat(border, "\n", sep = "")
+  }
+  invisible(NULL)
 }
 
 #' SPSS's footnote for a negative alpha, plus the items to check
