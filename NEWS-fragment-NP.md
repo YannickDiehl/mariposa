@@ -41,3 +41,10 @@
   compact `print()` marks the statistic as "(continuity-corrected)". The
   compact line now spells out "negligible" (was "neglig.") and ends with
   the "Use summary()" hint.
+* `summary()` of `chi_square()` follows the SPSS "Symmetric Measures"
+  table: Phi and Cramer's V are shown for every table (Phi was hidden
+  outside 2x2 although `phi()` returned it and SPSS prints it), and
+  Goodman's gamma - with its verbal label - only when both variables are
+  ordinal (ordered factor or numeric). For nominal variables such as
+  gender x region its sign depends on the arbitrary category order.
+  `goodman_gamma()` still computes gamma on request.

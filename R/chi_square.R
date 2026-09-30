@@ -42,8 +42,14 @@
 #'   - 0.1-0.3: Small relationship
 #'   - 0.3-0.5: Medium relationship
 #'   - 0.5 or higher: Large relationship
-#' - **Phi**: Only for 2x2 tables (similar interpretation as Cramer's V)
-#' - **Gamma**: For ordinal data (-1 to +1, shows direction of relationship)
+#' - **Phi**: sqrt(chi-squared / N). Reported for every table, as SPSS
+#'   does; in a 2x2 table it equals Cramer's V, in larger tables it can
+#'   exceed 1 (use Cramer's V there)
+#' - **Gamma**: For two ordinal variables (-1 to +1, shows the direction of
+#'   the relationship). Shown by \code{summary()} only when both variables
+#'   are ordered factors or numeric; for nominal variables its sign depends
+#'   on the arbitrary category order. \code{goodman_gamma()} always
+#'   computes it.
 #'
 #' ## When to Use This
 #'
@@ -131,6 +137,12 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   data <- weights_info$data
   w_name <- weights_info$name
 
+  # Gamma is an ordinal measure: shown only when both variables are
+  # ordinal (ordered factor) or numeric; for nominal variables its sign
+  # depends on the arbitrary category order
+  is_ordinal <- function(v) is.ordered(v) || (is.numeric(v) && !is.factor(v))
+  ordinal <- is_ordinal(data[[var_names[1]]]) && is_ordinal(data[[var_names[2]]])
+
   # One test per data slice (the whole data or one group_by() group)
   run_slice <- function(slice, key = NULL) {
     w <- if (!is.null(w_name)) slice[[w_name]] else NULL
@@ -158,7 +170,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
     weights = w_name,
     correct = correct,
     is_grouped = is_grouped,
-    groups = group_vars
+    groups = group_vars,
+    ordinal = ordinal
   )
   
   class(result) <- "chi_square"
@@ -354,7 +367,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 #' @param i Row index to extract from
 #' @param digits Number of decimal places
 #' @noRd
-.print_chi_effect_sizes <- function(df, i, digits) {
+.print_chi_effect_sizes <- function(df, i, digits, show_gamma = TRUE) {
   cramers_v <- df$cramers_v[i]
   if (is.na(cramers_v)) return(invisible(NULL))
 
@@ -363,13 +376,16 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   is_2x2 <- (rows == 2 && cols == 2)
   n <- df$n[i]
 
-  measure <- c("Cramer's V", if (is_2x2) "Phi", "Gamma")
-  value <- c(cramers_v, if (is_2x2) df$phi[i], df$gamma[i])
-  p <- c(df$cramers_v_p_value[i], if (is_2x2) df$phi_p_value[i],
-         df$gamma_p_value[i])
-  interp <- c(.interpret_cramers_v(cramers_v),
-              if (is_2x2) .interpret_phi(df$phi[i]),
-              .interpret_gamma(df$gamma[i]))
+  # SPSS Symmetric Measures: Phi and Cramer's V for every table (Phi is
+  # not bounded by 1 beyond 2x2, so it gets no verbal label there);
+  # Gamma only for two ordinal variables.
+  measure <- c("Phi", "Cramer's V", if (show_gamma) "Gamma")
+  value <- c(df$phi[i], cramers_v, if (show_gamma) df$gamma[i])
+  p <- c(df$phi_p_value[i], df$cramers_v_p_value[i],
+         if (show_gamma) df$gamma_p_value[i])
+  interp <- c(if (is_2x2) .interpret_phi(df$phi[i]) else "",
+              .interpret_cramers_v(cramers_v),
+              if (show_gamma) .interpret_gamma(df$gamma[i]))
 
   effect_table <- data.frame(
     Measure = measure,
@@ -386,9 +402,8 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
                    col_labels = c(p = "p value", stars = ""))
   cat(sprintf("Table size: %d\u00d7%d | N = %s\n", as.integer(rows),
               as.integer(cols), format(n, big.mark = "")))
-
-  if (!is_2x2) {
-    cat("Note: Phi coefficient only shown for 2x2 tables\n")
+  if (!show_gamma) {
+    cat("Note: Gamma is shown for two ordinal variables (ordered factor or numeric) only.\n")
   }
 }
 
@@ -587,13 +602,15 @@ print.summary.chi_square <- function(x, ...) {
     "Continuity correction" = if (isTRUE(x$correct)) "Yates' correction applied (2x2 tables)" else NULL
   )
   print_info_section(test_info)
+  # Objects from before the `ordinal` flag existed: keep showing gamma
+  show_gamma <- !isFALSE(x$ordinal)
 
   if (!isTRUE(x$is_grouped)) {
-    .print_chi_block(x$results, 1, digits, show)
+    .print_chi_block(x$results, 1, digits, show, show_gamma)
   } else {
     for (i in seq_len(nrow(x$results))) {
       print_group_header(x$results[i, x$groups, drop = FALSE])
-      .print_chi_block(x$results, i, digits, show)
+      .print_chi_block(x$results, i, digits, show, show_gamma)
     }
   }
 
@@ -610,7 +627,7 @@ print.summary.chi_square <- function(x, ...) {
 #' @param digits Decimal places
 #' @param show Named list of section toggles
 #' @noRd
-.print_chi_block <- function(results, i, digits, show) {
+.print_chi_block <- function(results, i, digits, show, show_gamma = TRUE) {
   obs <- results$observed[[i]]
 
   if (show$observed && !is.null(obs)) {
@@ -649,7 +666,7 @@ print.summary.chi_square <- function(x, ...) {
   }
 
   if (show$effect_sizes) {
-    .print_chi_effect_sizes(results, i, digits)
+    .print_chi_effect_sizes(results, i, digits, show_gamma = show_gamma)
   }
   invisible(NULL)
 }
@@ -684,8 +701,10 @@ print.summary.chi_square <- function(x, ...) {
 #' @description
 #' Convenience helpers that run \code{\link{chi_square}} and return just the
 #' requested effect size as a numeric value (named by group for grouped
-#' data): \code{phi()} for 2x2 tables, \code{cramers_v()} for larger tables,
-#' and \code{goodman_gamma()} for ordinal variables.
+#' data): \code{phi()} (sqrt(chi-squared / N); bounded by 1 only in 2x2
+#' tables), \code{cramers_v()} (normalized to 0-1 for any table size), and
+#' \code{goodman_gamma()} for two ordinal variables. As in SPSS, Phi and
+#' Cramer's V are computed for any table size.
 #'
 #' For the full test output (chi-square statistic, p-value, all effect
 #' sizes), call \code{\link{chi_square}} directly.

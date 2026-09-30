@@ -197,6 +197,32 @@ test_that("NP-05 chi_square(correct = TRUE): Phi/V from the Pearson chi-square",
   expect_true(any(grepl("Continuity Correction", out_s, fixed = TRUE)))
 })
 
+test_that("NP-15 chi_square shows gamma only for two ordinal variables", {
+  # Was: Goodman's gamma (with a verbal label) was reported for any pair,
+  # also for nominal variables where its sign is arbitrary.
+  nominal <- capture.output(print(summary(chi_square(survey_data, gender, region))))
+  expect_false(any(grepl("^Gamma", nominal)))
+  ordinal <- capture.output(print(summary(
+    chi_square(survey_data, education, life_satisfaction))))
+  expect_true(any(grepl("^Gamma", ordinal)))
+  # goodman_gamma() still returns gamma on request
+  expect_false(is.na(goodman_gamma(survey_data, gender, region)))
+})
+
+test_that("NP-24 Phi is reported for tables larger than 2x2, as in SPSS", {
+  # Was: chi_square() hid Phi outside 2x2 ("only shown for 2x2 tables")
+  # while phi() returned it; SPSS prints Phi for any table.
+  r <- chi_square(survey_data, education, employment, weights = sampling_weight)
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("^Phi", out)))
+  expect_false(any(grepl("only shown for 2x2", out, fixed = TRUE)))
+  # chi_squared_output.txt Test 2b: Phi .228, Cramer's V .132
+  assert_spss(r$results$phi, 0.228, tier = "display", precision = 3,
+              label = "2b phi (4x5)")
+  assert_spss(r$results$cramers_v, 0.132, tier = "display", precision = 3,
+              label = "2b Cramer's V (4x5)")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()
