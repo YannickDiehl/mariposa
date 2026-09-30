@@ -73,3 +73,78 @@ test_that("REG-02: confint() and profile() work on logistic_regression", {
   td_or <- broom::tidy(mw, conf.int = TRUE, exponentiate = TRUE)
   expect_equal(td_or$conf.high[-1], unname(mw$coef_table$CI_upper[-1]))
 })
+
+# Numerical AME oracle: average centered difference of glm predictions on
+# the original data, perturbing one raw variable
+.ame_oracle <- function(g, dat, v, h = 1e-5) {
+  a1 <- dat; a1[[v]] <- a1[[v]] + h
+  a0 <- dat; a0[[v]] <- a0[[v]] - h
+  mean((stats::predict(g, a1, type = "response") -
+          stats::predict(g, a0, type = "response")) / (2 * h))
+}
+
+# REG-03: marginal_effects() perturbed one column of model$model; for
+# transformed terms (I(x^2), log(x), poly(x)) the transformed column was not
+# recomputed (AME of inc_k 0.466 instead of 0.173), and variables that only
+# enter transformed, character and logical predictors were dropped silently.
+test_that("REG-03: AMEs are rebuilt from the original data for every term type", {
+  d <- .reg_sd2()
+  d$inc_k <- d$income / 1000
+  d$gender_chr <- as.character(d$gender)
+  d$female <- d$gender == "Female"
+  dat <- d[stats::complete.cases(d[c("high_sat", "inc_k", "age")]), ]
+
+  f5 <- high_sat ~ inc_k + I(inc_k^2)
+  me5 <- marginal_effects(logistic_regression(d, f5))$results
+  g5 <- stats::glm(f5, family = stats::binomial(), data = dat)
+  expect_equal(me5$AME[me5$Term == "inc_k"], .ame_oracle(g5, dat, "inc_k"),
+               tolerance = 1e-6)
+  expect_equal(nrow(me5), 1L)
+
+  # Variable entering only transformed: log(), poly(), I()
+  for (f in list(high_sat ~ age + log(income), high_sat ~ age + poly(inc_k, 2),
+                 high_sat ~ age + I(inc_k / 10))) {
+    me <- marginal_effects(logistic_regression(d, f))$results
+    g <- stats::glm(f, family = stats::binomial(), data = dat)
+    raw <- setdiff(all.vars(f[[3]]), "age")
+    expect_true(raw %in% me$Term, info = deparse(f))
+    expect_equal(me$AME[me$Term == raw], .ame_oracle(g, dat, raw),
+                 tolerance = 1e-6, info = deparse(f))
+    expect_equal(me$AME[me$Term == "age"], .ame_oracle(g, dat, "age"),
+                 tolerance = 1e-6, info = deparse(f))
+  }
+
+  # Character and logical predictors: discrete changes, same as the factor
+  me_f <- marginal_effects(logistic_regression(d, high_sat ~ age + gender))$results
+  me_c <- marginal_effects(logistic_regression(d, high_sat ~ age + gender_chr))$results
+  me_l <- marginal_effects(logistic_regression(d, high_sat ~ age + female))$results
+  # character levels sort alphabetically (as glm does): Female is reference
+  expect_equal(me_c$Term[2], "gender_chr: Male vs. Female")
+  expect_equal(me_c$AME[2], -me_f$AME[2], tolerance = 1e-10)
+  expect_equal(me_l$Term[2], "female: TRUE vs. FALSE")
+  expect_equal(me_l$AME[2], me_f$AME[2], tolerance = 1e-10)
+
+  # A numeric variable that enters only as factor() cannot be perturbed:
+  # clear warning naming it, never a silent drop
+  d$edu_num <- as.integer(d$education)
+  expect_warning(
+    me_n <- marginal_effects(logistic_regression(d, high_sat ~ age + factor(edu_num))),
+    "edu_num"
+  )
+  expect_equal(me_n$results$Term, "age")
+})
+
+# REG-04: marginal_effects() on a grouped model with a haven-labelled group
+# variable crashed ("arguments imply differing number of rows: 1, 2").
+test_that("REG-04: grouped marginal_effects() with a labelled group variable", {
+  skip_if_not_installed("haven")
+  d <- .reg_sd2()
+  d$reg <- haven::labelled(as.integer(d$region), c(East = 1, West = 2))
+  mg <- logistic_regression(dplyr::group_by(d, reg), high_sat ~ age + income)
+  expect_no_error(me <- marginal_effects(mg))
+  expect_equal(nrow(me$results), 4L)
+  out <- capture.output(print(me))
+  expect_true(any(grepl("reg = East", out, fixed = TRUE)))
+  expect_true(any(grepl("reg = West", out, fixed = TRUE)))
+  expect_no_error(capture.output(print(summary(me))))
+})

@@ -54,8 +54,15 @@
 #' ## Technical Details
 #'
 #' Continuous predictors use a centered numerical derivative of the
-#' predicted probability; factor predictors use the average discrete
-#' change against the reference level. Standard errors come from the
+#' predicted probability; factor, character and logical predictors use
+#' the average discrete change against the reference level (the first
+#' level; \code{FALSE} for logicals). Effects are computed per
+#' \emph{variable} from the original data: a variable that enters through
+#' several terms (\code{x + I(x^2)}, \code{poly(x, 2)}, \code{log(x)},
+#' interactions) gets one AME that moves all of those terms together. A
+#' numeric variable that enters only as a categorical term (e.g.
+#' \code{factor(x)}) cannot be differentiated; it is skipped with a
+#' warning. Standard errors come from the
 #' delta method with the analytic gradient of the AME with respect to
 #' the coefficients and the model's Wald covariance matrix, matching the
 #' default in Stata's \code{margins} and R's \pkg{margins} package.
@@ -132,11 +139,17 @@ marginal_effects.logistic_regression <- function(model, conf.level = 0.95, ...) 
   if (isTRUE(model$is_grouped)) {
     group_vars <- model$group_vars
     per_group <- lapply(model$groups, function(grp) {
-      rows <- .ame_glm(grp, conf.level)
-      gv <- as.data.frame(grp$group_values, stringsAsFactors = FALSE)
-      cbind(gv, rows)
+      rows <- .ame_glm(grp, conf.level,
+                       group_label = .format_group_label(grp$group_values))
+      # Group keys repeated per row via vctrs-aware tibble construction:
+      # as.data.frame() on a haven_labelled key expanded its value labels
+      # into extra rows ("differing number of rows: 1, 2")
+      gv <- tibble::as_tibble(lapply(grp$group_values, function(v) {
+        rep(v, length.out = nrow(rows))
+      }))
+      dplyr::bind_cols(gv, rows)
     })
-    results <- tibble::as_tibble(do.call(rbind, per_group))
+    results <- dplyr::bind_rows(per_group)
     n <- vapply(model$groups, function(g) g$n, numeric(1))
   } else {
     if (!inherits(model, "glm")) {
@@ -166,30 +179,57 @@ marginal_effects.logistic_regression <- function(model, conf.level = 0.95, ...) 
 
 #' AME computation for one fitted binomial glm
 #'
-#' For each raw predictor variable in the model frame, builds a pair of
-#' counterfactual design matrices (x + h / x - h for continuous, level /
-#' reference for factors), averages the difference of the predicted
-#' probabilities with the model's frequency weights, and derives the
-#' delta-method SE from the analytic gradient
+#' For each raw predictor variable of the formula, builds a pair of
+#' counterfactual copies of the ORIGINAL data (x + h / x - h for numeric
+#' variables, level / reference for factors, character and logical
+#' variables), re-evaluates the whole design matrix from them - so every
+#' term that uses the variable (I(x^2), log(x), poly(x, 2), interactions)
+#' moves with it - averages the difference of the predicted probabilities
+#' with the model's frequency weights, and derives the delta-method SE
+#' from the analytic gradient
 #'   d AME / d beta = wmean( mu'(eta_A) X_A - mu'(eta_B) X_B ) / scale
 #' with mu'(eta) = mu (1 - mu) for the logit link.
+#'
+#' Perturbing columns of model$model instead (the historical approach)
+#' left transformed columns at their fitted values - wrong AMEs for
+#' I(x^2) - and silently skipped variables that exist only inside a
+#' transformation, and character/logical predictors.
+#' @param group_label Group label for warnings (grouped models)
 #' @noRd
-.ame_glm <- function(model, conf.level) {
-  mf <- model$model
+.ame_glm <- function(model, conf.level, group_label = NULL) {
   beta <- stats::coef(model)
-  V <- stats::vcov(model)
+  V <- stats::vcov(.glr_strip_class(model))
   tt <- stats::delete.response(stats::terms(model))
   w <- model$prior.weights
   sw <- sum(w)
+  fam <- model$family %||% stats::binomial()
+  where <- if (!is.null(group_label)) paste0(" (", group_label, ")") else ""
 
-  pred_vars <- all.vars(tt)
+  # Rows of the original data the model was fitted on
+  dat <- model$data
+  if (!is.data.frame(dat)) {
+    cli_abort("{.fn marginal_effects} needs the data the model was fitted on.")
+  }
+  if (!is.null(model$na.action)) {
+    dat <- dat[-as.integer(model$na.action), , drop = FALSE]
+  }
+  if (nrow(dat) != length(w)) {
+    cli_abort("Internal error: fitted rows and model data differ in length.")
+  }
+
+  var_exprs <- as.list(attr(tt, "variables"))[-1]
+  var_labels <- vapply(var_exprs, function(e) {
+    paste(deparse(e, width.cutoff = 500L), collapse = " ")
+  }, character(1))
+  data_classes <- attr(stats::terms(model), "dataClasses")
+  pred_vars <- unique(unlist(lapply(var_exprs, all.vars)))
   z_crit <- stats::qnorm(1 - (1 - conf.level) / 2)
 
   build_X <- function(newdata) {
-    stats::model.matrix(tt, newdata, xlev = model$xlevels,
-                        contrasts.arg = model$contrasts)
+    mf <- stats::model.frame(tt, newdata, xlev = model$xlevels,
+                             na.action = stats::na.pass)
+    stats::model.matrix(tt, mf, contrasts.arg = model$contrasts)
   }
-  linkinv <- stats::binomial()$linkinv
 
   one_contrast <- function(data_a, data_b, scale, term, type) {
     Xa <- build_X(data_a)
@@ -198,13 +238,19 @@ marginal_effects.logistic_regression <- function(model, conf.level = 0.95, ...) 
     keep <- !is.na(beta)
     eta_a <- as.vector(Xa[, keep, drop = FALSE] %*% beta[keep])
     eta_b <- as.vector(Xb[, keep, drop = FALSE] %*% beta[keep])
-    mu_a <- linkinv(eta_a)
-    mu_b <- linkinv(eta_b)
+    mu_a <- fam$linkinv(eta_a)
+    mu_b <- fam$linkinv(eta_b)
 
     ame <- sum(w * (mu_a - mu_b)) / sw / scale
+    if (!is.finite(ame)) {
+      cli_warn(c(
+        "Average marginal effect of {.var {term}}{where} is not finite.",
+        i = "A transformation of the variable is undefined near some observed values."
+      ))
+    }
 
-    dmu_a <- mu_a * (1 - mu_a)
-    dmu_b <- mu_b * (1 - mu_b)
+    dmu_a <- fam$mu.eta(eta_a)
+    dmu_b <- fam$mu.eta(eta_b)
     grad <- (crossprod(Xa[, keep, drop = FALSE], w * dmu_a) -
                crossprod(Xb[, keep, drop = FALSE], w * dmu_b)) / sw / scale
     se <- sqrt(as.numeric(t(grad) %*% V %*% grad))
@@ -224,13 +270,38 @@ marginal_effects.logistic_regression <- function(model, conf.level = 0.95, ...) 
 
   rows <- list()
   for (v in pred_vars) {
-    x <- mf[[v]]
-    if (is.factor(x)) {
-      levs <- model$xlevels[[v]] %||% levels(x)
+    x <- dat[[v]]
+    if (is.null(x)) {
+      cli_warn(c(
+        "No average marginal effect for {.var {v}}{where}.",
+        i = "The variable is not a column of the model data."
+      ))
+      next
+    }
+    n_rows <- length(x)
+    # Model-frame variables (terms of the formula) built from v
+    uses <- var_labels[vapply(var_exprs, function(e) v %in% all.vars(e),
+                              logical(1))]
+    use_classes <- data_classes[uses]
+
+    if (is.factor(x) || is.character(x) || is.logical(x)) {
+      # Discrete change of every level against the reference level
+      if (is.logical(x)) {
+        levs <- c(FALSE, TRUE)
+        set_level <- function(lv) rep(lv, n_rows)
+      } else if (is.factor(x)) {
+        levs <- model$xlevels[[v]] %||% levels(droplevels(x))
+        all_levs <- levels(x)
+        set_level <- function(lv) factor(rep(lv, n_rows), levels = all_levs)
+      } else {
+        levs <- model$xlevels[[v]] %||% sort(unique(x[!is.na(x)]))
+        set_level <- function(lv) rep(lv, n_rows)
+      }
+      if (length(levs) < 2) next
       ref <- levs[1]
       for (lv in levs[-1]) {
-        da <- mf; da[[v]] <- factor(lv, levels = levs)
-        db <- mf; db[[v]] <- factor(ref, levels = levs)
+        da <- dat; da[[v]] <- set_level(lv)
+        db <- dat; db[[v]] <- set_level(ref)
         rows[[length(rows) + 1]] <- one_contrast(
           da, db, scale = 1,
           term = sprintf("%s: %s vs. %s", v, lv, ref),
@@ -238,17 +309,41 @@ marginal_effects.logistic_regression <- function(model, conf.level = 0.95, ...) 
         )
       }
     } else if (is.numeric(x)) {
-      h <- stats::sd(x)
+      categorical_use <- uses[use_classes %in%
+                                c("factor", "ordered", "character", "logical")]
+      if (length(categorical_use) > 0) {
+        # e.g. factor(educ): a numeric variable that enters as categories
+        # cannot be perturbed - say so instead of dropping it silently
+        cli_warn(c(
+          "No average marginal effect for {.var {v}}{where}.",
+          i = "It enters the model as {.code {categorical_use}}, a categorical term.",
+          i = "Convert {.var {v}} to a factor in the data (e.g. with {.fn to_label}) to get discrete-change AMEs."
+        ))
+        next
+      }
+      xv <- .plain_numeric(x)
+      h <- stats::sd(xv)
       if (!is.finite(h) || h == 0) h <- 1
       h <- h * 1e-4
-      da <- mf; da[[v]] <- x + h
-      db <- mf; db[[v]] <- x - h
+      da <- dat; da[[v]] <- xv + h
+      db <- dat; db[[v]] <- xv - h
       rows[[length(rows) + 1]] <- one_contrast(
         da, db, scale = 2 * h, term = v, type = "dydx"
       )
+    } else {
+      cli_warn(c(
+        "No average marginal effect for {.var {v}}{where}.",
+        i = "Unsupported variable type {.cls {class(x)[1]}}."
+      ))
     }
   }
 
+  if (length(rows) == 0) {
+    return(tibble::tibble(Term = character(0), Type = character(0),
+                          AME = numeric(0), SE = numeric(0), z = numeric(0),
+                          p_value = numeric(0), CI_lower = numeric(0),
+                          CI_upper = numeric(0)))
+  }
   do.call(rbind, rows)
 }
 
