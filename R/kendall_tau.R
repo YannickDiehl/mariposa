@@ -317,8 +317,9 @@ kendall_tau <- function(data, ..., weights = NULL,
     )
   },
   params = NULL,
+  min_n = 2,
   pair_stat_prefix = "Kendall's tau-b: tau-b",
-  pair_extras = function(corrs, digits) {
+  pair_extras = function(corrs, digits, x) {
     # Always show z-score (returns lines; printed by the engine's print layer)
     if ("z_score" %in% names(corrs)) {
       sprintf("  z-score: %.*f\n", digits, corrs$z_score[1])
@@ -332,16 +333,21 @@ kendall_tau <- function(data, ..., weights = NULL,
     sprintf("Significance Matrix (p-values, %s):",
             if (x$alternative == "two.sided") "2-tailed" else "1-tailed")
   },
-  pairwise_df = function(corrs, digits) {
-    data.frame(
-      Pair = paste(corrs$var1, "\u00d7", corrs$var2),
-      tau_b = sprintf("%.*f", digits, corrs$tau),
-      z = sprintf("%.*f", digits, corrs$z_score),
-      p = sprintf("%.4f", as.numeric(corrs$p_value)),
-      n = corrs$n,
+  pairwise_df = function(corrs, digits, x) {
+    out <- data.frame(
+      Pair = paste(corrs$var1, "x", corrs$var2),
+      tau_b = formatC(as.numeric(corrs$tau), format = "f", digits = digits),
+      z = formatC(as.numeric(corrs$z_score), format = "f", digits = digits),
+      p = fmt_p(corrs$p_value, digits, style = "table"),
+      n = .fmt_n(corrs$n),
       sig = corrs$sig,
       stringsAsFactors = FALSE
     )
+    na <- is.na(corrs$tau)
+    out$tau_b[na] <- "n.c."
+    out$z[na] <- ""
+    attr(out, "col_labels") <- c(tau_b = "tau-b", n = "N", sig = "")
+    out
   }
 )
 

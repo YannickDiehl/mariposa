@@ -113,3 +113,24 @@
   to `to_label()` for dummy coding. The Descriptive Statistics table shows
   one row per dummy (the share of each category) for factor predictors
   instead of the meaningless mean of the level index.
+* Correlation output (`pearson_cor()`, `spearman_rho()`, `kendall_tau()`,
+  `partial_cor()`):
+  - The compact print of a matrix shows the N range over the pairs
+    (`N = 2008-2421`); it showed the N of the first pair only (even
+    `N = 0`). With more than 15 pairs it lists the strongest significant
+    pairs instead of every pair (45 lines for 10 variables).
+  - `pearson_cor()` labels the interval by `conf.level` ("90% CI"; every
+    interval was called "95% CI", the column `CI_95`). A one-sided test
+    (`alternative = "less"`/`"greater"`) is named in print and summary
+    and gets the matching one-sided interval, as `cor.test()`.
+  - Matrices follow SPSS: blank p-value diagonal (was 0.0000), p in table
+    style (`<.001` instead of 0.0000), significance flags on the
+    coefficients, `digits` honoured for any number of variables (it
+    dropped to 2 decimals above 6 variables), and columns split into
+    blocks that fit the console instead of widening the `width` option.
+  - A constant variable gives one warning naming it and "not computed (no
+    variance)" instead of "r = NA, p = NA ," and one base-R warning per
+    pair; `partial_cor()` with a constant control variable no longer
+    crashes with "missing value where TRUE/FALSE needed".
+  - Aligned pair labels and a pairwise table that no longer wraps; a very
+    large weighted N (above 2^31) no longer breaks the output.

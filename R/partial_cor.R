@@ -161,7 +161,8 @@ partial_cor <- function(data, ..., controls, weights = NULL) {
     group_keys <- dplyr::group_keys(data)
 
     per_group <- lapply(seq_along(group_split), function(i) {
-      .partial_cor_group(group_split[[i]], var_names, control_names, w_name)
+      .partial_cor_group(group_split[[i]], var_names, control_names, w_name,
+                         .format_group_label(group_keys[i, , drop = FALSE]))
     })
     correlations <- do.call(rbind, lapply(seq_along(per_group), function(i) {
       cbind(group_keys[i, , drop = FALSE], per_group[[i]]$rows)
@@ -193,9 +194,11 @@ partial_cor <- function(data, ..., controls, weights = NULL) {
 
 #' Partial correlations for one data block
 #' @noRd
-.partial_cor_group <- function(data, var_names, control_names, w_name) {
+.partial_cor_group <- function(data, var_names, control_names, w_name,
+                               group_label = NULL) {
   all_vars <- c(var_names, control_names)
   k <- length(control_names)
+  where <- if (!is.null(group_label)) paste0(" (", group_label, ")") else ""
 
   # Listwise deletion across analysis + control variables (SPSS
   # /MISSING=LISTWISE); zero-weight cases are excluded like in the
@@ -224,11 +227,24 @@ partial_cor <- function(data, ..., controls, weights = NULL) {
     }
   }
 
+  # A constant variable (after listwise deletion) has no correlations: its
+  # NA entries made the partial-correlation algebra crash with "missing
+  # value where TRUE/FALSE needed"
+  constant <- all_vars[vapply(all_vars, function(v) {
+    length(unique(data[[v]][!is.na(data[[v]])])) < 2L
+  }, logical(1))]
+  if (length(constant) > 0) {
+    cli_warn(c(
+      "Partial correlations not computed{where}: no variance in {.var {constant}}.",
+      i = "Constant variables (after listwise deletion) cannot be correlated or controlled for."
+    ))
+  }
+
   c_idx <- match(control_names, all_vars)
-  Rcc_inv <- tryCatch(solve(R[c_idx, c_idx, drop = FALSE]),
-                      error = function(e) NULL)
-  if (is.null(Rcc_inv)) {
-    cli_warn("Control-variable correlation matrix is singular; partial correlations are NA.")
+  Rcc <- R[c_idx, c_idx, drop = FALSE]
+  Rcc_inv <- if (anyNA(Rcc)) NULL else tryCatch(solve(Rcc), error = function(e) NULL)
+  if (is.null(Rcc_inv) && !anyNA(Rcc)) {
+    cli_warn("Control-variable correlation matrix is singular{where}; partial correlations are NA.")
   }
 
   n_vars <- length(var_names)
@@ -247,7 +263,12 @@ partial_cor <- function(data, ..., controls, weights = NULL) {
         num <- r_xy - as.numeric(t(b_i) %*% Rcc_inv %*% b_j)
         den_i <- 1 - as.numeric(t(b_i) %*% Rcc_inv %*% b_i)
         den_j <- 1 - as.numeric(t(b_j) %*% Rcc_inv %*% b_j)
-        r_p <- if (den_i > 0 && den_j > 0) num / sqrt(den_i * den_j) else NA_real_
+        r_p <- if (is.finite(num) && is.finite(den_i) && is.finite(den_j) &&
+                   den_i > 0 && den_j > 0) {
+          num / sqrt(den_i * den_j)
+        } else {
+          NA_real_
+        }
       }
       partial_mat[i, j] <- partial_mat[j, i] <- r_p
 
@@ -310,15 +331,19 @@ print.partial_cor <- function(x, digits = 3, ...) {
               weighted_tag))
 
   print_rows <- function(corrs, indent = "  ") {
+    labels <- paste0(corrs$var1, " x ", corrs$var2, ":")
+    w <- max(nchar(labels, type = "width"))
     for (i in seq_len(nrow(corrs))) {
       r <- corrs[i, ]
-      cat(sprintf("%s%s x %s: partial r = %.*f, %s %s (zero-order r = %.*f), N = %d\n",
-                  indent, r$var1, r$var2,
-                  digits, r$partial_r,
-                  format_p_compact(r$p_value, digits),
-                  add_significance_stars(r$p_value),
-                  digits, r$zero_order_r,
-                  r$n))
+      stat <- if (is.na(r$partial_r)) {
+        "partial r not computed (no variance or too few cases)"
+      } else {
+        sprintf("partial r = %.*f, %s (zero-order r = %.*f)",
+                digits, r$partial_r, format_p_stars(r$p_value, digits),
+                digits, r$zero_order_r)
+      }
+      cat(indent, pad_utf8(labels[i], w), " ", stat, ", N = ", .fmt_n(r$n),
+          "\n", sep = "")
     }
   }
 
@@ -427,13 +452,21 @@ print.summary.partial_cor <- function(x, ...) {
 
   print_block <- function(corrs, matrix_idx) {
     if (show_matrix) {
-      .print_cor_matrix(x$matrices[[matrix_idx]], digits = digits,
-                        title = "Partial Correlation Matrix:",
-                        type = "correlation")
+      pmat <- x$matrices[[matrix_idx]]
+      # p-values of the pairs, for the significance flags in the matrix
+      p_mat <- matrix(NA_real_, nrow(pmat), ncol(pmat),
+                      dimnames = dimnames(pmat))
+      p_mat[cbind(corrs$var1, corrs$var2)] <- corrs$p_value
+      p_mat[cbind(corrs$var2, corrs$var1)] <- corrs$p_value
+      .print_cor_matrix_fit(pmat, "Partial Correlation Matrix:",
+                            type = "correlation", digits = digits,
+                            p_mat = p_mat)
     }
     if (show_pairwise) {
       cat("\nPairwise Results:\n")
-      df <- corrs[stat_cols]
+      df <- as.data.frame(corrs[stat_cols])
+      # counts as text: a weighted N can exceed the integer range
+      df$n <- .fmt_n(df$n)
       df$sig <- add_significance_stars(df$p_value)
       print_stat_table(df, digits = digits, col_labels = labels)
     }

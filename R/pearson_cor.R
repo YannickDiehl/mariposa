@@ -23,7 +23,9 @@
 #'   \code{sum(w) == n}, or use the survey package for design-based inference.
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #' @param alternative Direction of the test: \code{"two.sided"} (default),
-#'   \code{"less"}, or \code{"greater"}.
+#'   \code{"less"}, or \code{"greater"}. A one-sided test gets the matching
+#'   one-sided confidence interval (\code{[-1, upper]} for \code{"less"},
+#'   \code{[lower, 1]} for \code{"greater"}), as \code{stats::cor.test()}.
 #' @param use How to handle missing values:
 #'   \itemize{
 #'     \item \code{"pairwise"} (default): Use all available data for each pair
@@ -216,7 +218,14 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
       ))
     }
 
-    r <- cor(x, y, method = "pearson")
+    # A constant variable has no correlation: NA without cor()'s
+    # (translated) "standard deviation is zero" warning - the engine
+    # reports the variable once with a cli warning
+    r <- if (length(unique(x)) < 2L || length(unique(y)) < 2L) {
+      NA_real_
+    } else {
+      cor(x, y, method = "pearson")
+    }
     n_eff <- n
   }
 
@@ -250,18 +259,26 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
     )
   }
 
-  # Calculate confidence interval using Fisher's z transformation
+  # Calculate confidence interval using Fisher's z transformation. A
+  # one-sided test gets the matching one-sided interval (as
+  # stats::cor.test): "less" -> [-1, upper], "greater" -> [lower, 1].
   if (abs(r) < 1) {
     z <- 0.5 * log((1 + r) / (1 - r))
     se_z <- 1 / sqrt(n_eff - 3)
-    z_crit <- qnorm((1 + conf.level) / 2)
+    to_r <- function(zz) (exp(2 * zz) - 1) / (exp(2 * zz) + 1)
 
-    z_lower <- z - z_crit * se_z
-    z_upper <- z + z_crit * se_z
-
-    # Transform back to correlation scale
-    ci_lower <- (exp(2 * z_lower) - 1) / (exp(2 * z_lower) + 1)
-    ci_upper <- (exp(2 * z_upper) - 1) / (exp(2 * z_upper) + 1)
+    if (alternative == "less") {
+      ci_lower <- -1
+      ci_upper <- to_r(z + qnorm(conf.level) * se_z)
+    } else if (alternative == "greater") {
+      ci_lower <- to_r(z - qnorm(conf.level) * se_z)
+      ci_upper <- 1
+    } else {
+      z_crit <- qnorm((1 + conf.level) / 2)
+      # Transform back to correlation scale
+      ci_lower <- to_r(z - z_crit * se_z)
+      ci_upper <- to_r(z + z_crit * se_z)
+    }
   } else {
     ci_lower <- r
     ci_upper <- r
@@ -324,14 +341,18 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
       "Missing data handling" = paste(x$use, "deletion")
     )
   },
-  params = function(x) list(conf.level = x$conf.level),
+  params = function(x) list(conf.level = x$conf.level,
+                            alternative = x$alternative),
+  min_n = 3,
   pair_stat_prefix = "Correlation: r",
-  pair_extras = function(corrs, digits) {
+  pair_extras = function(corrs, digits, x) {
     # Always show CI and r-squared (returns lines; printed by the engine's
-    # print layer)
+    # print layer). The label follows conf.level; a one-sided test has a
+    # one-sided interval.
     lines <- character(0)
     if ("conf_int_lower" %in% names(corrs)) {
-      lines <- c(lines, sprintf("  95%% CI: [%.*f, %.*f]\n", digits,
+      lines <- c(lines, sprintf("  %s: [%.*f, %.*f]\n",
+                                .pearson_ci_label(x), digits,
                                 corrs$conf_int_lower[1], digits,
                                 corrs$conf_int_upper[1]))
     }
@@ -343,21 +364,40 @@ pearson_cor <- function(data, ..., weights = NULL, conf.level = 0.95,
   },
   matrix_key = "correlations",
   matrix_title = "Correlation Matrix:",
-  p_title = function(x) "Significance Matrix (p-values):",
-  pairwise_df = function(corrs, digits) {
-    data.frame(
-      Variable_Pair = paste(corrs$var1, "\u00d7", corrs$var2),
-      r = round(corrs$correlation, digits),
-      r_squared = round(corrs$r_squared, digits),
-      p_value = round(as.numeric(corrs$p_value), 4),
-      CI_95 = sprintf("[%.*f, %.*f]", digits, corrs$conf_int_lower,
-                      digits, corrs$conf_int_upper),
-      n = corrs$n,
+  p_title = function(x) {
+    sprintf("Significance Matrix (p-values, %s):",
+            if (x$alternative == "two.sided") "2-tailed" else "1-tailed")
+  },
+  pairwise_df = function(corrs, digits, x) {
+    # r-squared stays in $correlations; the table keeps to what the
+    # matrices do not show (the CI) so it fits a normal console
+    out <- data.frame(
+      Pair = paste(corrs$var1, "x", corrs$var2),
+      r = formatC(corrs$correlation, format = "f", digits = digits),
+      p = fmt_p(corrs$p_value, digits, style = "table"),
+      ci = sprintf("[%.*f, %.*f]", digits, corrs$conf_int_lower,
+                   digits, corrs$conf_int_upper),
+      n = .fmt_n(corrs$n),
       sig = corrs$sig,
       stringsAsFactors = FALSE
     )
+    na <- is.na(corrs$correlation)
+    out$r[na] <- "n.c."
+    out$ci[na] <- ""
+    attr(out, "col_labels") <- c(ci = .pearson_ci_label(x), n = "N", sig = "")
+    out
   }
 )
+
+#' CI label for pearson_cor output: "95% CI" / "90% CI (one-sided, less)"
+#' @noRd
+.pearson_ci_label <- function(x) {
+  lab <- paste(.ci_label(x$conf.level), "CI")
+  if (!identical(x$alternative %||% "two.sided", "two.sided")) {
+    lab <- sprintf("%s (one-sided, %s)", lab, x$alternative)
+  }
+  lab
+}
 
 #' Print Pearson correlation results (compact)
 #'

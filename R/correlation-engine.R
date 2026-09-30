@@ -120,7 +120,7 @@
   m_names <- names(spec$matrices)
 
   # Compute matrices + long-format rows for one group (or the whole data)
-  run_group <- function(group_data) {
+  run_group <- function(group_data, group_label = NULL) {
     weights_vec <- if (!is.null(w_name)) group_data[[w_name]] else NULL
 
     # Pair computations run on bare numbers: labelled vectors would send
@@ -184,6 +184,11 @@
       }
     }
 
+    # Degenerate pairs (NA coefficient): one warning naming the cause,
+    # instead of silent NA rows (and one base-R warning per pair)
+    .warn_cor_not_computed(pair_results, group_data, var_names, weights_vec,
+                           spec$stat_col, group_label)
+
     # Convert to long format (one 1-row data frame per pair)
     rows <- lapply(pair_results, function(pr) {
       if (identical(spec$df_source, "pairs")) {
@@ -213,7 +218,10 @@
     data_list <- dplyr::group_split(data)
     group_keys <- dplyr::group_keys(data)
 
-    per_group <- lapply(data_list, run_group)
+    per_group <- lapply(seq_along(data_list), function(gi) {
+      run_group(data_list[[gi]],
+                group_label = .format_group_label(group_keys[gi, , drop = FALSE]))
+    })
     matrices_list <- lapply(per_group, function(g) g$matrices)
 
     group_dfs <- lapply(seq_along(per_group), function(gi) {
@@ -301,38 +309,128 @@
 }
 
 #' Print compact correlation output for one group or ungrouped
+#'
+#' Pair labels are padded to the longest label (display width); a
+#' not-computable coefficient reads "not computed (<reason>)"; the N is
+#' the range over the pairs (pairwise deletion gives each pair its own N);
+#' with more than 15 pairs only the strongest significant pairs are listed
+#' so the compact print stays compact.
 #' @noRd
 .print_cor_compact <- function(x, corrs, weighted_tag, digits, spec) {
   n_vars <- length(x$variables)
-  stat <- corrs[[spec$stat_col]]
+  stat <- as.numeric(corrs[[spec$stat_col]])
+  p <- as.numeric(corrs$p_value)
+  n <- as.numeric(corrs$n)
+  alt_tag <- .cor_alternative_tag(x$alternative)
+  texts <- .cor_stat_text(spec$stat_label, stat, p, n, digits, spec$min_n)
 
   if (n_vars == 2) {
     pair_label <- paste(x$variables[1], "x", x$variables[2])
-    cat(sprintf("%s: %s%s\n", spec$compact_title, pair_label, weighted_tag))
-    p_val <- as.numeric(corrs$p_value[1])
-    cat(sprintf("  %s = %.*f, %s %s, N = %d\n",
-                spec$stat_label, digits, stat[1],
-                format_p_compact(p_val, digits),
-                add_significance_stars(p_val),
-                corrs$n[1]))
+    cat(sprintf("%s: %s%s%s\n", spec$compact_title, pair_label, alt_tag,
+                weighted_tag))
+    cat(sprintf("  %s, N = %s\n", texts[1], .fmt_n(n[1])))
   } else {
-    n_sig <- sum(as.numeric(corrs$p_value) < 0.05, na.rm = TRUE)
+    n_sig <- sum(p < 0.05, na.rm = TRUE)
     n_pairs <- nrow(corrs)
-    cat(sprintf("%s: %d variables%s\n", spec$compact_title, n_vars, weighted_tag))
+    cat(sprintf("%s: %d variables%s%s\n", spec$compact_title, n_vars,
+                alt_tag, weighted_tag))
 
-    for (i in seq_len(n_pairs)) {
-      pair_label <- paste(corrs$var1[i], "x", corrs$var2[i])
-      p_val <- as.numeric(corrs$p_value[i])
-      line <- sprintf("  %-30s %s = %.*f, %s %s",
-                      paste0(pair_label, ":"),
-                      spec$stat_label, digits, stat[i],
-                      format_p_compact(p_val, digits),
-                      add_significance_stars(p_val))
-      cat(line, "\n")
+    labels <- paste0(corrs$var1, " x ", corrs$var2, ":")
+    show <- seq_len(n_pairs)
+    limited <- n_pairs > 15L
+    if (limited) {
+      sig <- which(!is.na(p) & p < 0.05)
+      show <- utils::head(sig[order(-abs(stat[sig]))], 10L)
     }
-    cat(sprintf("  %d/%d pairs significant (p < .05), N = %d\n",
-                n_sig, n_pairs, corrs$n[1]))
+    if (length(show) > 0) {
+      w <- max(nchar(labels[show], type = "width"))
+      for (i in show) {
+        cat("  ", pad_utf8(labels[i], w), " ", texts[i], "\n", sep = "")
+      }
+    }
+    if (limited) {
+      cat(sprintf("  (%s: the %d strongest significant pairs; summary() shows all %d)\n",
+                  if (length(show) > 0) "Shown" else "None shown",
+                  length(show), n_pairs))
+    }
+    cat(sprintf("  %d/%d pairs significant (p < .05), %s\n",
+                n_sig, n_pairs, .cor_n_range(n, stat)))
   }
+}
+
+#' "r = 0.123, p = 0.045 *" per pair, or "not computed (<reason>)"
+#' @noRd
+.cor_stat_text <- function(label, stat, p, n, digits, min_n = 3) {
+  out <- sprintf("%s = %s, %s", label,
+                 formatC(stat, format = "f", digits = digits),
+                 vapply(p, format_p_stars, character(1), digits = digits))
+  miss <- is.na(stat)
+  out[miss] <- ifelse(!is.na(n[miss]) & n[miss] < (min_n %||% 3),
+                      "not computed (too few valid cases)",
+                      "not computed (no variance)")
+  out
+}
+
+#' "N = 2186" or "N = 2076-2500" over the computed pairs
+#' @noRd
+.cor_n_range <- function(n, stat = NULL) {
+  use <- if (!is.null(stat) && any(!is.na(stat))) n[!is.na(stat)] else n
+  use <- use[!is.na(use)]
+  if (length(use) == 0) return("N = NA")
+  lo <- min(use)
+  hi <- max(use)
+  if (round(lo) == round(hi)) {
+    paste("N =", .fmt_n(lo))
+  } else {
+    paste0("N = ", .fmt_n(lo), "-", .fmt_n(hi))
+  }
+}
+
+#' Title tag for a one-sided test ("" for two-sided)
+#' @noRd
+.cor_alternative_tag <- function(alternative) {
+  if (is.null(alternative) || identical(alternative, "two.sided")) return("")
+  sprintf(" [one-sided: %s]", alternative)
+}
+
+#' Warn once about pairs whose coefficient could not be computed
+#'
+#' A constant variable (or one with too few valid cases) used to leave NA
+#' rows silently - plus one translated base-R "standard deviation is zero"
+#' warning per pair. Names the variables and, for grouped data, the group.
+#' @noRd
+.warn_cor_not_computed <- function(pair_results, group_data, var_names,
+                                   weights_vec, stat_col, group_label = NULL) {
+  bad <- Filter(function(pr) is.na(pr$res[[stat_col]]), pair_results)
+  if (length(bad) == 0) return(invisible(NULL))
+  involved <- unique(unlist(lapply(bad, function(pr) var_names[c(pr$i, pr$j)])))
+  valid_values <- function(v) {
+    x <- group_data[[v]]
+    keep <- !is.na(x)
+    if (!is.null(weights_vec)) keep <- keep & !is.na(weights_vec) & weights_vec > 0
+    x[keep]
+  }
+  n_valid <- vapply(involved, function(v) length(valid_values(v)), numeric(1))
+  constant <- involved[n_valid >= 3 & vapply(involved, function(v) {
+    length(unique(valid_values(v))) == 1L
+  }, logical(1))]
+  sparse <- involved[n_valid < 3]
+  where <- if (!is.null(group_label)) paste0(" (", group_label, ")") else ""
+  msg <- c("Some correlations are not computed{where}.")
+  if (length(constant) > 0) {
+    msg <- c(msg, x = "No variance: {.var {constant}}.")
+  }
+  if (length(sparse) > 0) {
+    msg <- c(msg, x = "Too few valid cases: {.var {sparse}}.")
+  }
+  if (length(constant) == 0 && length(sparse) == 0) {
+    pairs <- vapply(bad, function(pr) {
+      paste(var_names[pr$i], "x", var_names[pr$j])
+    }, character(1))
+    msg <- c(msg, x = "Too few valid paired cases: {pairs}.")
+  }
+  cli_warn(msg)
+  invisible(NULL)
 }
 
 #' Verbose print driver shared by the three summary.* correlation classes
@@ -385,53 +483,144 @@
 .print_cor_verbose <- function(x, corrs, matrix_idx, show_cor, show_p, show_n,
                                digits, spec) {
   n_vars <- length(x$variables)
+  tails <- if (identical(x$alternative %||% "two.sided", "two.sided")) {
+    "2-tailed"
+  } else {
+    "1-tailed"
+  }
 
   if (n_vars == 2) {
     # For 2 variables, show single-pair detail with optional sections
+    stat <- as.numeric(corrs[[spec$stat_col]][1])
+    p <- as.numeric(corrs$p_value[1])
+    n <- as.numeric(corrs$n[1])
     if (show_cor) {
-      cat(sprintf("\n  %s = %.*f\n", spec$pair_stat_prefix, digits,
-                  corrs[[spec$stat_col]][1]))
+      if (is.na(stat)) {
+        cat(sprintf("\n  %s: %s\n", spec$pair_stat_prefix,
+                    .cor_stat_text("", stat, p, n, digits, spec$min_n)))
+      } else {
+        cat(sprintf("\n  %s = %.*f\n", spec$pair_stat_prefix, digits, stat))
+      }
     }
-    if (show_p) {
-      cat(sprintf("  p-value: %s %s\n",
-                  format_p_compact(as.numeric(corrs$p_value[1]), digits),
-                  add_significance_stars(as.numeric(corrs$p_value[1]))))
+    if (show_p && !is.na(stat)) {
+      cat(sprintf("  p-value (%s): %s\n", tails, format_p_stars(p, digits)))
     }
     if (show_n) {
-      cat(sprintf("  N = %d\n", corrs$n[1]))
+      cat(sprintf("  N = %s\n", .fmt_n(n)))
     }
     # Always-shown per-method extras (CI/r-squared, t-statistic, z-score);
     # the spec callback returns formatted lines so that all console output
     # stays inside this print layer
-    cat(spec$pair_extras(corrs, digits), sep = "")
+    if (!is.na(stat)) cat(spec$pair_extras(corrs, digits, x), sep = "")
   } else {
     # For 3+ variables, show matrices and pairwise table
+    mats <- x$matrices[[matrix_idx]]
 
     if (show_cor) {
-      .print_cor_matrix(x$matrices[[matrix_idx]][[spec$matrix_key]],
-                        digits = digits,
-                        title = spec$matrix_title,
-                        type = "correlation")
+      # Significance flags on the coefficients, as SPSS FLAG does
+      .print_cor_matrix_fit(mats[[spec$matrix_key]], spec$matrix_title,
+                            type = "correlation", digits = digits,
+                            p_mat = mats$p_values)
     }
 
     if (show_p) {
-      .print_cor_matrix(x$matrices[[matrix_idx]]$p_values, digits = 4,
-                        title = spec$p_title(x),
-                        type = "pvalue")
+      .print_cor_matrix_fit(mats$p_values, spec$p_title(x), type = "pvalue",
+                            digits = digits)
     }
 
     if (show_n) {
-      .print_cor_matrix(x$matrices[[matrix_idx]]$n_obs, digits = 0,
-                        title = "Sample Size Matrix:",
-                        type = "n")
+      .print_cor_matrix_fit(mats$n_obs, "Sample Size Matrix:", type = "n")
     }
 
-    # Pairwise results always shown
+    # Pairwise results always shown (pre-formatted text columns)
     cat("\nPairwise Results:\n")
-    border_width <- paste(rep("-", 16), collapse = "")
-    cat(border_width, "\n")
-
-    print(spec$pairwise_df(corrs, digits), row.names = FALSE)
-    cat(border_width, "\n")
+    tab <- spec$pairwise_df(corrs, digits, x)
+    print_stat_table(tab, col_types = stats::setNames(rep("char", ncol(tab)),
+                                                      names(tab)),
+                     col_labels = attr(tab, "col_labels"))
+    if (any(is.na(corrs[[spec$stat_col]]))) {
+      cat("  n.c. = not computed (no variance or too few valid cases)\n")
+    }
   }
+}
+
+#' Print a correlation / p-value / N matrix that fits the console
+#'
+#' Replaces .print_cor_matrix() for the correlation classes: honours
+#' `digits` for any number of variables (it dropped to 2 decimals above 6
+#' variables), leaves the p-value diagonal blank and shows p in SPSS table
+#' style ("<.001" instead of 0.0000), flags significant coefficients, and
+#' splits the columns into blocks that fit getOption("width") instead of
+#' temporarily raising the width option (lines wider than the console).
+#'
+#' @param mat Square matrix with variable dimnames
+#' @param title Section title
+#' @param type "correlation", "pvalue" or "n"
+#' @param digits Decimal places (correlation / p)
+#' @param p_mat Optional p-value matrix; adds significance stars to
+#'   correlation cells
+#' @noRd
+.print_cor_matrix_fit <- function(mat, title, type = c("correlation", "pvalue", "n"),
+                                  digits = 3, p_mat = NULL) {
+  type <- match.arg(type)
+  vars <- rownames(mat)
+  k <- ncol(mat)
+  num <- matrix("", k, k)
+  star <- matrix("", k, k)
+  for (i in seq_len(k)) {
+    for (j in seq_len(k)) {
+      v <- mat[i, j]
+      num[i, j] <- switch(type,
+        correlation = if (i == j) "1" else if (is.na(v)) "" else
+          formatC(v, format = "f", digits = digits),
+        pvalue = if (i == j) "" else fmt_p(v, digits, style = "table"),
+        n = if (is.na(v)) "" else .fmt_n(v)
+      )
+      if (type == "correlation" && !is.null(p_mat) && i != j) {
+        star[i, j] <- add_significance_stars(p_mat[i, j])
+      }
+    }
+  }
+  sw <- max(nchar(star), 0L)
+  col_w <- vapply(seq_len(k), function(j) {
+    max(nchar(vars[j], type = "width"), nchar(num[, j], type = "width"))
+  }, numeric(1))
+  row_w <- max(nchar(vars, type = "width"))
+
+  # Greedy column blocks that fit the console width
+  avail <- max(getOption("width", 80L) - row_w, 1L)
+  blocks <- list()
+  current <- integer(0)
+  used <- 0
+  for (j in seq_len(k)) {
+    need <- 2 + col_w[j] + sw
+    if (length(current) > 0 && used + need > avail) {
+      blocks[[length(blocks) + 1]] <- current
+      current <- integer(0)
+      used <- 0
+    }
+    current <- c(current, j)
+    used <- used + need
+  }
+  blocks[[length(blocks) + 1]] <- current
+
+  border <- strrep("-", nchar(title, type = "width"))
+  cat("\n", title, "\n", border, "\n", sep = "")
+  for (b in seq_along(blocks)) {
+    cols <- blocks[[b]]
+    if (b > 1) cat("\n")
+    header <- paste0(vapply(cols, function(j) {
+      paste0("  ", pad_utf8(vars[j], col_w[j], align = "right"), strrep(" ", sw))
+    }, character(1)), collapse = "")
+    cat(strrep(" ", row_w), header, "\n", sep = "")
+    for (i in seq_len(k)) {
+      cells <- paste0(vapply(cols, function(j) {
+        paste0("  ", pad_utf8(num[i, j], col_w[j], align = "right"),
+               if (sw > 0) pad_utf8(star[i, j], sw) else "")
+      }, character(1)), collapse = "")
+      cat(pad_utf8(vars[i], row_w), cells, "\n", sep = "")
+    }
+  }
+  cat(border, "\n", sep = "")
+  invisible(NULL)
 }

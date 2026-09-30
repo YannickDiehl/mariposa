@@ -175,8 +175,13 @@ spearman_rho <- function(data, ..., weights = NULL,
     rank_x <- rank(x, na.last = "keep", ties.method = "average")
     rank_y <- rank(y, na.last = "keep", ties.method = "average")
 
-    # Calculate unweighted Pearson correlation of ranks
-    rho <- cor(rank_x, rank_y, use = "complete.obs", method = "pearson")
+    # Calculate unweighted Pearson correlation of ranks (NA for a constant
+    # variable, without cor()'s base warning)
+    rho <- if (length(unique(x)) < 2L || length(unique(y)) < 2L) {
+      NA_real_
+    } else {
+      cor(rank_x, rank_y, use = "complete.obs", method = "pearson")
+    }
     n_eff <- n
 
   } else {
@@ -199,8 +204,13 @@ spearman_rho <- function(data, ..., weights = NULL,
     rank_x <- rank(x, na.last = "keep", ties.method = "average")
     rank_y <- rank(y, na.last = "keep", ties.method = "average")
 
-    # Calculate Pearson correlation of ranks
-    rho <- cor(rank_x, rank_y, use = "complete.obs", method = "pearson")
+    # Calculate Pearson correlation of ranks (NA for a constant variable,
+    # without cor()'s base warning)
+    rho <- if (length(unique(x)) < 2L || length(unique(y)) < 2L) {
+      NA_real_
+    } else {
+      cor(rank_x, rank_y, use = "complete.obs", method = "pearson")
+    }
     n_eff <- n
   }
 
@@ -287,8 +297,9 @@ spearman_rho <- function(data, ..., weights = NULL,
     )
   },
   params = function(x) list(alternative = x$alternative),
+  min_n = 3,
   pair_stat_prefix = "Spearman's rho: rho",
-  pair_extras = function(corrs, digits) {
+  pair_extras = function(corrs, digits, x) {
     # Always show t-stat (returns lines; printed by the engine's print layer)
     if ("t_stat" %in% names(corrs)) {
       sprintf("  t-statistic: %.*f\n", digits, corrs$t_stat[1])
@@ -302,16 +313,21 @@ spearman_rho <- function(data, ..., weights = NULL,
     sprintf("Significance Matrix (p-values, %s):",
             if (x$alternative == "two.sided") "2-tailed" else "1-tailed")
   },
-  pairwise_df = function(corrs, digits) {
-    data.frame(
-      Pair = paste(corrs$var1, "\u00d7", corrs$var2),
-      rho = sprintf("%.*f", digits, corrs$rho),
-      t = sprintf("%.*f", digits, corrs$t_stat),
-      p = sprintf("%.4f", as.numeric(corrs$p_value)),
-      n = corrs$n,
+  pairwise_df = function(corrs, digits, x) {
+    out <- data.frame(
+      Pair = paste(corrs$var1, "x", corrs$var2),
+      rho = formatC(as.numeric(corrs$rho), format = "f", digits = digits),
+      t = formatC(as.numeric(corrs$t_stat), format = "f", digits = digits),
+      p = fmt_p(corrs$p_value, digits, style = "table"),
+      n = .fmt_n(corrs$n),
       sig = corrs$sig,
       stringsAsFactors = FALSE
     )
+    na <- is.na(corrs$rho)
+    out$rho[na] <- "n.c."
+    out$t[na] <- ""
+    attr(out, "col_labels") <- c(n = "N", sig = "")
+    out
   }
 )
 

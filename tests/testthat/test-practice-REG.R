@@ -601,3 +601,134 @@ test_that("EDGE-17: regression prints survive very large weighted N", {
                           weights = wbig)
   expect_no_error(capture.output(print(mg), print(summary(mg))))
 })
+
+# ---------------------------------------------------------------------------
+# Correlations
+# ---------------------------------------------------------------------------
+
+# REG-14: the compact print of a correlation matrix showed the N of the
+# first pair only (even "N = 0") although pairwise deletion gives each
+# pair its own N.
+test_that("REG-14: compact correlation print shows the N range", {
+  p5 <- pearson_cor(survey_data, age, income, life_satisfaction, trust_media,
+                    political_orientation)
+  n <- p5$correlations$n
+  out <- capture.output(print(p5))
+  expect_true(any(grepl(sprintf("N = %d-%d", min(n), max(n)), out, fixed = TRUE)))
+  pl <- pearson_cor(survey_data, age, income, life_satisfaction, use = "listwise")
+  out_l <- capture.output(print(pl))
+  expect_true(any(grepl(sprintf("N = %d$", pl$correlations$n[1]), out_l)))
+  k <- kendall_tau(survey_data[1:200, ], age, income, trust_media)
+  expect_true(any(grepl(sprintf("N = %d-%d", min(k$correlations$n),
+                                max(k$correlations$n)),
+                        capture.output(print(k)), fixed = TRUE)))
+})
+
+# REG-15: pearson_cor labelled every interval "95% CI" (and named the
+# column CI_95) whatever conf.level was.
+test_that("REG-15: the CI label follows conf.level", {
+  s2 <- capture.output(print(summary(pearson_cor(survey_data, age, income,
+                                                 conf.level = 0.90))))
+  expect_true(any(grepl("90% CI", s2, fixed = TRUE)))
+  expect_false(any(grepl("95% CI", s2, fixed = TRUE)))
+  s3 <- capture.output(print(summary(pearson_cor(survey_data, age, income,
+                                                 trust_media, conf.level = 0.99))))
+  expect_true(any(grepl("99% CI", s3, fixed = TRUE)))
+  expect_false(any(grepl("CI_95", s3, fixed = TRUE)))
+})
+
+# REG-16: correlation summaries - p diagonal 0.0000 (SPSS leaves it blank),
+# tiny p as 0.0000, matrices silently at 2 decimals for > 6 variables,
+# options(width) raised (lines wider than the console), overflowing pair
+# labels, a wrapping pairwise table, no significance flags in the matrix,
+# a 45-line compact print for 10 variables, and a constant variable
+# printed as "r = NA, p = NA ," with repeated base-R warnings.
+test_that("REG-16: correlation matrices and tables are SPSS-like and fit", {
+  withr::local_options(width = 80)
+  p3 <- pearson_cor(survey_data, age, income, life_satisfaction, trust_media)
+  out <- capture.output(print(summary(p3)))
+  expect_false(any(grepl("0.0000", out, fixed = TRUE)))
+  expect_true(any(grepl("<.001", out, fixed = TRUE)))
+  expect_true(any(grepl("0.448***", out, fixed = TRUE)))   # SPSS-like flag
+  sig_start <- grep("Significance Matrix", out)
+  age_row <- out[sig_start + which(grepl("^age\\s", out[-(1:sig_start)]))[1]]
+  expect_false(grepl("1.000|\\.000\\b", age_row))
+  expect_true(all(nchar(out, type = "width") <= 80))
+  expect_equal(getOption("width"), 80)
+  expect_false(any(grepl("Variable_Pair", out, fixed = TRUE)))
+
+  vars8 <- c("age", "income", "life_satisfaction", "trust_media",
+             "trust_science", "trust_government", "political_orientation",
+             "environmental_concern")
+  p8 <- pearson_cor(survey_data, dplyr::all_of(vars8))
+  out8 <- capture.output(print(summary(p8, digits = 3)))
+  expect_true(any(grepl("-0.587", out8, fixed = TRUE)))
+  # The matrices (which grow with the number of variables) fit the console
+  matrix_part <- out8[seq_len(grep("Pairwise Results", out8) - 1)]
+  expect_true(all(nchar(matrix_part, type = "width") <= 80))
+  expect_lte(length(capture.output(print(p8))), 16L)
+
+  # Constant variable: one clear warning, "not computed" instead of NA text
+  d <- survey_data
+  d$const <- 3
+  warns <- character(0)
+  res <- withCallingHandlers(
+    pearson_cor(d, age, income, const),
+    warning = function(w) {
+      warns <<- c(warns, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_length(warns, 1L)
+  expect_match(warns, "const")
+  out_c <- capture.output(print(res))
+  expect_true(any(grepl("not computed (no variance)", out_c, fixed = TRUE)))
+  expect_false(any(grepl("NA ,", out_c, fixed = TRUE)))
+  expect_warning(spearman_rho(d, age, const), "const")
+  expect_no_error(capture.output(print(summary(res))))
+})
+
+# REG-23: alternative = "less"/"greater" was not shown in print/summary and
+# the CI stayed two-sided.
+test_that("REG-23: one-sided pearson tests are labelled and get one-sided CIs", {
+  pl <- pearson_cor(survey_data, age, income, alternative = "less")
+  ref <- stats::cor.test(survey_data$age, survey_data$income,
+                         alternative = "less")
+  expect_equal(pl$correlations$conf_int_lower, -1)
+  expect_equal(pl$correlations$conf_int_upper, ref$conf.int[2],
+               tolerance = 1e-10)
+  expect_equal(pl$correlations$p_value, ref$p.value, tolerance = 1e-10)
+  expect_true(any(grepl("less", capture.output(print(pl)), fixed = TRUE)))
+  out <- capture.output(print(summary(pl)))
+  expect_true(any(grepl("Alternative hypothesis: less", out, fixed = TRUE)))
+  expect_true(any(grepl("one-sided", out, fixed = TRUE)))
+  pg <- pearson_cor(survey_data, age, income, alternative = "greater")
+  expect_equal(pg$correlations$conf_int_upper, 1)
+})
+
+# EDGE-17 (correlations): a sum of weights above 2^31 broke the prints
+# with "invalid format '%d'".
+test_that("EDGE-17: correlation prints survive a very large weighted N", {
+  d <- survey_data
+  d$wbig <- d$sampling_weight * 1e7
+  p <- pearson_cor(d, age, income, trust_media, weights = wbig)
+  expect_no_error(capture.output(print(p), print(summary(p))))
+  p2 <- pearson_cor(d, age, income, weights = wbig)
+  expect_no_error(capture.output(print(p2), print(summary(p2))))
+  k <- kendall_tau(d[1:150, ], age, income, weights = wbig)
+  expect_no_error(capture.output(print(k), print(summary(k))))
+  pc <- partial_cor(d, life_satisfaction, income, controls = age, weights = wbig)
+  expect_no_error(capture.output(print(pc), print(summary(pc))))
+})
+
+# REG-21 (partial_cor): a constant control variable crashed with "missing
+# value where TRUE/FALSE needed".
+test_that("REG-21: partial_cor with a constant control variable", {
+  d <- survey_data
+  d$const <- 3
+  expect_warning(pc <- partial_cor(d, age, income, controls = const), "const")
+  expect_true(is.na(pc$correlations$partial_r))
+  out <- capture.output(print(pc))
+  expect_true(any(grepl("not computed", out, fixed = TRUE)))
+  expect_no_error(capture.output(print(summary(pc))))
+})
