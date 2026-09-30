@@ -44,6 +44,11 @@ VERSIONING_POLICY §3).
   two-tailed: p = 8e-69 instead of SPSS's .011 (reference Test 1d, now
   asserted). The p-values come from binomial tails, so weights summing to
   billions no longer exhaust memory.
+* `wilcoxon_test()`/`pairwise_wilcoxon()`: Z follows SPSS (from the smaller
+  rank sum, never positive) with the direction in the new `z_based_on`
+  column; Phi of a 2x2 table (`chi_square()`, `phi()`) is signed like
+  SPSS's. Both were positive where SPSS prints a negative value (see "SPSS
+  parity audit").
 * Rank tests (`mann_whitney()`, `kruskal_wallis()`, `wilcoxon_test()`,
   `friedman_test()`): nominal factors are an error; ordered factors are
   ranked by level order everywhere.
