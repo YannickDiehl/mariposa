@@ -8,7 +8,9 @@ Accumulates all changes since 0.7.3 went live on CRAN (see
 Result objects and defaults that change in ways existing code can notice.
 All of them move mariposa closer to SPSS or remove silently wrong output;
 none has a deprecation bridge because the old values were wrong or
-misleading (VERSIONING_POLICY §4.2).
+misleading (VERSIONING_POLICY §4.2). By maintainer decision these changes
+ship as 0.7.4 rather than a MINOR bump (a one-off exception to
+VERSIONING_POLICY §3).
 
 * One-sample `t_test()`: `mean_diff` and its CI are now the difference
   mean - `mu` as in SPSS's One-Sample Test (before: the mean itself, e.g.
