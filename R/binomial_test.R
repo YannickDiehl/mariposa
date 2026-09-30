@@ -164,8 +164,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 
     if (length(cats) != 2) {
       cli_abort(c(
-        "Binomial test requires exactly 2 categories.",
-        "x" = "Variable {.var {var_name}} has {length(cats)} unique value{?s}.",
+        "{.var {var_name}} has {length(cats)} observed categor{?y/ies}; the binomial test needs exactly 2 categories.",
         "i" = "Ensure your variable is binary (e.g., Yes/No, 0/1, TRUE/FALSE)."
       ))
     }
@@ -215,77 +214,73 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     ))
   }
 
-  # Main computation function (loops over variables)
-  compute_results <- function(data) {
-    results_list <- list()
-    single_var <- length(var_names) == 1
+  result_row <- function(var_name, res) {
+    tibble(
+      Variable = var_name,
+      cat1_name = res$cat1_name,
+      cat2_name = res$cat2_name,
+      n1 = res$n1,
+      n2 = res$n2,
+      n_total = res$n_total,
+      obs_prop1 = res$obs_prop1,
+      obs_prop2 = res$obs_prop2,
+      test_prop = res$test_prop,
+      p_value = res$p_value,
+      ci_lower = res$ci_lower,
+      ci_upper = res$ci_upper,
+      reason = NA_character_
+    )
+  }
+  na_row <- function(var_name, reason) {
+    tibble(
+      Variable = var_name,
+      cat1_name = NA_character_,
+      cat2_name = NA_character_,
+      n1 = NA_real_,
+      n2 = NA_real_,
+      n_total = NA_real_,
+      obs_prop1 = NA_real_,
+      obs_prop2 = NA_real_,
+      test_prop = p,
+      p_value = NA_real_,
+      ci_lower = NA_real_,
+      ci_upper = NA_real_,
+      reason = reason
+    )
+  }
 
-    for (var_name in var_names) {
-      if (single_var) {
-        # Single variable: let errors propagate to the user
-        result <- perform_single_binomial(data, var_name, w_name, p, conf.level)
-
-        results_list[[var_name]] <- tibble(
-          Variable = var_name,
-          cat1_name = result$cat1_name,
-          cat2_name = result$cat2_name,
-          n1 = result$n1,
-          n2 = result$n2,
-          n_total = result$n_total,
-          obs_prop1 = result$obs_prop1,
-          obs_prop2 = result$obs_prop2,
-          test_prop = result$test_prop,
-          p_value = result$p_value,
-          ci_lower = result$ci_lower,
-          ci_upper = result$ci_upper
-        )
-      } else {
-        # Multiple variables: catch errors so other variables still run
-        tryCatch({
-          result <- perform_single_binomial(data, var_name, w_name, p, conf.level)
-
-          results_list[[var_name]] <- tibble(
-            Variable = var_name,
-            cat1_name = result$cat1_name,
-            cat2_name = result$cat2_name,
-            n1 = result$n1,
-            n2 = result$n2,
-            n_total = result$n_total,
-            obs_prop1 = result$obs_prop1,
-            obs_prop2 = result$obs_prop2,
-            test_prop = result$test_prop,
-            p_value = result$p_value,
-            ci_lower = result$ci_lower,
-            ci_upper = result$ci_upper
-          )
-
-        }, error = function(e) {
-          cli_warn("Binomial test failed for variable {.var {var_name}}: {e$message}")
-          results_list[[var_name]] <<- tibble(
-            Variable = var_name,
-            cat1_name = NA_character_,
-            cat2_name = NA_character_,
-            n1 = NA_integer_,
-            n2 = NA_integer_,
-            n_total = NA_integer_,
-            obs_prop1 = NA_real_,
-            obs_prop2 = NA_real_,
-            test_prop = p,
-            p_value = NA_real_,
-            ci_lower = NA_real_,
-            ci_upper = NA_real_
-          )
-        })
+  # Main computation function (loops over variables). An ungrouped single
+  # variable lets its error reach the user; otherwise a variable or group
+  # that cannot be tested is skipped with a warning naming it (a constant
+  # variable in one group_by() group used to abort the whole call).
+  compute_results <- function(data, key = NULL) {
+    strict <- is.null(key) && length(var_names) == 1
+    rows <- lapply(var_names, function(var_name) {
+      if (strict) {
+        return(result_row(var_name, perform_single_binomial(
+          data, var_name, w_name, p, conf.level)))
       }
-    }
-
-    bind_rows(results_list)
+      tryCatch(
+        result_row(var_name, perform_single_binomial(
+          data, var_name, w_name, p, conf.level)),
+        error = function(e) {
+          where <- .np_where(key)
+          reason <- .np_error_reason(e)
+          cli_warn(c(
+            "Binomial test skipped for {.var {var_name}}{where}.",
+            "x" = "{reason}."
+          ))
+          na_row(var_name, reason)
+        }
+      )
+    })
+    bind_rows(rows)
   }
 
   # Execute computation (with or without group_by)
   if (is_grouped) {
     results <- data %>%
-      group_modify(~ compute_results(.x))
+      group_modify(~ compute_results(.x, .y))
   } else {
     results <- compute_results(data)
   }
@@ -297,6 +292,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     p = p,
     weights = w_name,
     is_grouped = is_grouped,
+    groups = grp_vars,
     conf.level = conf.level
   )
 
@@ -309,6 +305,11 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 .print_bt_block <- function(var_name, row_data, weights, digits,
                             show_categories = TRUE, show_results = TRUE) {
   print_header(var_name, newline_before = FALSE)
+
+  if (is.na(row_data$p_value)) {
+    cat(sprintf("  Not computed (%s).\n\n", .np_reason(row_data, 1)))
+    return(invisible(NULL))
+  }
 
   # Category table (gated by categories toggle)
   if (show_categories) {
@@ -367,6 +368,10 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
 #' @noRd
 .print_bt_compact <- function(results, i, weighted_tag, digits) {
   cat(sprintf("Binomial Test: %s%s\n", results$Variable[i], weighted_tag))
+  if (is.na(results$p_value[i])) {
+    cat(sprintf("  not computed (%s)\n", .np_reason(results, i)))
+    return(invisible(NULL))
+  }
   cat(sprintf("  Group 1 (%s): prop = %s vs %s, %s %s, N = %s\n",
               results$cat1_name[i],
               fmt_num(results$obs_prop1[i], digits),
@@ -404,12 +409,7 @@ print.binomial_test <- function(x, digits = 3, ...) {
   results$p_value <- as.numeric(results$p_value)
 
   if (isTRUE(x$is_grouped)) {
-    group_vars <- setdiff(names(results), c("Variable", "cat1_name",
-                                            "cat2_name", "n1", "n2",
-                                            "n_total", "obs_prop1",
-                                            "obs_prop2", "test_prop",
-                                            "p_value", "ci_lower",
-                                            "ci_upper"))
+    group_vars <- .bt_group_vars(x)
     groups <- unique(results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -525,12 +525,7 @@ print.summary.binomial_test <- function(x, ...) {
 
   if (is_grouped_data) {
     # Get unique groups
-    group_vars <- setdiff(names(x$results), c("Variable", "cat1_name",
-                                                "cat2_name", "n1", "n2",
-                                                "n_total", "obs_prop1",
-                                                "obs_prop2", "test_prop",
-                                                "p_value", "ci_lower",
-                                                "ci_upper", "sig"))
+    group_vars <- .bt_group_vars(x)
     groups <- unique(x$results[group_vars])
 
     for (i in seq_len(nrow(groups))) {
@@ -581,4 +576,14 @@ print.summary.binomial_test <- function(x, ...) {
   }
 
   invisible(x)
+}
+
+#' Grouping columns of a binomial_test result
+#' @noRd
+.bt_group_vars <- function(x) {
+  if (!is.null(x$groups)) return(x$groups)
+  setdiff(names(x$results), c("Variable", "cat1_name", "cat2_name", "n1",
+                              "n2", "n_total", "obs_prop1", "obs_prop2",
+                              "test_prop", "p_value", "ci_lower",
+                              "ci_upper", "reason", "sig"))
 }

@@ -401,6 +401,26 @@ test_that("NP-11 rank tests reject nominal variables with a clear error", {
   expect_error(wilcoxon_test(survey_data, x = gender, y = region), "ordered")
 })
 
+# --- NP-12: grouped binomial_test ----------------------------------------------
+
+test_that("NP-12 grouped binomial_test skips a group with one category", {
+  # Was: one group where the variable is constant aborted the whole call.
+  d <- dplyr::filter(survey_data, !(region == "East" & gender == "Male"))
+  expect_warning(
+    r <- binomial_test(dplyr::group_by(d, region), gender),
+    "East"
+  )
+  expect_equal(nrow(r$results), 2L)
+  expect_true(is.na(r$results$p_value[r$results$region == "East"]))
+  expect_false(is.na(r$results$p_value[r$results$region == "West"]))
+  out <- c(capture.output(print(r)), capture.output(print(summary(r))))
+  expect_true(any(grepl("not computed", out, ignore.case = TRUE)))
+  expect_false(any(grepl("(NA)", out, fixed = TRUE)))
+  # ungrouped single variable: still a clear error
+  expect_error(binomial_test(dplyr::filter(d, region == "East"), gender),
+               "2 categories")
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

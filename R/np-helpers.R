@@ -85,3 +85,34 @@
   f <- .group_factor(x)
   as.character(vals[match(levels, levels(f))])
 }
+
+#' First line of an error message, unwrapped and without styling
+#'
+#' conditionMessage() of a cli error is wrapped at the console width and
+#' contains the bullet lines; for a one-line "reason" the unformatted
+#' header (rlang stores it in `e$message[1]`) is used.
+#'
+#' @param e Condition
+#' @return Character scalar without a trailing period
+#' @noRd
+.np_error_reason <- function(e) {
+  msg <- if (inherits(e, "rlang_error") && length(e$message) > 0) {
+    e$message[[1]]
+  } else {
+    sub("\n.*", "", conditionMessage(e))
+  }
+  msg <- gsub("\\s+", " ", cli::ansi_strip(msg))
+  sub("[.]\\s*$", "", trimws(msg))
+}
+
+#' Reason text for a result row that was not computed
+#'
+#' @param results Results data frame with an optional `reason` column
+#' @param i Row index
+#' @return Character scalar ("see warning" when no reason is stored)
+#' @noRd
+.np_reason <- function(results, i) {
+  reason <- if ("reason" %in% names(results)) results$reason[i] else NA
+  if (is.null(reason) || length(reason) == 0 || is.na(reason) ||
+      !nzchar(reason)) "see warning" else reason
+}

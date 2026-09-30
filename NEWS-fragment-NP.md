@@ -98,3 +98,8 @@
   now a clear error in all four tests instead of running silently
   (`kruskal_wallis(gender, group = education)`) or failing with "not
   computed for this group" outside any `group_by()`.
+* `group_by() %>% binomial_test()` no longer aborts because the variable
+  has only one category in one group: that group gets an `NA` row, a
+  warning naming the group and the reason, and the output says "not
+  computed (gender has 1 observed category; ...)". An ungrouped single
+  variable still stops with a clear error.
