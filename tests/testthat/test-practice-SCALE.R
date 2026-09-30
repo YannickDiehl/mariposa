@@ -109,3 +109,128 @@ test_that("SCALE-17: Total Variance Explained is an aligned table", {
   }, integer(1))
   expect_length(unique(first_num_end), 1)
 })
+
+# --- SCALE-03: undefined correlations ----------------------------------------
+
+# Collect every condition message (the German base-R texts must not appear)
+conditions_of <- function(expr) {
+  msgs <- character(0)
+  res <- withCallingHandlers(
+    tryCatch(expr, error = function(e) {
+      msgs <<- c(msgs, paste("ERROR:", conditionMessage(e)))
+      NULL
+    }),
+    warning = function(w) {
+      msgs <<- c(msgs, paste("WARNING:", conditionMessage(w)))
+      invokeRestart("muffleWarning")
+    }
+  )
+  list(result = res, msgs = msgs)
+}
+
+test_that("SCALE-03: a constant item gives a mariposa error naming it", {
+  # Crashed with the base error "unendliche oder fehlende Werte in 'x'"
+  # (plus "Standardabweichung ist Null").
+  d <- survey_data
+  d$const <- 3L
+  cnd <- conditions_of(efa(d, trust_government, trust_media, trust_science,
+                           const))
+  expect_null(cnd$result)
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "^ERROR:")
+  expect_match(cnd$msgs, "const", fixed = TRUE)
+  expect_match(cnd$msgs, "constant", fixed = TRUE)
+  expect_false(any(grepl("fehlende|Standardabweichung|infinite or missing",
+                         cnd$msgs)))
+})
+
+test_that("SCALE-03: all-NA items and disjoint pairs are named", {
+  d <- survey_data
+  d$allna <- NA_real_
+  cnd <- conditions_of(efa(d, trust_government, trust_media, allna))
+  expect_match(cnd$msgs, "allna", fixed = TRUE)
+  expect_match(cnd$msgs, "no valid values", fixed = TRUE)
+
+  d$a <- ifelse(seq_len(nrow(d)) <= 1250, d$trust_government, NA)
+  d$b <- ifelse(seq_len(nrow(d)) > 1250, d$trust_media, NA)
+  cnd <- conditions_of(efa(d, a, b, trust_science, life_satisfaction))
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "`a` and `b`", fixed = TRUE)
+
+  cnd <- conditions_of(efa(d, a, b, trust_science, use = "complete"))
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "complete case", fixed = TRUE)
+})
+
+test_that("SCALE-03: a grouped efa() skips an undefined group with a warning", {
+  # An item constant in one region (or a 1-case group) aborted the whole
+  # grouped analysis, losing the results of every other group.
+  d <- survey_data
+  d$cg <- ifelse(d$region == "East", 3, d$trust_government)
+  cnd <- conditions_of(efa(group_by(d, region), cg, trust_media,
+                           trust_science, life_satisfaction))
+  expect_s3_class(cnd$result, "efa")
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "^WARNING:")
+  expect_match(cnd$msgs, "region = East", fixed = TRUE)
+  expect_match(cnd$msgs, "cg", fixed = TRUE)
+  east <- cnd$result$groups[[1]]
+  west <- cnd$result$groups[[2]]
+  expect_false(is.null(east$not_computed))
+  expect_true(is.null(west$not_computed))
+  expect_true(is.finite(west$kmo$overall))
+
+  out <- c(capture.output(print(cnd$result)),
+           capture.output(print(summary(cnd$result))))
+  expect_true(any(grepl("not computed", out, fixed = TRUE)))
+  expect_false(any(grepl("NA", out, fixed = TRUE)))
+})
+
+# --- SCALE-04: singular correlation matrices ---------------------------------
+
+test_that("SCALE-04: a singular matrix warns and leaves KMO/Bartlett empty", {
+  # A duplicated item gave KMO 0.500 (pseudo-inverse), Bartlett "Inf" and
+  # "Sig.: 0.000" without any hint.
+  d <- survey_data
+  d$dup <- d$trust_government
+  cnd <- conditions_of(efa(d, trust_government, trust_media, trust_science,
+                           dup))
+  e <- cnd$result
+  expect_s3_class(e, "efa")
+  expect_true(any(grepl("not positive definite", cnd$msgs, fixed = TRUE)))
+  expect_true(any(grepl("`trust_government` and `dup`", cnd$msgs,
+                        fixed = TRUE)))
+  expect_true(is.na(e$kmo$overall))
+  expect_true(is.na(e$bartlett$chi_sq))
+  expect_true(is.na(e$bartlett$p_value))
+  out <- c(capture.output(print(e)), capture.output(print(summary(e))))
+  expect_true(any(grepl("not computed", out, fixed = TRUE)))
+  expect_false(any(grepl("Inf|NaN|0\\.500", out)))
+})
+
+test_that("SCALE-04: ML on a singular matrix gives a clear error", {
+  d <- survey_data
+  d$dup <- d$trust_government
+  cnd <- conditions_of(efa(d, trust_government, trust_media, trust_science,
+                           life_satisfaction, dup, extraction = "ml",
+                           n_factors = 1))
+  expect_null(cnd$result)
+  err <- grep("^ERROR", cnd$msgs, value = TRUE)
+  expect_length(err, 1)
+  expect_match(err, "positive definite", fixed = TRUE)
+  expect_false(any(grepl("singul|Lapack", cnd$msgs)))
+})
+
+test_that("SCALE-04: fewer cases than variables are flagged", {
+  # efa(survey_data[1:5, ], 6 items) printed KMO NaN / 0.000 and 83.8 %
+  # variance explained without any warning.
+  cnd <- conditions_of(efa(survey_data[1:5, ], political_orientation,
+                           environmental_concern, life_satisfaction,
+                           trust_government, trust_media, trust_science))
+  expect_s3_class(cnd$result, "efa")
+  # (4 = the smallest pairwise N of the first five rows)
+  expect_true(any(grepl("4 cases for 6 variables", cnd$msgs, fixed = TRUE)))
+  expect_false(any(grepl("NaN|erzeugt|produced", cnd$msgs)))
+  expect_true(is.na(cnd$result$kmo$overall))
+  expect_false(anyNA(cnd$result$unrotated_loadings))
+})

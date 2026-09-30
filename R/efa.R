@@ -278,11 +278,23 @@ efa <- function(data, ...,
     for (i in seq_along(group_list)) {
       group_data <- group_list[[i]]
       group_weights <- if (!is.null(weights_info$name)) group_data[[weights_info$name]] else NULL
+      group_label <- .format_group_label(group_keys_df[i, , drop = FALSE])
 
-      results_list[[i]] <- .efa_core(
-        group_data, var_names, group_weights, n_factors, rotation,
-        extraction, use, sort, blank, na.rm
+      # A group whose correlation matrix is undefined (constant item, a
+      # single case, ...) is skipped with a warning instead of aborting
+      # the analysis of every other group.
+      res <- tryCatch(
+        .efa_core(
+          group_data, var_names, group_weights, n_factors, rotation,
+          extraction, use, sort, blank, na.rm, group_label = group_label
+        ),
+        mariposa_efa_undefined = function(e) e
       )
+      if (inherits(res, "mariposa_efa_undefined")) {
+        .efa_warn_skipped_group(group_label, res$reasons, res$headline)
+        res <- list(not_computed = res$headline, reasons = res$reasons)
+      }
+      results_list[[i]] <- res
       results_list[[i]]$group_values <- as.list(group_keys_df[i, , drop = FALSE])
     }
 
@@ -327,7 +339,7 @@ efa <- function(data, ...,
 #' Compute EFA for a single group
 #' @noRd
 .efa_core <- function(data, var_names, weights_vec, n_factors, rotation,
-                      extraction, use, sort, blank, na.rm) {
+                      extraction, use, sort, blank, na.rm, group_label = NULL) {
 
   k <- length(var_names)
 
@@ -346,12 +358,31 @@ efa <- function(data, ...,
   # For Bartlett's test, use the harmonic mean of pairwise N (SPSS approach)
   n_bartlett <- cor_result$n_bartlett
 
+  # An undefined correlation (constant item, no valid values, no cases in
+  # common) makes every later step meaningless: stop with the reason.
+  .efa_check_defined(cor_mat, data, var_names, weights_vec, use,
+                     cor_result$n_cases)
+
+  # A singular (not positive definite) matrix still has principal
+  # components, but no KMO, Bartlett test or ML solution (SPSS: "This
+  # matrix is not positive definite").
+  pd <- .efa_pd_check(cor_mat, var_names, cor_result$n_cases)
+  if (!pd$pd && extraction == "ml") {
+    .efa_abort_undefined(
+      c(pd$reasons,
+        "ML extraction needs a positive definite correlation matrix."),
+      headline = "the correlation matrix is not positive definite",
+      hint = "Remove the redundant item(s) or use {.code extraction = \"pca\"}."
+    )
+  }
+  .efa_warn_pd(pd, k, cor_result$n_cases, group_label)
+
   # ============================================================================
   # KMO AND BARTLETT'S TEST
   # ============================================================================
 
-  kmo_result <- .compute_kmo(cor_mat)
-  bartlett_result <- .compute_bartlett(cor_mat, n_bartlett, k)
+  kmo_result <- .compute_kmo(cor_mat, pd$pd)
+  bartlett_result <- .compute_bartlett(cor_mat, n_bartlett, k, pd$pd)
 
   # ============================================================================
   # EXTRACTION (PCA or ML)
@@ -360,7 +391,8 @@ efa <- function(data, ...,
   if (extraction == "pca") {
     ext <- .efa_extract_pca(cor_mat, k, n_factors, var_names)
   } else if (extraction == "ml") {
-    ext <- .efa_extract_ml(cor_mat, k, n_factors, n_bartlett, var_names)
+    ext <- .efa_extract_ml(cor_mat, k, n_factors, n_bartlett, var_names,
+                           group_label)
   }
 
   raw_loadings <- ext$raw_loadings
@@ -551,8 +583,12 @@ efa <- function(data, ...,
   )
 
   # Unrotated component matrix
+  # A singular matrix has (numerically) zero or tiny negative eigenvalues;
+  # clamp them so that no NaN loadings arise when such a component is
+  # requested explicitly.
   raw_loadings <- eigenvectors[, seq_len(n_factors_used), drop = FALSE] %*%
-    diag(sqrt(eigenvalues[seq_len(n_factors_used)]), nrow = n_factors_used)
+    diag(sqrt(pmax(eigenvalues[seq_len(n_factors_used)], 0)),
+         nrow = n_factors_used)
   raw_loadings <- .efa_reflect(raw_loadings)
   rownames(raw_loadings) <- var_names
   colnames(raw_loadings) <- paste0("PC", seq_len(n_factors_used))
@@ -582,7 +618,8 @@ efa <- function(data, ...,
 #' @description Maximum Likelihood extraction using stats::factanal()
 #'   (SPSS /EXTRACTION ML). Provides goodness-of-fit testing.
 #' @noRd
-.efa_extract_ml <- function(cor_mat, k, n_factors, n_obs, var_names) {
+.efa_extract_ml <- function(cor_mat, k, n_factors, n_obs, var_names,
+                            group_label = NULL) {
   # Eigenvalues from correlation matrix (for variance explained table)
   eig <- eigen(cor_mat, symmetric = TRUE)
   eigenvalues <- eig$values
@@ -598,8 +635,9 @@ efa <- function(data, ...,
   # Check ML degrees-of-freedom constraint
   ml_max <- .ml_max_factors(k)
   if (n_factors_used > ml_max) {
+    in_group <- if (is.null(group_label)) "" else paste0(" (group ", group_label, ")")
     cli_warn(c(
-      "Kaiser criterion suggests {n_factors_used} factors, but ML extraction supports at most {ml_max} with {k} variables.",
+      "Kaiser criterion suggests {n_factors_used} factors{in_group}, but ML extraction supports at most {ml_max} with {k} variables.",
       "i" = "Reducing to {ml_max} factor{?s}."
     ))
     n_factors_used <- ml_max
@@ -610,10 +648,11 @@ efa <- function(data, ...,
     stats::factanal(factors = n_factors_used, covmat = cor_mat,
                     n.obs = as.integer(round(n_obs)), rotation = "none"),
     error = function(e) {
-      cli_abort(c(
-        "ML extraction failed: {e$message}",
-        "i" = "Try {.code extraction = \"pca\"} or reduce the number of factors."
-      ))
+      .efa_abort_undefined(
+        paste0("ML extraction failed: ", conditionMessage(e)),
+        headline = "ML extraction failed",
+        hint = "Try {.code extraction = \"pca\"} or reduce the number of factors."
+      )
     }
   )
 
@@ -716,6 +755,156 @@ efa <- function(data, ...,
 
 
 # ============================================================================
+# DEGENERATE CORRELATION MATRICES
+# ============================================================================
+
+#' Abort because the correlation matrix cannot be analysed
+#'
+#' Carries class "mariposa_efa_undefined" plus the reasons, so that a
+#' grouped efa() can skip just this group with a warning.
+#' @param reasons Character vector, one line per problem (plain text)
+#' @param headline Short reason for the "not computed (...)" print line
+#' @param hint cli-formatted hint
+#' @noRd
+.efa_abort_undefined <- function(reasons, headline, hint) {
+  esc <- function(s) gsub("}", "}}", gsub("{", "{{", s, fixed = TRUE), fixed = TRUE)
+  cli::cli_abort(
+    c("{.fn efa} cannot analyse these items: {headline}.",
+      stats::setNames(esc(reasons), rep("x", length(reasons))),
+      "i" = hint),
+    class = "mariposa_efa_undefined",
+    reasons = reasons, headline = headline,
+    call = NULL
+  )
+}
+
+#' Warn that a group of a grouped efa() was skipped
+#' @noRd
+.efa_warn_skipped_group <- function(group_label, reasons, headline) {
+  esc <- function(s) gsub("}", "}}", gsub("{", "{{", s, fixed = TRUE), fixed = TRUE)
+  cli::cli_warn(c(
+    "{.fn efa} skipped group {group_label}: {headline}.",
+    stats::setNames(esc(reasons), rep("x", length(reasons))),
+    "i" = "The other groups are analysed as usual."
+  ))
+}
+
+#' Stop when a correlation of the matrix is undefined (NA)
+#'
+#' Names the cause: items without valid values, constant items, and item
+#' pairs without (varying) cases in common. Previously eigen() aborted with
+#' the base error "infinite or missing values in 'x'".
+#' @noRd
+.efa_check_defined <- function(cor_mat, data, var_names, weights_vec, use,
+                               n_cases) {
+  if (!anyNA(cor_mat)) return(invisible(NULL))
+
+  mat <- .efa_item_matrix(data, var_names)
+  rows <- if (is.null(weights_vec)) rep(TRUE, nrow(mat)) else !is.na(weights_vec)
+  if (use == "complete") rows <- rows & stats::complete.cases(mat)
+
+  reasons <- character(0)
+  if (use == "complete" && n_cases < 2) {
+    reasons <- sprintf(
+      "Only %d complete case%s: every item must be observed together in at least 2 cases.",
+      n_cases, if (n_cases == 1) "" else "s")
+  } else {
+    flagged <- character(0)
+    for (v in var_names) {
+      x <- mat[rows, v]
+      x <- x[!is.na(x)]
+      if (length(x) == 0) {
+        reasons <- c(reasons, sprintf("`%s` has no valid values.", v))
+        flagged <- c(flagged, v)
+      } else if (length(x) == 1) {
+        reasons <- c(reasons, sprintf("`%s` has only 1 valid value.", v))
+        flagged <- c(flagged, v)
+      } else if (length(unique(x)) == 1) {
+        reasons <- c(reasons, sprintf(
+          "`%s` is constant (every valid value is %s).", v, format(x[1])))
+        flagged <- c(flagged, v)
+      }
+    }
+    ok <- setdiff(var_names, flagged)
+    if (length(ok) >= 2) {
+      sub <- cor_mat[ok, ok, drop = FALSE]
+      idx <- which(is.na(sub) & upper.tri(sub), arr.ind = TRUE)
+      for (r in seq_len(nrow(idx))) {
+        a <- ok[idx[r, 1]]
+        b <- ok[idx[r, 2]]
+        both <- sum(rows & !is.na(mat[, a]) & !is.na(mat[, b]))
+        reasons <- c(reasons, if (both < 2) {
+          sprintf("`%s` and `%s` have %d case%s with valid values on both.",
+                  a, b, both, if (both == 1) "" else "s")
+        } else {
+          sprintf("`%s` and `%s`: one of them is constant in the cases they share.",
+                  a, b)
+        })
+      }
+    }
+  }
+  if (length(reasons) == 0) {
+    reasons <- "At least one correlation could not be computed."
+  }
+  .efa_abort_undefined(
+    reasons,
+    headline = "the correlation matrix cannot be computed",
+    hint = "Remove the item(s) listed above or analyse other cases."
+  )
+}
+
+#' Check whether the correlation matrix is positive definite
+#'
+#' @return list(pd, reasons): reasons names perfectly correlated item pairs
+#'   and too few cases (n <= k) when the matrix is singular.
+#' @noRd
+.efa_pd_check <- function(cor_mat, var_names, n_cases) {
+  k <- length(var_names)
+  ev <- eigen(cor_mat, symmetric = TRUE, only.values = TRUE)$values
+  pd <- min(ev) > 1e-8
+  reasons <- character(0)
+  if (!pd) {
+    idx <- which(abs(cor_mat) > 1 - 1e-8 & upper.tri(cor_mat), arr.ind = TRUE)
+    for (r in seq_len(nrow(idx))) {
+      reasons <- c(reasons, sprintf(
+        "`%s` and `%s` are perfectly correlated (r = %s).",
+        var_names[idx[r, 1]], var_names[idx[r, 2]],
+        formatC(cor_mat[idx[r, 1], idx[r, 2]], format = "f", digits = 3)))
+    }
+    if (n_cases <= k) {
+      reasons <- c(reasons, sprintf(
+        "Only %d cases for %d variables: the number of cases must exceed the number of variables.",
+        n_cases, k))
+    }
+    if (length(reasons) == 0) {
+      reasons <- "At least one item is a linear combination of the others."
+    }
+  }
+  list(pd = pd, reasons = reasons)
+}
+
+#' Warn about a singular matrix or too few cases
+#' @noRd
+.efa_warn_pd <- function(pd, k, n_cases, group_label) {
+  in_group <- if (is.null(group_label)) "" else paste0(" (group ", group_label, ")")
+  esc <- function(s) gsub("}", "}}", gsub("{", "{{", s, fixed = TRUE), fixed = TRUE)
+  if (!pd$pd) {
+    cli::cli_warn(c(
+      "The correlation matrix is not positive definite{in_group}: KMO and Bartlett's test are not computed.",
+      stats::setNames(esc(pd$reasons), rep("i", length(pd$reasons))),
+      "i" = "The components are shown, but interpret them with caution."
+    ))
+  } else if (n_cases <= k) {
+    cli::cli_warn(c(
+      "Only {n_cases} cases for {k} variables{in_group}.",
+      "i" = "Factor solutions need clearly more cases than variables; interpret with caution."
+    ))
+  }
+  invisible(NULL)
+}
+
+
+# ============================================================================
 # CORRELATION MATRIX COMPUTATION
 # ============================================================================
 
@@ -726,6 +915,7 @@ efa <- function(data, ...,
 
   if (!is.null(weights_vec)) {
     # Weighted pairwise correlations
+    item_mat <- .efa_item_matrix(data, var_names)
     cor_mat <- matrix(1, k, k)
     n_mat <- matrix(0, k, k)
     rownames(cor_mat) <- colnames(cor_mat) <- var_names
@@ -735,14 +925,14 @@ efa <- function(data, ...,
       for (j in seq_len(k)) {
         if (i == j) {
           # Count valid cases for diagonal
-          valid <- !is.na(data[[var_names[i]]]) & !is.na(weights_vec)
+          valid <- !is.na(item_mat[, i]) & !is.na(weights_vec)
           n_mat[i, j] <- sum(weights_vec[valid])
           next
         }
         if (j > i) next  # Will fill from lower triangle
 
-        x <- data[[var_names[i]]]
-        y <- data[[var_names[j]]]
+        x <- item_mat[, i]
+        y <- item_mat[, j]
         valid <- !is.na(x) & !is.na(y) & !is.na(weights_vec)
 
         if (sum(valid) < 2) {
@@ -766,8 +956,8 @@ efa <- function(data, ...,
 
   } else {
     # Unweighted pairwise correlations
-    mat <- as.matrix(data[, var_names, drop = FALSE])
-    cor_mat <- stats::cor(mat, use = "pairwise.complete.obs")
+    mat <- .efa_item_matrix(data, var_names)
+    cor_mat <- .efa_cor_quiet(mat, use = "pairwise.complete.obs")
     rownames(cor_mat) <- colnames(cor_mat) <- var_names
 
     # Pairwise N matrix
@@ -784,35 +974,78 @@ efa <- function(data, ...,
     n_bartlett <- min(off_diag_n)
   }
 
-  list(cor_mat = cor_mat, n_obs = n_mat, n_bartlett = n_bartlett)
+  # Unweighted number of cases behind the smallest pairwise correlation
+  # (bounds the rank of the matrix; weights do not add information)
+  item_mat <- .efa_item_matrix(data, var_names)
+  ok_w <- if (is.null(weights_vec)) rep(TRUE, nrow(item_mat)) else !is.na(weights_vec)
+  obs <- !is.na(item_mat) & ok_w
+  n_cases <- min(crossprod(obs)[lower.tri(diag(k))])
+
+  list(cor_mat = cor_mat, n_obs = n_mat, n_bartlett = n_bartlett,
+       n_cases = n_cases)
+}
+
+#' Item columns as a plain numeric matrix
+#'
+#' Label classes are dropped (.plain_numeric) so that haven_labelled items
+#' never route the correlation code through vctrs dispatch.
+#' @noRd
+.efa_item_matrix <- function(data, var_names) {
+  mat <- vapply(var_names, function(v) as.double(.plain_numeric(data[[v]])),
+                numeric(nrow(data)))
+  matrix(mat, nrow = nrow(data), dimnames = list(NULL, var_names))
+}
+
+#' stats::cor() without its "standard deviation is zero" warning
+#'
+#' A constant item makes its correlations NA; .efa_check_defined() names
+#' the item in an English mariposa error, so the (translated) base warning
+#' is muffled - and only that one.
+#' @noRd
+.efa_cor_quiet <- function(mat, use = "everything") {
+  # Raised from C (stats/src/cov.c), so it is translated via the "stats"
+  # catalog, not "R-stats"
+  zero_sd <- gettext("the standard deviation is zero", domain = "stats")
+  withCallingHandlers(
+    stats::cor(mat, use = use),
+    warning = function(w) {
+      if (conditionMessage(w) %in% c(zero_sd, "the standard deviation is zero")) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 }
 
 #' Compute listwise correlation matrix
 #' @noRd
 .efa_listwise_cor <- function(data, var_names, weights_vec, na.rm) {
-  item_data <- data[, var_names, drop = FALSE]
-  complete <- stats::complete.cases(item_data)
+  mat <- .efa_item_matrix(data, var_names)
+  complete <- stats::complete.cases(mat)
 
   if (!is.null(weights_vec)) {
     complete <- complete & !is.na(weights_vec)
     weights_vec <- weights_vec[complete]
   }
 
-  item_data <- item_data[complete, , drop = FALSE]
-  n <- nrow(item_data)
-  mat <- as.matrix(item_data)
+  mat <- mat[complete, , drop = FALSE]
+  n <- nrow(mat)
+  k <- length(var_names)
 
-  if (!is.null(weights_vec)) {
+  if (n < 2) {
+    # No correlation is defined; .efa_check_defined() reports why
+    cor_mat <- matrix(NA_real_, k, k)
+    n_eff <- if (!is.null(weights_vec)) sum(weights_vec) else n
+  } else if (!is.null(weights_vec)) {
     cor_mat <- .weighted_cor(mat, weights_vec)
     n_eff <- sum(weights_vec)
   } else {
-    cor_mat <- stats::cor(mat)
+    cor_mat <- .efa_cor_quiet(mat)
     n_eff <- n
   }
 
   rownames(cor_mat) <- colnames(cor_mat) <- var_names
 
-  list(cor_mat = cor_mat, n_obs = n, n_bartlett = n_eff)
+  list(cor_mat = cor_mat, n_obs = n, n_bartlett = n_eff, n_cases = n)
 }
 
 
@@ -825,20 +1058,17 @@ efa <- function(data, ...,
 #' KMO measures the proportion of variance among variables that might be
 #' common variance. SPSS-compatible implementation.
 #' @noRd
-.compute_kmo <- function(cor_mat) {
+.compute_kmo <- function(cor_mat, pd = TRUE) {
+  k <- ncol(cor_mat)
+  if (!pd) {
+    # The anti-image needs R^-1; a pseudo-inverse produced meaningless
+    # values (0.500, NaN). SPSS prints no KMO for such a matrix either.
+    return(list(overall = NA_real_,
+                per_item = stats::setNames(rep(NA_real_, k), colnames(cor_mat))))
+  }
   # Anti-image approach (SPSS method)
   # 1. Compute inverse of correlation matrix
-  k <- ncol(cor_mat)
-  inv_cor <- tryCatch(solve(cor_mat), error = function(e) {
-    # If singular, use pseudo-inverse
-    MASS_available <- requireNamespace("MASS", quietly = TRUE)
-    if (MASS_available) {
-      MASS::ginv(cor_mat)
-    } else {
-      # Fallback: add small ridge
-      solve(cor_mat + diag(1e-10, k))
-    }
-  })
+  inv_cor <- solve(cor_mat)
 
   # 2. Compute partial correlation matrix from inverse
   # S_ij = -inv_ij / sqrt(inv_ii * inv_jj)
@@ -873,13 +1103,14 @@ efa <- function(data, ...,
 #' Tests whether the correlation matrix is significantly different from
 #' an identity matrix. SPSS-compatible formula.
 #' @noRd
-.compute_bartlett <- function(cor_mat, n, k) {
+.compute_bartlett <- function(cor_mat, n, k, pd = TRUE) {
   # Bartlett's test: chi_sq = -((n - 1) - (2*k + 5)/6) * log(det(R))
   log_det <- determinant(cor_mat, logarithm = TRUE)
 
-  if (log_det$sign <= 0) {
-    # Singular or near-singular matrix
-    return(list(chi_sq = NA_real_, df = k * (k - 1) / 2, p_value = NA_real_))
+  if (!pd || log_det$sign <= 0 || !is.finite(log_det$modulus)) {
+    # Singular matrix: log(det) is -Inf (chi-square "Inf", p "0.000")
+    return(list(chi_sq = NA_real_, df = as.integer(k * (k - 1) / 2),
+                p_value = NA_real_))
   }
 
   log_det_val <- as.numeric(log_det$modulus)
@@ -1029,12 +1260,22 @@ print.efa <- function(x, digits = 3, ...) {
 #' @noRd
 .print_efa_compact <- function(res, n_vars, extraction_label, rotation_label,
                                weighted_tag, digits) {
+  if (!is.null(res$not_computed)) {
+    cat(sprintf("Exploratory Factor Analysis: %d items%s\n", n_vars, weighted_tag))
+    cat(sprintf("  not computed (%s)\n", res$not_computed))
+    return(invisible(NULL))
+  }
+
   n_factors <- res$n_factors
   unit <- if (identical(res$extraction, "ml")) "factor" else "component"
   component_label <- if (n_factors == 1) unit else paste0(unit, "s")
 
   kmo <- res$kmo$overall
-  kmo_interp <- .kmo_interpretation(kmo)
+  kmo_text <- if (is.na(kmo)) {
+    "KMO = not computed"
+  } else {
+    sprintf("KMO = %s (%s)", fmt_num(kmo, digits), .kmo_interpretation(kmo))
+  }
 
   # Variance explained by the extracted solution (SPSS "Extraction Sums of
   # Squared Loadings", cumulative %); for ML this is not the eigenvalue share
@@ -1043,10 +1284,8 @@ print.efa <- function(x, digits = 3, ...) {
   cat(sprintf("Exploratory Factor Analysis: %d items, %d %s (%s/%s)%s\n",
               n_vars, n_factors, component_label,
               extraction_label, rotation_label, weighted_tag))
-  cat(sprintf("  KMO = %s (%s), Variance explained: %s%%\n",
-              format(round(kmo, digits), nsmall = digits),
-              kmo_interp,
-              format(round(total_var_pct, 1), nsmall = 1)))
+  cat(sprintf("  %s, Variance explained: %s%%\n",
+              kmo_text, fmt_num(total_var_pct, 1)))
 }
 
 
@@ -1197,19 +1436,27 @@ print.summary.efa <- function(x, ...) {
     cat("\n")
     cat("KMO and Bartlett's Test\n")
     cat(paste(rep("-", 40), collapse = ""), "\n")
-    cat(sprintf("  Kaiser-Meyer-Olkin Measure:     %s\n",
-                format(round(x$kmo$overall, digits), nsmall = digits)))
-    cat(sprintf("  Bartlett's Chi-Square:          %.3f\n", x$bartlett$chi_sq))
-    cat(sprintf("  df:                             %d\n", x$bartlett$df))
-    cat(sprintf("  Sig.:                           %.3f\n", x$bartlett$p_value))
+    if (is.na(x$kmo$overall) && is.na(x$bartlett$chi_sq)) {
+      cat("  not computed (the correlation matrix is not positive definite)\n")
+    } else {
+      cat(sprintf("  Kaiser-Meyer-Olkin Measure:     %s\n",
+                  fmt_num(x$kmo$overall, digits)))
+      cat(sprintf("  Bartlett's Chi-Square:          %s\n",
+                  fmt_num(x$bartlett$chi_sq, digits)))
+      cat(sprintf("  df:                             %d\n", as.integer(x$bartlett$df)))
+      cat(sprintf("  Sig.:                           %s\n",
+                  fmt_p(x$bartlett$p_value, digits)))
+    }
 
     # Goodness-of-fit Test (ML only)
     if (!is.null(x$goodness_of_fit)) {
       cat("\nGoodness-of-fit Test\n")
       cat(paste(rep("-", 40), collapse = ""), "\n")
-      cat(sprintf("  Chi-Square:                     %.3f\n", x$goodness_of_fit$chi_sq))
-      cat(sprintf("  df:                             %d\n", x$goodness_of_fit$df))
-      cat(sprintf("  Sig.:                           %.3f\n", x$goodness_of_fit$p_value))
+      cat(sprintf("  Chi-Square:                     %s\n",
+                  fmt_num(x$goodness_of_fit$chi_sq, digits)))
+      cat(sprintf("  df:                             %d\n", as.integer(x$goodness_of_fit$df)))
+      cat(sprintf("  Sig.:                           %s\n",
+                  fmt_p(x$goodness_of_fit$p_value, digits)))
     }
   }
 
@@ -1293,6 +1540,12 @@ print.summary.efa <- function(x, ...) {
     # Group header
     group_values <- group_result$group_values
     print_group_header(group_values)
+
+    if (!is.null(group_result$not_computed)) {
+      cat(sprintf("  not computed (%s)\n", group_result$not_computed))
+      for (r in group_result$reasons) cat("  - ", r, "\n", sep = "")
+      next
+    }
 
     # Create a temporary ungrouped-like structure for printing
     temp <- c(group_result, list(
