@@ -13,8 +13,9 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The items to analyze. Use bare column names separated by commas,
 #'   or tidyselect helpers like \code{starts_with("trust")}.
-#' @param n_factors Number of components to extract. Default \code{NULL} uses
-#'   the Kaiser criterion (eigenvalue > 1).
+#' @param n_factors Number of components to extract (a whole number).
+#'   Default \code{NULL} uses the Kaiser criterion (eigenvalue > 1). A single
+#'   component cannot be rotated; it is shown unrotated with SPSS's note.
 #' @param rotation Rotation method: \code{"varimax"} (default, orthogonal),
 #'   \code{"oblimin"} (oblique, allows correlated factors),
 #'   \code{"promax"} (oblique, power-based), or \code{"none"}.
@@ -23,7 +24,8 @@
 #'   goodness-of-fit testing, assumes multivariate normality).
 #' @param weights Optional survey weights for population-representative results.
 #' @param use How to handle missing data for correlation computation:
-#'   \code{"pairwise"} (default, matches SPSS) or \code{"complete"} (listwise).
+#'   \code{"pairwise"} (default, matches SPSS) or \code{"complete"} (listwise;
+#'   \code{"listwise"} is accepted as an alias).
 #' @param sort Logical. Sort loadings by size within each component? Default \code{TRUE}.
 #' @param blank Numeric. Suppress (hide) loadings with absolute value below this
 #'   threshold in the print output. Default \code{0.40} (matches SPSS BLANK(.40)).
@@ -209,14 +211,14 @@ efa <- function(data, ...,
     cli_abort("{.arg data} must be a data frame or tibble.")
   }
 
-  # Validate rotation
-  rotation <- match.arg(rotation, c("varimax", "oblimin", "promax", "none"))
-
-  # Validate extraction
-  extraction <- match.arg(extraction, c("pca", "ml"))
-
-  # Validate use
-  use <- match.arg(use, c("pairwise", "complete"))
+  # Validate rotation, extraction, use (English errors; "listwise" is the
+  # SPSS name for complete-case deletion and accepted as an alias)
+  rotation <- .efa_match_choice(rotation, c("varimax", "oblimin", "promax", "none"),
+                                "rotation")
+  extraction <- .efa_match_choice(extraction, c("pca", "ml"), "extraction")
+  if (identical(use, "listwise")) use <- "complete"
+  use <- .efa_match_choice(use, c("pairwise", "complete"), "use",
+                           note = "{.val listwise} is accepted as an alias of {.val complete}.")
 
   # Check GPArotation availability for oblimin
   if (rotation == "oblimin") {
@@ -245,8 +247,15 @@ efa <- function(data, ...,
     cli_abort("{.fn efa} requires at least 2 variables.")
   }
 
-  # Validate n_factors
+  # Validate n_factors (2.7 used to be truncated to 2 silently)
   if (!is.null(n_factors)) {
+    if (!is.numeric(n_factors) || length(n_factors) != 1 || is.na(n_factors) ||
+        n_factors != round(n_factors)) {
+      cli_abort(c(
+        "{.arg n_factors} must be a whole number (or {.code NULL} for the Kaiser criterion).",
+        "x" = "You supplied {.val {n_factors}}."
+      ))
+    }
     n_factors <- as.integer(n_factors)
     if (n_factors < 1 || n_factors > length(var_names)) {
       cli_abort("{.arg n_factors} must be between 1 and {length(var_names)} (number of variables).")
@@ -544,6 +553,7 @@ efa <- function(data, ...,
     goodness_of_fit = ext$goodness_of_fit,
     uniquenesses = ext$uniquenesses,
     rotation = rotation_used,
+    rotation_requested = rotation,
     extraction = extraction,
     n_factors = n_factors_used,
     correlation_matrix = cor_mat,
@@ -765,6 +775,25 @@ efa <- function(data, ...,
 # ============================================================================
 # DEGENERATE CORRELATION MATRICES
 # ============================================================================
+
+#' Match a character option against its choices (English error)
+#'
+#' Like match.arg() (partial matching allowed), but the error is a cli
+#' message in English instead of base R's translated "'arg' should be one
+#' of ..." (German: "'arg' sollte eines von ... sein").
+#' @noRd
+.efa_match_choice <- function(x, choices, arg, note = NULL) {
+  if (is.character(x) && length(x) == 1 && !is.na(x)) {
+    hit <- pmatch(x, choices)
+    if (!is.na(hit)) return(choices[hit])
+  }
+  shown <- if (is.character(x)) x else deparse(x)
+  cli::cli_abort(c(
+    "{.arg {arg}} must be one of {.or {.val {choices}}}.",
+    "x" = "You supplied {.val {shown}}.",
+    if (!is.null(note)) c("i" = note)
+  ), call = rlang::caller_env())
+}
 
 #' Abort because the correlation matrix cannot be analysed
 #'
@@ -1248,32 +1277,41 @@ print.efa <- function(x, digits = 3, ...) {
     "ml" = "ML",
     "paf" = "PAF"
   )
-  rotation_label <- switch(x$rotation %||% "varimax",
-    "varimax" = "Varimax",
-    "oblimin" = "Oblimin",
-    "promax" = "Promax",
-    "none" = "Unrotated"
-  )
-
   if (isTRUE(x$is_grouped)) {
     for (group_result in x$groups) {
       group_values <- group_result$group_values
       group_label <- .format_group_label(group_values)
       cat(sprintf("[%s]\n", group_label))
       .print_efa_compact(group_result, length(x$variables), extraction_label,
-                         rotation_label, weighted_tag, digits)
+                         weighted_tag, digits)
     }
   } else {
     .print_efa_compact(x, length(x$variables), extraction_label,
-                       rotation_label, weighted_tag, digits)
+                       weighted_tag, digits)
   }
 
   invisible(x)
 }
 
+#' SPSS's note when a requested rotation is impossible
+#'
+#' A single component/factor cannot be rotated; efa() leaves it unrotated.
+#' SPSS says so instead of silently printing an unrotated solution.
+#' @return Character scalar or NULL
+#' @noRd
+.efa_rotation_note <- function(res) {
+  requested <- res$rotation_requested %||% res$rotation %||% "none"
+  if (!identical(requested, "none") && identical(as.integer(res$n_factors), 1L)) {
+    unit <- if (identical(res$extraction, "ml")) "factor" else "component"
+    sprintf("Only one %s was extracted. The solution cannot be rotated.", unit)
+  } else {
+    NULL
+  }
+}
+
 #' Print compact one-liner for a single EFA result
 #' @noRd
-.print_efa_compact <- function(res, n_vars, extraction_label, rotation_label,
+.print_efa_compact <- function(res, n_vars, extraction_label,
                                weighted_tag, digits) {
   if (!is.null(res$not_computed)) {
     cat(sprintf("Exploratory Factor Analysis: %d items%s\n", n_vars, weighted_tag))
@@ -1296,12 +1334,21 @@ print.efa <- function(x, digits = 3, ...) {
   # Squared Loadings", cumulative %); for ML this is not the eigenvalue share
   total_var_pct <- .efa_extraction_variance(res)$cumulative_prc[n_factors]
 
+  rotation_label <- switch(res$rotation %||% "none",
+    "varimax" = "Varimax",
+    "oblimin" = "Oblimin",
+    "promax" = "Promax",
+    "none" = "Unrotated"
+  )
+
   n_info <- .efa_n_info(res)
   cat(sprintf("Exploratory Factor Analysis: %d items, %d %s (%s/%s)%s\n",
               n_vars, n_factors, component_label,
               extraction_label, rotation_label, weighted_tag))
   cat(sprintf("  %s, Variance explained: %s%%, N = %s (%s)\n",
               kmo_text, fmt_num(total_var_pct, 1), n_info$value, n_info$basis))
+  note <- .efa_rotation_note(res)
+  if (!is.null(note)) cat("  ", note, "\n", sep = "")
 }
 
 #' Sample size of an EFA and what it refers to
@@ -1451,19 +1498,23 @@ print.summary.efa <- function(x, ...) {
   matrix_label <- if ((x$extraction %||% "pca") == "pca") "Component" else "Factor"
   prefix <- x$col_prefix %||% "PC"
 
+  rotation_note <- .efa_rotation_note(x)
+
   # Info section
-  print_info_section(list(
+  info <- list(
     "Variables" = paste(x$variables, collapse = ", "),
     "Extraction" = extraction_full,
     "Rotation" = switch(x$rotation,
       "varimax" = "Varimax with Kaiser Normalization",
       "oblimin" = "Oblimin with Kaiser Normalization",
       "promax" = "Promax with Kaiser Normalization",
-      "none" = "None"
+      "none" = if (is.null(rotation_note)) "None" else "None (a single solution cannot be rotated)"
     ),
     "N of Factors" = as.character(x$n_factors),
     "Weights" = x$weights
-  ))
+  )
+  names(info)[names(info) == "N of Factors"] <- paste0("N of ", matrix_label, "s")
+  print_info_section(info)
   n_info <- .efa_n_info(x)
   cat(sprintf("- N (%s): %s%s\n", n_info$basis, n_info$value,
               if (!is.null(x$weights)) " (weighted)" else ""))
@@ -1513,22 +1564,26 @@ print.summary.efa <- function(x, ...) {
   # Communalities
   if (show_comm) {
     cat("\nCommunalities\n")
-    cat(paste(rep("-", 40), collapse = ""), "\n")
 
     # Initial communalities: 1.0 for PCA, SMC for ML/PAF
     initial_vals <- if (!is.null(x$initial_communalities)) {
-      round(as.numeric(x$initial_communalities[names(x$communalities)]), digits)
+      as.numeric(x$initial_communalities[names(x$communalities)])
     } else {
-      rep(1.000, length(x$communalities))
+      rep(1, length(x$communalities))
     }
 
     comm_df <- data.frame(
       variable = names(x$communalities),
       initial = initial_vals,
-      extraction = round(as.numeric(x$communalities), digits),
+      extraction = as.numeric(x$communalities),
       stringsAsFactors = FALSE
     )
-    print(comm_df, row.names = FALSE)
+    # Fixed decimals in both columns (print.data.frame showed "1" next to
+    # "0.457")
+    print_stat_table(comm_df, digits = digits,
+                     col_types = c(initial = "num", extraction = "num"),
+                     col_labels = c(variable = "Variable", initial = "Initial",
+                                    extraction = "Extraction"))
     cat(sprintf("Extraction Method: %s.\n", extraction_full))
   }
 
@@ -1544,6 +1599,11 @@ print.summary.efa <- function(x, ...) {
     cat(paste(rep("-", 40), collapse = ""), "\n")
     .print_loading_matrix(x$unrotated_loadings, blank, sort_loadings, digits)
     cat(sprintf("Extraction Method: %s.\n", extraction_full))
+  }
+  if (!is.null(rotation_note) && show_rotated) {
+    cat(sprintf("\nRotated %s Matrix\n", matrix_label))
+    cat(paste(rep("-", 40), collapse = ""), "\n")
+    cat(rotation_note, "\n", sep = "")
   }
 
   # Rotated loadings

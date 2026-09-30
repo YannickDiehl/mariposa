@@ -41,3 +41,12 @@
   toggle `descriptives`). With `use = "complete"`, `$item_statistics` now
   describes the complete cases the analysis uses; the analysis N was
   pairwise before.
+* `efa()` input and output details: `n_factors = 2.7` is an error instead
+  of being truncated to 2; `use = "listwise"` (the SPSS term) is accepted
+  as an alias of `"complete"`, and invalid `rotation`/`extraction`/`use`
+  values give an English error instead of a translated `match.arg()`
+  message. A requested rotation of a single component is no longer
+  dropped silently: output says "Only one component was extracted. The
+  solution cannot be rotated." as SPSS does. Communalities print with
+  fixed decimals ("1.000" instead of "1" next to "0.457"), and the
+  summary says "N of Components" for PCA.

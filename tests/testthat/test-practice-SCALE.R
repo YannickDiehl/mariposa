@@ -267,3 +267,51 @@ test_that("SCALE-13: use = 'complete' reports the listwise N per item", {
   expect_true(any(grepl(sprintf("N = %d (listwise)", sum(cc)), out,
                         fixed = TRUE)))
 })
+
+# --- SCALE-17: efa() input handling and output details ------------------------
+
+test_that("SCALE-17: fractional n_factors is an error, 'listwise' an alias", {
+  expect_error(
+    efa(survey_data, trust_government, trust_media, trust_science,
+        n_factors = 2.7),
+    "whole number"
+  )
+  a <- efa(survey_data, trust_government, trust_media, trust_science,
+           use = "listwise")
+  b <- efa(survey_data, trust_government, trust_media, trust_science,
+           use = "complete")
+  expect_equal(a$loadings, b$loadings)
+  expect_equal(a$n, b$n)
+  # A typo gives an English error listing the choices (was a translated
+  # match.arg() error)
+  expect_error(
+    efa(survey_data, trust_government, trust_media, trust_science,
+        use = "pairwize"),
+    "must be one of"
+  )
+})
+
+test_that("SCALE-17: a one-factor solution says why it is not rotated", {
+  # rotation = "varimax" was silently turned into "Unrotated".
+  e <- efa(survey_data, trust_government, trust_media, trust_science,
+           n_factors = 1)
+  out <- c(capture.output(print(e)), capture.output(print(summary(e))))
+  expect_true(any(grepl("Only one component was extracted", out,
+                        fixed = TRUE)))
+  expect_true(any(grepl("cannot be rotated", out, fixed = TRUE)))
+})
+
+test_that("SCALE-17: communalities print with fixed decimals", {
+  # Initial communalities printed as "1" next to "0.457".
+  e <- efa(survey_data, political_orientation, environmental_concern,
+           life_satisfaction, trust_government, trust_media, trust_science)
+  s <- capture.output(print(summary(e, kmo_bartlett = FALSE,
+                                    variance_explained = FALSE,
+                                    unrotated_matrix = FALSE,
+                                    rotated_matrix = FALSE)))
+  row <- grep("political_orientation", s, value = TRUE)
+  row <- row[grepl("0\\.786", row)]
+  expect_length(row, 1)
+  expect_match(row, "1.000", fixed = TRUE)
+  expect_true(any(grepl("N of Components: 3", s, fixed = TRUE)))
+})
