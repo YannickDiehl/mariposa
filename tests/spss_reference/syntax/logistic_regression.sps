@@ -19,14 +19,18 @@ VALUE LABELS high_satisfaction 0 'Low' 1 'High'.
 EXECUTE.
 
 * Recode gender into numeric binary: Male = 0, Female = 1.
-RECODE gender ('Male'=0)('Female'=1) INTO female.
+* gender is numeric in survey_data.sav (1 = Male, 2 = Female); the former
+* string recode ('Male'=0)('Female'=1) matched nothing, so this syntax
+* never produced a reference output.
+RECODE gender (1=0)(2=1) INTO female.
 VARIABLE LABELS female 'Female (0=Male, 1=Female)'.
 EXECUTE.
 
 * Start Output Management System to save results as text
 
+* All tables (no SUBTYPES filter: the subtype names differ between SPSS
+* versions and a mismatch silently drops the table).
 OMS
-  /IF SUBTYPES=['Variables in the Equation' 'Model Summary' 'Classification Table' 'Hosmer and Lemeshow Test' 'Omnibus Tests of Model Coefficients']
   /DESTINATION FORMAT=TEXT OUTFILE='/Users/yannickdiehl/Documents/SoftwareProjekte/RPakete/mariposa/tests/spss_reference/outputs/logistic_regression_output.txt'.
 
 COMPUTE original_order = $CASENUM.
