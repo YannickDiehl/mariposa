@@ -323,6 +323,24 @@
   diff(range(cleaned$x, na.rm = na.rm))
 }
 
+#' Minimum / maximum of the observed values (weights do not move them)
+#'
+#' SPSS DESCRIPTIVES reports Minimum and Maximum; like the range they are
+#' properties of the observed values, not of the weights.
+#' @noRd
+.w_min <- function(x, weights = NULL, na.rm = TRUE) {
+  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
+  if (all(is.na(cleaned$x))) return(NA_real_)
+  min(cleaned$x, na.rm = na.rm)
+}
+
+#' @noRd
+.w_max <- function(x, weights = NULL, na.rm = TRUE) {
+  cleaned <- .validate_and_clean_weights(x, weights, na.rm)
+  if (all(is.na(cleaned$x))) return(NA_real_)
+  max(cleaned$x, na.rm = na.rm)
+}
+
 #' Weighted IQR using weighted quantiles
 #' @noRd
 .w_iqr <- function(x, weights = NULL, na.rm = TRUE) {

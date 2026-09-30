@@ -20,10 +20,11 @@
 #' @param show Which statistics to display:
 #'   \itemize{
 #'     \item \code{"short"} (default): Essential stats (mean, median, SD, range, IQR, skewness)
-#'     \item \code{"all"}: Everything including variance, kurtosis, mode, quantiles
+#'     \item \code{"all"}: Everything including min/max, variance, kurtosis, mode, quantiles
 #'     \item Custom list: Choose specific stats like \code{c("mean", "sd", "range")}
 #'       from \code{"mean"}, \code{"median"}, \code{"sd"}, \code{"se"},
-#'       \code{"var"}, \code{"range"}, \code{"iqr"}, \code{"skew"},
+#'       \code{"var"}, \code{"min"}, \code{"max"} (SPSS DESCRIPTIVES'
+#'       Minimum/Maximum), \code{"range"}, \code{"iqr"}, \code{"skew"},
 #'       \code{"kurtosis"}, \code{"mode"}, \code{"quantiles"}. Unknown names
 #'       are an error.
 #'   }
@@ -120,7 +121,8 @@ describe <- function(data, ..., weights = NULL,
   # Validate show: an unknown value (e.g. "min") used to be ignored
   # silently, leaving a table with nothing but N and Missing
   valid_show <- c("short", "all", "mean", "median", "sd", "se", "var",
-                  "range", "iqr", "skew", "kurtosis", "mode", "quantiles")
+                  "min", "max", "range", "iqr", "skew", "kurtosis", "mode",
+                  "quantiles")
   if (!is.character(show) || length(show) == 0) {
     cli_abort("{.arg show} must be a character vector of statistic names.")
   }
@@ -134,7 +136,7 @@ describe <- function(data, ..., weights = NULL,
 
   # Process show parameter - expand shortcuts to full statistic names
   if ("all" %in% show) {
-    show <- c("mean", "median", "sd", "se", "range", "iqr", "skew", "kurtosis", "var", "mode", "quantiles")
+    show <- c("mean", "median", "sd", "se", "min", "max", "range", "iqr", "skew", "kurtosis", "var", "mode", "quantiles")
   } else if ("short" %in% show) {
     show <- c("mean", "median", "sd", "range", "iqr", "skew")
   }
@@ -268,6 +270,8 @@ describe <- function(data, ..., weights = NULL,
   if ("sd" %in% show) stats_list$SD <- .w_sd(xs, ws, na.rm)
   if ("se" %in% show) stats_list$SE <- .w_se(xs, ws, na.rm)
   if ("var" %in% show) stats_list$Variance <- .w_var(xs, ws, na.rm)
+  if ("min" %in% show) stats_list$Min <- .w_min(xs, ws, na.rm)
+  if ("max" %in% show) stats_list$Max <- .w_max(xs, ws, na.rm)
   if ("range" %in% show) stats_list$Range <- .w_range(xs, ws, na.rm)
   if ("iqr" %in% show) stats_list$IQR <- .w_iqr(xs, ws, na.rm)
   if ("skew" %in% show) stats_list$Skewness <- .w_skew(xs, ws, na.rm)
@@ -469,7 +473,8 @@ print.summary.describe <- function(x, ...) {
       col_name <- paste0(var_name, "_",
                         switch(stat,
                                "mean" = "Mean", "median" = "Median", "sd" = "SD",
-                               "se" = "SE", "var" = "Variance", "range" = "Range",
+                               "se" = "SE", "var" = "Variance", "min" = "Min", "max" = "Max",
+                               "range" = "Range",
                                "iqr" = "IQR", "skew" = "Skewness", "kurtosis" = "Kurtosis",
                                "mode" = "Mode", "quantiles" = "Q25"))
 
@@ -490,7 +495,8 @@ print.summary.describe <- function(x, ...) {
         value <- results_df[[col_name]]
         if (is.numeric(value)) {
           stat_name <- switch(stat, "mean" = "Mean", "median" = "Median", "sd" = "SD",
-                             "se" = "SE", "var" = "Variance", "range" = "Range",
+                             "se" = "SE", "var" = "Variance", "min" = "Min", "max" = "Max",
+                               "range" = "Range",
                              "iqr" = "IQR", "skew" = "Skewness", "kurtosis" = "Kurtosis",
                              "mode" = "Mode")
           row_data[[stat_name]] <- value

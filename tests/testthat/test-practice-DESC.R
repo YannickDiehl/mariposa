@@ -86,7 +86,7 @@ test_that("DESC-15: describe() validates show and prints no NaN or duplicates", 
   # N/Missing), probs = 1/3 gave the header "Q33.3333333333333",
   # show = "all" printed Q50 next to the identical Median, and a constant
   # variable showed Skewness "NaN".
-  expect_error(describe(survey_data, age, show = "min"), "min")
+  expect_error(describe(survey_data, age, show = "minimum"), "minimum")
   expect_error(describe(survey_data, age, show = c("mean", "sdev")), "sdev")
 
   r <- describe(survey_data, age, show = "quantiles", probs = 1 / 3)

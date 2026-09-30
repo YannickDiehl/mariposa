@@ -337,6 +337,10 @@ reference output showed mariposa was wrong.
   without thousands separators ("2500 observations"), like every other
   table in the package and SPSS's default output.
 
+* `describe()` gains `show = c("min", "max")`, SPSS DESCRIPTIVES'
+  Minimum and Maximum (also part of `show = "all"`). Before `show` was
+  validated, these names were silently ignored.
+
 ### Parametric tests
 
 * `t_test()`, `oneway_anova()`, `factorial_anova()`, `ancova()` and the

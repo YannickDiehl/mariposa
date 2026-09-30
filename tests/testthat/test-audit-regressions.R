@@ -1141,3 +1141,20 @@ test_that(".group_factor() orders by code and shows value labels", {
   # factors unchanged
   expect_identical(.group_factor(factor(c("b", "a"))), factor(c("b", "a")))
 })
+
+test_that("describe() offers SPSS DESCRIPTIVES' Minimum and Maximum", {
+  # 0.7.4: show = c("min", "max") was silently ignored before `show` was
+  # validated (a vignette relied on it); SPSS DESCRIPTIVES reports Minimum
+  # and Maximum by default. Weights do not change the observed extremes.
+  data(survey_data)
+  r <- describe(survey_data, age, income, show = c("mean", "min", "max"))
+  expect_equal(r$results$age_Min, min(survey_data$age, na.rm = TRUE))
+  expect_equal(r$results$income_Max, max(survey_data$income, na.rm = TRUE))
+  rw <- describe(survey_data, age, show = c("min", "max"),
+                 weights = sampling_weight)
+  expect_equal(rw$results$age_Min, min(survey_data$age, na.rm = TRUE))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("Min", out)) && any(grepl("Max", out)))
+  expect_true(is.na(describe(data.frame(x = NA_real_), x,
+                             show = c("min", "max"))$results$x_Min))
+})
