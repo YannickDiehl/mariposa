@@ -103,12 +103,16 @@ spss_values <- list(
                                               # would be 0.000 tolerance ±5e-4
   ),
 
-  # ---- Test 6: Multiple variables at once (the trust additions) ----------
-  # life_sat, income, age duplicate Tests 1b-d; here we add the trust rows
+  # ---- Test 6: Multiple variables at once --------------------------------
+  # All six rows in SPSS's print order (life_sat, income, age repeat the
+  # values of Tests 1b-1d; the row order is asserted as well).
   test_6_multi_var = list(
-    trust_government = list(f_stat = 3.217, p = 0.073),   # levene_test_output.txt:177
-    trust_media      = list(f_stat = 0.005, p = 0.944),   # levene_test_output.txt:178
-    trust_science    = list(f_stat = 3.241, p = 0.072)    # levene_test_output.txt:179
+    life_satisfaction = list(f_stat = 1.277, p = 0.258),  # levene_test_output.txt:174
+    income            = list(f_stat = 0.057, p = 0.811),  # levene_test_output.txt:175
+    age               = list(f_stat = 0.534, p = 0.465),  # levene_test_output.txt:176
+    trust_government  = list(f_stat = 3.217, p = 0.073),  # levene_test_output.txt:177
+    trust_media       = list(f_stat = 0.005, p = 0.944),  # levene_test_output.txt:178
+    trust_science     = list(f_stat = 3.241, p = 0.072)   # levene_test_output.txt:179
   )
 )
 
@@ -303,24 +307,89 @@ test_that("Test 4c: Levene age by gender, weighted, grouped — matches SPSS", {
 # TEST 6 — MULTIPLE VARIABLES AT ONCE
 # =============================================================================
 
-test_that("Test 6: Levene multiple variables (trust additions) — matches SPSS", {
+#' Compare a multi-variable Levene result with Test 6: SPSS's row order
+#' and F/p of every row.
+compare_levene_multi <- function(r, scenario) {
+  spss <- spss_values$test_6_multi_var
+  expect_equal(nrow(r$results), length(spss))
+  expect_identical(r$results$Variable, names(spss),
+                   label = sprintf("[%s] row order", scenario))
+  for (var_name in names(spss)) {
+    row <- r$results[r$results$Variable == var_name, , drop = FALSE]
+    compare_levene_row(row, spss[[var_name]],
+                       sprintf("%s: %s by gender", scenario, var_name))
+  }
+}
+
+test_that("Test 6: Levene multiple variables — matches SPSS (rows and order)", {
   r <- survey_data |>
     levene_test(life_satisfaction, income, age,
                 trust_government, trust_media, trust_science,
                 group = gender, center = "mean")
-
-  expect_equal(nrow(r$results), 6L)
-  expect_setequal(r$results$Variable,
-                  c("life_satisfaction", "income", "age",
-                    "trust_government", "trust_media", "trust_science"))
-
-  # Validate the three trust additions (life_sat/income/age duplicate 1b-d)
-  for (var_name in c("trust_government", "trust_media", "trust_science")) {
-    row <- r$results[r$results$Variable == var_name, , drop = FALSE]
-    compare_levene_row(row, spss_values$test_6_multi_var[[var_name]],
-                       sprintf("6: %s by gender", var_name))
-  }
+  compare_levene_multi(r, "6")
 })
+
+
+# =============================================================================
+# LEVENE FROM A FITTED t_test() / oneway_anova()
+# =============================================================================
+# SPSS computes Levene's test inside T-TEST (the reference above). The
+# levene_test.t_test and levene_test.oneway_anova methods rerun it from the
+# fitted object and must reproduce the same F and p in every scenario
+# (with two gender groups the ONEWAY Levene equals the T-TEST one).
+
+levene_cases <- list(
+  list(key = "test_1b_life_by_gender",            var = "life_satisfaction", weighted = FALSE, grouped = FALSE),
+  list(key = "test_1c_income_by_gender",          var = "income",            weighted = FALSE, grouped = FALSE),
+  list(key = "test_1d_age_by_gender",             var = "age",               weighted = FALSE, grouped = FALSE),
+  list(key = "test_2b_life_by_gender_weighted",   var = "life_satisfaction", weighted = TRUE,  grouped = FALSE),
+  list(key = "test_2c_income_by_gender_weighted", var = "income",            weighted = TRUE,  grouped = FALSE),
+  list(key = "test_2d_age_by_gender_weighted",    var = "age",               weighted = TRUE,  grouped = FALSE),
+  list(key = "test_3a_life_by_gender_grouped",    var = "life_satisfaction", weighted = FALSE, grouped = TRUE),
+  list(key = "test_3b_income_by_gender_grouped",  var = "income",            weighted = FALSE, grouped = TRUE),
+  list(key = "test_3c_age_by_gender_grouped",     var = "age",               weighted = FALSE, grouped = TRUE),
+  list(key = "test_4a_life_by_gender_weighted_grouped",   var = "life_satisfaction", weighted = TRUE, grouped = TRUE),
+  list(key = "test_4b_income_by_gender_weighted_grouped", var = "income",            weighted = TRUE, grouped = TRUE),
+  list(key = "test_4c_age_by_gender_weighted_grouped",    var = "age",               weighted = TRUE, grouped = TRUE)
+)
+
+levene_methods <- list(t_test = t_test, oneway_anova = oneway_anova)
+
+#' Levene result from a fitted t_test()/oneway_anova() of `vars` by gender.
+levene_via <- function(method, vars, weighted, grouped) {
+  d <- if (grouped) group_by(survey_data, region) else survey_data
+  fit <- levene_methods[[method]]
+  res <- if (weighted) {
+    fit(d, all_of(vars), group = gender, weights = sampling_weight)
+  } else {
+    fit(d, all_of(vars), group = gender)
+  }
+  levene_test(res)
+}
+
+for (method in names(levene_methods)) {
+  test_that(sprintf("levene_test.%s reproduces SPSS Levene F/p in all scenarios", method), {
+    for (case in levene_cases) {
+      r <- levene_via(method, case$var, case$weighted, case$grouped)
+      spss <- spss_values[[case$key]]
+      scenario <- sprintf("%s via %s", case$key, method)
+      if (case$grouped) {
+        for (rg in c("East", "West")) {
+          compare_levene_row(extract_grouped_row(r, rg), spss[[rg]],
+                             sprintf("%s [%s]", scenario, rg))
+        }
+      } else {
+        compare_levene_row(r$results, spss, scenario)
+      }
+    }
+  })
+
+  test_that(sprintf("levene_test.%s reproduces SPSS Test 6 (rows and order)", method), {
+    r <- levene_via(method, names(spss_values$test_6_multi_var),
+                    weighted = FALSE, grouped = FALSE)
+    compare_levene_multi(r, sprintf("6 via %s", method))
+  })
+}
 
 
 # =============================================================================
