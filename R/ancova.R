@@ -791,7 +791,7 @@ print.ancova <- function(x, digits = 3, ...) {
                 info$dv, factor_str, cov_str, weighted_tag))
     .print_grouped_fits(x, function(fit, label) {
       cat(sprintf("[%s] N = %s\n", label,
-                  formatC(fit$call_info$n_total, format = "d")))
+                  fmt_int(fit$call_info$n_total)))
       .print_effect_lines(fit$anova_table, digits, covariates = info$covariates)
     })
     return(invisible(x))
@@ -800,7 +800,7 @@ print.ancova <- function(x, digits = 3, ...) {
   # N once in the title (it was appended to the last effect line only)
   cat(sprintf("ANCOVA: %s by %s, covariate: %s%s, N = %s\n",
               info$dv, factor_str, cov_str, weighted_tag,
-              formatC(info$n_total, format = "d")))
+              fmt_int(info$n_total)))
   .print_effect_lines(x$anova_table, digits, covariates = info$covariates)
 
   invisible(x)

@@ -721,7 +721,7 @@ print.factorial_anova <- function(x, digits = 3, ...) {
                 n_factors, info$dv, factor_str, weighted_tag))
     .print_grouped_fits(x, function(fit, label) {
       cat(sprintf("[%s] N = %s\n", label,
-                  formatC(fit$call_info$n_total, format = "d")))
+                  fmt_int(fit$call_info$n_total)))
       .print_effect_lines(fit$anova_table, digits)
     })
     return(invisible(x))
@@ -730,7 +730,7 @@ print.factorial_anova <- function(x, digits = 3, ...) {
   # N once in the title (it was appended to the last effect line only)
   cat(sprintf("Factorial ANOVA (%d-Way): %s by %s%s, N = %s\n",
               n_factors, info$dv, factor_str, weighted_tag,
-              formatC(info$n_total, format = "d")))
+              fmt_int(info$n_total)))
   .print_effect_lines(x$anova_table, digits)
 
   invisible(x)
@@ -816,7 +816,7 @@ print.factorial_anova <- function(x, digits = 3, ...) {
                        stringsAsFactors = FALSE, check.names = FALSE)
   tbl$Mean <- fmt_num(desc$mean, digits)
   tbl$`Std. Deviation` <- fmt_num(desc$sd, digits)
-  tbl$N <- formatC(desc$n, format = "d")
+  tbl$N <- fmt_int(desc$n)
   .print_table_utf8(tbl, left = length(factors))
   if (weighted) cat("Note: Means and SDs are weighted (WLS)\n")
   invisible(NULL)

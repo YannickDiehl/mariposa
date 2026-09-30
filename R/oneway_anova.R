@@ -827,7 +827,7 @@ print.oneway_anova <- function(x, digits = 3, ...) {
       n_shown <- if (is_weighted) num("weighted_n") else num("n")
       .print_table_utf8(data.frame(
         Group = names(stats),
-        N = formatC(round(n_shown), format = "d"),
+        N = fmt_int(n_shown),
         Mean = fmt_num(num("mean"), digits),
         `Std. Deviation` = fmt_num(num("sd"), digits),
         `Std. Error` = fmt_num(num("se"), digits),

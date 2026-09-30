@@ -171,9 +171,12 @@
 }
 
 #' Format a (possibly weighted) count for display: integer, no decimals
+#'
+#' fmt_int(): formatC(format = "d") printed NA for sums of weights of 2^31
+#' or more.
 #' @noRd
 .np_count <- function(n) {
-  ifelse(is.na(n), "", formatC(round(as.numeric(n)), format = "d", big.mark = ""))
+  fmt_int(n)
 }
 
 #' First line of an error message, unwrapped and without styling

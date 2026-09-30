@@ -1000,7 +1000,7 @@ print.summary.reliability <- function(x, ...) {
     item_df$n <- if (!is.null(x$weighted_n)) {
       formatC(item_df$n, format = "f", digits = 2)
     } else {
-      formatC(round(item_df$n), format = "d")
+      fmt_int(item_df$n)
     }
     # name + (shortened) label; indent, Mean, SD, N and separators take
     # about 34 + digits columns

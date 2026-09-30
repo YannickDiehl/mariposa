@@ -853,7 +853,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
       cat(sprintf("\n%sGroup Statistics:\n", weighted_prefix))
       .print_table_utf8(data.frame(
         Group = vapply(gs, function(s) as.character(s$name), character(1)),
-        N = formatC(round(gs_num("n")), format = "d"),
+        N = fmt_int(gs_num("n")),
         Mean = fmt_num(gs_num("mean"), digits),
         `Std. Deviation` = fmt_num(gs_num("sd"), digits),
         `Std. Error Mean` = fmt_num(gs_num("se"), digits),
@@ -985,7 +985,7 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   if (show_descriptives && !is.null(stats)) {
     cat(sprintf("\n%sOne-Sample Statistics:\n", if (weighted) "Weighted " else ""))
     .print_table_utf8(data.frame(
-      N = formatC(round(stats$n), format = "d"),
+      N = fmt_int(stats$n),
       Mean = fmt_num(stats$means, digits),
       `Std. Deviation` = fmt_num(stats$sd %||% NA_real_, digits),
       `Std. Error Mean` = fmt_num(stats$se %||% NA_real_, digits),

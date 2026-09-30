@@ -37,6 +37,30 @@ test_that("EDGE-17: print_stat_table() shows whole numbers beyond 2^31", {
   expect_false(any(grepl("NA", out, fixed = TRUE)))
 })
 
+test_that("EDGE-17: sums of weights beyond 2^31 print as whole numbers everywhere", {
+  # formatC(format = "d") / as.integer() on a sum of expansion weights
+  # printed "N = NA" (rank tests, goodness of fit) and an N of "NA" in the
+  # one-sample table, with integer-coercion warnings.
+  d <- survey_data
+  d$big_w <- d$sampling_weight * 1e6          # sum(w) ~ 2.5e9 > 2^31
+  expect_no_warning(out <- c(
+    capture.output(print(kruskal_wallis(d, life_satisfaction,
+                                        group = education, weights = big_w))),
+    capture.output(print(summary(kruskal_wallis(d, life_satisfaction,
+                                                group = education,
+                                                weights = big_w)))),
+    capture.output(print(chisq_gof(d, education, weights = big_w))),
+    capture.output(print(mann_whitney(d, age, group = gender, weights = big_w))),
+    capture.output(print(wilcoxon_test(d, trust_government, trust_media,
+                                       weights = big_w))),
+    capture.output(print(summary(t_test(d, age, mu = 50, weights = big_w)))),
+    capture.output(print(summary(oneway_anova(d, age, group = education,
+                                              weights = big_w))))
+  ))
+  expect_false(any(grepl("\\bNA\\b", out)))
+  expect_true(any(grepl("N = 2516092404", out, fixed = TRUE)))
+})
+
 test_that("FMT-SPACE: print_stat_table() lines carry no trailing blank", {
   # cat(row, "\n") appended a space to every table line.
   df <- data.frame(Term = c("a", "b"), B = c(1.5, -2))

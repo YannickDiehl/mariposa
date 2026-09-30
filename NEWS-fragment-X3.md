@@ -15,3 +15,9 @@
   `0.0000` p-value diagonal) and the unused `.print_single_pair()` are
   removed; `reliability()` and the correlation functions have their own
   console-fitting matrix printers.
+* Sums of weights of 2^31 or more (expansion weights) no longer print
+  as `N = NA` in the compact lines of the rank tests and the
+  goodness-of-fit test, as `NA` in the N column of the one-sample t-test,
+  and no longer raise integer-coercion warnings in the t-test, one-way
+  ANOVA, factorial ANOVA/ANCOVA, Levene and reliability tables: every
+  count is formatted as a whole number without integer coercion.
