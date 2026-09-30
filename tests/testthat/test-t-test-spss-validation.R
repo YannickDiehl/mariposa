@@ -18,37 +18,22 @@
 #   Test  6    — Multiple variables at once
 #   Tests 7a-b — Alternative confidence levels (90%, 99%)
 #
-# Tolerance tier assignment for t-test outputs:
-#   N (integer)                       — Spec (count, exact)
-#   Mean, SD, SE                      — Spec (statistic), see "Gaps" note below
-#   t-statistic                       — Display (precision = 3, ±5e-4)
-#   df (integer, equal variance)      — Spec (count, exact)
-#   df (Welch-Satterthwaite, decimal) — Display (precision = 3, ±5e-4)
-#   Mean Difference                   — Spec (statistic)
-#   SE of Difference                  — Display (precision = 5 for income/age,
-#                                       precision = 3 for life_satisfaction)
-#   CI lower/upper                    — Display (precision = 3 for life_sat /
-#                                       region grouped, precision = 5 for
-#                                       income/age ungrouped)
-#   p-value (one-sided AND two-sided) — Spec (p_value)
-#   p-value when SPSS prints ".000"   — sentinel "<.001" → actual < 0.001
+# Asserted per SPSS row (Independent Samples Test: both the equal-variance
+# and the Welch row; One-Sample Test and One-Sample Statistics):
+#   t, df, one- and two-sided Sig., Mean Difference, Std. Error Difference,
+#   CI bounds; N, Mean, SD, SE of the mean (one-sample); the headline
+#   columns of $results (Welch row by default); the one-sided p through
+#   mariposa's own alternative = "less" / "greater" path.
 #
-# Tolerance gaps to fix in mariposa source (Phase 2 work):
-#   - t_test() does NOT currently expose Mean, SD, SE in $results for one-sample
-#     scenarios. These assertions are commented out below with TODO markers.
-#     Source: R/t_test.R structure() call at line 649; group_stats only contains
-#     means and Ns, no SDs/SEs.
-#   - Adding $descriptives or $statistics field would close this gap and is
-#     SPSS-equivalent (SPSS prints these as "One-Sample Statistics" before the
-#     test table).
-#
-# Expected exception candidates (Phase 1 diagnosis):
-#   - SPSS's Welch-Satterthwaite df calculation in weighted scenarios uses
-#     integer-rounded n_eff in the denominator; R's t_test() matches this
-#     (R/t_test.R:443-456), so no exception expected. Confirmed by reading
-#     unweighted Welch df (e.g., Test 1b: SPSS 2384.147 should match within
-#     Display tier).
-#   - Equal-variance df = n1 + n2 - 2 is exact integer arithmetic; Spec.
+# Tolerance tiers (Charter §4/§5):
+#   N, unweighted integer df          — Spec (count) / Display(0)
+#   t, Welch df, p                    — Display, 3 decimals (p: what = "p_value";
+#                                       ".000" -> sentinel "<.001")
+#   equal-variance df                 — Display(0): non-integer sum(w) - 2
+#                                       when weighted (Charter §5.1)
+#   Mean Difference, SE Difference,   — Display with the decimals SPSS printed,
+#   CI bounds, Mean, SD, SE             cached per entry as `dp` (e.g. 3 for
+#                                       the 1-5 scales, 5 for income/age)
 # =============================================================================
 
 library(testthat)
@@ -60,6 +45,8 @@ library(mariposa)
 # SPSS REFERENCE VALUES (with citation comments per Charter §7)
 # =============================================================================
 
+# `dp` = the number of decimals SPSS printed for the Mean Difference,
+# Std. Error Difference and CI columns (one-sample: per statistic).
 spss_values <- list(
 
   # =========================================================================
@@ -68,6 +55,7 @@ spss_values <- list(
 
   # ---- Test 1a: one-sample, life_satisfaction, mu = 3.0 -----------------
   test_1a_one_sample = list(
+    dp = c(mean = 2L, sd = 3L, se = 3L, mean_diff = 3L, ci = 2L),  # decimals printed
     n           = 2421,        # t_test_output.txt:11
     mean        = 3.63,        # t_test_output.txt:11  (SPSS prints 2 decimals)
     sd          = 1.153,       # t_test_output.txt:11
@@ -83,6 +71,7 @@ spss_values <- list(
 
   # ---- Test 1b: two-sample, life_satisfaction by gender -----------------
   test_1b_life_by_gender = list(
+    dp = 3L,  # decimals printed: Mean/SE Difference, CI
     equal_var = list(
       t_stat      = -1.019,    # t_test_output.txt:33
       df          = 2419,      # t_test_output.txt:33
@@ -107,6 +96,7 @@ spss_values <- list(
 
   # ---- Test 1c: two-sample, income by gender ----------------------------
   test_1c_income_by_gender = list(
+    dp = 5L,  # decimals printed: Mean/SE Difference, CI
     equal_var = list(
       t_stat      = 0.690,     # t_test_output.txt:48
       df          = 2184,      # t_test_output.txt:48
@@ -131,6 +121,7 @@ spss_values <- list(
 
   # ---- Test 1d: two-sample, age by gender -------------------------------
   test_1d_age_by_gender = list(
+    dp = 5L,  # decimals printed: Mean/SE Difference, CI
     equal_var = list(
       t_stat      = -0.229,    # t_test_output.txt:62
       df          = 2498,      # t_test_output.txt:62
@@ -159,6 +150,7 @@ spss_values <- list(
 
   # ---- Test 2a: one-sample weighted, life_satisfaction, mu = 3.0 --------
   test_2a_one_sample_weighted = list(
+    dp = c(mean = 2L, sd = 3L, se = 3L, mean_diff = 3L, ci = 2L),  # decimals printed
     n           = 2437,        # t_test_output.txt:75  (rounded sum of weights)
     mean        = 3.62,        # t_test_output.txt:75
     sd          = 1.152,       # t_test_output.txt:75
@@ -174,6 +166,7 @@ spss_values <- list(
 
   # ---- Test 2b: two-sample weighted, life_satisfaction by gender --------
   test_2b_life_by_gender_weighted = list(
+    dp = 3L,  # decimals printed: Mean/SE Difference, CI
     equal_var = list(
       t_stat      = -1.070,    # t_test_output.txt:97
       df          = 2435,      # t_test_output.txt:97
@@ -198,6 +191,7 @@ spss_values <- list(
 
   # ---- Test 2c: two-sample weighted, income by gender -------------------
   test_2c_income_by_gender_weighted = list(
+    dp = 5L,  # decimals printed: Mean/SE Difference, CI
     equal_var = list(
       t_stat      = 0.751,     # t_test_output.txt:112
       df          = 2199,      # t_test_output.txt:112
@@ -222,6 +216,7 @@ spss_values <- list(
 
   # ---- Test 2d: two-sample weighted, age by gender ----------------------
   test_2d_age_by_gender_weighted = list(
+    dp = 5L,  # decimals printed: Mean/SE Difference, CI
     equal_var = list(
       t_stat      = 0.138,     # t_test_output.txt:126
       df          = 2514,      # t_test_output.txt:126
@@ -251,6 +246,7 @@ spss_values <- list(
   # ---- Test 3a: life_satisfaction by gender, grouped by region ----------
   test_3a_life_by_gender_grouped = list(
     East = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = 0.598,   # t_test_output.txt:143
         df          = 463,     # t_test_output.txt:143
@@ -273,6 +269,7 @@ spss_values <- list(
       )
     ),
     West = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = -1.453,  # t_test_output.txt:148
         df          = 1954,    # t_test_output.txt:148
@@ -299,6 +296,7 @@ spss_values <- list(
   # ---- Test 3b: income by gender, grouped by region ---------------------
   test_3b_income_by_gender_grouped = list(
     East = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = 1.426,        # t_test_output.txt:165
         df          = 427,          # t_test_output.txt:165
@@ -321,6 +319,7 @@ spss_values <- list(
       )
     ),
     West = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = 0.087,        # t_test_output.txt:169
         df          = 1755,         # t_test_output.txt:169
@@ -347,6 +346,7 @@ spss_values <- list(
   # ---- Test 3c: age by gender, grouped by region ------------------------
   test_3c_age_by_gender_grouped = list(
     East = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = -0.942,       # t_test_output.txt:186
         df          = 483,          # t_test_output.txt:186
@@ -369,6 +369,7 @@ spss_values <- list(
       )
     ),
     West = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = 0.193,        # t_test_output.txt:188
         df          = 2013,         # t_test_output.txt:188
@@ -399,6 +400,7 @@ spss_values <- list(
   # ---- Test 4a: life_satisfaction by gender, weighted, grouped ----------
   test_4a_life_by_gender_weighted_grouped = list(
     East = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = 0.641,        # t_test_output.txt:205
         df          = 486,          # t_test_output.txt:205
@@ -421,6 +423,7 @@ spss_values <- list(
       )
     ),
     West = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = -1.550,       # t_test_output.txt:210
         df          = 1947,         # t_test_output.txt:210
@@ -447,6 +450,7 @@ spss_values <- list(
   # ---- Test 4b: income by gender, weighted, grouped by region -----------
   test_4b_income_by_gender_weighted_grouped = list(
     East = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = 1.681,        # t_test_output.txt:227
         df          = 447,          # t_test_output.txt:227
@@ -469,6 +473,7 @@ spss_values <- list(
       )
     ),
     West = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = 0.009,        # t_test_output.txt:231
         df          = 1749,         # t_test_output.txt:231
@@ -495,6 +500,7 @@ spss_values <- list(
   # ---- Test 4c: age by gender, weighted, grouped by region --------------
   test_4c_age_by_gender_weighted_grouped = list(
     East = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = -0.669,       # t_test_output.txt:248
         df          = 507,          # t_test_output.txt:248
@@ -517,6 +523,7 @@ spss_values <- list(
       )
     ),
     West = list(
+      dp = 5L,
       equal_var = list(
         t_stat      = 0.462,        # t_test_output.txt:250
         df          = 2005,         # t_test_output.txt:250
@@ -546,6 +553,7 @@ spss_values <- list(
 
   # ---- Test 5a: one-sample, income, mu = 5000 ---------------------------
   test_5a_income_one_sample = list(
+    dp = c(mean = 4L, sd = 5L, se = 5L, mean_diff = 5L, ci = 4L),  # decimals printed
     n           = 2186,                # t_test_output.txt:263
     mean        = 3753.9341,           # t_test_output.txt:263
     sd          = 1432.80161,          # t_test_output.txt:263
@@ -561,6 +569,7 @@ spss_values <- list(
 
   # ---- Test 5b: one-sample, age, mu = 45 --------------------------------
   test_5b_age_one_sample = list(
+    dp = c(mean = 4L, sd = 5L, se = 5L, mean_diff = 5L, ci = 4L),  # decimals printed
     n           = 2500,                # t_test_output.txt:280
     mean        = 50.5496,             # t_test_output.txt:280
     sd          = 16.97602,            # t_test_output.txt:280
@@ -579,6 +588,7 @@ spss_values <- list(
   # The life_satisfaction / income / age rows duplicate Tests 1b-d.
   test_6_multi_var_trust = list(
     trust_government = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = -0.673,           # t_test_output.txt:310
         df          = 2352,             # t_test_output.txt:310
@@ -601,6 +611,7 @@ spss_values <- list(
       )
     ),
     trust_media = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = -2.172,           # t_test_output.txt:314
         df          = 2365,             # t_test_output.txt:314
@@ -623,6 +634,7 @@ spss_values <- list(
       )
     ),
     trust_science = list(
+      dp = 3L,
       equal_var = list(
         t_stat      = -1.490,           # t_test_output.txt:317
         df          = 2396,             # t_test_output.txt:317
@@ -647,13 +659,26 @@ spss_values <- list(
   ),
 
   # ---- Test 7a: alternative 90% CI --------------------------------------
-  # t/df/p/mean_diff/se_diff are identical to Test 1b (only CI bounds differ).
+  # t/df/p/mean_diff/se_diff are those of Test 1b; only the CI differs.
   test_7a_life_by_gender_90ci = list(
+    dp = 3L,
     equal_var = list(
+      t_stat      = -1.019,           # t_test_output.txt:334
+      df          = 2419,             # t_test_output.txt:334
+      p_one_sided = 0.154,            # t_test_output.txt:334
+      p_two_sided = 0.308,            # t_test_output.txt:334
+      mean_diff   = -0.048,           # t_test_output.txt:334
+      se_diff     = 0.047,            # t_test_output.txt:334
       ci_lower    = -0.125,           # t_test_output.txt:334
       ci_upper    = 0.029             # t_test_output.txt:334
     ),
     welch = list(
+      t_stat      = -1.018,           # t_test_output.txt:336
+      df          = 2384.147,         # t_test_output.txt:336
+      p_one_sided = 0.154,            # t_test_output.txt:336
+      p_two_sided = 0.309,            # t_test_output.txt:336
+      mean_diff   = -0.048,           # t_test_output.txt:336
+      se_diff     = 0.047,            # t_test_output.txt:336
       ci_lower    = -0.125,           # t_test_output.txt:336
       ci_upper    = 0.029             # t_test_output.txt:336
     )
@@ -661,11 +686,24 @@ spss_values <- list(
 
   # ---- Test 7b: alternative 99% CI --------------------------------------
   test_7b_life_by_gender_99ci = list(
+    dp = 3L,
     equal_var = list(
+      t_stat      = -1.019,           # t_test_output.txt:350
+      df          = 2419,             # t_test_output.txt:350
+      p_one_sided = 0.154,            # t_test_output.txt:350
+      p_two_sided = 0.308,            # t_test_output.txt:350
+      mean_diff   = -0.048,           # t_test_output.txt:350
+      se_diff     = 0.047,            # t_test_output.txt:350
       ci_lower    = -0.169,           # t_test_output.txt:350
       ci_upper    = 0.073             # t_test_output.txt:350
     ),
     welch = list(
+      t_stat      = -1.018,           # t_test_output.txt:352
+      df          = 2384.147,         # t_test_output.txt:352
+      p_one_sided = 0.154,            # t_test_output.txt:352
+      p_two_sided = 0.309,            # t_test_output.txt:352
+      mean_diff   = -0.048,           # t_test_output.txt:352
+      se_diff     = 0.047,            # t_test_output.txt:352
       ci_lower    = -0.169,           # t_test_output.txt:352
       ci_upper    = 0.073             # t_test_output.txt:352
     )
@@ -678,276 +716,167 @@ spss_values <- list(
 # =============================================================================
 # Per Charter §8: each helper internally calls assert_spss() for every
 # numerical comparison. No tolerance literals, no NA-as-match defaulting.
+#
+# Each test passes a `run(alternative)` closure that calls t_test(); the
+# helpers call it once two-sided and once with the one-sided alternative in
+# the direction of the SPSS t ("less" for t < 0, "greater" otherwise), so the
+# SPSS "One-Sided p" is compared with mariposa's own one-sided test.
 # =============================================================================
 
-#' Compare a one-sample t-test result against SPSS reference
-#'
-#' SPSS one-sample output prints:
-#'   - One-Sample Statistics: N, Mean, SD, SE (descriptives)
-#'   - One-Sample Test:       t, df, Sig (1-/2-sided), Mean Difference, CI bounds
-#'
-#' mariposa's t_test() result$results columns for one-sample:
-#'   - t_stat, df, p_value, mean_diff (observed mean - mu, as SPSS),
-#'     conf_int_lower/upper (CI of the difference, as SPSS)
-#'   - group_stats: means, n, sd, se (SPSS "One-Sample Statistics")
-#'
-#' @param r_result A t_test result object (one-sample form)
-#' @param spss     The corresponding spss_values entry
-#' @param scenario A short label identifying the test scenario
-compare_one_sample <- function(r_result, spss, scenario) {
+# One-sided alternative in the direction of the observed (SPSS) t
+one_sided_alternative <- function(t_spss) if (t_spss < 0) "less" else "greater"
 
-  r <- r_result$results[1, ]
-
-  # ---- t-statistic (Display) -----------------------------------------------
-  # SPSS prints t to 3 decimals → Display tier, precision = 3 (tol ±5e-4).
-  assert_spss(r$t_stat, spss$t_stat,
-              tier = "display", precision = 3,
-              label = sprintf("[%s] t-statistic", scenario))
-
-  # ---- df: SPSS displays as integer; internally non-integer for weighted -
-  # When weights are present, df = sum(w) - 1 is non-integer; SPSS rounds for
-  # the displayed column but uses the unrounded value for the t distribution.
-  # Display(precision = 0) handles both unweighted (exact integer) and
-  # weighted (within half a unit of the displayed integer) cleanly.
-  assert_spss(r$df, spss$df,
-              tier = "display", precision = 0,
-              label = sprintf("[%s] df", scenario))
-
-  # ---- p-value, two-sided (Spec; "<.001" handled by helper) -------------
-  # SPSS prints p to 3 decimals → Display tier (sentinel "<.001" handled by helper)
-  assert_spss(r$p_value, spss$p_two_sided,
-              tier = "display", precision = 3,
-              label = sprintf("[%s] two-sided p", scenario))
-
-  # ---- p-value, one-sided (derived from two-sided) -----------------------
-  # For a symmetric distribution, one-sided p (in observed direction) = p/2.
-  r_p_one_sided <- r$p_value / 2
-  assert_spss(r_p_one_sided, spss$p_one_sided,
-              tier = "display", precision = 3,
-              label = sprintf("[%s] one-sided p", scenario))
-
-  # ---- Mean Difference (observed mean - mu) ------------------------------
-  # Since 0.7.4 mariposa stores the difference itself (PAR-06); earlier
-  # versions stored the observed mean and this helper subtracted mu.
-  r_mean_diff <- r$mean_diff
-  # Precision in SPSS varies: 3 dp for life_satisfaction, 5 dp for income/age.
-  # We pick precision per the SPSS print width; the spss_values comment shows.
-  precision <- if (abs(spss$mean_diff) >= 100) 4L else 3L
-  assert_spss(r_mean_diff, spss$mean_diff,
-              tier = "display", precision = precision,
-              label = sprintf("[%s] Mean Difference", scenario))
-
-  # ---- CI for Mean Difference --------------------------------------------
-  r_ci_lower <- r$conf_int_lower
-  r_ci_upper <- r$conf_int_upper
-
-  ci_precision <- if (abs(spss$ci_lower) >= 100) 4L else 2L
-  assert_spss(r_ci_lower, spss$ci_lower,
-              tier = "display", precision = ci_precision,
-              label = sprintf("[%s] CI lower", scenario))
-  assert_spss(r_ci_upper, spss$ci_upper,
-              tier = "display", precision = ci_precision,
-              label = sprintf("[%s] CI upper", scenario))
-
-  # ---- N (Spec — exact integer for both unweighted and integer-rounded
-  #         weighted N). For one-sample, N is in result$results$n1.
-  if ("n1" %in% names(r) && !is.na(r$n1)) {
-    assert_spss_count(r$n1, spss$n,
-                      label = sprintf("[%s] N", scenario))
+# Row selector for grouped / multi-variable results (exactly one row)
+row_where <- function(...) {
+  crit <- list(...)
+  function(res) {
+    sel <- rep(TRUE, nrow(res))
+    for (k in names(crit)) sel <- sel & as.character(res[[k]]) == crit[[k]]
+    if (sum(sel) != 1L) {
+      stop(sprintf("row_where(): expected exactly 1 row for %s; got %d",
+                   paste(names(crit), crit, sep = "=", collapse = ", "),
+                   sum(sel)), call. = FALSE)
+    }
+    res[sel, , drop = FALSE]
   }
+}
+first_row <- function(res) res[1, , drop = FALSE]
 
-  # ---- One-Sample Statistics: Mean, SD, SE (0.7.4, PAR-06) --------------
-  # SPSS prints 2 decimals for the life_satisfaction mean and 3 for its
-  # SD/SE; 4 (mean) and 5 (SD, SE) for income and age.
+
+#' Compare a one-sample t-test against SPSS One-Sample Statistics / Test
+#'
+#' mariposa's one-sample $results row: t_stat, df, p_value, mean_diff
+#' (observed mean - mu, as SPSS), conf_int_lower/upper (CI of the
+#' difference, as SPSS), n1; group_stats: means, sd, se (SPSS "One-Sample
+#' Statistics"). `spss$dp` holds the decimals SPSS printed for mean, sd,
+#' se, mean_diff and the CI.
+compare_one_sample <- function(run, spss, scenario) {
+  r  <- run()$results[1, ]
+  dp <- spss$dp
+
+  assert_spss(r$t_stat, spss$t_stat, tier = "display", precision = 3,
+              label = sprintf("[%s] t-statistic", scenario))
+  # df = sum(w) - 1 is non-integer when weighted; SPSS prints an integer.
+  assert_spss(r$df, spss$df, tier = "display", precision = 0,
+              label = sprintf("[%s] df", scenario))
+  assert_spss(r$p_value, spss$p_two_sided, tier = "display", precision = 3,
+              what = "p_value", label = sprintf("[%s] two-sided p", scenario))
+
+  alt <- one_sided_alternative(spss$t_stat)
+  r1 <- run(alt)$results[1, ]
+  assert_spss(r1$p_value, spss$p_one_sided, tier = "display", precision = 3,
+              what = "p_value",
+              label = sprintf("[%s] one-sided p (alternative = \"%s\")", scenario, alt))
+
+  assert_spss(r$mean_diff, spss$mean_diff, tier = "display",
+              precision = dp[["mean_diff"]],
+              label = sprintf("[%s] Mean Difference", scenario))
+  assert_spss(r$conf_int_lower, spss$ci_lower, tier = "display",
+              precision = dp[["ci"]], label = sprintf("[%s] CI lower", scenario))
+  assert_spss(r$conf_int_upper, spss$ci_upper, tier = "display",
+              precision = dp[["ci"]], label = sprintf("[%s] CI upper", scenario))
+
+  # N: exact for unweighted, the rounded sum of weights when weighted
+  assert_spss_count(r$n1, spss$n, label = sprintf("[%s] N", scenario))
+
+  # One-Sample Statistics
   st <- r$group_stats[[1]]
-  wide <- abs(spss$mean) >= 10
-  assert_spss(st$means, spss$mean,
-              tier = "display", precision = if (wide) 4L else 2L,
+  assert_spss_count(st$n, spss$n, label = sprintf("[%s] Statistics N", scenario))
+  assert_spss(st$means, spss$mean, tier = "display", precision = dp[["mean"]],
               label = sprintf("[%s] Mean", scenario))
-  assert_spss(st$sd, spss$sd,
-              tier = "display", precision = if (wide) 5L else 3L,
+  assert_spss(st$sd, spss$sd, tier = "display", precision = dp[["sd"]],
               label = sprintf("[%s] Std. Deviation", scenario))
-  assert_spss(st$se, spss$se,
-              tier = "display", precision = if (wide) 5L else 3L,
+  assert_spss(st$se, spss$se, tier = "display", precision = dp[["se"]],
               label = sprintf("[%s] Std. Error Mean", scenario))
 
   invisible(NULL)
 }
 
 
-#' Compare a two-sample t-test result against SPSS reference (both var paths)
+#' Compare both rows of an SPSS Independent Samples Test
 #'
-#' SPSS independent-samples output prints two rows per analysis: equal-variance
-#' (Student) and not-equal-variance (Welch). mariposa's t_test() stores both in
-#' result$results$equal_var_result and result$results$unequal_var_result (which
-#' are lists holding t-test return objects with $statistic, $parameter, etc).
+#' mariposa keeps both rows: $equal_var_result (Student) and
+#' $unequal_var_result (Welch) hold htest objects (statistic, parameter,
+#' p.value, estimate, stderr, conf.int). The headline $results columns
+#' report the Welch row (var.equal = FALSE by default). `spss$dp` holds the
+#' decimals SPSS printed for Mean Difference, Std. Error Difference and CI.
 #'
-#' @param r_result A t_test result object (two-sample form)
-#' @param spss     The spss_values entry with $equal_var and $welch sublists
-#' @param scenario A short label identifying the test scenario
-#' @param row_idx  Which row of result$results to use (default 1; used by
-#'                 grouped and multi-variable tests)
-compare_two_sample <- function(r_result, spss, scenario, row_idx = 1L) {
+#' @param run    function(alternative = "two.sided") returning a t_test result
+#' @param spss   spss_values entry with $dp, $equal_var and $welch
+#' @param select picks the result row (grouped / multi-variable results)
+compare_two_sample <- function(run, spss, scenario, select = first_row) {
+  r  <- select(run()$results)
+  dp <- spss$dp
 
-  r <- r_result$results[row_idx, ]
+  rows <- list(equal_var = r$equal_var_result[[1]],
+               welch     = r$unequal_var_result[[1]])
+  for (branch in names(rows)) {
+    o <- rows[[branch]]
+    s <- spss[[branch]]
+    lab <- sprintf("[%s, %s]", scenario,
+                   if (branch == "welch") "Welch" else "equal-var")
+    if (is.null(o)) {
+      stop(sprintf("%s R-side result row is NULL", lab), call. = FALSE)
+    }
 
-  # Equal-variance R values (Student's t)
-  eq <- r$equal_var_result[[1]]
-  if (is.null(eq)) {
-    stop(sprintf("[%s] R-side equal_var_result is NULL — t_test() may have
-omitted this branch.", scenario), call. = FALSE)
-  }
-  r_eq_t        <- as.numeric(eq$statistic)
-  r_eq_df       <- as.numeric(eq$parameter)
-  r_eq_p_two    <- as.numeric(eq$p.value)
-  r_eq_meandiff <- as.numeric(eq$estimate[1] - eq$estimate[2])
-  r_eq_ci_lo    <- as.numeric(eq$conf.int[1])
-  r_eq_ci_hi    <- as.numeric(eq$conf.int[2])
-
-  # Welch values (unequal variance)
-  un <- r$unequal_var_result[[1]]
-  if (is.null(un)) {
-    stop(sprintf("[%s] R-side unequal_var_result is NULL", scenario),
-         call. = FALSE)
-  }
-  r_un_t        <- as.numeric(un$statistic)
-  r_un_df       <- as.numeric(un$parameter)
-  r_un_p_two    <- as.numeric(un$p.value)
-  r_un_meandiff <- as.numeric(un$estimate[1] - un$estimate[2])
-  r_un_ci_lo    <- as.numeric(un$conf.int[1])
-  r_un_ci_hi    <- as.numeric(un$conf.int[2])
-
-  # ---- Equal-variance assertions ----------------------------------------
-  if (!is.null(spss$equal_var)) {
-    e <- spss$equal_var
-
-    if (!is.null(e$t_stat)) {
-      assert_spss(r_eq_t, e$t_stat,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, equal-var] t", scenario))
-    }
-    if (!is.null(e$df)) {
-      # Equal-variance df = sw1 + sw2 - 2 (non-integer when weighted; SPSS
-      # rounds for display). Display(precision = 0) handles both cleanly.
-      assert_spss(r_eq_df, e$df,
-                  tier = "display", precision = 0,
-                  label = sprintf("[%s, equal-var] df", scenario))
-    }
-    if (!is.null(e$p_two_sided)) {
-      assert_spss(r_eq_p_two, e$p_two_sided,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, equal-var] two-sided p", scenario))
-    }
-    if (!is.null(e$p_one_sided)) {
-      r_eq_p_one <- r_eq_p_two / 2
-      assert_spss(r_eq_p_one, e$p_one_sided,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, equal-var] one-sided p", scenario))
-    }
-    if (!is.null(e$mean_diff)) {
-      precision <- if (abs(e$mean_diff) >= 100) 4L else 3L
-      assert_spss(r_eq_meandiff, e$mean_diff,
-                  tier = "display", precision = precision,
-                  label = sprintf("[%s, equal-var] Mean Difference", scenario))
-    }
-    if (!is.null(e$ci_lower)) {
-      precision <- if (abs(e$ci_lower) >= 100) 4L else 3L
-      assert_spss(r_eq_ci_lo, e$ci_lower,
-                  tier = "display", precision = precision,
-                  label = sprintf("[%s, equal-var] CI lower", scenario))
-    }
-    if (!is.null(e$ci_upper)) {
-      precision <- if (abs(e$ci_upper) >= 100) 4L else 3L
-      assert_spss(r_eq_ci_hi, e$ci_upper,
-                  tier = "display", precision = precision,
-                  label = sprintf("[%s, equal-var] CI upper", scenario))
-    }
+    assert_spss(as.numeric(o$statistic), s$t_stat, tier = "display",
+                precision = 3, label = paste(lab, "t"))
+    # Welch df: SPSS prints 3 decimals. Equal-variance df = sw1 + sw2 - 2
+    # (non-integer when weighted; SPSS prints an integer).
+    assert_spss(as.numeric(o$parameter), s$df, tier = "display",
+                precision = if (branch == "welch") 3L else 0L,
+                label = paste(lab, "df"))
+    assert_spss(as.numeric(o$p.value), s$p_two_sided, tier = "display",
+                precision = 3, what = "p_value", label = paste(lab, "two-sided p"))
+    assert_spss(as.numeric(o$estimate[1] - o$estimate[2]), s$mean_diff,
+                tier = "display", precision = dp,
+                label = paste(lab, "Mean Difference"))
+    assert_spss(as.numeric(o$stderr), s$se_diff, tier = "display",
+                precision = dp, label = paste(lab, "Std. Error Difference"))
+    assert_spss(as.numeric(o$conf.int[1]), s$ci_lower, tier = "display",
+                precision = dp, label = paste(lab, "CI lower"))
+    assert_spss(as.numeric(o$conf.int[2]), s$ci_upper, tier = "display",
+                precision = dp, label = paste(lab, "CI upper"))
   }
 
-  # ---- Welch assertions -------------------------------------------------
-  if (!is.null(spss$welch)) {
-    w <- spss$welch
+  # ---- Headline columns of $results: the Welch row ---------------------
+  w <- spss$welch
+  lab <- sprintf("[%s, $results]", scenario)
+  assert_spss(r$t_stat, w$t_stat, tier = "display", precision = 3,
+              label = paste(lab, "t_stat"))
+  assert_spss(r$df, w$df, tier = "display", precision = 3,
+              label = paste(lab, "df"))
+  assert_spss(r$p_value, w$p_two_sided, tier = "display", precision = 3,
+              what = "p_value", label = paste(lab, "p_value"))
+  assert_spss(r$mean_diff, w$mean_diff, tier = "display", precision = dp,
+              label = paste(lab, "mean_diff"))
+  assert_spss(r$conf_int_lower, w$ci_lower, tier = "display", precision = dp,
+              label = paste(lab, "conf_int_lower"))
+  assert_spss(r$conf_int_upper, w$ci_upper, tier = "display", precision = dp,
+              label = paste(lab, "conf_int_upper"))
 
-    if (!is.null(w$t_stat)) {
-      assert_spss(r_un_t, w$t_stat,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, Welch] t", scenario))
-    }
-    if (!is.null(w$df)) {
-      # Welch df is decimal; SPSS prints to 3 decimals.
-      assert_spss(r_un_df, w$df,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, Welch] df", scenario))
-    }
-    if (!is.null(w$p_two_sided)) {
-      assert_spss(r_un_p_two, w$p_two_sided,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, Welch] two-sided p", scenario))
-    }
-    if (!is.null(w$p_one_sided)) {
-      r_un_p_one <- r_un_p_two / 2
-      assert_spss(r_un_p_one, w$p_one_sided,
-                  tier = "display", precision = 3,
-                  label = sprintf("[%s, Welch] one-sided p", scenario))
-    }
-    if (!is.null(w$mean_diff)) {
-      precision <- if (abs(w$mean_diff) >= 100) 4L else 3L
-      assert_spss(r_un_meandiff, w$mean_diff,
-                  tier = "display", precision = precision,
-                  label = sprintf("[%s, Welch] Mean Difference", scenario))
-    }
-    if (!is.null(w$ci_lower)) {
-      precision <- if (abs(w$ci_lower) >= 100) 4L else 3L
-      assert_spss(r_un_ci_lo, w$ci_lower,
-                  tier = "display", precision = precision,
-                  label = sprintf("[%s, Welch] CI lower", scenario))
-    }
-    if (!is.null(w$ci_upper)) {
-      precision <- if (abs(w$ci_upper) >= 100) 4L else 3L
-      assert_spss(r_un_ci_hi, w$ci_upper,
-                  tier = "display", precision = precision,
-                  label = sprintf("[%s, Welch] CI upper", scenario))
-    }
-  }
+  # ---- One-sided p through alternative = "less" / "greater" ------------
+  alt <- one_sided_alternative(spss$equal_var$t_stat)
+  ro <- select(run(alt)$results)
+  lab <- sprintf("[%s] one-sided p (alternative = \"%s\")", scenario, alt)
+  assert_spss(as.numeric(ro$equal_var_result[[1]]$p.value),
+              spss$equal_var$p_one_sided, tier = "display", precision = 3,
+              what = "p_value", label = paste(lab, "equal-var"))
+  assert_spss(as.numeric(ro$unequal_var_result[[1]]$p.value),
+              spss$welch$p_one_sided, tier = "display", precision = 3,
+              what = "p_value", label = paste(lab, "Welch"))
+  assert_spss(ro$p_value, spss$welch$p_one_sided, tier = "display",
+              precision = 3, what = "p_value", label = paste(lab, "$results"))
 
-  # ---- N (sum of group sizes) -------------------------------------------
-  # SPSS computes df_equal = round(sw1 + sw2) - 2, so the displayed total N
-  # is round(sw1 + sw2). On the R side, n1 and n2 are independently rounded
-  # per group via round(sw1) + round(sw2), which can differ from
-  # round(sw1 + sw2) by 1 due to half-up rounding accumulation.
-  # We compare the un-rounded total recovered from r$df instead.
-  if (!is.null(spss$equal_var) && !is.null(spss$equal_var$df)) {
-    spss_n_total <- spss$equal_var$df + 2L
-    r_n_total_unrounded <- as.numeric(r$equal_var_result[[1]]$parameter) + 2
-    assert_spss(r_n_total_unrounded, spss_n_total,
-                tier = "display", precision = 0,
-                label = sprintf("[%s] total N (via df+2)", scenario))
-  }
+  # ---- Total N ---------------------------------------------------------
+  # SPSS's equal-variance df is sw1 + sw2 - 2 (unrounded sum of weights),
+  # printed as an integer; mariposa's n1/n2 are rounded per group, so the
+  # total is recovered from the df instead.
+  assert_spss(as.numeric(rows$equal_var$parameter) + 2, spss$equal_var$df + 2,
+              tier = "display", precision = 0,
+              label = sprintf("[%s] total N (via df+2)", scenario))
 
   invisible(NULL)
-}
-
-
-#' Extract grouped results for one (region, variable) cell
-#' @param result Grouped t_test result
-#' @param region "East" or "West"
-#' @param variable Optional variable name when result has multiple variables
-extract_grouped_row <- function(result, region, variable = NULL) {
-  res <- result$results
-  if (!is.null(variable)) {
-    sel <- res$region == region & res$Variable == variable
-  } else {
-    sel <- res$region == region
-  }
-  if (sum(sel) != 1L) {
-    stop(sprintf("extract_grouped_row(): expected exactly 1 row for region=%s%s; got %d",
-                 region,
-                 if (!is.null(variable)) sprintf(", variable=%s", variable) else "",
-                 sum(sel)), call. = FALSE)
-  }
-  out <- result
-  out$results <- res[sel, , drop = FALSE]
-  out
 }
 
 
@@ -963,26 +892,35 @@ data(survey_data, envir = environment())
 # =============================================================================
 
 test_that("Test 1a: one-sample, life_satisfaction, mu = 3.0", {
-  result <- survey_data |> t_test(life_satisfaction, mu = 3.0)
-  compare_one_sample(result, spss_values$test_1a_one_sample,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, mu = 3.0, alternative = alternative)
+  }
+  compare_one_sample(run, spss_values$test_1a_one_sample,
                      "1a: one-sample life_sat mu=3")
 })
 
 test_that("Test 1b: two-sample, life_satisfaction by gender", {
-  result <- survey_data |> t_test(life_satisfaction, group = gender)
-  compare_two_sample(result, spss_values$test_1b_life_by_gender,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, group = gender,
+           alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_1b_life_by_gender,
                      "1b: life_sat by gender")
 })
 
 test_that("Test 1c: two-sample, income by gender", {
-  result <- survey_data |> t_test(income, group = gender)
-  compare_two_sample(result, spss_values$test_1c_income_by_gender,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, income, group = gender, alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_1c_income_by_gender,
                      "1c: income by gender")
 })
 
 test_that("Test 1d: two-sample, age by gender", {
-  result <- survey_data |> t_test(age, group = gender)
-  compare_two_sample(result, spss_values$test_1d_age_by_gender,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, age, group = gender, alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_1d_age_by_gender,
                      "1d: age by gender")
 })
 
@@ -992,30 +930,38 @@ test_that("Test 1d: two-sample, age by gender", {
 # =============================================================================
 
 test_that("Test 2a: one-sample weighted, life_satisfaction, mu = 3.0", {
-  result <- survey_data |>
-    t_test(life_satisfaction, mu = 3.0, weights = sampling_weight)
-  compare_one_sample(result, spss_values$test_2a_one_sample_weighted,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, mu = 3.0, weights = sampling_weight,
+           alternative = alternative)
+  }
+  compare_one_sample(run, spss_values$test_2a_one_sample_weighted,
                      "2a: weighted one-sample life_sat mu=3")
 })
 
 test_that("Test 2b: two-sample weighted, life_satisfaction by gender", {
-  result <- survey_data |>
-    t_test(life_satisfaction, group = gender, weights = sampling_weight)
-  compare_two_sample(result, spss_values$test_2b_life_by_gender_weighted,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, group = gender,
+           weights = sampling_weight, alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_2b_life_by_gender_weighted,
                      "2b: weighted life_sat by gender")
 })
 
 test_that("Test 2c: two-sample weighted, income by gender", {
-  result <- survey_data |>
-    t_test(income, group = gender, weights = sampling_weight)
-  compare_two_sample(result, spss_values$test_2c_income_by_gender_weighted,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, income, group = gender, weights = sampling_weight,
+           alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_2c_income_by_gender_weighted,
                      "2c: weighted income by gender")
 })
 
 test_that("Test 2d: two-sample weighted, age by gender", {
-  result <- survey_data |>
-    t_test(age, group = gender, weights = sampling_weight)
-  compare_two_sample(result, spss_values$test_2d_age_by_gender_weighted,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, age, group = gender, weights = sampling_weight,
+           alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_2d_age_by_gender_weighted,
                      "2d: weighted age by gender")
 })
 
@@ -1025,41 +971,41 @@ test_that("Test 2d: two-sample weighted, age by gender", {
 # =============================================================================
 
 test_that("Test 3a: life_satisfaction by gender, grouped by region", {
-  result <- survey_data |>
-    group_by(region) |>
-    t_test(life_satisfaction, group = gender)
-
+  run <- function(alternative = "two.sided") {
+    survey_data |>
+      group_by(region) |>
+      t_test(life_satisfaction, group = gender, alternative = alternative)
+  }
   for (rg in c("East", "West")) {
-    cell <- extract_grouped_row(result, rg)
-    compare_two_sample(cell,
-                       spss_values$test_3a_life_by_gender_grouped[[rg]],
-                       sprintf("3a: life_sat by gender [%s]", rg))
+    compare_two_sample(run, spss_values$test_3a_life_by_gender_grouped[[rg]],
+                       sprintf("3a: life_sat by gender [%s]", rg),
+                       select = row_where(region = rg))
   }
 })
 
 test_that("Test 3b: income by gender, grouped by region", {
-  result <- survey_data |>
-    group_by(region) |>
-    t_test(income, group = gender)
-
+  run <- function(alternative = "two.sided") {
+    survey_data |>
+      group_by(region) |>
+      t_test(income, group = gender, alternative = alternative)
+  }
   for (rg in c("East", "West")) {
-    cell <- extract_grouped_row(result, rg)
-    compare_two_sample(cell,
-                       spss_values$test_3b_income_by_gender_grouped[[rg]],
-                       sprintf("3b: income by gender [%s]", rg))
+    compare_two_sample(run, spss_values$test_3b_income_by_gender_grouped[[rg]],
+                       sprintf("3b: income by gender [%s]", rg),
+                       select = row_where(region = rg))
   }
 })
 
 test_that("Test 3c: age by gender, grouped by region", {
-  result <- survey_data |>
-    group_by(region) |>
-    t_test(age, group = gender)
-
+  run <- function(alternative = "two.sided") {
+    survey_data |>
+      group_by(region) |>
+      t_test(age, group = gender, alternative = alternative)
+  }
   for (rg in c("East", "West")) {
-    cell <- extract_grouped_row(result, rg)
-    compare_two_sample(cell,
-                       spss_values$test_3c_age_by_gender_grouped[[rg]],
-                       sprintf("3c: age by gender [%s]", rg))
+    compare_two_sample(run, spss_values$test_3c_age_by_gender_grouped[[rg]],
+                       sprintf("3c: age by gender [%s]", rg),
+                       select = row_where(region = rg))
   }
 })
 
@@ -1069,41 +1015,47 @@ test_that("Test 3c: age by gender, grouped by region", {
 # =============================================================================
 
 test_that("Test 4a: life_satisfaction by gender, weighted, grouped by region", {
-  result <- survey_data |>
-    group_by(region) |>
-    t_test(life_satisfaction, group = gender, weights = sampling_weight)
-
+  run <- function(alternative = "two.sided") {
+    survey_data |>
+      group_by(region) |>
+      t_test(life_satisfaction, group = gender, weights = sampling_weight,
+             alternative = alternative)
+  }
   for (rg in c("East", "West")) {
-    cell <- extract_grouped_row(result, rg)
-    compare_two_sample(cell,
+    compare_two_sample(run,
                        spss_values$test_4a_life_by_gender_weighted_grouped[[rg]],
-                       sprintf("4a: weighted life_sat by gender [%s]", rg))
+                       sprintf("4a: weighted life_sat by gender [%s]", rg),
+                       select = row_where(region = rg))
   }
 })
 
 test_that("Test 4b: income by gender, weighted, grouped by region", {
-  result <- survey_data |>
-    group_by(region) |>
-    t_test(income, group = gender, weights = sampling_weight)
-
+  run <- function(alternative = "two.sided") {
+    survey_data |>
+      group_by(region) |>
+      t_test(income, group = gender, weights = sampling_weight,
+             alternative = alternative)
+  }
   for (rg in c("East", "West")) {
-    cell <- extract_grouped_row(result, rg)
-    compare_two_sample(cell,
+    compare_two_sample(run,
                        spss_values$test_4b_income_by_gender_weighted_grouped[[rg]],
-                       sprintf("4b: weighted income by gender [%s]", rg))
+                       sprintf("4b: weighted income by gender [%s]", rg),
+                       select = row_where(region = rg))
   }
 })
 
 test_that("Test 4c: age by gender, weighted, grouped by region", {
-  result <- survey_data |>
-    group_by(region) |>
-    t_test(age, group = gender, weights = sampling_weight)
-
+  run <- function(alternative = "two.sided") {
+    survey_data |>
+      group_by(region) |>
+      t_test(age, group = gender, weights = sampling_weight,
+             alternative = alternative)
+  }
   for (rg in c("East", "West")) {
-    cell <- extract_grouped_row(result, rg)
-    compare_two_sample(cell,
+    compare_two_sample(run,
                        spss_values$test_4c_age_by_gender_weighted_grouped[[rg]],
-                       sprintf("4c: weighted age by gender [%s]", rg))
+                       sprintf("4c: weighted age by gender [%s]", rg),
+                       select = row_where(region = rg))
   }
 })
 
@@ -1113,96 +1065,65 @@ test_that("Test 4c: age by gender, weighted, grouped by region", {
 # =============================================================================
 
 test_that("Test 5a: one-sample, income, mu = 5000", {
-  result <- survey_data |> t_test(income, mu = 5000)
-  compare_one_sample(result, spss_values$test_5a_income_one_sample,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, income, mu = 5000, alternative = alternative)
+  }
+  compare_one_sample(run, spss_values$test_5a_income_one_sample,
                      "5a: one-sample income mu=5000")
 })
 
 test_that("Test 5b: one-sample, age, mu = 45", {
-  result <- survey_data |> t_test(age, mu = 45)
-  compare_one_sample(result, spss_values$test_5b_age_one_sample,
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, age, mu = 45, alternative = alternative)
+  }
+  compare_one_sample(run, spss_values$test_5b_age_one_sample,
                      "5b: one-sample age mu=45")
 })
 
-test_that("Test 6: multiple variables simultaneously (trust_* additions)", {
-  # SPSS Test 6 runs t-tests on six DVs at once; the first three (life_sat,
-  # income, age) duplicate Tests 1b-d (already validated). This block adds
-  # validation for trust_government / trust_media / trust_science, which the
-  # legacy test file omitted.
-  result <- survey_data |>
-    t_test(life_satisfaction, income, age,
+test_that("Test 6: multiple variables simultaneously", {
+  # SPSS Test 6 runs t-tests on six DVs at once. The life_satisfaction /
+  # income / age rows (t_test_output.txt:300-309) print exactly the values
+  # of Tests 1b-1d and are compared with those entries; the trust_* rows
+  # have their own entries.
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, income, age,
            trust_government, trust_media, trust_science,
-           group = gender)
+           group = gender, alternative = alternative)
+  }
+  result <- run()
+  # SPSS order of the rows
+  expect_identical(result$results$Variable,
+                   c("life_satisfaction", "income", "age",
+                     "trust_government", "trust_media", "trust_science"))
 
-  expect_equal(nrow(result$results), 6L)
-  expect_setequal(
-    result$results$Variable,
-    c("life_satisfaction", "income", "age",
-      "trust_government", "trust_media", "trust_science")
-  )
-
-  trust_vars <- c("trust_government", "trust_media", "trust_science")
-  for (v in trust_vars) {
-    row_i <- which(result$results$Variable == v)
-    # Build a one-row pseudo-result that compare_two_sample expects
-    sub <- result
-    sub$results <- result$results[row_i, , drop = FALSE]
-    compare_two_sample(sub,
-                       spss_values$test_6_multi_var_trust[[v]],
-                       sprintf("6: %s by gender", v))
+  entries <- c(spss_values[c("test_1b_life_by_gender",
+                             "test_1c_income_by_gender",
+                             "test_1d_age_by_gender")],
+               spss_values$test_6_multi_var_trust)
+  names(entries) <- c("life_satisfaction", "income", "age",
+                      names(spss_values$test_6_multi_var_trust))
+  for (v in names(entries)) {
+    compare_two_sample(run, entries[[v]], sprintf("6: %s by gender", v),
+                       select = row_where(Variable = v))
   }
 })
 
 test_that("Test 7a: alternative CI level 90%, life_satisfaction by gender", {
-  result <- survey_data |>
-    t_test(life_satisfaction, group = gender, conf.level = 0.90)
-
-  r <- result$results[1, ]
-
-  # CI bounds at 90% (precision = 3 dp from SPSS print).
-  spss <- spss_values$test_7a_life_by_gender_90ci
-
-  # Equal-variance branch
-  eq <- r$equal_var_result[[1]]
-  assert_spss(as.numeric(eq$conf.int[1]), spss$equal_var$ci_lower,
-              tier = "display", precision = 3,
-              label = "7a equal-var CI lower (90%)")
-  assert_spss(as.numeric(eq$conf.int[2]), spss$equal_var$ci_upper,
-              tier = "display", precision = 3,
-              label = "7a equal-var CI upper (90%)")
-
-  # Welch branch
-  un <- r$unequal_var_result[[1]]
-  assert_spss(as.numeric(un$conf.int[1]), spss$welch$ci_lower,
-              tier = "display", precision = 3,
-              label = "7a Welch CI lower (90%)")
-  assert_spss(as.numeric(un$conf.int[2]), spss$welch$ci_upper,
-              tier = "display", precision = 3,
-              label = "7a Welch CI upper (90%)")
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, group = gender, conf.level = 0.90,
+           alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_7a_life_by_gender_90ci,
+                     "7a: life_sat by gender, 90% CI")
 })
 
 test_that("Test 7b: alternative CI level 99%, life_satisfaction by gender", {
-  result <- survey_data |>
-    t_test(life_satisfaction, group = gender, conf.level = 0.99)
-
-  r <- result$results[1, ]
-  spss <- spss_values$test_7b_life_by_gender_99ci
-
-  eq <- r$equal_var_result[[1]]
-  assert_spss(as.numeric(eq$conf.int[1]), spss$equal_var$ci_lower,
-              tier = "display", precision = 3,
-              label = "7b equal-var CI lower (99%)")
-  assert_spss(as.numeric(eq$conf.int[2]), spss$equal_var$ci_upper,
-              tier = "display", precision = 3,
-              label = "7b equal-var CI upper (99%)")
-
-  un <- r$unequal_var_result[[1]]
-  assert_spss(as.numeric(un$conf.int[1]), spss$welch$ci_lower,
-              tier = "display", precision = 3,
-              label = "7b Welch CI lower (99%)")
-  assert_spss(as.numeric(un$conf.int[2]), spss$welch$ci_upper,
-              tier = "display", precision = 3,
-              label = "7b Welch CI upper (99%)")
+  run <- function(alternative = "two.sided") {
+    t_test(survey_data, life_satisfaction, group = gender, conf.level = 0.99,
+           alternative = alternative)
+  }
+  compare_two_sample(run, spss_values$test_7b_life_by_gender_99ci,
+                     "7b: life_sat by gender, 99% CI")
 })
 
 
@@ -1240,24 +1161,3 @@ test_that("Edge case: tidyselect helper selects three trust_* variables", {
   expect_setequal(result$results$Variable,
                   c("trust_government", "trust_media", "trust_science"))
 })
-
-
-# =============================================================================
-# NOTE — DESCRIPTIVES VALIDATION GAP
-# =============================================================================
-# SPSS prints a "One-Sample Statistics" table (N, Mean, SD, SE) before the
-# main test for one-sample analyses. mariposa's t_test() does NOT currently
-# expose Mean, SD, SE in its result object — only the test statistics and the
-# observed mean (via mean_diff field).
-#
-# Tests 1a, 2a, 5a, 5b have SPSS reference values for mean/sd/se but cannot
-# be asserted today. This is a t_test() source-code gap, not a test gap. To
-# close it (Phase 2), add a $descriptives or $statistics field to t_test()
-# that exposes those statistics; then add assert_spss() calls in
-# compare_one_sample() above.
-#
-# Until then, this file validates 100% of statistics that the R function
-# currently exposes against SPSS reference values, with no NA placeholders,
-# no inline tolerances, no expect_true(TRUE) reporting blocks, and no
-# scenario-name-based tolerance switching.
-# =============================================================================
