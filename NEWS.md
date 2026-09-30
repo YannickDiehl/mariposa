@@ -1260,6 +1260,12 @@ reference output showed mariposa was wrong.
   compact print; a skipped group shows "not computed (reason)" under its
   `[group]` line.
 
+* Analysis functions called on a data frame without rows stop with one
+  clear message ("`data` has no rows") instead of base-R errors from deep
+  inside (`frequency()`, `reliability()`, `efa()`) or seven repeated
+  weight warnings (`describe()`). Transformations such as `rec()` still
+  pass empty data through.
+
 ### Result export and R Markdown
 
 * `dunn_test()` and `pairwise_wilcoxon()` store their comparison table as

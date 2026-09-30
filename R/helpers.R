@@ -145,6 +145,15 @@ NULL
     cli_abort("No variables selected. Please specify at least one variable.", call = call)
   }
 
+  # Analyses (drop_groups = TRUE) need cases; transformations may pass an
+  # empty data frame through. Without this, 0-row data ended in base-R
+  # errors deep inside (e.g. "Ersetzung hat 1 Zeile, Daten haben 0").
+  if (drop_groups && nrow(data) == 0) {
+    cli_abort(c("{.arg data} has no rows, so there is nothing to analyse.",
+                "i" = "Check the filter or subset that produced it."),
+              call = call)
+  }
+
   if (drop_groups) vars <- .drop_grouping_vars(data, vars, call = call)
   vars
 }

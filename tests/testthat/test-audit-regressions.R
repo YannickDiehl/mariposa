@@ -1166,3 +1166,22 @@ test_that("describe() offers SPSS DESCRIPTIVES' Minimum and Maximum", {
   expect_true(is.na(describe(data.frame(x = NA_real_), x,
                              show = c("min", "max"))$results$x_Min))
 })
+
+test_that("analysis functions on data without rows give one clear error", {
+  # 0.7.4 practice-test leftover: 0-row data gave German base errors
+  # (frequency "Ersetzung hat 1 Zeile", reliability/efa "Laenge von
+  # 'dimnames'") or seven repeated weight warnings (describe).
+  data(survey_data)
+  d0 <- survey_data[0, ]
+  for (f in list(
+    function() frequency(d0, gender),
+    function() describe(d0, age, weights = sampling_weight),
+    function() reliability(d0, trust_government, trust_media, trust_science),
+    function() efa(d0, trust_government, trust_media, trust_science),
+    function() t_test(d0, age, group = gender)
+  )) {
+    expect_error(f(), "no rows")
+  }
+  # transformations keep working on empty data
+  expect_equal(nrow(rec(d0, age, rules = "18:29=1; else=copy")), 0L)
+})
