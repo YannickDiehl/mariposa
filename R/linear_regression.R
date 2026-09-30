@@ -1055,6 +1055,8 @@ linear_regression <- function(data, formula = NULL,
 #'
 #' @param x An object of class \code{"linear_regression"} returned by
 #'   \code{\link{linear_regression}}.
+#' @param digits Number of decimal places for R-squared and the p-value
+#'   (the F statistic keeps one decimal fewer). (Default: 3)
 #' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
@@ -1066,17 +1068,17 @@ linear_regression <- function(data, formula = NULL,
 #'
 #' @export
 #' @method print linear_regression
-print.linear_regression <- function(x, ...) {
+print.linear_regression <- function(x, digits = 3, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
   formula_str <- .formula_label(x$formula)
 
   fit_line <- function(m) {
     sprintf("R2 = %s, adj.R2 = %s, F(%s, %s) = %s, %s, N = %s",
-            .fmt_fixed(m$model_summary$R_squared, 3),
-            .fmt_fixed(m$model_summary$adj_R_squared, 3),
+            .fmt_fixed(m$model_summary$R_squared, digits),
+            .fmt_fixed(m$model_summary$adj_R_squared, digits),
             .fmt_n(m$anova_table$df[1]), .fmt_n(m$anova_table$df[2]),
-            .fmt_est(m$anova_table$F_statistic[1], 2),
-            format_p_stars(m$anova_table$Sig[1]),
+            .fmt_est(m$anova_table$F_statistic[1], max(digits - 1L, 1L)),
+            format_p_stars(m$anova_table$Sig[1], digits),
             .fmt_n(m$n))
   }
 

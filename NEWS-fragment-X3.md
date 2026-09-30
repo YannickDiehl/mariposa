@@ -52,3 +52,8 @@
   of `chi_square()`, `fisher_test()`, `mcnemar_test()` and `crosstab()`
   and the chi-square "Table size" line used the multiplication sign
   (U+00D7), the correlation, factorial and post-hoc output an "x".
+* `print()` of `linear_regression()`, `logistic_regression()` and
+  `normality_test()` results accepts `digits` like every other compact
+  print (R-squared, statistics and p-values ignored it). The grouped
+  `normality_test()` compact print shows the test results under a
+  `[group]` line for every group instead of only the number of groups.

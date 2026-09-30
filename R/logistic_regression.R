@@ -757,6 +757,8 @@ logistic_regression <- function(data, formula = NULL,
 #'
 #' @param x An object of class \code{"logistic_regression"} returned by
 #'   \code{\link{logistic_regression}}.
+#' @param digits Number of decimal places for the pseudo R-squared and the
+#'   p-value (chi-square one decimal fewer). (Default: 3)
 #' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
@@ -769,7 +771,7 @@ logistic_regression <- function(data, formula = NULL,
 #'
 #' @export
 #' @method print logistic_regression
-print.logistic_regression <- function(x, ...) {
+print.logistic_regression <- function(x, digits = 3, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
   formula_str <- .formula_label(x$formula)
   # The modelled category (internal value 1), e.g. "[P(vote = yes)]"
@@ -779,9 +781,10 @@ print.logistic_regression <- function(x, ...) {
 
   fit_line <- function(m) {
     sprintf("Nagelkerke R2 = %s, chi2(%s) = %s, %s, Accuracy = %.1f%%, N = %s",
-            .fmt_fixed(m$model_summary$nagelkerke_r2, 3),
-            .fmt_n(m$omnibus_test$df), .fmt_est(m$omnibus_test$chi_sq, 2),
-            format_p_stars(m$omnibus_test$p),
+            .fmt_fixed(m$model_summary$nagelkerke_r2, digits),
+            .fmt_n(m$omnibus_test$df),
+            .fmt_est(m$omnibus_test$chi_sq, max(digits - 1L, 1L)),
+            format_p_stars(m$omnibus_test$p, digits),
             m$classification$overall_pct,
             .fmt_n(m$n))
   }

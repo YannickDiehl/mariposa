@@ -282,12 +282,12 @@ normality_test <- function(data, ...) {
 #'
 #' @description
 #' Compact print method for objects of class \code{"normality_test"}.
-#' Shows one line per variable with both test results. For grouped
-#' analyses, only the dimensions are shown — use \code{summary()} for the
-#' per-group tables.
+#' Shows one line per variable with both test results; grouped analyses
+#' show these lines under a \code{[group]} line for every group.
 #'
 #' @param x An object of class \code{"normality_test"} returned by
 #'   \code{\link{normality_test}}.
+#' @param digits Number of decimal places. (Default: 3)
 #' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the input object \code{x}.
@@ -299,38 +299,48 @@ normality_test <- function(data, ...) {
 #'
 #' @export
 #' @method print normality_test
-print.normality_test <- function(x, ...) {
-  cat(sprintf("Normality Tests: %s\n", paste(x$variables, collapse = ", ")))
+print.normality_test <- function(x, digits = 3, ...) {
+  grouped <- isTRUE(x$is_grouped)
+  cat(sprintf("Normality Tests: %s%s\n", paste(x$variables, collapse = ", "),
+              if (grouped) sprintf(" [Grouped: %s]",
+                                   paste(x$group_vars, collapse = ", ")) else ""))
 
-  if (x$is_grouped) {
-    n_groups <- nrow(unique(x$results[x$group_vars]))
-    cat(sprintf("  %d group combination(s) x %d variable(s) [Grouped: %s]\n",
-                n_groups, length(x$variables),
-                paste(x$group_vars, collapse = ", ")))
-  } else {
-    for (i in seq_len(nrow(x$results))) {
-      r <- x$results[i, ]
-      if ("note" %in% names(r) && !is.na(r$note)) {
-        cat(sprintf("  %s: not computed (%s)\n", r$Variable, r$note))
-        next
-      }
-      sw_str <- if (is.na(r$shapiro_w)) {
-        "Shapiro-Wilk n/a"
-      } else {
-        sprintf("Shapiro-Wilk W = %.3f, %s", r$shapiro_w,
-                format_p_compact(r$shapiro_p))
-      }
-      ks_str <- if (is.na(r$ks_statistic)) {
-        "KS n/a"
-      } else {
-        sprintf("KS = %.3f, %s", r$ks_statistic, format_p_compact(r$ks_p))
-      }
-      cat(sprintf("  %s: %s; %s (n = %d)\n", r$Variable, ks_str, sw_str, r$n))
-    }
-  }
+  # One line per variable; grouped results under a "[group]" line, as in
+  # the other compact prints (it showed only the number of groups)
+  for_each_group(x$results, if (grouped) x$group_vars, function(rows, key) {
+    if (!is.null(key)) cat(sprintf("[%s]\n", .format_group_label(key)))
+    .print_normality_lines(rows, digits)
+  }, header = FALSE)
 
   cat("Use summary() for detailed output.\n")
   invisible(x)
+}
+
+#' Compact normality lines, one per variable
+#' @noRd
+.print_normality_lines <- function(rows, digits = 3) {
+  for (i in seq_len(nrow(rows))) {
+    r <- rows[i, ]
+    if ("note" %in% names(r) && !is.na(r$note)) {
+      cat(sprintf("  %s: not computed (%s)\n", r$Variable, r$note))
+      next
+    }
+    sw_str <- if (is.na(r$shapiro_w)) {
+      "Shapiro-Wilk n/a"
+    } else {
+      sprintf("Shapiro-Wilk W = %s, %s", fmt_num(r$shapiro_w, digits),
+              format_p_compact(r$shapiro_p, digits))
+    }
+    ks_str <- if (is.na(r$ks_statistic)) {
+      "KS n/a"
+    } else {
+      sprintf("KS = %s, %s", fmt_num(r$ks_statistic, digits),
+              format_p_compact(r$ks_p, digits))
+    }
+    cat(sprintf("  %s: %s; %s (n = %s)\n", r$Variable, ks_str, sw_str,
+                fmt_int(r$n)))
+  }
+  invisible(NULL)
 }
 
 

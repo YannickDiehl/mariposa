@@ -209,6 +209,34 @@ test_that("EDGE-23: variable pairs are joined by ASCII 'x' everywhere", {
   expect_true(any(grepl("Table size: 4 x 2", outs, fixed = TRUE)))
 })
 
+# --- EDGE-22: digits honoured in the compact lines ------------------------------
+
+test_that("EDGE-22: print(digits =) works for regressions and normality_test", {
+  # print.linear_regression/print.logistic_regression/print.normality_test
+  # had no digits argument: R2 = 0.201 and KS = 0.028 whatever was asked.
+  lr <- linear_regression(survey_data, life_satisfaction ~ age + income)
+  expect_match(capture.output(print(lr, digits = 1))[2], "R2 = 0\\.2, adj\\.R2 = 0\\.2")
+  expect_match(capture.output(print(lr, digits = 4))[2], "R2 = 0\\.2010, adj\\.R2 = 0\\.2002")
+  d <- survey_data
+  d$hi <- as.integer(d$life_satisfaction >= 4)
+  lg <- logistic_regression(d, hi ~ age + income)
+  expect_match(capture.output(print(lg, digits = 2))[2], "Nagelkerke R2 = 0\\.21,")
+  nt <- normality_test(survey_data, age)
+  expect_match(capture.output(print(nt, digits = 2))[2],
+               "KS = 0\\.03, p < 0\\.001; Shapiro-Wilk W = 0\\.99")
+})
+
+test_that("EDGE-23: grouped normality_test() compact print shows the results", {
+  # It printed only "2 group combination(s) x 1 variable(s)".
+  nt <- normality_test(dplyr::group_by(survey_data, region), age)
+  out <- capture.output(print(nt))
+  expect_true(any(grepl("Grouped: region", out, fixed = TRUE)))
+  expect_true(any(grepl("[region = East]", out, fixed = TRUE)))
+  expect_true(any(grepl("[region = West]", out, fixed = TRUE)))
+  expect_identical(sum(grepl("^  age: KS = ", out)), 2L)
+  expect_false(any(grepl("group combination", out, fixed = TRUE)))
+})
+
 # --- EDGE-23: one group-header style, no trailing blanks in headers -----------
 
 test_that("EDGE-23: verbose group headers share one style without a trailing blank", {
