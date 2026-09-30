@@ -1888,7 +1888,7 @@ test_that("print.summary.levene_test produces output", {
   s <- summary(result)
   output <- expect_summary_prints(s, "Levene")
   expect_true(any(grepl("Levene's Test Results", output, fixed = TRUE)))
-  expect_true(any(grepl("F_statistic", output, fixed = TRUE)))
+  expect_true(any(grepl("Levene Statistic", output, fixed = TRUE)))
   expect_true(any(grepl("Variance", output, ignore.case = TRUE)))
 })
 

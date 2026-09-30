@@ -492,11 +492,10 @@ perform_single_levene_test <- function(data, var_name, group_name, weight_name =
   }
 
   cat(sprintf("Levene's Test: %s%s%s\n", rows$Variable[i], group_tag, weighted_tag))
-  cat(sprintf("  F(%s, %s) = %s, %s %s%s\n",
+  cat(sprintf("  F(%s, %s) = %s, %s%s\n",
               formatC(as.integer(df1), format = "d"), df2_str,
               fmt_num(F_val, digits),
-              fmt_p(p_val, digits, style = "compact"),
-              add_significance_stars(p_val),
+              format_p_stars(p_val, digits),
               concl_str))
 }
 
@@ -646,151 +645,53 @@ print.summary.levene_test <- function(x, ...) {
     "Center" = x$center
   )
   print_info_section(test_info)
-  cat("\n")
 
-  # Add significance stars
-  x$results$sig <- sapply(x$results$p_value, add_significance_stars)
+  results_title <- if (!is.null(x$weights)) {
+    "Weighted Levene's Test Results"
+  } else {
+    "Levene's Test Results"
+  }
 
-  # Check if this is grouped data
-  is_grouped_data <- isTRUE(x$is_grouped)
-  if (show_results && is_grouped_data) {
-    # Handle grouped results - group by group identity, then show all variables for each group
-
-    # Get unique groups
-    if ("Group" %in% names(x$results)) {
-      # Direct grouped analysis: Group column like "eastwest=East"
-      unique_groups <- unique(x$results$Group)
-      group_column <- "Group"
-    } else if (!is.null(x$groups) && length(x$groups) > 0) {
-      # t_test grouped analysis: separate column for each group variable
-      group_combinations <- unique(x$results[x$groups])
-      unique_groups <- apply(group_combinations, 1, function(row) {
-        group_parts <- sapply(x$groups, function(group_var) {
-          paste(group_var, "=", row[group_var])
-        })
-        paste(group_parts, collapse = ", ")
-      })
-      group_column <- x$groups
-    } else {
-      # Fallback - check for any non-standard columns that might be group indicators
-      non_standard_cols <- setdiff(names(x$results), c("Variable", "F_statistic", "df1", "df2", "p_value", "sig", "conclusion"))
-      if (length(non_standard_cols) > 0) {
-        group_column <- non_standard_cols[1]
-        unique_groups <- unique(x$results[[group_column]])
-        unique_groups <- paste(group_column, "=", unique_groups)
-      } else {
-        unique_groups <- "Unknown Group"
-        group_column <- NULL
-      }
-    }
-
-    # Process each unique group - similar to t_test format
-    for (group_idx in seq_along(unique_groups)) {
-      group_label <- unique_groups[group_idx]
-
-      # Filter results for current group
-      if ("Group" %in% names(x$results)) {
-        # Direct group column - group_label is the raw Group value
-        group_results <- x$results[x$results$Group == group_label, ]
-      } else if (!is.null(x$groups) && length(x$groups) > 0) {
-        # For multi-column grouping, match all group columns
-        group_results <- x$results
-        group_combination <- group_combinations[group_idx, , drop = FALSE]
-        for (g in x$groups) {
-          group_results <- group_results[.group_match(group_results[[g]], group_combination[[g]]), ]
-        }
-      } else if (!is.null(group_column)) {
-        group_value <- unique(x$results[[group_column]])[group_idx]
-        group_results <- x$results[.group_match(x$results[[group_column]], group_value), ]
-      } else {
-        group_results <- x$results
-      }
-
-      if (nrow(group_results) == 0) next
-
-      # Show group header only once - similar to t_test format
-      # Format group label according to template standard (ensure single spaces around =)
-      formatted_group_label <- gsub(" = ", "=", group_label)  # Remove existing spaces
-      formatted_group_label <- gsub("=", " = ", formatted_group_label)  # Add single spaces
-      cat(sprintf("\nGroup: %s\n", formatted_group_label))
-
-      # Process each variable in this group as separate blocks
-      for (i in seq_len(nrow(group_results))) {
-        group_row <- group_results[i, ]
-        var_name <- group_row$Variable
-
-        cat(sprintf("\n--- %s ---\n", var_name))
-        cat("\n")  # Add blank line after variable name
-
-        # Create results table for this variable
-        results_df <- data.frame(
-          Variable = group_row$Variable,
-          F_statistic = round(group_row$F_statistic, digits),
-          df1 = group_row$df1,
-          df2 = group_row$df2,
-          p_value = round(group_row$p_value, digits),
-          sig = group_row$sig,
-          Conclusion = group_row$conclusion,
-          stringsAsFactors = FALSE
-        )
-
-        # Calculate border width
-        col_widths <- sapply(names(results_df), function(col) {
-          max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
-        })
-        total_width <- sum(col_widths) + length(col_widths) - 1
-        border_width <- paste(rep("-", total_width), collapse = "")
-
-        cat(sprintf("%s:\n", ifelse(!is.null(x$weights), "Weighted Levene's Test Results", "Levene's Test Results")))
-        cat(border_width, "\n")
-        print(results_df, row.names = FALSE)
-        cat(border_width, "\n")
-      }
-    }
-
-  } else if (show_results) {
-    # Handle ungrouped results (original behavior)
-    valid_results <- x$results[!is.na(x$results$Variable), ]
-
-    # Process each variable separately like in t-test
-    for (i in seq_len(nrow(valid_results))) {
-      var_name <- valid_results$Variable[i]
-
-      # Add variable box like in t-test
-      cat(sprintf("\n--- %s ---\n", var_name))
-      cat("\n")  # Add blank line after variable name
-
-      # Create results table for this variable
-      results_df <- data.frame(
-        Variable = valid_results$Variable[i],
-        F_statistic = round(valid_results$F_statistic[i], digits),
-        df1 = valid_results$df1[i],
-        df2 = valid_results$df2[i],
-        p_value = round(valid_results$p_value[i], digits),
-        sig = valid_results$sig[i],
-        Conclusion = valid_results$conclusion[i],
-        stringsAsFactors = FALSE
-      )
-
-      # Calculate border width
-      col_widths <- sapply(names(results_df), function(col) {
-        max(nchar(as.character(results_df[[col]])), nchar(col), na.rm = TRUE)
-      })
-      total_width <- sum(col_widths) + length(col_widths) - 1
-      border_width <- paste(rep("-", total_width), collapse = "")
-
-      cat(sprintf("%s:\n", ifelse(!is.null(x$weights), "Weighted Levene's Test Results", "Levene's Test Results")))
-      cat(border_width, "\n")
-      print(results_df, row.names = FALSE)
-      cat(border_width, "\n")
-
-      if (i < nrow(valid_results)) {
-        cat("\n")  # Add spacing between variables
-      }
-    }
+  # One table per group: all variables, SPSS columns (Levene Statistic,
+  # df1, df2, Sig.), fixed decimals and `digits` (p used to print as a bare
+  # 0 and df2 as 474.2032 next to 3)
+  print_table <- function(rows) {
+    rows <- rows[!is.na(rows$Variable), , drop = FALSE]
+    if (nrow(rows) == 0) return(invisible(NULL))
+    p <- as.numeric(rows$p_value)
+    f <- as.numeric(rows$F_statistic)
+    note <- if ("note" %in% names(rows)) rows$note else rep(NA_character_, nrow(rows))
+    concl <- ifelse(is.na(f),
+                    paste0("not computed (", ifelse(is.na(note), "see warning", note), ")"),
+                    rows$conclusion)
+    cat(sprintf("\n%s:\n", results_title))
+    .print_table_utf8(data.frame(
+      Variable = rows$Variable,
+      `Levene Statistic` = fmt_num(f, digits),
+      df1 = .fmt_df(rows$df1, digits),
+      df2 = .fmt_df(rows$df2, digits),
+      Sig = fmt_p(p, digits),
+      sig = add_significance_stars(p),
+      Conclusion = concl,
+      check.names = FALSE, stringsAsFactors = FALSE
+    ), col_labels = c(sig = ""))
   }
 
   if (show_results) {
+    if (isTRUE(x$is_grouped) && "Group" %in% names(x$results)) {
+      # Objects created before 0.7.4: one "Group" label column
+      for (label in unique(x$results$Group)) {
+        cat(sprintf("\nGroup: %s\n", label))
+        print_table(x$results[x$results$Group == label, , drop = FALSE])
+      }
+    } else if (isTRUE(x$is_grouped) && length(x$groups) > 0 &&
+               all(x$groups %in% names(x$results))) {
+      for_each_group(x$results, x$groups, function(rows, group_values) {
+        print_table(rows)
+      })
+    } else {
+      print_table(x$results)
+    }
     print_significance_legend()
   }
 
@@ -800,31 +701,64 @@ print.summary.levene_test <- function(x, ...) {
     cat("- p <= 0.05: Variances are heterogeneous (equal variances NOT assumed)\n")
   }
 
-  # Always show recommendation for grouped data (gated by recommendation toggle)
   if (show_recommendation) {
-    if (is_grouped_data) {
+    lines <- .levene_recommendation(x)
+    if (length(lines) > 0) {
       cat("\nRecommendation based on Levene test:\n")
-      unequal_groups <- sum(x$results$p_value <= 0.05, na.rm = TRUE)
-      if (unequal_groups > 0) {
-        cat(sprintf("- %d group(s) show unequal variances (p <= 0.05)\n", unequal_groups))
-        cat("- Consider using Welch's t-test for groups with unequal variances\n")
-      } else {
-        cat("- All groups show equal variances (p > 0.05)\n")
-        cat("- Standard t-test assumptions are met for all groups\n")
-      }
-    } else if (!is.null(x$original_test)) {
-      cat("\nRecommendation based on Levene test:\n")
-      if (any(x$results$p_value <= 0.05, na.rm = TRUE)) {
-        cat("- Use Welch's t-test (unequal variances)\n")
-      } else {
-        cat("- Student's t-test or Welch's t-test both appropriate\n")
-      }
+      cat(paste0("- ", lines, "\n"), sep = "")
     }
   }
 
   invisible(x)
 }
 
+#' Follow-up recommendation for a Levene result
+#'
+#' Welch's t-test is only an option for two groups. For three or more groups
+#' the robust alternative is Welch's ANOVA (SPSS "Robust Tests of Equality of
+#' Means", shown by summary(oneway_anova())); factorial designs have no
+#' Welch test in SPSS UNIANOVA. The old text recommended "Welch's t-test"
+#' for every design.
+#'
+#' @param x levene_test (or summary) object
+#' @return Character vector of recommendation lines (may be empty)
+#' @noRd
+.levene_recommendation <- function(x) {
+  res <- x$results
+  tested <- !is.na(res$p_value)
+  if (!any(tested)) return(character(0))
+  n_unequal <- sum(res$p_value[tested] <= 0.05)
+  is_grouped <- isTRUE(x$is_grouped)
+  if (!is_grouped && is.null(x$original_test)) return(character(0))
 
+  factorial <- inherits(x$original_test, "factorial_anova")
+  two_groups <- !factorial && all(res$df1[tested] == 1)
 
+  status <- if (is_grouped || nrow(res) > 1) {
+    sprintf("%d of %d tests show unequal variances (p <= 0.05)",
+            n_unequal, sum(tested))
+  } else if (n_unequal > 0) {
+    "Variances are unequal (p <= 0.05)"
+  } else {
+    "Variances are equal (p > 0.05)"
+  }
 
+  advice <- if (n_unequal == 0) {
+    if (factorial) {
+      "The equal-variance assumption of the ANOVA F tests is met"
+    } else if (two_groups) {
+      "Student's t-test or Welch's t-test both appropriate"
+    } else {
+      "The classical ANOVA F test is appropriate"
+    }
+  } else if (factorial) {
+    c("Interpret the F tests with caution (factorial designs have no Welch test)",
+      "Consider a variance-stabilizing transformation or robust methods")
+  } else if (two_groups) {
+    "Use Welch's t-test (equal variances not assumed)"
+  } else {
+    c("Use Welch's ANOVA (Robust Tests of Equality of Means in summary(oneway_anova()))",
+      "Prefer post-hoc tests that do not assume equal variances")
+  }
+  c(status, advice)
+}

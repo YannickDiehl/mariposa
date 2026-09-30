@@ -80,3 +80,11 @@
   variance prints "not computed (no variance ...)", and `weights` follow
   the package policy (negative or non-numeric weights are an error; they
   were accepted). (PAR-03, PAR-12, EDGE-04)
+* `summary(levene_test())` prints one SPSS-style table per group (Levene
+  Statistic, df1, df2, Sig.) with fixed decimals and `digits` (p printed as
+  a bare 0, df2 as 474.2032 next to 3), and its recommendation fits the
+  design: Welch's ANOVA for three or more groups, Welch's t-test only for
+  two groups, a caution for factorial designs. It used to recommend
+  "Welch's t-test" after `oneway_anova()` and `factorial_anova()`. The
+  compact line no longer ends in "p = 0.125 , variances equal". (PAR-14,
+  PAR-21)

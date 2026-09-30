@@ -411,3 +411,39 @@ test_that("levene_test() applies the package weights policy", {
   expect_error(levene_test(dplyr::group_by(d, region), life_satisfaction,
                            group = gender, weights = w_neg), "negative")
 })
+
+test_that("PAR-14: Levene recommends Welch's ANOVA for k > 2, not Welch's t-test", {
+  ow <- oneway_anova(survey_data, income, group = education)
+  out <- capture.output(print(summary(levene_test(ow))))
+  expect_false(any(grepl("t-test", out, fixed = TRUE)))
+  expect_true(any(grepl("Welch's ANOVA", out, fixed = TRUE)))
+
+  og <- oneway_anova(dplyr::group_by(survey_data, region), income, group = education)
+  out_g <- capture.output(print(summary(levene_test(og))))
+  expect_false(any(grepl("t-test", out_g, fixed = TRUE)))
+
+  fa <- factorial_anova(survey_data, dv = income, between = c(gender, education))
+  out_f <- capture.output(print(summary(levene_test(fa))))
+  expect_false(any(grepl("t-test", out_f, fixed = TRUE)))
+
+  tt <- t_test(survey_data, income, group = gender)
+  out_t <- capture.output(print(summary(levene_test(tt))))
+  expect_true(any(grepl("t-test", out_t, fixed = TRUE)))
+})
+
+test_that("PAR-21: levene summary: p as <.001, SPSS df, digits; compact without dangling space", {
+  # p printed as a bare 0, df2 "474.2032" next to df1 3, digits ignored;
+  # compact "p = 0.125 , variances equal".
+  r <- levene_test(dplyr::group_by(survey_data, region), life_satisfaction,
+                   group = education, weights = sampling_weight)
+  out <- capture.output(print(summary(r)))
+  row <- out[grepl("^ +life_satisfaction", out)][1]
+  expect_match(row, "<\\.001")
+  expect_false(grepl(" 0 ", row))
+  expect_match(row, " [0-9]+\\.[0-9]{3} ")
+  out2 <- capture.output(print(summary(r, digits = 1)))
+  expect_true(any(grepl("^ +life_satisfaction +[0-9]+\\.[0-9] ", out2)))
+  d <- survey_data
+  out_c <- capture.output(print(levene_test(d, life_satisfaction, group = gender)))
+  expect_false(any(grepl(" ,", out_c, fixed = TRUE)))
+})
